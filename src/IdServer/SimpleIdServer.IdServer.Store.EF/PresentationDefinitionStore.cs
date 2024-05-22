@@ -16,9 +16,6 @@ public class PresentationDefinitionStore : IPresentationDefinitionStore
         _dbContext = dbContext;
     }
 
-    public IQueryable<PresentationDefinition> Query()
-        => _dbContext.PresentationDefinitions;
-
     public Task<List<PresentationDefinition>> GetAll(string realm, CancellationToken cancellationToken)
     {
         var result = _dbContext.PresentationDefinitions

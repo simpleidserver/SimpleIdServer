@@ -18,7 +18,8 @@ public class SugarRegistrationWorkflow
     public bool IsDefault { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarApiResourceRealm.RealmsName), nameof(SugarApiResourceRealm.ApiResourcesId))]
     public SugarRealm Realm { get; set; }
-    public ICollection<SugarAuthenticationContextClassReference> Acrs { get; set; }
+    [Navigate(NavigateType.OneToMany, nameof(SugarAuthenticationContextClassReference.RegistrationWorkflowId)]
+    public List<SugarAuthenticationContextClassReference> Acrs { get; set; }
 
     public RegistrationWorkflow ToDomain()
     {

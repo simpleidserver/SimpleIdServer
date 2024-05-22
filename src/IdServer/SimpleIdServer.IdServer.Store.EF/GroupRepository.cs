@@ -74,13 +74,14 @@ public class GroupRepository : IGroupRepository
                 .Where(g => g.Realms.Any(r => r.RealmsName == realm) && g.FullPath.StartsWith(fullPath) && g.Id != id)
                 .ToListAsync(cancellationToken);
 
-    public IQueryable<Group> Query() => _dbContext.Groups;
-
     public void Add(Group group) => _dbContext.Groups.Add(group);
 
-    public void DeleteRange(IEnumerable<Group> groups) => _dbContext.Groups.RemoveRange(groups);
+    public void Update()
+    {
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    public void DeleteRange(IEnumerable<Group> groups) => _dbContext.Groups.RemoveRange(groups);
 
     public virtual async Task BulkUpdate(List<Group> groups)
     {

@@ -121,13 +121,16 @@ namespace SimpleIdServer.IdServer.Api.Groups
             {
                 try
                 {
-                    activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
-                    var result = await _groupRepository.GetAllByFullPath(prefix, request.FullPath, cancellationToken);
-                    _groupRepository.DeleteRange(result);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Groups {request.FullPath} are removed");
-                    await _groupRepository.SaveChanges(CancellationToken.None);
-                    return new NoContentResult();
+                    using (var transaction = _transactionBuilder.Build())
+                    {
+                        activity?.SetTag("realm", prefix);
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
+                        var result = await _groupRepository.GetAllByFullPath(prefix, request.FullPath, cancellationToken);
+                        _groupRepository.DeleteRange(result);
+                        activity?.SetStatus(ActivityStatusCode.Ok, $"Groups {request.FullPath} are removed");
+                        await transaction.Commit(cancellationToken);
+                        return new NoContentResult();
+                    }
                 }
                 catch (OAuthException ex)
                 {
@@ -206,22 +209,26 @@ namespace SimpleIdServer.IdServer.Api.Groups
             {
                 try
                 {
-                    activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
-                    var result = await _groupRepository.Get(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
-                    var scope = await _scopeRepository.GetByName(prefix, request.Scope, cancellationToken);
-                    if(scope == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScope, request.Scope));
-                    result.Roles.Add(scope);
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    await _groupRepository.SaveChanges(CancellationToken.None);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Group role {request.Scope} is added");
-                    return new ContentResult
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        StatusCode = (int)HttpStatusCode.Created,
-                        Content = JsonSerializer.Serialize(scope).ToString(),
-                        ContentType = "application/json"
-                    };
+                        activity?.SetTag("realm", prefix);
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
+                        var result = await _groupRepository.Get(prefix, id, cancellationToken);
+                        if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
+                        var scope = await _scopeRepository.GetByName(prefix, request.Scope, cancellationToken);
+                        if (scope == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScope, request.Scope));
+                        result.Roles.Add(scope);
+                        result.UpdateDateTime = DateTime.UtcNow;
+                        _groupRepository.Update(result);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(ActivityStatusCode.Ok, $"Group role {request.Scope} is added");
+                        return new ContentResult
+                        {
+                            StatusCode = (int)HttpStatusCode.Created,
+                            Content = JsonSerializer.Serialize(scope).ToString(),
+                            ContentType = "application/json"
+                        };
+                    }
                 }
                 catch (OAuthException ex)
                 {
@@ -240,17 +247,21 @@ namespace SimpleIdServer.IdServer.Api.Groups
             {
                 try
                 {
-                    activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
-                    var result = await _groupRepository.Get(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
-                    var role = result.Roles.SingleOrDefault(r => r.Id == roleId);
-                    if (role == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownGroupRole, roleId));
-                    result.Roles.Remove(role);
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    await _groupRepository.SaveChanges(CancellationToken.None);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Group role {roleId} is removed");
-                    return new NoContentResult();
+                    using (var transaction = _transactionBuilder.Build())
+                    {
+                        activity?.SetTag("realm", prefix);
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Groups.Name);
+                        var result = await _groupRepository.Get(prefix, id, cancellationToken);
+                        if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
+                        var role = result.Roles.SingleOrDefault(r => r.Id == roleId);
+                        if (role == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownGroupRole, roleId));
+                        result.Roles.Remove(role);
+                        result.UpdateDateTime = DateTime.UtcNow;
+                        _groupRepository.Update(result);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(ActivityStatusCode.Ok, $"Group role {roleId} is removed");
+                        return new NoContentResult();
+                    }
                 }
                 catch (OAuthException ex)
                 {

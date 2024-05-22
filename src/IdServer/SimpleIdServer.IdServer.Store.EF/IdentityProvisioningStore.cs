@@ -46,11 +46,12 @@ public class IdentityProvisioningStore : IIdentityProvisioningStore
                     .SingleOrDefaultAsync(p => p.Realms.Any(r => r.Name == realm) && p.Id == id, cancellationToken);
     }
 
-    public IQueryable<IdentityProvisioning> Query() => _dbContext.IdentityProvisioningLst;
-
     public void DeleteRange(IEnumerable<IdentityProvisioning> identityProvisioningLst) => _dbContext.IdentityProvisioningLst.RemoveRange(identityProvisioningLst);
 
     public void Remove(IdentityProvisioning identityProvisioning) => _dbContext.IdentityProvisioningLst.Remove(identityProvisioning);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(IdentityProvisioning identityProvisioning)
+    {
+
+    }
 }

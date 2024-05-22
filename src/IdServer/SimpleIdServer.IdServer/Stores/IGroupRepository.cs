@@ -3,7 +3,6 @@
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,10 +16,9 @@ public interface IGroupRepository
     Task<List<Group>> GetAllByFullPath(string realm, string fullPath, CancellationToken cancellationToken);
     Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken);
     Task<List<Group>> GetAllByFullPath(string realm, string id, string fullPath, CancellationToken cancellationToken);
-    IQueryable<Group> Query();
     void Add(Group group);
+    void Update(Group group);
     void DeleteRange(IEnumerable<Group> groups);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
     Task BulkUpdate(List<Group> groups);
     Task BulkUpdate(List<GroupRealm> groupRealms);
 }

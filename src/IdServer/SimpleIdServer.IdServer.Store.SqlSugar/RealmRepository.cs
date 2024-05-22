@@ -30,11 +30,16 @@ public class RealmRepository : IRealmRepository
     }
 
     public void Add(Realm realm)
-        => _dbContext.Client.Insertable(new SugarRealm
+        => _dbContext.Client.Insertable(Transform(realm)).ExecuteCommand();
+
+    private static SugarRealm Transform(Realm realm)
+    {
+        return new SugarRealm
         {
             CreateDateTime = realm.CreateDateTime,
             UpdateDateTime = realm.UpdateDateTime,
             Description = realm.Description,
             RealmsName = realm.Name
-        }).ExecuteCommand();
+        };
+    }
 }

@@ -3,7 +3,6 @@
 
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,8 +14,7 @@ public interface IRegistrationWorkflowRepository
     Task<RegistrationWorkflow> GetByName(string realm, string name, CancellationToken cancellationToken);
     Task<RegistrationWorkflow> GetDefault(string realm, CancellationToken cancellationToken);
     Task<List<RegistrationWorkflow>> GetAll(string realm,  CancellationToken cancellationToken);
-    IQueryable<RegistrationWorkflow> Query();
     void Delete(RegistrationWorkflow record);
     void Add(RegistrationWorkflow record);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
+    void Update(RegistrationWorkflow record);
 }

@@ -25,24 +25,24 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
     {
         private readonly IBusControl _busControl;
         private readonly IIdentityProvisioningStore _identityProvisioningStore;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
         private readonly IEnumerable<IProvisioningService> _provisioningServices;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public IdentityProvisioningController(
             IBusControl busControl,
             IIdentityProvisioningStore identityProvisioningStore, 
-            IServiceProvider serviceProvider, 
             ITokenRepository tokenRepository, 
             IJwtBuilder jwtBuilder, 
             IConfiguration configuration, 
-            IEnumerable<IProvisioningService> provisioningServices) : base(tokenRepository, jwtBuilder)
+            IEnumerable<IProvisioningService> provisioningServices,
+            ITransactionBuilder transactionBuilder) : base(tokenRepository, jwtBuilder)
         {
             _busControl = busControl;
             _identityProvisioningStore = identityProvisioningStore;
-            _serviceProvider = serviceProvider;
             _configuration = configuration;
             _provisioningServices = provisioningServices;
+            _transactionBuilder = transactionBuilder;
         }
 
         [HttpPost]
@@ -93,12 +93,16 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                result.Description = request.Description;
-                await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                return NoContent();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    result.Description = request.Description;
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    return NoContent();
+                }
             }
             catch(OAuthException ex)
             {
@@ -112,14 +116,18 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                result.UpdateDateTime = DateTime.UtcNow;
-                SyncConfiguration(result, request.Values);
-                await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                return NoContent();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    SyncConfiguration(result, request.Values);
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    return NoContent();
+                }
             }
             catch (OAuthException ex)
             {
@@ -133,15 +141,19 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                var mapper = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
-                if (mapper == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, mapperId));
-                result.UpdateDateTime = DateTime.UtcNow;
-                result.Definition.MappingRules = result.Definition.MappingRules.Where(r => r.Id != mapperId).ToList();
-                await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                return NoContent();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    var mapper = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
+                    if (mapper == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, mapperId));
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    result.Definition.MappingRules = result.Definition.MappingRules.Where(r => r.Id != mapperId).ToList();
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    return NoContent();
+                }
             }
             catch (OAuthException ex)
             {
@@ -155,34 +167,38 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                if (IProvisioningMappingRule.IsUnique(request.MappingRule) && result.Definition.MappingRules.Any(r => r.MapperType == request.MappingRule))
-                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.IdProvisioningTypeUnique);
-
-                // TODO : Check GROUPNAME can be added when usage is GROUP.
-                // TODO : Check SUBJECT or USERATTRIBUTE can be added when usage is USER.
-
-                result.UpdateDateTime = DateTime.UtcNow;
-                var record = new IdentityProvisioningMappingRule
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    From = request.From,
-                    MapperType = request.MappingRule,
-                    TargetUserAttribute = request.TargetUserAttribute,
-                    TargetUserProperty = request.TargetUserProperty,
-                    HasMultipleAttribute = request.HasMultipleAttribute,
-                    Usage = request.Usage
-                };
-                result.Definition.MappingRules.Add(record);
-                await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                return new ContentResult
-                {
-                    StatusCode = (int)HttpStatusCode.Created,
-                    Content = JsonSerializer.Serialize(Build(record)),
-                    ContentType = "application/json"
-                };
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    if (IProvisioningMappingRule.IsUnique(request.MappingRule) && result.Definition.MappingRules.Any(r => r.MapperType == request.MappingRule))
+                        return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.IdProvisioningTypeUnique);
+
+                    // TODO : Check GROUPNAME can be added when usage is GROUP.
+                    // TODO : Check SUBJECT or USERATTRIBUTE can be added when usage is USER.
+
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    var record = new IdentityProvisioningMappingRule
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        From = request.From,
+                        MapperType = request.MappingRule,
+                        TargetUserAttribute = request.TargetUserAttribute,
+                        TargetUserProperty = request.TargetUserProperty,
+                        HasMultipleAttribute = request.HasMultipleAttribute,
+                        Usage = request.Usage
+                    };
+                    result.Definition.MappingRules.Add(record);
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    return new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.Created,
+                        Content = JsonSerializer.Serialize(Build(record)),
+                        ContentType = "application/json"
+                    };
+                }
             }
             catch (OAuthException ex)
             {
@@ -196,18 +212,22 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
-                if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, id));
-                result.UpdateDateTime = DateTime.UtcNow;
-                mapperRule.From = request.From;
-                mapperRule.TargetUserAttribute = request.TargetUserAttribute;
-                mapperRule.TargetUserProperty = request.TargetUserProperty;
-                mapperRule.HasMultipleAttribute = request.HasMultipleAttribute;
-                await _identityProvisioningStore.SaveChanges(cancellationToken);
-                return NoContent();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
+                    if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, id));
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    mapperRule.From = request.From;
+                    mapperRule.TargetUserAttribute = request.TargetUserAttribute;
+                    mapperRule.TargetUserProperty = request.TargetUserProperty;
+                    mapperRule.HasMultipleAttribute = request.HasMultipleAttribute;
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    return NoContent();
+                }
             }
             catch (OAuthException ex)
             {
@@ -312,28 +332,32 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
-                if (result == null) 
-                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
-                await provisioningService.ExtractTestData(result.Definition, cancellationToken);
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null)
+                        return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
+                    await provisioningService.ExtractTestData(result.Definition, cancellationToken);
 
-                var processId = result.Launch();
-                await _identityProvisioningStore.SaveChanges(cancellationToken);
-                var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ExtractUsersConsumer.Queuename}"));
-                await sendEndpoint.Send(new StartExtractUsersCommand
-                {
-                    InstanceId = id,
-                    Realm = prefix,
-                    ProcessId = processId
-                });
-                return new ContentResult
-                {
-                    StatusCode = (int)HttpStatusCode.Created,
-                    Content = JsonSerializer.Serialize(new IdentityProvisioningLaunchedResult { Id = processId }),
-                    ContentType = "application/json"
-                };
+                    var processId = result.Launch();
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ExtractUsersConsumer.Queuename}"));
+                    await sendEndpoint.Send(new StartExtractUsersCommand
+                    {
+                        InstanceId = id,
+                        Realm = prefix,
+                        ProcessId = processId
+                    });
+                    return new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.Created,
+                        Content = JsonSerializer.Serialize(new IdentityProvisioningLaunchedResult { Id = processId }),
+                        ContentType = "application/json"
+                    };
+                }
             }
             catch(OAuthException ex)
             {

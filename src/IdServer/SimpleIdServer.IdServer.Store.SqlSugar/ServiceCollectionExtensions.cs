@@ -24,6 +24,13 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDeviceAuthCodeRepository, DeviceAuthCodeRepository>();
         services.AddTransient<IGotiySessionStore, GotiySessionStore>();
         services.AddTransient<IGrantRepository, GrantRepository>();
+        services.AddTransient<IGroupRepository, GroupRepository>();
+        services.AddTransient<IIdentityProvisioningStore, IdentityProvisioningStore>();
+        services.AddTransient<IKeyValueRepository, KeyValueRepository>();
+        services.AddTransient<ILanguageRepository, LanguageRepository>();
+        services.AddTransient<IPresentationDefinitionStore, PresentationDefinitionStore>();
+        services.AddTransient<IRegistrationWorkflowRepository, RegistrationWorkflowRepository>();
+        services.AddTransient<IScopeRepository, ScopeRepository>();
         services.AddTransient<ITransactionBuilder, SqlSugarTransactionBuilder>();
         return services;
     }

@@ -24,59 +24,98 @@ public class GroupRepository : IGroupRepository
             .ExecuteCommand();
     }
 
-    public Task BulkUpdate(List<Group> groups)
+    public void Update(Group group)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.UpdateNav(Transform(group))
+            .Include(g => g.Roles)
+            .ExecuteCommand();
     }
 
-    public Task BulkUpdate(List<GroupRealm> groupRealms)
+    public async Task BulkUpdate(List<Group> groups)
     {
-        throw new NotImplementedException();
+        var grps = groups.Select(g => Transform(g)).ToList();
+        await _dbContext.Client.Fastest<SugarGroup>().BulkUpdateAsync(grps);
+    }
+
+    public async Task BulkUpdate(List<GroupRealm> groupRealms)
+    {
+        var grps = groupRealms.Select(g => Transform(g)).ToList();
+        await _dbContext.Client.Fastest<SugarGroupRealm>().BulkUpdateAsync(grps);
     }
 
     public void DeleteRange(IEnumerable<Group> groups)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.Deleteable(groups.Select(g => Transform(g)).ToList())
+            .ExecuteCommand();
     }
 
-    public Task<Group> Get(string realm, string id, CancellationToken cancellationToken)
+    public async Task<Group> Get(string realm, string id, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarGroup>()
+                    .Includes(c => c.Realms)
+                    .Includes(c => c.Children)
+                    .Includes(c => c.Roles)
+                    .FirstAsync(g => g.Realms.Any(r => r.RealmsName == realm) && g.Id == id, cancellationToken);
+        return result?.ToDomain();
     }
 
-    public Task<List<Group>> GetAllByFullPath(string realm, string fullPath, CancellationToken cancellationToken)
+    public async Task<List<Group>> GetAllByFullPath(string realm, string fullPath, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarGroup>()
+                .Includes(c => c.Realms)
+                .Where(g => g.Realms.Any(r => r.RealmsName == realm) && g.FullPath.StartsWith(fullPath))
+                .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<List<Group>> GetAllByFullPath(string realm, string id, string fullPath, CancellationToken cancellationToken)
+    public async Task<List<Group>> GetAllByFullPath(string realm, string id, string fullPath, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarGroup>()
+                .Includes(c => c.Realms)
+                .Where(g => g.Realms.Any(r => r.RealmsName == realm) && g.FullPath.StartsWith(fullPath) && g.Id != id)
+                .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken)
+    public async Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarGroup>()
+            .Includes(g => g.Roles)
+            .Includes(c => c.Realms)
+            .Where(g => fullPathLst.Contains(g.FullPath) && g.Realms.Any(r => r.RealmsName == realm))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<Group> GetByStrictFullPath(string realm, string fullPath, CancellationToken cancellationToken)
+    public async Task<Group> GetByStrictFullPath(string realm, string fullPath, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarGroup>()
+            .Includes(c => c.Realms)
+            .Includes(c => c.Children)
+            .FirstAsync(g => g.FullPath == fullPath && g.Realms.Any(r => r.RealmsName == realm), CancellationToken.None);
+        return result?.ToDomain();
     }
 
-    public IQueryable<Group> Query()
+    public async Task<SearchResult<Group>> Search(string realm, SearchGroupsRequest request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
+        var query = _dbContext.Client.Queryable<SugarGroup>()
+            .Includes(c => c.Realms)
+            .Where(c => c.Realms.Any(r => r.RealmsName == realm) && (!request.OnlyRoot || request.OnlyRoot && c.Name == c.FullPath));
+        if (!string.IsNullOrWhiteSpace(request.Filter))
+            query = query.Where(request.Filter);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+        if (!string.IsNullOrWhiteSpace(request.OrderBy))
+            query = query.OrderBy(request.OrderBy);
+        else
+            query = query.OrderBy(q => q.FullPath);
 
-    public Task<SearchResult<Group>> Search(string realm, SearchGroupsRequest request, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
+        var nb = query.Count();
+        var groups = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
+        return new SearchResult<Group>
+        {
+            Content = groups.Select(g => g.ToDomain()).ToList(),
+            Count = nb
+        };
     }
 
     private static SugarGroup Transform(Group group)
@@ -90,10 +129,7 @@ public class GroupRepository : IGroupRepository
             Name = group.Name,
             ParentGroupId = group.ParentGroupId,
             UpdateDateTime = group.UpdateDateTime,
-            Realms = group.Realms.Select(r => new SugarGroupRealm
-            {
-                RealmsName = r.RealmsName
-            }).ToList(),
+            Realms = group.Realms.Select(r => Transform(r)).ToList(),
             Users = group.Users.Select(u => new SugarGroupUser
             {
                 GroupsId = u.UsersId
@@ -106,6 +142,15 @@ public class GroupRepository : IGroupRepository
             {
                 ScopesId = r.Id
             }).ToList()
+        };
+    }
+
+    private static SugarGroupRealm Transform(GroupRealm realm)
+    {
+        return new SugarGroupRealm
+        {
+            GroupsId = realm.GroupsId,
+            RealmsName = realm.RealmsName,
         };
     }
 }

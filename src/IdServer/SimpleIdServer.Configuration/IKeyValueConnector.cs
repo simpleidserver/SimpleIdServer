@@ -18,10 +18,14 @@ namespace SimpleIdServer.Configuration
     public class EFKeyValueConnector : IKeyValueConnector
     {
         private readonly IKeyValueRepository _repository;
+        private readonly ITransactionBuilder _transactionBuilder;
 
-        public EFKeyValueConnector(IKeyValueRepository repository)
+        public EFKeyValueConnector(
+            IKeyValueRepository repository, 
+            ITransactionBuilder transactionBuilder)
         {
             _repository = repository;
+            _transactionBuilder = transactionBuilder;
         }
 
         public async Task<Dictionary<string, string>> GetAll(CancellationToken cancellationToken)
@@ -32,12 +36,16 @@ namespace SimpleIdServer.Configuration
 
         public async Task Set(string key, string value, CancellationToken cancellationToken)
         {
-            var record = await _repository.Get(key, cancellationToken);
-            if (record == null)
-                _repository.Add(new IdServer.Domains.ConfigurationKeyPairValueRecord { Name = key, Value = value });
-            else
-                record.Value = value;
-            await _repository.SaveChanges(cancellationToken);
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var record = await _repository.Get(key, cancellationToken);
+                if (record == null)
+                    _repository.Add(new IdServer.Domains.ConfigurationKeyPairValueRecord { Name = key, Value = value });
+                else
+                    record.Value = value;
+                _repository.Update(record);
+                await transaction.Commit(cancellationToken);
+            }
         }
     }
 }

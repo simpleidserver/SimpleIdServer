@@ -24,32 +24,36 @@ public class ExtractUsersConsumer :
     private readonly IIdentityProvisioningStore _identityProvisioningStore;
     private readonly IEnumerable<IProvisioningService> _provisioningServices;
     private readonly IProvisioningStagingStore _stagingStore;
+    private readonly ITransactionBuilder _transactionBuilder;
     public static string Queuename = "extract-users";
 
     public ExtractUsersConsumer(
         IIdentityProvisioningStore identityProvisioningStore,
         IEnumerable<IProvisioningService> provisioningServices,
-        IProvisioningStagingStore stagingStore)
+        IProvisioningStagingStore stagingStore,
+        ITransactionBuilder transactionBuilder)
     {
 
         _identityProvisioningStore = identityProvisioningStore;
         _provisioningServices = provisioningServices;
         _stagingStore = stagingStore;
+        _transactionBuilder = transactionBuilder;
     }
 
     public async Task Consume(ConsumeContext<StartExtractUsersCommand> context)
     {
-        var message = context.Message;
-        var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
-        if (!instance.IsEnabled)
+        using (var transaction = _transactionBuilder.Build())
         {
-            return;
-        }
-
-        var provisioningService = _provisioningServices.Single(p => p.Name == instance.Definition.Name);
-        var pages = (await provisioningService.Paginate(instance.Definition, context.CancellationToken)).OrderBy(p => p.Page);
-        var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
-        foreach (var page in pages.OrderBy(p => p.Page))
+            var message = context.Message;
+            var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
+            if (!instance.IsEnabled)
+            {
+                return;
+            }
+            var provisioningService = _provisioningServices.Single(p => p.Name == instance.Definition.Name);
+            var pages = (await provisioningService.Paginate(instance.Definition, context.CancellationToken)).OrderBy(p => p.Page);
+            var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
+            foreach (var page in pages.OrderBy(p => p.Page))
             {
                 await context.Send(destination, new ExtractUsersCommand
                 {
@@ -61,14 +65,16 @@ public class ExtractUsersConsumer :
                 });
             }
 
-        instance.Start(message.ProcessId, pages.Last().Page);
-        await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-        await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
-        {
-            InstanceId = message.InstanceId,
-            ProcessId = message.ProcessId,
-            Realm = message.Realm
-        });
+            instance.Start(message.ProcessId, pages.Last().Page);
+            _identityProvisioningStore.Update(instance);
+            await transaction.Commit(context.CancellationToken);
+            await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
+            {
+                InstanceId = message.InstanceId,
+                ProcessId = message.ProcessId,
+                Realm = message.Realm
+            });
+        }
     }
 
     public async Task Consume(ConsumeContext<ExtractUsersCommand> context)
@@ -111,7 +117,7 @@ public class ExtractUsersConsumer :
                 newOrChangedRepresentations.Count(r => r.Type == ExtractedRepresentationType.USER),
                 newOrChangedRepresentations.Count(u => u.Type == ExtractedRepresentationType.GROUP),
                 filteredRepresentations.Count());
-            await _identityProvisioningStore.SaveChanges(context.CancellationToken);
+            // await _identityProvisioningStore.SaveChanges(context.CancellationToken);
             transactionScope.Complete();
         }
     }
@@ -124,7 +130,7 @@ public class ExtractUsersConsumer :
         if(process.TotalPageToExtract == process.NbExtractedPages)
         {
             instance.FinishExtract(message.ProcessId);
-            await _identityProvisioningStore.SaveChanges(context.CancellationToken);
+            // await _identityProvisioningStore.SaveChanges(context.CancellationToken);
             return;
         }
 

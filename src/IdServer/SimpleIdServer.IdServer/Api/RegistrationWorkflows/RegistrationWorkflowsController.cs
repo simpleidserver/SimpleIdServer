@@ -23,15 +23,18 @@ public class RegistrationWorkflowsController : BaseController
 {
 	private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
     private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
+    private readonly ITransactionBuilder _transactionBuilder;
 
     public RegistrationWorkflowsController(
         IRegistrationWorkflowRepository registrationWorkflowRepository, 
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder, 
-        IEnumerable<IAuthenticationMethodService> authenticationMethodServices) : base(tokenRepository, jwtBuilder)
+        IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
+        ITransactionBuilder transactionBuilder) : base(tokenRepository, jwtBuilder)
 	{
 		_registrationWorkflowRepository = registrationWorkflowRepository;
         _authenticationMethodServices = authenticationMethodServices;
+        _transactionBuilder = transactionBuilder;
 	}
 
 	[HttpGet]
@@ -57,12 +60,15 @@ public class RegistrationWorkflowsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
 		try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
-            var registrationWorkflow = await _registrationWorkflowRepository.Get(prefix, id, cancellationToken);
-            if (registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
-            _registrationWorkflowRepository.Delete(registrationWorkflow);
-            await _registrationWorkflowRepository.SaveChanges(CancellationToken.None);
-            return new NoContentResult();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
+                var registrationWorkflow = await _registrationWorkflowRepository.Get(prefix, id, cancellationToken);
+                if (registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
+                _registrationWorkflowRepository.Delete(registrationWorkflow);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
+            }
         }
         catch (OAuthException ex)
         {
@@ -76,40 +82,43 @@ public class RegistrationWorkflowsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
-            if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
-            if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Steps));
-            var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
-            var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
-            if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));
-            var existingRegistrationWorkflow = await _registrationWorkflowRepository.GetByName(prefix, request.Name, cancellationToken);
-            if (existingRegistrationWorkflow != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.RegistrationWorkflowExists);
-            if(request.IsDefault)
+            using (var transaction = _transactionBuilder.Build())
             {
-                var defaultRegistrationWorkflow = await _registrationWorkflowRepository.GetDefault(prefix, cancellationToken);
-                if (defaultRegistrationWorkflow != null) defaultRegistrationWorkflow.IsDefault = false;
-            }
+                await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
+                if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
+                if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Steps));
+                var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
+                var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
+                if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));
+                var existingRegistrationWorkflow = await _registrationWorkflowRepository.GetByName(prefix, request.Name, cancellationToken);
+                if (existingRegistrationWorkflow != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.RegistrationWorkflowExists);
+                if (request.IsDefault)
+                {
+                    var defaultRegistrationWorkflow = await _registrationWorkflowRepository.GetDefault(prefix, cancellationToken);
+                    if (defaultRegistrationWorkflow != null) defaultRegistrationWorkflow.IsDefault = false;
+                }
 
-            var builder = RegistrationWorkflowBuilder.New(request.Name, request.IsDefault, prefix);
-            foreach (var step in request.Steps) builder.AddStep(step);
-            var record = builder.Build();
-            _registrationWorkflowRepository.Add(record);
-            await _registrationWorkflowRepository.SaveChanges(CancellationToken.None);
-            var json = JsonSerializer.Serialize(new RegistrationWorkflowResult
-            {
-                CreateDateTime = record.CreateDateTime,
-                UpdateDateTime = record.UpdateDateTime,
-                Id = record.Id,
-                IsDefault = record.IsDefault,
-                Name = record.Name,
-                Steps = record.Steps
-            });
-            return new ContentResult
-            {
-                StatusCode = (int)HttpStatusCode.Created,
-                Content = json,
-                ContentType = "application/json"
-            };
+                var builder = RegistrationWorkflowBuilder.New(request.Name, request.IsDefault, prefix);
+                foreach (var step in request.Steps) builder.AddStep(step);
+                var record = builder.Build();
+                _registrationWorkflowRepository.Add(record);
+                await transaction.Commit(cancellationToken);
+                var json = JsonSerializer.Serialize(new RegistrationWorkflowResult
+                {
+                    CreateDateTime = record.CreateDateTime,
+                    UpdateDateTime = record.UpdateDateTime,
+                    Id = record.Id,
+                    IsDefault = record.IsDefault,
+                    Name = record.Name,
+                    Steps = record.Steps
+                });
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = json,
+                    ContentType = "application/json"
+                };
+            }
         }
         catch (OAuthException ex)
         {
@@ -123,26 +132,31 @@ public class RegistrationWorkflowsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
-            if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
-            if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Steps));
-            var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
-            var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
-            if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));
-            var existingRegistrationWorkflow = await _registrationWorkflowRepository.Get(prefix, id, cancellationToken);
-            if (existingRegistrationWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownRegistrationWorkflow, id));
-            existingRegistrationWorkflow.UpdateDateTime = DateTime.UtcNow;
-            existingRegistrationWorkflow.IsDefault = request.IsDefault;
-            existingRegistrationWorkflow.Steps = request.Steps;
-            var defaultRegistrationWorkflow = await _registrationWorkflowRepository.GetDefault(prefix, cancellationToken);
-            if(defaultRegistrationWorkflow != null) 
+            using (var transaction = _transactionBuilder.Build())
             {
-                defaultRegistrationWorkflow.IsDefault = false;
-                defaultRegistrationWorkflow.UpdateDateTime = DateTime.UtcNow;
-            }
+                await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
+                if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
+                if (request.Steps == null || !request.Steps.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Steps));
+                var existingAmrs = _authenticationMethodServices.Select(a => a.Amr);
+                var unknownAmrs = request.Steps.Where(s => !existingAmrs.Contains(s));
+                if (unknownAmrs.Any()) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthMethods, string.Join(",", unknownAmrs)));
+                var existingRegistrationWorkflow = await _registrationWorkflowRepository.Get(prefix, id, cancellationToken);
+                if (existingRegistrationWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownRegistrationWorkflow, id));
+                existingRegistrationWorkflow.UpdateDateTime = DateTime.UtcNow;
+                existingRegistrationWorkflow.IsDefault = request.IsDefault;
+                existingRegistrationWorkflow.Steps = request.Steps;
+                var defaultRegistrationWorkflow = await _registrationWorkflowRepository.GetDefault(prefix, cancellationToken);
+                if (defaultRegistrationWorkflow != null)
+                {
+                    defaultRegistrationWorkflow.IsDefault = false;
+                    defaultRegistrationWorkflow.UpdateDateTime = DateTime.UtcNow;
+                }
 
-            await _registrationWorkflowRepository.SaveChanges(CancellationToken.None);
-            return new NoContentResult();
+                _registrationWorkflowRepository.Update(existingRegistrationWorkflow);
+                _registrationWorkflowRepository.Update(defaultRegistrationWorkflow);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
+            }
         }
         catch (OAuthException ex)
         {

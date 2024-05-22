@@ -16,6 +16,8 @@ public class SugarRealm
     public DateTime UpdateDateTime { get; set; }
     [Navigate(typeof(SugarApiResourceRealm), nameof(SugarApiResourceRealm.RealmsName), nameof(SugarApiResourceRealm.ApiResourcesId))]
     public List<SugarApiResource> ApiResources { get; set; }
+    [Navigate(NavigateType.OneToMany, nameof(SugarPresentationDefinition.RealmName))]
+    public List<SugarPresentationDefinition> PresentationDefinitions { get; set; }
 
     public Realm ToDomain()
     {

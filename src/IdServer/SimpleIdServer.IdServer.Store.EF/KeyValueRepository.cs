@@ -19,6 +19,10 @@ namespace SimpleIdServer.IdServer.Store.EF
         public void Add(ConfigurationKeyPairValueRecord keyValue)
             => _dbContext.ConfigurationKeyPairValueRecords.Add(keyValue);
 
+        public void Update(ConfigurationKeyPairValueRecord keyValue)
+        {
+        }
+
         public Task<ConfigurationKeyPairValueRecord> Get(string key, CancellationToken cancellationToken)
             => _dbContext.ConfigurationKeyPairValueRecords.SingleOrDefaultAsync(c => c.Name == key, cancellationToken);
 

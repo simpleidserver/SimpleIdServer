@@ -42,11 +42,7 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
             .ToListAsync(cancellationToken);
     }
 
-    public IQueryable<RegistrationWorkflow> Query() => _dbContext.RegistrationWorkflows;
-
     public void Delete(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Remove(record);
 
 	public void Add(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Add(record);
-
-	public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
 }
