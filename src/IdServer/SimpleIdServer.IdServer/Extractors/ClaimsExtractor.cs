@@ -52,6 +52,7 @@ namespace SimpleIdServer.IdServer.Extractors
             {
                 var extractor = _extractors.Single(e => e.MappingRuleType == mappingRule.MapperType);
                 var value = extractor.Extract(context, mappingRule);
+                if (value == null) continue;
                 if (Uri.TryCreate(mappingRule.TargetClaimPath, UriKind.Absolute, out Uri r))
                 {
                     dic.Add(mappingRule.TargetClaimPath, value);

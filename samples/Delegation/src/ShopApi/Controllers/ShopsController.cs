@@ -28,7 +28,7 @@ public class ShopsController : ControllerBase
 
     private async Task<string> GetAccessToken()
     {
-        const string clientId = "firstDelegationAPi";
+        const string clientId = "firstDelegationApi";
         const string clientSecret = "password";
         const string tokenUrl = "https://localhost:5001/master/token";
         var subjectToken = Request.Headers["Authorization"].ElementAt(0).Split(" ")[1];

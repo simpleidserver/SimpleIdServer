@@ -131,6 +131,9 @@ namespace SimpleIdServer.IdServer.WsFederation.Api
                         cl.Properties[format] = Options.DefaultNameIdentifierFormat;
                 }
 
+                if (claims.Count() == 1 && !claims.Any(c => c.Type == ClaimTypes.Name))
+                    claims.Add(new Claim(ClaimTypes.Name, user.Name));
+
                 return new ClaimsIdentity(claims, "idserver");
             }
 

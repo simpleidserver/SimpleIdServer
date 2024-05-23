@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -442,10 +443,21 @@ namespace SimpleIdServer.Scim.Api
                 var representation = updateResult.Result.Representation;
                 representation.ApplyEmptyArray();
                 var location = GetLocation(representation);
-                var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                if(!_options.IsFullRepresentationReturned) return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
-                return await InternalGet(realm, id, new GetSCIMResourceRequest(), cancellationToken);
+                if (!_options.IsFullRepresentationReturned)
+                {
+                    var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                    return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
+                }
+                else
+                {
+                    var getRepresentationResult = await _getRepresentationQueryHandler.Handle(realm, id, new GetSCIMResourceRequest(), _resourceType, cancellationToken);
+                    representation = getRepresentationResult.Result;
+                    await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
+                    var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                    return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
+                }
             }
             catch (SCIMUniquenessAttributeException ex)
             {
@@ -504,10 +516,23 @@ namespace SimpleIdServer.Scim.Api
                 var representation = patchResult.Representation;
                 representation.ApplyEmptyArray();
                 var location = GetLocation(representation);
-                var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
-                if(!_options.IsFullRepresentationReturned) return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
-                return await InternalGet(realm, id, new GetSCIMResourceRequest(), CancellationToken.None);
+                if(!_options.IsFullRepresentationReturned)
+                {
+                    var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
+                    if (IsPublishEvtsEnabled)
+                        await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                    
+                    return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
+                }
+                else
+                {
+                    var getRepresentationResult = await _getRepresentationQueryHandler.Handle(realm, id, new GetSCIMResourceRequest(), _resourceType, cancellationToken);
+                    representation = getRepresentationResult.Result;
+                    await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
+                    var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                    return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
+                }
             }
             catch (SCIMDuplicateAttributeException ex)
             {
