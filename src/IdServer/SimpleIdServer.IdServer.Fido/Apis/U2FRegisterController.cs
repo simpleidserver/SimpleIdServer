@@ -31,6 +31,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IUserRepository _userRepository;
         private readonly IFido2 _fido2;
         private readonly IDistributedCache _distributedCache;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly IdServerHostOptions _idServerHostOptions;
 
         public U2FRegisterController(
@@ -39,7 +40,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             IUserRepository userRepository, 
             IFido2 fido2, 
             IDistributedCache distributedCache, 
-            IUserCredentialRepository userCredentialRepository,
+            ITransactionBuilder transactionBuilder,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             IOptions<IdServerHostOptions> idServerHostOptions) : base(tokenRepository, jwtBuilder)
@@ -49,6 +50,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _userRepository = userRepository;
             _fido2 = fido2;
             _distributedCache = distributedCache;
+            _transactionBuilder = transactionBuilder;
             _idServerHostOptions = idServerHostOptions.Value;
         }
 
@@ -115,6 +117,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpPost]
         public async Task<IActionResult> End([FromRoute] string prefix, [FromBody] EndU2FRegisterRequest request, CancellationToken cancellationToken)
         {
+            var transaction = _transactionBuilder.Build();
             var fidoOptions = GetOptions();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
@@ -198,8 +201,12 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                         });
                         _userRepository.Add(user);
                     }
+                    else
+                    {
+                        _userRepository.Update(user);
+                    }
 
-                    await _userRepository.SaveChanges(CancellationToken.None);
+                    await transaction.Commit(cancellationToken);
                     return new OkObjectResult(new EndU2FRegisterResult
                     {
                         Sig = success.Result.SignCount

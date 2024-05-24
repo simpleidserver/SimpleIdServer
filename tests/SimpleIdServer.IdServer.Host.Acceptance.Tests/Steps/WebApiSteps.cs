@@ -149,27 +149,31 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             {
                 var keyStore = scope.ServiceProvider.GetRequiredService<IKeyStore>();
                 var tokenRepository = scope.ServiceProvider.GetRequiredService<ITokenRepository>();
-                var signKey = keyStore.GetAllSigningKeys("master").First(k => k.Key.KeyId == keyId);
-                var handler = new JsonWebTokenHandler();
-                var claims = new Dictionary<string, object>();
-                foreach (var row in table.Rows)
-                    claims.Add(row["Key"].ToString(), row["Value"].ToString());
-                var descritor = new SecurityTokenDescriptor
+                var transactionBuilder = scope.ServiceProvider.GetRequiredService<ITransactionBuilder>();
+                using (var transaction = transactionBuilder.Build())
                 {
-                    Claims = claims,
-                    SigningCredentials = signKey
-                };
-                var request = handler.CreateToken(descritor);
-                var record = new Domains.Token
-                {
-                    Id = request,
-                    ClientId = "clientId",
-                    TokenType = DTOs.TokenResponseParameters.AccessToken,
-                    ExpirationTime = DateTime.UtcNow.AddDays(2)
-                };
-                tokenRepository.Add(record);
-                await tokenRepository.SaveChanges(CancellationToken.None);
-                _scenarioContext.Set(request, "access_token");
+                    var signKey = keyStore.GetAllSigningKeys("master").First(k => k.Key.KeyId == keyId);
+                    var handler = new JsonWebTokenHandler();
+                    var claims = new Dictionary<string, object>();
+                    foreach (var row in table.Rows)
+                        claims.Add(row["Key"].ToString(), row["Value"].ToString());
+                    var descritor = new SecurityTokenDescriptor
+                    {
+                        Claims = claims,
+                        SigningCredentials = signKey
+                    };
+                    var request = handler.CreateToken(descritor);
+                    var record = new Domains.Token
+                    {
+                        Id = request,
+                        ClientId = "clientId",
+                        TokenType = DTOs.TokenResponseParameters.AccessToken,
+                        ExpirationTime = DateTime.UtcNow.AddDays(2)
+                    };
+                    tokenRepository.Add(record);
+                    await transaction.Commit(CancellationToken.None);
+                    _scenarioContext.Set(request, "access_token");
+                }
             }
         }
 

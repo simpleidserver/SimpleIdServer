@@ -17,8 +17,4 @@ public class TranslationRepository : ITranslationRepository
 
     public Task<List<Translation>> GetAllByKey(string key, CancellationToken cancellationToken)
         => _dbContext.Translations.Where(t => t.Key == key).ToListAsync(cancellationToken);
-
-    public IQueryable<Translation> Query() => _dbContext.Translations;
-
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
 }

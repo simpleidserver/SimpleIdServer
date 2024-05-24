@@ -15,6 +15,7 @@ using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer.Api.Realms;
 
@@ -86,24 +87,30 @@ public class RealmsController : BaseController
                     var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
                     var acrs = await _authenticationContextClassReferenceRepository.GetAll(cancellationToken);
                     foreach (var user in users)
+                    {
                         user.Realms.Add(new RealmUser { RealmsName = request.Name });
+                        _userRepository.Update(user);
+                    }
 
                     foreach (var client in clients)
                         client.Realms.Add(realm);
 
                     foreach (var scope in scopes)
+                    {
                         scope.Realms.Add(realm);
+                        _scopeRepository.Update(scope);
+                    }
 
                     foreach (var acr in acrs)
                         acr.Realms.Add(realm);
 
                     foreach (var key in keys)
+                    {
                         key.Realms.Add(realm);
+                        _fileSerializedKeyStore.Update(key);
+                    }
 
                     _realmRepository.Add(realm);
-                    await _userRepository.SaveChanges(CancellationToken.None);
-                    await _scopeRepository.SaveChanges(CancellationToken.None);
-                    await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
                     await transaction.Commit(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, $"Realm {request.Name} is added");
                     return new ContentResult

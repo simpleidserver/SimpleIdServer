@@ -29,9 +29,10 @@ public class UmaPendingRequestRepository : IUmaPendingRequestRepository
             .ToListAsync(cancellationToken);
     }
 
-    public IQueryable<UMAPendingRequest> Query() => _dbContext.UmaPendingRequest;
-
     public void Add(UMAPendingRequest request) => _dbContext.UmaPendingRequest.Add(request);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(UMAPendingRequest request)
+    {
+
+    }
 }

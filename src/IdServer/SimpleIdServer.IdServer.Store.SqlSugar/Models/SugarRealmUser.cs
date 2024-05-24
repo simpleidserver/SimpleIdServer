@@ -1,27 +1,24 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using SimpleIdServer.IdServer.Domains;
 using SqlSugar;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar.Models;
 
-[SugarTable("GroupUser")]
-public class SugarGroupUser
+[SugarTable("RealmUser")]
+public class SugarRealmUser
 {
     [SugarColumn(IsPrimaryKey = true)]
-    public string GroupsId { get; set; } = null!;
+    public string UsersId { get; set; }
     [SugarColumn(IsPrimaryKey = true)]
-    public string UsersId { get; set; } = null!;
-    public SugarGroup Group { get; set; }
+    public string RealmsName {  get; set; }
 
-    public GroupUser ToDomain()
+    public RealmUser ToDomain()
     {
-        return new GroupUser
+        return new RealmUser
         {
-            GroupsId = GroupsId,
             UsersId = UsersId,
-            Group = Group.ToDomain()
+            RealmsName = RealmsName
         };
     }
 }

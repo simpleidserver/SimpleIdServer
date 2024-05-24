@@ -80,7 +80,7 @@ public class UserRepository : IUserRepository
         var result = await _dbContext.Users
             .Include(u => u.Realms)
             .AsNoTracking()
-            .CountAsync(u => u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
+            .CountAsync(u => u.Realms.Any(r => r.RealmsName == realm), cancellationToken); NbUsers
         return result;
     }
 

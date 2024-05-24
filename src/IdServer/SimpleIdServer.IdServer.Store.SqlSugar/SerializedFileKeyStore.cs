@@ -2,43 +2,80 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains;
-
-// Copyright (c) SimpleIdServer. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
+using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar;
 
 public class SerializedFileKeyStore : IFileSerializedKeyStore
 {
+    private readonly DbContext _dbContext;
+
+    public SerializedFileKeyStore(DbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
     public void Add(SerializedFileKey key)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.InsertNav(Transform(key))
+            .Include(s => s.Realms)
+            .ExecuteCommand();
     }
 
-    public Task<List<SerializedFileKey>> GetAll(string realm, CancellationToken cancellationToken)
+    public void Update(SerializedFileKey key)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.UpdateNav(Transform(key))
+            .Include(s => s.Realms)
+            .ExecuteCommand();
     }
 
-    public Task<List<SerializedFileKey>> GetAllEnc(string realm, CancellationToken cancellationToken)
+    public async Task<List<SerializedFileKey>> GetAll(string realm, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarSerializedFileKey>()
+            .Includes(s => s.Realms)
+            .Where(s => s.Realms.Any(r => r.RealmsName == realm))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<List<SerializedFileKey>> GetAllSig(string realm, CancellationToken cancellationToken)
+    public async Task<List<SerializedFileKey>> GetAllEnc(string realm, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarSerializedFileKey>()
+            .Includes(s => s.Realms)
+            .Where(s => s.Usage == Constants.JWKUsages.Enc && s.Realms.Any(r => r.RealmsName == realm))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public IQueryable<SerializedFileKey> Query()
+    public async Task<List<SerializedFileKey>> GetAllSig(string realm, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarSerializedFileKey>()
+            .Includes(s => s.Realms)
+            .Where(s => s.Usage == Constants.JWKUsages.Sig && s.Realms.Any(r => r.RealmsName == realm))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
+    private static SugarSerializedFileKey Transform(SerializedFileKey fileKey)
     {
-        throw new NotImplementedException();
+        return new SugarSerializedFileKey
+        {
+            Alg = fileKey.Alg,
+            CreateDateTime = fileKey.CreateDateTime,
+            Enc = fileKey.Enc,
+            Id = fileKey.Id,
+            IsSymmetric = fileKey.IsSymmetric,
+            Key = fileKey.Key,
+            KeyId = fileKey.KeyId,
+            PrivateKeyPem = fileKey.PrivateKeyPem,
+            PublicKeyPem = fileKey.PublicKeyPem,
+            UpdateDateTime = fileKey.UpdateDateTime,
+            Usage = fileKey.Usage,
+            Realms = fileKey.Realms.Select(r => new SugarRealm
+            {
+                RealmsName = r.Name
+            }).ToList()
+        };
     }
 }

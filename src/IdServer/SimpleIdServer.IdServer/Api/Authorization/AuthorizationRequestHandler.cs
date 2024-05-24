@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
         private readonly IUserRepository _userRepository;
         private readonly IUserSessionResitory _userSessionRepository;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IAuthorizationRequestValidator validator,
@@ -41,6 +42,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             IAuthorizationRequestEnricher authorizationRequestEnricher,
             IUserRepository userRepository,
             IUserSessionResitory userSessionResitory,
+            ITransactionBuilder transactionBuilder,
             IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
@@ -48,6 +50,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _authorizationRequestEnricher = authorizationRequestEnricher;
             _userRepository = userRepository;
             _userSessionRepository = userSessionResitory;
+            _transactionBuilder = transactionBuilder;
             _options = options.Value;
         }
 
@@ -55,14 +58,18 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         {
             try
             {
-                var result = await BuildResponse(context, token);
-                var display = context.Request.RequestData.GetDisplayFromAuthorizationRequest();
-                if (!string.IsNullOrWhiteSpace(display))
-                    context.Response.Add(AuthorizationRequestParameters.Display, display);
-                var sessionState = BuildSessionState(context);
-                if (!string.IsNullOrWhiteSpace(sessionState))
-                    context.Response.Add(AuthorizationRequestParameters.SessionState, sessionState);
-                return result;
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    var result = await BuildResponse(context, token);
+                    var display = context.Request.RequestData.GetDisplayFromAuthorizationRequest();
+                    if (!string.IsNullOrWhiteSpace(display))
+                        context.Response.Add(AuthorizationRequestParameters.Display, display);
+                    var sessionState = BuildSessionState(context);
+                    if (!string.IsNullOrWhiteSpace(sessionState))
+                        context.Response.Add(AuthorizationRequestParameters.SessionState, sessionState);
+                    await transaction.Commit(token);
+                    return result;
+                }
             }
             catch (OAuthUserConsentRequiredException ex)
             {
@@ -104,12 +111,12 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
                 _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
                 UpdateSession(context);
-                await _userSessionRepository.SaveChanges(cancellationToken);
+                _userSessionRepository.Update(context.Session);
                 return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
             }
             finally
             {
-                await _userRepository.SaveChanges(cancellationToken);
+                _userRepository.Update(context.User);
             }
         }
 

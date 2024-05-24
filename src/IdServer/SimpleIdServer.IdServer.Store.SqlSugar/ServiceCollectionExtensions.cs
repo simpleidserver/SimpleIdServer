@@ -31,6 +31,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IPresentationDefinitionStore, PresentationDefinitionStore>();
         services.AddTransient<IRegistrationWorkflowRepository, RegistrationWorkflowRepository>();
         services.AddTransient<IScopeRepository, ScopeRepository>();
+        services.AddTransient<IFileSerializedKeyStore, SerializedFileKeyStore>();
+        services.AddTransient<ITokenRepository, TokenRepository>();
+        services.AddTransient<ITranslationRepository, TranslationRepository>();
+        services.AddTransient<IUmaPendingRequestRepository, UmaPendingRequestRepository>();
+        services.AddTransient<IUmaResourceRepository, UmaResourceRepository>();
         services.AddTransient<ITransactionBuilder, SqlSugarTransactionBuilder>();
         return services;
     }

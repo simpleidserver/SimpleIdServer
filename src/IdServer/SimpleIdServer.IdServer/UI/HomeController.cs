@@ -49,6 +49,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IRecurringJobManager _recurringJobManager;
         private readonly IDistributedCache _distributedCache;
         private readonly ISessionHelper _sessionHelper;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -64,6 +65,7 @@ namespace SimpleIdServer.IdServer.UI
             IRecurringJobManager recurringJobManager,
             IDistributedCache distributedCache,
             ISessionHelper sessionHelper,
+            ITransactionBuilder transactionBuilder,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -79,6 +81,7 @@ namespace SimpleIdServer.IdServer.UI
             _recurringJobManager = recurringJobManager;
             _distributedCache = distributedCache;
             _sessionHelper = sessionHelper;
+            _transactionBuilder = transactionBuilder;
             _logger = logger;
         }
 
@@ -127,42 +130,50 @@ namespace SimpleIdServer.IdServer.UI
         [Authorize(Constants.Policies.Authenticated)]
         public async virtual Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var pendingRequests = await _pendingRequestRepository.GetByPermissionTicketId(ticketId, cancellationToken);
-            if (!pendingRequests.Any())
-                return NotFound();
+            using(var transaction = _transactionBuilder.Build())
+            {
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var pendingRequests = await _pendingRequestRepository.GetByPermissionTicketId(ticketId, cancellationToken);
+                if (!pendingRequests.Any())
+                    return NotFound();
 
-            var pendingRequest = pendingRequests.First();
-            if (pendingRequest.Owner != nameIdentifier)
-                return Unauthorized();
+                var pendingRequest = pendingRequests.First();
+                if (pendingRequest.Owner != nameIdentifier)
+                    return Unauthorized();
 
-            if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be rejected" });
+                if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be rejected" });
 
-            pendingRequest.Reject();
-            await _pendingRequestRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Profile");
+                pendingRequest.Reject();
+                _pendingRequestRepository.Update(pendingRequest);
+                await transaction.Commit(cancellationToken);
+                return RedirectToAction("Profile");
+            }
         }
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
         public async virtual Task<IActionResult> ConfirmUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var pendingRequests = await _pendingRequestRepository.GetByPermissionTicketId(ticketId, cancellationToken);
-            if (!pendingRequests.Any())
-                return NotFound();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var pendingRequests = await _pendingRequestRepository.GetByPermissionTicketId(ticketId, cancellationToken);
+                if (!pendingRequests.Any())
+                    return NotFound();
 
-            var pendingRequest = pendingRequests.First();
-            if (pendingRequest.Owner != nameIdentifier)
-                return Unauthorized();
+                var pendingRequest = pendingRequests.First();
+                if (pendingRequest.Owner != nameIdentifier)
+                    return Unauthorized();
 
-            if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be confirmed" });
+                if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be confirmed" });
 
-            pendingRequest.Confirm();
-            await _pendingRequestRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Profile");
+                pendingRequest.Confirm();
+                _pendingRequestRepository.Update(pendingRequest);
+                await transaction.Commit(cancellationToken);
+                return RedirectToAction("Profile");
+            }
         }
 
         #region Account Linking

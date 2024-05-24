@@ -20,10 +20,12 @@ namespace SimpleIdServer.IdServer.Stores
     public class InMemoryKeyStore : IKeyStore
     {
         private readonly IFileSerializedKeyStore _fileSerializedKeyStore;
+        private readonly ITransactionBuilder _builder;
 
-        public InMemoryKeyStore(IFileSerializedKeyStore fileSerializedKeyStore) 
+        public InMemoryKeyStore(IFileSerializedKeyStore fileSerializedKeyStore, ITransactionBuilder builder) 
         {
             _fileSerializedKeyStore = fileSerializedKeyStore;
+            _builder = builder;
         }
 
         public IEnumerable<SigningCredentials> GetAllSigningKeys(string realm)
@@ -72,38 +74,50 @@ namespace SimpleIdServer.IdServer.Stores
 
         public async void Add(Domains.Realm realm, SigningCredentials signingCredentials)
         {
-            var result = Convert(signingCredentials, realm);
-            _fileSerializedKeyStore.Add(result);
-            await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
+            using (var transaction = _builder.Build())
+            {
+                var result = Convert(signingCredentials, realm);
+                _fileSerializedKeyStore.Add(result);
+                await transaction.Commit(CancellationToken.None);
+            }
         }
 
         public async void Add(Domains.Realm realm, EncryptingCredentials encryptingCredentials)
         {
-            var result = Convert(encryptingCredentials, realm);
-            _fileSerializedKeyStore.Add(result);
-            await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
+            using (var transaction = _builder.Build())
+            {
+                var result = Convert(encryptingCredentials, realm);
+                _fileSerializedKeyStore.Add(result);
+                await transaction.Commit(CancellationToken.None);
+            }
         }
 
         internal async void SetSigningCredentials(Domains.Realm realm, IEnumerable<SigningCredentials> signingCredentials)
         {
-            foreach(var signingCredential in signingCredentials)
+            using (var transaction = _builder.Build())
             {
-                var record = Convert(signingCredential, realm);
-                _fileSerializedKeyStore.Add(record);
-            }
+                foreach (var signingCredential in signingCredentials)
+                {
+                    var record = Convert(signingCredential, realm);
+                    _fileSerializedKeyStore.Add(record);
+                }
 
-            await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
+                await transaction.Commit(CancellationToken.None);
+            }
         }
 
         internal async void SetEncryptedCredentials(Domains.Realm realm, IEnumerable<EncryptingCredentials> encryptedCredentials)
         {
-            foreach (var encryptedCredential in encryptedCredentials)
+            using (var transaction = _builder.Build())
             {
-                var record = Convert(encryptedCredential, realm);
-                _fileSerializedKeyStore.Add(record);
-            }
+                foreach (var encryptedCredential in encryptedCredentials)
+                {
+                    var record = Convert(encryptedCredential, realm);
+                    _fileSerializedKeyStore.Add(record);
+                }
 
-            await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
+                await transaction.Commit(CancellationToken.None);
+            }
         }
 
         public static SerializedFileKey Convert(SigningCredentials credentials, Domains.Realm realm)

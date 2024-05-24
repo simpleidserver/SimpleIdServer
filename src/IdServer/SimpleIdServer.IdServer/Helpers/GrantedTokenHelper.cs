@@ -59,12 +59,18 @@ namespace SimpleIdServer.IdServer.Helpers
     {
         private readonly IDistributedCache _distributedCache;
         private readonly ITokenRepository _tokenRepository;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly IdServerHostOptions _oauthHostOptions;
 
-        public GrantedTokenHelper(IDistributedCache distributedCache, ITokenRepository tokenRepository, IOptions<IdServerHostOptions> oauthHostOptions)
+        public GrantedTokenHelper(
+            IDistributedCache distributedCache, 
+            ITokenRepository tokenRepository, 
+            ITransactionBuilder transactionBuilder,
+            IOptions<IdServerHostOptions> oauthHostOptions)
         {
             _distributedCache = distributedCache;
             _tokenRepository = tokenRepository;
+            _transactionBuilder = transactionBuilder;
             _oauthHostOptions = oauthHostOptions.Value;
         }
 
@@ -78,23 +84,29 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<bool> RemoveToken(string token, CancellationToken cancellationToken)
         {
-            var result = await _tokenRepository.Get(token, cancellationToken);
-            if (result == null)
+            using (var transaction = _transactionBuilder.Build())
             {
-                return false;
-            }
+                var result = await _tokenRepository.Get(token, cancellationToken);
+                if (result == null)
+                {
+                    return false;
+                }
 
-            _tokenRepository.Remove(result);
-            await _tokenRepository.SaveChanges(cancellationToken);
-            return true;
+                _tokenRepository.Remove(result);
+                await transaction.Commit(cancellationToken);
+                return true;
+            }
         }
 
         public async Task<bool> RemoveTokens(IEnumerable<Token> tokens, CancellationToken cancellationToken)
         {
-            foreach(var token in tokens)
-                _tokenRepository.Remove(token);
-            await _tokenRepository.SaveChanges(cancellationToken);
-            return true;
+            using (var transaction = _transactionBuilder.Build())
+            {
+                foreach (var token in tokens)
+                    _tokenRepository.Remove(token);
+                await transaction.Commit(cancellationToken);
+                return true;
+            }
         }
 
         #endregion
@@ -129,35 +141,41 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<bool> AddJwtAccessToken(string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken)
         {
-            _tokenRepository.Add(new Token
+            using (var transaction = _transactionBuilder.Build())
             {
-                Id = token,
-                ClientId = clientId,
-                CreateDateTime = DateTime.UtcNow,
-                TokenType = DTOs.TokenResponseParameters.AccessToken,
-                AccessTokenType = AccessTokenTypes.Jwt,
-                AuthorizationCode = authorizationCode,
-                GrantId = grantId
-            });
-            await _tokenRepository.SaveChanges(cancellationToken);
-            return true;
+                _tokenRepository.Add(new Token
+                {
+                    Id = token,
+                    ClientId = clientId,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenType = DTOs.TokenResponseParameters.AccessToken,
+                    AccessTokenType = AccessTokenTypes.Jwt,
+                    AuthorizationCode = authorizationCode,
+                    GrantId = grantId
+                });
+                await transaction.Commit(cancellationToken);
+                return true;
+            }
         }
 
         public async Task<bool> AddReferenceAccessToken(string id, string token, string clientId, string authorizationCode, string grantId, CancellationToken cancellationToken)
         {
-            _tokenRepository.Add(new Token
+            using (var transaction = _transactionBuilder.Build())
             {
-                Id = id,
-                ClientId = clientId,
-                CreateDateTime = DateTime.UtcNow,
-                TokenType = DTOs.TokenResponseParameters.AccessToken,
-                AccessTokenType = AccessTokenTypes.Reference,
-                AuthorizationCode = authorizationCode,
-                GrantId = grantId,
-                Data = token
-            });
-            await _tokenRepository.SaveChanges(cancellationToken);
-            return true;
+                _tokenRepository.Add(new Token
+                {
+                    Id = id,
+                    ClientId = clientId,
+                    CreateDateTime = DateTime.UtcNow,
+                    TokenType = DTOs.TokenResponseParameters.AccessToken,
+                    AccessTokenType = AccessTokenTypes.Reference,
+                    AuthorizationCode = authorizationCode,
+                    GrantId = grantId,
+                    Data = token
+                });
+                await transaction.Commit(cancellationToken);
+                return true;
+            }
         }
 
         public async Task<JsonWebToken> GetAccessToken(string accessToken, CancellationToken cancellationToken)
@@ -171,12 +189,15 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<bool> TryRemoveAccessToken(string accessToken, string clientId, CancellationToken cancellationToken)
         {
-            var result = await _tokenRepository.Get(accessToken, cancellationToken);
-            if (result == null) return false;
-            if (result.ClientId != clientId) throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.UnauthorizedClient);
-            _tokenRepository.Remove(result);
-            await _tokenRepository.SaveChanges(cancellationToken);
-            return true;
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var result = await _tokenRepository.Get(accessToken, cancellationToken);
+                if (result == null) return false;
+                if (result.ClientId != clientId) throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.UnauthorizedClient);
+                _tokenRepository.Remove(result);
+                await transaction.Commit(cancellationToken);
+                return true;
+            }
         }
 
         #endregion
@@ -192,23 +213,26 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject request, JsonObject originalRequest, double validityPeriodsInSeconds, string jkt, string sessionId, CancellationToken cancellationToken)
         {
-            var refreshToken = Guid.NewGuid().ToString();
-            _tokenRepository.Add(new Token
+            using (var transaction = _transactionBuilder.Build())
             {
-                Id = refreshToken,
-                TokenType = DTOs.TokenResponseParameters.RefreshToken,
-                ClientId = clientId,
-                Data = request.ToString(),
-                OriginalData = originalRequest?.ToString(),
-                AuthorizationCode = authorizationCode,
-                ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
-                CreateDateTime = DateTime.UtcNow,
-                GrantId = grantId,
-                SessionId = sessionId,
-                Jkt = jkt
-            });
-            await _tokenRepository.SaveChanges(cancellationToken);
-            return refreshToken;
+                var refreshToken = Guid.NewGuid().ToString();
+                _tokenRepository.Add(new Token
+                {
+                    Id = refreshToken,
+                    TokenType = DTOs.TokenResponseParameters.RefreshToken,
+                    ClientId = clientId,
+                    Data = request.ToString(),
+                    OriginalData = originalRequest?.ToString(),
+                    AuthorizationCode = authorizationCode,
+                    ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
+                    CreateDateTime = DateTime.UtcNow,
+                    GrantId = grantId,
+                    SessionId = sessionId,
+                    Jkt = jkt
+                });
+                await transaction.SaveChanges(cancellationToken);
+                return refreshToken;
+            }
         }
 
         public Task RemoveRefreshToken(string refreshToken, CancellationToken token)
@@ -218,20 +242,23 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<bool> TryRemoveRefreshToken(string refreshToken, string clientId, CancellationToken cancellationToken)
         {
-            var result = await _tokenRepository.Get(refreshToken, cancellationToken);
-            if (result == null)
+            using (var transaction = _transactionBuilder.Build())
             {
-                return false;
-            }
+                var result = await _tokenRepository.Get(refreshToken, cancellationToken);
+                if (result == null)
+                {
+                    return false;
+                }
 
-            if (result.ClientId != clientId)
-            {
-                throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.UnauthorizedClient);
-            }
+                if (result.ClientId != clientId)
+                {
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.UnauthorizedClient);
+                }
 
-            _tokenRepository.Remove(result);
-            await _tokenRepository.SaveChanges(cancellationToken);
-            return true;
+                _tokenRepository.Remove(result);
+                await transaction.SaveChanges(cancellationToken);
+                return true;
+            }
         }
 
         #endregion

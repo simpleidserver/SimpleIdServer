@@ -13,6 +13,6 @@ public interface IUmaResourceRepository
     Task<List<UMAResource>> GetByIds(List<string> resourceIds, CancellationToken cancellationToken);
     Task<List<UMAResource>> GetAll(CancellationToken cancellationToken);
     void Add(UMAResource resource);
+    void Update(UMAResource resource);
     void Delete(UMAResource resource);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
 }

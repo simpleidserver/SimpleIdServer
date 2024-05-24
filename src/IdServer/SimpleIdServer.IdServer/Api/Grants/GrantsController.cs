@@ -77,7 +77,6 @@ namespace SimpleIdServer.IdServer.Api.Grants
                     var tokens = await _tokenRepository.GetByGrantId(id, cancellationToken);
                     foreach (var t in tokens)
                         _tokenRepository.Remove(t);
-                    await _tokenRepository.SaveChanges(cancellationToken);
                     await transaction.Commit(cancellationToken);
                     return new NoContentResult();
                 }

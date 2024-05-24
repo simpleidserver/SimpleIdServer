@@ -17,8 +17,6 @@ public class ScopeRepository : IScopeRepository
         _dbContext = dbContext;
     }
 
-    public IQueryable<Scope> Query() => _dbContext.Scopes;
-
     public Task<Scope> Get(string realm, string id, CancellationToken cancellationToken)
     {
         return _dbContext.Scopes
@@ -91,5 +89,5 @@ public class ScopeRepository : IScopeRepository
 
     public void Add(Scope scope) => _dbContext.Scopes.Add(scope);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(Scope scope) { }
 }

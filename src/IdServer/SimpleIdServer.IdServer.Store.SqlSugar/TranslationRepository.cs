@@ -1,25 +1,26 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit.Initializers;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 
-namespace SimpleIdServer.IdServer.Store.SqlSugar
+namespace SimpleIdServer.IdServer.Store.SqlSugar;
+
+public class TranslationRepository : ITranslationRepository
 {
-    public class TranslationRepository : ITranslationRepository
+    private readonly DbContext _dbContext;
+
+    public TranslationRepository(DbContext dbContext)
     {
-        public Task<List<Translation>> GetAllByKey(string key, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+        _dbContext = dbContext;
+    }
 
-        public IQueryable<Translation> Query()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> SaveChanges(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+    public async Task<List<Translation>> GetAllByKey(string key, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.Client.Queryable<SugarTranslation>()
+            .Where(t => t.Key == key)
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 }

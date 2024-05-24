@@ -1,39 +1,60 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using MassTransit.Initializers;
 using SimpleIdServer.IdServer.Domains;
-
-// Copyright (c) SimpleIdServer. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
+using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar;
 
 public class UmaPendingRequestRepository : IUmaPendingRequestRepository
 {
+    private readonly DbContext _dbContext;
+
+    public UmaPendingRequestRepository(DbContext dbContext)
+    {
+        _dbContext  = dbContext;
+    }
+
     public void Add(UMAPendingRequest request)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.Insertable(Transform(request)).ExecuteCommand();
     }
 
-    public Task<List<UMAPendingRequest>> GetByPermissionTicketId(string permissionTicketId, CancellationToken cancellationToken)
+    public void Update(UMAPendingRequest request)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.Updateable(Transform(request)).ExecuteCommand();
     }
 
-    public Task<List<UMAPendingRequest>> GetByUsername(string realm, string userName, CancellationToken cancellationToken)
+    public async Task<List<UMAPendingRequest>> GetByPermissionTicketId(string permissionTicketId, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarUMAPendingRequest>()
+            .Where(r => r.TicketId == permissionTicketId)
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public IQueryable<UMAPendingRequest> Query()
+    public async Task<List<UMAPendingRequest>> GetByUsername(string realm, string userName, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var result = await _dbContext.Client.Queryable<SugarUMAPendingRequest>()
+            .Includes(p => p.Resource, p => p.Translations)
+            .Where(r => (r.Owner == userName || r.Requester == userName) && r.Realm == realm)
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
+    private static SugarUMAPendingRequest Transform(UMAPendingRequest request)
     {
-        throw new NotImplementedException();
+        return new SugarUMAPendingRequest
+        {
+            CreateDateTime = request.CreateDateTime,
+            TicketId = request.TicketId,
+            Owner = request.Owner,
+            Realm = request.Realm,
+            Requester = request.Requester,
+            Scopes = request.Scopes == null ? string.Empty : string.Join(",", request.Scopes),
+            Status = request.Status
+        };
     }
 }

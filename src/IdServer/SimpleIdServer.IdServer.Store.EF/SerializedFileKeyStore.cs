@@ -43,5 +43,8 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
 
     public void Add(SerializedFileKey key) => _dbContext.SerializedFileKeys.Add(key);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(SerializedFileKey key)
+    {
+
+    }
 }

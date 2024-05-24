@@ -29,7 +29,5 @@ namespace SimpleIdServer.IdServer.Store.EF
         public void Add(Token token) => _dbContext.Tokens.Add(token);
 
         public void Remove(Token token) => _dbContext.Tokens.Remove(token);
-
-        public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

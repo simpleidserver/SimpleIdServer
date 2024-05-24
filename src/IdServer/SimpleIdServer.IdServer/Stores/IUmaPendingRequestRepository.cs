@@ -3,7 +3,6 @@
 
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +12,6 @@ public interface IUmaPendingRequestRepository
 {
     Task<List<UMAPendingRequest>> GetByPermissionTicketId(string permissionTicketId, CancellationToken cancellationToken);
     Task<List<UMAPendingRequest>> GetByUsername(string realm, string userName, CancellationToken cancellationToken);
-    IQueryable<UMAPendingRequest> Query();
     void Add(UMAPendingRequest request);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
+    void Update(UMAPendingRequest request);
 }

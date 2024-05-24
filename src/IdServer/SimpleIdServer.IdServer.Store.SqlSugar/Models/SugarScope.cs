@@ -19,11 +19,11 @@ public class SugarScope
     public DateTime UpdateDateTime { get; set; }
 
     [Navigate(NavigateType.OneToMany, nameof(SugarScopeClaimMapper.ScopeId))]
-    public ICollection<SugarScopeClaimMapper> ClaimMappers { get; set; }
+    public List<SugarScopeClaimMapper> ClaimMappers { get; set; }
     [Navigate(typeof(SugarApiResourceScope), nameof(SugarApiResourceScope.ScopesId), nameof(SugarApiResourceScope.ApiResourcesId))]
     public List<SugarApiResource> ApiResources { get; set; }
     [Navigate(typeof(SugarScopeRealm), nameof(SugarScopeRealm.ScopesId), nameof(SugarScopeRealm.RealmsName))]
-    public List<Realm> Realms { get; set; }
+    public List<SugarRealm> Realms { get; set; }
 
     public Scope ToDomain()
     {
