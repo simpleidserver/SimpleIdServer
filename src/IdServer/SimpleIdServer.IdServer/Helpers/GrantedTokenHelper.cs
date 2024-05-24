@@ -193,6 +193,8 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject request, JsonObject originalRequest, double validityPeriodsInSeconds, string jkt, string sessionId, CancellationToken cancellationToken)
         {
+            CleanRequest(request);
+            CleanRequest(originalRequest);
             var refreshToken = Guid.NewGuid().ToString();
             _tokenRepository.Add(new Token
             {
@@ -210,6 +212,17 @@ namespace SimpleIdServer.IdServer.Helpers
             });
             await _tokenRepository.SaveChanges(cancellationToken);
             return refreshToken;
+
+            void CleanRequest(JsonObject jsonObj)
+            {
+                if (jsonObj == null) return;
+                jsonObj.Remove(TokenRequestParameters.Password);
+                jsonObj.Remove(TokenRequestParameters.ClientSecret);
+                jsonObj.Remove(TokenRequestParameters.Code);
+                jsonObj.Remove(TokenRequestParameters.CodeVerifier);
+                jsonObj.Remove(TokenRequestParameters.PreAuthorizedCode);
+                jsonObj.Remove(TokenRequestParameters.DeviceCode);
+            }
         }
 
         public Task RemoveRefreshToken(string refreshToken, CancellationToken token)
