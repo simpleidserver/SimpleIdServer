@@ -237,8 +237,6 @@ public class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public virtual Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
-
     private IQueryable<User> GetUsers() => _dbContext.Users
                     .Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources)
                     .Include(u => u.IdentityProvisioning).ThenInclude(i => i.Definition)

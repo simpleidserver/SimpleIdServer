@@ -32,11 +32,12 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         IOptions<IdServerHostOptions> options, 
         IDistributedCache distributedCache, 
         IUserRepository userRepository, 
+        ITransactionBuilder transactionBuilder,
         IEnumerable<IOTPAuthenticator> otpAuthenticators, 
         IConfiguration configuration, 
         IUserNotificationService userNotificationService,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
     {
         _userRepository = userRepository;
         _otpAuthenticators = otpAuthenticators;
@@ -153,15 +154,19 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
         async Task<IActionResult> UpdateAuthenticatedUser()
         {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, CancellationToken.None);
-            BuildUser(authenticatedUser, viewModel);
-            authenticatedUser.UpdateDateTime = DateTime.UtcNow;
-            if (authenticatedUser.ActiveOTP == null)
-                authenticatedUser.GenerateTOTP();
+            using (var transaction = TransactionBuilder.Build())
+            {
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, CancellationToken.None);
+                BuildUser(authenticatedUser, viewModel);
+                authenticatedUser.UpdateDateTime = DateTime.UtcNow;
+                if (authenticatedUser.ActiveOTP == null)
+                    authenticatedUser.GenerateTOTP();
 
-            await _userRepository.SaveChanges(CancellationToken.None);
-            return await base.UpdateUser(userRegistrationProgress, viewModel, Amr, viewModel.RedirectUrl);
+                _userRepository.Update(authenticatedUser);
+                await transaction.Commit(CancellationToken.None);
+                return await base.UpdateUser(userRegistrationProgress, viewModel, Amr, viewModel.RedirectUrl);
+            }
         }
 
         async Task<IActionResult> RegisterUser()

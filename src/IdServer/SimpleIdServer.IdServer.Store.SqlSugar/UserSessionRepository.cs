@@ -4,43 +4,49 @@
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
 
-namespace SimpleIdServer.IdServer.Store.SqlSugar
+namespace SimpleIdServer.IdServer.Store.SqlSugar;
+
+public class UserSessionRepository : IUserSessionResitory
 {
-    internal class UserSessionRepository : IUserSessionResitory
+    private readonly DbContext _dbContext;
+
+    public UserSessionRepository(DbContext dbContext)
     {
-        public void Add(UserSession session)
-        {
-            throw new NotImplementedException();
-        }
+        _dbContext = dbContext;
+    }
 
-        public Task<IEnumerable<UserSession>> GetActive(string userId, string realm, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+    public void Add(UserSession session)
+    {
+        throw new NotImplementedException();
+    }
 
-        public Task<UserSession> GetById(string sessionId, string realm, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+    public Task<IEnumerable<UserSession>> GetActive(string userId, string realm, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 
-        public Task<IEnumerable<UserSession>> GetInactiveAndNotNotified(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+    public Task<UserSession> GetById(string sessionId, string realm, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 
-        public IQueryable<UserSession> Query()
-        {
-            throw new NotImplementedException();
-        }
+    public Task<IEnumerable<UserSession>> GetInactiveAndNotNotified(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 
-        public Task<int> SaveChanges(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+    public IQueryable<UserSession> Query()
+    {
+        throw new NotImplementedException();
+    }
 
-        public Task<SearchResult<UserSession>> Search(string userId, string realm, SearchRequest request, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
+    public Task<int> SaveChanges(CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<SearchResult<UserSession>> Search(string userId, string realm, SearchRequest request, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
     }
 }

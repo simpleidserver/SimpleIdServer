@@ -25,7 +25,8 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
         IDistributedCache distributedCache, 
         IUserRepository userRepository, 
         ITokenRepository tokenRepository, 
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+        ITransactionBuilder transactionBuilder,
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
     {
         _presentationDefinitionStore = presentationDefinitionStore;
     }

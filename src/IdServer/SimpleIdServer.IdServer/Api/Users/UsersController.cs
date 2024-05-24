@@ -594,21 +594,25 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                    var assignedGroup = user.Groups.SingleOrDefault(g => g.GroupsId == groupId);
-                    if (assignedGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
-                    user.Groups.Remove(assignedGroup);
-                    user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "User's group is removed");
-                    await _busControl.Publish(new RemoveUserGroupSuccessEvent
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        Realm = prefix,
-                        Id = id
-                    });
-                    return new NoContentResult();
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
+                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                        var assignedGroup = user.Groups.SingleOrDefault(g => g.GroupsId == groupId);
+                        if (assignedGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
+                        user.Groups.Remove(assignedGroup);
+                        user.UpdateDateTime = DateTime.UtcNow;
+                        _userRepository.Update(user);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(ActivityStatusCode.Ok, "User's group is removed");
+                        await _busControl.Publish(new RemoveUserGroupSuccessEvent
+                        {
+                            Realm = prefix,
+                            Id = id
+                        });
+                        return new NoContentResult();
+                    }
                 }
                 catch (OAuthException ex)
                 {
@@ -636,21 +640,25 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                    var consent = user.Consents.SingleOrDefault(c => c.Id == consentId);
-                    if (consent == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserConsent, consentId));
-                    user.Consents.Remove(consent);
-                    user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "User's consent is revoked");
-                    await _busControl.Publish(new RevokeUserConsentSuccessEvent
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        Realm = prefix,
-                        Id = id
-                    });
-                    return new NoContentResult();
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
+                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                        var consent = user.Consents.SingleOrDefault(c => c.Id == consentId);
+                        if (consent == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserConsent, consentId));
+                        user.Consents.Remove(consent);
+                        user.UpdateDateTime = DateTime.UtcNow;
+                        _userRepository.Update(user);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(ActivityStatusCode.Ok, "User's consent is revoked");
+                        await _busControl.Publish(new RevokeUserConsentSuccessEvent
+                        {
+                            Realm = prefix,
+                            Id = id
+                        });
+                        return new NoContentResult();
+                    }
                 }
                 catch (OAuthException ex)
                 {
@@ -760,24 +768,28 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                    if (string.IsNullOrWhiteSpace(request.Scheme)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Scheme));
-                    if (string.IsNullOrWhiteSpace(request.Subject)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Subject));
-                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                    var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(c => c.Subject == request.Subject && c.Scheme == request.Scheme);
-                    if (externalAuthProvider == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnknownUserExternalAuthProvider);
-                    user.ExternalAuthProviders.Remove(externalAuthProvider);
-                    user.UpdateDateTime = DateTime.UtcNow;
-                    await _userRepository.SaveChanges(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "User's external authentication provider is unlinked");
-                    await _busControl.Publish(new UnlinkUserExternalAuthProviderSuccessEvent
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        Realm = prefix,
-                        Id = id
-                    });
-                    return new NoContentResult();
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
+                        if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                        if (string.IsNullOrWhiteSpace(request.Scheme)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Scheme));
+                        if (string.IsNullOrWhiteSpace(request.Subject)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Subject));
+                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                        var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(c => c.Subject == request.Subject && c.Scheme == request.Scheme);
+                        if (externalAuthProvider == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnknownUserExternalAuthProvider);
+                        user.ExternalAuthProviders.Remove(externalAuthProvider);
+                        user.UpdateDateTime = DateTime.UtcNow;
+                        _userRepository.Update(user);
+                        await transaction.Commit(cancellationToken);
+                        activity?.SetStatus(ActivityStatusCode.Ok, "User's external authentication provider is unlinked");
+                        await _busControl.Publish(new UnlinkUserExternalAuthProviderSuccessEvent
+                        {
+                            Realm = prefix,
+                            Id = id
+                        });
+                        return new NoContentResult();
+                    }
                 }
                 catch (OAuthException ex)
                 {

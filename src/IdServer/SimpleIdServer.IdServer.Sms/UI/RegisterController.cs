@@ -32,7 +32,8 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions, 
         IConfiguration configuration,
         ISmsUserNotificationService userNotificationService,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
+        ITransactionBuilder transactionBuilder,
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
     {
         _authenticationHelper = authenticationHelper;
     }

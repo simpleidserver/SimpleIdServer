@@ -23,7 +23,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IDistributedCache distributedCache, 
             IUserRepository userRepository,
             ITokenRepository tokenRepository,
-            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+            ITransactionBuilder transactionBuilder,
+            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
         {
         }
 

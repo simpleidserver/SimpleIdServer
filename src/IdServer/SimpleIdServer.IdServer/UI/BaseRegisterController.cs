@@ -24,16 +24,19 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         IDistributedCache distributedCache,
         IUserRepository userRepository,
         ITokenRepository tokenRepository,
+        ITransactionBuilder transactionBuilder,
         IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
     {
         Options = options.Value;
         DistributedCache = distributedCache;
         UserRepository = userRepository;
+        TransactionBuilder = transactionBuilder;
     }
 
     protected IdServerHostOptions Options { get; }
     protected IDistributedCache DistributedCache { get; }
     protected IUserRepository UserRepository { get; }
+    protected ITransactionBuilder TransactionBuilder { get; }
 
     protected async Task<UserRegistrationProgress> GetRegistrationProgress()
     {
@@ -59,15 +62,18 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         var lastStep = registrationProgress.Steps.Last();
         if(lastStep == amr)
         {
-            user.Realms.Add(new Domains.RealmUser
+            using (var transaction = TransactionBuilder.Build())
             {
-                RealmsName = prefix
-            });
-            UserRepository.Add(user);
-            await UserRepository.SaveChanges(CancellationToken.None);
-            viewModel.IsUpdated = true;
-            viewModel.RedirectUrl = registrationProgress.RedirectUrl ?? redirectUrl;
-            return View(viewModel);
+                user.Realms.Add(new Domains.RealmUser
+                {
+                    RealmsName = prefix
+                });
+                UserRepository.Add(user);
+                await transaction.Commit(CancellationToken.None);
+                viewModel.IsUpdated = true;
+                viewModel.RedirectUrl = registrationProgress.RedirectUrl ?? redirectUrl;
+                return View(viewModel);
+            }
         }
 
         registrationProgress.NextAmr();

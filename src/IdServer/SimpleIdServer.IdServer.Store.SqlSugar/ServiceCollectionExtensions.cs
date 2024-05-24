@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITranslationRepository, TranslationRepository>();
         services.AddTransient<IUmaPendingRequestRepository, UmaPendingRequestRepository>();
         services.AddTransient<IUmaResourceRepository, UmaResourceRepository>();
+        services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<ITransactionBuilder, SqlSugarTransactionBuilder>();
         return services;
     }

@@ -102,28 +102,36 @@ namespace SimpleIdServer.IdServer.UI
         [Authorize(Constants.Policies.Authenticated)]
         public async Task<IActionResult> UpdatePicture([FromResult] string prefix, IFormFile file, CancellationToken cancellationToken)
         {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var realm = prefix ?? Constants.DefaultRealm;
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.GetBySubject(nameIdentifier, realm, cancellationToken);
-            _userHelper.UpdatePicture(user, file, issuer);
-            await _userRepository.SaveChanges(cancellationToken);
-            return new NoContentResult();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                var realm = prefix ?? Constants.DefaultRealm;
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var user = await _userRepository.GetBySubject(nameIdentifier, realm, cancellationToken);
+                _userHelper.UpdatePicture(user, file, issuer);
+                _userRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
+            }
         }
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
         public async virtual Task<IActionResult> RejectConsent([FromRoute] string prefix, string consentId, CancellationToken cancellationToken)
         {
-            prefix = prefix ?? Constants.DefaultRealm;
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-            if (!_userHelper.HasOpenIDConsent(user, consentId))
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
+            using (var transaction = _transactionBuilder.Build())
+            {
+                prefix = prefix ?? Constants.DefaultRealm;
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+                if (!_userHelper.HasOpenIDConsent(user, consentId))
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
 
-            user.RejectConsent(consentId);
-            await _userRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Profile");
+                user.RejectConsent(consentId);
+                _userRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                return RedirectToAction("Profile");
+            }
         }
 
         [HttpGet]
@@ -238,12 +246,16 @@ namespace SimpleIdServer.IdServer.UI
                     return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = "a local account has already been linked to the external authentication provider" });
                 }
 
-                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-                if (!user.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme))
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    user.AddExternalAuthProvider(scheme, sub);
-                    await _userRepository.SaveChanges(cancellationToken);
-                    _logger.LogInformation("user account {userId} has been linked to the external account {authProviderScheme} with external subject {authProviderSubject}", nameIdentifier, scheme, sub);
+                    var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+                    if (!user.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme))
+                    {
+                        user.AddExternalAuthProvider(scheme, sub);
+                        _userRepository.Update(user);
+                        await transaction.Commit(cancellationToken);
+                        _logger.LogInformation("user account {userId} has been linked to the external account {authProviderScheme} with external subject {authProviderSubject}", nameIdentifier, scheme, sub);
+                    }
                 }
 
                 await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
@@ -259,17 +271,20 @@ namespace SimpleIdServer.IdServer.UI
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Request cannot be empty" });
 
-            prefix = prefix ?? Constants.DefaultRealm;
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-            var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(p => p.Subject == viewModel.Subject && p.Scheme == viewModel.Scheme);
-            if(externalAuthProvider == null)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Cannot unlink an unknown profile" });
+            using (var transaction = _transactionBuilder.Build())
+            {
+                prefix = prefix ?? Constants.DefaultRealm;
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+                var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(p => p.Subject == viewModel.Subject && p.Scheme == viewModel.Scheme);
+                if (externalAuthProvider == null)
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Cannot unlink an unknown profile" });
 
-            user.ExternalAuthProviders.Remove(externalAuthProvider);
-            _userRepository.Update(user);
-            await _userRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Profile", "Home");
+                user.ExternalAuthProviders.Remove(externalAuthProvider);
+                _userRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                return RedirectToAction("Profile", "Home");
+            }
         }
 
         #endregion

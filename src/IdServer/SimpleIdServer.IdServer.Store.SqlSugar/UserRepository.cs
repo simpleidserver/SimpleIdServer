@@ -156,18 +156,13 @@ public class UserRepository : IUserRepository
     {
         var result = await _dbContext.Client.Queryable<SugarUser>()
             .Includes(u => u.Realms)
-            .CountAsync(u => u.Realms.Any(r => r.RealmsName == realm), cancellationToken); NbUsers
+            .CountAsync(u => u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
         return result;
     }
 
     public void Remove(IEnumerable<User> users)
     {
         _dbContext.Client.Deleteable(users.Select(u => Transform(u)).ToList()).ExecuteCommand();
-    }
-
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<SearchResult<User>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)

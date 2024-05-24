@@ -47,6 +47,7 @@ namespace SimpleIdServer.IdServer.UI
             IUserTransformer userTransformer,
             IDataProtectionProvider dataProtectionProvider,
             IAuthenticationHelper authenticationHelper,
+            ITransactionBuilder transactionBuilder,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
@@ -59,6 +60,7 @@ namespace SimpleIdServer.IdServer.UI
             _userTransformer = userTransformer;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _authenticationHelper = authenticationHelper;
+            TransactionBuilder = transactionBuilder;
             _options = options.Value;
         }
 
@@ -68,6 +70,7 @@ namespace SimpleIdServer.IdServer.UI
         protected IAmrHelper AmrHelper => _amrHelper;
         protected IBusControl Bus => _busControl;
         protected IAuthenticationHelper AuthenticationHelper => _authenticationHelper;
+        protected ITransactionBuilder TransactionBuilder { get; }
 
         protected JsonObject ExtractQuery(string returnUrl) => ExtractQueryFromUnprotectedUrl(Unprotect(returnUrl));
 
@@ -127,14 +130,18 @@ namespace SimpleIdServer.IdServer.UI
                 return await Sign(realm, unprotectedUrl, currentAmr, user, client, token, rememberLogin.Value);
             }
 
-            if(rememberLogin != null)
-                HttpContext.Response.Cookies.Append(Constants.DefaultRememberMeCookieName, rememberLogin.Value.ToString());
+            using (var transaction = TransactionBuilder.Build())
+            {
+                if (rememberLogin != null)
+                    HttpContext.Response.Cookies.Append(Constants.DefaultRememberMeCookieName, rememberLogin.Value.ToString());
 
-            var allAmr = acr.AuthenticationMethodReferences;
-            var login = _authenticationHelper.GetLogin(user);
-            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), allAmr, amr)));
-	        await _userRepository.SaveChanges(token);
-            return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
+                var allAmr = acr.AuthenticationMethodReferences;
+                var login = _authenticationHelper.GetLogin(user);
+                HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), allAmr, amr)));
+                _userRepository.Update(user);
+                await transaction.Commit(token);
+                return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
+            }
         }
 
         protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)
@@ -173,34 +180,38 @@ namespace SimpleIdServer.IdServer.UI
 
         protected async Task AddSession(string realm, User user, Client client, CancellationToken cancellationToken, bool rememberLogin = false)
         {
-            var currentDateTime = DateTime.UtcNow;
-            var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
-            var expirationDateTime = currentDateTime.AddSeconds(expirationTimeInSeconds);
-            var session = new UserSession
+            using(var transaction = TransactionBuilder.Build())
             {
-                SessionId = Guid.NewGuid().ToString(),
-                AuthenticationDateTime = DateTime.UtcNow,
-                ExpirationDateTime = expirationDateTime,
-                State = UserSessionStates.Active,
-                Realm = realm,
-                UserId = user.Id,
-                ClientIds = new List<string> { }
-            };
-            _userSessionRepository.Add(session);
-            await _userSessionRepository.SaveChanges(cancellationToken);
-            await _userRepository.SaveChanges(cancellationToken);
-            var cookieOptions = new CookieOptions
-            {
-                Secure = true,
-                HttpOnly = false,
-                SameSite = SameSiteMode.None
-            };
-            if(rememberLogin)
-            {
-                cookieOptions.MaxAge = TimeSpan.FromSeconds(expirationTimeInSeconds);
-            }
+                var currentDateTime = DateTime.UtcNow;
+                var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
+                var expirationDateTime = currentDateTime.AddSeconds(expirationTimeInSeconds);
+                var session = new UserSession
+                {
+                    SessionId = Guid.NewGuid().ToString(),
+                    AuthenticationDateTime = DateTime.UtcNow,
+                    ExpirationDateTime = expirationDateTime,
+                    State = UserSessionStates.Active,
+                    Realm = realm,
+                    UserId = user.Id,
+                    ClientIds = new List<string> { }
+                };
+                _userSessionRepository.Add(session);
+                await _userSessionRepository.SaveChanges(cancellationToken);
+                _userRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                var cookieOptions = new CookieOptions
+                {
+                    Secure = true,
+                    HttpOnly = false,
+                    SameSite = SameSiteMode.None
+                };
+                if (rememberLogin)
+                {
+                    cookieOptions.MaxAge = TimeSpan.FromSeconds(expirationTimeInSeconds);
+                }
 
-            Response.Cookies.Append(_options.GetSessionCookieName(), session.SessionId, cookieOptions);
+                Response.Cookies.Append(_options.GetSessionCookieName(), session.SessionId, cookieOptions);
+            }
         }
 
         private double GetCookieExpirationTimeInSeconds(Client client)

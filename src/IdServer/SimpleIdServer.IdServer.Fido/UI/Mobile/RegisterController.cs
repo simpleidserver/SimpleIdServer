@@ -24,7 +24,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IUserRepository userRepository, 
             IConfiguration configuration,
             ITokenRepository tokenRepository,
-            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+            ITransactionBuilder transactionBuilder,
+            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
         {
             _configuration = configuration;
         }

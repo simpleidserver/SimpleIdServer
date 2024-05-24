@@ -25,11 +25,12 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
         IOptions<IdServerHostOptions> options, 
         IDistributedCache distributedCache, 
         IUserRepository userRepository, 
+        ITransactionBuilder transactionBuilder,
         IEnumerable<IOTPAuthenticator> otpAuthenticators, 
         IConfiguration configuration, 
         IEmailUserNotificationService userNotificationService,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
     {
         _authenticationHelper = authenticationHelper;
     }
