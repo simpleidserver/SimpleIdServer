@@ -16,6 +16,5 @@ public interface IUserSessionResitory
     Task<UserSession> GetById(string sessionId, string realm, CancellationToken cancellationToken);
     Task<SearchResult<UserSession>> Search(string userId, string realm, SearchRequest request, CancellationToken cancellationToken);
     void Add(UserSession session);
-    IQueryable<UserSession> Query();
-    Task<int> SaveChanges(CancellationToken cancellationToken);
+    void Update(UserSession session);
 }

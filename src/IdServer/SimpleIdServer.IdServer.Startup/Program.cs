@@ -131,7 +131,7 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
-    var chooser = services.AddSIDIdentityServer(callback: cb =>
+    var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix)) 
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
@@ -140,12 +140,13 @@ void ConfigureIdServer(IServiceCollection services)
         {
             if(!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix)) 
                 c.Cookie.Name = identityServerConfiguration.AuthCookieNamePrefix;
-        }, dataProtectionBuilderCallback: ConfigureDataProtection);
-    chooser.UseEFStore(o => ConfigureStorage(o));
-    var idServerBuilder = chooser.UseSqlSugar(o =>
-    {
-        o.ConnectionConfig = new SqlSugar.ConnectionConfig { DbType = SqlSugar.DbType.SqlServer, ConnectionString = "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True" };
-    })
+        }, dataProtectionBuilderCallback: ConfigureDataProtection)
+        .UseEFStore(o => ConfigureStorage(o))
+        /*.UseSqlSugar(o =>
+        {
+            o.ConnectionConfig = new SqlSugar.ConnectionConfig { DbType = SqlSugar.DbType.SqlServer, ConnectionString = "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True" };
+        })
+        */
         .AddSwagger(o =>
         {
             o.IncludeDocumentation<AccessTokenTypeService>();

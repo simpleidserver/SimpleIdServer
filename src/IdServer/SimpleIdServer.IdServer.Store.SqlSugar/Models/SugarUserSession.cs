@@ -17,6 +17,7 @@ public class SugarUserSession
     public bool IsClientsNotified { get; set; } = false;
     public string SerializedClientIds { get; set; } = string.Empty;
     public string UserId { get; set; } = null!;
+    public SugarUser User { get; set; }
 
     public UserSession ToDomain()
     {
@@ -29,7 +30,8 @@ public class SugarUserSession
             State = State,
             Realm = Realm,
             IsClientsNotified = IsClientsNotified,
-            SerializedClientIds = SerializedClientIds
+            SerializedClientIds = SerializedClientIds,
+            User = User?.ToDomain()
         };
     }
 }

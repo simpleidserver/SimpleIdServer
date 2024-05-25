@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Email.UI
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider,
             ITokenRepository tokenRepository,
+            ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder,
             IAuthenticationHelper authenticationHelper,
             IClientRepository clientRepository, 
@@ -43,7 +44,7 @@ namespace SimpleIdServer.IdServer.Email.UI
             IUserTransformer userTransformer, 
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _configuration = configuration;
         }

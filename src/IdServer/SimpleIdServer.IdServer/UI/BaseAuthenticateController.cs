@@ -196,7 +196,6 @@ namespace SimpleIdServer.IdServer.UI
                     ClientIds = new List<string> { }
                 };
                 _userSessionRepository.Add(session);
-                await _userSessionRepository.SaveChanges(cancellationToken);
                 _userRepository.Update(user);
                 await transaction.Commit(cancellationToken);
                 var cookieOptions = new CookieOptions

@@ -41,6 +41,7 @@ namespace SimpleIdServer.IdServer.UI
             IUserAuthenticationService userAuthenticationService,
             IDataProtectionProvider dataProtectionProvider,
             ITokenRepository tokenRepository,
+            ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder,
             IAuthenticationHelper authenticationHelper,
             IClientRepository clientRepository,
@@ -50,7 +51,7 @@ namespace SimpleIdServer.IdServer.UI
             IUserTransformer userTransformer,
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
         {
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;

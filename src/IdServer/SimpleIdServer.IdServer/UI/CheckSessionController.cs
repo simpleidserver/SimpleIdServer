@@ -41,6 +41,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IClientRepository _clientRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
@@ -49,6 +50,7 @@ namespace SimpleIdServer.IdServer.UI
             IClientRepository clientRepository,
             IAuthenticationHelper authenticationHelper,
             IRecurringJobManager reccuringJobManager,
+            ITransactionBuilder transactionBuilder,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
         {
@@ -58,6 +60,7 @@ namespace SimpleIdServer.IdServer.UI
             _clientRepository = clientRepository;
             _authenticationHelper = authenticationHelper;
             _recurringJobManager = reccuringJobManager;
+            _transactionBuilder = transactionBuilder;
         }
 
         [HttpGet]
@@ -175,17 +178,21 @@ namespace SimpleIdServer.IdServer.UI
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoSessionId);
                 }
 
-                var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                if(activeSession == null)
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, kvp.Value));
-                }
+                    var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+                    if (activeSession == null)
+                    {
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, kvp.Value));
+                    }
 
-                if(!activeSession.IsClientsNotified)
-                {
-                    activeSession.State = UserSessionStates.Rejected;
-                    await _userSessionRepository.SaveChanges(cancellationToken);
-                    _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    if (!activeSession.IsClientsNotified)
+                    {
+                        activeSession.State = UserSessionStates.Rejected;
+                        _userSessionRepository.Update(activeSession);
+                        await transaction.Commit(cancellationToken);
+                        _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    }
                 }
 
                 Response.Cookies.Delete(_options.GetSessionCookieName());

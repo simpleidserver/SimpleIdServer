@@ -45,4 +45,9 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
     public void Delete(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Remove(record);
 
 	public void Add(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Add(record);
+
+    public void Update(RegistrationWorkflow record)
+    {
+
+    }
 }

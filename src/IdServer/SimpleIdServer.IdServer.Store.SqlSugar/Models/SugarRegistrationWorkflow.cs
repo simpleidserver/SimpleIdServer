@@ -18,7 +18,7 @@ public class SugarRegistrationWorkflow
     public bool IsDefault { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarApiResourceRealm.RealmsName), nameof(SugarApiResourceRealm.ApiResourcesId))]
     public SugarRealm Realm { get; set; }
-    [Navigate(NavigateType.OneToMany, nameof(SugarAuthenticationContextClassReference.RegistrationWorkflowId)]
+    [Navigate(NavigateType.OneToMany, nameof(SugarAuthenticationContextClassReference.RegistrationWorkflowId))]
     public List<SugarAuthenticationContextClassReference> Acrs { get; set; }
 
     public RegistrationWorkflow ToDomain()
@@ -32,7 +32,8 @@ public class SugarRegistrationWorkflow
             UpdateDateTime = UpdateDateTime,
             Steps = Steps.Split(',').ToList(),
             IsDefault = IsDefault,
-
+            Acrs = Acrs.Select(a => a.ToDomain()).ToList(),
+            Realm = Realm?.ToDomain()
         };
     }
 }

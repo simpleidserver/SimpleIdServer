@@ -31,5 +31,4 @@ public interface IUserRepository
     Task BulkUpdate(List<User> users);
     Task BulkUpdate(List<RealmUser> userRealms);
     Task BulkUpdate(List<GroupUser> groupUsers);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
 }

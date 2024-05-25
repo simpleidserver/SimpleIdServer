@@ -29,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IKeyValueRepository, KeyValueRepository>();
         services.AddTransient<ILanguageRepository, LanguageRepository>();
         services.AddTransient<IPresentationDefinitionStore, PresentationDefinitionStore>();
+        services.AddTransient<IProvisioningStagingStore, ProvisioningStagingStore>();
         services.AddTransient<IRegistrationWorkflowRepository, RegistrationWorkflowRepository>();
         services.AddTransient<IScopeRepository, ScopeRepository>();
         services.AddTransient<IFileSerializedKeyStore, SerializedFileKeyStore>();
@@ -37,6 +38,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUmaPendingRequestRepository, UmaPendingRequestRepository>();
         services.AddTransient<IUmaResourceRepository, UmaResourceRepository>();
         services.AddTransient<IUserRepository, UserRepository>();
+        services.AddTransient<IUserSessionResitory, UserSessionRepository>();
         services.AddTransient<ITransactionBuilder, SqlSugarTransactionBuilder>();
         return services;
     }

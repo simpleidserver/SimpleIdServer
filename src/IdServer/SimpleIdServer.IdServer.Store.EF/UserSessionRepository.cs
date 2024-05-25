@@ -63,7 +63,8 @@ public class UserSessionRepository : IUserSessionResitory
 
     public void Add(UserSession session) => _dbContext.UserSession.Add(session);
 
-    public IQueryable<UserSession> Query() => _dbContext.UserSession;
+    public void Update(UserSession session)
+    {
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    }
 }

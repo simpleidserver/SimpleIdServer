@@ -58,4 +58,9 @@ public class AuthenticationSchemeProviderRepository : IAuthenticationSchemeProvi
     }
 
     public void Remove(AuthenticationSchemeProvider idProvider) => _dbContext.AuthenticationSchemeProviders.Remove(idProvider);
+
+    public void Update(AuthenticationSchemeProvider idProvider)
+    {
+        
+    }
 }

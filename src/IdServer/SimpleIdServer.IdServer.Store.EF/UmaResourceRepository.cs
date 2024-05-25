@@ -39,5 +39,8 @@ public class UmaResourceRepository : IUmaResourceRepository
 
     public void Delete(UMAResource resource) => _dbContext.UmaResources.Remove(resource);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
+    public void Update(UMAResource resource)
+    {
+
+    }
 }

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar;
@@ -17,36 +18,75 @@ public class UserSessionRepository : IUserSessionResitory
 
     public void Add(UserSession session)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.Insertable(Transform(session))
+            .ExecuteCommand();
     }
 
-    public Task<IEnumerable<UserSession>> GetActive(string userId, string realm, CancellationToken cancellationToken)
+    public void Update(UserSession session)
     {
-        throw new NotImplementedException();
+        _dbContext.Client.Updateable(Transform(session))
+            .ExecuteCommand();
     }
 
-    public Task<UserSession> GetById(string sessionId, string realm, CancellationToken cancellationToken)
+    public async Task<IEnumerable<UserSession>> GetActive(string userId, string realm, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var currentDateTime = DateTime.UtcNow;
+        var result = await _dbContext.Client.Queryable<SugarUserSession>()
+            .Where(s => s.UserId == userId && s.Realm == realm && s.State == UserSessionStates.Active && currentDateTime <= s.ExpirationDateTime)
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain());
     }
 
-    public Task<IEnumerable<UserSession>> GetInactiveAndNotNotified(CancellationToken cancellationToken)
+    public async Task<UserSession> GetById(string sessionId, string realm, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var session = await _dbContext.Client.Queryable<SugarUserSession>()
+            .FirstAsync(s => s.Realm == realm && s.SessionId == sessionId, cancellationToken);
+        return session?.ToDomain();
     }
 
-    public IQueryable<UserSession> Query()
+    public async Task<IEnumerable<UserSession>> GetInactiveAndNotNotified(CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var currentDateTime = DateTime.UtcNow;
+        var session = await _dbContext.Client.Queryable<SugarUserSession>()
+            .Includes(s => s.User)
+            .Where(s => (s.State == UserSessionStates.Rejected || s.ExpirationDateTime < currentDateTime) && s.IsClientsNotified == false)
+            .ToListAsync(cancellationToken);
+        return session.Select(s => s.ToDomain());
     }
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
+    public async Task<SearchResult<UserSession>> Search(string userId, string realm, SearchRequest request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var query = _dbContext.Client.Queryable<SugarUserSession>()
+            .Where(u => u.Realm == realm && u.UserId == userId);
+        if (!string.IsNullOrWhiteSpace(request.Filter))
+            query = query.Where(request.Filter);
+
+        if (!string.IsNullOrWhiteSpace(request.OrderBy))
+            query = query.OrderBy(request.OrderBy);
+        else
+            query = query.OrderByDescending(u => u.AuthenticationDateTime);
+
+        var count = query.Count();
+        var users = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(CancellationToken.None);
+        return new SearchResult<UserSession>
+        {
+            Content = users.Select(u => u.ToDomain()).ToList(),
+            Count = count
+        };
     }
 
-    public Task<SearchResult<UserSession>> Search(string userId, string realm, SearchRequest request, CancellationToken cancellationToken)
+    private static SugarUserSession Transform(UserSession userSession)
     {
-        throw new NotImplementedException();
+        return new SugarUserSession
+        {
+            AuthenticationDateTime = userSession.AuthenticationDateTime,
+            ExpirationDateTime = userSession.ExpirationDateTime,
+            IsClientsNotified = userSession.IsClientsNotified,
+            SerializedClientIds = userSession.SerializedClientIds,
+            SessionId = userSession.SessionId,
+            State = userSession.State,
+            UserId = userSession.UserId,
+            Realm = userSession.Realm
+        };
     }
 }

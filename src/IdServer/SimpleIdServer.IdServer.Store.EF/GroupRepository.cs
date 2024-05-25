@@ -76,7 +76,7 @@ public class GroupRepository : IGroupRepository
 
     public void Add(Group group) => _dbContext.Groups.Add(group);
 
-    public void Update()
+    public void Update(Group group)
     {
 
     }

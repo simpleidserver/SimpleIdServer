@@ -31,7 +31,6 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAuthenticationSchemeProviderRepository _authenticationSchemeProviderRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IRealmRepository _realmRepository;
-        private readonly ITransactionBuilder _transactionBuilder;
 
         public ExternalAuthenticateController(
             IOptions<IdServerHostOptions> options,
@@ -49,7 +48,11 @@ namespace SimpleIdServer.IdServer.UI
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
             ITransactionBuilder transactionBuilder,
-            IBusControl busControl) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
+            IBusControl busControl) : base(
+                clientRepository, 
+                userRepository, 
+                userSessionRepository, 
+                amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
@@ -57,7 +60,6 @@ namespace SimpleIdServer.IdServer.UI
             _authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
             _authenticationHelper = authenticationHelper;
             _realmRepository = realmRepository;
-            _transactionBuilder = transactionBuilder;
         }
 
         [HttpGet]
@@ -135,7 +137,7 @@ namespace SimpleIdServer.IdServer.UI
             var user = await UserRepository.GetByExternalAuthProvider(scheme, sub, realm, cancellationToken);
             if (user == null)
             {
-                using (var transaction = _transactionBuilder.Build())
+                using (var transaction = TransactionBuilder.Build())
                 {
                     _logger.LogInformation($"Start to provision the user '{sub}'");
                     var existingUser = await _authenticationHelper.GetUserByLogin(sub, realm, cancellationToken);

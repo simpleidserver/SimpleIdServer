@@ -36,10 +36,11 @@ public class AuthenticateController : BaseOTPAuthenticateController<Authenticate
         IUserSessionResitory userSessionRepository, 
         IUserTransformer userTransformer, 
         ITokenRepository tokenRepository, 
+        ITransactionBuilder transactionBuilder,
         IJwtBuilder jwtBuilder, 
         IBusControl busControl,
         IAntiforgery antiforgery,
-        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
+        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
     {
     }
 

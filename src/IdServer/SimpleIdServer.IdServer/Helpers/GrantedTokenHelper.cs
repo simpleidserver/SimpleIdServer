@@ -230,7 +230,7 @@ namespace SimpleIdServer.IdServer.Helpers
                     SessionId = sessionId,
                     Jkt = jkt
                 });
-                await transaction.SaveChanges(cancellationToken);
+                await transaction.Commit(cancellationToken);
                 return refreshToken;
             }
         }
@@ -256,7 +256,7 @@ namespace SimpleIdServer.IdServer.Helpers
                 }
 
                 _tokenRepository.Remove(result);
-                await transaction.SaveChanges(cancellationToken);
+                await transaction.Commit(cancellationToken);
                 return true;
             }
         }

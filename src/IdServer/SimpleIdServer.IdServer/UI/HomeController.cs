@@ -347,14 +347,18 @@ namespace SimpleIdServer.IdServer.UI
             IEnumerable<string> frontChannelLogouts = new List<string>();
             if (!string.IsNullOrWhiteSpace(kvp.Key))
             {
-                var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                var targetedClients = await _clientRepository.GetByClientIdsAndExistingFrontchannelLogoutUri(prefix, activeSession.ClientIds, cancellationToken);
-                frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
-                if (activeSession != null && !activeSession.IsClientsNotified)
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    activeSession.State = UserSessionStates.Rejected;
-                    await _userSessionRepository.SaveChanges(cancellationToken);
-                    _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+                    var targetedClients = await _clientRepository.GetByClientIdsAndExistingFrontchannelLogoutUri(prefix, activeSession.ClientIds, cancellationToken);
+                    frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
+                    if (activeSession != null && !activeSession.IsClientsNotified)
+                    {
+                        activeSession.State = UserSessionStates.Rejected;
+                        _userSessionRepository.Update(activeSession);
+                        await transaction.Commit(cancellationToken);
+                        _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    }
                 }
             }
 

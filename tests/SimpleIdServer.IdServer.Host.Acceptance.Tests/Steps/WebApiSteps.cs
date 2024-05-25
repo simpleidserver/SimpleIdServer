@@ -186,11 +186,19 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             {
                 var userRepository = scope.ServiceProvider.GetRequiredService<IUserRepository>();
                 var userSessionRepository = scope.ServiceProvider.GetRequiredService<IUserSessionResitory>();
-                var user = await userRepository.GetBySubject("user", Constants.DefaultRealm, CancellationToken.None);
-                var sessions = await userSessionRepository.GetActive(user.Id, Constants.DefaultRealm, CancellationToken.None);
-                foreach(var session in sessions)
-                    session.AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
-                await userSessionRepository.SaveChanges(CancellationToken.None);
+                var transactionBuilder = scope.ServiceProvider.GetRequiredService<ITransactionBuilder>();
+                using (var transaction = transactionBuilder.Build())
+                {
+                    var user = await userRepository.GetBySubject("user", Constants.DefaultRealm, CancellationToken.None);
+                    var sessions = await userSessionRepository.GetActive(user.Id, Constants.DefaultRealm, CancellationToken.None);
+                    foreach (var session in sessions)
+                    {
+                        session.AuthenticationDateTime = DateTime.UtcNow.AddSeconds(seconds);
+                        userSessionRepository.Update(session);
+                    }
+
+                    await transaction.Commit(CancellationToken.None);
+                }
             }
         }
 

@@ -49,7 +49,7 @@ public class CertificateAuthorityRepository : ICertificateAuthorityRepository
         var result = await _dbContext.Client.Queryable<SugarCertificateAuthority>()
             .Includes(r => r.ClientCertificates)
             .Includes(r => r.Realms)
-            .FirstAsync(c => c.Id == id && c.Realms.Any(r => r.RealmsName == realm), cancellationToken)
+            .FirstAsync(c => c.Id == id && c.Realms.Any(r => r.RealmsName == realm), cancellationToken);
         return result?.ToDomain();
     }
 

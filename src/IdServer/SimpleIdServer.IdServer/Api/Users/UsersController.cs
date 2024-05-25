@@ -686,22 +686,29 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
-                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                    var sessions = await _userSessionRepository.GetActive(id, prefix, cancellationToken);
-                    foreach (var session in sessions)
-                        session.State = UserSessionStates.Rejected;
-                    await _userSessionRepository.SaveChanges(cancellationToken);
-                    _recurringJobManager.Trigger(nameof(UserSessionJob));
-                    activity?.SetStatus(ActivityStatusCode.Ok, "User's sessions are revoked");
-                    await _busControl.Publish(new RevokeUserSessionsSuccessEvent
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        Realm = prefix,
-                        Id = id
-                    });
-                    return new NoContentResult();
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
+                        var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                        var sessions = await _userSessionRepository.GetActive(id, prefix, cancellationToken);
+                        foreach (var session in sessions)
+                        {
+                            session.State = UserSessionStates.Rejected;
+                            _userSessionRepository.Update(session);
+                        }
+
+                        await transaction.Commit(cancellationToken);
+                        _recurringJobManager.Trigger(nameof(UserSessionJob));
+                        activity?.SetStatus(ActivityStatusCode.Ok, "User's sessions are revoked");
+                        await _busControl.Publish(new RevokeUserSessionsSuccessEvent
+                        {
+                            Realm = prefix,
+                            Id = id
+                        });
+                        return new NoContentResult();
+                    }
                 }
                 catch(OAuthException ex)
                 {
@@ -725,22 +732,26 @@ namespace SimpleIdServer.IdServer.Api.Users
             {
                 try
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                    var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
-                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                    var session = await _userSessionRepository.GetById(sessionId, prefix, cancellationToken);
-                    if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, sessionId));
-                    session.State = UserSessionStates.Rejected;
-                    await _userSessionRepository.SaveChanges(cancellationToken);
-                    _recurringJobManager.Trigger(nameof(UserSessionJob));
-                    activity?.SetStatus(ActivityStatusCode.Ok, "User's session is revoked");
-                    await _busControl.Publish(new RevokeUserSessionSuccessEvent
+                    using (var transaction = _transactionBuilder.Build())
                     {
-                        Realm = prefix,
-                        Id = id
-                    });
-                    return new NoContentResult();
+                        await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
+                        var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                        var session = await _userSessionRepository.GetById(sessionId, prefix, cancellationToken);
+                        if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, sessionId));
+                        session.State = UserSessionStates.Rejected;
+                        _userSessionRepository.Update(session);
+                        await transaction.Commit(cancellationToken);
+                        _recurringJobManager.Trigger(nameof(UserSessionJob));
+                        activity?.SetStatus(ActivityStatusCode.Ok, "User's session is revoked");
+                        await _busControl.Publish(new RevokeUserSessionSuccessEvent
+                        {
+                            Realm = prefix,
+                            Id = id
+                        });
+                        return new NoContentResult();
+                    }
                 }
                 catch (OAuthException ex)
                 {
