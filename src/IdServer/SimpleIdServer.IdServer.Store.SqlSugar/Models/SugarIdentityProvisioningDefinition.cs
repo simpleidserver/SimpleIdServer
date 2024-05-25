@@ -20,6 +20,7 @@ public class SugarIdentityProvisioningDefinition
     public List<SugarIdentityProvisioning> IdentityProvisionings { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarIdentityProvisioningMappingRule.IdentityProvisioningDefinitionName))]
     public List<SugarIdentityProvisioningMappingRule> MappingRules { get; set; }
+
     public IdentityProvisioningDefinition ToDomain()
     {
         return new IdentityProvisioningDefinition

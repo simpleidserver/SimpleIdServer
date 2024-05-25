@@ -92,7 +92,7 @@ ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
 
 var app = builder.Build();
-SeedData(app, identityServerConfiguration.SCIMBaseUrl);
+// SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
 if (identityServerConfiguration.IsForwardedEnabled)
 {
@@ -141,12 +141,11 @@ void ConfigureIdServer(IServiceCollection services)
             if(!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix)) 
                 c.Cookie.Name = identityServerConfiguration.AuthCookieNamePrefix;
         }, dataProtectionBuilderCallback: ConfigureDataProtection)
-        .UseEFStore(o => ConfigureStorage(o))
-        /*.UseSqlSugar(o =>
+        // .UseEFStore(o => ConfigureStorage(o))
+        .UseSqlSugar(o =>
         {
             o.ConnectionConfig = new SqlSugar.ConnectionConfig { DbType = SqlSugar.DbType.SqlServer, ConnectionString = "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True" };
         })
-        */
         .AddSwagger(o =>
         {
             o.IncludeDocumentation<AccessTokenTypeService>();
@@ -301,6 +300,7 @@ void ConfigureStorage(DbContextOptionsBuilder b)
 
 void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
 {
+    // TODO : UPDATE !!
     dataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();
 }
 

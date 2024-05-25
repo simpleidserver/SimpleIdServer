@@ -18,6 +18,7 @@ public class SugarIdentityProvisioningMappingRule
     public bool HasMultipleAttribute { get; set; } = false;
     public string IdentityProvisioningDefinitionName { get; set; } = null!;
     public IdentityProvisioningMappingUsage Usage { get; set; } = IdentityProvisioningMappingUsage.USER;
+    [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningDefinitionName))]
     public IdentityProvisioningDefinition IdentityProvisioningDefinition { get; set; } = null!;
 
     public IdentityProvisioningMappingRule ToDomain()

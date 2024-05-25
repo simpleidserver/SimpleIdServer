@@ -17,6 +17,7 @@ public class SugarIdentityProvisioning
     public bool IsEnabled { get; set; } = true;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(DefinitionName))]
     public SugarIdentityProvisioningDefinition Definition { get; set; } = null!;
     [Navigate(NavigateType.OneToMany, nameof(SugarIdentityProvisioningHistory.IdentityProvisioningId))]
     public List<SugarIdentityProvisioningHistory> Histories { get; set; }

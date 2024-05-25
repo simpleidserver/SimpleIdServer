@@ -20,6 +20,7 @@ public class SugarIdentityProvisioningHistory
     public int TotalPages { get; set; }
     public IdentityProvisioningHistoryStatus Status { get; set; }
     public string IdentityProvisioningId { get; set; } = null!;
+    [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningId))]
     public IdentityProvisioning IdentityProvisioning { get; set; } = null!;
 
     public IdentityProvisioningHistory ToDomain()

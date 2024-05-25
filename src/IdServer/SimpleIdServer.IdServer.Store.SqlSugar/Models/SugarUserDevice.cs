@@ -20,7 +20,8 @@ public class SugarUserDevice
     public string? PushType { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
     public string UserId { get; set; } = null!;
-    public User User { get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(UserId))]
+    public SugarUser User { get; set; }
 
     public UserDevice ToDomain()
     {

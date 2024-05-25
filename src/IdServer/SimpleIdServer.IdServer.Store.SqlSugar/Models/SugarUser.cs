@@ -23,6 +23,7 @@ public class SugarUser
     public string? IdentityProvisioningId { get; set; } = null;
     public string? EncodedPicture { get; set; } = null;
     public string NotificationMode { get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningId))]
     public IdentityProvisioning IdentityProvisioning { get; set; }
 
     [Navigate(NavigateType.OneToMany, nameof(SugarUserSession.UserId))]

@@ -21,6 +21,7 @@ public class SugarAuthenticationSchemeProvider
     public List<SugarAuthenticationSchemeProviderMapper> Mappers { get; set; }
     [Navigate(typeof(SugarAuthenticationSchemeProviderRealm), nameof(SugarAuthenticationSchemeProviderRealm.AuthenticationSchemeProvidersId), nameof(SugarAuthenticationSchemeProviderRealm.RealmsName))]
     public List<SugarRealm> Realms { get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(AuthSchemeProviderDefinitionName))]
     public SugarAuthenticationSchemeProviderDefinition AuthSchemeProviderDefinition { get; set; }
 
     public AuthenticationSchemeProvider ToDomain()

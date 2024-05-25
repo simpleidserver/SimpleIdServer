@@ -13,6 +13,7 @@ public class SugarGroupUser
     public string GroupsId { get; set; } = null!;
     [SugarColumn(IsPrimaryKey = true)]
     public string UsersId { get; set; } = null!;
+    [Navigate(NavigateType.ManyToOne, nameof(GroupsId))]
     public SugarGroup Group { get; set; }
 
     public GroupUser ToDomain()

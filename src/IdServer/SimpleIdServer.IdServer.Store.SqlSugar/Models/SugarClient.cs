@@ -27,6 +27,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public string? TlsClientAuthSanURI { get; set; } = null;
         public string? TlsClientAuthSanIP { get; set; } = null;
         public string? TlsClientAuthSanEmail { get; set; } = null;
+        public string? AuthenticationContextClassReferenceId { get; set; } = null;
         public DateTime? ClientSecretExpirationTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public DateTime CreateDateTime { get; set; }

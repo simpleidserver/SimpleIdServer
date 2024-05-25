@@ -17,6 +17,7 @@ public class SugarAuthenticationSchemeProviderMapper
     public string? TargetUserAttribute { get; set; } = null;
     public string? TargetUserProperty { get; set; } = null;
     public string IdProviderId { get; set; } = null!;
+    [Navigate(NavigateType.ManyToOne, nameof(IdProviderId)]
     public AuthenticationSchemeProvider IdProvider { get; set; } = null!;
 
     public AuthenticationSchemeProviderMapper ToDomain()

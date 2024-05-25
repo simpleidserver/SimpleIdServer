@@ -18,6 +18,7 @@ public class SugarClientCertificate
     public string PublicKey { get; set; } = null!;
     public string PrivateKey { get; set; } = null!;
     public string CertificateAuthorityId { get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(CertificateAuthorityId))]
     public CertificateAuthority CertificateAuthority { get; set; }
 
     public ClientCertificate ToDomain()

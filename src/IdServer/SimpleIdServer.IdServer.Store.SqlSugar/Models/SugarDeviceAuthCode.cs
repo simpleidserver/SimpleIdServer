@@ -14,6 +14,7 @@ public class SugarDeviceAuthCode
     public string DeviceCode { get; set; } = null!;
     public string UserCode { get; set; } = null!;
     public string ClientId { get; set; } = null!;
+    public string UserId { get; set; } = null;
     public string? UserLogin { get; set; } = null;
     public string Scopes { get; set; } = null!;
     public DateTime CreateDateTime { get; set; }
@@ -22,7 +23,9 @@ public class SugarDeviceAuthCode
     public DateTime? NextAccessDateTime { get; set; } = null;
     public DeviceAuthCodeStatus Status { get; set; }
     public DateTime LastAccessTime { get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(ClientId))]
     public SugarClient Client { get; set; } = null!;
+    [Navigate(NavigateType.ManyToOne, nameof(UserId))]
     public SugarUser? User { get; set; } = null;
 
     public DeviceAuthCode ToDomain()

@@ -17,6 +17,7 @@ public class SugarUserSession
     public bool IsClientsNotified { get; set; } = false;
     public string SerializedClientIds { get; set; } = string.Empty;
     public string UserId { get; set; } = null!;
+    [Navigate(NavigateType.ManyToOne, nameof(SugarUserSession.UserId))]
     public SugarUser User { get; set; }
 
     public UserSession ToDomain()

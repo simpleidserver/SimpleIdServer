@@ -17,10 +17,15 @@ public class SugarGroup
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
     public string? ParentGroupId { get; set; } = null;
+    [Navigate(NavigateType.ManyToOne, nameof(ParentGroupId))]
     public SugarGroup? ParentGroup { get; set; } = null;
+    [Navigate(NavigateType.OneToMany, nameof(ParentGroupId))]
     public List<SugarGroup> Children { get; set; }
+    [Navigate(typeof(SugarGroupScope), nameof(SugarGroupScope.GroupsId), nameof(SugarGroupScope.RolesId))]
     public List<SugarScope> Roles { get; set; }
+    [Navigate(NavigateType.OneToMany, nameof(SugarGroupUser.GroupsId))]
     public List<SugarGroupUser> Users { get; set; }
+    [Navigate(NavigateType.OneToMany, nameof(SugarGroupRealm.GroupsId))]
     public List<SugarGroupRealm> Realms { get; set; }
 
     public Group ToDomain()

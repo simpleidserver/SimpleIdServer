@@ -19,6 +19,7 @@ public class SugarUserCredential
     public int TOTPStep { get; set; }
     public int HOTPWindow { get; set; }
     public string UserId { get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(UserId))]
     public SugarUser User { get; set; }
 
     public UserCredential ToDomain()

@@ -16,12 +16,12 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public string? RegistrationWorkflowId { get; set; }
-        [Navigate(NavigateType.ManyToOne, nameof(SugarAuthenticationContextClassReference.RegistrationWorkflowId))]
+        [Navigate(NavigateType.ManyToOne, nameof(RegistrationWorkflowId))]
         public SugarRegistrationWorkflow? RegistrationWorkflow { get; set; }
         [Navigate(typeof(SugarAuthenticationContextClassReferenceRealm), nameof(SugarAuthenticationContextClassReferenceRealm.AuthenticationContextClassReferencesId), nameof(SugarAuthenticationContextClassReferenceRealm.RealmsName))]
         public List<SugarRealm> Realms { get; set; }
-       // [JsonIgnore]
-        // public ICollection<Client> Clients { get; set; } = new List<Client>();
+        [Navigate(NavigateType.OneToMany, nameof(SugarClient.AuthenticationContextClassReferenceId))]
+        public List<SugarClient> Clients { get; set; }
 
         public AuthenticationContextClassReference ToDomain()
         {
@@ -34,7 +34,8 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 UpdateDateTime = UpdateDateTime,
                 RegistrationWorkflowId = RegistrationWorkflowId,
                 AuthenticationMethodReferences = AuthenticationMethodReferences.Split(','),
-                Realms = Realms.Select(r => r.ToDomain()).ToList()
+                Realms = Realms.Select(r => r.ToDomain()).ToList(),
+                Clients
             };
         }
     }
