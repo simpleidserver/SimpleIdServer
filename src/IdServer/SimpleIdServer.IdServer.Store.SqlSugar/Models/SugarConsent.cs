@@ -29,6 +29,7 @@ public class SugarConsent
     {
         return new SugarConsent
         {
+            Id = c.Id,
             Claims = c.Claims == null ? string.Empty : string.Join(",", c.Claims),
             UpdateDateTime = c.UpdateDateTime,
             Status = c.Status,

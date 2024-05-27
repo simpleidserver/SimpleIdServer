@@ -44,7 +44,7 @@
                 {
                     <RadzenBadge Text="@Global.Rejected" IsPill="true" BadgeStyle="BadgeStyle.Danger" />
                 }
-                else if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
+                else if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.Now)
                 {
                     <RadzenBadge Text="@Global.Active" IsPill="true" BadgeStyle="BadgeStyle.Success"></RadzenBadge>
                 }
@@ -56,7 +56,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="UserSession" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                @if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.UtcNow)
+                @if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.Now)
                 {
                     <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                 }
