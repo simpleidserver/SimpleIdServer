@@ -31,8 +31,8 @@ public class SugarPresentationDefinitionInputDescriptor
             PublicId = PublicId,
             Name = Name,
             Purpose = Purpose,
-            Format = Format.Select(f => f.ToDomain()).ToList(),
-            Constraints = Constraints.Select(f => f.ToDomain()).ToList()
+            Format = Format == null ? new List<PresentationDefinitionFormat>() : Format.Select(f => f.ToDomain()).ToList(),
+            Constraints = Constraints == null ? new List<PresentationDefinitionInputDescriptorConstraint>() : Constraints.Select(f => f.ToDomain()).ToList()
         };
     }
 }

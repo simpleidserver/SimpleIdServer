@@ -121,13 +121,15 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 .Includes(p => p.Realms)
                 .Includes(p => p.Scopes)
                 .Where(p => p.Realms.Any(r => r.RealmsName == realm));
+            result = result.OrderByDescending(c => c.UpdateDateTime);
+            /*
             if (!string.IsNullOrWhiteSpace(request.Filter))
                 result = result.Where(request.Filter);
-
             if (!string.IsNullOrWhiteSpace(request.OrderBy))
                 result = result.OrderBy(request.OrderBy);
             else
                 result = result.OrderByDescending(r => r.UpdateDateTime);
+            */
 
             var nb = result.Count();
             var clients = await result.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();

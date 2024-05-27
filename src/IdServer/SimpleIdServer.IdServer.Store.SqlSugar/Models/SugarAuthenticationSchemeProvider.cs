@@ -35,8 +35,8 @@ public class SugarAuthenticationSchemeProvider
             CreateDateTime = CreateDateTime,
             UpdateDateTime = UpdateDateTime,
             AuthSchemeProviderDefinition = AuthSchemeProviderDefinition?.ToDomain(),
-            Realms = Realms.Select(r => r.ToDomain()).ToList(),
-            Mappers = Mappers.Select(m => m.ToDomain()).ToList()
+            Realms = Realms == null ? Realms.Select(r => r.ToDomain()).ToList() : new List<Realm>(),
+            Mappers = Mappers == null ? new List<AuthenticationSchemeProviderMapper>() : Mappers.Select(m => m.ToDomain()).ToList()
         };
     }
 }

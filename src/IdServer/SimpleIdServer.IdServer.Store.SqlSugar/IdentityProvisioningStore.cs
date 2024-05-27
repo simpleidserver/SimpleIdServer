@@ -50,12 +50,14 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             var query = _dbContext.Client.Queryable<SugarIdentityProvisioning>()
                 .Includes(p => p.Realms)
                 .Where(p => p.Realms.Any(r => r.RealmsName == realm));
+            /*
             if (!string.IsNullOrWhiteSpace(request.Filter))
                 query = query.Where(request.Filter);
 
             if (!string.IsNullOrWhiteSpace(request.OrderBy))
                 query = query.OrderBy(request.OrderBy);
-
+            */
+            query = query.OrderByDescending(c => c.UpdateDateTime);
             var nb = query.Count();
             var idProviders = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
             return new SearchResult<IdentityProvisioning>

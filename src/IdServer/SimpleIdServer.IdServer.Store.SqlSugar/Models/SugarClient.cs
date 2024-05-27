@@ -175,11 +175,11 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 DefaultAcrValues = DefaultAcrValues == null ? new List<string>() : DefaultAcrValues.Split(','),
                 Contacts = Contacts == null ? new List<string>() : Contacts.Split(','),
                 AuthorizationDataTypes = AuthorizationDataTypes == null ? new List<string>() : AuthorizationDataTypes.Split(','),
-                Realms = Realms.Select(r => r.ToDomain()).ToList(),
-                Translations = Translations.Select(r => r.ToDomain()).ToList(),
-                DeviceAuthCodes = DeviceAuthCodes.Select(r => r.ToDomain()).ToList(),
-                SerializedJsonWebKeys = SerializedJsonWebKeys.Select(j => j.ToDomain()).ToList(),
-                Scopes = Scopes.Select(s => s.ToDomain()).ToList(),
+                Realms = Realms == null ? new List<Realm>() : Realms.Select(r => r.ToDomain()).ToList(),
+                Translations = Translations == null ? new List<Translation>() : Translations.Select(r => r.ToDomain()).ToList(),
+                DeviceAuthCodes = DeviceAuthCodes == null ? new List<DeviceAuthCode>() : DeviceAuthCodes.Select(r => r.ToDomain()).ToList(),
+                SerializedJsonWebKeys = SerializedJsonWebKeys == null ? new List<ClientJsonWebKey>() : SerializedJsonWebKeys.Select(j => j.ToDomain()).ToList(),
+                Scopes = Scopes == null ? new List<Scope>() : Scopes.Select(s => s.ToDomain()).ToList(),
                 Id = Id
             };
         }

@@ -37,8 +37,8 @@ public class SugarIdentityProvisioning
             CreateDateTime = CreateDateTime,
             UpdateDateTime = UpdateDateTime,
             Definition = Definition?.ToDomain(),
-            Histories = Histories.Select(h => h.ToDomain()).ToList(),
-            Realms = Realms.Select(h => h.ToDomain()).ToList()
+            Histories = Histories == null ? new List<IdentityProvisioningHistory>() : Histories.Select(h => h.ToDomain()).ToList(),
+            Realms = Realms == null ? new List<Realm>() : Realms.Select(h => h.ToDomain()).ToList()
         };
     }
 }

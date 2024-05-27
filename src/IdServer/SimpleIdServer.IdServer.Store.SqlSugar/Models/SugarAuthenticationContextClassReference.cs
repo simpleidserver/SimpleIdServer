@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
     [SugarTable("Acrs")]
     public class SugarAuthenticationContextClassReference
     {
+        [SugarColumn(IsPrimaryKey = true)]
         public string Id { get; set; } = null!;
         public string Name { get; set; } = null;
         public string DisplayName { get; set; } = null;
@@ -34,8 +35,9 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 UpdateDateTime = UpdateDateTime,
                 RegistrationWorkflowId = RegistrationWorkflowId,
                 AuthenticationMethodReferences = AuthenticationMethodReferences.Split(','),
-                Realms = Realms.Select(r => r.ToDomain()).ToList(),
-                Clients
+                Realms = Realms == null ? new List<Realm>() : Realms.Select(r => r.ToDomain()).ToList(),
+                Clients = Clients == null ? new List<Client>() : Clients.Select(c => c.ToDomain()).ToList(),
+                RegistrationWorkflow = RegistrationWorkflow?.ToDomain()
             };
         }
     }

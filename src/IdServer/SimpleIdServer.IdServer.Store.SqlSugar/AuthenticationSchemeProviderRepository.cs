@@ -54,11 +54,14 @@ public class AuthenticationSchemeProviderRepository : IAuthenticationSchemeProvi
         var query = _dbContext.Client.Queryable<SugarAuthenticationSchemeProvider>()
                 .Includes(p => p.Realms)
                 .Where(p => p.Realms.Any(r => r.RealmsName == realm));
+        query = query.OrderByDescending(r => r.CreateDateTime);
+        /*
         if (!string.IsNullOrWhiteSpace(request.Filter))
             query = query.Where(request.Filter);
 
         if (!string.IsNullOrWhiteSpace(request.OrderBy))
             query = query.OrderBy(request.OrderBy);
+        */
 
         var nb = query.Count();
         var idProviders = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(cancellationToken);

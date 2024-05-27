@@ -40,10 +40,10 @@ public class SugarGroup
             UpdateDateTime = UpdateDateTime,
             ParentGroupId = ParentGroupId,
             ParentGroup = ParentGroup?.ToDomain(),
-            Children = Children.Select(c => c.ToDomain()).ToList(),
-            Users = Users.Select(u => u.ToDomain()).ToList(),
-            Roles = Roles.Select(r => r.ToDomain()).ToList(),
-            Realms = Realms.Select(r => r.ToDomain()).ToList(),
+            Children = Children == null ? new List<Group>() : Children.Select(c => c.ToDomain()).ToList(),
+            Users = Users == null ? new List<GroupUser>() : Users.Select(u => u.ToDomain()).ToList(),
+            Roles = Roles == null ? new List<Scope>() : Roles.Select(r => r.ToDomain()).ToList(),
+            Realms = Realms == null ? new List<GroupRealm>() : Realms.Select(r => r.ToDomain()).ToList(),
         };
     }
 }

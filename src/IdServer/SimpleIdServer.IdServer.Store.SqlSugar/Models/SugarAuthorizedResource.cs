@@ -15,6 +15,15 @@ public class SugarAuthorizedResource
     public string? Audience { get; set; } = null;
     public string? AuthorizedScopeId { get; set; } = null;
 
+    public static SugarAuthorizedResource Transform(AuthorizedResource a)
+    {
+        return new SugarAuthorizedResource
+        {
+            Audience = a.Audience,
+            Resource = a.Resource
+        };
+    }
+
     public AuthorizedResource ToDomain()
     {
         return new AuthorizedResource

@@ -10,7 +10,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddSqlSugarStore(this IServiceCollection services, Action<SqlSugarOptions> action)
     {
         services.Configure(action);
-        services.AddScoped<DbContext>();
+        services.AddSingleton<DbContext>();
         services.AddTransient<IRealmRepository, RealmRepository>();
         services.AddTransient<IApiResourceRepository, ApiResourceRepository>();
         services.AddTransient<IAuditEventRepository, AuditEventRepository>();

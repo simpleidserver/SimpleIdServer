@@ -35,8 +35,8 @@ public class SugarUMAResource
             Realm = Realm,
             Scopes = Scopes.Split(',').ToList(),
             UpdateDateTime = UpdateDateTime,
-            Translations = Translations.Select(t => t.ToDomain()).ToList(),
-            Permissions = Permissions.Select(p => p.ToDomain()).ToList()
+            Translations = Translations == null ? new List<Translation>() : Translations.Select(t => t.ToDomain()).ToList(),
+            Permissions = Permissions == null ? new List<UMAResourcePermission>() : Permissions.Select(p => p.ToDomain()).ToList()
         };
     }
 }

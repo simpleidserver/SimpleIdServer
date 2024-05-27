@@ -39,7 +39,7 @@ public class SugarSerializedFileKey
             PublicKeyPem = PublicKeyPem,
             UpdateDateTime = UpdateDateTime,
             Usage = Usage,
-            Realms = Realms.Select(r => r.ToDomain()).ToList()
+            Realms = Realms == null ? new List<Realm>(): Realms.Select(r => r.ToDomain()).ToList()
         };
     }
 }

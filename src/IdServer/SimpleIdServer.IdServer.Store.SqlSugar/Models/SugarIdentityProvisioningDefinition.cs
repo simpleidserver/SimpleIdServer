@@ -31,8 +31,8 @@ public class SugarIdentityProvisioningDefinition
             UpdateDateTime  = UpdateDateTime,
             OptionsName = OptionsName,
             OptionsFullQualifiedName  = OptionsFullQualifiedName,
-            Instances = IdentityProvisionings.Select(r => r.ToDomain()).ToList(),
-            MappingRules = MappingRules.Select(r => r.ToDomain()).ToList()
+            Instances = IdentityProvisionings == null ? new List<IdentityProvisioning>() : IdentityProvisionings.Select(r => r.ToDomain()).ToList(),
+            MappingRules = MappingRules == null ? new List<IdentityProvisioningMappingRule>() : MappingRules.Select(r => r.ToDomain()).ToList()
         };
     }
 }

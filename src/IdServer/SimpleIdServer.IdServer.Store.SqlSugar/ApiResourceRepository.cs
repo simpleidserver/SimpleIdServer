@@ -70,6 +70,8 @@ public class ApiResourceRepository : IApiResourceRepository
                 .Includes(p => p.Realms)
                 .Includes(p => p.Scopes)
                 .Where(p => p.Realms.Any(r => r.RealmsName == realm));
+        query = query.OrderByDescending(a => a.UpdateDateTime);
+        /*
         if (!string.IsNullOrWhiteSpace(request.Filter))
             query = query.Where(request.Filter);
 
@@ -77,6 +79,8 @@ public class ApiResourceRepository : IApiResourceRepository
             query = query.OrderBy(request.OrderBy);
         else
             query = query.OrderBy(r => r.Name);
+        */
+
         var nb = query.Count();
 
         var apiResources = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(cancellationToken);

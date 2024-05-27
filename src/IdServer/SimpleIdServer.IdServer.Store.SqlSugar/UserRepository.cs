@@ -19,7 +19,6 @@ public class UserRepository : IUserRepository
     public void Add(User user)
     {
         _dbContext.Client.InsertNav(Transform(user))
-            .Include(u => u.Sessions)
             .Include(u => u.Claims)
             .Include(u => u.Credentials)
             .Include(u => u.ExternalAuthProviders)
@@ -39,7 +38,6 @@ public class UserRepository : IUserRepository
     public async Task BulkUpdate(List<User> users)
     {
         await _dbContext.Client.UpdateNav(users.Select(u => Transform(u)).ToList())
-            .Include(u => u.Sessions)
             .Include(u => u.Claims)
             .Include(u => u.Credentials)
             .Include(u => u.ExternalAuthProviders)
@@ -171,6 +169,7 @@ public class UserRepository : IUserRepository
             .Includes(u => u.Realms)
             .Includes(u => u.Claims)
             .Where(u => u.Realms.Any(r => r.RealmsName == realm));
+        /*
         if (!string.IsNullOrWhiteSpace(request.Filter))
             query = query.Where(request.Filter);
 
@@ -178,7 +177,8 @@ public class UserRepository : IUserRepository
             query = query.OrderBy(request.OrderBy);
         else
             query = query.OrderByDescending(u => u.UpdateDateTime);
-
+        */
+        query = query.OrderByDescending(u => u.UpdateDateTime);
         var count = query.Count();
         var users = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(CancellationToken.None);
         return new SearchResult<User>
@@ -191,11 +191,10 @@ public class UserRepository : IUserRepository
     public void Update(User user)
     {
         _dbContext.Client.UpdateNav(Transform(user))
-            .Include(u => u.Sessions)
             .Include(u => u.Claims)
             .Include(u => u.Credentials)
             .Include(u => u.ExternalAuthProviders)
-            .Include(u => u.Consents)
+            .Include(u => u.Consents).ThenInclude(c => c.Scopes).ThenInclude(c => c.AuthorizedResources)
             .Include(u => u.Groups)
             .Include(u => u.Devices)
             .Include(u => u.Realms)
@@ -230,34 +229,7 @@ public class UserRepository : IUserRepository
             IdentityProvisioningId = user.IdentityProvisioningId,
             EncodedPicture = user.EncodedPicture,
             UpdateDateTime = user.UpdateDateTime,
-            Sessions = user.Sessions == null ? new List<SugarUserSession>() : user.Sessions.Select(u => new SugarUserSession
-            {
-                AuthenticationDateTime = u.AuthenticationDateTime,
-                ExpirationDateTime = u.ExpirationDateTime,
-                IsClientsNotified = u.IsClientsNotified,
-                Realm = u.Realm,
-                SerializedClientIds = u.SerializedClientIds,
-                SessionId = u.SessionId,
-                State = u.State
-            }).ToList(),
-            Consents = user.Consents == null ? new List<SugarConsent>() : user.Consents.Select(c => new SugarConsent
-            {
-                Claims = c.Claims == null ? string.Empty : string.Join(",", c.Claims),
-                UpdateDateTime = c.UpdateDateTime,
-                Status = c.Status,
-                SerializedAuthorizationDetails = c.SerializedAuthorizationDetails,
-                CreateDateTime = c.CreateDateTime,
-                ClientId = c.ClientId,
-                Scopes = c.Scopes == null ? new List<SugarAuthorizedScope>() : c.Scopes.Select(s => new SugarAuthorizedScope
-                {
-                    AuthorizedResources = s.AuthorizedResources == null ? new List<SugarAuthorizedResource>() : s.AuthorizedResources.Select(a => new SugarAuthorizedResource
-                    {
-                        Audience = a.Audience,
-                        Resource = a.Resource
-                    }).ToList(),
-                    Scope = s.Scope
-                }).ToList()
-            }).ToList(),
+            Consents = user.Consents == null ? new List<SugarConsent>() : user.Consents.Select(c => SugarConsent.Transform(c)).ToList(),
             Realms = user.Realms == null ? new List<SugarRealmUser>() : user.Realms.Select(r => Transform(r)).ToList(),
             Claims = user.Consents == null ? new List<SugarUserClaim>() : user.OAuthUserClaims.Select(r => Transform(r)).ToList(),
             Credentials = user.Credentials == null ? new List<SugarUserCredential>() : user.Credentials.Select(c => new SugarUserCredential

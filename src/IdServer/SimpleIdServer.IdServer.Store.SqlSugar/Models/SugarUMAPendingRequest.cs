@@ -18,6 +18,8 @@ public class SugarUMAPendingRequest
     public DateTime CreateDateTime { get; set; }
     public UMAPendingRequestStatus Status { get; set; }
     public string Realm { get; set; }
+    public string ResourceId { get; set; } = null!;
+    [Navigate(NavigateType.ManyToOne, nameof(ResourceId))]
     public SugarUMAResource Resource { get; set; }
 
     public UMAPendingRequest ToDomain()

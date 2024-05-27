@@ -17,8 +17,23 @@ public class SugarUserSession
     public bool IsClientsNotified { get; set; } = false;
     public string SerializedClientIds { get; set; } = string.Empty;
     public string UserId { get; set; } = null!;
-    [Navigate(NavigateType.ManyToOne, nameof(SugarUserSession.UserId))]
+    [Navigate(NavigateType.ManyToOne, nameof(UserId))]
     public SugarUser User { get; set; }
+
+    public static SugarUserSession Transform(UserSession userSession)
+    {
+        return new SugarUserSession
+        {
+            AuthenticationDateTime = userSession.AuthenticationDateTime,
+            ExpirationDateTime = userSession.ExpirationDateTime,
+            IsClientsNotified = userSession.IsClientsNotified,
+            SerializedClientIds = userSession.SerializedClientIds,
+            SessionId = userSession.SessionId,
+            State = userSession.State,
+            UserId = userSession.UserId,
+            Realm = userSession.Realm
+        };
+    }
 
     public UserSession ToDomain()
     {

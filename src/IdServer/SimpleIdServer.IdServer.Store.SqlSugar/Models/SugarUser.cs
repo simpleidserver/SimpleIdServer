@@ -24,13 +24,13 @@ public class SugarUser
     public string? EncodedPicture { get; set; } = null;
     public string NotificationMode { get; set; }
     [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningId))]
-    public IdentityProvisioning IdentityProvisioning { get; set; }
+    public SugarIdentityProvisioning IdentityProvisioning { get; set; }
 
     [Navigate(NavigateType.OneToMany, nameof(SugarUserSession.UserId))]
     public List<SugarUserSession> Sessions { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarUserClaim.UserId))]
     public List<SugarUserClaim> Claims { get; set; }
-    [Navigate(NavigateType.OneToMany, nameof(SugarUserCredential.User))]
+    [Navigate(NavigateType.OneToMany, nameof(SugarUserCredential.UserId))]
     public List<SugarUserCredential> Credentials { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarUserExternalAuthProvider.UserId))]
     public List<SugarUserExternalAuthProvider> ExternalAuthProviders { get; set; }
@@ -61,13 +61,13 @@ public class SugarUser
             UpdateDateTime = UpdateDateTime,
             NotificationMode = NotificationMode,
             Lastname = Lastname,
-            Sessions = Sessions.Select(s => s.ToDomain()).ToList(),
-            OAuthUserClaims = Claims.Select(c => c.ToDomain()).ToList(),
-            Credentials = Credentials.Select(c => c.ToDomain()).ToList(),
-            ExternalAuthProviders = ExternalAuthProviders.Select(e => e.ToDomain()).ToList(),
-            Consents = Consents.Select(c => c.ToDomain()).ToList(),
-            Groups = Groups.Select(c => c.ToDomain()).ToList(),
-            Realms = Realms.Select(r => r.ToDomain()).ToList()
+            Sessions = Sessions == null ? new List<UserSession>() : Sessions.Select(s => s.ToDomain()).ToList(),
+            OAuthUserClaims = Claims == null ? new List<UserClaim>() : Claims.Select(c => c.ToDomain()).ToList(),
+            Credentials = Credentials == null ? new List<UserCredential>() : Credentials.Select(c => c.ToDomain()).ToList(),
+            ExternalAuthProviders = ExternalAuthProviders == null ? new List<UserExternalAuthProvider>() : ExternalAuthProviders.Select(e => e.ToDomain()).ToList(),
+            Consents = Consents == null ? new List<Consent>() : Consents.Select(c => c.ToDomain()).ToList(),
+            Groups = Groups == null ? new List<GroupUser>() : Groups.Select(c => c.ToDomain()).ToList(),
+            Realms = Realms == null ? new List<RealmUser>() : Realms.Select(r => r.ToDomain()).ToList()
         };
     }
 }

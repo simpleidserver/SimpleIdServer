@@ -19,7 +19,7 @@ public class SugarIdentityProvisioningMappingRule
     public string IdentityProvisioningDefinitionName { get; set; } = null!;
     public IdentityProvisioningMappingUsage Usage { get; set; } = IdentityProvisioningMappingUsage.USER;
     [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningDefinitionName))]
-    public IdentityProvisioningDefinition IdentityProvisioningDefinition { get; set; } = null!;
+    public SugarIdentityProvisioningDefinition IdentityProvisioningDefinition { get; set; } = null!;
 
     public IdentityProvisioningMappingRule ToDomain()
     {
@@ -31,7 +31,8 @@ public class SugarIdentityProvisioningMappingRule
             TargetUserAttribute = TargetUserAttribute,
             TargetUserProperty = TargetUserProperty,
             HasMultipleAttribute = HasMultipleAttribute,
-            Usage = Usage
+            Usage = Usage,
+            IdentityProvisioningDefinition = IdentityProvisioningDefinition?.ToDomain()
         };
     }
 }

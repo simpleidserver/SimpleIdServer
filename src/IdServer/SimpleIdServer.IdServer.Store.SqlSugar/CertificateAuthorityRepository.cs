@@ -58,6 +58,7 @@ public class CertificateAuthorityRepository : ICertificateAuthorityRepository
         var query = _dbContext.Client.Queryable<SugarCertificateAuthority>()
             .Includes(p => p.Realms)
             .Where(p => p.Realms.Any(r => r.RealmsName == realm));
+        /*
         if (!string.IsNullOrWhiteSpace(request.Filter))
             query = query.Where(request.Filter);
 
@@ -65,7 +66,9 @@ public class CertificateAuthorityRepository : ICertificateAuthorityRepository
             query = query.OrderBy(request.OrderBy);
         else
             query = query.OrderByDescending(c => c.UpdateDateTime);
+        */
 
+        query = query.OrderByDescending(c => c.UpdateDateTime);
         var nb = query.Count();
         var cas = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(cancellationToken);
         return new SearchResult<CertificateAuthority>

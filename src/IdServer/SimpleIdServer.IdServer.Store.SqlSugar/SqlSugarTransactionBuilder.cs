@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Stores;
 
+using Transac = SqlSugar.SqlSugarTransaction;
 namespace SimpleIdServer.IdServer.Store.SqlSugar;
 
 public class SqlSugarTransactionBuilder : ITransactionBuilder
@@ -15,23 +16,24 @@ public class SqlSugarTransactionBuilder : ITransactionBuilder
     }
 
     public ITransaction Build()
-        => new SqlSugarTransaction(_dbContext);
+        => new SqlSugarTransactionInternal(_dbContext);
 }
 
-public class SqlSugarTransaction : ITransaction
+public class SqlSugarTransactionInternal : ITransaction
 {
     private readonly DbContext _dbContext;
+    private readonly Transac _trans;
 
-    public SqlSugarTransaction(DbContext dbContext)
+    public SqlSugarTransactionInternal(DbContext dbContext)
     {
         _dbContext = dbContext;
-        _dbContext.Client.BeginTran();
+        _trans = _dbContext.Client.UseTran();
     }
 
-    public async Task<int> Commit(CancellationToken cancellationToken)
+    public Task<int> Commit(CancellationToken cancellationToken)
     {
-        await _dbContext.Client.CommitTranAsync();
-        return 1; 
+        _trans.CommitTran();
+        return Task.FromResult(1);
     }
 
     public void Dispose()

@@ -28,7 +28,7 @@ public class SugarPresentationDefinition
             Name= Name,
             RealmName= RealmName,
             Purpose= Purpose,
-            InputDescriptors = InputDescriptors.Select(i => i.ToDomain()).ToList()
+            InputDescriptors = InputDescriptors == null ? new List<PresentationDefinitionInputDescriptor>() : InputDescriptors.Select(i => i.ToDomain()).ToList()
         };
     }
 }

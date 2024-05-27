@@ -100,7 +100,8 @@ public class GroupRepository : IGroupRepository
     {
         var query = _dbContext.Client.Queryable<SugarGroup>()
             .Includes(c => c.Realms)
-            .Where(c => c.Realms.Any(r => r.RealmsName == realm) && (!request.OnlyRoot || request.OnlyRoot && c.Name == c.FullPath));
+            .Where(c => c.Realms.Any(r => r.RealmsName == realm) && (request.OnlyRoot  == false || request.OnlyRoot == true && c.Name == c.FullPath));
+        /*
         if (!string.IsNullOrWhiteSpace(request.Filter))
             query = query.Where(request.Filter);
 
@@ -108,7 +109,8 @@ public class GroupRepository : IGroupRepository
             query = query.OrderBy(request.OrderBy);
         else
             query = query.OrderBy(q => q.FullPath);
-
+        */
+        query = query.OrderByDescending(r => r.UpdateDateTime);
         var nb = query.Count();
         var groups = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
         return new SearchResult<Group>

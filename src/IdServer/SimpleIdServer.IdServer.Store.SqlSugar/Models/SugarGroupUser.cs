@@ -22,7 +22,7 @@ public class SugarGroupUser
         {
             GroupsId = GroupsId,
             UsersId = UsersId,
-            Group = Group.ToDomain()
+            Group = Group?.ToDomain()
         };
     }
 }

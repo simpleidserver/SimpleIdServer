@@ -36,8 +36,8 @@ public class SugarConfigurationDefinitionRecord
             IsRequired = IsRequired,
             Order = Order,
             UpdateDateTime = UpdateDateTime,
-            Translations = Translations.Select(t => t.ToDomain()).ToList(),
-            Values = Values.Select(t => t.ToDomain()).ToList()
+            Translations = Translations == null ? new List<Translation>() : Translations.Select(t => t.ToDomain()).ToList(),
+            Values = Values == null ? new List<ConfigurationDefinitionRecordValue>() : Values.Select(t => t.ToDomain()).ToList()
         };
     }
 }

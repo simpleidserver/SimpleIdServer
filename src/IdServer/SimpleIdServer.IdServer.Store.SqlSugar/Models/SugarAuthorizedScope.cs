@@ -16,12 +16,21 @@ public class SugarAuthorizedScope
     [Navigate(NavigateType.OneToMany, nameof(SugarAuthorizedResource.AuthorizedScopeId))]
     public List<SugarAuthorizedResource> AuthorizedResources { get; set; }
 
+    public static SugarAuthorizedScope Transform(AuthorizedScope authorizedScope)
+    {
+        return new SugarAuthorizedScope
+        {
+            AuthorizedResources = authorizedScope.AuthorizedResources == null ? new List<SugarAuthorizedResource>() : authorizedScope.AuthorizedResources.Select(a => SugarAuthorizedResource.Transform(a)).ToList(),
+            Scope = authorizedScope.Scope
+        };
+    }
+
     public AuthorizedScope ToDomain()
     {
         return new AuthorizedScope
         {
             Scope = Scope,
-            AuthorizedResources = AuthorizedResources.Select(r => r.ToDomain()).ToList()
+            AuthorizedResources = AuthorizedResources == null ? new List<AuthorizedResource>() : AuthorizedResources.Select(r => r.ToDomain()).ToList()
         };
     }
 }

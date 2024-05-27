@@ -13,7 +13,6 @@ public class SugarLanguage
     public string Code { get; set; } = null!;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
-    public string? Description { get; set; } = null;
 
     public Language ToDomain()
     {
@@ -21,8 +20,7 @@ public class SugarLanguage
         {
             Code = Code,
             CreateDateTime = CreateDateTime,
-            UpdateDateTime  = UpdateDateTime,
-            Description = Description
+            UpdateDateTime  = UpdateDateTime
         };
     }
 }

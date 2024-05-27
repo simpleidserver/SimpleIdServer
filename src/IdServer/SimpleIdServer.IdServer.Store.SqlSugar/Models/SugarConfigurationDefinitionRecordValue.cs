@@ -22,7 +22,7 @@ public class SugarConfigurationDefinitionRecordValue
         {
             Id = Id,
             Value = Value,
-            Translations = Translations.Select(t => t.ToDomain()).ToList()
+            Translations = Translations == null ? new List<Translation>() : Translations.Select(t => t.ToDomain()).ToList()
         };
     }
 }

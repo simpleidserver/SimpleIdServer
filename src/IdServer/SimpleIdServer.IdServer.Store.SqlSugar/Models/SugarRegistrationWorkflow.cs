@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models;
 [SugarTable("RegistrationWorkflows")]
 public class SugarRegistrationWorkflow
 {
+    [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; }
     public string Name { get; set; }
     public string RealmName { get; set; }
@@ -32,7 +33,7 @@ public class SugarRegistrationWorkflow
             UpdateDateTime = UpdateDateTime,
             Steps = Steps.Split(',').ToList(),
             IsDefault = IsDefault,
-            Acrs = Acrs.Select(a => a.ToDomain()).ToList(),
+            Acrs = Acrs == null ? new List<AuthenticationContextClassReference>() : Acrs.Select(a => a.ToDomain()).ToList(),
             Realm = Realm?.ToDomain()
         };
     }

@@ -47,7 +47,7 @@ public class SugarBCAuthorize
             Realm = Realm,
             SerializedAuthorizationDetails = SerializedAuthorizationDetails,
             Scopes = Scopes == null ? new List<string>() : Scopes.Split(','),
-            Histories = Histories.Select(h => h.ToDomain()).ToList()
+            Histories = Histories == null ? new List<BCAuthorizeHistory>() : Histories.Select(h => h.ToDomain()).ToList()
         };
     }
 }

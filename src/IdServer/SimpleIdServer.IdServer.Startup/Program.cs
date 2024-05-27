@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Did.Key;
@@ -30,10 +31,12 @@ using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store.EF;
+using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
+using SqlSugar;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +60,41 @@ const string MYSQLCreateTableFormat =
                 "`Value` longblob NOT NULL," +
                 "PRIMARY KEY(`Id`)," +
                 "KEY `Index_ExpiresAtTime` (`ExpiresAtTime`)" +
-            ")";
+")";
+
+/*
+static void Test()
+{
+    var connectionConfig = new ConnectionConfig
+    {
+        DbType = DbType.SqlServer,
+        ConnectionString = "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True"
+    };
+    var client = new SqlSugarClient(connectionConfig, it =>
+    {
+        it.Aop.OnLogExecuted = (sql, para) =>
+        {
+            var ss = UtilMethods.GetNativeSql(sql, para);
+            string ss2 = "";
+        };
+    });
+    client.BeginTran();
+    client.Insertable(new SugarUserSession
+    {
+        AuthenticationDateTime = DateTime.Now,
+        ExpirationDateTime = DateTime.Now,
+        Realm = "master",
+        SerializedClientIds = "",
+        SessionId = "id",
+        State = UserSessionStates.Active,
+        UserId = "91ad04aa-de65-4cb5-8717-7c4a97c47632",
+        IsClientsNotified = false
+    }).ExecuteCommand();
+    client.CommitTran();
+}
+
+Test();
+*/
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
@@ -300,8 +337,8 @@ void ConfigureStorage(DbContextOptionsBuilder b)
 
 void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
 {
-    // TODO : UPDATE !!
-    dataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();
+    dataProtectionBuilder.Services.PersistKeysToSqlSugar();
+    // dataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();
 }
 
 void SeedData(WebApplication application, string scimBaseUrl)

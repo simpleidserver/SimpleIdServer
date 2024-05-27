@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             var result = await _dbContext.Client.Queryable<SugarScope>()
                 .Includes(s => s.Realms)
                 .Includes(s => s.ClaimMappers)
-                .Where(s => s.IsExposedInConfigurationEdp && s.Realms.Any(r => r.RealmsName == realm))
+                .Where(s => s.IsExposedInConfigurationEdp == true && s.Realms.Any(r => r.RealmsName == realm))
                 .ToListAsync(cancellationToken);
             return result.Select(s => s.ToDomain()).ToList();
         }
@@ -91,8 +91,11 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
         {
             var query = _dbContext.Client.Queryable<SugarScope>()
                     .Includes(p => p.Realms)
-                    .Includes(p => p.Realms)
-                    .Where(p => p.Realms.Any(r => r.RealmsName == realm) && ((request.IsRole && p.Type == ScopeTypes.ROLE) || (!request.IsRole && (p.Type == ScopeTypes.IDENTITY || p.Type == ScopeTypes.APIRESOURCE))));
+                    .Where(p => p.Realms.Any(r => r.RealmsName == realm) && 
+                        ((request.IsRole == true && p.Type == ScopeTypes.ROLE) || 
+                        (request.IsRole == false && (p.Type == ScopeTypes.IDENTITY || p.Type == ScopeTypes.APIRESOURCE)))
+                    );
+            /*
             if (!string.IsNullOrWhiteSpace(request.Filter))
                 query = query.Where(request.Filter);
 
@@ -100,7 +103,8 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 query = query.OrderBy(request.OrderBy);
             else
                 query = query.OrderByDescending(s => s.UpdateDateTime);
-
+            */
+            query = query.OrderByDescending(c => c.UpdateDateTime);
             if (request.Protocols != null && request.Protocols.Any())
                 query = query.Where(q => request.Protocols.Contains(q.Protocol));
             var nb = query.Count();

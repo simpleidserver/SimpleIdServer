@@ -58,12 +58,14 @@ internal class AuditEventRepository : IAuditEventRepository
             .Where(r => r.Realm == realm);
         if (request.DisplayOnlyErrors)
             query = query.Where(r => r.IsError);
-
+        query = query.OrderByDescending(a => a.CreateDateTime);
+        /*
         if (!string.IsNullOrWhiteSpace(request.Filter))
             query = query.Where(request.Filter);
 
         if (!string.IsNullOrWhiteSpace(request.OrderBy))
             query = query.OrderBy(request.OrderBy);
+        */
 
         var nb = query.Count();
         var result = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(cancellationToken);

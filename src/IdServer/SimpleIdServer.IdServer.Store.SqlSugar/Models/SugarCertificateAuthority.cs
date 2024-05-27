@@ -6,6 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar.Models;
 
+[SugarTable("CertificateAuthorities")]
 public class SugarCertificateAuthority
 {
     [SugarColumn(IsPrimaryKey = true)]
@@ -43,7 +44,7 @@ public class SugarCertificateAuthority
             EndDateTime = EndDateTime,
             UpdateDateTime = UpdateDateTime,
             Realms = Realms.Select(r => r.ToDomain()).ToList(),
-            ClientCertificates = ClientCertificates.Select(c => c.ToDomain()).ToList()
+            ClientCertificates = ClientCertificates == null ? new List<ClientCertificate>() : ClientCertificates.Select(c => c.ToDomain()).ToList()
         };
     }
 }

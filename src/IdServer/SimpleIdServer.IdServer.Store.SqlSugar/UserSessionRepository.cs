@@ -17,14 +17,13 @@ public class UserSessionRepository : IUserSessionResitory
     }
 
     public void Add(UserSession session)
-    {
-        _dbContext.Client.Insertable(Transform(session))
-            .ExecuteCommand();
+    {   
+        _dbContext.UserSessions.Insert(Transform(session));
     }
 
     public void Update(UserSession session)
     {
-        _dbContext.Client.Updateable(Transform(session))
+        _dbContext.Client.Updateable(SugarUserSession.Transform(session))
             .ExecuteCommand();
     }
 
@@ -58,6 +57,7 @@ public class UserSessionRepository : IUserSessionResitory
     {
         var query = _dbContext.Client.Queryable<SugarUserSession>()
             .Where(u => u.Realm == realm && u.UserId == userId);
+        /*
         if (!string.IsNullOrWhiteSpace(request.Filter))
             query = query.Where(request.Filter);
 
@@ -65,6 +65,8 @@ public class UserSessionRepository : IUserSessionResitory
             query = query.OrderBy(request.OrderBy);
         else
             query = query.OrderByDescending(u => u.AuthenticationDateTime);
+        */
+        query = query.OrderByDescending(s => s.SessionId);
 
         var count = query.Count();
         var users = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(CancellationToken.None);

@@ -62,11 +62,6 @@ public class UmaResourceRepository : IUmaResourceRepository
         return result.Select(r => r.ToDomain()).ToList();
     }
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
     private static SugarUMAResource Transform(UMAResource resource)
     {
         return new SugarUMAResource

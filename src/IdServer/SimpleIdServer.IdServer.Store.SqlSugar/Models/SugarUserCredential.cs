@@ -18,7 +18,7 @@ public class SugarUserCredential
     public int OTPCounter { get; set; }
     public int TOTPStep { get; set; }
     public int HOTPWindow { get; set; }
-    public string UserId { get; set; }
+    public string UserId { get; set; } = null!;
     [Navigate(NavigateType.ManyToOne, nameof(UserId))]
     public SugarUser User { get; set; }
 

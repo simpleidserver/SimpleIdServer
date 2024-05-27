@@ -25,7 +25,7 @@ public class SugarConfigurationDefinition
             CreateDateTime  = CreateDateTime,
             UpdateDateTime = UpdateDateTime,
             FullQualifiedName = FullQualifiedName,
-            Records = ConfigurationDefinitionRecords.Select(r => r.ToDomain()).ToList()
+            Records = ConfigurationDefinitionRecords == null ? new List<ConfigurationDefinitionRecord>() : ConfigurationDefinitionRecords.Select(r => r.ToDomain()).ToList()
         };
     }
 }
