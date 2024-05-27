@@ -1,0 +1,12 @@
+{
+  "Users": [
+    {
+      "Login": "user2",
+      "Password": "password",
+      "FirstName": "User",
+      "LastName": "2",
+      "Email": "user2@localhost.com",
+      "Roles": [ "user", "local" ]
+    }
+  ]
+}
