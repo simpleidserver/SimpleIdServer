@@ -181,7 +181,7 @@ void ConfigureIdServer(IServiceCollection services, IConfiguration configuration
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDidKey();
-    services.AddJsonSeeding(configuration); // Uncomment to allow seed data via JSON file.
+    // services.AddJsonSeeding(configuration); // Uncomment to allow seed data from JSON file.
     ConfigureDistributedCache();
 }
 
@@ -442,9 +442,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
 
-            // Uncomment to allow seed data via JSON file.
-            ISeedingService seedingService = scope.ServiceProvider.GetService<ISeedingService>();
-            seedingService.SeedDataAsync().Wait();
+            // Uncomment these two lines to allow seed data from JSON file.
+            // ISeedingService seedingService = scope.ServiceProvider.GetService<ISeedingService>();
+            // seedingService.SeedDataAsync().Wait();
         }
 
         void EnableIsolationLevel(StoreDbContext dbContext)
