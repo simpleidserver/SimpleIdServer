@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Services.Seeding.Interfaces;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 /// <summary>
@@ -24,25 +25,28 @@ namespace SimpleIdServer.IdServer.Services.Seeding
             _userSeederService = userSeederService;
         }
 
-        public async Task<SeedsDto?> GetDataFromResourceAsync()
+        public async Task<SeedsDto?> GetDataFromResourceAsync(CancellationToken cancellationToken = default)
         {
-            string jsonText = await File.ReadAllTextAsync(_jsonSeedingOptions.JsonFilePath);
+            string jsonText = await File.ReadAllTextAsync(_jsonSeedingOptions.JsonFilePath, cancellationToken);
             var jsonSerializationOptions = new JsonSerializerOptions() { AllowTrailingCommas = true };
             SeedsDto? seedsDto = JsonSerializer.Deserialize<SeedsDto>(jsonText, jsonSerializationOptions);
             return seedsDto;
         }
 
-        public async Task SeedDataAsync()
+        public async Task SeedDataAsync(CancellationToken cancellationToken = default)
         {
-            SeedsDto? seeds = await GetDataFromResourceAsync();
-            if (seeds != null) await SeedDataAsync(seeds);
+            if (_jsonSeedingOptions.SeedFromJson)
+            {
+                SeedsDto? seeds = await GetDataFromResourceAsync(cancellationToken);
+                if (seeds != null) await SeedDataAsync(seeds, cancellationToken);
+            }
         }
 
-        public async Task SeedDataAsync(SeedsDto seeds)
+        public async Task SeedDataAsync(SeedsDto seeds, CancellationToken cancellationToken = default)
         {
             if (seeds.Users.Count > 0)
             {
-                await _userSeederService.SeedAsync(seeds.Users);
+                await _userSeederService.SeedAsync(seeds.Users, cancellationToken);
             }
         }
     }

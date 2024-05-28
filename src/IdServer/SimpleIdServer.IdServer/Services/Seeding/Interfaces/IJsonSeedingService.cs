@@ -5,7 +5,7 @@ namespace SimpleIdServer.IdServer.Services.Seeding.Interfaces
     /// <summary>
     /// Defines the method that allows to seed all the entities found in JSON file.
     /// </summary>
-    internal interface IJsonSeedingService : ISeedingService
+    public interface IJsonSeedingService : ISeedingService
     {
 
     }

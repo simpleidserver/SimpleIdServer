@@ -177,7 +177,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SeedFromJson = !string.IsNullOrEmpty(jsonSeedsFilePath);
                     options.JsonFilePath = jsonSeedsFilePath;
                 })
-                .Validate(config => !config.SeedFromJson || (config.SeedFromJson && !File.Exists(config.JsonFilePath)), "The JSON file for seeding must exists.");
+                .Validate(config => !config.SeedFromJson || (config.SeedFromJson && File.Exists(config.JsonFilePath)), "The JSON file for seeding must exists.");
 
             services.AddTransient<ISeedingService, JsonSeedingService>();
             services.AddSeeders();

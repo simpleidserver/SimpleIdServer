@@ -38,6 +38,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using SimpleIdServer.Did.Key;
+using SimpleIdServer.IdServer.Services.Seeding.Interfaces;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -440,6 +441,10 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
+
+            // Uncomment to allow seed data via JSON file.
+            ISeedingService seedingService = scope.ServiceProvider.GetService<ISeedingService>();
+            seedingService.SeedDataAsync().Wait();
         }
 
         void EnableIsolationLevel(StoreDbContext dbContext)

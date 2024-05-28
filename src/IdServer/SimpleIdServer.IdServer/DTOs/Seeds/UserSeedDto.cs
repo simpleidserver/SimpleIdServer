@@ -5,7 +5,7 @@ namespace SimpleIdServer.IdServer.DTOs.Seeds
     /// <summary>
     /// Represents an user to seed.
     /// </summary>
-    internal class UserSeedDto
+    public class UserSeedDto
     {
         /// <summary>
         /// The user's name for login.

@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.DTOs.Seeds
     /// <summary>
     /// Represents all the entities to seed.
     /// </summary>
-    internal class SeedsDto
+    public class SeedsDto
     {
 
         public IReadOnlyCollection<UserSeedDto> Users { get; set; } = [];
