@@ -86,8 +86,8 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public string DefaultAcrValues { get; set; }
         public int BCIntervalSeconds { get; set; }
         public AccessTokenTypes AccessTokenType { get; set; }
-        [Navigate(typeof(SugarClientScope), nameof(SugarClientScope.ClientsId), nameof(SugarClientScope.ScopesId))]
-        public List<SugarScope> Scopes { get; set; }
+        [Navigate(NavigateType.OneToMany, nameof(SugarClientScope.ClientsId))]
+        public List<SugarClientScope> ClientScopes { get; set; }
         [Navigate(NavigateType.OneToMany, nameof(SugarClientJsonWebKey.ClientId))]
         public List<SugarClientJsonWebKey> SerializedJsonWebKeys { get; set; }
         [Navigate(typeof(SugarClientRealm), nameof(SugarClientRealm.ClientsId), nameof(SugarClientRealm.RealmsName))]
@@ -96,6 +96,123 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public List<SugarDeviceAuthCode> DeviceAuthCodes { get; set; }
         [Navigate(NavigateType.OneToMany, nameof(SugarTranslation.ClientId))]
         public List<SugarTranslation> Translations { get; set; }
+
+        public static SugarClient Transform(Client client)
+        {
+            return new SugarClient
+            {
+                AccessTokenType = client.AccessTokenType,
+                ApplicationType = client.ApplicationType,
+                AuthorizationEncryptedResponseAlg = client.AuthorizationEncryptedResponseAlg,
+                AuthorizationEncryptedResponseEnc = client.AuthorizationEncryptedResponseEnc,
+                AuthorizationSignedResponseAlg = client.AuthorizationSignedResponseAlg,
+                AuthReqIdExpirationTimeInSeconds = client.AuthReqIdExpirationTimeInSeconds,
+                BackChannelLogoutSessionRequired = client.BackChannelLogoutSessionRequired,
+                BackChannelLogoutUri = client.BackChannelLogoutUri,
+                BCAuthenticationRequestSigningAlg = client.BCAuthenticationRequestSigningAlg,
+                BCClientNotificationEndpoint = client.BCClientNotificationEndpoint,
+                BCIntervalSeconds = client.BCIntervalSeconds,
+                BCTokenDeliveryMode = client.BCTokenDeliveryMode,
+                BCUserCodeParameter = client.BCUserCodeParameter,
+                ClientId = client.ClientId,
+                ClientSecret = client.ClientSecret,
+                ClientSecretExpirationTime = client.ClientSecretExpirationTime,
+                ClientType = client.ClientType,
+                CNonceExpirationTimeInSeconds = client.CNonceExpirationTimeInSeconds,
+                CreateDateTime = client.CreateDateTime,
+                CredentialOfferEndpoint = client.CredentialOfferEndpoint,
+                DefaultMaxAge = client.DefaultMaxAge,
+                DPOPBoundAccessTokens = client.DPOPBoundAccessTokens,
+                DPOPNonceLifetimeInSeconds = client.DPOPNonceLifetimeInSeconds,
+                FrontChannelLogoutSessionRequired = client.FrontChannelLogoutSessionRequired,
+                FrontChannelLogoutUri = client.FrontChannelLogoutUri,
+                IdTokenEncryptedResponseAlg = client.IdTokenEncryptedResponseAlg,
+                IdTokenEncryptedResponseEnc = client.IdTokenEncryptedResponseEnc,
+                IdTokenSignedResponseAlg = client.IdTokenSignedResponseAlg,
+                InitiateLoginUri = client.InitiateLoginUri,
+                IsConsentDisabled = client.IsConsentDisabled,
+                IsDPOPNonceRequired = client.IsDPOPNonceRequired,
+                IsRedirectUrlCaseSensitive = client.IsRedirectUrlCaseSensitive,
+                Id = client.Id,
+                IsResourceParameterRequired = client.IsResourceParameterRequired,
+                IsTokenExchangeEnabled = client.IsTokenExchangeEnabled,
+                IsTransactionCodeRequired = client.IsTransactionCodeRequired,
+                JwksUri = client.JwksUri,
+                PairWiseIdentifierSalt = client.PairWiseIdentifierSalt,
+                PreAuthCodeExpirationTimeInSeconds = client.PreAuthCodeExpirationTimeInSeconds,
+                PreferredTokenProfile = client.PreferredTokenProfile,
+                RedirectToRevokeSessionUI = client.RedirectToRevokeSessionUI,
+                RefreshTokenExpirationTimeInSeconds = client.RefreshTokenExpirationTimeInSeconds,
+                RegistrationAccessToken = client.RegistrationAccessToken,
+                RequestObjectEncryptionAlg = client.RequestObjectEncryptionAlg,
+                RequestObjectEncryptionEnc = client.RequestObjectEncryptionEnc,
+                RequestObjectSigningAlg = client.RequestObjectSigningAlg,
+                RequireAuthTime = client.RequireAuthTime,
+                SectorIdentifierUri = client.SectorIdentifierUri,
+                SoftwareId = client.SoftwareId,
+                SoftwareVersion = client.SoftwareVersion,
+                SubjectType = client.SubjectType,
+                TlsClientAuthSanDNS = client.TlsClientAuthSanDNS,
+                TlsClientAuthSanEmail = client.TlsClientAuthSanEmail,
+                TlsClientAuthSanIP = client.TlsClientAuthSanIP,
+                TlsClientAuthSanURI = client.TlsClientAuthSanURI,
+                TlsClientAuthSubjectDN = client.TlsClientAuthSubjectDN,
+                TlsClientCertificateBoundAccessToken = client.TlsClientCertificateBoundAccessToken,
+                TokenEncryptedResponseAlg = client.TokenEncryptedResponseAlg,
+                TokenEncryptedResponseEnc = client.TokenEncryptedResponseEnc,
+                TokenEndPointAuthMethod = client.TokenEndPointAuthMethod,
+                UpdateDateTime = client.UpdateDateTime,
+                UserInfoEncryptedResponseAlg = client.UserInfoEncryptedResponseAlg,
+                UserInfoSignedResponseAlg = client.UserInfoSignedResponseAlg,
+                UserInfoEncryptedResponseEnc = client.UserInfoEncryptedResponseEnc,
+                SerializedParameters = client.SerializedParameters,
+                TokenExchangeType = client.TokenExchangeType,
+                TokenExpirationTimeInSeconds = client.TokenExpirationTimeInSeconds,
+                TokenSignedResponseAlg = client.TokenSignedResponseAlg,
+                ResponseTypes = client.ResponseTypes == null ? string.Empty : string.Join(",", client.ResponseTypes),
+                RedirectionUrls = client.RedirectionUrls == null ? string.Empty : string.Join(",", client.RedirectionUrls),
+                PostLogoutRedirectUris = client.PostLogoutRedirectUris == null ? string.Empty : string.Join(",", client.PostLogoutRedirectUris),
+                GrantTypes = client.GrantTypes == null ? string.Empty : string.Join(",", client.GrantTypes),
+                DefaultAcrValues = client.DefaultAcrValues == null ? string.Empty : string.Join(",", client.DefaultAcrValues),
+                Contacts = client.Contacts == null ? string.Empty : string.Join(",", client.Contacts),
+                AuthorizationDataTypes = client.AuthorizationDataTypes == null ? string.Empty : string.Join(",", client.AuthorizationDataTypes),
+                DeviceAuthCodes = client.DeviceAuthCodes == null ? new List<SugarDeviceAuthCode>() : client.DeviceAuthCodes.Select(a => new SugarDeviceAuthCode
+                {
+                    CreateDateTime = a.CreateDateTime,
+                    DeviceCode = a.DeviceCode,
+                    ExpirationDateTime = a.ExpirationDateTime,
+                    LastAccessTime = a.LastAccessTime,
+                    NextAccessDateTime = a.NextAccessDateTime,
+                    Scopes = a.Scopes == null ? string.Empty : string.Join(",", a.Scopes),
+                    Status = a.Status,
+                    UpdateDateTime = a.UpdateDateTime,
+                    UserLogin = a.UserLogin,
+                    UserCode = a.UserCode
+                }).ToList(),
+                SerializedJsonWebKeys = client.SerializedJsonWebKeys == null ? new List<SugarClientJsonWebKey>() : client.SerializedJsonWebKeys.Select(s => new SugarClientJsonWebKey
+                {
+                    Alg = s.Alg,
+                    KeyType = s.KeyType,
+                    Kid = s.Kid,
+                    SerializedJsonWebKey = s.SerializedJsonWebKey,
+                    Usage = s.Usage,
+                }).ToList(),
+                Translations = client.Translations == null ? new List<SugarTranslation>() : client.Translations.Select(t => new SugarTranslation
+                {
+                    Key = t.Key,
+                    Language = t.Language,
+                    Value = t.Value
+                }).ToList(),
+                Realms = client.Realms == null ? new List<SugarRealm>() : client.Realms.Select(r => new SugarRealm
+                {
+                    RealmsName = r.Name
+                }).ToList(),
+                ClientScopes = client.Scopes == null ? new List<SugarClientScope>() : client.Scopes.Select(r => new SugarClientScope
+                {
+                    ScopesId = r.Id
+                }).ToList()
+            };
+        }
 
         public Client ToDomain()
         {
@@ -179,7 +296,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 Translations = Translations == null ? new List<Translation>() : Translations.Select(r => r.ToDomain()).ToList(),
                 DeviceAuthCodes = DeviceAuthCodes == null ? new List<DeviceAuthCode>() : DeviceAuthCodes.Select(r => r.ToDomain()).ToList(),
                 SerializedJsonWebKeys = SerializedJsonWebKeys == null ? new List<ClientJsonWebKey>() : SerializedJsonWebKeys.Select(j => j.ToDomain()).ToList(),
-                Scopes = Scopes == null ? new List<Scope>() : Scopes.Select(s => s.ToDomain()).ToList(),
+                Scopes = ClientScopes == null ? new List<Scope>() : ClientScopes.Select(s => s.Scope.ToDomain()).ToList(),
                 Id = Id
             };
         }

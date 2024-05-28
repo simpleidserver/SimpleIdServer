@@ -25,6 +25,21 @@ public class SugarScope
     [Navigate(typeof(SugarScopeRealm), nameof(SugarScopeRealm.ScopesId), nameof(SugarScopeRealm.RealmsName))]
     public List<SugarRealm> Realms { get; set; }
 
+    public static SugarScope Transform(Scope scope)
+    {
+        return new SugarScope
+        {
+            ScopesId = scope.Id,
+            Name = scope.Name,
+            Type = scope.Type,
+            Protocol = scope.Protocol,
+            Description = scope.Description,
+            IsExposedInConfigurationEdp = scope.IsExposedInConfigurationEdp,
+            CreateDateTime = scope.CreateDateTime,
+            UpdateDateTime = scope.UpdateDateTime
+        };
+    }
+
     public Scope ToDomain()
     {
         return new Scope

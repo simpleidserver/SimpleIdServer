@@ -12,4 +12,6 @@ public class SugarClientScope
     public string ClientsId { get; set; }
     [SugarColumn(IsPrimaryKey = true)]
     public string ScopesId {  get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(ScopesId))]
+    public SugarScope Scope { get; set; }
 }

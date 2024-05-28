@@ -708,6 +708,7 @@ public class ClientsController : BaseController
                     newScope.Realms.Add(realm);
                     result.Scopes.Add(newScope);
                     result.UpdateDateTime = DateTime.UtcNow;
+                    _scopeRepository.Add(newScope);
                     _clientRepository.Update(result);
                     await transaction.Commit(cancellationToken);
                     await _busControl.Publish(new AddClientRoleSuccessEvent
