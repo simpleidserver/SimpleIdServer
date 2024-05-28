@@ -5,7 +5,7 @@ namespace SimpleIdServer.IdServer.Options
     /// <summary>
     /// Options for seeding via JSON file.
     /// </summary>
-    internal class JsonSeedingOptions
+    public class JsonSeedingOptions
     {
         /// <summary>
         /// Indicates if seeding from JSON file is needed.

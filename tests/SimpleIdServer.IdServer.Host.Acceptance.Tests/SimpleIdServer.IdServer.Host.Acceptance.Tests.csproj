@@ -64,7 +64,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Moq" Version="4.18.3" />
+		<PackageReference Include="Moq" Version="4.20.70" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Console\SimpleIdServer.IdServer.Console.csproj" />
