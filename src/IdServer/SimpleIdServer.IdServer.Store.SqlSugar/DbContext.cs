@@ -14,15 +14,8 @@ public class DbContext : IDisposable
     {
         var connectionConfig = options.Value.ConnectionConfig;
         connectionConfig.IsAutoCloseConnection = true;
-        connectionConfig.DbType = DbType.SqlServer;
-        _client = new SqlSugarScope(connectionConfig, it =>
-        {
-            it.Aop.OnLogExecuted = (sql, para) =>
-            {
-                var ss = UtilMethods.GetNativeSql(sql, para);
-                string ss2 = "";
-            };
-        });
+        connectionConfig.DbType = options.Value.DbType;
+        _client = new SqlSugarScope(connectionConfig);
         UserSessions = new SimpleClient<SugarUserSession>(_client);
         Users = new SimpleClient<SugarUser>();
     }

@@ -51,7 +51,7 @@ public class IdServerConfiguration
     private static Scope AdminScope = ScopeBuilder.CreateApiScope("admin", true).Build();
     private static Scope CalendarScope = ScopeBuilder.CreateApiScope("calendar", true).Build();
     private static Scope UniversityCredential = ScopeBuilder.CreateApiScope("UniversityCredential", true).Build();
-    private static Group AdminGroup = GroupBuilder.Create("admin", "admin").AddRole(FiftySixClientAdminRole).Build();
+    private static Group AdminGroup = GroupBuilder.Create("admin", "admin").AddRealm(SimpleIdServer.IdServer.Constants.DefaultRealm).AddRole(FiftySixClientAdminRole).Build();
     private static User OtpUser = UserBuilder.Create("otpUser", "password")
         .GenerateRandomTOTPKey()
         .Build();

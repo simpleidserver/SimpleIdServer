@@ -56,6 +56,8 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
         {
             var result = await _dbContext.Client.Queryable<SugarScope>()
                 .Includes(s => s.Realms)
+                .Includes(s => s.ApiResources)
+                .Includes(s => s.ClaimMappers)
                 .Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.RealmsName == realm))
                 .ToListAsync(cancellationToken);
             return result.Select(s => s.ToDomain()).ToList();

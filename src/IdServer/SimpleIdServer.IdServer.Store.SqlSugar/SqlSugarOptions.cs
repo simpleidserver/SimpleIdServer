@@ -8,4 +8,5 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar;
 public class SqlSugarOptions
 {
     public ConnectionConfig ConnectionConfig { get; set; }
+    public DbType DbType { get; set; } = DbType.SqlServer;
 }

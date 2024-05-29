@@ -64,6 +64,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
             _audienceHelper = audienceHelper;
+            _transactionBuilder = transactionBuilder;
             _logger = logger;
         }
 

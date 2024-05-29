@@ -1,0 +1,27 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using SimpleIdServer.IdServer.SqlSugar.Startup.Resources
+@using System.Globalization
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimpleIdServer - @ViewBag.Title</title>
+    <link rel="stylesheet" href="@Url.Content("~/lib/bootstrap/css/bootstrap.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/lib/fontawesome/css/all.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/styles/theme.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/styles/authenticate.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/styles/consent.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/styles/profile.css")" />
+    <link rel="icon" href="@Url.Content("~/images/favicon.ico")" />
+</head>
+<body class="orange">
+    @RenderBody()
+    <script type="text/javascript" src="@Url.Content("~/lib/jquery/jquery.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/popper.js/umd/popper.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/bootstrap/js/bootstrap.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/helpers.js")"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

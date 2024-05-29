@@ -86,6 +86,7 @@ public class RealmsController : BaseController
                     var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
                     var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
                     var acrs = await _authenticationContextClassReferenceRepository.GetAll(cancellationToken);
+                    _realmRepository.Add(realm);
                     foreach (var user in users)
                     {
                         user.Realms.Add(new RealmUser { RealmsName = request.Name });
@@ -93,7 +94,10 @@ public class RealmsController : BaseController
                     }
 
                     foreach (var client in clients)
+                    {
                         client.Realms.Add(realm);
+                        _clientRepository.Update(client);
+                    }
 
                     foreach (var scope in scopes)
                     {
@@ -102,7 +106,10 @@ public class RealmsController : BaseController
                     }
 
                     foreach (var acr in acrs)
+                    {
                         acr.Realms.Add(realm);
+                        _authenticationContextClassReferenceRepository.Update(acr);
+                    }
 
                     foreach (var key in keys)
                     {
@@ -110,7 +117,6 @@ public class RealmsController : BaseController
                         _fileSerializedKeyStore.Update(key);
                     }
 
-                    _realmRepository.Add(realm);
                     await transaction.Commit(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, $"Realm {request.Name} is added");
                     return new ContentResult

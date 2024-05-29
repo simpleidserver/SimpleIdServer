@@ -99,10 +99,14 @@ public class ImportUsersConsumer :
         var userRepresentations = representations.Where(r => r.Type == Domains.ExtractedRepresentationType.USER);
         using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
         {
-            await Export(userRepresentations, groupRepresentations, idProvisioning, message.Realm);
-            idProvisioning.Import(message.ProcessId, userRepresentations.Count(), groupRepresentations.Count(), message.Page);
-            // await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-            transactionScope.Complete();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await Export(userRepresentations, groupRepresentations, idProvisioning, message.Realm);
+                idProvisioning.Import(message.ProcessId, userRepresentations.Count(), groupRepresentations.Count(), message.Page);
+                _identityProvisioningStore.Update(idProvisioning);
+                await transaction.Commit(context.CancellationToken);
+                transactionScope.Complete();
+            }
         }
     }
 

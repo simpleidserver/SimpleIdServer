@@ -104,43 +104,51 @@ public class ExtractUsersConsumer :
 
         using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
         {
-            // Store the representation id and its version.
-            await _stagingStore.BulkUpdate(newOrChangedRepresentations.Select(r => new ExtractedRepresentation
+            using (var transaction = _transactionBuilder.Build())
             {
-                ExternalId = r.RepresentationId,
-                Version = r.RepresentationVersion
-            }).ToList(), context.CancellationToken);
-            // Store the extracted representations.
-            await _stagingStore.BulkUpdate(newOrChangedRepresentations, context.CancellationToken);
-            instance.Extract(message.ProcessId,
-                message.Page,
-                newOrChangedRepresentations.Count(r => r.Type == ExtractedRepresentationType.USER),
-                newOrChangedRepresentations.Count(u => u.Type == ExtractedRepresentationType.GROUP),
-                filteredRepresentations.Count());
-            // await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-            transactionScope.Complete();
+                // Store the representation id and its version.
+                await _stagingStore.BulkUpdate(newOrChangedRepresentations.Select(r => new ExtractedRepresentation
+                {
+                    ExternalId = r.RepresentationId,
+                    Version = r.RepresentationVersion
+                }).ToList(), context.CancellationToken);
+                // Store the extracted representations.
+                await _stagingStore.BulkUpdate(newOrChangedRepresentations, context.CancellationToken);
+                instance.Extract(message.ProcessId,
+                    message.Page,
+                    newOrChangedRepresentations.Count(r => r.Type == ExtractedRepresentationType.USER),
+                    newOrChangedRepresentations.Count(u => u.Type == ExtractedRepresentationType.GROUP),
+                    filteredRepresentations.Count());
+                _identityProvisioningStore.Update(instance);
+                await transaction.Commit(context.CancellationToken);
+                transactionScope.Complete();
+            }
         }
     }
 
     public async Task Consume(ConsumeContext<CheckUsersExtractedCommand> context)
     {
-        var message = context.Message;
-        var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, CancellationToken.None);
-        var process = instance.GetProcess(message.ProcessId);
-        if(process.TotalPageToExtract == process.NbExtractedPages)
+        using (var transaction = _transactionBuilder.Build())
         {
-            instance.FinishExtract(message.ProcessId);
-            // await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-            return;
-        }
+            var message = context.Message;
+            var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, CancellationToken.None);
+            var process = instance.GetProcess(message.ProcessId);
+            if (process.TotalPageToExtract == process.NbExtractedPages)
+            {
+                instance.FinishExtract(message.ProcessId);
+                _identityProvisioningStore.Update(instance);
+                await transaction.Commit(context.CancellationToken);
+                return;
+            }
 
-        var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
-        await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
-        {
-            InstanceId = message.InstanceId,
-            ProcessId = message.ProcessId,
-            Realm = message.Realm
-        });
+            var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
+            await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
+            {
+                InstanceId = message.InstanceId,
+                ProcessId = message.ProcessId,
+                Realm = message.Realm
+            });
+        }
     }
 
     private List<ExtractedRepresentationStaging> Extract(string processId, ExtractedResult extractedResult, IdentityProvisioningDefinition definition)
