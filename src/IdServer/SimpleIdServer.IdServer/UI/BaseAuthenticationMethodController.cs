@@ -172,10 +172,7 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var query = ExtractQuery(viewModel.ReturnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var client = await ClientRepository.Query()
-                    .Include(c => c.Realms)
-                    .Include(c => c.Translations)
-                    .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), token);
+                var client = await ClientRepository.GetByClientId(prefix, clientId, token);
                 var res = await ResolveAmrInfo(query, prefix, client, token);
                 amrInfo = res?.Item1;
                 viewModel.AmrAuthInfo = amrInfo;

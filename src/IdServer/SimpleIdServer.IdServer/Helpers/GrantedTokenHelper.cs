@@ -215,26 +215,26 @@ namespace SimpleIdServer.IdServer.Helpers
         {
             CleanRequest(request);
             CleanRequest(originalRequest);
-
             using (var transaction = _transactionBuilder.Build())
-            {           
-		var refreshToken = Guid.NewGuid().ToString();
-            _tokenRepository.Add(new Token
             {
-                Id = refreshToken,
-                TokenType = DTOs.TokenResponseParameters.RefreshToken,
-                ClientId = clientId,
-                Data = request.ToString(),
-                OriginalData = originalRequest?.ToString(),
-                AuthorizationCode = authorizationCode,
-                ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
-                CreateDateTime = DateTime.UtcNow,
-                GrantId = grantId,
-                SessionId = sessionId,
-                Jkt = jkt
-            });
-            await _tokenRepository.SaveChanges(cancellationToken);
-            return refreshToken;
+                var refreshToken = Guid.NewGuid().ToString();
+                _tokenRepository.Add(new Token
+                {
+                    Id = refreshToken,
+                    TokenType = DTOs.TokenResponseParameters.RefreshToken,
+                    ClientId = clientId,
+                    Data = request.ToString(),
+                    OriginalData = originalRequest?.ToString(),
+                    AuthorizationCode = authorizationCode,
+                    ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
+                    CreateDateTime = DateTime.UtcNow,
+                    GrantId = grantId,
+                    SessionId = sessionId,
+                    Jkt = jkt
+                });
+                await transaction.Commit(cancellationToken);
+                return refreshToken;
+            }
 
             void CleanRequest(JsonObject jsonObj)
             {
