@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
 
         public void DeleteRange(IEnumerable<IdentityProvisioning> identityProvisioningLst)
         {
-            var lst = identityProvisioningLst.Select(i => Transform(i)).ToList();
+            var lst = identityProvisioningLst.Select(i => SugarIdentityProvisioning.Transform(i)).ToList();
             _dbContext.Client.Deleteable(lst).ExecuteCommand();
         }
 
@@ -34,14 +34,23 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
 
         public void Remove(IdentityProvisioning identityProvisioning)
         {
-            _dbContext.Client.Deleteable(Transform(identityProvisioning)).ExecuteCommand();
+            _dbContext.Client.Deleteable(SugarIdentityProvisioning.Transform(identityProvisioning)).ExecuteCommand();
         }
 
         public void Update(IdentityProvisioning identityProvisioning)
         {
-            _dbContext.Client.UpdateNav(Transform(identityProvisioning))
+            var transformedIdentityProvisioning = SugarIdentityProvisioning.Transform(identityProvisioning);
+            _dbContext.Client.Updateable(transformedIdentityProvisioning).ExecuteCommand();
+            _dbContext.Client.UpdateNav(SugarIdentityProvisioning.Transform(identityProvisioning))
                 .Include(c => c.Histories)
-                .Include(c => c.Definition)
+                .Include(c => c.Realms)
+                .ExecuteCommand();
+        }
+
+        public void Update(IdentityProvisioningDefinition identityProvisioningDefinition)
+        {
+            _dbContext.Client.UpdateNav(SugarIdentityProvisioningDefinition.Transform(identityProvisioningDefinition))
+                .Include(c => c.MappingRules)
                 .ExecuteCommand();
         }
 
@@ -64,61 +73,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             {
                 Count = nb,
                 Content = idProviders.Select(i => i.ToDomain()).ToList()
-            };
-        }
-
-        private static SugarIdentityProvisioning Transform(IdentityProvisioning identityProvisioning)
-        {
-            return new SugarIdentityProvisioning
-            {
-                Id = identityProvisioning.Id,
-                Description = identityProvisioning.Description,
-                Name = identityProvisioning.Name,
-                Histories = identityProvisioning.Histories.Select(h => Transform(h)).ToList(),
-                Definition = Transform(identityProvisioning.Definition)
-            };
-        }
-
-        private static SugarIdentityProvisioningHistory Transform(IdentityProvisioningHistory history)
-        {
-            return new SugarIdentityProvisioningHistory
-            {
-                CurrentPage = history.CurrentPage,
-                ExecutionDateTime = history.ExecutionDateTime,
-                NbFilteredRepresentations = history.NbFilteredRepresentations,
-                NbGroups = history.NbGroups,
-                NbUsers = history.NbUsers,
-                ProcessId = history.ProcessId,
-                Status = history.Status,
-                TotalPages = history.TotalPages,
-            };
-        }
-
-        private static SugarIdentityProvisioningDefinition Transform(IdentityProvisioningDefinition definition)
-        {
-            return new SugarIdentityProvisioningDefinition
-            {
-                CreateDateTime = definition.CreateDateTime,
-                Description = definition.Description,
-                Name = definition.Name,
-                OptionsFullQualifiedName = definition.OptionsFullQualifiedName,
-                OptionsName = definition.OptionsName,
-                UpdateDateTime = definition.UpdateDateTime,
-                MappingRules = definition.MappingRules.Select(m => Transform(m)).ToList()
-            };
-        }
-
-        private static SugarIdentityProvisioningMappingRule Transform(IdentityProvisioningMappingRule rule)
-        {
-            return new SugarIdentityProvisioningMappingRule
-            {
-                From = rule.From,
-                HasMultipleAttribute = rule.HasMultipleAttribute,
-                Id = rule.Id,
-                MapperType = rule.MapperType,
-                TargetUserAttribute = rule.TargetUserAttribute,
-                TargetUserProperty = rule.TargetUserProperty,
-                Usage = rule.Usage
             };
         }
     }

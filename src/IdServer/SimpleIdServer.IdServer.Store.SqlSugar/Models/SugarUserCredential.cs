@@ -22,6 +22,21 @@ public class SugarUserCredential
     [Navigate(NavigateType.ManyToOne, nameof(UserId))]
     public SugarUser User { get; set; }
 
+    public static SugarUserCredential Transform(UserCredential c)
+    {
+        return new SugarUserCredential
+        {
+            Id = c.Id,
+            CredentialType = c.CredentialType,
+            HOTPWindow = c.HOTPWindow,
+            IsActive = c.IsActive,
+            OTPAlg = c.OTPAlg,
+            OTPCounter = c.OTPCounter,
+            TOTPStep = c.TOTPStep,
+            Value = c.Value
+        };
+    }
+
     public UserCredential ToDomain()
     {
         return new UserCredential

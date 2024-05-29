@@ -17,9 +17,22 @@ public class SugarApiResource
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
     [Navigate(typeof(SugarApiResourceScope), nameof(SugarApiResourceScope.ApiResourcesId), nameof(SugarApiResourceScope.ScopesId))]
-    public List<SugarScope> Scopes { get; set; } = new List<SugarScope>();
+    public List<SugarScope> Scopes { get; set; }
     [Navigate(typeof(SugarApiResourceRealm), nameof(SugarApiResourceRealm.ApiResourcesId), nameof(SugarApiResourceRealm.RealmsName))]
     public List<SugarRealm> Realms { get; set; }
+
+    public static SugarApiResource Transform(ApiResource apiResource)
+    {
+        return new SugarApiResource
+        {
+            Audience = apiResource.Audience,
+            CreateDateTime = apiResource.CreateDateTime,
+            Description = apiResource.Description,
+            Id = apiResource.Id,
+            Name = apiResource.Name,
+            UpdateDateTime = apiResource.UpdateDateTime
+        };
+    }
 
     public ApiResource ToDomain()
     {

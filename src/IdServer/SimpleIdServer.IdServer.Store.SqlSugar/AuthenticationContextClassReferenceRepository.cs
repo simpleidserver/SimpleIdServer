@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
 
         public void Add(AuthenticationContextClassReference record)
         {
-            var newRecord = Transform(record);
+            var newRecord = SugarAuthenticationContextClassReference.Transform(record);
             _dbContext.Client.InsertNav(newRecord)
                 .Include(r => r.Realms)
                 .ExecuteCommand();
@@ -81,25 +81,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
 
         public void Update(AuthenticationContextClassReference record)
         {
-            _dbContext.Client.Updateable(record).ExecuteCommand();
-        }
-
-        private static SugarAuthenticationContextClassReference Transform(AuthenticationContextClassReference record)
-        {
-            return new SugarAuthenticationContextClassReference
-            {
-                Id = record.Id,
-                CreateDateTime = record.CreateDateTime,
-                DisplayName = record.DisplayName,
-                Name = record.Name,
-                RegistrationWorkflowId = record.RegistrationWorkflowId,
-                UpdateDateTime = record.UpdateDateTime,
-                AuthenticationMethodReferences = record.AuthenticationMethodReferences.Join(","),
-                Realms = record.Realms.Select(r => new SugarRealm
-                {
-                    RealmsName = r.Name
-                }).ToList()
-            };
+            _dbContext.Client.Updateable(SugarAuthenticationContextClassReference.Transform(record)).ExecuteCommand();
         }
     }
 }

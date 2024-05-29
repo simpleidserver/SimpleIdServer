@@ -22,6 +22,26 @@ public class SugarRegistrationWorkflow
     [Navigate(NavigateType.OneToMany, nameof(SugarAuthenticationContextClassReference.RegistrationWorkflowId))]
     public List<SugarAuthenticationContextClassReference> Acrs { get; set; }
 
+    public static SugarRegistrationWorkflow Transform(RegistrationWorkflow record)
+    {
+        return new SugarRegistrationWorkflow
+        {
+            Id = record.Id,
+            CreateDateTime = record.CreateDateTime,
+            Name = record.Name,
+            UpdateDateTime = record.UpdateDateTime,
+            Steps = record.Steps == null ? "" : record.Steps.Join(","),
+            IsDefault = record.IsDefault,
+            RealmName = record.RealmName ?? record.Realm?.Name,
+            Acrs = record.Acrs == null ? new List<SugarAuthenticationContextClassReference>() : record.Acrs.Select(a => new SugarAuthenticationContextClassReference
+            {
+                Id = a.Id,
+                Name = a.Name,
+                DisplayName = a.DisplayName,
+            }).ToList()
+        };
+    }
+
     public RegistrationWorkflow ToDomain()
     {
         return new RegistrationWorkflow

@@ -14,4 +14,5 @@ public interface IIdentityProvisioningStore
     void DeleteRange(IEnumerable<IdentityProvisioning> identityProvisioningLst);
     void Remove(IdentityProvisioning identityProvisioning);
     void Update(IdentityProvisioning identityProvisioning);
+    void Update(IdentityProvisioningDefinition identityProvisioningDefinition);
 }

@@ -23,6 +23,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
 
         public void Update(ConfigurationKeyPairValueRecord keyValue)
         {
+            if (keyValue == null) return;
             _dbContext.Client.Updateable(Transform(keyValue)).ExecuteCommand();
         }
 

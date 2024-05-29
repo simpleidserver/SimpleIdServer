@@ -21,6 +21,20 @@ public class SugarIdentityProvisioningDefinition
     [Navigate(NavigateType.OneToMany, nameof(SugarIdentityProvisioningMappingRule.IdentityProvisioningDefinitionName))]
     public List<SugarIdentityProvisioningMappingRule> MappingRules { get; set; }
 
+    public static SugarIdentityProvisioningDefinition Transform(IdentityProvisioningDefinition definition)
+    {
+        return new SugarIdentityProvisioningDefinition
+        {
+            CreateDateTime = definition.CreateDateTime,
+            Description = definition.Description,
+            Name = definition.Name,
+            OptionsFullQualifiedName = definition.OptionsFullQualifiedName,
+            OptionsName = definition.OptionsName,
+            UpdateDateTime = definition.UpdateDateTime,
+            MappingRules = definition.MappingRules.Select(m => SugarIdentityProvisioningMappingRule.Transform(m)).ToList()
+        };
+    }
+
     public IdentityProvisioningDefinition ToDomain()
     {
         return new IdentityProvisioningDefinition

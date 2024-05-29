@@ -21,6 +21,20 @@ public class SugarIdentityProvisioningMappingRule
     [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningDefinitionName))]
     public SugarIdentityProvisioningDefinition IdentityProvisioningDefinition { get; set; } = null!;
 
+    public static SugarIdentityProvisioningMappingRule Transform(IdentityProvisioningMappingRule rule)
+    {
+        return new SugarIdentityProvisioningMappingRule
+        {
+            From = rule.From,
+            HasMultipleAttribute = rule.HasMultipleAttribute,
+            Id = rule.Id,
+            MapperType = rule.MapperType,
+            TargetUserAttribute = rule.TargetUserAttribute,
+            TargetUserProperty = rule.TargetUserProperty,
+            Usage = rule.Usage
+        };
+    }
+
     public IdentityProvisioningMappingRule ToDomain()
     {
         return new IdentityProvisioningMappingRule

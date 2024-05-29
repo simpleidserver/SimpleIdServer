@@ -151,6 +151,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     result.UpdateDateTime = DateTime.UtcNow;
                     result.Definition.MappingRules = result.Definition.MappingRules.Where(r => r.Id != mapperId).ToList();
                     _identityProvisioningStore.Update(result);
+                    _identityProvisioningStore.Update(result.Definition);
                     await transaction.Commit(cancellationToken);
                     return NoContent();
                 }
@@ -191,6 +192,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     };
                     result.Definition.MappingRules.Add(record);
                     _identityProvisioningStore.Update(result);
+                    _identityProvisioningStore.Update(result.Definition);
                     await transaction.Commit(cancellationToken);
                     return new ContentResult
                     {
@@ -225,6 +227,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                     mapperRule.TargetUserProperty = request.TargetUserProperty;
                     mapperRule.HasMultipleAttribute = request.HasMultipleAttribute;
                     _identityProvisioningStore.Update(result);
+                    _identityProvisioningStore.Update(result.Definition);
                     await transaction.Commit(cancellationToken);
                     return NoContent();
                 }

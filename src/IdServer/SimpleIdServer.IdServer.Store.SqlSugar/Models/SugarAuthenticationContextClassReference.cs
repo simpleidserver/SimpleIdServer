@@ -24,6 +24,24 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         [Navigate(NavigateType.OneToMany, nameof(SugarClient.AuthenticationContextClassReferenceId))]
         public List<SugarClient> Clients { get; set; }
 
+        public static SugarAuthenticationContextClassReference Transform(AuthenticationContextClassReference record)
+        {
+            return new SugarAuthenticationContextClassReference
+            {
+                Id = record.Id,
+                CreateDateTime = record.CreateDateTime,
+                DisplayName = record.DisplayName,
+                Name = record.Name,
+                RegistrationWorkflowId = record.RegistrationWorkflowId,
+                UpdateDateTime = record.UpdateDateTime,
+                AuthenticationMethodReferences = record.AuthenticationMethodReferences.Join(","),
+                Realms = record.Realms.Select(r => new SugarRealm
+                {
+                    RealmsName = r.Name
+                }).ToList()
+            };
+        }
+
         public AuthenticationContextClassReference ToDomain()
         {
             return new AuthenticationContextClassReference

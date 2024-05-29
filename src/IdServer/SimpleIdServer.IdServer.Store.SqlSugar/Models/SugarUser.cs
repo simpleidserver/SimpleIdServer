@@ -38,10 +38,44 @@ public class SugarUser
     public List<SugarConsent> Consents { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarUserDevice.UserId))]
     public List<SugarUserDevice> Devices { get; set; }
-    [Navigate(NavigateType.OneToMany, nameof(SugarGroupUser.UsersId))]
-    public List<SugarGroupUser> Groups { get; set; }
+    [Navigate(typeof(SugarGroupUser), nameof(SugarGroupUser.UsersId), nameof(SugarGroupUser.GroupsId))]
+    public List<SugarGroup> Groups { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarRealmUser.UsersId))]
     public List<SugarRealmUser> Realms { get; set; }
+
+    public static SugarUser Transform(User user)
+    {
+        return new SugarUser
+        {
+            Id = user.Id,
+            EmailVerified = user.EmailVerified,
+            Email = user.Email,
+            Firstname = user.Firstname,
+            DeviceRegistrationToken = user.DeviceRegistrationToken,
+            CreateDateTime = user.CreateDateTime,
+            Lastname = user.Lastname,
+            NotificationMode = user.NotificationMode,
+            Name = user.Name,
+            Source = user.Source,
+            Status = user.Status,
+            IdentityProvisioningId = user.IdentityProvisioningId,
+            EncodedPicture = user.EncodedPicture,
+            UpdateDateTime = user.UpdateDateTime,
+            Consents = user.Consents == null ? new List<SugarConsent>() : user.Consents.Select(c => SugarConsent.Transform(c)).ToList(),
+            Realms = user.Realms == null ? new List<SugarRealmUser>() : user.Realms.Select(r => new SugarRealmUser
+            {
+                RealmsName = r.RealmsName ?? r.Realm.Name
+            }).ToList(),
+            Claims = user.Consents == null ? new List<SugarUserClaim>() : user.OAuthUserClaims.Select(r => SugarUserClaim.Transform(r)).ToList(),
+            Credentials = user.Credentials == null ? new List<SugarUserCredential>() : user.Credentials.Select(c => SugarUserCredential.Transform(c)).ToList(),
+            Devices = user.Devices == null ? new List<SugarUserDevice>() : user.Devices.Select(d => SugarUserDevice.Transform(d)).ToList(),
+            ExternalAuthProviders = user.ExternalAuthProviders == null ? new List<SugarUserExternalAuthProvider>() : user.ExternalAuthProviders.Select(e => SugarUserExternalAuthProvider.Transform(e)).ToList(),
+            Groups = user.Groups == null ? new List<SugarGroup>() : user.Groups.Select(g => new SugarGroup
+            {
+                Id = g.GroupsId
+            }).ToList()
+        };
+    }
 
     public User ToDomain()
     {
@@ -66,7 +100,11 @@ public class SugarUser
             Credentials = Credentials == null ? new List<UserCredential>() : Credentials.Select(c => c.ToDomain()).ToList(),
             ExternalAuthProviders = ExternalAuthProviders == null ? new List<UserExternalAuthProvider>() : ExternalAuthProviders.Select(e => e.ToDomain()).ToList(),
             Consents = Consents == null ? new List<Consent>() : Consents.Select(c => c.ToDomain()).ToList(),
-            Groups = Groups == null ? new List<GroupUser>() : Groups.Select(c => c.ToDomain()).ToList(),
+            Groups = Groups == null ? new List<GroupUser>() : Groups.Select(c => new GroupUser
+            {
+                GroupsId = c.Id,
+                Group = c?.ToDomain()
+            }).ToList(),
             Realms = Realms == null ? new List<RealmUser>() : Realms.Select(r => r.ToDomain()).ToList()
         };
     }

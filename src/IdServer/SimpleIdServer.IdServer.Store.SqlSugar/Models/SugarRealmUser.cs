@@ -13,6 +13,14 @@ public class SugarRealmUser
     [SugarColumn(IsPrimaryKey = true)]
     public string RealmsName {  get; set; }
 
+    public static SugarRealmUser Transform(RealmUser user)
+    {
+        return new SugarRealmUser
+        {
+            RealmsName = user.RealmsName
+        };
+    }
+
     public RealmUser ToDomain()
     {
         return new RealmUser

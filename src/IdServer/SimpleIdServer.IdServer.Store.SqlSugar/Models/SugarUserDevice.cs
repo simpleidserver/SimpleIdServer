@@ -23,6 +23,22 @@ public class SugarUserDevice
     [Navigate(NavigateType.ManyToOne, nameof(UserId))]
     public SugarUser User { get; set; }
 
+    public static SugarUserDevice Transform(UserDevice d)
+    {
+        return new SugarUserDevice
+        {
+            CreateDateTime = d.CreateDateTime,
+            DeviceType = d.DeviceType,
+            Id = d.Id,
+            Manufacturer = d.Manufacturer,
+            Model = d.Model,
+            Name = d.Name,
+            PushToken = d.PushToken,
+            PushType = d.PushType,
+            Version = d.Version
+        };
+    }
+
     public UserDevice ToDomain()
     {
         return new UserDevice

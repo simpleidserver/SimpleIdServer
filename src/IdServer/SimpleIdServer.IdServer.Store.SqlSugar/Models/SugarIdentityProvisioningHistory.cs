@@ -23,6 +23,21 @@ public class SugarIdentityProvisioningHistory
     [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningId))]
     public IdentityProvisioning IdentityProvisioning { get; set; } = null!;
 
+    public static SugarIdentityProvisioningHistory Transform(IdentityProvisioningHistory history)
+    {
+        return new SugarIdentityProvisioningHistory
+        {
+            CurrentPage = history.CurrentPage,
+            ExecutionDateTime = history.ExecutionDateTime,
+            NbFilteredRepresentations = history.NbFilteredRepresentations,
+            NbGroups = history.NbGroups,
+            NbUsers = history.NbUsers,
+            ProcessId = history.ProcessId,
+            Status = history.Status,
+            TotalPages = history.TotalPages,
+        };
+    }
+
     public IdentityProvisioningHistory ToDomain()
     {
         return new IdentityProvisioningHistory

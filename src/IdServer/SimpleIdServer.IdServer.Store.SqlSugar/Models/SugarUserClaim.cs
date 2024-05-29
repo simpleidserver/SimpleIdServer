@@ -15,6 +15,17 @@ public class SugarUserClaim
     public string? Type { get; set; } = null;
     public string? UserId { get; set; } = null;
 
+    public static SugarUserClaim Transform(UserClaim cl)
+    {
+        return new SugarUserClaim
+        {
+            Id = cl.Id,
+            Name = cl.Name,
+            Type = cl.Type,
+            Value = cl.Value,
+        };
+    }
+
     public UserClaim ToDomain()
     {
         return new UserClaim

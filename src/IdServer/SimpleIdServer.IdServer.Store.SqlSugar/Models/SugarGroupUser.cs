@@ -16,6 +16,14 @@ public class SugarGroupUser
     [Navigate(NavigateType.ManyToOne, nameof(GroupsId))]
     public SugarGroup Group { get; set; }
 
+    public static SugarGroupUser Transform(GroupUser u)
+    {
+        return new SugarGroupUser
+        {
+            GroupsId = u.GroupsId
+        };
+    }
+
     public GroupUser ToDomain()
     {
         return new GroupUser

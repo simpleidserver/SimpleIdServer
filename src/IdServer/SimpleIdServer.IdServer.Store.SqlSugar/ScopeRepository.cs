@@ -18,7 +18,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
 
         public void Add(Scope scope)
         {
-            _dbContext.Client.InsertNav(Transform(scope))
+            _dbContext.Client.InsertNav(SugarScope.Transform(scope))
                 .Include(s => s.Realms)
                 .Include(s => s.ApiResources)
                 .Include(s => s.ClaimMappers)
@@ -27,7 +27,9 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
 
         public void Update(Scope scope)
         {
-            _dbContext.Client.UpdateNav(Transform(scope))
+            var transformedScope = SugarScope.Transform(scope);
+            _dbContext.Client.Updateable(transformedScope).ExecuteCommand();
+            _dbContext.Client.UpdateNav(transformedScope)
                 .Include(s => s.Realms)
                 .Include(s => s.ApiResources)
                 .Include(s => s.ClaimMappers)
@@ -36,7 +38,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
 
         public void DeleteRange(IEnumerable<Scope> scopes)
         {
-            _dbContext.Client.Deleteable(scopes.Select(s => Transform(s)).ToList())
+            _dbContext.Client.Deleteable(scopes.Select(s => SugarScope.Transform(s)).ToList())
                 .ExecuteCommand();
         }
 
@@ -90,7 +92,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
         public async Task<SearchResult<Scope>> Search(string realm, SearchScopeRequest request, CancellationToken cancellationToken)
         {
             var query = _dbContext.Client.Queryable<SugarScope>()
-                    .Includes(p => p.Realms)
+                    .Includes(s => s.Realms)
                     .Where(p => p.Realms.Any(r => r.RealmsName == realm) && 
                         ((request.IsRole == true && p.Type == ScopeTypes.ROLE) || 
                         (request.IsRole == false && (p.Type == ScopeTypes.IDENTITY || p.Type == ScopeTypes.APIRESOURCE)))
@@ -113,42 +115,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             {
                 Count = nb,
                 Content = scopes.Select(s => s.ToDomain()).ToList()
-            };
-        }
-
-        private static SugarScope Transform(Scope scope)
-        {
-            return new SugarScope
-            {
-                Name = scope.Name,
-                CreateDateTime = scope.CreateDateTime,
-                Description = scope.Description,
-                IsExposedInConfigurationEdp = scope.IsExposedInConfigurationEdp,
-                ScopesId = scope.Id,
-                Type = scope.Type,
-                UpdateDateTime = scope.UpdateDateTime,
-                Protocol = scope.Protocol,
-                Realms = scope.Realms.Select(r => new SugarRealm
-                {
-                    RealmsName = r.Name
-                }).ToList(),
-                ApiResources = scope.ApiResources == null ? new List<SugarApiResource>() : scope.ApiResources.Select(r => new SugarApiResource
-                {
-                    Id = r.Id
-                }).ToList(),
-                ClaimMappers = scope.ClaimMappers == null ? new List<SugarScopeClaimMapper>() : scope.ClaimMappers.Select(c => new SugarScopeClaimMapper
-                {
-                    IncludeInAccessToken = c.IncludeInAccessToken,
-                    IsMultiValued = c.IsMultiValued,
-                    MapperType = c.MapperType,
-                    Name = c.Name,
-                    SAMLAttributeName = c.SAMLAttributeName,
-                    ScopeClaimMapperId = c.Id,
-                    SourceUserAttribute = c.SourceUserAttribute,
-                    SourceUserProperty = c.SourceUserProperty,
-                    TargetClaimPath = c.TargetClaimPath,
-                    TokenClaimJsonType = c.TokenClaimJsonType
-                }).ToList()
             };
         }
     }

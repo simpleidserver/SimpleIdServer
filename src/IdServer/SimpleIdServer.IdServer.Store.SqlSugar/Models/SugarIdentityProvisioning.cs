@@ -26,6 +26,26 @@ public class SugarIdentityProvisioning
     [Navigate(NavigateType.OneToMany, nameof(SugarUser.IdentityProvisioningId))]
     public List<SugarUser> Users { get; set; }
 
+    public static SugarIdentityProvisioning Transform(IdentityProvisioning identityProvisioning)
+    {
+        return new SugarIdentityProvisioning
+        {
+            Id = identityProvisioning.Id,
+            Description = identityProvisioning.Description,
+            Name = identityProvisioning.Name,
+            IsEnabled = identityProvisioning.IsEnabled,
+            CreateDateTime = identityProvisioning.CreateDateTime,
+            UpdateDateTime = identityProvisioning.UpdateDateTime,
+            DefinitionName = identityProvisioning.Definition.Name,
+            Histories = identityProvisioning.Histories.Select(h => SugarIdentityProvisioningHistory.Transform(h)).ToList(),
+            Definition = SugarIdentityProvisioningDefinition.Transform(identityProvisioning.Definition),
+            Realms = identityProvisioning.Realms.Select(r => new SugarRealm
+            {
+                RealmsName = r.Name
+            }).ToList()
+        };
+    }
+
     public IdentityProvisioning ToDomain()
     {
         return new IdentityProvisioning

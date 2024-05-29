@@ -31,12 +31,18 @@ public class SugarScope
         {
             ScopesId = scope.Id,
             Name = scope.Name,
-            Type = scope.Type,
-            Protocol = scope.Protocol,
+            CreateDateTime = scope.CreateDateTime,
             Description = scope.Description,
             IsExposedInConfigurationEdp = scope.IsExposedInConfigurationEdp,
-            CreateDateTime = scope.CreateDateTime,
-            UpdateDateTime = scope.UpdateDateTime
+            Type = scope.Type,
+            UpdateDateTime = scope.UpdateDateTime,
+            Protocol = scope.Protocol,
+            Realms = scope.Realms == null ? new List<SugarRealm>() : scope.Realms.Select(r => new SugarRealm
+            {
+                RealmsName = r.Name
+            }).ToList(),
+            ApiResources = scope.ApiResources == null ? new List<SugarApiResource>() : scope.ApiResources.Select(c => SugarApiResource.Transform(c)).ToList(),
+            ClaimMappers = scope.ClaimMappers == null ? new List<SugarScopeClaimMapper>() : scope.ClaimMappers.Select(c => SugarScopeClaimMapper.Transform(c)).ToList()
         };
     }
 
@@ -52,7 +58,9 @@ public class SugarScope
             IsExposedInConfigurationEdp = IsExposedInConfigurationEdp,
             CreateDateTime = CreateDateTime,
             UpdateDateTime = UpdateDateTime,
-            ClaimMappers = ClaimMappers == null ? new List<ScopeClaimMapper>() : ClaimMappers.Select(m => m.ToDomain()).ToList()
+            ClaimMappers = ClaimMappers == null ? new List<ScopeClaimMapper>() : ClaimMappers.Select(m => m.ToDomain()).ToList(),
+            Realms = Realms == null ? new List<Realm>() : Realms.Select(r => r.ToDomain()).ToList(),
+            ApiResources = ApiResources == null ? new List<ApiResource>() : ApiResources.Select(r => r.ToDomain()).ToList()
         };
     }
 }

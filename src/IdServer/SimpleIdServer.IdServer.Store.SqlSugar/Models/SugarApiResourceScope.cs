@@ -12,4 +12,6 @@ public class SugarApiResourceScope
     public string ApiResourcesId { get; set; }
     [SugarColumn(IsPrimaryKey = true)]
     public string ScopesId { get; set; }
+    [Navigate(NavigateType.ManyToOne, nameof(ApiResourcesId))]
+    public SugarApiResource ApiResource { get; set; }
 }

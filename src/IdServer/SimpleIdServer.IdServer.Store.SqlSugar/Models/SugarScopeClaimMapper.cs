@@ -23,6 +23,23 @@ public class SugarScopeClaimMapper
     public bool IsMultiValued { get; set; } = false;
     public string ScopeId { get; set; }
 
+    public static SugarScopeClaimMapper Transform(ScopeClaimMapper c)
+    {
+        return new SugarScopeClaimMapper
+        {
+            IncludeInAccessToken = c.IncludeInAccessToken,
+            IsMultiValued = c.IsMultiValued,
+            MapperType = c.MapperType,
+            Name = c.Name,
+            SAMLAttributeName = c.SAMLAttributeName,
+            ScopeClaimMapperId = c.Id,
+            SourceUserAttribute = c.SourceUserAttribute,
+            SourceUserProperty = c.SourceUserProperty,
+            TargetClaimPath = c.TargetClaimPath,
+            TokenClaimJsonType = c.TokenClaimJsonType
+        };
+    }
+
     public ScopeClaimMapper ToDomain()
     {
         return new ScopeClaimMapper

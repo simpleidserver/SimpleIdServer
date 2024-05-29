@@ -18,7 +18,7 @@ public class UserRepository : IUserRepository
 
     public void Add(User user)
     {
-        _dbContext.Client.InsertNav(Transform(user))
+        _dbContext.Client.InsertNav(SugarUser.Transform(user))
             .Include(u => u.Claims)
             .Include(u => u.Credentials)
             .Include(u => u.ExternalAuthProviders)
@@ -31,13 +31,13 @@ public class UserRepository : IUserRepository
 
     public async Task BulkUpdate(List<UserClaim> userClaims)
     {
-        var claims = userClaims.Select(c => Transform(c)).ToList();
+        var claims = userClaims.Select(c => SugarUserClaim.Transform(c)).ToList();
         await _dbContext.Client.Updateable(claims).ExecuteCommandAsync();
     }
 
     public async Task BulkUpdate(List<User> users)
     {
-        await _dbContext.Client.UpdateNav(users.Select(u => Transform(u)).ToList())
+        await _dbContext.Client.UpdateNav(users.Select(u => SugarUser.Transform(u)).ToList())
             .Include(u => u.Claims)
             .Include(u => u.Credentials)
             .Include(u => u.ExternalAuthProviders)
@@ -50,12 +50,12 @@ public class UserRepository : IUserRepository
 
     public async Task BulkUpdate(List<RealmUser> userRealms)
     {
-        await _dbContext.Client.Updateable(userRealms.Select(u => Transform(u)).ToList()).ExecuteCommandAsync();
+        await _dbContext.Client.Updateable(userRealms.Select(u => SugarRealmUser.Transform(u)).ToList()).ExecuteCommandAsync();
     }
 
     public async Task BulkUpdate(List<GroupUser> groupUsers)
     {
-        await _dbContext.Client.Updateable(groupUsers.Select(u => Transform(u)).ToList()).ExecuteCommandAsync();
+        await _dbContext.Client.Updateable(groupUsers.Select(u => SugarGroupUser.Transform(u)).ToList()).ExecuteCommandAsync();
     }
 
     public async Task<User> GetByClaim(string name, string value, string realm, CancellationToken cancellationToken)
@@ -160,7 +160,7 @@ public class UserRepository : IUserRepository
 
     public void Remove(IEnumerable<User> users)
     {
-        _dbContext.Client.Deleteable(users.Select(u => Transform(u)).ToList()).ExecuteCommand();
+        _dbContext.Client.Deleteable(users.Select(u => SugarUser.Transform(u)).ToList()).ExecuteCommand();
     }
 
     public async Task<SearchResult<User>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)
@@ -190,7 +190,7 @@ public class UserRepository : IUserRepository
 
     public void Update(User user)
     {
-        _dbContext.Client.UpdateNav(Transform(user))
+        _dbContext.Client.UpdateNav(SugarUser.Transform(user))
             .Include(u => u.Claims)
             .Include(u => u.Credentials)
             .Include(u => u.ExternalAuthProviders)
@@ -206,91 +206,8 @@ public class UserRepository : IUserRepository
                     .Includes(u => u.IdentityProvisioning, i => i.Definition)
                     .Includes(u => u.Credentials)
                     .Includes(u => u.ExternalAuthProviders)
-                    .Includes(u => u.Groups, u => u.Group)
+                    .Includes(u => u.Groups)
                     .Includes(u => u.Devices)
                     .Includes(u => u.Claims)
                     .Includes(u => u.Realms);
-
-    public SugarUser Transform(User user)
-    {
-        return new SugarUser
-        {
-            Id = user.Id,
-            EmailVerified = user.EmailVerified,
-            Email = user.Email,
-            Firstname = user.Firstname,
-            DeviceRegistrationToken = user.DeviceRegistrationToken,
-            CreateDateTime = user.CreateDateTime,
-            Lastname = user.Lastname,
-            NotificationMode = user.NotificationMode,
-            Name = user.Name,
-            Source = user.Source,
-            Status = user.Status,
-            IdentityProvisioningId = user.IdentityProvisioningId,
-            EncodedPicture = user.EncodedPicture,
-            UpdateDateTime = user.UpdateDateTime,
-            Consents = user.Consents == null ? new List<SugarConsent>() : user.Consents.Select(c => SugarConsent.Transform(c)).ToList(),
-            Realms = user.Realms == null ? new List<SugarRealmUser>() : user.Realms.Select(r => Transform(r)).ToList(),
-            Claims = user.Consents == null ? new List<SugarUserClaim>() : user.OAuthUserClaims.Select(r => Transform(r)).ToList(),
-            Credentials = user.Credentials == null ? new List<SugarUserCredential>() : user.Credentials.Select(c => new SugarUserCredential
-            {
-                Id = c.Id,
-                CredentialType = c.CredentialType,
-                HOTPWindow = c.HOTPWindow,
-                IsActive = c.IsActive,
-                OTPAlg = c.OTPAlg,
-                OTPCounter = c.OTPCounter,
-                TOTPStep = c.TOTPStep,
-                Value = c.Value 
-            }).ToList(),
-            Devices = user.Devices == null ? new List<SugarUserDevice>() : user.Devices.Select(d => new SugarUserDevice
-            {
-                CreateDateTime = d.CreateDateTime,
-                DeviceType = d.DeviceType,
-                Id = d.Id,
-                Manufacturer = d.Manufacturer,
-                Model = d.Model,
-                Name = d.Name,
-                PushToken = d.PushToken,
-                PushType = d.PushType,
-                Version = d.Version
-            }).ToList(),
-            ExternalAuthProviders = user.ExternalAuthProviders == null ? new List<SugarUserExternalAuthProvider>() : user.ExternalAuthProviders.Select(e => new SugarUserExternalAuthProvider
-            {
-                CreateDateTime = e.CreateDateTime,
-                Subject = e.Subject,
-                Scheme = e.Scheme
-            }).ToList(),
-            Groups = user.Groups == null ? new List<SugarGroupUser>() : user.Groups.Select(g => Transform(g)).ToList()
-        };
-    }
-
-    private static SugarUserClaim Transform(UserClaim claim)
-    {
-        return new SugarUserClaim
-        {
-            Id = claim.Id,
-            Name = claim.Name,
-            Value = claim.Value,
-            Type = claim.Type
-        };
-    }
-
-    private static SugarRealmUser Transform(RealmUser realm)
-    {
-        return new SugarRealmUser
-        {
-            RealmsName = realm.RealmsName,
-            UsersId = realm.UsersId
-        };
-    }
-
-    private static SugarGroupUser Transform(GroupUser group)
-    {
-        return new SugarGroupUser
-        {
-            GroupsId = group.GroupsId,
-            UsersId = group.UsersId
-        };
-    }
 }

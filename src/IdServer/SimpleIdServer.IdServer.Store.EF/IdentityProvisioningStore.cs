@@ -54,4 +54,9 @@ public class IdentityProvisioningStore : IIdentityProvisioningStore
     {
 
     }
+
+    public void Update(IdentityProvisioningDefinition identityProvisioningDefinition)
+    {
+
+    }
 }

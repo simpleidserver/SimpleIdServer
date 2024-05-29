@@ -18,7 +18,7 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
 
     public void Add(RegistrationWorkflow record)
     {
-        _dbContext.Client.InsertNav(Transform(record))
+        _dbContext.Client.InsertNav(SugarRegistrationWorkflow.Transform(record))
             .Include(a => a.Realm)
             .Include(a => a.Acrs)
             .ExecuteCommand();
@@ -26,7 +26,7 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
 
     public void Update(RegistrationWorkflow record)
     {
-        _dbContext.Client.UpdateNav(Transform(record))
+        _dbContext.Client.UpdateNav(SugarRegistrationWorkflow.Transform(record))
             .Include(a => a.Realm)
             .Include(a => a.Acrs)
             .ExecuteCommand();
@@ -34,7 +34,7 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
 
     public void Delete(RegistrationWorkflow record)
     {
-        _dbContext.Client.Deleteable(Transform(record)).ExecuteCommand();
+        _dbContext.Client.Deleteable(SugarRegistrationWorkflow.Transform(record)).ExecuteCommand();
     }
 
     public async Task<RegistrationWorkflow> Get(string realm, string id, CancellationToken cancellationToken)
@@ -65,25 +65,5 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
         var result = await _dbContext.Client.Queryable<SugarRegistrationWorkflow>()
             .FirstAsync(r => r.RealmName == realm && r.IsDefault, cancellationToken);
         return result?.ToDomain();
-    }
-
-    private static SugarRegistrationWorkflow Transform(RegistrationWorkflow record)
-    {
-        return new SugarRegistrationWorkflow
-        {
-            Id  = record.Id,
-            CreateDateTime = record.CreateDateTime,
-            Name = record.Name,
-            UpdateDateTime = record.UpdateDateTime,
-            Steps = record.Steps == null ? "" : record.Steps.Join(","),
-            IsDefault = record.IsDefault,
-            RealmName = record.Realm?.Name,
-            Acrs = record.Acrs.Select(a => new SugarAuthenticationContextClassReference
-            {
-                Id = a.Id,
-                Name = a.Name,
-                DisplayName = a.DisplayName,
-            }).ToList()
-        };
     }
 }

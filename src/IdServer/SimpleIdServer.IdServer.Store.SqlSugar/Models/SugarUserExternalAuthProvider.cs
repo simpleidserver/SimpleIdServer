@@ -17,6 +17,16 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         [Navigate(NavigateType.ManyToOne, nameof(UserId))]
         public SugarUser User { get; set; }
 
+        public static SugarUserExternalAuthProvider Transform(UserExternalAuthProvider e)
+        {
+            return new SugarUserExternalAuthProvider
+            {
+                CreateDateTime = e.CreateDateTime,
+                Subject = e.Subject,
+                Scheme = e.Scheme
+            };
+        }
+
         public UserExternalAuthProvider ToDomain()
         {
             return new UserExternalAuthProvider

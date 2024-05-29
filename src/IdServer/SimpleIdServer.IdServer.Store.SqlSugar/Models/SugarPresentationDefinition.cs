@@ -15,6 +15,7 @@ public class SugarPresentationDefinition
     public string? Name { get; set; } = null;
     public string? Purpose { get; set; } = null;
     public string RealmName { get; set; } = null!;
+    [Navigate(NavigateType.ManyToOne, nameof(RealmName))]
     public SugarRealm Realm { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarPresentationDefinitionInputDescriptor.PresentationDefinitionId))]
     public List<SugarPresentationDefinitionInputDescriptor> InputDescriptors { get; set; }
