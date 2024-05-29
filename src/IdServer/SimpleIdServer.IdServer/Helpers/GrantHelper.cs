@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Helpers
         {
             get
             {
-                return Authorizations.Select(a => a.Scope).Distinct();
+                return Authorizations.Select(a => a.Scope).Distinct().ToList();
             }
         }
 
@@ -36,7 +36,7 @@ namespace SimpleIdServer.IdServer.Helpers
         {
             get
             {
-                return Authorizations.SelectMany(a => a.Audiences).Distinct();
+                return Authorizations.SelectMany(a => a.Audiences).Distinct().ToList();
             }
         }
 

@@ -135,13 +135,11 @@ namespace SimpleIdServer.IdServer.UI
                 if (rememberLogin != null)
                     HttpContext.Response.Cookies.Append(Constants.DefaultRememberMeCookieName, rememberLogin.Value.ToString());
 
-                var allAmr = acr.AuthenticationMethodReferences;
-                var login = _authenticationHelper.GetLogin(user);
-                HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), allAmr, amr)));
-                _userRepository.Update(user);
-                await transaction.Commit(token);
-                return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
-            }
+            var allAmr = acr.AuthenticationMethodReferences;
+            var login = _authenticationHelper.GetLogin(user);
+            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), allAmr, amr)));
+	        await _userRepository.SaveChanges(token);
+            return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
         }
 
         protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)

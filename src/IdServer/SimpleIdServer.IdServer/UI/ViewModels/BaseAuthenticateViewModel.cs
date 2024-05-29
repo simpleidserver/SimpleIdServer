@@ -27,13 +27,14 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 
     public record AmrAuthInfo
     {
-        public AmrAuthInfo(string userId, string login, string email, List<KeyValuePair<string, string>> claims, IEnumerable<string> allAmr, string currentAmr)
+        public AmrAuthInfo(string userId, string login, string email, List<KeyValuePair<string, string>> claims, IEnumerable<string> allAmr, string currentAcr, string currentAmr)
         {
             UserId = userId;
             Login = login;
             Email = email;
             Claims = claims;
             AllAmr = allAmr;
+            CurrentAcr = currentAcr;
             CurrentAmr = currentAmr;
         }
 
@@ -42,6 +43,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public string Email { get; private set; }
         public List<KeyValuePair<string, string>> Claims { get; set; }
         public IEnumerable<string> AllAmr { get; set; }
+        public string CurrentAcr { get; private set; }
         public string CurrentAmr { get; private set; }
     }
 }

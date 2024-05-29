@@ -213,25 +213,38 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<string> AddRefreshToken(string clientId, string authorizationCode, string grantId, JsonObject request, JsonObject originalRequest, double validityPeriodsInSeconds, string jkt, string sessionId, CancellationToken cancellationToken)
         {
+            CleanRequest(request);
+            CleanRequest(originalRequest);
+
             using (var transaction = _transactionBuilder.Build())
+            {           
+		var refreshToken = Guid.NewGuid().ToString();
+            _tokenRepository.Add(new Token
             {
-                var refreshToken = Guid.NewGuid().ToString();
-                _tokenRepository.Add(new Token
-                {
-                    Id = refreshToken,
-                    TokenType = DTOs.TokenResponseParameters.RefreshToken,
-                    ClientId = clientId,
-                    Data = request.ToString(),
-                    OriginalData = originalRequest?.ToString(),
-                    AuthorizationCode = authorizationCode,
-                    ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
-                    CreateDateTime = DateTime.UtcNow,
-                    GrantId = grantId,
-                    SessionId = sessionId,
-                    Jkt = jkt
-                });
-                await transaction.Commit(cancellationToken);
-                return refreshToken;
+                Id = refreshToken,
+                TokenType = DTOs.TokenResponseParameters.RefreshToken,
+                ClientId = clientId,
+                Data = request.ToString(),
+                OriginalData = originalRequest?.ToString(),
+                AuthorizationCode = authorizationCode,
+                ExpirationTime = DateTime.UtcNow.AddSeconds(validityPeriodsInSeconds),
+                CreateDateTime = DateTime.UtcNow,
+                GrantId = grantId,
+                SessionId = sessionId,
+                Jkt = jkt
+            });
+            await _tokenRepository.SaveChanges(cancellationToken);
+            return refreshToken;
+
+            void CleanRequest(JsonObject jsonObj)
+            {
+                if (jsonObj == null) return;
+                jsonObj.Remove(TokenRequestParameters.Password);
+                jsonObj.Remove(TokenRequestParameters.ClientSecret);
+                jsonObj.Remove(TokenRequestParameters.Code);
+                jsonObj.Remove(TokenRequestParameters.CodeVerifier);
+                jsonObj.Remove(TokenRequestParameters.PreAuthorizedCode);
+                jsonObj.Remove(TokenRequestParameters.DeviceCode);
             }
         }
 

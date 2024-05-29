@@ -10,7 +10,8 @@ namespace SimpleIdServer.Scim.Startup.Consumers
         IConsumer<RepresentationRefAttributeAddedEvent>,
         IConsumer<RepresentationRefAttributeRemovedEvent>,
         IConsumer<RepresentationRefAttributeUpdatedEvent>,
-        IConsumer<RepresentationRemovedEvent>
+        IConsumer<RepresentationRemovedEvent>,
+        IConsumer<RepresentationUpdatedEvent>
     {
         public Task Consume(ConsumeContext<RepresentationRefAttributeAddedEvent> context)
         {
@@ -38,6 +39,12 @@ namespace SimpleIdServer.Scim.Startup.Consumers
         }
 
         public Task Consume(ConsumeContext<RepresentationRemovedEvent> context)
+        {
+            Debug.WriteLine(context.Message.Id);
+            return Task.CompletedTask;
+        }
+
+        public Task Consume(ConsumeContext<RepresentationUpdatedEvent> context)
         {
             Debug.WriteLine(context.Message.Id);
             return Task.CompletedTask;
