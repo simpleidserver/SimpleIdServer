@@ -147,6 +147,12 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
+                if(!frontChannelLogouts.Any() && !validationResult.Client.RedirectToRevokeSessionUI)
+                {
+                    var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                    return Redirect($"{issuer}{url}");
+                }
+
                 return View(new RevokeSessionViewModel(
                     url,
                     validationResult.Payload,
