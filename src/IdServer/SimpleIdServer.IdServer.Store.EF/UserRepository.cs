@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using EFCore.BulkExtensions;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
@@ -159,13 +159,26 @@ public class UserRepository : IUserRepository
 
     public virtual async Task BulkUpdate(List<UserClaim> userClaims)
     {
-        if (_dbContext.Database.IsRelational())
+        if(_dbContext.Database.IsRelational())
         {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(UserClaim.Id), nameof(UserClaim.UserId), nameof(UserClaim.Name), nameof(UserClaim.Value) }
-            };
-            await _dbContext.BulkInsertOrUpdateAsync(userClaims, bulkConfig);
+            var merged = LinqToDB.LinqExtensions.UpdateWhenMatched(
+                        LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.UserClaims.ToLinqToDBTable()),
+                                        userClaims
+                                    ),
+                                    (g1, g2) => g1.Id == g2.Id
+                            ),
+                            source => source),
+                        (target, source) => new UserClaim
+                        {
+                            Name = source.Name,
+                            Value = source.Value,
+                            UserId = source.UserId
+                        });
+            LinqToDB.LinqExtensions.Merge(merged);
             return;
         }
 
@@ -182,11 +195,26 @@ public class UserRepository : IUserRepository
     {
         if(_dbContext.Database.IsRelational())
         {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(User.Id), nameof(User.Name), nameof(User.Firstname), nameof(User.Lastname), nameof(User.Email), nameof(User.EmailVerified) }
-            };
-            await _dbContext.BulkInsertOrUpdateAsync(users, bulkConfig);
+            var merged = LinqToDB.LinqExtensions.UpdateWhenMatched(
+                        LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.Users.ToLinqToDBTable()),
+                                        users
+                                    ),
+                                    (g1, g2) => g1.Id == g2.Id
+                            ),
+                            source => source),
+                        (target, source) => new User
+                        {
+                            Name = source.Name,
+                            Firstname = source.Firstname,
+                            Lastname = source.Lastname,
+                            Email = source.Email,
+                            EmailVerified = source.EmailVerified
+                        });
+            LinqToDB.LinqExtensions.Merge(merged);
             return;
         }
 
@@ -201,11 +229,24 @@ public class UserRepository : IUserRepository
     {
         if (_dbContext.Database.IsRelational())
         {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(RealmUser.RealmsName), nameof(RealmUser.UsersId) }
-            };
-            await _dbContext.BulkInsertOrUpdateAsync(userRealms, bulkConfig);
+            var merged = LinqToDB.LinqExtensions.UpdateWhenMatched(
+                        LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.RealmUser.ToLinqToDBTable()),
+                                        userRealms
+                                    ),
+                                    (g1, g2) => g1.RealmsName == g2.RealmsName && g1.UsersId == g2.UsersId
+                            ),
+                            source => source),
+                        (target, source) => new RealmUser
+                        {
+                            RealmsName = source.RealmsName,
+                            UsersId = source.UsersId
+                        });
+            LinqToDB.LinqExtensions.Merge(merged);
+            return;
         }
 
         var userIds = userRealms.Select(r => r.UsersId).ToList();
@@ -221,11 +262,24 @@ public class UserRepository : IUserRepository
     {
         if (_dbContext.Database.IsRelational())
         {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(GroupUser.GroupsId), nameof(GroupUser.UsersId) }
-            };
-            await _dbContext.BulkInsertOrUpdateAsync(groupUsers, bulkConfig);
+            var merged = LinqToDB.LinqExtensions.UpdateWhenMatched(
+                        LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.GroupUser.ToLinqToDBTable()),
+                                        groupUsers
+                                    ),
+                                    (g1, g2) => g1.GroupsId == g2.GroupsId && g1.UsersId == g2.UsersId
+                            ),
+                            source => source),
+                        (target, source) => new GroupUser
+                        {
+                            GroupsId = source.GroupsId,
+                            UsersId = source.UsersId
+                        });
+            LinqToDB.LinqExtensions.Merge(merged);
+            return;
         }
 
         var userIds = groupUsers.Select(r => r.UsersId).ToList();

@@ -8,4 +8,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
 </Project>

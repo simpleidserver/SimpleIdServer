@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using EFCore.BulkExtensions;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
@@ -18,17 +18,6 @@ public class ProvisioningStagingStore : IProvisioningStagingStore
 
     public async Task<List<ExtractedRepresentation>> GetLastExtractedRepresentations(IEnumerable<string> externalIds, CancellationToken cancellationToken)
     {
-        if (_dbContext.Database.IsRelational())
-        {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(ExtractedRepresentation.ExternalId) }
-            };
-            var result = externalIds.Select(id => new ExtractedRepresentation { ExternalId = id }).ToList();
-            await _dbContext.BulkReadAsync(result, bulkConfig, cancellationToken: cancellationToken);
-            return result;
-        }
-
         var representations = await _dbContext.ExtractedRepresentations
             .Where(r => externalIds.Contains(r.ExternalId))
             .ToListAsync();
@@ -49,11 +38,23 @@ public class ProvisioningStagingStore : IProvisioningStagingStore
     {
         if (_dbContext.Database.IsRelational())
         {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(ExtractedRepresentation.ExternalId), nameof(ExtractedRepresentation.Version) }
-            };
-            await _dbContext.BulkInsertOrUpdateAsync(extractedRepresentations, bulkConfig, cancellationToken: cancellationToken);
+            var merged = LinqToDB.LinqExtensions.UpdateWhenMatched(
+                        LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.ExtractedRepresentations.ToLinqToDBTable()),
+                                        extractedRepresentations
+                                    ),
+                                    (g1, g2) => g1.ExternalId == g2.ExternalId
+                            ),
+                            source => source),
+                        (target, source) => new ExtractedRepresentation
+                        {
+                            ExternalId = source.ExternalId,
+                            Version = source.Version
+                        });
+            LinqToDB.LinqExtensions.Merge(merged);
             return;
         }
 
@@ -70,11 +71,27 @@ public class ProvisioningStagingStore : IProvisioningStagingStore
     {
         if (_dbContext.Database.IsRelational())
         {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(ExtractedRepresentationStaging.Id) }
-            };
-            await _dbContext.BulkInsertOrUpdateAsync(representations, bulkConfig, cancellationToken: cancellationToken);
+            var merged = LinqToDB.LinqExtensions.UpdateWhenMatched(
+                        LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.ExtractedRepresentationsStaging.ToLinqToDBTable()),
+                                        representations
+                                    ),
+                                    (g1, g2) => g1.Id == g2.Id
+                            ),
+                            source => source),
+                        (target, source) => new ExtractedRepresentationStaging
+                        {
+                            GroupIds = source.GroupIds,
+                            IdProvisioningProcessId = source.IdProvisioningProcessId,
+                            RepresentationId = source.RepresentationId,
+                            RepresentationVersion = source.RepresentationVersion,
+                            Type = source.Type,
+                            Values = source.Values
+                        });
+            LinqToDB.LinqExtensions.Merge(merged);
             return;
         }
 

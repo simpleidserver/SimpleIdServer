@@ -7,33 +7,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
 {
     /// <inheritdoc />
-    public partial class InitMySQL : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Acrs",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Name = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DisplayName = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AuthenticationMethodReferences = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Acrs", x => x.Id);
-                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -114,27 +93,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AuthenticationSchemeProviderDefinitions", x => x.Name);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "BaseCredentialTemplate",
-                columns: table => new
-                {
-                    TechnicalId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Id = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Format = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Discriminator = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BaseCredentialTemplate", x => x.TechnicalId);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -220,138 +178,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Clients",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClientId = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClientSecret = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RegistrationAccessToken = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    GrantTypes = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RedirectionUrls = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TokenEndPointAuthMethod = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ResponseTypes = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    JwksUri = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Contacts = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    SoftwareId = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    SoftwareVersion = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TlsClientAuthSubjectDN = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TlsClientAuthSanDNS = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TlsClientAuthSanURI = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TlsClientAuthSanIP = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TlsClientAuthSanEmail = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClientSecretExpirationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    IsTokenExchangeEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    TokenExchangeType = table.Column<int>(type: "int", nullable: true),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    TokenExpirationTimeInSeconds = table.Column<double>(type: "double", nullable: true),
-                    CNonceExpirationTimeInSeconds = table.Column<double>(type: "double", nullable: true),
-                    RefreshTokenExpirationTimeInSeconds = table.Column<double>(type: "double", nullable: true),
-                    TokenSignedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TokenEncryptedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TokenEncryptedResponseEnc = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PostLogoutRedirectUris = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PreferredTokenProfile = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RequestObjectSigningAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RequestObjectEncryptionAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RequestObjectEncryptionEnc = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    SubjectType = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PairWiseIdentifierSalt = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    SectorIdentifierUri = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdTokenSignedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdTokenEncryptedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IdTokenEncryptedResponseEnc = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    BCTokenDeliveryMode = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    BCClientNotificationEndpoint = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    BCAuthenticationRequestSigningAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserInfoSignedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserInfoEncryptedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserInfoEncryptedResponseEnc = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    BCUserCodeParameter = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    FrontChannelLogoutUri = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CredentialOfferEndpoint = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserPinRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    FrontChannelLogoutSessionRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    BackChannelLogoutSessionRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    DefaultMaxAge = table.Column<double>(type: "double", nullable: true),
-                    TlsClientCertificateBoundAccessToken = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    BackChannelLogoutUri = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ApplicationType = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    InitiateLoginUri = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RequireAuthTime = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    AuthorizationSignedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AuthorizationEncryptedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AuthorizationDataTypes = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    AuthorizationEncryptedResponseEnc = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DPOPBoundAccessTokens = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    IsConsentDisabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    IsResourceParameterRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    AuthReqIdExpirationTimeInSeconds = table.Column<int>(type: "int", nullable: false),
-                    ClientType = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsDPOPNonceRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    DPOPNonceLifetimeInSeconds = table.Column<double>(type: "double", nullable: false),
-                    IsRedirectUrlCaseSensitive = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    SerializedParameters = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DefaultAcrValues = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    BCIntervalSeconds = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Clients", x => x.Id);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "ConfigurationKeyPairValueRecords",
                 columns: table => new
                 {
@@ -416,6 +242,45 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "ExtractedRepresentationsStaging",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RepresentationId = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RepresentationVersion = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Values = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdProvisioningProcessId = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    GroupIds = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Type = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExtractedRepresentationsStaging", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "GotifySessions",
+                columns: table => new
+                {
+                    ApplicationToken = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClientToken = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GotifySessions", x => x.ApplicationToken);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "Groups",
                 columns: table => new
                 {
@@ -465,23 +330,17 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Networks",
+                name: "Languages",
                 columns: table => new
                 {
-                    Name = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RpcUrl = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PrivateAccountKey = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ContractAdr = table.Column<string>(type: "longtext", nullable: true)
+                    Code = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Networks", x => x.Name);
+                    table.PrimaryKey("PK_Languages", x => x.Code);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -561,11 +420,13 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Id = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    SessionId = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     ClientId = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TokenType = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsRegistrationAccessToken = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AccessTokenType = table.Column<int>(type: "int", nullable: true),
                     Data = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     OriginalData = table.Column<string>(type: "longtext", nullable: true)
@@ -574,10 +435,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     GrantId = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ExpirationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Jkt = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ExpirationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -644,102 +505,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_AuthenticationSchemeProviders", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AuthenticationSchemeProviders_AuthenticationSchemeProviderD~",
+                        name: "FK_AuthenticationSchemeProviders_AuthenticationSchemeProviderDe~",
                         column: x => x.AuthSchemeProviderDefinitionName,
                         principalTable: "AuthenticationSchemeProviderDefinitions",
                         principalColumn: "Name",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "CredentialTemplateClaimMapper",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    MapperType = table.Column<int>(type: "int", nullable: false),
-                    SourceUserAttribute = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    SourceUserProperty = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TargetClaimPath = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    IsMultiValued = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    TokenClaimJsonType = table.Column<int>(type: "int", nullable: true),
-                    CredentialTemplateId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CredentialTemplateClaimMapper", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CredentialTemplateClaimMapper_BaseCredentialTemplate_Credent~",
-                        column: x => x.CredentialTemplateId,
-                        principalTable: "BaseCredentialTemplate",
-                        principalColumn: "TechnicalId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "CredentialTemplateDisplay",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Name = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Locale = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    LogoUrl = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    LogoAltText = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    BackgroundColor = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TextColor = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CredentialTemplateId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CredentialTemplateDisplay", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CredentialTemplateDisplay_BaseCredentialTemplate_CredentialT~",
-                        column: x => x.CredentialTemplateId,
-                        principalTable: "BaseCredentialTemplate",
-                        principalColumn: "TechnicalId",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "CredentialTemplateParameter",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Name = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Value = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CredentialTemplateId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ParameterType = table.Column<int>(type: "int", nullable: false),
-                    IsArray = table.Column<bool>(type: "tinyint(1)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CredentialTemplateParameter", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CredentialTemplateParameter_BaseCredentialTemplate_Credentia~",
-                        column: x => x.CredentialTemplateId,
-                        principalTable: "BaseCredentialTemplate",
-                        principalColumn: "TechnicalId",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -792,66 +561,9 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_ClientCertificate", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ClientCertificate_CertificateAuthorities_CertificateAuthori~",
+                        name: "FK_ClientCertificate_CertificateAuthorities_CertificateAuthorit~",
                         column: x => x.CertificateAuthorityId,
                         principalTable: "CertificateAuthorities",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "ClientJsonWebKey",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Kid = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Alg = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Usage = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    KeyType = table.Column<int>(type: "int", nullable: true),
-                    SerializedJsonWebKey = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClientId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientJsonWebKey", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ClientJsonWebKey_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Translations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Key = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Value = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Language = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClientId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Translations", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Translations_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -865,6 +577,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
@@ -878,7 +591,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_ConfigurationDefinitionRecord", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecord_Definitions_ConfigurationDefi~",
+                        name: "FK_ConfigurationDefinitionRecord_Definitions_ConfigurationDefin~",
                         column: x => x.ConfigurationDefinitionId,
                         principalTable: "Definitions",
                         principalColumn: "Id",
@@ -906,7 +619,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_IdentityProvisioningLst", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityProvisioningLst_IdentityProvisioningDefinitions_Def~",
+                        name: "FK_IdentityProvisioningLst_IdentityProvisioningDefinitions_Defi~",
                         column: x => x.DefinitionName,
                         principalTable: "IdentityProvisioningDefinitions",
                         principalColumn: "Name",
@@ -928,6 +641,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     TargetUserProperty = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     HasMultipleAttribute = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Usage = table.Column<int>(type: "int", nullable: false),
                     IdentityProvisioningDefinitionName = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -935,7 +649,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_IdentityProvisioningMappingRule", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityProvisioningMappingRule_IdentityProvisioningDefinit~",
+                        name: "FK_IdentityProvisioningMappingRule_IdentityProvisioningDefiniti~",
                         column: x => x.IdentityProvisioningDefinitionName,
                         principalTable: "IdentityProvisioningDefinitions",
                         principalColumn: "Name",
@@ -971,33 +685,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "AuthenticationContextClassReferenceRealm",
-                columns: table => new
-                {
-                    AuthenticationContextClassReferencesId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RealmsName = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AuthenticationContextClassReferenceRealm", x => new { x.AuthenticationContextClassReferencesId, x.RealmsName });
-                    table.ForeignKey(
-                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_Authenticatio~",
-                        column: x => x.AuthenticationContextClassReferencesId,
-                        principalTable: "Acrs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_AuthenticationContextClassReferenceRealm_Realms_RealmsName",
-                        column: x => x.RealmsName,
-                        principalTable: "Realms",
-                        principalColumn: "Name",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "CertificateAuthorityRealm",
                 columns: table => new
                 {
@@ -1010,7 +697,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_CertificateAuthorityRealm", x => new { x.CertificateAuthoritiesId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_CertificateAuthorityRealm_CertificateAuthorities_Certificat~",
+                        name: "FK_CertificateAuthorityRealm_CertificateAuthorities_Certificate~",
                         column: x => x.CertificateAuthoritiesId,
                         principalTable: "CertificateAuthorities",
                         principalColumn: "Id",
@@ -1025,66 +712,12 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ClientRealm",
-                columns: table => new
-                {
-                    ClientsId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RealmsName = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientRealm", x => new { x.ClientsId, x.RealmsName });
-                    table.ForeignKey(
-                        name: "FK_ClientRealm_Clients_ClientsId",
-                        column: x => x.ClientsId,
-                        principalTable: "Clients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ClientRealm_Realms_RealmsName",
-                        column: x => x.RealmsName,
-                        principalTable: "Realms",
-                        principalColumn: "Name",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "CredentialTemplateRealm",
-                columns: table => new
-                {
-                    CredentialTemplatesTechnicalId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    RealmsName = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CredentialTemplateRealm", x => new { x.CredentialTemplatesTechnicalId, x.RealmsName });
-                    table.ForeignKey(
-                        name: "FK_CredentialTemplateRealm_BaseCredentialTemplate_CredentialTem~",
-                        column: x => x.CredentialTemplatesTechnicalId,
-                        principalTable: "BaseCredentialTemplate",
-                        principalColumn: "TechnicalId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CredentialTemplateRealm_Realms_RealmsName",
-                        column: x => x.RealmsName,
-                        principalTable: "Realms",
-                        principalColumn: "Name",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "GroupRealm",
                 columns: table => new
                 {
-                    GroupsId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     RealmsName = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    GroupsId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -1106,25 +739,25 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "ImportSummaries",
+                name: "PresentationDefinitions",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    StartDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    EndDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    NbRepresentations = table.Column<int>(type: "int", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "longtext", nullable: true)
+                    PublicId = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Status = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Purpose = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     RealmName = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ImportSummaries", x => x.Id);
+                    table.PrimaryKey("PK_PresentationDefinitions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ImportSummaries_Realms_RealmName",
+                        name: "FK_PresentationDefinitions_Realms_RealmName",
                         column: x => x.RealmName,
                         principalTable: "Realms",
                         principalColumn: "Name",
@@ -1180,33 +813,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ApiResourceScope_Scopes_ScopesId",
-                        column: x => x.ScopesId,
-                        principalTable: "Scopes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "ClientScope",
-                columns: table => new
-                {
-                    ClientsId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ScopesId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ClientScope", x => new { x.ClientsId, x.ScopesId });
-                    table.ForeignKey(
-                        name: "FK_ClientScope_Clients_ClientsId",
-                        column: x => x.ClientsId,
-                        principalTable: "Clients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ClientScope_Scopes_ScopesId",
                         column: x => x.ScopesId,
                         principalTable: "Scopes",
                         principalColumn: "Id",
@@ -1283,6 +889,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TargetClaimPath = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    IncludeInAccessToken = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     SAMLAttributeName = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TokenClaimJsonType = table.Column<int>(type: "int", nullable: true),
@@ -1321,7 +928,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         principalColumn: "Name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_RealmSerializedFileKey_SerializedFileKeys_SerializedFileKey~",
+                        name: "FK_RealmSerializedFileKey_SerializedFileKeys_SerializedFileKeys~",
                         column: x => x.SerializedFileKeysId,
                         principalTable: "SerializedFileKeys",
                         principalColumn: "Id",
@@ -1346,7 +953,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_UMAPermissionTicketRecord", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UMAPermissionTicketRecord_UMAPermissionTicket_UMAPermission~",
+                        name: "FK_UMAPermissionTicketRecord_UMAPermissionTicket_UMAPermissionT~",
                         column: x => x.UMAPermissionTicketId,
                         principalTable: "UMAPermissionTicket",
                         principalColumn: "Id",
@@ -1433,7 +1040,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_AuthenticationSchemeProviderMapper", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AuthenticationSchemeProviderMapper_AuthenticationSchemeProv~",
+                        name: "FK_AuthenticationSchemeProviderMapper_AuthenticationSchemeProvi~",
                         column: x => x.IdProviderId,
                         principalTable: "AuthenticationSchemeProviders",
                         principalColumn: "Id",
@@ -1454,7 +1061,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_AuthenticationSchemeProviderRealm", x => new { x.AuthenticationSchemeProvidersId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_AuthenticationSchemeProviderRealm_AuthenticationSchemeProvi~",
+                        name: "FK_AuthenticationSchemeProviderRealm_AuthenticationSchemeProvid~",
                         column: x => x.AuthenticationSchemeProvidersId,
                         principalTable: "AuthenticationSchemeProviders",
                         principalColumn: "Id",
@@ -1464,58 +1071,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         column: x => x.RealmsName,
                         principalTable: "Realms",
                         principalColumn: "Name",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "TranslationUMAResource",
-                columns: table => new
-                {
-                    TranslationsId = table.Column<int>(type: "int", nullable: false),
-                    UMAResourceId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TranslationUMAResource", x => new { x.TranslationsId, x.UMAResourceId });
-                    table.ForeignKey(
-                        name: "FK_TranslationUMAResource_Translations_TranslationsId",
-                        column: x => x.TranslationsId,
-                        principalTable: "Translations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_TranslationUMAResource_UmaResources_UMAResourceId",
-                        column: x => x.UMAResourceId,
-                        principalTable: "UmaResources",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "ConfigurationDefinitionRecordTranslation",
-                columns: table => new
-                {
-                    ConfigurationDefinitionRecordId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TranslationsId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ConfigurationDefinitionRecordTranslation", x => new { x.ConfigurationDefinitionRecordId, x.TranslationsId });
-                    table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordTranslation_ConfigurationDefin~",
-                        column: x => x.ConfigurationDefinitionRecordId,
-                        principalTable: "ConfigurationDefinitionRecord",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordTranslation_Translations_Trans~",
-                        column: x => x.TranslationsId,
-                        principalTable: "Translations",
-                        principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -1535,7 +1090,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_ConfigurationDefinitionRecordValue", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordValue_ConfigurationDefinitionR~",
+                        name: "FK_ConfigurationDefinitionRecordValue_ConfigurationDefinitionRe~",
                         column: x => x.ConfigurationDefinitionRecordId,
                         principalTable: "ConfigurationDefinitionRecord",
                         principalColumn: "Id");
@@ -1548,14 +1103,15 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    StartDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    EndDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    FolderName = table.Column<string>(type: "longtext", nullable: true)
+                    ProcessId = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    NbRepresentations = table.Column<int>(type: "int", nullable: false),
+                    ExecutionDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    CurrentPage = table.Column<int>(type: "int", nullable: false),
+                    NbUsers = table.Column<int>(type: "int", nullable: false),
+                    NbGroups = table.Column<int>(type: "int", nullable: false),
+                    NbFilteredRepresentations = table.Column<int>(type: "int", nullable: false),
+                    TotalPages = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    ErrorMessage = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     IdentityProvisioningId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -1563,7 +1119,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_IdentityProvisioningHistory", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IdentityProvisioningHistory_IdentityProvisioningLst_Identit~",
+                        name: "FK_IdentityProvisioningHistory_IdentityProvisioningLst_Identity~",
                         column: x => x.IdentityProvisioningId,
                         principalTable: "IdentityProvisioningLst",
                         principalColumn: "Id",
@@ -1584,7 +1140,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_IdentityProvisioningRealm", x => new { x.IdentityProvisioningLstId, x.RealmsName });
                     table.ForeignKey(
-                        name: "FK_IdentityProvisioningRealm_IdentityProvisioningLst_IdentityP~",
+                        name: "FK_IdentityProvisioningRealm_IdentityProvisioningLst_IdentityPr~",
                         column: x => x.IdentityProvisioningLstId,
                         principalTable: "IdentityProvisioningLst",
                         principalColumn: "Id",
@@ -1622,9 +1178,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IdentityProvisioningId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Did = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    DidPrivateHex = table.Column<string>(type: "longtext", nullable: true)
+                    EncodedPicture = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     NotificationMode = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
@@ -1636,6 +1190,61 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         name: "FK_Users_IdentityProvisioningLst_IdentityProvisioningId",
                         column: x => x.IdentityProvisioningId,
                         principalTable: "IdentityProvisioningLst",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "PresentationDefinitionInputDescriptor",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PublicId = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Purpose = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PresentationDefinitionId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PresentationDefinitionInputDescriptor", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PresentationDefinitionInputDescriptor_PresentationDefinition~",
+                        column: x => x.PresentationDefinitionId,
+                        principalTable: "PresentationDefinitions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Acrs",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DisplayName = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AuthenticationMethodReferences = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    RegistrationWorkflowId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Acrs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Acrs_RegistrationWorkflows_RegistrationWorkflowId",
+                        column: x => x.RegistrationWorkflowId,
+                        principalTable: "RegistrationWorkflows",
                         principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -1661,120 +1270,11 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 {
                     table.PrimaryKey("PK_UMAResourcePermissionClaim", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_UMAResourcePermissionClaim_UMAResourcePermission_UMAResourc~",
+                        name: "FK_UMAResourcePermissionClaim_UMAResourcePermission_UMAResource~",
                         column: x => x.UMAResourcePermissionId,
                         principalTable: "UMAResourcePermission",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "ConfigurationDefinitionRecordValueTranslation",
-                columns: table => new
-                {
-                    ConfigurationDefinitionRecordValueId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TranslationsId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ConfigurationDefinitionRecordValueTranslation", x => new { x.ConfigurationDefinitionRecordValueId, x.TranslationsId });
-                    table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordValueTranslation_Configuration~",
-                        column: x => x.ConfigurationDefinitionRecordValueId,
-                        principalTable: "ConfigurationDefinitionRecordValue",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ConfigurationDefinitionRecordValueTranslation_Translations_~",
-                        column: x => x.TranslationsId,
-                        principalTable: "Translations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "CredentialOffers",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CredentialTemplateId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CredentialNames = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClientId = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ExpirationDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Pin = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PreAuthorizedCode = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CredIssuerState = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CredentialOffers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CredentialOffers_BaseCredentialTemplate_CredentialTemplateId",
-                        column: x => x.CredentialTemplateId,
-                        principalTable: "BaseCredentialTemplate",
-                        principalColumn: "TechnicalId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CredentialOffers_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "DeviceAuthCodes",
-                columns: table => new
-                {
-                    DeviceCode = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserCode = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ClientId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserLogin = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Scopes = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ExpirationDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    NextAccessDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    LastAccessTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DeviceAuthCodes", x => x.DeviceCode);
-                    table.ForeignKey(
-                        name: "FK_DeviceAuthCodes_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_DeviceAuthCodes_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -1883,7 +1383,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Type = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    UserId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    UserId = table.Column<string>(type: "varchar(255)", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -1911,6 +1411,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     OTPAlg = table.Column<int>(type: "int", nullable: true),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     OTPCounter = table.Column<int>(type: "int", nullable: false),
+                    TOTPStep = table.Column<int>(type: "int", nullable: false),
+                    HOTPWindow = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -1999,6 +1501,9 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     State = table.Column<int>(type: "int", nullable: false),
                     Realm = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsClientsNotified = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    SerializedClientIds = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     UserId = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -2011,6 +1516,225 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "PresentationDefinitionFormat",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Format = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ProofType = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PresentationDefinitionInputDescriptorId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PresentationDefinitionFormat", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PresentationDefinitionFormat_PresentationDefinitionInputDesc~",
+                        column: x => x.PresentationDefinitionInputDescriptorId,
+                        principalTable: "PresentationDefinitionInputDescriptor",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "PresentationDefinitionInputDescriptorConstraint",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Path = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Filter = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PresentationDefinitionInputDescriptorId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PresentationDefinitionInputDescriptorConstraint", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PresentationDefinitionInputDescriptorConstraint_Presentation~",
+                        column: x => x.PresentationDefinitionInputDescriptorId,
+                        principalTable: "PresentationDefinitionInputDescriptor",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "AuthenticationContextClassReferenceRealm",
+                columns: table => new
+                {
+                    AuthenticationContextClassReferencesId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RealmsName = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AuthenticationContextClassReferenceRealm", x => new { x.AuthenticationContextClassReferencesId, x.RealmsName });
+                    table.ForeignKey(
+                        name: "FK_AuthenticationContextClassReferenceRealm_Acrs_Authentication~",
+                        column: x => x.AuthenticationContextClassReferencesId,
+                        principalTable: "Acrs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AuthenticationContextClassReferenceRealm_Realms_RealmsName",
+                        column: x => x.RealmsName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Clients",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClientId = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClientSecret = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RegistrationAccessToken = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    GrantTypes = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RedirectionUrls = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TokenEndPointAuthMethod = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ResponseTypes = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    JwksUri = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Contacts = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SoftwareId = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SoftwareVersion = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TlsClientAuthSubjectDN = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TlsClientAuthSanDNS = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TlsClientAuthSanURI = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TlsClientAuthSanIP = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TlsClientAuthSanEmail = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClientSecretExpirationTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    IsTokenExchangeEnabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    TokenExchangeType = table.Column<int>(type: "int", nullable: true),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    TokenExpirationTimeInSeconds = table.Column<double>(type: "double", nullable: true),
+                    CNonceExpirationTimeInSeconds = table.Column<double>(type: "double", nullable: true),
+                    RefreshTokenExpirationTimeInSeconds = table.Column<double>(type: "double", nullable: true),
+                    TokenSignedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TokenEncryptedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TokenEncryptedResponseEnc = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PostLogoutRedirectUris = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RedirectToRevokeSessionUI = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    PreferredTokenProfile = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RequestObjectSigningAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RequestObjectEncryptionAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RequestObjectEncryptionEnc = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SubjectType = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PairWiseIdentifierSalt = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SectorIdentifierUri = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdTokenSignedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdTokenEncryptedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IdTokenEncryptedResponseEnc = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BCTokenDeliveryMode = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BCClientNotificationEndpoint = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BCAuthenticationRequestSigningAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserInfoSignedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserInfoEncryptedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserInfoEncryptedResponseEnc = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BCUserCodeParameter = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    FrontChannelLogoutUri = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CredentialOfferEndpoint = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsTransactionCodeRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    PreAuthCodeExpirationTimeInSeconds = table.Column<double>(type: "double", nullable: false),
+                    FrontChannelLogoutSessionRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    BackChannelLogoutSessionRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DefaultMaxAge = table.Column<double>(type: "double", nullable: true),
+                    TlsClientCertificateBoundAccessToken = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    BackChannelLogoutUri = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ApplicationType = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    InitiateLoginUri = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RequireAuthTime = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AuthorizationSignedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AuthorizationEncryptedResponseAlg = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AuthorizationDataTypes = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    AuthorizationEncryptedResponseEnc = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DPOPBoundAccessTokens = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsConsentDisabled = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    IsResourceParameterRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    AuthReqIdExpirationTimeInSeconds = table.Column<int>(type: "int", nullable: false),
+                    ClientType = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsDPOPNonceRequired = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    DPOPNonceLifetimeInSeconds = table.Column<double>(type: "double", nullable: false),
+                    IsRedirectUrlCaseSensitive = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    SerializedParameters = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    DefaultAcrValues = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BCIntervalSeconds = table.Column<int>(type: "int", nullable: false),
+                    AccessTokenType = table.Column<int>(type: "int", nullable: false),
+                    AuthenticationContextClassReferenceId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Clients", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Clients_Acrs_AuthenticationContextClassReferenceId",
+                        column: x => x.AuthenticationContextClassReferenceId,
+                        principalTable: "Acrs",
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -2032,6 +1756,157 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         name: "FK_AuthorizedScope_Grants_ConsentId",
                         column: x => x.ConsentId,
                         principalTable: "Grants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ClientJsonWebKey",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Kid = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Alg = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Usage = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    KeyType = table.Column<int>(type: "int", nullable: true),
+                    SerializedJsonWebKey = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClientId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientJsonWebKey", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ClientJsonWebKey_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ClientRealm",
+                columns: table => new
+                {
+                    ClientsId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RealmsName = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientRealm", x => new { x.ClientsId, x.RealmsName });
+                    table.ForeignKey(
+                        name: "FK_ClientRealm_Clients_ClientsId",
+                        column: x => x.ClientsId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClientRealm_Realms_RealmsName",
+                        column: x => x.RealmsName,
+                        principalTable: "Realms",
+                        principalColumn: "Name",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ClientScope",
+                columns: table => new
+                {
+                    ClientsId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ScopesId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClientScope", x => new { x.ClientsId, x.ScopesId });
+                    table.ForeignKey(
+                        name: "FK_ClientScope_Clients_ClientsId",
+                        column: x => x.ClientsId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ClientScope_Scopes_ScopesId",
+                        column: x => x.ScopesId,
+                        principalTable: "Scopes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "DeviceAuthCodes",
+                columns: table => new
+                {
+                    DeviceCode = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserCode = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClientId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserLogin = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Scopes = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UpdateDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ExpirationDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    NextAccessDateTime = table.Column<DateTime>(type: "datetime(6)", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    LastAccessTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    UserId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeviceAuthCodes", x => x.DeviceCode);
+                    table.ForeignKey(
+                        name: "FK_DeviceAuthCodes_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DeviceAuthCodes_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Translations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Key = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Value = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Language = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ClientId = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Translations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Translations_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 })
@@ -2061,6 +1936,89 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
+            migrationBuilder.CreateTable(
+                name: "ConfigurationDefinitionRecordTranslation",
+                columns: table => new
+                {
+                    ConfigurationDefinitionRecordId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TranslationsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ConfigurationDefinitionRecordTranslation", x => new { x.ConfigurationDefinitionRecordId, x.TranslationsId });
+                    table.ForeignKey(
+                        name: "FK_ConfigurationDefinitionRecordTranslation_ConfigurationDefini~",
+                        column: x => x.ConfigurationDefinitionRecordId,
+                        principalTable: "ConfigurationDefinitionRecord",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ConfigurationDefinitionRecordTranslation_Translations_Transl~",
+                        column: x => x.TranslationsId,
+                        principalTable: "Translations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "ConfigurationDefinitionRecordValueTranslation",
+                columns: table => new
+                {
+                    ConfigurationDefinitionRecordValueId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TranslationsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ConfigurationDefinitionRecordValueTranslation", x => new { x.ConfigurationDefinitionRecordValueId, x.TranslationsId });
+                    table.ForeignKey(
+                        name: "FK_ConfigurationDefinitionRecordValueTranslation_ConfigurationD~",
+                        column: x => x.ConfigurationDefinitionRecordValueId,
+                        principalTable: "ConfigurationDefinitionRecordValue",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ConfigurationDefinitionRecordValueTranslation_Translations_T~",
+                        column: x => x.TranslationsId,
+                        principalTable: "Translations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "TranslationUMAResource",
+                columns: table => new
+                {
+                    TranslationsId = table.Column<int>(type: "int", nullable: false),
+                    UMAResourceId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TranslationUMAResource", x => new { x.TranslationsId, x.UMAResourceId });
+                    table.ForeignKey(
+                        name: "FK_TranslationUMAResource_Translations_TranslationsId",
+                        column: x => x.TranslationsId,
+                        principalTable: "Translations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TranslationUMAResource_UmaResources_UMAResourceId",
+                        column: x => x.UMAResourceId,
+                        principalTable: "UmaResources",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Acrs_RegistrationWorkflowId",
+                table: "Acrs",
+                column: "RegistrationWorkflowId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_ApiResourceRealm_RealmsName",
                 table: "ApiResourceRealm",
@@ -2087,7 +2045,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 column: "RealmsName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthenticationSchemeProviders_AuthSchemeProviderDefinitionN~",
+                name: "IX_AuthenticationSchemeProviders_AuthSchemeProviderDefinitionNa~",
                 table: "AuthenticationSchemeProviders",
                 column: "AuthSchemeProviderDefinitionName");
 
@@ -2127,6 +2085,11 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 column: "RealmsName");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Clients_AuthenticationContextClassReferenceId",
+                table: "Clients",
+                column: "AuthenticationContextClassReferenceId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ClientScope_ScopesId",
                 table: "ClientScope",
                 column: "ScopesId");
@@ -2142,7 +2105,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 column: "TranslationsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConfigurationDefinitionRecordValue_ConfigurationDefinitionR~",
+                name: "IX_ConfigurationDefinitionRecordValue_ConfigurationDefinitionRe~",
                 table: "ConfigurationDefinitionRecordValue",
                 column: "ConfigurationDefinitionRecordId");
 
@@ -2150,36 +2113,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 name: "IX_ConfigurationDefinitionRecordValueTranslation_TranslationsId",
                 table: "ConfigurationDefinitionRecordValueTranslation",
                 column: "TranslationsId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CredentialOffers_CredentialTemplateId",
-                table: "CredentialOffers",
-                column: "CredentialTemplateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CredentialOffers_UserId",
-                table: "CredentialOffers",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CredentialTemplateClaimMapper_CredentialTemplateId",
-                table: "CredentialTemplateClaimMapper",
-                column: "CredentialTemplateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CredentialTemplateDisplay_CredentialTemplateId",
-                table: "CredentialTemplateDisplay",
-                column: "CredentialTemplateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CredentialTemplateParameter_CredentialTemplateId",
-                table: "CredentialTemplateParameter",
-                column: "CredentialTemplateId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_CredentialTemplateRealm_RealmsName",
-                table: "CredentialTemplateRealm",
-                column: "RealmsName");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DeviceAuthCodes_ClientId",
@@ -2232,7 +2165,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 column: "DefinitionName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IdentityProvisioningMappingRule_IdentityProvisioningDefinit~",
+                name: "IX_IdentityProvisioningMappingRule_IdentityProvisioningDefiniti~",
                 table: "IdentityProvisioningMappingRule",
                 column: "IdentityProvisioningDefinitionName");
 
@@ -2242,8 +2175,23 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 column: "RealmsName");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ImportSummaries_RealmName",
-                table: "ImportSummaries",
+                name: "IX_PresentationDefinitionFormat_PresentationDefinitionInputDesc~",
+                table: "PresentationDefinitionFormat",
+                column: "PresentationDefinitionInputDescriptorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PresentationDefinitionInputDescriptor_PresentationDefinition~",
+                table: "PresentationDefinitionInputDescriptor",
+                column: "PresentationDefinitionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PresentationDefinitionInputDescriptorConstraint_Presentation~",
+                table: "PresentationDefinitionInputDescriptorConstraint",
+                column: "PresentationDefinitionInputDescriptorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PresentationDefinitions_RealmName",
+                table: "PresentationDefinitions",
                 column: "RealmName");
 
             migrationBuilder.CreateIndex(
@@ -2387,21 +2335,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 name: "ConfigurationKeyPairValueRecords");
 
             migrationBuilder.DropTable(
-                name: "CredentialOffers");
-
-            migrationBuilder.DropTable(
-                name: "CredentialTemplateClaimMapper");
-
-            migrationBuilder.DropTable(
-                name: "CredentialTemplateDisplay");
-
-            migrationBuilder.DropTable(
-                name: "CredentialTemplateParameter");
-
-            migrationBuilder.DropTable(
-                name: "CredentialTemplateRealm");
-
-            migrationBuilder.DropTable(
                 name: "DataProtectionKeys");
 
             migrationBuilder.DropTable(
@@ -2409,6 +2342,12 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
 
             migrationBuilder.DropTable(
                 name: "ExtractedRepresentations");
+
+            migrationBuilder.DropTable(
+                name: "ExtractedRepresentationsStaging");
+
+            migrationBuilder.DropTable(
+                name: "GotifySessions");
 
             migrationBuilder.DropTable(
                 name: "GroupRealm");
@@ -2429,10 +2368,13 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 name: "IdentityProvisioningRealm");
 
             migrationBuilder.DropTable(
-                name: "ImportSummaries");
+                name: "Languages");
 
             migrationBuilder.DropTable(
-                name: "Networks");
+                name: "PresentationDefinitionFormat");
+
+            migrationBuilder.DropTable(
+                name: "PresentationDefinitionInputDescriptorConstraint");
 
             migrationBuilder.DropTable(
                 name: "RealmScope");
@@ -2442,9 +2384,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
 
             migrationBuilder.DropTable(
                 name: "RealmUser");
-
-            migrationBuilder.DropTable(
-                name: "RegistrationWorkflows");
 
             migrationBuilder.DropTable(
                 name: "ScopeClaimMapper");
@@ -2483,9 +2422,6 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 name: "ApiResources");
 
             migrationBuilder.DropTable(
-                name: "Acrs");
-
-            migrationBuilder.DropTable(
                 name: "AuthenticationSchemeProviders");
 
             migrationBuilder.DropTable(
@@ -2501,16 +2437,13 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 name: "ConfigurationDefinitionRecordValue");
 
             migrationBuilder.DropTable(
-                name: "BaseCredentialTemplate");
-
-            migrationBuilder.DropTable(
                 name: "Groups");
 
             migrationBuilder.DropTable(
-                name: "SerializedFileKeys");
+                name: "PresentationDefinitionInputDescriptor");
 
             migrationBuilder.DropTable(
-                name: "Realms");
+                name: "SerializedFileKeys");
 
             migrationBuilder.DropTable(
                 name: "Translations");
@@ -2531,6 +2464,9 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 name: "ConfigurationDefinitionRecord");
 
             migrationBuilder.DropTable(
+                name: "PresentationDefinitions");
+
+            migrationBuilder.DropTable(
                 name: "Clients");
 
             migrationBuilder.DropTable(
@@ -2546,10 +2482,19 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                 name: "Definitions");
 
             migrationBuilder.DropTable(
+                name: "Acrs");
+
+            migrationBuilder.DropTable(
                 name: "IdentityProvisioningLst");
 
             migrationBuilder.DropTable(
+                name: "RegistrationWorkflows");
+
+            migrationBuilder.DropTable(
                 name: "IdentityProvisioningDefinitions");
+
+            migrationBuilder.DropTable(
+                name: "Realms");
         }
     }
 }

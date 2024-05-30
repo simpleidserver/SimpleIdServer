@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using EFCore.BulkExtensions;
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
@@ -87,12 +87,25 @@ public class GroupRepository : IGroupRepository
     {
         if (_dbContext.Database.IsRelational())
         {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(Group.Id) }
-            };
-            await _dbContext.BulkInsertOrUpdateAsync(groups, bulkConfig);
-            return;
+            var merged = LinqToDB.LinqExtensions.UpdateWhenMatched(
+                        LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.Groups.ToLinqToDBTable()),
+                                        groups
+                                    ),
+                                    (g1, g2) => g1.Id == g2.Id
+                            ),
+                            source => source),
+                        (target, source) => new Group
+                        {
+                            Id = source.Id,
+                            Description = source.Description,
+                            Name = source.Name,
+                            UpdateDateTime = source.UpdateDateTime
+                        });
+            LinqToDB.LinqExtensions.Merge(merged);
         }
 
         var groupIds = groups.Select(u => u.Id).ToList();
@@ -106,11 +119,24 @@ public class GroupRepository : IGroupRepository
     {
         if (_dbContext.Database.IsRelational())
         {
-            var bulkConfig = new BulkConfig
-            {
-                PropertiesToIncludeOnCompare = new List<string> { nameof(GroupRealm.GroupsId), nameof(GroupRealm.RealmsName) }
-            };
-            await _dbContext.BulkInsertOrUpdateAsync(groupRealms, bulkConfig);
+            var merged = LinqToDB.LinqExtensions.UpdateWhenMatched(
+                        LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.GroupRealm.ToLinqToDBTable()),
+                                        groupRealms
+                                    ),
+                                    (g1, g2) => g1.GroupsId == g2.GroupsId && g1.RealmsName == g2.RealmsName
+                            ),
+                            source => source),
+                        (target, source) => new GroupRealm
+                        {
+                            GroupsId = source.GroupsId,
+                            RealmsName = source.RealmsName
+                        });
+            LinqToDB.LinqExtensions.Merge(merged);
+            return;
         }
 
         var groupIds = groupRealms.Select(r => r.GroupsId).ToList();
