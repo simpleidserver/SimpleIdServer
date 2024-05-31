@@ -58,8 +58,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         {
             try
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
                     var result = await BuildResponse(context, token);
                     var display = context.Request.RequestData.GetDisplayFromAuthorizationRequest();
                     if (!string.IsNullOrWhiteSpace(display))
@@ -67,9 +65,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                     var sessionState = BuildSessionState(context);
                     if (!string.IsNullOrWhiteSpace(sessionState))
                         context.Response.Add(AuthorizationRequestParameters.SessionState, sessionState);
-                    await transaction.Commit(token);
                     return result;
-                }
             }
             catch (OAuthUserConsentRequiredException ex)
             {
@@ -90,33 +86,37 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
         protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
-            var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
-            var activeSession = await GetActiveSession(context, cancellationToken);
-            context.SetUser(user, activeSession);
-            var grantRequest = validationResult.GrantRequest;
-            var responseTypeHandlers = validationResult.ResponseTypes;
-            await _validator.ValidateAuthorizationRequestWhenUserIsAuthenticated(grantRequest, context, cancellationToken);
-            var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
-            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
-            if (!string.IsNullOrWhiteSpace(state))
-                context.Response.Add(AuthorizationResponseParameters.State, state);
-
-            _authorizationRequestEnricher.Enrich(context);
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                var grant = await ExecuteGrantManagementAction(grantRequest, context, cancellationToken);
-                foreach (var responseTypeHandler in responseTypeHandlers)
-                    await responseTypeHandler.Enrich(new EnrichParameter { AuthorizationDetails = grantRequest.AuthorizationDetails, Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
+                var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
+                var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
+                var activeSession = await GetActiveSession(context, cancellationToken);
+                context.SetUser(user, activeSession);
+                var grantRequest = validationResult.GrantRequest;
+                var responseTypeHandlers = validationResult.ResponseTypes;
+                await _validator.ValidateAuthorizationRequestWhenUserIsAuthenticated(grantRequest, context, cancellationToken);
+                var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
+                var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
+                if (!string.IsNullOrWhiteSpace(state))
+                    context.Response.Add(AuthorizationResponseParameters.State, state);
 
-                _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
-                UpdateSession(context);
-                _userSessionRepository.Update(context.Session);
-                return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
-            }
-            finally
-            {
-                _userRepository.Update(context.User);
+                _authorizationRequestEnricher.Enrich(context);
+                try
+                {
+                    var grant = await ExecuteGrantManagementAction(grantRequest, context, cancellationToken);
+                    foreach (var responseTypeHandler in responseTypeHandlers)
+                        await responseTypeHandler.Enrich(new EnrichParameter { AuthorizationDetails = grantRequest.AuthorizationDetails, Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
+
+                    _tokenProfiles.First(t => t.Profile == (context.Client.PreferredTokenProfile ?? _options.DefaultTokenProfile)).Enrich(context);
+                    UpdateSession(context);
+                    _userSessionRepository.Update(context.Session);
+                    return new RedirectURLAuthorizationResponse(redirectUri, context.Response.Parameters);
+                }
+                finally
+                {
+                    _userRepository.Update(context.User);
+                    await transaction.Commit(cancellationToken);
+                }
             }
         }
 
