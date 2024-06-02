@@ -38,6 +38,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using SimpleIdServer.IdServer.Services.Seeding.Interfaces;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -129,7 +130,7 @@ app
 
 app.Run();
 
-void ConfigureIdServer(IServiceCollection services)
+void ConfigureIdServer(IServiceCollection services, IConfiguration configuration)
 {
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
@@ -180,6 +181,7 @@ void ConfigureIdServer(IServiceCollection services)
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDidKey();
+    // services.AddJsonSeeding(configuration); // Uncomment to allow seed data from JSON file.
     ConfigureDistributedCache();
 }
 
@@ -419,6 +421,10 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
+
+            // Uncomment these two lines to allow seed data from JSON file.
+            // ISeedingService seedingService = scope.ServiceProvider.GetService<ISeedingService>();
+            // seedingService.SeedDataAsync().Wait();
         }
 
         void EnableIsolationLevel(StoreDbContext dbContext)

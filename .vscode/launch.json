@@ -10,7 +10,7 @@
       "request": "launch",
       "preLaunchTask": "build-idserver",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup/bin/Debug/net7.0/SimpleIdServer.IdServer.Startup.dll",
+      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup/bin/Debug/net8.0/SimpleIdServer.IdServer.Startup.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup",
       "stopAtEntry": false,
@@ -36,7 +36,7 @@
       "request": "launch",
       "preLaunchTask": "build-ui",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup/bin/Debug/net7.0/SimpleIdServer.IdServer.Website.Startup.dll",
+      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup/bin/Debug/net8.0/SimpleIdServer.IdServer.Website.Startup.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup",
       "stopAtEntry": false,
