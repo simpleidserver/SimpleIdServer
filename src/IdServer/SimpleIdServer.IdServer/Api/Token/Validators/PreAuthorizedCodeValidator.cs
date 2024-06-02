@@ -1,12 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,21 +18,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
 
     public class PreAuthorizedCodeValidator : IPreAuthorizedCodeValidator
     {
-        private readonly IClientAuthenticationHelper _clientAuthenticationHelper;
-        private readonly IClientRepository _clientRepository;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly IUserRepository _userRepository;
 
         public PreAuthorizedCodeValidator(
-            IClientAuthenticationHelper clientAuthenticationHelper,
-            IClientRepository clientRepository,
-            IGrantedTokenHelper grantedTokenHelper,
-            IUserRepository userRepository)
+            IGrantedTokenHelper grantedTokenHelper)
         {
-            _clientAuthenticationHelper = clientAuthenticationHelper;
-            _clientRepository = clientRepository;
             _grantedTokenHelper = grantedTokenHelper;
-            _userRepository = userRepository;
         }
 
         public async virtual Task<PreAuthCode> Validate(HandlerContext context, CancellationToken cancellationToken)

@@ -2,14 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Linq;
 using System.Net;
@@ -23,15 +22,18 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
     {
         public const string UserAccessPolicyUri = "user_access_policy_uri";
         private readonly IUmaResourceRepository _umaResourceRepository;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly ILogger<UMAResourcesController> _logger;
 
         public UMAResourcesController(
-            IUmaResourceRepository umaResourceRepository, 
+            IUmaResourceRepository umaResourceRepository,
+            ITransactionBuilder transactionBuilder,
             ITokenRepository tokenRepository, 
             IJwtBuilder jwtBuilder, 
             ILogger<UMAResourcesController> logger) : base(tokenRepository, jwtBuilder)
         {
             _umaResourceRepository = umaResourceRepository;
+            _transactionBuilder = transactionBuilder;
             _logger = logger;
         }
 
@@ -42,7 +44,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 await CheckHasPAT(prefix);
-                var result = await _umaResourceRepository.Query().AsNoTracking().ToListAsync(cancellationToken);
+                var result = await _umaResourceRepository.GetAll(cancellationToken);
                 return new OkObjectResult(result.Select(r => r.Id));
             }
             catch(OAuthException ex)
@@ -59,7 +61,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 await CheckHasPAT(prefix);
-                var result = await _umaResourceRepository.Query().Include(r => r.Translations).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
+                var result = await _umaResourceRepository.Get(id, cancellationToken);
                 if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
                 return new OkObjectResult(result);
             }
@@ -75,32 +77,35 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                prefix = prefix ?? Constants.DefaultRealm;
-                await CheckHasPAT(prefix);
-                Validate(request);
-                if(string.IsNullOrWhiteSpace(request.Subject))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UMAResourceNames.Subject));
-                var umaResource = new UMAResource(Guid.NewGuid().ToString(), DateTime.UtcNow, prefix)
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    IconUri = request.IconUri,
-                    Scopes = request.Scopes,
-                    Type = request.Type
-                };
-                umaResource.UpdateTranslations(request.Translations.Select(t => new Translation { Key = t.Name, Language = t.Language, Value = t.Value }));
-                _umaResourceRepository.Add(umaResource);
-                await _umaResourceRepository.SaveChanges(cancellationToken);
-                _logger.LogInformation("UMA resource {UmaResourceId} has been added", umaResource.Id);
-                var result = new JsonObject
-                {
-                    [UMAResourceNames.Id] = umaResource.Id,
-                    [UserAccessPolicyUri] = Url.Action("Edit", "Resources", new { id = umaResource.Id })
-                };
-                return new ContentResult
-                {
-                    Content = result.ToJsonString(),
-                    StatusCode = (int)HttpStatusCode.Created,
-                    ContentType = "application/json"
-                };
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckHasPAT(prefix);
+                    Validate(request);
+                    if (string.IsNullOrWhiteSpace(request.Subject))
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UMAResourceNames.Subject));
+                    var umaResource = new UMAResource(Guid.NewGuid().ToString(), DateTime.UtcNow, prefix)
+                    {
+                        IconUri = request.IconUri,
+                        Scopes = request.Scopes,
+                        Type = request.Type
+                    };
+                    umaResource.UpdateTranslations(request.Translations.Select(t => new Translation { Key = t.Name, Language = t.Language, Value = t.Value }));
+                    _umaResourceRepository.Add(umaResource);
+                    await transaction.Commit(cancellationToken);
+                    _logger.LogInformation("UMA resource {UmaResourceId} has been added", umaResource.Id);
+                    var result = new JsonObject
+                    {
+                        [UMAResourceNames.Id] = umaResource.Id,
+                        [UserAccessPolicyUri] = Url.Action("Edit", "Resources", new { id = umaResource.Id })
+                    };
+                    return new ContentResult
+                    {
+                        Content = result.ToJsonString(),
+                        StatusCode = (int)HttpStatusCode.Created,
+                        ContentType = "application/json"
+                    };
+                }
             }
             catch(OAuthException ex)
             {
@@ -114,29 +119,33 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
-                Validate(request);
-                var currentUmaResource = await _umaResourceRepository.Query().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
-                if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckHasPAT(prefix ?? Constants.DefaultRealm);
+                    Validate(request);
+                    var currentUmaResource = await _umaResourceRepository.Get(id, cancellationToken);
+                    if (currentUmaResource == null)
+                        return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
 
-                currentUmaResource.IconUri = request.IconUri;
-                currentUmaResource.Scopes = request.Scopes;
-                currentUmaResource.Type = request.Type;
-                currentUmaResource.UpdateDateTime = DateTime.UtcNow;
-                currentUmaResource.UpdateTranslations(request.Translations.Select(t => new Translation { Key = t.Name, Language = t.Language, Value = t.Value }));
-                await _umaResourceRepository.SaveChanges(cancellationToken);
-                _logger.LogInformation("UMA resource {UmaResourceId} has been updated", currentUmaResource.Id);
-                var result = new JsonObject
-                {
-                    [UMAResourceNames.Id] = currentUmaResource.Id
-                };
-                return new ContentResult
-                {
-                    ContentType = "application/json",
-                    Content = result.ToJsonString(),
-                    StatusCode = (int)HttpStatusCode.OK
-                };
+                    currentUmaResource.IconUri = request.IconUri;
+                    currentUmaResource.Scopes = request.Scopes;
+                    currentUmaResource.Type = request.Type;
+                    currentUmaResource.UpdateDateTime = DateTime.UtcNow;
+                    currentUmaResource.UpdateTranslations(request.Translations.Select(t => new Translation { Key = t.Name, Language = t.Language, Value = t.Value }));
+                    _umaResourceRepository.Update(currentUmaResource);
+                    await transaction.Commit(cancellationToken);
+                    _logger.LogInformation("UMA resource {UmaResourceId} has been updated", currentUmaResource.Id);
+                    var result = new JsonObject
+                    {
+                        [UMAResourceNames.Id] = currentUmaResource.Id
+                    };
+                    return new ContentResult
+                    {
+                        ContentType = "application/json",
+                        Content = result.ToJsonString(),
+                        StatusCode = (int)HttpStatusCode.OK
+                    };
+                }
             }
             catch (OAuthException ex)
             {
@@ -150,14 +159,17 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
-                var currentUmaResource = await _umaResourceRepository.Query().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
-                if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckHasPAT(prefix ?? Constants.DefaultRealm);
+                    var currentUmaResource = await _umaResourceRepository.Get(id, cancellationToken);
+                    if (currentUmaResource == null)
+                        return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
 
-                _umaResourceRepository.Delete(currentUmaResource);
-                await _umaResourceRepository.SaveChanges(cancellationToken);
-                return new NoContentResult();
+                    _umaResourceRepository.Delete(currentUmaResource);
+                    await transaction.Commit(cancellationToken);
+                    return new NoContentResult();
+                }
             }
             catch (OAuthException ex)
             {
@@ -171,38 +183,42 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
-                var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
-                if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
-                Validate(request);
-                var permissions = request.Permissions.Select(p =>
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    return new UMAResourcePermission(Guid.NewGuid().ToString(), DateTime.UtcNow)
+                    await CheckHasPAT(prefix ?? Constants.DefaultRealm);
+                    var currentUmaResource = await _umaResourceRepository.Get(id, cancellationToken);
+                    if (currentUmaResource == null)
+                        return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
+                    Validate(request);
+                    var permissions = request.Permissions.Select(p =>
                     {
-                        Scopes = p.Scopes.ToList(),
-                        Claims = p.Claims.Select(c => new UMAResourcePermissionClaim
+                        return new UMAResourcePermission(Guid.NewGuid().ToString(), DateTime.UtcNow)
                         {
-                            ClaimType = c.ClaimType,
-                            FriendlyName = c.ClaimFriendlyName,
-                            Name = c.ClaimName,
-                            Value = c.ClaimValue
-                        }).ToList()
+                            Scopes = p.Scopes.ToList(),
+                            Claims = p.Claims.Select(c => new UMAResourcePermissionClaim
+                            {
+                                ClaimType = c.ClaimType,
+                                FriendlyName = c.ClaimFriendlyName,
+                                Name = c.ClaimName,
+                                Value = c.ClaimValue
+                            }).ToList()
+                        };
+                    });
+                    currentUmaResource.Permissions = permissions.ToList();
+                    currentUmaResource.UpdateDateTime = DateTime.UtcNow;
+                    _umaResourceRepository.Update(currentUmaResource);
+                    await transaction.Commit(cancellationToken);
+                    var result = new JsonObject
+                    {
+                        [UMAResourceNames.Id] = currentUmaResource.Id
                     };
-                });
-                currentUmaResource.Permissions = permissions.ToList();
-                currentUmaResource.UpdateDateTime = DateTime.UtcNow;
-                await _umaResourceRepository.SaveChanges(cancellationToken);
-                var result = new JsonObject
-                {
-                    [UMAResourceNames.Id] = currentUmaResource.Id
-                };
-                return new ContentResult
-                {
-                    ContentType = "application/json",
-                    Content = result.ToString(),
-                    StatusCode = (int)HttpStatusCode.OK
-                };
+                    return new ContentResult
+                    {
+                        ContentType = "application/json",
+                        Content = result.ToString(),
+                        StatusCode = (int)HttpStatusCode.OK
+                    };
+                }
             }
             catch (OAuthException ex)
             {
@@ -217,7 +233,7 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
             try
             {
                 await CheckHasPAT(prefix ?? Constants.DefaultRealm);
-                var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).AsNoTracking().SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
+                var currentUmaResource = await _umaResourceRepository.Get(id, cancellationToken);
                 if (currentUmaResource == null)
                     return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
                 return new OkObjectResult(currentUmaResource.Permissions);
@@ -234,13 +250,17 @@ namespace SimpleIdServer.IdServer.Api.UMAResources
         {
             try
             {
-                await CheckHasPAT(prefix ?? Constants.DefaultRealm);
-                var currentUmaResource = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
-                if (currentUmaResource == null)
-                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
-                currentUmaResource.Permissions.Clear();
-                await _umaResourceRepository.SaveChanges(cancellationToken);
-                return new NoContentResult();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckHasPAT(prefix ?? Constants.DefaultRealm);
+                    var currentUmaResource = await _umaResourceRepository.Get(id, cancellationToken);
+                    if (currentUmaResource == null)
+                        return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownUmaResource);
+                    currentUmaResource.Permissions.Clear();
+                    _umaResourceRepository.Update(currentUmaResource);
+                    await transaction.Commit(cancellationToken);
+                    return new NoContentResult();
+                }
             }
             catch (OAuthException ex)
             {

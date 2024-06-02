@@ -1,0 +1,11 @@
+﻿@using SimpleIdServer.IdServer.SqlSugar.Startup.Resources;
+@model SimpleIdServer.IdServer.UI.ViewModels.ErrorViewModel
+
+@{
+    ViewBag.Title = "Error";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="alert alert-danger" role="alert">
+    @Model.Message
+</div>

@@ -8,7 +8,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 
@@ -22,7 +22,8 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         IDistributedCache distributedCache, 
         IUserRepository userRepository,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+        ITransactionBuilder transactionBuilder,
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
     {
     }
 
@@ -91,18 +92,22 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 
         async Task<IActionResult> UpdateUser()
         {
-            var user = await UserRepository.GetBySubject(viewModel.Login, prefix, cancellationToken);
-            var passwordCredential = user.Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD);
-            if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputeHash(viewModel.Password);
-            else user.Credentials.Add(new UserCredential
+            using (var transaction = TransactionBuilder.Build())
             {
-                Id = Guid.NewGuid().ToString(),
-                Value = PasswordHelper.ComputeHash(viewModel.Password),
-                CredentialType = UserCredential.PWD,
-                IsActive = true
-            });
-            await UserRepository.SaveChanges(cancellationToken);
-            return await base.UpdateUser(userRegistrationProgress, viewModel, Constants.Areas.Password, viewModel.RedirectUrl);
+                var user = await UserRepository.GetBySubject(viewModel.Login, prefix, cancellationToken);
+                var passwordCredential = user.Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD);
+                if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputeHash(viewModel.Password);
+                else user.Credentials.Add(new UserCredential
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Value = PasswordHelper.ComputeHash(viewModel.Password),
+                    CredentialType = UserCredential.PWD,
+                    IsActive = true
+                });
+                UserRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                return await base.UpdateUser(userRegistrationProgress, viewModel, Constants.Areas.Password, viewModel.RedirectUrl);
+            }
         }
     }
 

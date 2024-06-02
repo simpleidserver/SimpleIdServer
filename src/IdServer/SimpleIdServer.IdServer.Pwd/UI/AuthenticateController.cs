@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Pwd.Services;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
@@ -29,6 +29,7 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         IOptions<IdServerHostOptions> options,
         IDataProtectionProvider dataProtectionProvider,
         ITokenRepository tokenRepository,
+        ITransactionBuilder transactionBuidler,
         IJwtBuilder jwtBuilder,
         IAuthenticationHelper authenticationHelper,
         IClientRepository clientRepository,
@@ -39,7 +40,7 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         IBusControl busControl,
         IConfiguration configuration,
         IAntiforgery antiforgery,
-        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
+        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
     {
         _configuration = configuration;
     }

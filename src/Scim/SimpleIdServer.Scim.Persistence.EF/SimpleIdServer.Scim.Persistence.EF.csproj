@@ -8,6 +8,6 @@
   </ItemGroup>
   <ItemGroup>
 	<PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
-	<PackageReference Include="EFCore.BulkExtensions" Version="8.0.2" />
+	<PackageReference Include="linq2db.EntityFrameworkCore" Version="8.1.0" />
   </ItemGroup>
 </Project>

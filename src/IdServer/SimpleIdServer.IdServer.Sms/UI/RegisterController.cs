@@ -12,9 +12,8 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Sms.UI.ViewModels;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
-using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Sms.UI;
@@ -33,7 +32,8 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions, 
         IConfiguration configuration,
         ISmsUserNotificationService userNotificationService,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
+        ITransactionBuilder transactionBuilder,
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
     {
         _authenticationHelper = authenticationHelper;
     }

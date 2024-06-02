@@ -1,10 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -71,7 +70,7 @@ namespace SimpleIdServer.IdServer.Helpers
             async Task<List<AuthorizedScope>> ProcessResourceParameter(IEnumerable<string> resources, IEnumerable<string> audiences, IEnumerable<string> scopes, CancellationToken cancellationToken)
             {
                 var authResults = new List<AuthorizedScope>();
-                var apiResources = await _apiResourceRepository.Query().Include(r => r.Realms).Include(r => r.Scopes).Where(r => (resources.Contains(r.Name) || audiences.Contains(r.Audience)) && r.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+                var apiResources = await _apiResourceRepository.GetByNamesOrAudiences(realm, resources.ToList(), audiences.ToList(), cancellationToken);
                 var unsupportedResources = resources.Where(r => !apiResources.Any(a => a.Name == r));
                 if (unsupportedResources.Any())
                     throw new OAuthException(ErrorCodes.INVALID_TARGET, string.Format(Global.UnknownResource, string.Join(",", unsupportedResources)));
@@ -101,7 +100,7 @@ namespace SimpleIdServer.IdServer.Helpers
 
             async Task<List<AuthorizedScope>> ProcessScopeParameter(IEnumerable<string> scopes, CancellationToken cancellationToken)
             {
-                var apiResources = await _apiResourceRepository.Query().Include(r => r.Scopes).Where(r => r.Scopes.Any(s => scopes.Contains(s.Name))).ToListAsync(cancellationToken);
+                var apiResources = await _apiResourceRepository.GetByScopes(scopes.ToList(), cancellationToken);
                 var result = new List<AuthorizedScope>();
                 foreach (var scope in scopes)
                     result.Add(new AuthorizedScope

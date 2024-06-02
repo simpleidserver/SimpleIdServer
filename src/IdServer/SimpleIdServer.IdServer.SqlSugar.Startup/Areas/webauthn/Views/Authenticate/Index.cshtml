@@ -1,0 +1,180 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using SimpleIdServer.IdServer.SqlSugar.Startup.Resources;
+@model SimpleIdServer.IdServer.Fido.UI.ViewModels.AuthenticateWebauthnViewModel;
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = AuthenticateSmsResource.title;
+    Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
+    var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
+    var realm = SimpleIdServer.IdServer.Middlewares.RealmContext.Instance()?.Realm;
+    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
+}
+
+<ul class="list-group mb-3" id="errors">
+    @foreach (var modelState in ViewData.ModelState.Values)
+    {
+        foreach (var error in modelState.Errors)
+        {
+            <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
+        }
+    }
+</ul>
+
+@if (Model.IsLoginMissing)
+{    
+    <div class="alert alert-danger">
+        @AuthenticateWebauthnResource.missing_login
+    </div>
+}
+else
+{
+    <!-- Login form -->
+    @using (Html.BeginForm("Index", "Authenticate", new { area = "webauthn" }, FormMethod.Post, null, new { id = "fido2Auth" }))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ReturnUrl" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
+        <input asp-for="EndLoginUrl" type="hidden" class="form-control" />
+        <input asp-for="SessionId" type="hidden" class="form-control" />
+        <div class="input-group mb-3">
+            @if (Model.IsAuthInProgress)
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
+            }
+        </div>
+        @if(Model.IsFirstAmr)
+        {
+            <div>
+                <input type="checkbox" asp-for="RememberLogin " />
+                <label>@AuthenticateWebauthnResource.remember_login</label>
+            </div>
+        }
+        <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.authenticate</button>        
+    }
+
+    @if (Model.IsFirstAmr && Model.RegistrationWorkflow != null)
+    {
+        <div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
+        </div>
+    }
+}
+
+@section SubScripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".login input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+            
+            var beginLoginUrl = "@Model.BeginLoginUrl";
+            var endLoginUrl = "@Model.EndLoginUrl";
+            var makeAssertionsUrl = "@makeAssertionsOptionsUrl";
+            var authenticateUrl = "@authenticateUrl";
+
+            var toggleBtn = function(isDisabled) {
+                $("#fido2Auth button[type='submit']").attr('disabled', isDisabled);
+            }
+
+            var displayError = function (errorJson) {
+                console.error(errorJson);
+                $("#errors").empty();
+                $("#errors").append("<li  class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
+            }
+
+            async function makeAssertion(credential, form, sessionId) {
+                let authData = new Uint8Array(credential.response.authenticatorData);
+                let clientDataJSON = new Uint8Array(credential.response.clientDataJSON);
+                let rawId = new Uint8Array(credential.rawId);
+                let sig = new Uint8Array(credential.response.signature);
+                const assertion = {
+                    id: credential.id,
+                    rawId: coerceToBase64Url(rawId),
+                    type: credential.type,
+                    extensions: credential.getClientExtensionResults(),
+                    response: {
+                        authenticatorData: coerceToBase64Url(authData),
+                        clientDataJSON: coerceToBase64Url(clientDataJSON),
+                        signature: coerceToBase64Url(sig)
+                    }
+                };
+                let response = await fetch(endLoginUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login: form.Login, session_id: sessionId, assertion: assertion }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    const json = await response.json();
+                    toggleBtn(false);
+                    displayError(json);
+                    return;
+                }
+                
+
+                $("#fido2Auth").unbind("submit");
+                $("#fido2Auth input[name='SessionId']").val(sessionId);
+                $("#fido2Auth").trigger("submit");
+            }
+
+            async function makeAssertionOptions(form) {
+                toggleBtn(true);
+                let response = await fetch(beginLoginUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login : form.Login, credential_type: 'webauthn' }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+                const json = await response.json();
+                if (!response.ok) {
+                    toggleBtn(false);
+                    displayError(json);
+                    return;
+                }
+
+                const makeAssertionOptions = json["assertion"];
+                const sessionId = json["session_id"];
+                const challenge = makeAssertionOptions.challenge.replace(/-/g, "+").replace(/_/g, "/");
+                makeAssertionOptions.challenge = Uint8Array.from(atob(challenge), c => c.charCodeAt(0));
+                makeAssertionOptions.allowCredentials.forEach(function (listItem) {
+                    var fixedId = listItem.id.replace(/\_/g, "/").replace(/\-/g, "+");
+                    listItem.id = Uint8Array.from(atob(fixedId), c => c.charCodeAt(0));
+                });
+                let credential;
+                try {
+                    credential = await navigator.credentials.get({ publicKey: makeAssertionOptions })
+                } catch (err) {
+                    console.error(err);
+                    toggleBtn(false);
+                    return;
+                }
+
+                await makeAssertion(credential, form, sessionId);
+            }
+
+            $("#fido2Auth").submit(function(e) {
+                e.preventDefault();
+                makeAssertionOptions(convertFormToJSON($(e.target)));
+            });
+        });
+    </script>
+}

@@ -8,7 +8,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.VerifiablePresentation.DTOs;
 using SimpleIdServer.IdServer.VerifiablePresentation.Resources;
@@ -21,12 +21,14 @@ public class VpRegisterController : BaseController
 {
     private readonly IDistributedCache _distributedCache;
     private readonly IUserRepository _userRepository;
+    private readonly ITransactionBuilder _transactionBuilder;
     private readonly IdServerHostOptions _idServerHostOptions;
     private readonly ILogger<VpRegisterController> _logger;
 
     public VpRegisterController(
         IDistributedCache distributedCache,
         IUserRepository userRepository,
+        ITransactionBuilder transactionBuilder,
         Microsoft.Extensions.Options.IOptions<IdServerHostOptions> idServerHostOptions,
         ILogger<VpRegisterController> logger,
         ITokenRepository tokenRepository,
@@ -34,6 +36,7 @@ public class VpRegisterController : BaseController
     {
         _distributedCache = distributedCache;
         _userRepository = userRepository;
+        _transactionBuilder = transactionBuilder;
         _idServerHostOptions = idServerHostOptions.Value;
         _logger = logger;
     }
@@ -86,34 +89,37 @@ public class VpRegisterController : BaseController
         string amr, 
         CancellationToken cancellationToken)
     {
-        var user = registrationProgress.User ?? new Domains.User
+        using (var transaction = _transactionBuilder.Build())
         {
-            Id = Guid.NewGuid().ToString(),
-            Name = Guid.NewGuid().ToString(),
-            CreateDateTime = DateTime.UtcNow,
-            UpdateDateTime = DateTime.UtcNow
-        };
-        var lastStep = registrationProgress.Steps.Last();
-        if (lastStep == amr)
-        {
-            user.Realms.Add(new Domains.RealmUser
+            var user = registrationProgress.User ?? new Domains.User
             {
-                RealmsName = prefix
-            });
-            _userRepository.Add(user);
-            await _userRepository.SaveChanges(cancellationToken);
-            return new VpEndRegisterResult();
-        }
+                Id = Guid.NewGuid().ToString(),
+                Name = Guid.NewGuid().ToString(),
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            var lastStep = registrationProgress.Steps.Last();
+            if (lastStep == amr)
+            {
+                user.Realms.Add(new Domains.RealmUser
+                {
+                    RealmsName = prefix
+                });
+                _userRepository.Add(user);
+                await transaction.Commit(cancellationToken);
+                return new VpEndRegisterResult();
+            }
 
-        registrationProgress.NextAmr();
-        registrationProgress.User = user;
-        var json = Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress);
-        await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
-        var nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{registrationProgress.Amr}/register";
-        return new VpEndRegisterResult
-        {
-            NextRegistrationRedirectUrl = nextRegistrationRedirectUrl
-        };
+            registrationProgress.NextAmr();
+            registrationProgress.User = user;
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress);
+            await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
+            var nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{registrationProgress.Amr}/register";
+            return new VpEndRegisterResult
+            {
+                NextRegistrationRedirectUrl = nextRegistrationRedirectUrl
+            };
+        }
     }
 
     private async Task<UserRegistrationProgress> GetRegistrationProgress()

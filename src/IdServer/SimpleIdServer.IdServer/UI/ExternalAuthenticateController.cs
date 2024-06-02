@@ -5,7 +5,6 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
@@ -14,9 +13,8 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -49,7 +47,12 @@ namespace SimpleIdServer.IdServer.UI
             IJwtBuilder jwtBuilder,
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
-            IBusControl busControl) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, tokenRepository, jwtBuilder, options)
+            ITransactionBuilder transactionBuilder,
+            IBusControl busControl) : base(
+                clientRepository, 
+                userRepository, 
+                userSessionRepository, 
+                amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;
@@ -67,7 +70,7 @@ namespace SimpleIdServer.IdServer.UI
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, nameof(scheme)));
 
             var result = await HttpContext.AuthenticateAsync(scheme);
-            if(result is {  Succeeded : true})
+            if(result is {  Succeeded : true })
             {
                 var user = await JustInTimeProvision(prefix, scheme, result, cancellationToken);
                 if (!string.IsNullOrWhiteSpace(returnUrl))
@@ -117,11 +120,7 @@ namespace SimpleIdServer.IdServer.UI
         private async Task<User> JustInTimeProvision(string realm, string scheme, AuthenticateResult authResult, CancellationToken cancellationToken)
         {
             var principal = authResult.Principal;
-            var idProvider = await _authenticationSchemeProviderRepository
-                .Query()
-                .AsNoTracking()
-                .Include(p => p.Mappers)
-                .SingleOrDefaultAsync(p => p.Name == scheme, cancellationToken);
+            var idProvider = await _authenticationSchemeProviderRepository.Get(realm, scheme, cancellationToken);
             if(idProvider == null)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedSchemeProvider, scheme));
@@ -138,25 +137,28 @@ namespace SimpleIdServer.IdServer.UI
             var user = await UserRepository.GetByExternalAuthProvider(scheme, sub, realm, cancellationToken);
             if (user == null)
             {
-                _logger.LogInformation($"Start to provision the user '{sub}'");
-                var existingUser = await _authenticationHelper.GetUserByLogin(sub, realm, cancellationToken);
-                if(existingUser != null)
+                using (var transaction = TransactionBuilder.Build())
                 {
-                    user = existingUser;
-                    user.AddExternalAuthProvider(scheme, sub);
-                    await UserRepository.SaveChanges(cancellationToken);
-                }
-                else
-                {
-                    
-                    var r = await _realmRepository.Query().FirstAsync(r => r.Name == realm);
-                    user = _userTransformer.Transform(r, principal, idProvider);
-                    user.AddExternalAuthProvider(scheme, sub);
-                    UserRepository.Add(user);
-                    await UserRepository.SaveChanges(cancellationToken);
-                }
+                    _logger.LogInformation($"Start to provision the user '{sub}'");
+                    var existingUser = await _authenticationHelper.GetUserByLogin(sub, realm, cancellationToken);
+                    if (existingUser != null)
+                    {
+                        user = existingUser;
+                        user.AddExternalAuthProvider(scheme, sub);
+                        UserRepository.Update(user);
+                    }
+                    else
+                    {
 
-                _logger.LogInformation($"Finish to provision the user '{sub}'");
+                        var r = await _realmRepository.Get(realm, cancellationToken);
+                        user = _userTransformer.Transform(r, principal, idProvider);
+                        user.AddExternalAuthProvider(scheme, sub);
+                        UserRepository.Add(user);
+                    }
+
+                    await transaction.Commit(cancellationToken);
+                    _logger.LogInformation($"Finish to provision the user '{sub}'");
+                }
             }
 
             return user;

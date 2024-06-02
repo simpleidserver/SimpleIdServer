@@ -26,6 +26,15 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
+        public GroupBuilder AddRealm(string realm)
+        {
+            _group.Realms.Add(new GroupRealm
+            {
+                RealmsName = realm
+            });
+            return this;
+        }
+
         public Group Build() => _group;
     }
 }

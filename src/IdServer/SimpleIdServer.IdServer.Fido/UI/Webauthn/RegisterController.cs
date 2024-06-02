@@ -9,7 +9,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
 
@@ -23,7 +23,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IDistributedCache distributedCache, 
             IUserRepository userRepository,
             ITokenRepository tokenRepository,
-            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+            ITransactionBuilder transactionBuilder,
+            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
         {
         }
 

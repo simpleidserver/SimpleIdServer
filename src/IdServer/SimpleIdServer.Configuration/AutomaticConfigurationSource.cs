@@ -1,23 +1,31 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace SimpleIdServer.Configuration
 {
     public class AutomaticConfigurationSource : IConfigurationSource
     {
         private readonly AutomaticConfigurationOptions _options;
-        private readonly IKeyValueConnector _keyValueConnector;
+        private readonly IServiceProvider _serviceProvider;
 
-        public AutomaticConfigurationSource(AutomaticConfigurationOptions options, IKeyValueConnector keyValueConnector)
+        public AutomaticConfigurationSource()
+        {
+            
+        }
+
+        public AutomaticConfigurationSource(AutomaticConfigurationOptions options, IServiceProvider serviceProvider)
         {
             _options = options;
-            _keyValueConnector = keyValueConnector;
+            _serviceProvider = serviceProvider;
         }
 
         public IConfigurationProvider Build(IConfigurationBuilder builder)
         {
-            return new AutomaticConfigurationProvider(_options, _keyValueConnector);
+            var keyValueConnector = _serviceProvider.GetRequiredService<IKeyValueConnector>();
+            return new AutomaticConfigurationProvider(_options, keyValueConnector);
         }
     }
 }

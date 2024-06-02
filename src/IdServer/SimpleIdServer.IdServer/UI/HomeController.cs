@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,7 +20,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -50,6 +49,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IRecurringJobManager _recurringJobManager;
         private readonly IDistributedCache _distributedCache;
         private readonly ISessionHelper _sessionHelper;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -65,6 +65,7 @@ namespace SimpleIdServer.IdServer.UI
             IRecurringJobManager recurringJobManager,
             IDistributedCache distributedCache,
             ISessionHelper sessionHelper,
+            ITransactionBuilder transactionBuilder,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -80,6 +81,7 @@ namespace SimpleIdServer.IdServer.UI
             _recurringJobManager = recurringJobManager;
             _distributedCache = distributedCache;
             _sessionHelper = sessionHelper;
+            _transactionBuilder = transactionBuilder;
             _logger = logger;
         }
 
@@ -100,68 +102,86 @@ namespace SimpleIdServer.IdServer.UI
         [Authorize(Constants.Policies.Authenticated)]
         public async Task<IActionResult> UpdatePicture([FromResult] string prefix, IFormFile file, CancellationToken cancellationToken)
         {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var realm = prefix ?? Constants.DefaultRealm;
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.GetBySubject(nameIdentifier, realm, cancellationToken);
-            _userHelper.UpdatePicture(user, file, issuer);
-            await _userRepository.SaveChanges(cancellationToken);
-            return new NoContentResult();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                var realm = prefix ?? Constants.DefaultRealm;
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var user = await _userRepository.GetBySubject(nameIdentifier, realm, cancellationToken);
+                _userHelper.UpdatePicture(user, file, issuer);
+                _userRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
+            }
         }
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
         public async virtual Task<IActionResult> RejectConsent([FromRoute] string prefix, string consentId, CancellationToken cancellationToken)
         {
-            prefix = prefix ?? Constants.DefaultRealm;
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-            if (!_userHelper.HasOpenIDConsent(user, consentId))
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
+            using (var transaction = _transactionBuilder.Build())
+            {
+                prefix = prefix ?? Constants.DefaultRealm;
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+                if (!_userHelper.HasOpenIDConsent(user, consentId))
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request" });
 
-            user.RejectConsent(consentId);
-            await _userRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Profile");
+                user.RejectConsent(consentId);
+                _userRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                return RedirectToAction("Profile");
+            }
         }
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
         public async virtual Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var pendingRequest = await _pendingRequestRepository.Query().FirstOrDefaultAsync(p => p.TicketId == ticketId, cancellationToken);
-            if (pendingRequest == null)
-                return NotFound();
+            using(var transaction = _transactionBuilder.Build())
+            {
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var pendingRequests = await _pendingRequestRepository.GetByPermissionTicketId(ticketId, cancellationToken);
+                if (!pendingRequests.Any())
+                    return NotFound();
 
-            if (pendingRequest.Owner != nameIdentifier)
-                return Unauthorized();
+                var pendingRequest = pendingRequests.First();
+                if (pendingRequest.Owner != nameIdentifier)
+                    return Unauthorized();
 
-            if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be rejected" });
+                if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be rejected" });
 
-            pendingRequest.Reject();
-            await _pendingRequestRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Profile");
+                pendingRequest.Reject();
+                _pendingRequestRepository.Update(pendingRequest);
+                await transaction.Commit(cancellationToken);
+                return RedirectToAction("Profile");
+            }
         }
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
         public async virtual Task<IActionResult> ConfirmUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var pendingRequest = await _pendingRequestRepository.Query().FirstOrDefaultAsync(p => p.TicketId == ticketId, cancellationToken);
-            if (pendingRequest == null)
-                return NotFound();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var pendingRequests = await _pendingRequestRepository.GetByPermissionTicketId(ticketId, cancellationToken);
+                if (!pendingRequests.Any())
+                    return NotFound();
 
-            if (pendingRequest.Owner != nameIdentifier)
-                return Unauthorized();
+                var pendingRequest = pendingRequests.First();
+                if (pendingRequest.Owner != nameIdentifier)
+                    return Unauthorized();
 
-            if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be confirmed" });
+                if (pendingRequest.Status != UMAPendingRequestStatus.TOBECONFIRMED)
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Pending request is not ready to be confirmed" });
 
-            pendingRequest.Confirm();
-            await _pendingRequestRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Profile");
+                pendingRequest.Confirm();
+                _pendingRequestRepository.Update(pendingRequest);
+                await transaction.Commit(cancellationToken);
+                return RedirectToAction("Profile");
+            }
         }
 
         #region Account Linking
@@ -226,12 +246,16 @@ namespace SimpleIdServer.IdServer.UI
                     return RedirectToAction("Index", "Errors", new { code = ErrorCodes.INVALID_REQUEST, message = "a local account has already been linked to the external authentication provider" });
                 }
 
-                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-                if (!user.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme))
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    user.AddExternalAuthProvider(scheme, sub);
-                    await _userRepository.SaveChanges(cancellationToken);
-                    _logger.LogInformation("user account {userId} has been linked to the external account {authProviderScheme} with external subject {authProviderSubject}", nameIdentifier, scheme, sub);
+                    var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+                    if (!user.ExternalAuthProviders.Any(p => p.Subject == sub && p.Scheme == scheme))
+                    {
+                        user.AddExternalAuthProvider(scheme, sub);
+                        _userRepository.Update(user);
+                        await transaction.Commit(cancellationToken);
+                        _logger.LogInformation("user account {userId} has been linked to the external account {authProviderScheme} with external subject {authProviderSubject}", nameIdentifier, scheme, sub);
+                    }
                 }
 
                 await HttpContext.SignOutAsync(Constants.DefaultExternalCookieAuthenticationScheme);
@@ -247,17 +271,20 @@ namespace SimpleIdServer.IdServer.UI
             if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Request cannot be empty" });
 
-            prefix = prefix ?? Constants.DefaultRealm;
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-            var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(p => p.Subject == viewModel.Subject && p.Scheme == viewModel.Scheme);
-            if(externalAuthProvider == null)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Cannot unlink an unknown profile" });
+            using (var transaction = _transactionBuilder.Build())
+            {
+                prefix = prefix ?? Constants.DefaultRealm;
+                var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+                var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(p => p.Subject == viewModel.Subject && p.Scheme == viewModel.Scheme);
+                if (externalAuthProvider == null)
+                    return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = "Cannot unlink an unknown profile" });
 
-            user.ExternalAuthProviders.Remove(externalAuthProvider);
-            _userRepository.Update(user);
-            await _userRepository.SaveChanges(cancellationToken);
-            return RedirectToAction("Profile", "Home");
+                user.ExternalAuthProviders.Remove(externalAuthProvider);
+                _userRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                return RedirectToAction("Profile", "Home");
+            }
         }
 
         #endregion
@@ -320,17 +347,18 @@ namespace SimpleIdServer.IdServer.UI
             IEnumerable<string> frontChannelLogouts = new List<string>();
             if (!string.IsNullOrWhiteSpace(kvp.Key))
             {
-                var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                var targetedClients = await _clientRepository.Query()
-                    .AsNoTracking()
-                    .Where(c => activeSession.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix) && !string.IsNullOrWhiteSpace(c.FrontChannelLogoutUri))
-                    .ToListAsync();
-                frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
-                if (activeSession != null && !activeSession.IsClientsNotified)
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    activeSession.State = UserSessionStates.Rejected;
-                    await _userSessionRepository.SaveChanges(cancellationToken);
-                    _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+                    var targetedClients = await _clientRepository.GetByClientIdsAndExistingFrontchannelLogoutUri(prefix, activeSession.ClientIds, cancellationToken);
+                    frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
+                    if (activeSession != null && !activeSession.IsClientsNotified)
+                    {
+                        activeSession.State = UserSessionStates.Rejected;
+                        _userSessionRepository.Update(activeSession);
+                        await transaction.Commit(cancellationToken);
+                        _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    }
                 }
             }
 
@@ -380,8 +408,8 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var consents = new List<ConsentViewModel>();
                 var filteredConsents = user.Consents.Where(c => c.Realm == prefix);
-                var clientIds = filteredConsents.Select(c => c.ClientId);
-                var oauthClients = await _clientRepository.Query().Include(c => c.Translations).Include(r => r.Realms).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix)).ToListAsync(cancellationToken);
+                var clientIds = filteredConsents.Select(c => c.ClientId).ToList();
+                var oauthClients = await _clientRepository.GetByClientIds(prefix, clientIds, cancellationToken);
                 foreach (var consent in filteredConsents)
                 {
                     var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
@@ -399,7 +427,7 @@ namespace SimpleIdServer.IdServer.UI
 
             async Task<List<PendingRequestViewModel>> GetPendingRequest()
             {
-                var pendingRequestLst = await _pendingRequestRepository.Query().Include(p => p.Resource).ThenInclude(p => p.Translations).Where(r => (r.Owner == nameIdentifier || r.Requester == nameIdentifier) && r.Realm == prefix).ToListAsync(cancellationToken);
+                var pendingRequestLst = await _pendingRequestRepository.GetByUsername(prefix, nameIdentifier, cancellationToken);
                 var result = new List<PendingRequestViewModel>();
                 foreach (var pendingRequest in pendingRequestLst)
                 {

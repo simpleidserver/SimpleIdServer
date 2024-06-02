@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Store.EF;
 using System;
 
 #nullable disable

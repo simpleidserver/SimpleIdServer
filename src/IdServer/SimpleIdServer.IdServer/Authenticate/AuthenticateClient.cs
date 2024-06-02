@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Domains;
@@ -9,7 +8,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,12 +47,7 @@ namespace SimpleIdServer.IdServer.Authenticate
             string clientId;
             if (!TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(errorCode, Global.MissingClientId);
 
-            var client = await _clientRepository.Query()
-                .Include(c => c.SerializedJsonWebKeys)
-                .Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
-                .Include(c=> c.Realms)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == authenticateInstruction.Realm), cancellationToken);
+            var client = await _clientRepository.GetByClientId(authenticateInstruction.Realm, clientId, cancellationToken);
             if (client == null) throw new OAuthException(errorCode, string.Format(Global.UnknownClient, clientId));
             if (isAuthorizationCodeGrantType) return client;
 

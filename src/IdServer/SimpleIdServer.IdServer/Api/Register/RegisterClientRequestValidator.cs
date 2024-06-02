@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate;
@@ -8,7 +7,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
@@ -97,7 +96,7 @@ namespace SimpleIdServer.IdServer.Api.Register
             if (!string.IsNullOrWhiteSpace(client.Scope))
             {
                 var scopes = client.Scope.ToScopes();
-                var existingScopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => scopes.Contains(s.Name) && s.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+                var existingScopes = await _scopeRepository.GetByNames(realm, scopes.ToList(), cancellationToken);
                 var existingScopeNames = existingScopes.Select(s => s.Name);
                 var unsupportedScopes = scopes.Except(existingScopeNames);
                 if (unsupportedScopes.Any())

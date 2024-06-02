@@ -1,12 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.VerifiablePresentation.Resources;
 using System.Net;
 
@@ -33,11 +32,7 @@ public class PresentationDefinitionsController : BaseController
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
         try
         {
-            var presentationDefinition = await _presentationDefinitionStore.Query()
-                .AsNoTracking()
-                .Include(p => p.InputDescriptors).ThenInclude(p => p.Format)
-                .Include(p => p.InputDescriptors).ThenInclude(p => p.Constraints)
-                .SingleOrDefaultAsync(p => p.PublicId == id && p.RealmName == prefix, cancellationToken);
+            var presentationDefinition = await _presentationDefinitionStore.GetByPublicId(id, prefix, cancellationToken);
             if(presentationDefinition == null)
                 throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownPresentationDefinition, id));
             return new OkObjectResult(presentationDefinition);

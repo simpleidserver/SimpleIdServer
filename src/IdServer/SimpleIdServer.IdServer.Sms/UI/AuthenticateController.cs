@@ -14,7 +14,7 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Sms.Services;
 using SimpleIdServer.IdServer.Sms.UI.ViewModels;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Sms.UI
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IDataProtectionProvider dataProtectionProvider,
+            ITransactionBuilder transactionBuilder,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             IAuthenticationHelper authenticationHelper,
@@ -44,7 +45,7 @@ namespace SimpleIdServer.IdServer.Sms.UI
             IUserTransformer userTransformer,
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _configuration = configuration;
         }

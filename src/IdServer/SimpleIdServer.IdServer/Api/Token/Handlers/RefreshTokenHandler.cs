@@ -16,7 +16,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,6 +38,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly ILogger<RefreshTokenHandler> _logger;
 
         public RefreshTokenHandler(
@@ -51,6 +52,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IGrantHelper audienceHelper,
             IBusControl busControl,
             IDPOPProofValidator dpopProofValidator,
+            ITransactionBuilder transactionBuilder,
             IOptions<IdServerHostOptions> options,
             ILogger<RefreshTokenHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
@@ -62,6 +64,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
             _audienceHelper = audienceHelper;
+            _transactionBuilder = transactionBuilder;
             _logger = logger;
         }
 
@@ -211,15 +214,19 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             UserSession session = null;
             if(!string.IsNullOrWhiteSpace(tokenResult.SessionId))
             {
-                session = await _userSessionRepository.GetById(tokenResult.SessionId, handlerContext.Realm ?? Constants.DefaultRealm, token);
-                if (session != null && !session.IsActive()) session = null;
-                else
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    var currentDateTime = DateTime.UtcNow;
-                    var expirationTimeInSeconds = GetExpirationTimeInSeconds(handlerContext.Client);
-                    var expirationDateTime = currentDateTime.AddSeconds(expirationTimeInSeconds);
-                    session.ExpirationDateTime = expirationDateTime;
-                    await _userSessionRepository.SaveChanges(token);
+                    session = await _userSessionRepository.GetById(tokenResult.SessionId, handlerContext.Realm ?? Constants.DefaultRealm, token);
+                    if (session != null && !session.IsActive()) session = null;
+                    else
+                    {
+                        var currentDateTime = DateTime.UtcNow;
+                        var expirationTimeInSeconds = GetExpirationTimeInSeconds(handlerContext.Client);
+                        var expirationDateTime = currentDateTime.AddSeconds(expirationTimeInSeconds);
+                        session.ExpirationDateTime = expirationDateTime;
+                        _userSessionRepository.Update(session);
+                        await transaction.Commit(token);
+                    }
                 }
             }
 

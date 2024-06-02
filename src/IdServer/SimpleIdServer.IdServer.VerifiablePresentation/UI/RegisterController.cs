@@ -3,13 +3,12 @@
 
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.VerifiablePresentation.UI.ViewModels;
 
@@ -26,7 +25,8 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
         IDistributedCache distributedCache, 
         IUserRepository userRepository, 
         ITokenRepository tokenRepository, 
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, jwtBuilder)
+        ITransactionBuilder transactionBuilder,
+        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
     {
         _presentationDefinitionStore = presentationDefinitionStore;
     }
@@ -37,11 +37,7 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var userRegistrationProgress = await GetRegistrationProgress();
-        var presentationDefinitions = await _presentationDefinitionStore.Query()
-            .Include(p => p.InputDescriptors)
-            .AsNoTracking()
-            .Where(p => p.RealmName == prefix)
-            .ToListAsync(cancellationToken);
+        var presentationDefinitions = await _presentationDefinitionStore.GetAll(prefix, cancellationToken);
         var verifiablePresentations = presentationDefinitions.Select(d => new VerifiablePresentationViewModel
         {
             Id = d.PublicId,

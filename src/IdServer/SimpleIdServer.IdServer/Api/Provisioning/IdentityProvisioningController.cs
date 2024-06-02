@@ -3,19 +3,16 @@
 using MassTransit;
 using MassTransit.Testing;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
@@ -28,49 +25,38 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
     {
         private readonly IBusControl _busControl;
         private readonly IIdentityProvisioningStore _identityProvisioningStore;
-        private readonly IServiceProvider _serviceProvider;
         private readonly IConfiguration _configuration;
         private readonly IEnumerable<IProvisioningService> _provisioningServices;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public IdentityProvisioningController(
             IBusControl busControl,
             IIdentityProvisioningStore identityProvisioningStore, 
-            IServiceProvider serviceProvider, 
             ITokenRepository tokenRepository, 
             IJwtBuilder jwtBuilder, 
             IConfiguration configuration, 
-            IEnumerable<IProvisioningService> provisioningServices) : base(tokenRepository, jwtBuilder)
+            IEnumerable<IProvisioningService> provisioningServices,
+            ITransactionBuilder transactionBuilder) : base(tokenRepository, jwtBuilder)
         {
             _busControl = busControl;
             _identityProvisioningStore = identityProvisioningStore;
-            _serviceProvider = serviceProvider;
             _configuration = configuration;
             _provisioningServices = provisioningServices;
+            _transactionBuilder = transactionBuilder;
         }
 
         [HttpPost]
-        public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchRequest request)
+        public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                IQueryable<IdentityProvisioning> query = _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .AsNoTracking();
-                if (!string.IsNullOrWhiteSpace(request.Filter))
-                    query = query.Where(request.Filter);
-
-                if (!string.IsNullOrWhiteSpace(request.OrderBy))
-                    query = query.OrderBy(request.OrderBy);
-
-                var nb = query.Count();
-                var idProviders = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
+                var result = await _identityProvisioningStore.Search(prefix, request, cancellationToken);
                 return new OkObjectResult(new SearchResult<IdentityProvisioningResult>
                 {
-                    Count = nb,
-                    Content = idProviders.Select(p => Build(p)).ToList()
+                    Count = result.Count,
+                    Content = result.Content.Select(p => Build(p)).ToList()
                 });
             }
             catch (OAuthException ex)
@@ -80,19 +66,13 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get([FromRoute] string prefix, string id)
+        public async Task<IActionResult> Get([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Histories)
-                    .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .AsNoTracking()
-                    .SingleOrDefaultAsync(p => p.Id == id);
+                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var optionKey = $"{result.Name}:{result.Definition.OptionsName}";
                 var optionType = Type.GetType(result.Definition.OptionsFullQualifiedName);
@@ -108,20 +88,21 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateDetails([FromRoute] string prefix, string id, [FromBody] UpdateIdentityProvisioningDetailsRequest request)
+        public async Task<IActionResult> UpdateDetails([FromRoute] string prefix, string id, [FromBody] UpdateIdentityProvisioningDetailsRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                result.Description = request.Description;
-                await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                return NoContent();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    result.Description = request.Description;
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    return NoContent();
+                }
             }
             catch(OAuthException ex)
             {
@@ -130,23 +111,23 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateProperties([FromRoute] string prefix, string id, [FromBody] UpdateIdentityProvisioningPropertiesRequest request)
+        public async Task<IActionResult> UpdateProperties([FromRoute] string prefix, string id, [FromBody] UpdateIdentityProvisioningPropertiesRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Definition)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                result.UpdateDateTime = DateTime.UtcNow;
-                SyncConfiguration(result, request.Values);
-                await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                return NoContent();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    SyncConfiguration(result, request.Values);
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    return NoContent();
+                }
             }
             catch (OAuthException ex)
             {
@@ -155,24 +136,25 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         }
 
         [HttpDelete]
-        public async Task<IActionResult> RemoveMapper([FromRoute] string prefix, string id, string mapperId)
+        public async Task<IActionResult> RemoveMapper([FromRoute] string prefix, string id, string mapperId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                var mapper = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
-                if (mapper == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, mapperId));
-                result.UpdateDateTime = DateTime.UtcNow;
-                result.Definition.MappingRules = result.Definition.MappingRules.Where(r => r.Id != mapperId).ToList();
-                await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                return NoContent();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    var mapper = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
+                    if (mapper == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, mapperId));
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    result.Definition.MappingRules = result.Definition.MappingRules.Where(r => r.Id != mapperId).ToList();
+                    _identityProvisioningStore.Update(result);
+                    _identityProvisioningStore.Update(result.Definition);
+                    await transaction.Commit(cancellationToken);
+                    return NoContent();
+                }
             }
             catch (OAuthException ex)
             {
@@ -181,43 +163,44 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddMapper([FromRoute] string prefix, string id, [FromBody] AddIdentityProvisioningMapperRequest request)
+        public async Task<IActionResult> AddMapper([FromRoute] string prefix, string id, [FromBody] AddIdentityProvisioningMapperRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .SingleOrDefaultAsync(p => p.Id == id);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                if (IProvisioningMappingRule.IsUnique(request.MappingRule) && result.Definition.MappingRules.Any(r => r.MapperType == request.MappingRule))
-                    return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.IdProvisioningTypeUnique);
-
-                // TODO : Check GROUPNAME can be added when usage is GROUP.
-                // TODO : Check SUBJECT or USERATTRIBUTE can be added when usage is USER.
-
-                result.UpdateDateTime = DateTime.UtcNow;
-                var record = new IdentityProvisioningMappingRule
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    From = request.From,
-                    MapperType = request.MappingRule,
-                    TargetUserAttribute = request.TargetUserAttribute,
-                    TargetUserProperty = request.TargetUserProperty,
-                    HasMultipleAttribute = request.HasMultipleAttribute,
-                    Usage = request.Usage
-                };
-                result.Definition.MappingRules.Add(record);
-                await _identityProvisioningStore.SaveChanges(CancellationToken.None);
-                return new ContentResult
-                {
-                    StatusCode = (int)HttpStatusCode.Created,
-                    Content = JsonSerializer.Serialize(Build(record)),
-                    ContentType = "application/json"
-                };
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    if (IProvisioningMappingRule.IsUnique(request.MappingRule) && result.Definition.MappingRules.Any(r => r.MapperType == request.MappingRule))
+                        return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.IdProvisioningTypeUnique);
+
+                    // TODO : Check GROUPNAME can be added when usage is GROUP.
+                    // TODO : Check SUBJECT or USERATTRIBUTE can be added when usage is USER.
+
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    var record = new IdentityProvisioningMappingRule
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        From = request.From,
+                        MapperType = request.MappingRule,
+                        TargetUserAttribute = request.TargetUserAttribute,
+                        TargetUserProperty = request.TargetUserProperty,
+                        HasMultipleAttribute = request.HasMultipleAttribute,
+                        Usage = request.Usage
+                    };
+                    result.Definition.MappingRules.Add(record);
+                    _identityProvisioningStore.Update(result);
+                    _identityProvisioningStore.Update(result.Definition);
+                    await transaction.Commit(cancellationToken);
+                    return new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.Created,
+                        Content = JsonSerializer.Serialize(Build(record)),
+                        ContentType = "application/json"
+                    };
+                }
             }
             catch (OAuthException ex)
             {
@@ -231,22 +214,23 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
-                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
-                if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, id));
-                result.UpdateDateTime = DateTime.UtcNow;
-                mapperRule.From = request.From;
-                mapperRule.TargetUserAttribute = request.TargetUserAttribute;
-                mapperRule.TargetUserProperty = request.TargetUserProperty;
-                mapperRule.HasMultipleAttribute = request.HasMultipleAttribute;
-                await _identityProvisioningStore.SaveChanges(cancellationToken);
-                return NoContent();
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
+                    if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, id));
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    mapperRule.From = request.From;
+                    mapperRule.TargetUserAttribute = request.TargetUserAttribute;
+                    mapperRule.TargetUserProperty = request.TargetUserProperty;
+                    mapperRule.HasMultipleAttribute = request.HasMultipleAttribute;
+                    _identityProvisioningStore.Update(result);
+                    _identityProvisioningStore.Update(result.Definition);
+                    await transaction.Commit(cancellationToken);
+                    return NoContent();
+                }
             }
             catch (OAuthException ex)
             {
@@ -261,11 +245,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .SingleOrDefaultAsync(p => p.Id == id, cancellationToken);
+                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
                 if (mapperRule == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioningMappingRule, id));
@@ -284,11 +264,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             try
             {
                 await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
-                    .Where(p => p.Realms.Any(r => r.Name == prefix))
-                    .SingleOrDefaultAsync(p => p.Id == id);
+                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
                 var extractionResult = await provisioningService.ExtractTestData(result.Definition, cancellationToken);
@@ -359,31 +335,32 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
-                    .SingleOrDefaultAsync(p => p.Id == id && p.Realms.Any(r => r.Name == prefix), cancellationToken);
-                if (result == null) 
-                    return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
-                var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
-                await provisioningService.ExtractTestData(result.Definition, cancellationToken);
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null)
+                        return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
+                    await provisioningService.ExtractTestData(result.Definition, cancellationToken);
 
-                var processId = result.Launch();
-                await _identityProvisioningStore.SaveChanges(cancellationToken);
-                var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ExtractUsersConsumer.Queuename}"));
-                await sendEndpoint.Send(new StartExtractUsersCommand
-                {
-                    InstanceId = id,
-                    Realm = prefix,
-                    ProcessId = processId
-                });
-                return new ContentResult
-                {
-                    StatusCode = (int)HttpStatusCode.Created,
-                    Content = JsonSerializer.Serialize(new IdentityProvisioningLaunchedResult { Id = processId }),
-                    ContentType = "application/json"
-                };
+                    var processId = result.Launch();
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{ExtractUsersConsumer.Queuename}"));
+                    await sendEndpoint.Send(new StartExtractUsersCommand
+                    {
+                        InstanceId = id,
+                        Realm = prefix,
+                        ProcessId = processId
+                    });
+                    return new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.Created,
+                        Content = JsonSerializer.Serialize(new IdentityProvisioningLaunchedResult { Id = processId }),
+                        ContentType = "application/json"
+                    };
+                }
             }
             catch(OAuthException ex)
             {
@@ -402,11 +379,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             {
                 prefix = prefix ?? Constants.DefaultRealm;
                 await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
-                var result = await _identityProvisioningStore.Query()
-                    .Include(p => p.Realms)
-                    .Include(p => p.Histories)
-                    .Include(p => p.Definition).ThenInclude(p => p.MappingRules)
-                    .SingleOrDefaultAsync(p => p.Id == id && p.Realms.Any(r => r.Name == prefix), cancellationToken);
+                var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                 if (result == null) 
                     return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var process = result.GetProcess(processId);

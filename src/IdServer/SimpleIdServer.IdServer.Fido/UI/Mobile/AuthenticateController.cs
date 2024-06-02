@@ -17,7 +17,7 @@ using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -41,6 +41,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IAuthenticationSchemeProvider authenticationSchemeProvider, 
             IDataProtectionProvider dataProtectionProvider,
             ITokenRepository tokenRepository,
+            ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder,
             IClientRepository clientRepository, 
             IAmrHelper amrHelper, 
@@ -49,7 +50,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IUserTransformer userTransformer, 
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;

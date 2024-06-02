@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.Sms;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using SimpleIdServer.IdServer;
 using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,7 +42,7 @@ void RunSqlServerIdServer(IServiceCollection services)
 {
     var name = Assembly.GetExecutingAssembly().GetName().Name;
     services.AddSIDIdentityServer()
-        .UseInMemoryStore(o =>
+        .UseInMemoryEFStore(o =>
         {
             o.AddInMemoryRealms(IdServerConfiguration.Realms);
             o.AddInMemoryScopes(IdServerConfiguration.Scopes);

@@ -3,13 +3,12 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,9 +111,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                 {
                     var realm = RealmContext.Instance().Realm;
                     realm = realm ?? Constants.DefaultRealm;
-                    authenticationSchemeProviders = await authenticationSchemeProviderRepository.Query()
-                        .Include(c => c.Realms)
-                        .Include(c => c.AuthSchemeProviderDefinition).Where(c=> c.Realms.Any(r => r.Name == realm)).ToListAsync(CancellationToken.None);
+                    authenticationSchemeProviders = await authenticationSchemeProviderRepository.GetAll(realm, CancellationToken.None);
                     if (_options.CacheExternalAuthProvidersInSeconds != null)
                     {
                         _nextExpirationTime = currentDateTime.AddSeconds(_options.CacheExternalAuthProvidersInSeconds.Value);

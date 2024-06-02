@@ -1,8 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +32,7 @@ namespace SimpleIdServer.IdServer.Stores
 
         public async Task<(CertificateAuthority, X509Certificate2)?> Get(string id, CancellationToken cancellationToken)
         {
-            var ca = await _repository.Query().Include(r => r.ClientCertificates).AsNoTracking().FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
+            var ca = await _repository.Get(id, cancellationToken);
             if (ca == null) return null;
             return (ca, _mappingTypeToBuiler[ca.Source](ca));
         }

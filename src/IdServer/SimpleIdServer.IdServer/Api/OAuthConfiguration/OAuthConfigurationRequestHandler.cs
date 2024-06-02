@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
@@ -8,7 +7,7 @@ using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -56,12 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Configuration
         public virtual async Task Enrich(string prefix, JsonObject jObj, string issuer, CancellationToken cancellationToken)
         {
             var realm = prefix ?? Constants.DefaultRealm;
-            var scopes = await _scopeRepository.Query()
-                .Include(s => s.Realms)
-                .AsNoTracking()
-                .Where(s => s.IsExposedInConfigurationEdp && s.Realms.Any(r => r.Name == realm))
-                .Select(s => s.Name)
-                .ToListAsync(cancellationToken);
+            var scopes = (await _scopeRepository.GetAllExposedScopes(prefix, cancellationToken)).Select(s => s.Name);
             jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);
             jObj.Add(OAuthConfigurationNames.ScopesSupported, JsonSerializer.SerializeToNode(scopes));
             jObj.Add(OAuthConfigurationNames.ResponseTypesSupported, JsonSerializer.SerializeToNode(GetResponseTypes()));

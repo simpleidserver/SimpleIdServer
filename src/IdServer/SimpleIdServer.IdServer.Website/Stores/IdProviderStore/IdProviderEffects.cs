@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             };
             var httpResult = await httpClient.SendAsync(requestMessage);
             var json = await httpResult.Content.ReadAsStringAsync();
-            var result = SidJsonSerializer.Deserialize<DTOs.SearchResult<AuthenticationSchemeProviderResult>>(json);
+            var result = SidJsonSerializer.Deserialize<SearchResult<AuthenticationSchemeProviderResult>>(json);
             dispatcher.Dispatch(new SearchIdProvidersSuccessAction { IdProviders = result.Content, Count = result.Count });
 
             string SanitizeExpression(string expression) => expression?.Replace("Value.", "");

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +23,7 @@ public class ImportUsersConsumer :
     private TimeSpan _checkInterval = TimeSpan.FromSeconds(5);
     private readonly IIdentityProvisioningStore _identityProvisioningStore;
     private readonly IProvisioningStagingStore _provisioningStagingStore;
+    private readonly ITransactionBuilder _transactionBuilder;
     private readonly IUserRepository _userRepository;
     private readonly IGroupRepository _groupRepository;
     public const string Queuename = "import-users";
@@ -30,11 +31,13 @@ public class ImportUsersConsumer :
     public ImportUsersConsumer(
         IIdentityProvisioningStore identityProvisioningStore,
         IProvisioningStagingStore provisioningStagingStore,
+        ITransactionBuilder transactionBuilder,
         IUserRepository userRepository,
         IGroupRepository groupRepository)
     {
         _identityProvisioningStore = identityProvisioningStore;
         _provisioningStagingStore = provisioningStagingStore;
+        _transactionBuilder = transactionBuilder;
         _userRepository = userRepository;
         _groupRepository = groupRepository;
 
@@ -42,54 +45,51 @@ public class ImportUsersConsumer :
 
     public async Task Consume(ConsumeContext<StartImportUsersCommand> context)
     {
-        var message = context.Message;
-        var idProvisioning = await _identityProvisioningStore.Query()
-            .Include(i => i.Definition).ThenInclude(i => i.MappingRules)
-            .Include(i => i.Realms)
-            .Include(i => i.Histories)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm), context.CancellationToken);
-        var nbRecords = await _provisioningStagingStore.NbStagingExtractedRepresentations(context.Message.ProcessId, context.CancellationToken);
-        var nbPages = ((int)Math.Ceiling((double)nbRecords / _pageSize));
-        if(nbPages == 0)
+        using (var transaction = _transactionBuilder.Build())
         {
-            idProvisioning.Import(message.ProcessId, 0);
-            idProvisioning.FinishImport(message.ProcessId);
-            await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-            return;
-        }
+            var message = context.Message;
+            var idProvisioning = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
+            var nbRecords = await _provisioningStagingStore.NbStagingExtractedRepresentations(context.Message.ProcessId, context.CancellationToken);
+            var nbPages = ((int)Math.Ceiling((double)nbRecords / _pageSize));
+            if (nbPages == 0)
+            {
+                idProvisioning.Import(message.ProcessId, 0);
+                idProvisioning.FinishImport(message.ProcessId);
+                _identityProvisioningStore.Update(idProvisioning);
+                await transaction.Commit(context.CancellationToken);
+                return;
+            }
 
-        var allPages = Enumerable.Range(1, nbPages);
-        var destination = new Uri($"queue:{ImportUsersConsumer.Queuename}");
-        foreach (var page in allPages)
-        {
-            await context.Send(destination, new ImportUsersCommand
+            var allPages = Enumerable.Range(1, nbPages);
+            var destination = new Uri($"queue:{ImportUsersConsumer.Queuename}");
+            foreach (var page in allPages)
+            {
+                await context.Send(destination, new ImportUsersCommand
+                {
+                    InstanceId = message.InstanceId,
+                    Page = page,
+                    PageSize = _pageSize,
+                    ProcessId = message.ProcessId,
+                    Realm = message.Realm
+                });
+            }
+
+            await context.ScheduleSend(destination, _checkInterval, new CheckUsersImportedCommand
             {
                 InstanceId = message.InstanceId,
-                Page = page,
-                PageSize = _pageSize,
                 ProcessId = message.ProcessId,
                 Realm = message.Realm
             });
+            idProvisioning.Import(message.ProcessId, allPages.Last());
+            _identityProvisioningStore.Update(idProvisioning);
+            await transaction.Commit(context.CancellationToken);
         }
-
-        await context.ScheduleSend(destination, _checkInterval, new CheckUsersImportedCommand
-        {
-            InstanceId = message.InstanceId,
-            ProcessId = message.ProcessId,
-            Realm = message.Realm
-        });
-        idProvisioning.Import(message.ProcessId, allPages.Last());
-        await _identityProvisioningStore.SaveChanges(context.CancellationToken);
     }
 
     public async Task Consume(ConsumeContext<ImportUsersCommand> context)
     {
         var message = context.Message;
-        var idProvisioning = await _identityProvisioningStore.Query()
-            .Include(i => i.Definition).ThenInclude(i => i.MappingRules)
-            .Include(i => i.Realms)
-            .Include(i => i.Histories)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm), context.CancellationToken);
+        var idProvisioning = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
         var representations = await _provisioningStagingStore.GetStagingExtractedRepresentations(
             message.ProcessId,
             message.Page - 1, 
@@ -99,36 +99,40 @@ public class ImportUsersConsumer :
         var userRepresentations = representations.Where(r => r.Type == Domains.ExtractedRepresentationType.USER);
         using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
         {
-            await Export(userRepresentations, groupRepresentations, idProvisioning, message.Realm);
-            idProvisioning.Import(message.ProcessId, userRepresentations.Count(), groupRepresentations.Count(), message.Page);
-            await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-            transactionScope.Complete();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await Export(userRepresentations, groupRepresentations, idProvisioning, message.Realm);
+                idProvisioning.Import(message.ProcessId, userRepresentations.Count(), groupRepresentations.Count(), message.Page);
+                _identityProvisioningStore.Update(idProvisioning);
+                await transaction.Commit(context.CancellationToken);
+                transactionScope.Complete();
+            }
         }
     }
 
     public async Task Consume(ConsumeContext<CheckUsersImportedCommand> context)
     {
-        var message = context.Message;
-        var instance = await _identityProvisioningStore.Query()
-            .Include(d => d.Realms)
-            .Include(d => d.Histories)
-            .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
-        var process = instance.GetProcess(message.ProcessId);
-        if (process.TotalPageToImport == process.NbImportedPages)
+        using (var transaction = _transactionBuilder.Build())
         {
-            instance.FinishImport(message.ProcessId);
-            await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-            return;
-        }
+            var message = context.Message;
+            var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
+            var process = instance.GetProcess(message.ProcessId);
+            if (process.TotalPageToImport == process.NbImportedPages)
+            {
+                instance.FinishImport(message.ProcessId);
+                _identityProvisioningStore.Update(instance);
+                await transaction.Commit(context.CancellationToken);
+                return;
+            }
 
-        var destination = new Uri($"queue:{ImportUsersConsumer.Queuename}");
-        await context.ScheduleSend(destination, _checkInterval, new CheckUsersImportedCommand
-        {
-            InstanceId = message.InstanceId,
-            ProcessId = message.ProcessId,
-            Realm = message.Realm
-        });
+            var destination = new Uri($"queue:{ImportUsersConsumer.Queuename}");
+            await context.ScheduleSend(destination, _checkInterval, new CheckUsersImportedCommand
+            {
+                InstanceId = message.InstanceId,
+                ProcessId = message.ProcessId,
+                Realm = message.Realm
+            });
+        }
     }
 
     private async Task Export(IEnumerable<ExtractedRepresentationStaging> extractedUsers, IEnumerable<ExtractedRepresentationStaging> extractedGroups, IdentityProvisioning idProvisioning, string realm)

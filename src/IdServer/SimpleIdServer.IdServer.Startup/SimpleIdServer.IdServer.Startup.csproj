@@ -23,6 +23,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqliteMigrations\SimpleIdServer.IdServer.SqliteMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Swagger\SimpleIdServer.IdServer.Swagger.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.VerifiablePresentation\SimpleIdServer.IdServer.VerifiablePresentation.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj" />

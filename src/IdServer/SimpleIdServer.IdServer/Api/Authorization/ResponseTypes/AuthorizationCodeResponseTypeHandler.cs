@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Api.Token.PKCECodeChallengeMethods;
-using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -25,14 +24,15 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
     {
         private readonly IGrantedTokenHelper _grantedTokenHelper;
         private readonly IEnumerable<ICodeChallengeMethodHandler> _codeChallengeMethodHandlers;
-        private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IdServerHostOptions _options;
 
-        public AuthorizationCodeResponseTypeHandler(IGrantedTokenHelper grantedTokenHelper, IEnumerable<ICodeChallengeMethodHandler> codeChallengeMethodHandlers, IEnumerable<ITokenBuilder> tokenBuilders, IOptions<IdServerHostOptions> options)
+        public AuthorizationCodeResponseTypeHandler(
+            IGrantedTokenHelper grantedTokenHelper, 
+            IEnumerable<ICodeChallengeMethodHandler> codeChallengeMethodHandlers, 
+            IOptions<IdServerHostOptions> options)
         {
             _grantedTokenHelper = grantedTokenHelper;
             _codeChallengeMethodHandlers = codeChallengeMethodHandlers;
-            _tokenBuilders = tokenBuilders;
             _options = options.Value;
         }
 

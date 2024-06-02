@@ -3,10 +3,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Middlewares
@@ -38,7 +39,8 @@ namespace SimpleIdServer.IdServer.Middlewares
                     var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
                     if (realmCookie.Value != prefix)
                     {
-                        if (realmRepository.Query().Any(r => r.Name == prefix))
+                        var existingRealm = await realmRepository.Get(prefix, CancellationToken.None);
+                        if (existingRealm != null)
                         {
                             realm = prefix;
                             if (!string.IsNullOrWhiteSpace(realm))

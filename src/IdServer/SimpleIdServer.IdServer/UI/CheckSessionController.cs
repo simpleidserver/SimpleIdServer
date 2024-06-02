@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api;
@@ -20,7 +19,7 @@ using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -42,6 +41,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IClientRepository _clientRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
@@ -50,6 +50,7 @@ namespace SimpleIdServer.IdServer.UI
             IClientRepository clientRepository,
             IAuthenticationHelper authenticationHelper,
             IRecurringJobManager reccuringJobManager,
+            ITransactionBuilder transactionBuilder,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
         {
@@ -59,6 +60,7 @@ namespace SimpleIdServer.IdServer.UI
             _clientRepository = clientRepository;
             _authenticationHelper = authenticationHelper;
             _recurringJobManager = reccuringJobManager;
+            _transactionBuilder = transactionBuilder;
         }
 
         [HttpGet]
@@ -135,10 +137,8 @@ namespace SimpleIdServer.IdServer.UI
                 IEnumerable<string> frontChannelLogouts = new List<string>();
                 if (userSession != null && userSession.State == UserSessionStates.Active)
                 {
-                    var targetedClients = await _clientRepository.Query()
-                        .AsNoTracking()
-                        .Where(c => userSession.ClientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == prefix) && !string.IsNullOrWhiteSpace(c.FrontChannelLogoutUri))
-                        .ToListAsync();
+                    var clientIds = userSession.ClientIds;
+                    var targetedClients = await _clientRepository.GetByClientIdsAndExistingFrontchannelLogoutUri(prefix, clientIds, cancellationToken);
                     frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
                     if (frontChannelLogouts.Any())
                     {
@@ -147,6 +147,12 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var authenticatedUser = await _authenticationHelper.GetUserByLogin(subject, prefix, cancellationToken);
+                if(!frontChannelLogouts.Any() && !validationResult.Client.RedirectToRevokeSessionUI)
+                {
+                    var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                    return Redirect($"{issuer}{url}");
+                }
+
                 return View(new RevokeSessionViewModel(
                     url,
                     validationResult.Payload,
@@ -178,17 +184,21 @@ namespace SimpleIdServer.IdServer.UI
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoSessionId);
                 }
 
-                var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                if(activeSession == null)
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, kvp.Value));
-                }
+                    var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
+                    if (activeSession == null)
+                    {
+                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, kvp.Value));
+                    }
 
-                if(!activeSession.IsClientsNotified)
-                {
-                    activeSession.State = UserSessionStates.Rejected;
-                    await _userSessionRepository.SaveChanges(cancellationToken);
-                    _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    if (!activeSession.IsClientsNotified)
+                    {
+                        activeSession.State = UserSessionStates.Rejected;
+                        _userSessionRepository.Update(activeSession);
+                        await transaction.Commit(cancellationToken);
+                        _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    }
                 }
 
                 Response.Cookies.Delete(_options.GetSessionCookieName());
@@ -241,7 +251,7 @@ namespace SimpleIdServer.IdServer.UI
             if (!extractionResult.Jwt.Audiences.Contains(GetIssuer()))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidAudienceIdTokenHint);
 
-            var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => extractionResult.Jwt.Audiences.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm)).ToListAsync(cancellationToken);
+            var clients = await _clientRepository.GetByClientIds(realm, extractionResult.Jwt.Audiences.ToList(), cancellationToken);
             if (clients == null || !clients.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidClientIdTokenHint);
 

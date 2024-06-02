@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
@@ -9,7 +8,7 @@ using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +29,7 @@ namespace SimpleIdServer.IdServer.Jobs
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly IdServerHostOptions _options;
 
         public BCNotificationJob(
@@ -38,7 +38,8 @@ namespace SimpleIdServer.IdServer.Jobs
             Infrastructures.IHttpClientFactory httpClientFactory, 
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IUserRepository userRepository,
-            IClientRepository clientRepository, 
+            IClientRepository clientRepository,
+            ITransactionBuilder transactionBuilder,
             IOptions<IdServerHostOptions> options)
         {
             _repository = repository;
@@ -47,33 +48,35 @@ namespace SimpleIdServer.IdServer.Jobs
             _tokenBuilders = tokenBuilders;
             _userRepository = userRepository;
             _clientRepository = clientRepository;
+            _transactionBuilder = transactionBuilder;
             _options = options.Value;
         }
 
         public async Task Execute()
         {
-            var notificationMethods = GetNotificationMethods();
-            var allMethods = notificationMethods.Select(kvp => kvp.Key);
-            var bcAuthorizeLst = await _repository.Query().Include(a => a.Histories).Where(a => a.LastStatus == Domains.BCAuthorizeStatus.Confirmed && allMethods.Contains(a.NotificationMode) && DateTime.UtcNow < a.ExpirationDateTime).ToListAsync(CancellationToken.None);
-            foreach(var grp in bcAuthorizeLst.GroupBy(b => b.Realm))
+            using (var transaction = _transactionBuilder.Build())
             {
-                var realmBcAuthorizeLst = grp.Select(g => g);
-                var userIds = realmBcAuthorizeLst.Select(a => a.UserId).Distinct();
-                var clientIds = realmBcAuthorizeLst.Select(a => a.ClientId).Distinct();
-                var users = await _userRepository.GetUsersById(userIds, grp.Key, CancellationToken.None);
-                var clients = await _clientRepository.Query()
-                    .Include(c => c.SerializedJsonWebKeys)
-                    .Include(c => c.Realms)
-                    .Include(c => c.Scopes).AsNoTracking().Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == grp.Key)).ToListAsync();
-                var parameter = new NotificationParameter { Clients = clients, Users = users.ToList() };
-                await Parallel.ForEachAsync(realmBcAuthorizeLst, async (bc, t) =>
+                var notificationMethods = GetNotificationMethods();
+                var allMethods = notificationMethods.Select(kvp => kvp.Key).ToList();
+                var bcAuthorizeLst = await _repository.GetAllConfirmed(allMethods, CancellationToken.None);
+                foreach (var grp in bcAuthorizeLst.GroupBy(b => b.Realm))
                 {
-                    var method = notificationMethods[bc.NotificationMode];
-                    await method(bc, parameter);
-                });
-            }
+                    var realmBcAuthorizeLst = grp.Select(g => g);
+                    var userIds = realmBcAuthorizeLst.Select(a => a.UserId).Distinct();
+                    var clientIds = realmBcAuthorizeLst.Select(a => a.ClientId).Distinct().ToList();
+                    var users = await _userRepository.GetUsersById(userIds, grp.Key, CancellationToken.None);
+                    var clients = await _clientRepository.GetByClientIds(grp.Key, clientIds, CancellationToken.None);
+                    var parameter = new NotificationParameter { Clients = clients, Users = users.ToList() };
+                    await Parallel.ForEachAsync(realmBcAuthorizeLst, async (bc, t) =>
+                    {
+                        var method = notificationMethods[bc.NotificationMode];
+                        await method(bc, parameter);
+                        _repository.Update(bc);
+                    });
+                }
 
-            await _repository.SaveChanges(CancellationToken.None);
+                await transaction.Commit(CancellationToken.None);
+            }
         }
 
         protected virtual async Task HandlePingNotification(BCAuthorize bcAuthorize, NotificationParameter parameter)

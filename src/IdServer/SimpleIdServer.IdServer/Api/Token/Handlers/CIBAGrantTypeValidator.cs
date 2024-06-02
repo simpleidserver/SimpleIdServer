@@ -1,11 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -40,7 +39,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if (string.IsNullOrWhiteSpace(authRequestId))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.AuthReqId));
 
-            var authRequest = await _bcAuthorizeRepository.Query().Include(a => a.Histories).FirstOrDefaultAsync(bc => bc.Id == authRequestId, cancellationToken);
+            var authRequest = await _bcAuthorizeRepository.GetById(authRequestId, cancellationToken);
             if (authRequest == null)
                 throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidAuthRequestId);
 

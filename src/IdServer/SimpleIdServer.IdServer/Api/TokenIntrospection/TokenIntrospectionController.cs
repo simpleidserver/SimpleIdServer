@@ -19,7 +19,9 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
         private readonly ITokenIntrospectionRequestHandler _requestHandler;
         private readonly IdServerHostOptions _options;
 
-        public TokenIntrospectionController(ITokenIntrospectionRequestHandler requestHandler, IOptions<IdServerHostOptions> options)
+        public TokenIntrospectionController(
+            ITokenIntrospectionRequestHandler requestHandler, 
+            IOptions<IdServerHostOptions> options)
         {
             _requestHandler = requestHandler;
             _options = options.Value;

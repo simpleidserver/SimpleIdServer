@@ -8,7 +8,6 @@ using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -18,12 +17,11 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extractors;
-using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Saml.Idp.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Saml.Idp.Factories;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -172,11 +170,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
 
         private async Task<ClientResult> GetClient(string issuer, string realm, CancellationToken cancellationToken)
         {
-            var client = await _clientRepository.Query()
-                .Include(c => c.Realms)
-                .Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
-                .Include(c => c.SerializedJsonWebKeys)
-                .AsNoTracking().SingleOrDefaultAsync(c => c.ClientId == issuer && c.Realms.Any(r => r.Name == realm), cancellationToken);
+            var client = await _clientRepository.GetByClientId(realm, issuer, cancellationToken);
             if (client == null) throw new OAuthException(string.Empty, $"the client '{issuer}' doesn't exist");
             var kvp = await _saml2ConfigurationFactory.BuildSamSpConfiguration(client, cancellationToken);
             return new ClientResult { Client = client, SpSamlConfiguration = kvp.Item1, EntityDescriptor = kvp.Item2 };

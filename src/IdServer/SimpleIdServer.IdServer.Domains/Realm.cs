@@ -2,10 +2,12 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains.DTOs;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
+    [Table("Realms")]
     public class Realm
     {
         [JsonPropertyName(RealmNames.Name)]

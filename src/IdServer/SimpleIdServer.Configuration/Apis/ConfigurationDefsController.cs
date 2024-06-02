@@ -1,13 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Configuration.DTOs;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jwt;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Configuration.Apis;
@@ -29,11 +29,7 @@ public class ConfigurationDefsController : BaseController
     {
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
         await CheckAccessToken(prefix, Constants.ConfigurationsScope.Name);
-        var confDefs = await _configurationDefinitionStore.Query()
-            .Include(c => c.Records).ThenInclude(r => r.Values).ThenInclude(r => r.Translations)
-            .Include(c => c.Records).ThenInclude(r => r.Translations)
-            .AsNoTracking()
-            .ToListAsync();
+        var confDefs = await _configurationDefinitionStore.GetAll(CancellationToken.None);
         return Ok(confDefs.Select(d => Build(d)));
     }
 

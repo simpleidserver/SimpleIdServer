@@ -1,17 +1,17 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Linq;
 using System.Net;
 using System.Text.Json.Nodes;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api
@@ -76,7 +76,7 @@ namespace SimpleIdServer.IdServer.Api
                 jwt = extractionResult.Jwt;
             }
 
-            var token = await _tokenRepository.Query().FirstOrDefaultAsync(t => t.Id == accessToken);
+            var token = await _tokenRepository.Get(accessToken, CancellationToken.None);
             if (token == null || token.IsExpired()) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
             return (jwt ?? handler.ReadJsonWebToken(token.Data), token);
         }

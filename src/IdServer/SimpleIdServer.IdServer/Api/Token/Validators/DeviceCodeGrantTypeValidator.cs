@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Net;
 using System.Text.Json.Nodes;
@@ -37,7 +36,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
             var currentDateTime = DateTime.UtcNow;
             var deviceCode = context.Request.RequestData.GetDeviceCode();
             if (string.IsNullOrWhiteSpace(deviceCode)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.DeviceCode));
-            var authDeviceCode = await _deviceAuthCodeRepository.Query().SingleOrDefaultAsync(d => d.DeviceCode == deviceCode, cancellationToken);
+            var authDeviceCode = await _deviceAuthCodeRepository.GetByDeviceCode(deviceCode, cancellationToken);
             if (authDeviceCode == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnknownDeviceCode);
             if (authDeviceCode.Status == DeviceAuthCodeStatus.ISSUED) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIssuedDeviceCode);
             if (authDeviceCode.ExpirationDateTime <= currentDateTime) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.EXPIRED_TOKEN, Global.InvalidExpiredDeviceCode);

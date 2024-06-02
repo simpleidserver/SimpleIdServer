@@ -3,7 +3,7 @@
 
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;

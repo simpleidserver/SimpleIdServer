@@ -15,7 +15,7 @@ using SimpleIdServer.IdServer.Fido.Extensions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Fido.Apis
@@ -26,6 +26,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IUserRepository _userRepository;
         private readonly IDistributedCache _distributedCache;
+        private readonly ITransactionBuilder _transactionBuilder;
         private IFido2 _fido2;
 
         public U2FLoginController(
@@ -35,12 +36,14 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder, 
             IDistributedCache distributedCache,
+            ITransactionBuilder transactionBuilder,
             IFido2 fido2) : base(tokenRepository, jwtBuilder)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;
             _userRepository = userRepository;
             _distributedCache = distributedCache;
+            _transactionBuilder = transactionBuilder;
             _fido2 = fido2;
         }
 
@@ -106,43 +109,47 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpPost]
         public async Task<IActionResult> End([FromRoute] string prefix, [FromBody] EndU2FLoginRequest request, CancellationToken cancellationToken)
         {
-            var fidoOptions = GetOptions();
-            prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-            var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
-            if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Resources.Global.SessionCannotBeExtracted);
-            JsonWebToken jsonWebToken = null;
-            if (!TryGetIdentityToken(prefix, out jsonWebToken))
-                if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, EndU2FRegisterRequestNames.Login));
-            var login = jsonWebToken?.Subject ?? request.Login;
-            var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
-            if (authenticatedUser == null)
-                return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(SimpleIdServer.IdServer.Resources.Global.UnknownUser, login));
-
-            var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
-            var options = sessionRecord.Options;
-            var storedCredentials = authenticatedUser.GetStoredFidoCredentials(sessionRecord.CredentialType);
-            IsUserHandleOwnerOfCredentialIdAsync callback = (args, cancellationToken) =>
+            using (var transaction = _transactionBuilder.Build())
             {
-                return Task.FromResult(storedCredentials.Any(c => c.Descriptor.Id.SequenceEqual(args.CredentialId)));
-            };
+                var fidoOptions = GetOptions();
+                prefix = prefix ?? IdServer.Constants.DefaultRealm;
+                if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
+                if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Resources.Global.SessionCannotBeExtracted);
+                JsonWebToken jsonWebToken = null;
+                if (!TryGetIdentityToken(prefix, out jsonWebToken))
+                    if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, EndU2FRegisterRequestNames.Login));
+                var login = jsonWebToken?.Subject ?? request.Login;
+                var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
+                if (authenticatedUser == null)
+                    return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(SimpleIdServer.IdServer.Resources.Global.UnknownUser, login));
 
-            var fidoCredentials = authenticatedUser.GetFidoCredentials(sessionRecord.CredentialType);
-            var credential = fidoCredentials.First(c => c.GetFidoCredential(sessionRecord.CredentialType).Descriptor.Id.SequenceEqual(request.Assertion.Id));
-            var creds = credential.GetFidoCredential(sessionRecord.CredentialType);
-            var storedCounter = creds.SignatureCounter;
-            var res = await _fido2.MakeAssertionAsync(request.Assertion, options, creds.PublicKey, creds.DevicePublicKeys, storedCounter, callback, cancellationToken: cancellationToken);
-            creds.SignCount = res.Counter;
-            if (res.DevicePublicKey is not null)
-                creds.DevicePublicKeys.Add(res.DevicePublicKey);
-            credential.Value = JsonSerializer.Serialize(creds);
-            await _userRepository.SaveChanges(cancellationToken);
-            sessionRecord.IsValidated = true;
-            await _distributedCache.SetStringAsync(request.SessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
-            {
-                SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
-            }, cancellationToken);
-            return NoContent();
+                var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
+                var options = sessionRecord.Options;
+                var storedCredentials = authenticatedUser.GetStoredFidoCredentials(sessionRecord.CredentialType);
+                IsUserHandleOwnerOfCredentialIdAsync callback = (args, cancellationToken) =>
+                {
+                    return Task.FromResult(storedCredentials.Any(c => c.Descriptor.Id.SequenceEqual(args.CredentialId)));
+                };
+
+                var fidoCredentials = authenticatedUser.GetFidoCredentials(sessionRecord.CredentialType);
+                var credential = fidoCredentials.First(c => c.GetFidoCredential(sessionRecord.CredentialType).Descriptor.Id.SequenceEqual(request.Assertion.Id));
+                var creds = credential.GetFidoCredential(sessionRecord.CredentialType);
+                var storedCounter = creds.SignatureCounter;
+                var res = await _fido2.MakeAssertionAsync(request.Assertion, options, creds.PublicKey, creds.DevicePublicKeys, storedCounter, callback, cancellationToken: cancellationToken);
+                creds.SignCount = res.Counter;
+                if (res.DevicePublicKey is not null)
+                    creds.DevicePublicKeys.Add(res.DevicePublicKey);
+                credential.Value = JsonSerializer.Serialize(creds);
+                _userRepository.Update(authenticatedUser);
+                await transaction.Commit(cancellationToken);
+                sessionRecord.IsValidated = true;
+                await _distributedCache.SetStringAsync(request.SessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
+                }, cancellationToken);
+                return NoContent();
+            }
         }
 
         protected async Task<(BeginU2FLoginResult, IActionResult)> CommonBegin(string prefix, BeginU2FLoginRequest request, CancellationToken cancellationToken)

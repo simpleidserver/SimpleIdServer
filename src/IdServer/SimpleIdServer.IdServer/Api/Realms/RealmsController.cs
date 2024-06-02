@@ -3,20 +3,19 @@
 
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer.Api.Realms;
 
@@ -28,6 +27,7 @@ public class RealmsController : BaseController
     private readonly IScopeRepository _scopeRepository;
     private readonly IFileSerializedKeyStore _fileSerializedKeyStore;
     private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
+    private readonly ITransactionBuilder _transactionBuilder;
     private readonly ILogger<RealmsController> _logger;
 
     public RealmsController(
@@ -37,6 +37,7 @@ public class RealmsController : BaseController
         IScopeRepository scopeRepository,
         IFileSerializedKeyStore fileSerializedKeyStore,
         IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
+        ITransactionBuilder transactionBuilder,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
         ILogger<RealmsController> logger) : base(tokenRepository, jwtBuilder)
@@ -46,17 +47,18 @@ public class RealmsController : BaseController
         _clientRepository = clientRepository;
         _scopeRepository = scopeRepository;
         _fileSerializedKeyStore = fileSerializedKeyStore;
+        _transactionBuilder = transactionBuilder;
         _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
         _logger = logger;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
         try
         {
             await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
-            var realms = await _realmRepository.Query().AsNoTracking().ToListAsync();
+            var realms = await _realmRepository.GetAll(cancellationToken);
             return new OkObjectResult(realms);
         }
         catch (OAuthException ex)
@@ -73,46 +75,57 @@ public class RealmsController : BaseController
         {
             try
             {
-                await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
-                var realmExists = await _realmRepository.Query()
-                    .AsNoTracking()
-                    .AnyAsync(r => r.Name == request.Name);
-                if (realmExists) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
-                var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
-                var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
-                var clients = await _clientRepository.Query().Include(c => c.Realms).Where(c => Constants.RealmStandardClients.Contains(c.ClientId)).ToListAsync();
-                var scopes = await _scopeRepository.Query().Include(s => s.Realms).Where(s => Constants.RealmStandardScopes.Contains(s.Name)).ToListAsync();
-                var keys = await _fileSerializedKeyStore.Query().Include(s => s.Realms).Where(s => s.Realms.Any(r => r.Name == Constants.DefaultRealm)).ToListAsync();
-                var acrs = await _authenticationContextClassReferenceRepository.Query().Include(a => a.Realms).ToListAsync();
-                foreach (var user in users)
-                    user.Realms.Add(new RealmUser { RealmsName = request.Name });
-
-                foreach (var client in clients)
-                    client.Realms.Add(realm);
-
-                foreach (var scope in scopes)
-                    scope.Realms.Add(realm);
-
-                foreach (var acr in acrs)
-                    acr.Realms.Add(realm);
-
-                foreach (var key in keys)
-                    key.Realms.Add(realm);
-
-                _realmRepository.Add(realm);
-                await _userRepository.SaveChanges(CancellationToken.None);
-                await _clientRepository.SaveChanges(CancellationToken.None);
-                await _scopeRepository.SaveChanges(CancellationToken.None);
-                await _fileSerializedKeyStore.SaveChanges(CancellationToken.None);
-                await _authenticationContextClassReferenceRepository.SaveChanges(CancellationToken.None);
-                await _realmRepository.SaveChanges(CancellationToken.None);
-                activity?.SetStatus(ActivityStatusCode.Ok, $"Realm {request.Name} is added");
-                return new ContentResult
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    StatusCode = (int)HttpStatusCode.Created,
-                    Content = JsonSerializer.Serialize(realm).ToString(),
-                    ContentType = "application/json"
-                };
+                    await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
+                    var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
+                    if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
+                    var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
+                    var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
+                    var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
+                    var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
+                    var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
+                    var acrs = await _authenticationContextClassReferenceRepository.GetAll(cancellationToken);
+                    _realmRepository.Add(realm);
+                    foreach (var user in users)
+                    {
+                        user.Realms.Add(new RealmUser { RealmsName = request.Name });
+                        _userRepository.Update(user);
+                    }
+
+                    foreach (var client in clients)
+                    {
+                        client.Realms.Add(realm);
+                        _clientRepository.Update(client);
+                    }
+
+                    foreach (var scope in scopes)
+                    {
+                        scope.Realms.Add(realm);
+                        _scopeRepository.Update(scope);
+                    }
+
+                    foreach (var acr in acrs)
+                    {
+                        acr.Realms.Add(realm);
+                        _authenticationContextClassReferenceRepository.Update(acr);
+                    }
+
+                    foreach (var key in keys)
+                    {
+                        key.Realms.Add(realm);
+                        _fileSerializedKeyStore.Update(key);
+                    }
+
+                    await transaction.Commit(cancellationToken);
+                    activity?.SetStatus(ActivityStatusCode.Ok, $"Realm {request.Name} is added");
+                    return new ContentResult
+                    {
+                        StatusCode = (int)HttpStatusCode.Created,
+                        Content = JsonSerializer.Serialize(realm).ToString(),
+                        ContentType = "application/json"
+                    };
+                }
             }
             catch (OAuthException ex)
             {

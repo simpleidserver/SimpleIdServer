@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Host.Acceptance.Tests;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
@@ -22,7 +23,7 @@ builder.Services.AddSIDIdentityServer(o =>
 {
     o.WalletAuthorizationServer = "http://localhost";
 })
-    .UseInMemoryStore(o =>
+    .UseInMemoryEFStore(o =>
     {
         o.AddInMemoryBCAuthorize(IdServerConfiguration.BCAuthorizeLst);
         o.AddInMemoryRealms(IdServerConfiguration.Realms);

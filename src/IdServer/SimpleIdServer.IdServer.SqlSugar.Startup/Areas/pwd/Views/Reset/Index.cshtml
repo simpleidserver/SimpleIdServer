@@ -1,0 +1,66 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using SimpleIdServer.IdServer.SqlSugar.Startup.Resources;
+@model SimpleIdServer.IdServer.Pwd.UI.ViewModels.ResetPasswordViewModel;
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = ResetPasswordResource.title;
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+            
+<div class="loginContainer">
+    <div class="card login">
+        <div class="card-body">
+            @if(Model.IsResetLinkedSent)
+            {
+                <div class="alert alert-success">@string.Format(ResetPasswordResource.reset_link_sent, Model.NotificationMode)</div>
+                if (!string.IsNullOrWhiteSpace(Model.ReturnUrl))
+                {
+                    <a href="@Model.ReturnUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
+                }
+            }
+            else
+            {
+                <h5>@ResetPasswordResource.title</h5>
+                <!-- Errors -->
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <ul class="list-group mb-3">
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            foreach (var error in modelState.Errors)
+                            {
+                                <li class="list-group-item list-group-item-danger">@ResetPasswordResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                            }
+                        }
+                    </ul>
+                }
+
+                <!-- Information -->
+                <div class="alert alert-info">
+                    The reset link will be sent to your <b>@Model.NotificationMode</b>
+                </div>
+
+                <!-- Reset form  -->
+                @using (Html.BeginForm("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <input asp-for="ReturnUrl" type="hidden" />
+                    <input asp-for="NotificationMode" type="hidden" />
+                    <!-- Login -->
+                    <div class="form-floating mb-3">
+                        <input asp-for="Login" placeholder="@ResetPasswordResource.login" id="floatingLogin" type="text" class="form-control" />
+                        <label for="floatingLogin">@ResetPasswordResource.login</label>
+                    </div>
+                    <!-- Destination -->
+                    <div class="form-floating mb-3">
+                        <input asp-for="Value" placeholder="@Model.NotificationMode" id="floatingDestination" type="text" class="form-control" />
+                        <label for="floatingDestination">@Model.NotificationMode</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary card-link">@ResetPasswordResource.send_link</button>
+                }
+            }
+        </div>
+    </div>
+</div>

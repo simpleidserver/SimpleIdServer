@@ -3,13 +3,13 @@
 
 using MassTransit;
 using MassTransit.Initializers;
-using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Nodes;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Transactions;
 
@@ -24,36 +24,36 @@ public class ExtractUsersConsumer :
     private readonly IIdentityProvisioningStore _identityProvisioningStore;
     private readonly IEnumerable<IProvisioningService> _provisioningServices;
     private readonly IProvisioningStagingStore _stagingStore;
+    private readonly ITransactionBuilder _transactionBuilder;
     public static string Queuename = "extract-users";
 
     public ExtractUsersConsumer(
         IIdentityProvisioningStore identityProvisioningStore,
         IEnumerable<IProvisioningService> provisioningServices,
-        IProvisioningStagingStore stagingStore)
+        IProvisioningStagingStore stagingStore,
+        ITransactionBuilder transactionBuilder)
     {
 
         _identityProvisioningStore = identityProvisioningStore;
         _provisioningServices = provisioningServices;
         _stagingStore = stagingStore;
+        _transactionBuilder = transactionBuilder;
     }
 
     public async Task Consume(ConsumeContext<StartExtractUsersCommand> context)
     {
-        var message = context.Message;
-        var instance = await _identityProvisioningStore.Query()
-            .Include(d => d.Realms)
-            .Include(d => d.Histories)
-            .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
-        if (!instance.IsEnabled)
+        using (var transaction = _transactionBuilder.Build())
         {
-            return;
-        }
-
-        var provisioningService = _provisioningServices.Single(p => p.Name == instance.Definition.Name);
-        var pages = (await provisioningService.Paginate(instance.Definition, context.CancellationToken)).OrderBy(p => p.Page);
-        var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
-        foreach (var page in pages.OrderBy(p => p.Page))
+            var message = context.Message;
+            var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, context.CancellationToken);
+            if (!instance.IsEnabled)
+            {
+                return;
+            }
+            var provisioningService = _provisioningServices.Single(p => p.Name == instance.Definition.Name);
+            var pages = (await provisioningService.Paginate(instance.Definition, context.CancellationToken)).OrderBy(p => p.Page);
+            var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
+            foreach (var page in pages.OrderBy(p => p.Page))
             {
                 await context.Send(destination, new ExtractUsersCommand
                 {
@@ -65,24 +65,22 @@ public class ExtractUsersConsumer :
                 });
             }
 
-        instance.Start(message.ProcessId, pages.Last().Page);
-        await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-        await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
-        {
-            InstanceId = message.InstanceId,
-            ProcessId = message.ProcessId,
-            Realm = message.Realm
-        });
+            instance.Start(message.ProcessId, pages.Last().Page);
+            _identityProvisioningStore.Update(instance);
+            await transaction.Commit(context.CancellationToken);
+            await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
+            {
+                InstanceId = message.InstanceId,
+                ProcessId = message.ProcessId,
+                Realm = message.Realm
+            });
+        }
     }
 
     public async Task Consume(ConsumeContext<ExtractUsersCommand> context)
     {
         var message = context.Message;
-        var instance = await _identityProvisioningStore.Query()
-            .Include(d => d.Realms)
-            .Include(d => d.Histories)
-            .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
+        var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, CancellationToken.None);
         var provisioningService = _provisioningServices.Single(p => p.Name == instance.Definition.Name);
         var extractionResult = await provisioningService.Extract(new ExtractionPage
         {
@@ -106,47 +104,51 @@ public class ExtractUsersConsumer :
 
         using (var transactionScope = new TransactionScope(TransactionScopeOption.Required, new TransactionOptions { IsolationLevel = System.Transactions.IsolationLevel.Snapshot }, TransactionScopeAsyncFlowOption.Enabled))
         {
-            // Store the representation id and its version.
-            await _stagingStore.BulkUpdate(newOrChangedRepresentations.Select(r => new ExtractedRepresentation
+            using (var transaction = _transactionBuilder.Build())
             {
-                ExternalId = r.RepresentationId,
-                Version = r.RepresentationVersion
-            }).ToList(), context.CancellationToken);
-            // Store the extracted representations.
-            await _stagingStore.BulkUpdate(newOrChangedRepresentations, context.CancellationToken);
-            instance.Extract(message.ProcessId,
-                message.Page,
-                newOrChangedRepresentations.Count(r => r.Type == ExtractedRepresentationType.USER),
-                newOrChangedRepresentations.Count(u => u.Type == ExtractedRepresentationType.GROUP),
-                filteredRepresentations.Count());
-            await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-            transactionScope.Complete();
+                // Store the representation id and its version.
+                await _stagingStore.BulkUpdate(newOrChangedRepresentations.Select(r => new ExtractedRepresentation
+                {
+                    ExternalId = r.RepresentationId,
+                    Version = r.RepresentationVersion
+                }).ToList(), context.CancellationToken);
+                // Store the extracted representations.
+                await _stagingStore.BulkUpdate(newOrChangedRepresentations, context.CancellationToken);
+                instance.Extract(message.ProcessId,
+                    message.Page,
+                    newOrChangedRepresentations.Count(r => r.Type == ExtractedRepresentationType.USER),
+                    newOrChangedRepresentations.Count(u => u.Type == ExtractedRepresentationType.GROUP),
+                    filteredRepresentations.Count());
+                _identityProvisioningStore.Update(instance);
+                await transaction.Commit(context.CancellationToken);
+                transactionScope.Complete();
+            }
         }
     }
 
     public async Task Consume(ConsumeContext<CheckUsersExtractedCommand> context)
     {
-        var message = context.Message;
-        var instance = await _identityProvisioningStore.Query()
-            .Include(d => d.Realms)
-            .Include(d => d.Histories)
-            .Include(d => d.Definition).ThenInclude(d => d.MappingRules)
-            .SingleAsync(i => i.Id == message.InstanceId && i.Realms.Any(r => r.Name == message.Realm));
-        var process = instance.GetProcess(message.ProcessId);
-        if(process.TotalPageToExtract == process.NbExtractedPages)
+        using (var transaction = _transactionBuilder.Build())
         {
-            instance.FinishExtract(message.ProcessId);
-            await _identityProvisioningStore.SaveChanges(context.CancellationToken);
-            return;
-        }
+            var message = context.Message;
+            var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, CancellationToken.None);
+            var process = instance.GetProcess(message.ProcessId);
+            if (process.TotalPageToExtract == process.NbExtractedPages)
+            {
+                instance.FinishExtract(message.ProcessId);
+                _identityProvisioningStore.Update(instance);
+                await transaction.Commit(context.CancellationToken);
+                return;
+            }
 
-        var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
-        await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
-        {
-            InstanceId = message.InstanceId,
-            ProcessId = message.ProcessId,
-            Realm = message.Realm
-        });
+            var destination = new Uri($"queue:{ExtractUsersConsumer.Queuename}");
+            await context.ScheduleSend(destination, _checkInterval, new CheckUsersExtractedCommand
+            {
+                InstanceId = message.InstanceId,
+                ProcessId = message.ProcessId,
+                Realm = message.Realm
+            });
+        }
     }
 
     private List<ExtractedRepresentationStaging> Extract(string processId, ExtractedResult extractedResult, IdentityProvisioningDefinition definition)

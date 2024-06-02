@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
+using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
@@ -28,7 +29,7 @@ using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Store.EF;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.VerifiablePresentation;
@@ -37,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer.Services.Seeding.Interfaces;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
@@ -58,7 +58,7 @@ const string MYSQLCreateTableFormat =
                 "`Value` longblob NOT NULL," +
                 "PRIMARY KEY(`Id`)," +
                 "KEY `Index_ExpiresAtTime` (`ExpiresAtTime`)" +
-            ")";
+")";
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
@@ -75,7 +75,6 @@ builder.Services.Configure<KestrelServerOptions>(options =>
         if (identityServerConfiguration.ClientCertificateMode != null) o.ClientCertificateMode = identityServerConfiguration.ClientCertificateMode.Value;
     });
 });
-ConfigureCentralizedConfiguration(builder);
 if (identityServerConfiguration.IsForwardedEnabled)
 {
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -90,7 +89,8 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 builder.Services.AddLocalization();
-ConfigureIdServer(builder.Services, builder.Configuration);
+ConfigureIdServer(builder.Services);
+ConfigureCentralizedConfiguration(builder);
 
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
@@ -203,27 +203,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<GotifyOptions>();
         o.Add<IdServerVpOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
-        o.UseEFConnector(b =>
-        {
-            switch (conf.Type)
-            {
-                case StorageTypes.INMEMORY:
-                    b.UseInMemoryDatabase(conf.ConnectionString);
-                    break;
-                case StorageTypes.SQLSERVER:
-                    b.UseSqlServer(conf.ConnectionString);
-                    break;
-                case StorageTypes.POSTGRE:
-                    b.UseNpgsql(conf.ConnectionString);
-                    break;
-                case StorageTypes.MYSQL:
-                    b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
-                    break;
-                case StorageTypes.SQLITE:
-                    b.UseSqlite(conf.ConnectionString);
-                    break;
-            }
-        });
+        o.UseEFConnector();
     });
 }
 

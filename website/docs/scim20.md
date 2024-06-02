@@ -75,6 +75,31 @@ Set the Secret Token to one of the following values :
 | IdServer | ba521b3b-02f7-4a37-b03c-58f713bf88e7 |
 | AzureAd  | 1595a72a-2804-495d-8a8a-2c861e7a736a |
 
+:::warning
+
+When the user is provisioned from Azure AD to the SCIM server, the following exception can occur because, according to the [RFC SCIM CORE SCHEMA](https://datatracker.ietf.org/doc/html/draft-ietf-scim-core-schema,), the schema for user representation does not include a `primary` property in the `addresses` section.
+
+```
+SimpleIdServer.Scim.Exceptions.SCIMSchemaViolatedException: attribute primary is not recognized by the SCIM schema
+```
+
+If this property is required, edit the `UserSchema.json` file and add the following property under the `addresses` section :
+
+```
+        {
+          "name": "primary",
+          "type": "boolean",
+          "multiValued": false,
+          "required": false,
+          "mutability": "readWrite",
+          "returned": "default",
+          "uniqueness": "none",
+          "description": "A Boolean value indicating the 'primary' or preferred attribute value for this attribute, e.g., the preferred mailing address or primary email address.  The primary attribute value 'true' MUST appear no more than once."
+        }
+```
+
+:::
+
 ## Security
 
 By default, the API is protected by an API Key. 

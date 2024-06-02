@@ -12,7 +12,7 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Otp.Services;
 using SimpleIdServer.IdServer.Otp.UI.ViewModels;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -36,10 +36,11 @@ public class AuthenticateController : BaseOTPAuthenticateController<Authenticate
         IUserSessionResitory userSessionRepository, 
         IUserTransformer userTransformer, 
         ITokenRepository tokenRepository, 
+        ITransactionBuilder transactionBuilder,
         IJwtBuilder jwtBuilder, 
         IBusControl busControl,
         IAntiforgery antiforgery,
-        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
+        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
     {
     }
 

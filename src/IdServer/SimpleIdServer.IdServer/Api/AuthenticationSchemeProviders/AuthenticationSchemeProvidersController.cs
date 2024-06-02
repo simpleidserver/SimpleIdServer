@@ -2,18 +2,16 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Reflection;
 using System.Text.Json;
@@ -28,6 +26,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 	private readonly IAuthenticationSchemeProviderDefinitionRepository _authenticationSchemeProviderDefinitionRepository;
 	private readonly IRealmRepository _realmRepository;
 	private readonly IConfiguration _configuration;
+    private readonly ITransactionBuilder _transactionBuilder;
 
 	public AuthenticationSchemeProvidersController(
         IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository, 
@@ -35,37 +34,28 @@ public class AuthenticationSchemeProvidersController : BaseController
         IRealmRepository realmRepository,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder, 
-        IConfiguration configuration) : base(tokenRepository, jwtBuilder)
+        IConfiguration configuration,
+        ITransactionBuilder transactionBuilder) : base(tokenRepository, jwtBuilder)
 	{
 		_authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
 		_authenticationSchemeProviderDefinitionRepository = authenticationSchemeProviderDefinitionRepository;
 		_realmRepository = realmRepository;
 		_configuration = configuration;
+        _transactionBuilder = transactionBuilder;
 	}
 
 	[HttpPost]
-	public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchRequest request)
+	public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchRequest request, CancellationToken cancellationToken)
 	{
 		prefix = prefix ?? Constants.DefaultRealm;
 		try
 		{
             await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            IQueryable<AuthenticationSchemeProvider> query = _authenticationSchemeProviderRepository.Query()
-				.Include(p => p.Realms)
-				.Where(p => p.Realms.Any(r => r.Name == prefix))
-				.AsNoTracking();
-            if (!string.IsNullOrWhiteSpace(request.Filter))
-                query = query.Where(request.Filter);
-
-            if (!string.IsNullOrWhiteSpace(request.OrderBy))
-				query = query.OrderBy(request.OrderBy);
-
-			var nb = query.Count();
-			var idProviders = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync();
+            var result = await _authenticationSchemeProviderRepository.Search(prefix, request, cancellationToken);
 			return new OkObjectResult(new SearchResult<AuthenticationSchemeProviderResult>
 			{
-				Count = nb,
-				Content = idProviders.Select(p => Build(p)).ToList()
+				Count = result.Count,
+				Content = result.Content.Select(p => Build(p)).ToList()
 			});
 		}
 		catch(OAuthException ex)
@@ -75,15 +65,13 @@ public class AuthenticationSchemeProvidersController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetDefinitions([FromRoute] string prefix)
+    public async Task<IActionResult> GetDefinitions([FromRoute] string prefix, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            var result = await _authenticationSchemeProviderDefinitionRepository.Query()
-                .AsNoTracking()
-                .ToListAsync();
+            var result = await _authenticationSchemeProviderDefinitionRepository.GetAll(cancellationToken);
             return new OkObjectResult(result);
         }
         catch (OAuthException ex)
@@ -93,20 +81,20 @@ public class AuthenticationSchemeProvidersController : BaseController
     }
 
     [HttpDelete]
-	public async Task<IActionResult> Remove([FromRoute] string prefix, string id)
+	public async Task<IActionResult> Remove([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-			var result = await _authenticationSchemeProviderRepository.Query()
-				.Include(p => p.Realms)
-				.Where(p => p.Realms.Any(r => r.Name == prefix))
-				.SingleOrDefaultAsync(p => p.Name == id);
-			if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
-			_authenticationSchemeProviderRepository.Remove(result);
-			await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
-			return NoContent();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
+                var result = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
+                _authenticationSchemeProviderRepository.Remove(result);
+                await transaction.Commit(cancellationToken);
+                return NoContent();
+            }
         }
         catch (OAuthException ex)
         {
@@ -114,26 +102,20 @@ public class AuthenticationSchemeProvidersController : BaseController
         }
     }
 
-	[HttpGet]
-	public async Task<IActionResult> Get([FromRoute] string prefix, string id)
+    [HttpGet]
+    public async Task<IActionResult> Get([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            var result = await _authenticationSchemeProviderRepository.Query()
-                .Include(p => p.Realms)
-                .Include(p => p.AuthSchemeProviderDefinition)
-                .Include(p => p.Mappers)
-                .Where(p => p.Realms.Any(r => r.Name == prefix))
-                .AsNoTracking()
-                .SingleOrDefaultAsync(p => p.Name == id);
+            var result = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
             if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthSchemeProvider, id));
-			var optionKey = $"{result.Name}:{result.AuthSchemeProviderDefinition.OptionsName}";
+            var optionKey = $"{result.Name}:{result.AuthSchemeProviderDefinition.OptionsName}";
             var optionType = Assembly.GetEntryAssembly().GetType(result.AuthSchemeProviderDefinition.OptionsFullQualifiedName);
             var section = _configuration.GetSection(optionKey);
             var configuration = section.Get(optionType);
-			return new OkObjectResult(Build(result, configuration));
+            return new OkObjectResult(Build(result, configuration));
         }
         catch (OAuthException ex)
         {
@@ -142,37 +124,36 @@ public class AuthenticationSchemeProvidersController : BaseController
     }
 
 	[HttpPost]
-	public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddAuthenticationSchemeProviderRequest request)
+	public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddAuthenticationSchemeProviderRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
-        {            
-            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            Validate();
-			var instance = await _authenticationSchemeProviderRepository
-                .Query()
-				.Include(r => r.Realms)
-				.AsNoTracking()
-                .SingleOrDefaultAsync(a => a.Name == request.Name && a.Realms.Any(r => r.Name == prefix));
-			if (instance != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.AuthSchemeProviderWithSameNameExists);
-			var idProviderDef = await _authenticationSchemeProviderDefinitionRepository.Query().SingleAsync(d => d.Name == request.DefinitionName);
-			var realm = await _realmRepository.Query().SingleAsync(r => r.Name == prefix);
-			var result = new AuthenticationSchemeProvider
-			{
-				Id = Guid.NewGuid().ToString(),
-				AuthSchemeProviderDefinition = idProviderDef,
-				CreateDateTime = DateTime.UtcNow,
-				Description = request.Description,
-				DisplayName = request.DisplayName,
-				Mappers = Constants.GetDefaultIdProviderMappers(),
-				Name = request.Name,
-				UpdateDateTime = DateTime.UtcNow
-			};
-			result.Realms.Add(realm);
-            SyncConfiguration(result, request.Values);
-            _authenticationSchemeProviderRepository.Add(result);
-			await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
-			return NoContent();
+        {
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
+                Validate();
+                var instance = await _authenticationSchemeProviderRepository.Get(prefix, request.Name, cancellationToken);
+                if (instance != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.AuthSchemeProviderWithSameNameExists);
+                var idProviderDef = await _authenticationSchemeProviderDefinitionRepository.Get(request.DefinitionName, cancellationToken);
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
+                var result = new AuthenticationSchemeProvider
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    AuthSchemeProviderDefinition = idProviderDef,
+                    CreateDateTime = DateTime.UtcNow,
+                    Description = request.Description,
+                    DisplayName = request.DisplayName,
+                    Mappers = Constants.GetDefaultIdProviderMappers(),
+                    Name = request.Name,
+                    UpdateDateTime = DateTime.UtcNow
+                };
+                result.Realms.Add(realm);
+                SyncConfiguration(result, request.Values);
+                _authenticationSchemeProviderRepository.Add(result);
+                await transaction.Commit(cancellationToken);
+                return NoContent();
+            }
         }
         catch (OAuthException ex)
         {
@@ -187,22 +168,23 @@ public class AuthenticationSchemeProvidersController : BaseController
     }
 
 	[HttpPut]
-	public async Task<IActionResult> UpdateDetails([FromRoute] string prefix, string id, [FromBody] UpdateAuthenticationSchemeProviderDetailsRequest request)
+	public async Task<IActionResult> UpdateDetails([FromRoute] string prefix, string id, [FromBody] UpdateAuthenticationSchemeProviderDetailsRequest request, CancellationToken cancellationToken)
 	{
 		prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            var instance = await _authenticationSchemeProviderRepository
-                .Query()
-                .Include(r => r.Realms)
-                .SingleAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
-            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
-			instance.UpdateDateTime = DateTime.UtcNow;
-			instance.Description = request.Description;
-			instance.DisplayName = request.DisplayName;
-            await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
-            return NoContent();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
+                var instance = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
+                if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
+                instance.UpdateDateTime = DateTime.UtcNow;
+                instance.Description = request.Description;
+                instance.DisplayName = request.DisplayName;
+                _authenticationSchemeProviderRepository.Update(instance);
+                await transaction.Commit(cancellationToken);
+                return NoContent();
+            }
         }
         catch (OAuthException ex)
         {
@@ -211,22 +193,22 @@ public class AuthenticationSchemeProvidersController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateValues([FromRoute] string prefix, string id, [FromBody] UpdateAuthenticationSchemeProviderValuesRequest request)
+    public async Task<IActionResult> UpdateValues([FromRoute] string prefix, string id, [FromBody] UpdateAuthenticationSchemeProviderValuesRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            var instance = await _authenticationSchemeProviderRepository
-                .Query()
-                .Include(r => r.AuthSchemeProviderDefinition)
-                .Include(r => r.Realms)
-                .SingleAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
-            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
-			instance.UpdateDateTime = DateTime.UtcNow;
-            SyncConfiguration(instance, request.Values);
-            await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
-            return NoContent();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
+                var instance = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
+                if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
+                instance.UpdateDateTime = DateTime.UtcNow;
+                SyncConfiguration(instance, request.Values);
+                _authenticationSchemeProviderRepository.Update(instance);
+                await transaction.Commit(cancellationToken);
+                return NoContent();
+            }
         }
         catch (OAuthException ex)
         {
@@ -235,36 +217,36 @@ public class AuthenticationSchemeProvidersController : BaseController
     }
 
 	[HttpPost]
-	public async Task<IActionResult> AddMapper([FromRoute] string prefix, string id, [FromBody] AddAuthenticationSchemeProviderMapperRequest request)
+	public async Task<IActionResult> AddMapper([FromRoute] string prefix, string id, [FromBody] AddAuthenticationSchemeProviderMapperRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            var instance = await _authenticationSchemeProviderRepository
-                .Query()
-                .Include(r => r.Realms)
-                .Include(r => r.Mappers)
-                .SingleOrDefaultAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
-            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
-            instance.UpdateDateTime = DateTime.UtcNow;
-            var record = new AuthenticationSchemeProviderMapper
+            using (var transaction = _transactionBuilder.Build())
             {
-                Id = Guid.NewGuid().ToString(),
-                MapperType = request.MapperType,
-                Name = request.Name,
-                SourceClaimName = request.SourceClaimName,
-                TargetUserAttribute = request.TargetUserAttribute,
-                TargetUserProperty = request.TargetUserProperty
-            };
-            instance.Mappers.Add(record);
-            await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
-            return new ContentResult
-            {
-                StatusCode = (int)HttpStatusCode.Created,
-                Content = JsonSerializer.Serialize(Build(record)),
-                ContentType = "application/json"
-            };
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
+                var instance = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
+                if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
+                instance.UpdateDateTime = DateTime.UtcNow;
+                var record = new AuthenticationSchemeProviderMapper
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    MapperType = request.MapperType,
+                    Name = request.Name,
+                    SourceClaimName = request.SourceClaimName,
+                    TargetUserAttribute = request.TargetUserAttribute,
+                    TargetUserProperty = request.TargetUserProperty
+                };
+                instance.Mappers.Add(record);
+                _authenticationSchemeProviderRepository.Update(instance);
+                await transaction.Commit(cancellationToken);
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JsonSerializer.Serialize(Build(record)),
+                    ContentType = "application/json"
+                };
+            }
         }
         catch (OAuthException ex)
         {
@@ -273,21 +255,21 @@ public class AuthenticationSchemeProvidersController : BaseController
     }
 
     [HttpDelete]
-    public async Task<IActionResult> RemoveMapper([FromRoute] string prefix, string id, string mapperId)
+    public async Task<IActionResult> RemoveMapper([FromRoute] string prefix, string id, string mapperId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            var result = await _authenticationSchemeProviderRepository.Query()
-                .Include(p => p.Realms)
-                .Include(p => p.Mappers)
-                .Where(p => p.Realms.Any(r => r.Name == prefix))
-                .SingleOrDefaultAsync(p => p.Name == id);
-            if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthSchemeProvider, id));
-            result.Mappers = result.Mappers.Where(m => m.Id != mapperId).ToList();
-            await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
-            return NoContent();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
+                var result = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
+                if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthSchemeProvider, id));
+                result.Mappers = result.Mappers.Where(m => m.Id != mapperId).ToList();
+                _authenticationSchemeProviderRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                return NoContent();
+            }
         }
         catch (OAuthException ex)
         {
@@ -296,26 +278,26 @@ public class AuthenticationSchemeProvidersController : BaseController
     }
 
     [HttpPut]
-    public async Task<IActionResult> UpdateMapper([FromRoute] string prefix, string id, string mapperId, [FromBody] UpdateAuthenticationSchemeProviderMapperRequest request)
+    public async Task<IActionResult> UpdateMapper([FromRoute] string prefix, string id, string mapperId, [FromBody] UpdateAuthenticationSchemeProviderMapperRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
-            var instance = await _authenticationSchemeProviderRepository
-                .Query()
-                .Include(r => r.Realms)
-                .Include(r => r.Mappers)
-                .SingleOrDefaultAsync(a => a.Name == id && a.Realms.Any(r => r.Name == prefix));
-            if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
-            instance.UpdateDateTime = DateTime.UtcNow;
-            var mapper = instance.Mappers.Single(m => m.Id == mapperId);
-            mapper.Name = request.Name;
-            mapper.SourceClaimName = request.SourceClaimName;
-            mapper.TargetUserAttribute = request.TargetUserAttribute;
-            mapper.TargetUserProperty = request.TargetUserProperty;
-            await _authenticationSchemeProviderRepository.SaveChanges(CancellationToken.None);
-            return NoContent();
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationSchemeProviders.Name);
+                var instance = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
+                if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
+                instance.UpdateDateTime = DateTime.UtcNow;
+                var mapper = instance.Mappers.Single(m => m.Id == mapperId);
+                mapper.Name = request.Name;
+                mapper.SourceClaimName = request.SourceClaimName;
+                mapper.TargetUserAttribute = request.TargetUserAttribute;
+                mapper.TargetUserProperty = request.TargetUserProperty;
+                _authenticationSchemeProviderRepository.Update(instance);
+                await transaction.Commit(cancellationToken);
+                return NoContent();
+            }
         }
         catch (OAuthException ex)
         {

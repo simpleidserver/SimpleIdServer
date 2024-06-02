@@ -10,7 +10,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using System.Security.Claims;
 
@@ -24,16 +24,18 @@ public class ResetController : BaseController
     private readonly IConfiguration _configuration;
     private readonly IGrantedTokenHelper _grantedTokenHelper;
     private readonly IUserRepository _userRepository;
+    private readonly ITransactionBuilder _transactionBuilder;
     private readonly ILogger<ResetController> _logger;
 
     public ResetController(
-        ITokenRepository tokenRepository, 
+        ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
         IEnumerable<IResetPasswordService> resetPasswordServices,
         IAuthenticationHelper authenticationHelper,
         IConfiguration configuration,
         IGrantedTokenHelper grantedTokenHelper,
         IUserRepository userRepository,
+        ITransactionBuilder transactionBuilder,
         ILogger<ResetController> logger) : base(tokenRepository, jwtBuilder)
     {
         _resetPasswordServices = resetPasswordServices;
@@ -41,6 +43,7 @@ public class ResetController : BaseController
         _configuration = configuration;
         _grantedTokenHelper = grantedTokenHelper;
         _userRepository = userRepository;
+        _transactionBuilder = transactionBuilder;
         _logger = logger;
     }
 
@@ -168,39 +171,43 @@ public class ResetController : BaseController
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Confirm([FromRoute] string prefix, ConfirmResetPasswordViewModel viewModel, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? Constants.DefaultRealm;
-        viewModel.Validate(ModelState);
-        if (!ModelState.IsValid)
+        using (var transaction = _transactionBuilder.Build())
         {
-            return View(viewModel);
-        }
-
-        var notificationMode = GetOptions().NotificationMode;
-        var service = _resetPasswordServices.Single(p => p.NotificationMode == notificationMode);
-        var resetPasswordLink = await service.Verify(viewModel.Code, cancellationToken);
-        if(resetPasswordLink == null)
-        {
-            ModelState.AddModelError("invalid_otpcode", "invalid_otpcode");
-            return View(viewModel);
-        }
-
-        var user = await _authenticationHelper.GetUserByLogin(resetPasswordLink.Login, prefix, cancellationToken);
-        var credential = user.Credentials.SingleOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
-        if(credential == null)
-        {
-            credential = new UserCredential
+            prefix = prefix ?? Constants.DefaultRealm;
+            viewModel.Validate(ModelState);
+            if (!ModelState.IsValid)
             {
-                Id = Guid.NewGuid().ToString(),
-                CredentialType = Constants.Areas.Password,
-                IsActive = true
-            };
-            user.Credentials.Add(credential);
-        }
+                return View(viewModel);
+            }
 
-        credential.Value = PasswordHelper.ComputeHash(viewModel.Password);
-        await _userRepository.SaveChanges(cancellationToken);
-        viewModel.IsPasswordUpdated = true;
-        return View(viewModel);
+            var notificationMode = GetOptions().NotificationMode;
+            var service = _resetPasswordServices.Single(p => p.NotificationMode == notificationMode);
+            var resetPasswordLink = await service.Verify(viewModel.Code, cancellationToken);
+            if (resetPasswordLink == null)
+            {
+                ModelState.AddModelError("invalid_otpcode", "invalid_otpcode");
+                return View(viewModel);
+            }
+
+            var user = await _authenticationHelper.GetUserByLogin(resetPasswordLink.Login, prefix, cancellationToken);
+            var credential = user.Credentials.SingleOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
+            if (credential == null)
+            {
+                credential = new UserCredential
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    CredentialType = Constants.Areas.Password,
+                    IsActive = true
+                };
+                user.Credentials.Add(credential);
+            }
+
+            credential.Value = PasswordHelper.ComputeHash(viewModel.Password);
+            _userRepository.Update(user);
+            await transaction.Commit(cancellationToken);
+            viewModel.IsPasswordUpdated = true;
+            return View(viewModel);
+        }
     }
 
     private IdServerPasswordOptions GetOptions()

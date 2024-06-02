@@ -3,7 +3,6 @@
 
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
@@ -19,7 +18,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -41,12 +40,14 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IDPOPProofValidator _dpopProofValidator;
         private readonly IBusControl _busControl;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public UmaTicketHandler(IUmaTicketGrantTypeValidator umaTicketGrantTypeValidator, IUmaPermissionTicketHelper umaPermissionTicketHelper, 
             IEnumerable<IClaimTokenFormat> claimTokenFormats, IUmaResourceRepository umaResourceRepository,
             IUmaPendingRequestRepository umaPendingRequestRepository, IEnumerable<ITokenBuilder> tokenBuilders,
             IEnumerable<ITokenProfile> tokenProfiles, IClientAuthenticationHelper clientAuthenticationHelper,
-            IDPOPProofValidator dpopProofValidator, IBusControl busControl, IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
+            IDPOPProofValidator dpopProofValidator, IBusControl busControl,
+            ITransactionBuilder transactionBuilder, IOptions<IdServerHostOptions> options) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _umaTicketGrantTypeValidator = umaTicketGrantTypeValidator;
             _umaPermissionTicketHelper = umaPermissionTicketHelper;
@@ -55,6 +56,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _umaPendingRequestRepository = umaPendingRequestRepository;
             _tokenBuilders = tokenBuilders;
             _dpopProofValidator = dpopProofValidator;
+            _transactionBuilder = transactionBuilder;
             _busControl = busControl;
         }
 
@@ -108,8 +110,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     if (invalidScopes)
                         throw new OAuthException(ErrorCodes.INVALID_SCOPE, Global.InvalidScope);
 
-                    var resourceIds = permissionTicket.Records.Select(r => r.ResourceId);
-                    var umaResources = await _umaResourceRepository.Query().Include(r => r.Permissions).ThenInclude(p => p.Claims).Where(r => resourceIds.Contains(r.Id)).ToListAsync(cancellationToken);
+                    var resourceIds = permissionTicket.Records.Select(r => r.ResourceId).ToList();
+                    var umaResources = await _umaResourceRepository.GetByIds(resourceIds, cancellationToken);
                     var requiredClaims = new List<UMAResourcePermissionClaim>();
                     foreach (var umaResource in umaResources)
                     {
@@ -155,36 +157,40 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         .All(pr => pr.Claims.All(cl => claimTokenFormatFetcherResult.Claims.Any(c => c.Type == cl.Name && !c.Value.ToString().Equals(cl.Value, StringComparison.InvariantCultureIgnoreCase)))));
                     if (isNotAuthorized)
                     {
-                        var pendingRequests = await _umaPendingRequestRepository.Query().Where(r => r.TicketId == permissionTicket.Id).ToListAsync(cancellationToken);
-                        if (pendingRequests.Any())
-                            return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, Global.RequestDenied);
 
-                        foreach (var umaResource in umaResources)
+                        using (var transaction = _transactionBuilder.Build())
                         {
-                            var permissionTicketRecord = permissionTicket.Records.First(r => r.ResourceId == umaResource.Id);
-                            var umaPendingRequest = new UMAPendingRequest(permissionTicket.Id, umaResource.Subject, DateTime.UtcNow, context.Realm)
+                            var pendingRequests = await _umaPendingRequestRepository.GetByPermissionTicketId(permissionTicket.Id, cancellationToken);
+                            if (pendingRequests.Any())
+                                return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.REQUEST_DENIED, Global.RequestDenied);
+
+                            foreach (var umaResource in umaResources)
                             {
-                                Requester = claimTokenFormatFetcherResult.UserNameIdentifier,
-                                Scopes = umaResource.Scopes,
-                                Resource = umaResource
+                                var permissionTicketRecord = permissionTicket.Records.First(r => r.ResourceId == umaResource.Id);
+                                var umaPendingRequest = new UMAPendingRequest(permissionTicket.Id, umaResource.Subject, DateTime.UtcNow, context.Realm)
+                                {
+                                    Requester = claimTokenFormatFetcherResult.UserNameIdentifier,
+                                    Scopes = umaResource.Scopes,
+                                    Resource = umaResource
+                                };
+                                _umaPendingRequestRepository.Add(umaPendingRequest);
+                            }
+
+                            await transaction.Commit(cancellationToken);
+                            return new ContentResult
+                            {
+                                ContentType = "application/json",
+                                StatusCode = (int)HttpStatusCode.Unauthorized,
+                                Content = new JObject
+                                {
+                                    { "request_submitted", new JObject
+                                    {
+                                        { TokenRequestParameters.Ticket, permissionTicket.Id },
+                                        { "interval", Options.RequestSubmittedInterval }
+                                    } }
+                                }.ToString()
                             };
-                            _umaPendingRequestRepository.Add(umaPendingRequest);
                         }
-
-                        await _umaPendingRequestRepository.SaveChanges(cancellationToken);
-                        return new ContentResult
-                        {
-                            ContentType = "application/json",
-                            StatusCode = (int)HttpStatusCode.Unauthorized,
-                            Content = new JObject
-                        {
-                            { "request_submitted", new JObject
-                            {
-                                { TokenRequestParameters.Ticket, permissionTicket.Id },
-                                { "interval", Options.RequestSubmittedInterval }
-                            } }
-                        }.ToString()
-                        };
                     }
 
                     var permissionClaims = new List<Dictionary<string, object>>();

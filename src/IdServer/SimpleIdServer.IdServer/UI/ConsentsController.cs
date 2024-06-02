@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
@@ -17,7 +16,7 @@ using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +39,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IExtractRequestHelper _extractRequestHelper;
         private readonly ITokenRepository _tokenRepository;
         private readonly IBusControl _busControl;
+        private readonly ITransactionBuilder _transactionBuilder;
         private readonly ILogger<ConsentsController> _logger;
         private readonly IdServerHostOptions _options;
 
@@ -52,6 +52,7 @@ namespace SimpleIdServer.IdServer.UI
             IExtractRequestHelper extractRequestHelper,
             ITokenRepository tokenRepository,
             IBusControl busControl,
+            ITransactionBuilder transactionBuilder,
             ILogger<ConsentsController> logger,
             IOptions<IdServerHostOptions> options)
         {
@@ -63,6 +64,7 @@ namespace SimpleIdServer.IdServer.UI
             _extractRequestHelper = extractRequestHelper;
             _tokenRepository = tokenRepository;
             _busControl = busControl;
+            _transactionBuilder = transactionBuilder;
             _logger = logger;
             _options = options.Value;
         }
@@ -78,7 +80,7 @@ namespace SimpleIdServer.IdServer.UI
                 var unprotectedUrl = _dataProtector.Unprotect(returnUrl);
                 var query = unprotectedUrl.GetQueries().ToJsonObject();
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+                var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
                 var grantId = query.GetGrantIdFromAuthorizationRequest();
                 if(!string.IsNullOrWhiteSpace(grantId))
                     return View(await BuildConsentsFromGrant(query, oauthClient, grantId));
@@ -138,7 +140,7 @@ namespace SimpleIdServer.IdServer.UI
             var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
             var query = unprotectedUrl.GetQueries().ToJsonObject();
             var clientId = query.GetClientIdFromAuthorizationRequest();
-            var oauthClient = await _clientRepository.Query().Include(c => c.Realms).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
+            var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
             query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
             var redirectUri = query.GetRedirectUriFromAuthorizationRequest();
             var grantId = query.GetGrantIdFromAuthorizationRequest();
@@ -146,12 +148,16 @@ namespace SimpleIdServer.IdServer.UI
             var claims = query.GetClaimsFromAuthorizationRequest().Select(c => c.Name);
             if (!string.IsNullOrWhiteSpace(grantId))
             {
-                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-                var consent = user.Consents.Single(c => c.Id == grantId);
-                user.Consents.Remove(consent);
-                await _userRepository.SaveChanges(cancellationToken);
-                scopes = consent.Scopes.Select(s => s.Scope);
-                claims = consent.Claims;
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+                    var consent = user.Consents.Single(c => c.Id == grantId);
+                    user.Consents.Remove(consent);
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    scopes = consent.Scopes.Select(s => s.Scope);
+                    claims = consent.Claims;
+                }
             }
 
             var state = query.GetStateFromAuthorizationRequest();
@@ -185,36 +191,22 @@ namespace SimpleIdServer.IdServer.UI
         {
             try
             {
-                prefix = prefix ?? Constants.DefaultRealm;
-                var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
-                var query = unprotectedUrl.GetQueries().ToJsonObject();
-                var grantId = query.GetGrantIdFromAuthorizationRequest();
-                var clientId = query.GetClientIdFromAuthorizationRequest();
-                var oauthClient = await _clientRepository.Query().Include(c => c.Translations).Include(c => c.Realms).Include(c => c.Scopes).Include(c => c.SerializedJsonWebKeys).AsNoTracking().FirstAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == prefix), cancellationToken);
-                query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
-                var nameIdentifier = GetNameIdentifier();
-                var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-                if(!string.IsNullOrWhiteSpace(grantId))
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    var consent = user.Consents.Single(c => c.Id == grantId);
-                    consent.Accept();
-                    await RevokeTokens(grantId, cancellationToken);
-                    await _busControl.Publish(new ConsentGrantedEvent
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    var unprotectedUrl = _dataProtector.Unprotect(viewModel.ReturnUrl);
+                    var query = unprotectedUrl.GetQueries().ToJsonObject();
+                    var grantId = query.GetGrantIdFromAuthorizationRequest();
+                    var clientId = query.GetClientIdFromAuthorizationRequest();
+                    var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
+                    query = await _extractRequestHelper.Extract(prefix, Request.GetAbsoluteUriWithVirtualPath(), query, oauthClient);
+                    var nameIdentifier = GetNameIdentifier();
+                    var user = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+                    if (!string.IsNullOrWhiteSpace(grantId))
                     {
-                        UserName = nameIdentifier,
-                        ClientId = consent.ClientId,
-                        Scopes = consent.Scopes.Select(s => s.Scope),
-                        Claims = consent.Claims,
-                        Realm = prefix
-                    });
-                }
-                else
-                {
-                    var consent = _userConsentFetcher.FetchFromAuthorizationRequest(prefix, user, query);
-                    if (consent == null)
-                    {
-                        consent = _userConsentFetcher.BuildFromAuthorizationRequest(prefix, query);
-                        user.Consents.Add(consent);
+                        var consent = user.Consents.Single(c => c.Id == grantId);
+                        consent.Accept();
+                        await RevokeTokens(grantId, cancellationToken);
                         await _busControl.Publish(new ConsentGrantedEvent
                         {
                             UserName = nameIdentifier,
@@ -224,10 +216,28 @@ namespace SimpleIdServer.IdServer.UI
                             Realm = prefix
                         });
                     }
-                }
+                    else
+                    {
+                        var consent = _userConsentFetcher.FetchFromAuthorizationRequest(prefix, user, query);
+                        if (consent == null)
+                        {
+                            consent = _userConsentFetcher.BuildFromAuthorizationRequest(prefix, query);
+                            user.Consents.Add(consent);
+                            await _busControl.Publish(new ConsentGrantedEvent
+                            {
+                                UserName = nameIdentifier,
+                                ClientId = consent.ClientId,
+                                Scopes = consent.Scopes.Select(s => s.Scope),
+                                Claims = consent.Claims,
+                                Realm = prefix
+                            });
+                        }
+                    }
 
-                await _userRepository.SaveChanges(cancellationToken);
-                return Redirect(unprotectedUrl);
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    return Redirect(unprotectedUrl);
+                }
             }
             catch (CryptographicException ex)
             {
@@ -238,10 +248,9 @@ namespace SimpleIdServer.IdServer.UI
 
             async Task RevokeTokens(string grantId, CancellationToken cancellationToken)
             {
-                var tokens = await _tokenRepository.Query().Where(t => t.GrantId == grantId).ToListAsync(cancellationToken);
+                var tokens = await _tokenRepository.GetByGrantId(grantId, cancellationToken);
                 foreach (var t in tokens)
                     _tokenRepository.Remove(t);
-                await _tokenRepository.SaveChanges(cancellationToken);
             }
         }
 

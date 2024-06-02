@@ -1,0 +1,118 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using SimpleIdServer.IdServer.SqlSugar.Startup.Resources;
+@model SimpleIdServer.IdServer.Sms.UI.ViewModels.AuthenticateSmsViewModel
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = AuthenticateSmsResource.title;
+    Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
+    var realm = SimpleIdServer.IdServer.Middlewares.RealmContext.Instance()?.Realm;
+    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
+}
+            
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="list-group mb-3">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@AuthenticateSmsResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    </ul>
+}
+
+@if(Model.IsLoginMissing)
+{
+    <div class="alert alert-danger">
+        @AuthenticateSmsResource.missing_phonenumber
+    </div>
+}
+else
+{
+    <!-- Send confirmation code -->
+    <div class="mt-3">
+        @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
+        {
+            <div class="alert alert-success">
+                @AuthenticateConsoleResource.ResourceManager.GetString(ViewBag.SuccessMessage)
+                @if (Model.TOTPStep != null)
+                {
+                    @string.Format(AuthenticateConsoleResource.code_validity, Model.TOTPStep)
+                }
+            </div>
+        }
+
+        @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Sms.Constants.AMR, returnUrl = Model.ReturnUrl }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl" />
+            <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+            <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+            <div class="input-group mb-3">
+                @if (Model.IsAuthInProgress)
+                {
+                    <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" disabled="disabled" />
+                    <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
+                }
+                else
+                {
+                    <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="text" class="form-control" />
+                }
+            </div>
+            <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.sendconfirmationcode</button>
+        }
+    </div>
+
+    <div class="mt-3">
+        <!-- Login form -->
+        @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Sms.Constants.AMR, returnUrl = Model.ReturnUrl }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl" />
+            <input type="hidden" name="Action" value="AUTHENTICATE" />
+            <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+            <div class="input-group mb-3">
+                <input asp-for="Login" placeholder="@AuthenticateSmsResource.phonenumber" type="hidden" class="form-control" />
+            </div>
+            <div class="input-group mb-3">
+                <input asp-for="OTPCode" type="password" class="form-control" placeholder="@AuthenticateSmsResource.confirmationcode" />
+            </div>
+            @if(Model.IsFirstAmr)
+            {
+                <div>
+                    <input type="checkbox" asp-for="RememberLogin " />
+                    <label>@AuthenticateSmsResource.remember_login</label>
+                </div>
+            }
+            <button type="submit" class="btn btn-primary card-link">@AuthenticateSmsResource.authenticate</button>
+        }
+    </div>
+
+    @if (Model.IsFirstAmr && Model.RegistrationWorkflow != null)
+    {
+        <div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
+        </div>
+    }
+}
+
+@section SubScripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".login input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+        });
+    </script>
+}
