@@ -82,15 +82,23 @@ Browse the [administration UI](http://localhost:5002), navigate to the `Identity
 
 In the `Properties` tab, you can update the attributes of the extraction job
 
-| Field                       | Description                                                                                         |
-| --------------------------- | --------------------------------------------------------------------------------------------------- |
-| Bind DN                     | DN of the LDAP admin, which will be used by IdServer to access LDAP Server                          |
-| Bind Credentials            | Password of LDAP admin                                                                              |
-| Users DN                    | Full DN of LDAP tree where users are                                                                |
-| User object classes         | All values of LDAP objectClass attribute for users in LDAP, divided by commas                       |
-| UUID LDAP Attribute         | Name of the LDAP attribute, which is used as a unique object identifier (UUID) for objects in LDAP. |
-| Modification Date Attribute | Name of the LDAP Attribute, which is used as the modification date for objects in LDAP              |
-| Batch Size                  | Number of records                                                                                   |
+| Field                       | Description                                                                                         | Default value |
+| --------------------------- | --------------------------------------------------------------------------------------------------- | ------------- |
+| Server                      | -                                                                                                   | localhost     |
+| Port                        | -                                                                                                   | 389           |
+| Bind DN                     | DN of the LDAP admin, which will be used by IdServer to access LDAP Server                          | cn=admin,dc=xl,dc=com |
+| Bind Credentials            | Password of LDAP admin                                                                              | password              |
+| Users DN                    | Full DN of LDAP tree where users are                                                                | ou=people,dc=xl,dc=com |
+| User object classes         | All values of LDAP objectClass attribute for users in LDAP, divided by commas                       | organizationalPerson,person |
+| Groups DN                   | Full DN of LDAP tree where groups are                                                               | ou=groups,dc=xl,dc=com |
+| Group object classes        | All values of LDAP objectClass attribute for groups in LDAP, divided by commas                      | posixGroup |
+| Membership Group LDAP Attribute | It is the name of the LDAP Attribute on the group, which is used for membership mappings, for example memberUid | memberUid |
+| Membership User LDAP Attribute | It is the name of the LDAP Attribute on the user, which is used for membership mappings, for example uidNumber | uidNumber |
+| User Groups Retrieve Strategy | Membership User LDAP Attribute | LOAD_BY_MEMBER_ATTRIBUTE |
+| User Identifier LDAP Attribute | Name of the LDAP attribute, which is used as a unique object identifier for objects in LDAP, objectSID for Active Directory or uidNumber of Open Ldap | uidNumber |
+| Group Identifier LDAP Attribute | Name of the LDAP attribute, which is used as a unique object identifier for objects in LDAP, objectSID for Active Directory or gidNumber of Open Ldap | gidNumber |
+| Modification Date Attribute | Name of the LDAP Attribute, which is used as the modification date for objects in LDAP              | modificationDate |
+| Batch Size                  | Number of records                                                                                   | 1 |
 
 :::warning
 
@@ -108,7 +116,6 @@ The `Mapping Rules` tab contains the rules used by IdServer to map properties fr
 ![Mapping rules](./images/ldap-4.png)
 
 Before initiating the extraction, ensure that both the Identity Server and the Administration UI are running/launched.
-
 
 Click on the `Histories` tab and then click on the `Launch` button.
 

@@ -23,7 +23,10 @@ public class LDAPProvisioningService : BaseProvisioningService<LDAPRepresentatio
 
     public override Task<ExtractedResult> ExtractTestData(IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
     {
-        return Extract(new ExtractionPage(), definition, cancellationToken);
+        return Extract(new ExtractionPage
+        {
+            Page = 1
+        }, definition, cancellationToken);
     }
 
     public override Task<ExtractedResult> Extract(ExtractionPage currentPage, IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
