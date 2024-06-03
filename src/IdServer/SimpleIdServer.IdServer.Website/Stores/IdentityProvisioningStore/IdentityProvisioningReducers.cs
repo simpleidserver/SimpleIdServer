@@ -178,6 +178,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             };
         }
 
+        [ReducerMethod]
+        public static IdentityProvisioningState ReduceRelaunchIdentityProvisioningErrorsSuccessAction(IdentityProvisioningState state, RelaunchIdentityProvisioningErrorsSuccessAction act)
+        {
+            var idProvisioning = state.IdentityProvisioning;
+            var process = idProvisioning.Processes.Single(p => p.Id == act.ExternalId);
+            process.Errors = new List<IdentityProvisioningProcessMessageErrorResult>();
+            return state with
+            {
+                IsLoading = false,
+                IdentityProvisioning = idProvisioning
+            };
+        }
+
         #endregion
 
         #region SearchIdentityProvisioningMappingRuleState

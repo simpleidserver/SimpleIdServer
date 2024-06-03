@@ -48,6 +48,18 @@
                 <RadzenDataGridColumn Title="@Global.EndExport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndExportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
                 <RadzenDataGridColumn Title="@Global.StartImport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
                 <RadzenDataGridColumn Title="@Global.EndImport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.Errors" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        @if(data.Errors != null && data.Errors.Any())
+                        {
+                            <p>
+                            <b>@string.Format(Global.RelaunchErrors, data.Errors.Count())</b>
+                                <RadzenButton Variant="Variant.Flat" Click=@(args => RelaunchErrors(data)) Icon="refresh" ButtonStyle="ButtonStyle.Primary" />
+                                <RadzenButton Variant="Variant.Flat" Click=@(args => ViewErrors(data)) Icon="visibility" ButtonStyle="ButtonStyle.Light" />
+                            </p>                            
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
                         @if(data.IsExported && data.StartImportDateTime == null)
@@ -127,12 +139,33 @@
                 message = $"Users {process.NbImportedUsers}, Groups {process.NbImportedGroups}, Page {process.NbImportedPages} / {process.TotalPageToImport}";
             }
         }
-                
+
         tooltipService.Open(elementReference.Value, message);
     }
 
     void ShowTooltip(ElementReference eltRef, string msg)
     {
         tooltipService.Open(eltRef, msg, null);
+    }
+
+    void RelaunchErrors(IdentityProvisioningProcessResult process)
+    {
+        var act = new RelaunchIdentityProvisioningErrorsAction
+        {
+            ExternalId = process.Id
+        };
+        dispatcher.Dispatch(act);
+    }
+
+    async Task ViewErrors(IdentityProvisioningProcessResult process)
+    {
+        var dic = new Dictionary<string, object> { { "IdentityProvisioningProcess", process } };
+        await dialogService.OpenAsync<IdentityProvisioningErrorsDialog>(Global.Errors, dic, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
     }
 }

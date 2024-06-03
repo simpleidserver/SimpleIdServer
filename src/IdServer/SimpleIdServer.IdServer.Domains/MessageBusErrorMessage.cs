@@ -11,4 +11,5 @@ public class MessageBusErrorMessage
     public string Content { get; set; } = null!;
     public List<string> Exceptions { get; set; } = new List<string>();
     public DateTime ReceivedDateTime { get; set; }
+    public string QueueName { get; set; } = null!;
 }

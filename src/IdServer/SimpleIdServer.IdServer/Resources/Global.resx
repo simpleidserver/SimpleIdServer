@@ -846,6 +846,9 @@
   <data name="UnknownDeviceType" xml:space="preserve">
     <value>the device {0} is not supported</value>
   </data>
+  <data name="UnknownErrorMessage" xml:space="preserve">
+    <value>The error message {0} is unknown</value>
+  </data>
   <data name="UnknownGrant" xml:space="preserve">
     <value>the grant {0} doesn't exist</value>
   </data>

@@ -157,6 +157,13 @@ namespace Microsoft.AspNetCore.Builder
                     defaults: new { controller = "UMAResources", action = "DeletePermissions" });
             }
 
+            webApplication.SidMapControllerRoute("relaunchErrorMessage",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ErrorMessages + "/{id}/relaunch",
+                defaults: new { controller = "ErrorMessages", action = "Relaunch" });
+            webApplication.SidMapControllerRoute("relaunchErrorMessagesByExternalid",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ErrorMessages + "/relaunch",
+                defaults: new { controller = "ErrorMessages", action = "RelaunchAllByExternalId" });
+
             webApplication.SidMapControllerRoute("getGrant",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Grants + "/{id}",
                 defaults: new { controller = "Grants", action = "Get" });

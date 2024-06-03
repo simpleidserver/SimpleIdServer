@@ -34,10 +34,11 @@ namespace SimpleIdServer.IdServer.Provisioning
                     Id = Guid.NewGuid().ToString(),
                     Content = JsonSerializer.Serialize(context.Message.Message),
                     ExternalId = context.Message.Message.ProcessId,
-                    FullName = type.FullName,
+                    FullName = type.AssemblyQualifiedName,
                     Name = type.Name,
                     Exceptions = exceptions,
-                    ReceivedDateTime = DateTime.UtcNow
+                    ReceivedDateTime = DateTime.UtcNow,
+                    QueueName = ImportUsersConsumer.Queuename
                 };
                 _messageBusErrorStore.Add(message);
                 await transaction.Commit(context.CancellationToken);

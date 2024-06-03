@@ -2248,6 +2248,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The error message {0} is unknown.
+        /// </summary>
+        public static string UnknownErrorMessage {
+            get {
+                return ResourceManager.GetString("UnknownErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the grant {0} doesn&apos;t exist.
         /// </summary>
         public static string UnknownGrant {

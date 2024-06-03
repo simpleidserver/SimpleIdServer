@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
         private readonly IConfiguration _configuration;
         private readonly IEnumerable<IProvisioningService> _provisioningServices;
         private readonly ITransactionBuilder _transactionBuilder;
+        private readonly IMessageBusErrorStore _messageBrokerErrorStore;
 
         public IdentityProvisioningController(
             IBusControl busControl,
@@ -36,13 +37,15 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             IJwtBuilder jwtBuilder, 
             IConfiguration configuration, 
             IEnumerable<IProvisioningService> provisioningServices,
-            ITransactionBuilder transactionBuilder) : base(tokenRepository, jwtBuilder)
+            ITransactionBuilder transactionBuilder,
+            IMessageBusErrorStore messageBusErrorStore) : base(tokenRepository, jwtBuilder)
         {
             _busControl = busControl;
             _identityProvisioningStore = identityProvisioningStore;
             _configuration = configuration;
             _provisioningServices = provisioningServices;
             _transactionBuilder = transactionBuilder;
+            _messageBrokerErrorStore = messageBusErrorStore;
         }
 
         [HttpPost]
@@ -79,7 +82,22 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
                 var section = _configuration.GetSection(optionKey);
                 var configuration = section.Get(optionType);
                 var provisioningService = _provisioningServices.Single(p => p.Name == result.Definition.Name);
-                return new OkObjectResult(Build(result, configuration));
+                var externalIds = result.Processes.Select(h => h.Id).ToList();
+                var messageErrors = await _messageBrokerErrorStore.GetAllByExternalId(externalIds, cancellationToken);
+                var res = Build(result, configuration);
+                res.Processes.ForEach(p =>
+                {
+                    var filteredMessageErrors = messageErrors.Where(e => e.ExternalId == p.Id);
+                    if (filteredMessageErrors.Any()) 
+                    {
+                        p.Errors = filteredMessageErrors.Select(e => new IdentityProvisioningProcessMessageErrorResult
+                        {
+                            Id = e.Id,
+                            Exceptions = e.Exceptions
+                        }).ToList();
+                    }
+                });
+                return new OkObjectResult(res);
             }
             catch (OAuthException ex)
             {

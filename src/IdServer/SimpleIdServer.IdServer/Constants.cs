@@ -91,6 +91,7 @@ namespace SimpleIdServer.IdServer
             public const string Realms = "realms";
             public const string Groups = "groups";
             public const string Languages = "languages";
+            public const string ErrorMessages = "errormessages";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>

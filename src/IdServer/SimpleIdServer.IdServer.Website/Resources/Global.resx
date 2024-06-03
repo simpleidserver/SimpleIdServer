@@ -1824,4 +1824,13 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="SupportUserRegistration" xml:space="preserve">
     <value>Support user registration</value>
   </data>
+  <data name="Errors" xml:space="preserve">
+    <value>Errors</value>
+  </data>
+  <data name="RelaunchErrors" xml:space="preserve">
+    <value>{0} errors</value>
+  </data>
+  <data name="Exception" xml:space="preserve">
+    <value>Exception</value>
+  </data>
 </root>

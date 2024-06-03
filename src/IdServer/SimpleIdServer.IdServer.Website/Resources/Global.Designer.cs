@@ -1600,6 +1600,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Errors.
+        /// </summary>
+        public static string Errors {
+            get {
+                return ResourceManager.GetString("Errors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Ethereum contract has been deployed.
         /// </summary>
         public static string EthrContractDeployed {
@@ -1623,6 +1632,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string EthrNetworkExists {
             get {
                 return ResourceManager.GetString("EthrNetworkExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Exception.
+        /// </summary>
+        public static string Exception {
+            get {
+                return ResourceManager.GetString("Exception", resourceCulture);
             }
         }
         
@@ -3299,6 +3317,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Rejected {
             get {
                 return ResourceManager.GetString("Rejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à {0} errors.
+        /// </summary>
+        public static string RelaunchErrors {
+            get {
+                return ResourceManager.GetString("RelaunchErrors", resourceCulture);
             }
         }
         

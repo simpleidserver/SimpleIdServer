@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.ErrorMessages;
 using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Provisioning;
@@ -295,6 +296,32 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(RelaunchIdentityProvisioningErrorsAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = $"{_options.IdServerBaseUrl}/errormessages";
+            if (_options.IsReamEnabled)
+            {
+                var realm = await _sessionStorage.GetAsync<string>("realm");
+                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                baseUrl = $"{_options.IdServerBaseUrl}/{realmStr}/errormessages";
+            }
+
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new RelaunchAllErrorMessagesByExternalIdRequest
+            {
+                ExternalId = action.ExternalId
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"),
+                RequestUri = new Uri($"{baseUrl}/relaunch")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new RelaunchIdentityProvisioningErrorsSuccessAction { ExternalId = action.ExternalId });
+        }
+
         private async Task<string> GetBaseUrl()
         {
             if(_options.IsReamEnabled)
@@ -512,5 +539,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     public class LaunchIdentityProvisioningImportFailureAction
     {
         public string ErrorMessage { get; set; }
+    }
+
+    public class RelaunchIdentityProvisioningErrorsAction
+    {
+        public string ExternalId { get; set; }
+    }
+
+    public class RelaunchIdentityProvisioningErrorsSuccessAction
+    {
+        public string ExternalId { get; set; }
     }
 }

@@ -41,6 +41,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IUserSessionResitory, UserSessionRepository>();
         services.AddTransient<ITransactionBuilder, SqlSugarTransactionBuilder>();
+        services.AddTransient<IMessageBusErrorStore, MessageBusErrorStore>();
         return services;
     }
 }
