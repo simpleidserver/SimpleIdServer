@@ -423,6 +423,9 @@
   <data name="DuplicateScopes" xml:space="preserve">
     <value>duplicate scopes : {0}</value>
   </data>
+  <data name="EmailIsTaken" xml:space="preserve">
+    <value>The email is taken</value>
+  </data>
   <data name="ExpiredBcAuthorize" xml:space="preserve">
     <value>the authorization request is expired</value>
   </data>

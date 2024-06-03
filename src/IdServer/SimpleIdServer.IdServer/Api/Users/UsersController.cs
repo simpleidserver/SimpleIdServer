@@ -229,6 +229,12 @@ namespace SimpleIdServer.IdServer.Api.Users
                         if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                        if (!string.IsNullOrWhiteSpace(request.Email))
+                        {
+                            var existingUser = await _userRepository.GetByEmail(request.Email, prefix, cancellationToken);
+                            if (existingUser != null && existingUser.Id != id) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.EmailIsTaken);
+                        }
+
                         user.UpdateEmail(request.Email);
                         user.UpdateName(request.Name);
                         user.UpdateLastname(request.Lastname);

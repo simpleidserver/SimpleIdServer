@@ -979,6 +979,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The email is taken.
+        /// </summary>
+        public static string EmailIsTaken {
+            get {
+                return ResourceManager.GetString("EmailIsTaken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the authorization request is expired.
         /// </summary>
         public static string ExpiredBcAuthorize {

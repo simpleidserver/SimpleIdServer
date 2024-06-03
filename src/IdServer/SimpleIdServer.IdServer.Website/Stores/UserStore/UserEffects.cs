@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Website.Stores.Base;
+using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.Json;
@@ -113,8 +114,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 Method = HttpMethod.Put,
                 Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
             };
-            await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
+            }
+            catch
+            {
+                var json = await httpResult.Content.ReadAsStringAsync();
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new UpdateUserDetailsFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
@@ -484,6 +495,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string? Firstname { get; set; } = null;
         public string? Lastname { get; set; } = null;
         public string? NotificationMode { get; set; } = null;
+    }
+
+    public class UpdateUserDetailsFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class RevokeUserConsentAction

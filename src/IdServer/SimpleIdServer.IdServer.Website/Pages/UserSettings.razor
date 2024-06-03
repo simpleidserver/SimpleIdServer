@@ -90,6 +90,11 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserDetailsUpdated });
                 StateHasChanged();
             });
+            SubscribeToAction<UpdateUserDetailsFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
         }
     }
 
