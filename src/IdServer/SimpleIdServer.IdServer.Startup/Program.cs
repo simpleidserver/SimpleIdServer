@@ -89,8 +89,10 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 builder.Services.AddLocalization();
-ConfigureIdServer(builder.Services, builder.Configuration);
+ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
+
+builder.Services.AddJsonSeeding(builder.Configuration); // Uncomment this line to allow seed data from JSON file.
 
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
@@ -130,7 +132,7 @@ app
 
 app.Run();
 
-void ConfigureIdServer(IServiceCollection services, IConfiguration configuration)
+void ConfigureIdServer(IServiceCollection services)
 {
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
@@ -181,7 +183,6 @@ void ConfigureIdServer(IServiceCollection services, IConfiguration configuration
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDidKey();
-    services.AddJsonSeeding(configuration); // Uncomment this line to allow seed data from JSON file.
     ConfigureDistributedCache();
 }
 

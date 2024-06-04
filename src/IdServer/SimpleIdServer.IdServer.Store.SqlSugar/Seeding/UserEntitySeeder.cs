@@ -1,12 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license informa
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Builders;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Seeding;
 
-namespace SimpleIdServer.IdServer.Store.EF.Seeding;
+namespace SimpleIdServer.IdServer.Store.SqlSugar.Seeding;
 
 /// <summary>
 /// Implements the method that allows to seed records of users.
@@ -14,18 +12,19 @@ namespace SimpleIdServer.IdServer.Store.EF.Seeding;
 public class UserEntitySeeder : IEntitySeeder<UserSeedDto>
 {
     private readonly ILogger<UserEntitySeeder> _logger;
-    private readonly StoreDbContext _storeDbContext;
+    private readonly DbContext _dbContext;
 
-    public UserEntitySeeder(ILogger<UserEntitySeeder> logger, StoreDbContext storeDbContext)
+    public UserEntitySeeder(ILogger<UserEntitySeeder> logger, DbContext dbContext)
     {
         _logger = logger;
-        _storeDbContext = storeDbContext;
+        _dbContext = dbContext;
     }
 
     public async Task SeedAsync(IReadOnlyCollection<UserSeedDto> records, CancellationToken cancellationToken = default)
     {
-        string[] dbLoginNames = await _storeDbContext.Users.Select(u => u.Name.ToUpper())
-            .ToArrayAsync(cancellationToken);
+        string[] dbLoginNames = await _dbContext.Client.Queryable<Models.SugarUser>()
+            .Select(u => u.Name.ToUpper())
+            .ToArrayAsync();
 
         UserSeedDto[] usersNotInDb = (from r in records
                                       join ln in dbLoginNames on r.Login.ToUpper() equals ln
@@ -36,7 +35,7 @@ public class UserEntitySeeder : IEntitySeeder<UserSeedDto>
 
         if (usersNotInDb.Length > 0)
         {
-            var usersToCreate = new List<User>();
+            var usersToCreate = new List<Models.SugarUser>();
 
             foreach (var user in usersNotInDb)
             {
@@ -46,11 +45,12 @@ public class UserEntitySeeder : IEntitySeeder<UserSeedDto>
 
                 foreach (var role in user.Roles) { builder.AddRole(role); }
 
-                usersToCreate.Add(builder.Build());
+                Models.SugarUser sugarUser = Models.SugarUser.Transform(builder.Build());
+
+                usersToCreate.Add(sugarUser);
             }
 
-            await _storeDbContext.Users.AddRangeAsync(usersToCreate, cancellationToken);
-            await _storeDbContext.SaveChangesAsync(cancellationToken);
+            await _dbContext.Client.Insertable<Models.SugarUser>(usersToCreate).ExecuteCommandAsync(cancellationToken);
         }
 
         _logger.LogInformation("{count} users seeded.", usersNotInDb.Length);
