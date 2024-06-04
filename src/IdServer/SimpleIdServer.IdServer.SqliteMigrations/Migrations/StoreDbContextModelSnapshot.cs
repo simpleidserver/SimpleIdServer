@@ -3,7 +3,6 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Store.EF;
 
 #nullable disable
@@ -1554,6 +1553,42 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("Languages");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MessageBusErrorMessage", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Exceptions")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("QueueName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ReceivedDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MessageBusErrorMessages");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>

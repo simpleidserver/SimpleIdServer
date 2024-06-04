@@ -17,6 +17,18 @@ public class SugarConfigurationDefinition
     [Navigate(NavigateType.OneToMany, nameof(SugarConfigurationDefinitionRecord.ConfigurationDefinitionId))]
     public List<SugarConfigurationDefinitionRecord> ConfigurationDefinitionRecords { get; set; }
 
+    public static SugarConfigurationDefinition Transform(ConfigurationDefinition configurationDefinition)
+    {
+        return new SugarConfigurationDefinition
+        {
+            Id = configurationDefinition.Id,
+            CreateDateTime = configurationDefinition.CreateDateTime,
+            UpdateDateTime = configurationDefinition.UpdateDateTime,
+            FullQualifiedName = configurationDefinition.FullQualifiedName,
+            ConfigurationDefinitionRecords = configurationDefinition.Records == null ? new List<SugarConfigurationDefinitionRecord>() : configurationDefinition.Records.Select(r => SugarConfigurationDefinitionRecord.Transform(r)).ToList()
+        };
+    }
+
     public ConfigurationDefinition ToDomain()
     {
         return new ConfigurationDefinition

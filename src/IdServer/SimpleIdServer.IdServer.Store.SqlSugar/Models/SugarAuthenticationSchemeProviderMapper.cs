@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Domains;
 using SqlSugar;
+using static MassTransit.Logging.OperationName;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar.Models;
 
@@ -19,6 +20,19 @@ public class SugarAuthenticationSchemeProviderMapper
     public string IdProviderId { get; set; } = null!;
     [Navigate(NavigateType.ManyToOne, nameof(IdProviderId))]
     public AuthenticationSchemeProvider IdProvider { get; set; } = null!;
+
+    public static SugarAuthenticationSchemeProviderMapper Transform(AuthenticationSchemeProviderMapper mapper)
+    {
+        return new SugarAuthenticationSchemeProviderMapper
+        {
+            Id = mapper.Id,
+            Name = mapper.Name,
+            SourceClaimName = mapper.SourceClaimName,
+            MapperType = mapper.MapperType,
+            TargetUserAttribute = mapper.TargetUserAttribute,
+            TargetUserProperty = mapper.TargetUserProperty
+        };
+    }
 
     public AuthenticationSchemeProviderMapper ToDomain()
     {

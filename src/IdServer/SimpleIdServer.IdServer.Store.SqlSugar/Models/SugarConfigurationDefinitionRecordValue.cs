@@ -16,6 +16,16 @@ public class SugarConfigurationDefinitionRecordValue
     [Navigate(typeof(SugarConfigurationDefinitionRecordValueTranslation), nameof(SugarConfigurationDefinitionRecordValueTranslation.ConfigurationDefinitionRecordValueId), nameof(SugarConfigurationDefinitionRecordValueTranslation.TranslationsId))]
     public List<SugarTranslation> Translations { get; set; }
 
+    public static SugarConfigurationDefinitionRecordValue Transform(ConfigurationDefinitionRecordValue value)
+    {
+        return new SugarConfigurationDefinitionRecordValue
+        {
+            Id = value.Id,
+            Value = value.Value,
+            Translations = value.Translations == null ? new List<SugarTranslation>() : value.Translations.Select(t => SugarTranslation.Transform(t)).ToList()
+        };
+    }
+
     public ConfigurationDefinitionRecordValue ToDomain()
     {
         return new ConfigurationDefinitionRecordValue

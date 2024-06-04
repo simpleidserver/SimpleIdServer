@@ -16,6 +16,14 @@ public class ConfigurationDefinitionStore : IConfigurationDefinitionStore
         _dbContext = dbContext;
     }
 
+    public void Add(ConfigurationDefinition cnfigurationDefinition)
+    {
+        _dbContext.Client.InsertNav(SugarConfigurationDefinition.Transform(cnfigurationDefinition))
+            .Include(c => c.ConfigurationDefinitionRecords).ThenInclude(c => c.Values).ThenInclude(c => c.Translations)
+            .Include(c => c.ConfigurationDefinitionRecords).ThenInclude(c => c.Translations)
+            .ExecuteCommand();
+    }
+
     public async Task<List<ConfigurationDefinition>> GetAll(CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarConfigurationDefinition>()

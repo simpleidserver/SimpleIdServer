@@ -12,4 +12,5 @@ public interface IAuthenticationSchemeProviderDefinitionRepository
 {
     Task<AuthenticationSchemeProviderDefinition> Get(string name, CancellationToken cancellationToken);
     Task<List<AuthenticationSchemeProviderDefinition>> GetAll(CancellationToken cancellationToken);
+    void Add(AuthenticationSchemeProviderDefinition definition);
 }

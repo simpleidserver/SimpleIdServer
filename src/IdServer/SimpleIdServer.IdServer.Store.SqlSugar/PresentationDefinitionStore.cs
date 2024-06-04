@@ -16,6 +16,14 @@ public class PresentationDefinitionStore : IPresentationDefinitionStore
         _dbContext = dbContext;
     }
 
+    public void Add(PresentationDefinition presentationDefinition)
+    {
+        _dbContext.Client.InsertNav(SugarPresentationDefinition.Transform(presentationDefinition))
+            .Include(p => p.InputDescriptors).ThenInclude(p => p.Format)
+            .Include(p => p.InputDescriptors).ThenInclude(p => p.Constraints)
+            .ExecuteCommand();
+    }
+
     public async Task<List<PresentationDefinition>> GetAll(string realm, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarPresentationDefinition>()

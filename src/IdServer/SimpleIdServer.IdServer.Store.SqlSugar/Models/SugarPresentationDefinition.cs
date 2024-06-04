@@ -20,6 +20,19 @@ public class SugarPresentationDefinition
     [Navigate(NavigateType.OneToMany, nameof(SugarPresentationDefinitionInputDescriptor.PresentationDefinitionId))]
     public List<SugarPresentationDefinitionInputDescriptor> InputDescriptors { get; set; }
 
+    public static SugarPresentationDefinition Transform(PresentationDefinition presentationDefinition)
+    {
+        return new SugarPresentationDefinition
+        {
+            Id = presentationDefinition.Id,
+            Name = presentationDefinition.Name,
+            PublicId = presentationDefinition.PublicId,
+            Purpose = presentationDefinition.Purpose,
+            RealmName = presentationDefinition.Realm == null ? presentationDefinition.RealmName : presentationDefinition.Realm.Name,
+            InputDescriptors = presentationDefinition.InputDescriptors == null ? new List<SugarPresentationDefinitionInputDescriptor>() : presentationDefinition.InputDescriptors.Select(d => SugarPresentationDefinitionInputDescriptor.Transform(d)).ToList()
+        };
+    }
+
     public PresentationDefinition ToDomain()
     {
         return new PresentationDefinition

@@ -15,6 +15,16 @@ public class SugarPresentationDefinitionFormat
     public string ProofType { get; set; }
     public string PresentationDefinitionInputDescriptorId {  get; set; }
 
+    public static SugarPresentationDefinitionFormat Transform(PresentationDefinitionFormat format)
+    {
+        return new SugarPresentationDefinitionFormat
+        {
+            Id = format.Id,
+            Format = format.Format,
+            ProofType = format.ProofType
+        };
+    }
+
     public PresentationDefinitionFormat ToDomain()
     {
         return new PresentationDefinitionFormat

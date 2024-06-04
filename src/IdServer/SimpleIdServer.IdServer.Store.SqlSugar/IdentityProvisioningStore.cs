@@ -47,6 +47,13 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 .ExecuteCommand();
         }
 
+        public void Add(IdentityProvisioningDefinition identityProvisioningDefinition)
+        {
+            _dbContext.Client.InsertNav(SugarIdentityProvisioningDefinition.Transform(identityProvisioningDefinition))
+                .Include(c => c.MappingRules)
+                .ExecuteCommand();
+        }
+
         public void Update(IdentityProvisioningDefinition identityProvisioningDefinition)
         {
             _dbContext.Client.UpdateNav(SugarIdentityProvisioningDefinition.Transform(identityProvisioningDefinition))

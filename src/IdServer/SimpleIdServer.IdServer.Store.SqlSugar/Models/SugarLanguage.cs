@@ -14,6 +14,16 @@ public class SugarLanguage
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
 
+    public static SugarLanguage Transform(Language language)
+    {
+        return new SugarLanguage
+        {
+            Code = language.Code,
+            CreateDateTime = language.CreateDateTime,
+            UpdateDateTime = language.UpdateDateTime
+        };
+    }
+
     public Language ToDomain()
     {
         return new Language

@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Domains;
 using SqlSugar;
+using SqlSugar.Extensions;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar.Models;
 
@@ -15,6 +16,16 @@ public class SugarTranslation
     public string? Value { get; set; } = null!;
     public string? Language { get; set; } = null;
     public string ClientId { get; set; } = null;
+
+    public static SugarTranslation Transform(Translation translation)
+    {
+        return new SugarTranslation
+        {
+            Key = translation.Key,
+            Language = translation.Language,
+            Value = translation.Value
+        };
+    }
 
     public Translation ToDomain()
     {

@@ -55,6 +55,11 @@ public class IdentityProvisioningStore : IIdentityProvisioningStore
 
     }
 
+    public void Add(IdentityProvisioningDefinition identityProvisioningDefinition)
+    {
+        _dbContext.IdentityProvisioningDefinitions.Add(identityProvisioningDefinition);
+    }
+
     public void Update(IdentityProvisioningDefinition identityProvisioningDefinition)
     {
 

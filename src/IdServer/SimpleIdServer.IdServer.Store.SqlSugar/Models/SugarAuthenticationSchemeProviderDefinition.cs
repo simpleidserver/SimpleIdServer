@@ -31,4 +31,18 @@ public class SugarAuthenticationSchemeProviderDefinition
             OptionsName = OptionsName
         };
     }
+
+    public static SugarAuthenticationSchemeProviderDefinition Transform(AuthenticationSchemeProviderDefinition def)
+    {
+        return new SugarAuthenticationSchemeProviderDefinition
+        {
+            Description = def.Description,
+            HandlerFullQualifiedName = def.HandlerFullQualifiedName,
+            Image = def.Image,
+            OptionsName = def.OptionsName,
+            OptionsFullQualifiedName = def.OptionsFullQualifiedName,
+            Name = def.Name,
+            AuthSchemeProviders = def.AuthSchemeProviders == null ? new List<SugarAuthenticationSchemeProvider>() : def.AuthSchemeProviders.Select(p => SugarAuthenticationSchemeProvider.Transform(p)).ToList()
+        };
+    }
 }

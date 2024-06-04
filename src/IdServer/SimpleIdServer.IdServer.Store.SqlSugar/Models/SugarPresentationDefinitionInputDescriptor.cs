@@ -3,8 +3,6 @@
 
 using SimpleIdServer.IdServer.Domains;
 using SqlSugar;
-using System.Text.Json.Nodes;
-using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar.Models;
 
@@ -22,6 +20,19 @@ public class SugarPresentationDefinitionInputDescriptor
     public List<SugarPresentationDefinitionFormat> Format { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarPresentationDefinitionInputDescriptorConstraint.PresentationDefinitionInputDescriptorId))]
     public List<SugarPresentationDefinitionInputDescriptorConstraint> Constraints { get; set; }
+
+    public static SugarPresentationDefinitionInputDescriptor Transform(PresentationDefinitionInputDescriptor descriptor)
+    {
+        return new SugarPresentationDefinitionInputDescriptor
+        {
+            Id = descriptor.Id,
+            PublicId = descriptor.PublicId,
+            Name = descriptor.Name,
+            Purpose = descriptor.Purpose,
+            Format = descriptor.Format == null ? new List<SugarPresentationDefinitionFormat>() : descriptor.Format.Select(f => SugarPresentationDefinitionFormat.Transform(f)).ToList(),
+            Constraints = descriptor.Constraints == null ? new List<SugarPresentationDefinitionInputDescriptorConstraint>() : descriptor.Constraints.Select(c => SugarPresentationDefinitionInputDescriptorConstraint.Transform(c)).ToList()
+        };
+    }
 
     public PresentationDefinitionInputDescriptor ToDomain()
     {

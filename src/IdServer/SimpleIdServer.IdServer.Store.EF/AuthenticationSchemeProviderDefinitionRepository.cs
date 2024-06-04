@@ -15,6 +15,11 @@ public class AuthenticationSchemeProviderDefinitionRepository : IAuthenticationS
         _dbContext= dbContext;
     }
 
+    public void Add(AuthenticationSchemeProviderDefinition definition)
+    {
+        _dbContext.AuthenticationSchemeProviderDefinitions.Add(definition);
+    }
+
     public Task<AuthenticationSchemeProviderDefinition> Get(string name, CancellationToken cancellationToken)
     {
         return _dbContext.AuthenticationSchemeProviderDefinitions.SingleOrDefaultAsync(a => a.Name == name, cancellationToken);

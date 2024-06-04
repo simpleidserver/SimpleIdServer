@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.Extensions.Logging.Abstractions;
 using SimpleIdServer.IdServer.Domains;
 using SqlSugar;
 
@@ -23,6 +24,24 @@ public class SugarAuthenticationSchemeProvider
     public List<SugarRealm> Realms { get; set; }
     [Navigate(NavigateType.ManyToOne, nameof(AuthSchemeProviderDefinitionName))]
     public SugarAuthenticationSchemeProviderDefinition AuthSchemeProviderDefinition { get; set; }
+
+    public static SugarAuthenticationSchemeProvider Transform(AuthenticationSchemeProvider provider)
+    {
+        return new SugarAuthenticationSchemeProvider
+        {
+            Id = provider.Id,
+            Name = provider.Name,
+            DisplayName = provider.DisplayName,
+            Description = provider.Description,
+            CreateDateTime = provider.CreateDateTime,
+            UpdateDateTime = provider.UpdateDateTime,
+            Mappers = provider.Mappers == null ? new List<SugarAuthenticationSchemeProviderMapper>() : provider.Mappers.Select(m => SugarAuthenticationSchemeProviderMapper.Transform(m)).ToList(),
+            Realms = provider.Realms == null ? new List<SugarRealm>() : provider.Realms.Select(r => new SugarRealm
+            {
+                RealmsName = r.Name
+            }).ToList()
+        };
+    }
 
     public AuthenticationSchemeProvider ToDomain()
     {

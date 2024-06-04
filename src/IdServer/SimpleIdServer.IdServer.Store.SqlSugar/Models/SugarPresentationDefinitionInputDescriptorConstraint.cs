@@ -15,6 +15,16 @@ public class SugarPresentationDefinitionInputDescriptorConstraint
     public string Filter { get; set; } = null!;
     public string PresentationDefinitionInputDescriptorId { get; set; }
 
+    public static SugarPresentationDefinitionInputDescriptorConstraint Transform(PresentationDefinitionInputDescriptorConstraint constraint)
+    {
+        return new SugarPresentationDefinitionInputDescriptorConstraint
+        {
+            Id = constraint.Id,
+            Path = constraint.Path == null ? "" : string.Join(",", constraint.Path),
+            Filter = constraint.Filter
+        };
+    }
+
     public PresentationDefinitionInputDescriptorConstraint ToDomain()
     {
         return new PresentationDefinitionInputDescriptorConstraint
