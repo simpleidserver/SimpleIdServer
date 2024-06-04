@@ -24,6 +24,7 @@ using SimpleIdServer.IdServer.SqlSugar.Startup;
 using SimpleIdServer.IdServer.SqlSugar.Startup.Configurations;
 using SimpleIdServer.IdServer.SqlSugar.Startup.Converters;
 using SimpleIdServer.IdServer.Store.SqlSugar;
+using SimpleIdServer.IdServer.Store.SqlSugar.Seeding;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.VerifiablePresentation;
@@ -75,7 +76,9 @@ builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
 
-builder.Services.AddJsonSeeding(builder.Configuration); // Uncomment this line to allow seed data from JSON file.
+// Uncomment these two lines to enable seed data from JSON file.
+builder.Services.AddJsonSeeding(builder.Configuration);
+builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
@@ -252,7 +255,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
     {
         using (var dbContext = scope.ServiceProvider.GetService<DbContext>())
         {
-            // Uncomment these two lines to allow seed data from an external resource like JSON file.
+            // Uncomment these two lines to enable seed data from an external resource like JSON file.
             ISeedStrategy seedingService = scope.ServiceProvider.GetService<ISeedStrategy>();
             seedingService.SeedDataAsync().Wait();
         }

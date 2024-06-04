@@ -39,6 +39,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using SimpleIdServer.IdServer.Seeding;
+using SimpleIdServer.IdServer.Store.EF.Seeding;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -92,7 +93,9 @@ builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
 
-builder.Services.AddJsonSeeding(builder.Configuration); // Uncomment this line to allow seed data from JSON file.
+// Uncomment these two lines to enable seed data from JSON file.
+builder.Services.AddJsonSeeding(builder.Configuration);
+builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
@@ -423,7 +426,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
 
-            // Uncomment these two lines to allow seed data from an external resource like JSON file.
+            // Uncomment these two lines to enable seed data from an external resource like JSON file.
             ISeedStrategy seedingService = scope.ServiceProvider.GetService<ISeedStrategy>();
             seedingService.SeedDataAsync().Wait();
         }
