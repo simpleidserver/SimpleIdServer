@@ -36,7 +36,6 @@ using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
-using SimpleIdServer.IdServer.DTOs.Seeds;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Infastructures;
@@ -44,8 +43,7 @@ using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Services.Seeding;
-using SimpleIdServer.IdServer.Services.Seeding.Interfaces;
+using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using SimpleIdServer.IdServer.TokenTypes;
@@ -55,7 +53,6 @@ using SimpleIdServer.IdServer.UI.Services;
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -174,10 +171,27 @@ namespace Microsoft.Extensions.DependencyInjection
                     options.SeedFromJson = !string.IsNullOrEmpty(jsonSeedsFilePath);
                     options.JsonFilePath = jsonSeedsFilePath;
                 })
-                .Validate(config => !config.SeedFromJson || (config.SeedFromJson && File.Exists(config.JsonFilePath)), "The JSON file for seeding must exists.");
+                .Validate(
+                    config => !config.SeedFromJson || (config.SeedFromJson && File.Exists(config.JsonFilePath)),
+                    "The JSON file for seeding must exists."
+                );
 
-            services.AddTransient<ISeedingService, JsonSeedingService>();
-            services.AddSeeders();
+            services.AddTransient<ISeedStrategy, JsonSeedStrategy>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddEntitySeeders(this IServiceCollection services, Type referenceType)
+        {
+            Type[] entitySeeders = referenceType.Assembly.GetTypes()
+                .Where(t => t.IsClass && t.GetInterfaces().Any(i => i.Name.Contains("IEntitySeeder")))
+                .ToArray();
+
+            foreach (Type entitySeeder in entitySeeders)
+            {
+                Type interfaceType = entitySeeder.GetInterfaces().First(i => i.Name.Contains("IEntitySeeder"));
+                services.TryAddTransient(interfaceType, entitySeeder);
+            }
 
             return services;
         }
@@ -373,12 +387,6 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddRegisterApi(this IServiceCollection services)
         {
             services.AddTransient<IRegisterClientRequestValidator, RegisterClientRequestValidator>();
-            return services;
-        }
-
-        private static IServiceCollection AddSeeders(this IServiceCollection services)
-        {
-            services.TryAddTransient<ISeederService<UserSeedDto>, UserSeederService>();
             return services;
         }
 
