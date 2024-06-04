@@ -5,6 +5,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Store.EF;
+using SimpleIdServer.IdServer.Store.EF.Seeding;
 
 namespace SimpleIdServer.IdServer;
 
@@ -13,6 +14,7 @@ public static class IdServerStoreChooserExtensions
     public static IdServerBuilder UseEFStore(this IdServerStoreChooser builder, Action<DbContextOptionsBuilder> dbCallback)
     {
         builder.Services.AddEFStore(dbCallback);
+        builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
         return new IdServerBuilder(builder.Services, builder.AuthBuilder);
     }
 
