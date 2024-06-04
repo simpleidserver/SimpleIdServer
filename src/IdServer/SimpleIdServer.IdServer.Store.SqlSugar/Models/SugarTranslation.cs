@@ -13,9 +13,12 @@ public class SugarTranslation
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
     public string Key { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Value { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Language { get; set; } = null;
-    public string ClientId { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
+    public string? ClientId { get; set; } = null;
 
     public static SugarTranslation Transform(Translation translation)
     {

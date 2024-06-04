@@ -12,7 +12,9 @@ public class SugarAuthorizedResource
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
     public string Resource { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Audience { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? AuthorizedScopeId { get; set; } = null;
 
     public static SugarAuthorizedResource Transform(AuthorizedResource a)

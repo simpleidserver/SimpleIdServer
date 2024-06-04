@@ -85,13 +85,14 @@ namespace SimpleIdServer.IdServer.SqlSugar.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.OfflineAccessScope,
             SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations,
             SimpleIdServer.IdServer.Constants.StandardScopes.CredentialInstances,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Acrs,
             UniversityDegreeScope
         };
 
         public static ICollection<User> Users => new List<User>
         {
-            UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").GenerateRandomTOTPKey().Build(),
-            UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
+            UserBuilder.Create("administrator", "password", "Administrator", isBase64Encoded: true).SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").GenerateRandomTOTPKey().Build(),
+            UserBuilder.Create("user", "password", "User", isBase64Encoded: true).SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
         };
 
         public static ICollection<Client> Clients => new List<Client>

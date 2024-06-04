@@ -11,16 +11,23 @@ public class SugarUser
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Firstname { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Lastname { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Email { get; set; } = null;
     public bool EmailVerified { get; set; } = false;
+    [SugarColumn(IsNullable = true)]
     public string? DeviceRegistrationToken { get; set; }
     public UserStatus Status { get; set; }
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? Source { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? IdentityProvisioningId { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? EncodedPicture { get; set; } = null;
     public string NotificationMode { get; set; }
     [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningId))]

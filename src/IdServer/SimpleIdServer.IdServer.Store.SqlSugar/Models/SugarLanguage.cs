@@ -14,6 +14,8 @@ public class SugarLanguage
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
 
+    public List<SugarTranslation> Translations { get; set; }
+
     public static SugarLanguage Transform(Language language)
     {
         return new SugarLanguage

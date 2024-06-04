@@ -13,9 +13,12 @@ public class SugarAuthenticationSchemeProviderMapper
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? SourceClaimName { get; set; } = null;
     public MappingRuleTypes MapperType { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? TargetUserAttribute { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? TargetUserProperty { get; set; } = null;
     public string IdProviderId { get; set; } = null!;
     [Navigate(NavigateType.ManyToOne, nameof(IdProviderId))]

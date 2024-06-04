@@ -11,6 +11,7 @@ public class SugarIdentityProvisioningDefinition
 {
     [SugarColumn(IsPrimaryKey = true)]
     public string Name { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Description { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }

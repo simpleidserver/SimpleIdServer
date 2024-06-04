@@ -203,6 +203,11 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public int EndSessionRedirectionTimeInMS { get; set; } = 3 * 1000;
 
+        /// <summary>
+        /// Set if the password is encoded in base64.
+        /// </summary>
+        public bool IsPasswordEncodeInBase64 { get; set; } = false;
+
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 
         public string GetStringParameter(string name) => Parameters[name];

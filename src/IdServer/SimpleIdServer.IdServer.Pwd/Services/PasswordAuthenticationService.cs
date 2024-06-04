@@ -1,7 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -16,10 +18,16 @@ public interface IPasswordAuthenticationService : IUserAuthenticationService
 public class PasswordAuthenticationService : GenericAuthenticationService<AuthenticatePasswordViewModel>, IPasswordAuthenticationService
 {
     private readonly IEnumerable<IIdProviderAuthService> _authServices;
+    private readonly IdServerHostOptions _options;
 
-    public PasswordAuthenticationService(IEnumerable<IIdProviderAuthService> authServices, IAuthenticationHelper authenticationHelper, IUserRepository userRepository) : base(authenticationHelper, userRepository)
+    public PasswordAuthenticationService(
+        IEnumerable<IIdProviderAuthService> authServices, 
+        IOptions<IdServerHostOptions> options,
+        IAuthenticationHelper authenticationHelper, 
+        IUserRepository userRepository) : base(authenticationHelper, userRepository)
     {
         _authServices = authServices;
+        _options = options.Value;
     }
 
     public override string Amr => Constants.Areas.Password;
@@ -52,7 +60,7 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
         else
         {
             var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
-            var hash = PasswordHelper.ComputeHash(viewModel.Password);
+            var hash = PasswordHelper.ComputeHash(viewModel.Password, _options.IsPasswordEncodeInBase64);
             if (credential == null || credential.Value != hash) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS));
         }
 

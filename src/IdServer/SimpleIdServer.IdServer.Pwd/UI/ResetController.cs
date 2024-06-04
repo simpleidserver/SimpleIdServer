@@ -1,14 +1,17 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using MassTransit.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
@@ -19,6 +22,7 @@ namespace SimpleIdServer.IdServer.Pwd.UI;
 [Area(Constants.Areas.Password)]
 public class ResetController : BaseController
 {
+    private readonly IdServerHostOptions _options;
     private readonly IEnumerable<IResetPasswordService> _resetPasswordServices;
     private readonly IAuthenticationHelper _authenticationHelper;
     private readonly IConfiguration _configuration;
@@ -28,6 +32,7 @@ public class ResetController : BaseController
     private readonly ILogger<ResetController> _logger;
 
     public ResetController(
+        IOptions<IdServerHostOptions> options,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
         IEnumerable<IResetPasswordService> resetPasswordServices,
@@ -38,6 +43,7 @@ public class ResetController : BaseController
         ITransactionBuilder transactionBuilder,
         ILogger<ResetController> logger) : base(tokenRepository, jwtBuilder)
     {
+        _options = options.Value;
         _resetPasswordServices = resetPasswordServices;
         _authenticationHelper = authenticationHelper;
         _configuration = configuration;
@@ -202,7 +208,7 @@ public class ResetController : BaseController
                 user.Credentials.Add(credential);
             }
 
-            credential.Value = PasswordHelper.ComputeHash(viewModel.Password);
+            credential.Value = PasswordHelper.ComputeHash(viewModel.Password, _options.IsPasswordEncodeInBase64);
             _userRepository.Update(user);
             await transaction.Commit(cancellationToken);
             viewModel.IsPasswordUpdated = true;

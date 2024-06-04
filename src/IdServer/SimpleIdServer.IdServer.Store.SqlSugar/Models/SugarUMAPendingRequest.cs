@@ -12,7 +12,9 @@ public class SugarUMAPendingRequest
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
     public string TicketId { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Requester { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Owner { get; set; } = null!;
     public string Scopes { get; set; } = null!;
     public DateTime CreateDateTime { get; set; }
@@ -32,6 +34,7 @@ public class SugarUMAPendingRequest
             CreateDateTime = CreateDateTime,
             Status = Status,
             Realm = Realm,
+            Resource = Resource?.ToDomain(),
             Scopes = Scopes.Split(',').ToList()
         };
     }

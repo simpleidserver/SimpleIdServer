@@ -13,75 +13,121 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public string Id { get; set; }
         public string ClientId { get; set; } = null!;
         public string ClientSecret { get; set; } = null!;
+        [SugarColumn(IsNullable = true)]
         public string? RegistrationAccessToken { get; set; } = null;
         public string GrantTypes { get; set; }
         public string RedirectionUrls { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? TokenEndPointAuthMethod { get; set; } = null;
         public string ResponseTypes { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? JwksUri { get; set; } = null;
         public string Contacts { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? SoftwareId { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? SoftwareVersion { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? TlsClientAuthSubjectDN { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? TlsClientAuthSanDNS { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? TlsClientAuthSanURI { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? TlsClientAuthSanIP { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? TlsClientAuthSanEmail { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? AuthenticationContextClassReferenceId { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public DateTime? ClientSecretExpirationTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public DateTime CreateDateTime { get; set; }
         public bool IsTokenExchangeEnabled { get; set; }
+        [SugarColumn(IsNullable = true)]
         public TokenExchangeTypes? TokenExchangeType { get; set; }
+        [SugarColumn(IsNullable = true)]
         public double? TokenExpirationTimeInSeconds { get; set; }
+        [SugarColumn(IsNullable = true)]
         public double? CNonceExpirationTimeInSeconds { get; set; }
+        [SugarColumn(IsNullable = true)]
         public double? RefreshTokenExpirationTimeInSeconds { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? TokenSignedResponseAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? TokenEncryptedResponseAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? TokenEncryptedResponseEnc { get; set; } = null;
         public string PostLogoutRedirectUris { get; set; }
         public bool RedirectToRevokeSessionUI { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? PreferredTokenProfile { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? RequestObjectSigningAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? RequestObjectEncryptionAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? RequestObjectEncryptionEnc { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? SubjectType { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? PairWiseIdentifierSalt { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? SectorIdentifierUri { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? IdTokenSignedResponseAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? IdTokenEncryptedResponseAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? IdTokenEncryptedResponseEnc { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? BCTokenDeliveryMode { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? BCClientNotificationEndpoint { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? BCAuthenticationRequestSigningAlg { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? UserInfoSignedResponseAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? UserInfoEncryptedResponseAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? UserInfoEncryptedResponseEnc { get; set; } = null;
         public bool BCUserCodeParameter { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? FrontChannelLogoutUri { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? CredentialOfferEndpoint { get; set; } = null;
         public bool IsTransactionCodeRequired { get; set; }
         public double PreAuthCodeExpirationTimeInSeconds { get; set; }
         public bool FrontChannelLogoutSessionRequired { get; set; }
         public bool BackChannelLogoutSessionRequired { get; set; }
+        [SugarColumn(IsNullable = true)]
         public double? DefaultMaxAge { get; set; } = null;
         public bool TlsClientCertificateBoundAccessToken { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? BackChannelLogoutUri { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? ApplicationType { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? InitiateLoginUri { get; set; }
         public bool RequireAuthTime { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? AuthorizationSignedResponseAlg { get; set; } = null;
+        [SugarColumn(IsNullable = true)]
         public string? AuthorizationEncryptedResponseAlg { get; set; } = null;
         public string AuthorizationDataTypes { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? AuthorizationEncryptedResponseEnc { get; set; } = null;
         public bool DPOPBoundAccessTokens { get; set; }
         public bool IsConsentDisabled { get; set; }
         public bool IsResourceParameterRequired { get; set; }
         public int AuthReqIdExpirationTimeInSeconds { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? ClientType { get; set; } = null;
         public bool IsDPOPNonceRequired { get; set; }
         public double DPOPNonceLifetimeInSeconds { get; set; }
         public bool IsRedirectUrlCaseSensitive { get; set; }
+        [SugarColumn(IsNullable = true, Length = 5000)]
         public string? SerializedParameters { get; set; } = null;
         public string DefaultAcrValues { get; set; }
         public int BCIntervalSeconds { get; set; }
@@ -296,7 +342,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 Translations = Translations == null ? new List<Translation>() : Translations.Select(r => r.ToDomain()).ToList(),
                 DeviceAuthCodes = DeviceAuthCodes == null ? new List<DeviceAuthCode>() : DeviceAuthCodes.Select(r => r.ToDomain()).ToList(),
                 SerializedJsonWebKeys = SerializedJsonWebKeys == null ? new List<ClientJsonWebKey>() : SerializedJsonWebKeys.Select(j => j.ToDomain()).ToList(),
-                Scopes = ClientScopes == null ? new List<Scope>() : ClientScopes.Select(s => s.Scope.ToDomain()).ToList(),
+                Scopes = ClientScopes == null ? new List<Scope>() : ClientScopes.Where(s => s.Scope != null).Select(s => s.Scope.ToDomain()).ToList(),
                 Id = Id
             };
         }

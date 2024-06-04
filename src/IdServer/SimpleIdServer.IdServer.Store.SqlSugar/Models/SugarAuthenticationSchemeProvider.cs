@@ -13,7 +13,9 @@ public class SugarAuthenticationSchemeProvider
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? DisplayName { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? Description { get; set; }
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }

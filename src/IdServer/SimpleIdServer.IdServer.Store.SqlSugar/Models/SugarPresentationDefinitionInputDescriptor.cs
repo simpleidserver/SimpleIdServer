@@ -12,8 +12,11 @@ public class SugarPresentationDefinitionInputDescriptor
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
     public string PublicId { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Name { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Purpose { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? PresentationDefinitionId { get; set; } = null;
 
     [Navigate(NavigateType.OneToMany, nameof(SugarPresentationDefinitionFormat.PresentationDefinitionInputDescriptorId))]

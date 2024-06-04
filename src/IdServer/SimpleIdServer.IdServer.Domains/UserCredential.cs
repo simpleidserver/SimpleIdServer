@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Domains
             };
         }
 
-        public static UserCredential CreatePassword(string pwd) => new UserCredential { Id = Guid.NewGuid().ToString(), CredentialType = "pwd", Value = PasswordHelper.ComputeHash(pwd) };
+        public static UserCredential CreatePassword(string pwd, bool isBase64Encoded) => new UserCredential { Id = Guid.NewGuid().ToString(), CredentialType = "pwd", Value = PasswordHelper.ComputeHash(pwd, isBase64Encoded) };
     }
 
     public enum OTPAlgs

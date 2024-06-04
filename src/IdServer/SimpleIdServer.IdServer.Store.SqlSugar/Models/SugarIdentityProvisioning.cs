@@ -11,7 +11,9 @@ public class SugarIdentityProvisioning
 {
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Name { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? Description { get; set; }
     public string DefinitionName { get; set; } = null!;
     public bool IsEnabled { get; set; } = true;

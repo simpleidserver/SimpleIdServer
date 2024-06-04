@@ -347,6 +347,11 @@ namespace SimpleIdServer.IdServer.Api.Users
                             request.Credential.IsActive = true;
                         }
 
+                        if(request.Credential.CredentialType == Constants.Areas.Password)
+                        {
+                            PasswordHelper.ComputeHash(request.Credential.Value, _options.IsPasswordEncodeInBase64);
+                        }
+
                         request.Credential.Id = Guid.NewGuid().ToString();
                         user.Credentials.Add(request.Credential);
                         user.UpdateDateTime = DateTime.UtcNow;
@@ -386,7 +391,11 @@ namespace SimpleIdServer.IdServer.Api.Users
                         if (user == null) return new NotFoundResult();
                         var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
                         if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
-                        existingCredential.Value = request.Value;
+                        if(existingCredential.CredentialType == Constants.Areas.Password)
+                            existingCredential.Value = PasswordHelper.ComputeHash(request.Value, _options.IsPasswordEncodeInBase64);
+                        else
+                            existingCredential.Value = request.Value;
+
                         existingCredential.OTPAlg = request.OTPAlg;
                         user.UpdateDateTime = DateTime.UtcNow;
                         _userRepository.Update(user);

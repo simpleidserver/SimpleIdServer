@@ -12,7 +12,9 @@ public class SugarPresentationDefinition
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
     public string PublicId { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Name { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Purpose { get; set; } = null;
     public string RealmName { get; set; } = null!;
     [Navigate(NavigateType.ManyToOne, nameof(RealmName))]

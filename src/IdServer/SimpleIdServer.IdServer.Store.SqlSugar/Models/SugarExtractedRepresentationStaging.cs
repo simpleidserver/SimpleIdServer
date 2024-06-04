@@ -13,6 +13,7 @@ public class SugarExtractedRepresentationStaging
     public string Id { get; set; } = null!;
     public string RepresentationId { get; set; } = null!;
     public string RepresentationVersion { get; set; } = null!;
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? Values { get; set; } = null;
     public string IdProvisioningProcessId { get; set; } = null!;
     public string GroupIds { get; set; } = null!;

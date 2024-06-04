@@ -11,10 +11,15 @@ public class SugarAuthenticationSchemeProviderDefinition
 {
     [SugarColumn(IsPrimaryKey = true)]
     public string Name { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Description { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Image { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? HandlerFullQualifiedName { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? OptionsFullQualifiedName { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? OptionsName { get; set; } = null;
     [Navigate(NavigateType.OneToMany, nameof(SugarAuthenticationSchemeProvider.AuthSchemeProviderDefinitionName))]
     public List<SugarAuthenticationSchemeProvider> AuthSchemeProviders { get; set; }

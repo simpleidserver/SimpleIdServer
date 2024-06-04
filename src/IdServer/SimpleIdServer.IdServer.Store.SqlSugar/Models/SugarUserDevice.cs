@@ -11,12 +11,19 @@ public class SugarUserDevice
 {
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? DeviceType { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Model { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Manufacturer { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Name { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Version { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? PushToken { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? PushType { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
     public string UserId { get; set; } = null!;

@@ -15,10 +15,13 @@ public class SugarConsent
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
     public string UserId { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? ScopeId { get; set; } = null;
     public ConsentStatus Status { get; set; }
     public string Realm { get; set; }
+    [SugarColumn(Length = 5000)]
     public string Claims { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? SerializedAuthorizationDetails { get; set; } = null;
     [Navigate(NavigateType.ManyToOne, nameof(UserId))]
     public SugarUser User { get; set; }

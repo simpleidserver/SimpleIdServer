@@ -13,6 +13,7 @@ public class SugarUserCredential
     public string Id { get; set; } = null!;
     public string CredentialType { get; set; } = null!;
     public string Value { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public OTPAlgs? OTPAlg { get; set; } = null;
     public bool IsActive { get; set; }
     public int OTPCounter { get; set; }

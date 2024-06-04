@@ -18,6 +18,7 @@ public class SugarConfigurationDefinitionRecord
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
     public int Order { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? DisplayCondition { get; set; }
     [Navigate(typeof(SugarConfigurationDefinitionRecordTranslation), nameof(SugarConfigurationDefinitionRecordTranslation.ConfigurationDefinitionRecordId), nameof(SugarConfigurationDefinitionRecordTranslation.TranslationsId))]
     public List<SugarTranslation> Translations { get; set; }

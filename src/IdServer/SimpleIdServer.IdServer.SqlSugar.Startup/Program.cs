@@ -87,7 +87,6 @@ if (identityServerConfiguration.IsForwardedEnabled)
     });
 }
 
-
 var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
 var conf = section.Get<StorageConfiguration>();
 
@@ -101,7 +100,6 @@ ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
 
 var app = builder.Build();
-// SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
 if (identityServerConfiguration.IsForwardedEnabled)
 {
@@ -145,6 +143,7 @@ void ConfigureIdServer(IServiceCollection services)
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix)) 
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
+            cb.IsPasswordEncodeInBase64 = true;
         }, cookie: c =>
         {
             if(!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix)) 
@@ -272,7 +271,7 @@ void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
 void SeedData(WebApplication webApplication)
 {
     var dbContext = webApplication.Services.GetRequiredService<DbContext>();
-    // dbContext.Migrate();
+    dbContext.Migrate();
     var transactionBuilder = webApplication.Services.GetRequiredService<ITransactionBuilder>();
     var realmRepository = webApplication.Services.GetRequiredService<IRealmRepository>();
     var scopeRepository = webApplication.Services.GetRequiredService<IScopeRepository>();
@@ -293,39 +292,39 @@ void SeedData(WebApplication webApplication)
     var configurationDefinitionRepository = webApplication.Services.GetRequiredService<IConfigurationDefinitionStore>();
     using (var transaction = transactionBuilder.Build())
     {
-        // foreach (var realm in IdServerConfiguration.Realms)
-        //     realmRepository.Add(realm);
+        foreach (var realm in IdServerConfiguration.Realms)
+            realmRepository.Add(realm);
         
         foreach(var scope in IdServerConfiguration.Scopes)
             scopeRepository.Add(scope);
-
+        
         foreach (var user in IdServerConfiguration.Users)
             userRepository.Add(user);
-
+        
         foreach (var client in IdServerConfiguration.Clients)
             clientRepository.Add(client);
-
+        
         foreach (var umaPendingRequest in IdServerConfiguration.PendingRequests)
             umaPendingRequestRepository.Add(umaPendingRequest);
-
+        
         foreach (var umaResource in IdServerConfiguration.Resources)
             umaResourceRepository.Add(umaResource);
-
+        
         foreach (var gotifySession in IdServerConfiguration.Sessions)
             gotifySessionRepository.Add(gotifySession);
-
+        
         foreach (var language in IdServerConfiguration.Languages)
             languageRepository.Add(language);
-
+        
         foreach (var definition in IdServerConfiguration.ProviderDefinitions)
             providerDefinitionRepository.Add(definition);
-
+        
         foreach (var authProvider in IdServerConfiguration.Providers)
             authSchemeProviderRepository.Add(authProvider);
-
+        
         foreach (var idProvisioningDef in IdServerConfiguration.IdentityProvisioningDefLst)
             idProvisioningDefRepository.Add(idProvisioningDef);
-
+        
         foreach (var registrationWorkflow in IdServerConfiguration.RegistrationWorkflows)
             registrationWorkflowRepository.Add(registrationWorkflow);
 

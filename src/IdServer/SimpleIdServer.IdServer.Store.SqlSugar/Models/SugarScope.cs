@@ -13,6 +13,7 @@ public class SugarScope
     public string Name { get; set; } = null!;
     public ScopeTypes Type { get; set; } = ScopeTypes.IDENTITY;
     public ScopeProtocols Protocol { get; set; } = ScopeProtocols.OPENID;
+    [SugarColumn(IsNullable = true)]
     public string? Description { get; set; } = null;
     public bool IsExposedInConfigurationEdp { get; set; }
     public DateTime CreateDateTime { get; set; }

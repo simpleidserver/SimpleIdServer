@@ -11,10 +11,13 @@ public class SugarMessageBusErrorMessage
 {
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? ExternalId { get; set; } = null;
     public string Name { get; set; } = null!;
     public string FullName { get; set; } = null!;
+    [SugarColumn(Length = 5000)]
     public string Content { get; set; } = null!;
+    [SugarColumn(Length = 5000)]
     public string Exceptions { get; set; } = null!;
     public DateTime ReceivedDateTime { get; set; }
     public string QueueName { get; set; } = null!;

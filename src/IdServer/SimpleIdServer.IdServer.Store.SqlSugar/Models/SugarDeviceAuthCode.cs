@@ -15,11 +15,13 @@ public class SugarDeviceAuthCode
     public string UserCode { get; set; } = null!;
     public string ClientId { get; set; } = null!;
     public string UserId { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? UserLogin { get; set; } = null;
     public string Scopes { get; set; } = null!;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
     public DateTime ExpirationDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public DateTime? NextAccessDateTime { get; set; } = null;
     public DeviceAuthCodeStatus Status { get; set; }
     public DateTime LastAccessTime { get; set; }

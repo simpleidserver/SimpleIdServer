@@ -11,16 +11,25 @@ public class SugarToken
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int PkID { get; set; }
+    [SugarColumn(Length = 5000)]
     public string Id { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? SessionId { get; set; } = null;
     public string ClientId { get; set; } = null!;
     public string TokenType { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public AccessTokenTypes? AccessTokenType { get; set; } = null;
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? Data { get; set; } = null;
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? OriginalData { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? AuthorizationCode { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? GrantId { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Jkt { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public DateTime? ExpirationTime { get; set; }
     public DateTime CreateDateTime { get; set; }
 

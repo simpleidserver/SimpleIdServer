@@ -14,11 +14,16 @@ public class SugarScopeClaimMapper
     public string ScopeClaimMapperId { get; set; } = null!;
     public string Name { get; set; } = null!;
     public MappingRuleTypes MapperType { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? SourceUserAttribute { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? SourceUserProperty { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? TargetClaimPath { get; set; } = null;
     public bool IncludeInAccessToken { get; set; } = false;
+    [SugarColumn(IsNullable = true)]
     public string? SAMLAttributeName { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public TokenClaimJsonTypes? TokenClaimJsonType { get; set; } = null;
     public bool IsMultiValued { get; set; } = false;
     public string ScopeId { get; set; }

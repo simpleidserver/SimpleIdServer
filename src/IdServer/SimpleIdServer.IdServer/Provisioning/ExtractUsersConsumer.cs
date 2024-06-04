@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace SimpleIdServer.IdServer.Provisioning;
 
@@ -78,8 +79,6 @@ public class ExtractUsersConsumer :
 
     public async Task Consume(ConsumeContext<ExtractUsersCommand> context)
     {
-        throw new Exception("ex");
-        /*
         var message = context.Message;
         var instance = await _identityProvisioningStore.Get(message.Realm, message.InstanceId, CancellationToken.None);
         var provisioningService = _provisioningServices.Single(p => p.Name == instance.Definition.Name);
@@ -125,7 +124,6 @@ public class ExtractUsersConsumer :
                 transactionScope.Complete();
             }
         }
-        */
     }
 
     public async Task Consume(ConsumeContext<CheckUsersExtractedCommand> context)
