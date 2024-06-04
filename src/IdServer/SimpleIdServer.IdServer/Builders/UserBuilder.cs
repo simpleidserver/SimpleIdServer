@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="name">(Optional) The user's first name.</param>
         /// <param name="realm">(Optional) The realm to asign.</param>
         /// <returns>An instace for building an user.</returns>
-        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null)
+        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null, bool isBase64Encoded = false)
         {
             var result = new UserBuilder();
             result._user.Id = Guid.NewGuid().ToString();

@@ -38,8 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using SimpleIdServer.IdServer.Seeding;
-using SimpleIdServer.IdServer.Store.EF.Seeding;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
