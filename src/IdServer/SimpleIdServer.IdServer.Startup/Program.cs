@@ -94,8 +94,8 @@ ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
 
 // Uncomment these two lines to enable seed data from JSON file.
-builder.Services.AddJsonSeeding(builder.Configuration);
-builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
+// builder.Services.AddJsonSeeding(builder.Configuration);
+// builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
@@ -427,8 +427,8 @@ void SeedData(WebApplication application, string scimBaseUrl)
             dbContext.SaveChanges();
 
             // Uncomment these two lines to enable seed data from an external resource like JSON file.
-            ISeedStrategy seedingService = scope.ServiceProvider.GetService<ISeedStrategy>();
-            seedingService.SeedDataAsync().Wait();
+            // ISeedStrategy seedingService = scope.ServiceProvider.GetService<ISeedStrategy>();
+            // seedingService.SeedDataAsync().Wait();
         }
 
         void EnableIsolationLevel(StoreDbContext dbContext)
