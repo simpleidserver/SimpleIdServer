@@ -19,7 +19,15 @@ namespace SimpleIdServer.IdServer.Builders
             _user = new User();
         }
 
-        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null, bool isBase64Encoded = false)
+        /// <summary>
+        /// Allows to create an instace for building an user.
+        /// </summary>
+        /// <param name="login">The user's name for login.</param>
+        /// <param name="password">The user's password.</param>
+        /// <param name="name">(Optional) The user's first name.</param>
+        /// <param name="realm">(Optional) The realm to asign.</param>
+        /// <returns>An instace for building an user.</returns>
+        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null)
         {
             var result = new UserBuilder();
             result._user.Id = Guid.NewGuid().ToString();
@@ -33,6 +41,9 @@ namespace SimpleIdServer.IdServer.Builders
             });
             if (realm == null) result._user.Realms.Add(new RealmUser { RealmsName = Constants.StandardRealms.Master.Name });
             else result._user.Realms.Add(new RealmUser { RealmsName = realm.Name });
+
+            if (!string.IsNullOrEmpty(name)) result.SetFirstname(name);
+
             result._user.CreateDateTime = DateTime.UtcNow;
             result._user.UpdateDateTime = DateTime.UtcNow;
             return result;

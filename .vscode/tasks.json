@@ -26,6 +26,30 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "build-idserver-sqlsugar",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.SqlSugar.Startup/SimpleIdServer.IdServer.SqlSugar.Startup.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "publish-idserver-sqlsugar",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "publish",
+        "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.SqlSugar.Startup/SimpleIdServer.IdServer.SqlSugar.Startup.csproj",
+        "/property:GenerateFullPaths=true",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
       "label": "build-ui",
       "command": "dotnet",
       "type": "process",

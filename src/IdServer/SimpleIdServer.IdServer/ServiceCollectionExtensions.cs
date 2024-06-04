@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api.Authorization;
@@ -41,6 +43,7 @@ using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using SimpleIdServer.IdServer.TokenTypes;
@@ -48,6 +51,7 @@ using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using System;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -64,8 +68,8 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="options"></param>
         /// <returns></returns>
         public static IdServerStoreChooser AddSIDIdentityServer(
-            this IServiceCollection services, 
-            Action<IdServerHostOptions>? callback = null, 
+            this IServiceCollection services,
+            Action<IdServerHostOptions>? callback = null,
             Action<CookieAuthenticationOptions>? cookie = null,
             Action<IDataProtectionBuilder>? dataProtectionBuilderCallback = null)
         {
@@ -110,7 +114,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 {
                     if (cookie != null) cookie(opts);
                     opts.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
-                    
+
                     opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                     {
                         if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
@@ -151,6 +155,47 @@ namespace Microsoft.Extensions.DependencyInjection
             }
         }
 
+        /// <summary>
+        /// Registrates the services to allow the seeding via JSON file.
+        /// </summary>
+        /// <param name="services">The services collection.</param>
+        /// <param name="configuration">The application's configuration.</param>
+        /// <returns>The services collection.</returns>
+        public static IServiceCollection AddJsonSeeding(this IServiceCollection services, IConfiguration configuration)
+        {
+            string jsonSeedsFilePath = configuration.GetValue<string>(Constants.ConfigurationSections.JsonSeedsFilePath);
+
+            services.AddOptionsWithValidateOnStart<JsonSeedingOptions>()
+                .Configure(options =>
+                {
+                    options.SeedFromJson = !string.IsNullOrEmpty(jsonSeedsFilePath);
+                    options.JsonFilePath = jsonSeedsFilePath;
+                })
+                .Validate(
+                    config => !config.SeedFromJson || (config.SeedFromJson && File.Exists(config.JsonFilePath)),
+                    "The JSON file for seeding must exists."
+                );
+
+            services.AddTransient<ISeedStrategy, JsonSeedStrategy>();
+
+            return services;
+        }
+
+        public static IServiceCollection AddEntitySeeders(this IServiceCollection services, Type referenceType)
+        {
+            Type[] entitySeeders = referenceType.Assembly.GetTypes()
+                .Where(t => t.IsClass && t.GetInterfaces().Any(i => i.Name.Contains("IEntitySeeder")))
+                .ToArray();
+
+            foreach (Type entitySeeder in entitySeeders)
+            {
+                Type interfaceType = entitySeeder.GetInterfaces().First(i => i.Name.Contains("IEntitySeeder"));
+                services.TryAddTransient(interfaceType, entitySeeder);
+            }
+
+            return services;
+        }
+
         #region Private methods
 
         private static IServiceCollection AddResponseModeHandlers(this IServiceCollection services)
@@ -175,7 +220,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddOAuthClientAuthentication(this IServiceCollection services)
         {
-            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>(), s.GetServices<IClientAssertionParser>(), s.GetService<IBusControl>(), s.GetService<IOptions<IdServerHostOptions>>() ));
+            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>(), s.GetServices<IClientAssertionParser>(), s.GetService<IBusControl>(), s.GetService<IOptions<IdServerHostOptions>>()));
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientPrivateKeyJwtAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();
@@ -320,7 +365,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IHttpClientFactory, HttpClientFactory>();
             return services;
         }
-        
+
         private static IServiceCollection AddConfigurationApi(this IServiceCollection services)
         {
             services.AddTransient<IOAuthConfigurationRequestHandler, OAuthConfigurationRequestHandler>();

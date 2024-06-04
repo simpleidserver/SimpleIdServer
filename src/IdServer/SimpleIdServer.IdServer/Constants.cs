@@ -810,5 +810,16 @@ namespace SimpleIdServer.IdServer
         public const string DefaultRememberMeCookieName = "RememberMe";
         public const string Prefix = "prefix";
         public const string DefaultLanguage = "en";
+
+        /// <summary>
+        /// Configration sections.
+        /// </summary>
+        public static class ConfigurationSections
+        {
+            /// <summary>
+            /// Indicates where is the JSON file for seeding.
+            /// </summary>
+            public const string JsonSeedsFilePath = "JSON_SEEDS_FILE_PATH";
+        }
     }
 }

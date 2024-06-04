@@ -10,9 +10,35 @@
       "request": "launch",
       "preLaunchTask": "build-idserver",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup/bin/Debug/net7.0/SimpleIdServer.IdServer.Startup.dll",
+      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup/bin/Debug/net8.0/SimpleIdServer.IdServer.Startup.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Startup",
+      "stopAtEntry": false,
+      // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:5001"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      // Use IntelliSense to find out which attributes exist for C# debugging
+      // Use hover for the description of the existing attributes
+      // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
+      "name": "Launch IdServer SqlSugar",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-idserver-sqlsugar",
+      // If you have changed target frameworks, make sure to update the program path.
+      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.SqlSugar.Startup/bin/Debug/net8.0/SimpleIdServer.IdServer.SqlSugar.Startup.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.SqlSugar.Startup",
       "stopAtEntry": false,
       // Enable launching a web browser when ASP.NET Core starts. For more information: https://aka.ms/VSCode-CS-LaunchJson-WebBrowser
       "serverReadyAction": {
@@ -36,7 +62,7 @@
       "request": "launch",
       "preLaunchTask": "build-ui",
       // If you have changed target frameworks, make sure to update the program path.
-      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup/bin/Debug/net7.0/SimpleIdServer.IdServer.Website.Startup.dll",
+      "program": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup/bin/Debug/net8.0/SimpleIdServer.IdServer.Website.Startup.dll",
       "args": [],
       "cwd": "${workspaceFolder}/src/IdServer/SimpleIdServer.IdServer.Website.Startup",
       "stopAtEntry": false,

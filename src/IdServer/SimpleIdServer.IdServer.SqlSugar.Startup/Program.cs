@@ -22,12 +22,13 @@ using SimpleIdServer.IdServer.Notification.Gotify;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
+using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.SqlSugar.Startup;
 using SimpleIdServer.IdServer.SqlSugar.Startup.Configurations;
 using SimpleIdServer.IdServer.SqlSugar.Startup.Converters;
 using SimpleIdServer.IdServer.Store.SqlSugar;
-using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Store.SqlSugar.Seeding;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.VerifiablePresentation;
@@ -99,6 +100,10 @@ builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
 
+// Uncomment these two lines to enable seed data from JSON file.
+// builder.Services.AddJsonSeeding(builder.Configuration);
+// builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
+
 var app = builder.Build();
 app.UseCors("AllowAll");
 if (identityServerConfiguration.IsForwardedEnabled)
@@ -140,13 +145,13 @@ void ConfigureIdServer(IServiceCollection services)
 {
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
-            if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix)) 
+            if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
             cb.IsPasswordEncodeInBase64 = true;
         }, cookie: c =>
         {
-            if(!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix)) 
+            if (!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix))
                 c.Cookie.Name = identityServerConfiguration.AuthCookieNamePrefix;
         }, dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseSqlSugar(o =>
