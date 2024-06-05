@@ -126,6 +126,9 @@
   <data name="consent_client_access" xml:space="preserve">
     <value>The client '{0}' is requesting access to your account</value>
   </data>
+  <data name="invalid_request" xml:space="preserve">
+    <value>Incoming request is invalid</value>
+  </data>
   <data name="manage_consents" xml:space="preserve">
     <value>Manage consents</value>
   </data>

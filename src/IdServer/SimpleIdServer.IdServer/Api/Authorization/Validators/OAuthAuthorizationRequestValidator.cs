@@ -227,6 +227,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (invalidClaims.Any())
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.InvalidClaims, string.Join(",", invalidClaims.Select(i => i.Name))));
             }
+
+            var acr = await _amrHelper.FetchDefaultAcr(context.Realm, acrValues, claims, openidClient, cancellationToken);
+            var notAuthorizedAmrs = acr.AuthenticationMethodReferences.Where(c => !context.Request.Amrs.Contains(c));
+            if (notAuthorizedAmrs.Any())
+                throw new OAuthAuthenticatedUserAmrMissingException(acr.Name, notAuthorizedAmrs.First(), acr.AuthenticationMethodReferences);
         }
 
         protected virtual void RedirectToConsentView(HandlerContext context)

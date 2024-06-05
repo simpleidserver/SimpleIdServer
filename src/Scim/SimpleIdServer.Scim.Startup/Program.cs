@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using SimpleIdServer.Scim;
 
 namespace SimpleIdServer.Scim.Startup;
 
@@ -323,7 +324,7 @@ public class Program
                 }
 
                 if (!context.Realms.Any())
-                    context.Realms.AddRange(Scim.SCIMConstants.StandardRealms);
+                    context.Realms.AddRange(SimpleIdServer.Scim.SCIMConstants.StandardRealms);
 
                 context.SaveChanges();
             }

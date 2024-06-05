@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
+using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
@@ -28,7 +29,7 @@ using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
-using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Store.EF;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.VerifiablePresentation;
@@ -37,7 +38,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using SimpleIdServer.Did.Key;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -46,7 +46,7 @@ const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjec
     "ExpiresAtTime datetimeoffset NOT NULL, " +
     "SlidingExpirationInSeconds bigint NULL," +
     "AbsoluteExpiration datetimeoffset NULL, " +
-    "PRIMARY KEY (Id))"; 
+    "PRIMARY KEY (Id))";
 
 const string MYSQLCreateTableFormat =
             "CREATE TABLE IF NOT EXISTS DistributedCache (" +
@@ -57,7 +57,7 @@ const string MYSQLCreateTableFormat =
                 "`Value` longblob NOT NULL," +
                 "PRIMARY KEY(`Id`)," +
                 "KEY `Index_ExpiresAtTime` (`ExpiresAtTime`)" +
-            ")";
+")";
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
@@ -74,7 +74,6 @@ builder.Services.Configure<KestrelServerOptions>(options =>
         if (identityServerConfiguration.ClientCertificateMode != null) o.ClientCertificateMode = identityServerConfiguration.ClientCertificateMode.Value;
     });
 });
-ConfigureCentralizedConfiguration(builder);
 if (identityServerConfiguration.IsForwardedEnabled)
 {
     builder.Services.Configure<ForwardedHeadersOptions>(options =>
@@ -90,6 +89,11 @@ builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
+ConfigureCentralizedConfiguration(builder);
+
+// Uncomment these two lines to enable seed data from JSON file.
+// builder.Services.AddJsonSeeding(builder.Configuration);
+// builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 
 var app = builder.Build();
 SeedData(app, identityServerConfiguration.SCIMBaseUrl);
@@ -133,12 +137,12 @@ void ConfigureIdServer(IServiceCollection services)
 {
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
-            if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix)) 
+            if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
         }, cookie: c =>
         {
-            if(!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix)) 
+            if (!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix))
                 c.Cookie.Name = identityServerConfiguration.AuthCookieNamePrefix;
         }, dataProtectionBuilderCallback: ConfigureDataProtection)
         .UseEFStore(o => ConfigureStorage(o))
@@ -201,27 +205,7 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<GotifyOptions>();
         o.Add<IdServerVpOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
-        o.UseEFConnector(b =>
-        {
-            switch (conf.Type)
-            {
-                case StorageTypes.INMEMORY:
-                    b.UseInMemoryDatabase(conf.ConnectionString);
-                    break;
-                case StorageTypes.SQLSERVER:
-                    b.UseSqlServer(conf.ConnectionString);
-                    break;
-                case StorageTypes.POSTGRE:
-                    b.UseNpgsql(conf.ConnectionString);
-                    break;
-                case StorageTypes.MYSQL:
-                    b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
-                    break;
-                case StorageTypes.SQLITE:
-                    b.UseSqlite(conf.ConnectionString);
-                    break;
-            }
-        });
+        o.UseEFConnector();
     });
 }
 
@@ -351,7 +335,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             foreach (var language in SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages)
                 AddMissingLanguage(dbContext, language);
 
-            foreach(var providerDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions)
+            foreach (var providerDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions)
             {
                 if (!dbContext.AuthenticationSchemeProviderDefinitions.Any(d => d.Name == providerDefinition.Name))
                 {
@@ -380,14 +364,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
 
             if (!dbContext.PresentationDefinitions.Any())
-            {
-                foreach(var processDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions)
-                {
-                    var realm = dbContext.Realms.Single(r => r.Name == processDefinition.Realm.Name);
-                    processDefinition.Realm = realm;
-                    dbContext.PresentationDefinitions.Add(processDefinition);
-                }
-            }
+                dbContext.PresentationDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions);
 
             if (!dbContext.Acrs.Any())
             {
@@ -446,6 +423,10 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
+
+            // Uncomment these two lines to enable seed data from an external resource like JSON file.
+            // ISeedStrategy seedingService = scope.ServiceProvider.GetService<ISeedStrategy>();
+            // seedingService.SeedDataAsync().Wait();
         }
 
         void EnableIsolationLevel(StoreDbContext dbContext)
@@ -466,7 +447,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
             }
 
             var mysqlConnection = dbConnection as MySqlConnector.MySqlConnection;
-            if(mysqlConnection != null)
+            if (mysqlConnection != null)
             {
                 if (mysqlConnection.State != System.Data.ConnectionState.Open) mysqlConnection.Open();
                 var cmd = mysqlConnection.CreateCommand();
@@ -479,7 +460,7 @@ void SeedData(WebApplication application, string scimBaseUrl)
         void AddMissingConfigurationDefinition<T>(StoreDbContext dbContext)
         {
             var name = typeof(T).Name;
-            if(!dbContext.Definitions.Any(d => d.Id == name))
+            if (!dbContext.Definitions.Any(d => d.Id == name))
             {
                 dbContext.Definitions.Add(ConfigurationDefinitionExtractor.Extract<T>());
             }
@@ -487,13 +468,13 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
         void AddMissingLanguage(StoreDbContext dbContext, Language language)
         {
-            if (!dbContext.Languages.Any(l => l.Code == language.Code)) 
+            if (!dbContext.Languages.Any(l => l.Code == language.Code))
                 dbContext.Languages.Add(language);
             var keys = language.Descriptions.Select(d => d.Key);
             var existingTranslations = dbContext.Translations.Where(t => keys.Contains(t.Key)).ToList();
             var unknownTranslations = language.Descriptions.Where(d => !existingTranslations.Any(t => t.Key == d.Key && t.Language == d.Language));
             dbContext.Translations.AddRange(unknownTranslations);
-            foreach(var existingTranslation in existingTranslations)
+            foreach (var existingTranslation in existingTranslations)
             {
                 var tr = language.Descriptions.SingleOrDefault(d => d.Key == existingTranslation.Key && d.Language == existingTranslation.Language);
                 if (tr == null) continue;

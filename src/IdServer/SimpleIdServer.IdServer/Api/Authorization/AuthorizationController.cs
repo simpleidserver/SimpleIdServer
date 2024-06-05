@@ -19,6 +19,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,10 +56,13 @@ public class AuthorizationController : Controller
         {
             var jObjBody = Request.Query.ToJObject();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            var claimAmrs = User.Claims.FirstOrDefault(c => c.Type == Constants.UserClaims.Amrs);
             var userSubject = claimName == null ? string.Empty : claimName.Value;
+            var userAmrs = claimAmrs == null ? new List<string>() : claimAmrs.Value.Split(" ").ToList();
             var referer = string.Empty;
             if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
+            context.Request.SetUserAmrs(userAmrs);
             activity?.SetTag("realm", context.Realm);
             try
             {
@@ -93,6 +97,11 @@ public class AuthorizationController : Controller
                         await HttpContext.SignOutAsync();
                     }
                     catch { }
+                }
+
+                if(redirectActionAuthorizationResponse.AmrAuthInfo != null)
+                {
+                    HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(redirectActionAuthorizationResponse.AmrAuthInfo));
                 }
 
                 var parameters = new List<KeyValuePair<string, string>>();

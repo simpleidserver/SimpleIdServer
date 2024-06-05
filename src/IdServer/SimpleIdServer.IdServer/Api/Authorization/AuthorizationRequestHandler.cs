@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,6 +82,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             {
                 context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
                 return new RedirectActionAuthorizationResponse("Index", "Accounts", context.Request.OriginalRequestData);
+            }
+            catch(OAuthAuthenticatedUserAmrMissingException ex)
+            {
+                var amrAuthInfo = new AmrAuthInfo(context.User.Id, context.User.Name, context.User.Firstname, new List<KeyValuePair<string, string>>(), ex.AllAmrs, ex.Acr, ex.Amr);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(), Constants.DefaultCurrentAmrCookieName }, amrAuthInfo);
             }
         }
 

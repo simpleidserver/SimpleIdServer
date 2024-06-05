@@ -106,7 +106,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             if (!IsProtected(returnUrl))
             {
-                return await Sign(realm, returnUrl, currentAmr, user, null, token, rememberLogin.Value);
+                return await Sign(realm, null, returnUrl, currentAmr, user, null, token, rememberLogin.Value);
             }
 
             var unprotectedUrl = Unprotect(returnUrl);
@@ -127,7 +127,7 @@ namespace SimpleIdServer.IdServer.UI
                         rememberLogin = false;
                 }
 
-                return await Sign(realm, unprotectedUrl, currentAmr, user, client, token, rememberLogin.Value);
+                return await Sign(realm, acr, unprotectedUrl, currentAmr, user, client, token, rememberLogin.Value);
             }
 
             using (var transaction = TransactionBuilder.Build())
@@ -144,12 +144,14 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        protected async Task<IActionResult> Sign(string realm, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)
+        protected async Task<IActionResult> Sign(string realm, AuthenticationContextClassReference acr, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)
         {
             var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
             await AddSession(realm, user, client, token, rememberLogin);
             var offset = DateTimeOffset.UtcNow.AddSeconds(expirationTimeInSeconds);
             var claims = _userTransformer.Transform(user);
+            if(acr != null)
+                claims.Add(new Claim(Constants.UserClaims.Amrs, string.Join(" ", acr.AuthenticationMethodReferences)));
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
             var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
             if (rememberLogin)

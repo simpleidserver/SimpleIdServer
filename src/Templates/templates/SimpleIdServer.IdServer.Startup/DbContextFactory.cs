@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using SimpleIdServer.IdServer.Store;
+using SimpleIdServer.IdServer.Store.EF;
 
 namespace SimpleIdServer.IdServer.PostgreMigrations;
-
 /*
 public class DbContextFactory : IDesignTimeDbContextFactory<StoreDbContext>
 {

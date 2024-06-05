@@ -75,7 +75,7 @@ namespace SimpleIdServer.IdServer.UI
                 var user = await JustInTimeProvision(prefix, scheme, result, cancellationToken);
                 if (!string.IsNullOrWhiteSpace(returnUrl))
                     return await Authenticate(prefix, returnUrl, Constants.Areas.Password, user, cancellationToken, false);
-                return await Sign(prefix, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
+                return await Sign(prefix, null, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
             }
 
             var items = new Dictionary<string, string>
@@ -114,7 +114,7 @@ namespace SimpleIdServer.IdServer.UI
             if (result.Properties.Items.ContainsKey(RETURN_URL_NAME))
                 return await Authenticate(prefix, result.Properties.Items[RETURN_URL_NAME], Constants.Areas.Password, user, cancellationToken, false);     
 
-            return await Sign(prefix, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
+            return await Sign(prefix, null, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
         }
 
         private async Task<User> JustInTimeProvision(string realm, string scheme, AuthenticateResult authResult, CancellationToken cancellationToken)

@@ -138,6 +138,9 @@
   <data name="disconnect" xml:space="preserve">
     <value>Disconnect</value>
   </data>
+  <data name="Disconnected" xml:space="preserve">
+    <value>Disconnected</value>
+  </data>
   <data name="en" xml:space="preserve">
     <value>English</value>
   </data>
@@ -158,5 +161,8 @@
   </data>
   <data name="user_is_created" xml:space="preserve">
     <value>User is created</value>
+  </data>
+  <data name="YouAreDisconnected" xml:space="preserve">
+    <value>You are disconnected</value>
   </data>
 </root>

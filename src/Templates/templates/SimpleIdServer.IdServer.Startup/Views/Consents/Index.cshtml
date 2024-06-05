@@ -40,8 +40,8 @@
                         }
                     </ul>
                 }
-                <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
 
+                <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
                 <h5>@string.Format(ConsentsResource.consent_client_access, Model.ClientName)</h5>
                 <ul class="list-group">
                     @if(Model.ScopeNames != null && Model.ScopeNames.Any())

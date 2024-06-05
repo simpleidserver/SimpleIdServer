@@ -195,6 +195,7 @@ namespace SimpleIdServer.IdServer
             public static string ScimId = "scim_id";
             public static string ScimLocation = "scim_location";
             public static string Events = "events";
+            public static string Amrs = "amrs";
         }
 
         public static class StandardClaims

@@ -112,6 +112,12 @@ namespace SimpleIdServer.IdServer.Api
         public X509Certificate2 Certificate { get; set; }
         public string Referer { get; set; }
         public string HttpMethod { get; set; }
+        public List<string> Amrs { get; private set; } = new List<string>();
+
+        public void SetUserAmrs(List<string> amrs)
+        {
+            Amrs = amrs;
+        }
 
         public void SetRequestData(JsonObject data)
         {
