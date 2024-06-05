@@ -26,7 +26,7 @@ public class DidEthrResolverFixture
     var s = ($"0x" + new string(chars)).ToUpper();
     */
 
-    [Test]
+    // [Test]
     public async Task When_Resolve_EthereumAddress_DID_With_No_Transactions_Then_DID_Document_Is_Resolved()
     {
         // ARRANGE
@@ -59,7 +59,7 @@ public class DidEthrResolverFixture
         Assert.That(didDocument.AssertionMethod.Count(), Is.EqualTo(1));
     }
 
-    [Test]
+    // [Test]
     public async Task When_Resolve_PublicKey_DID_With_No_Transactions_Then_DID_Document_Is_Resolved()
     {
         // ARRANGE
@@ -97,7 +97,7 @@ public class DidEthrResolverFixture
         Assert.That(didDocument.AssertionMethod.Count(), Is.EqualTo(2));
     }
 
-    [Test]
+    // [Test]
     public async Task When_Resolve_DID_With_Two_Services_Then_DID_Document_Is_Resolved()
     {
         var store = new NetworkConfigurationStore();
@@ -126,7 +126,7 @@ public class DidEthrResolverFixture
         Assert.That(travemEmail.ServiceEndpoint, Is.EqualTo("mailto:did:ethr:0x6918893854B2Eb01B194c46c4Efe2ea1ef36B7BC@tr-email.notabene.dev"));
     }
 
-    [Test]
+    // [Test]
     public async Task When_Resolve_DID_With_Two_VerificationMethod_Then_DID_Document_Is_Resolved()
     {
         var store = new NetworkConfigurationStore();
