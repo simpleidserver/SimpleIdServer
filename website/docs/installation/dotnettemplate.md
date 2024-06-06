@@ -196,6 +196,12 @@ cd src
 dotnet new credissueradminui -n CredentialIssuerAdminui
 ```
 
+:::danger
+
+If you are using version 5.0.0, you must install the NuGet package `Microsoft.IdentityModel.Protocols.OpenIdConnect` version `7.5.1`. Otherwise, the OpenIdConnect library will not be able to read the OpenID configuration from the well-known endpoint.
+
+:::
+
 Run the `CredentialIssuerAdminui` project, it must listens on the url `https://localhost:5006`.
 
 ```
