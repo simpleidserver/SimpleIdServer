@@ -86,7 +86,7 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    arguments: '-f net7.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=sidmobile.keystore -p:AndroidSigningKeyAlias=sidkey -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password'
+    arguments: '-f net8.0-android -c Release -p:AndroidKeyStore=true -p:AndroidSigningKeyStore=sidmobile.keystore -p:AndroidSigningKeyAlias=sidkey -p:AndroidSigningKeyPass=password -p:AndroidSigningStorePass=password'
     zipAfterPublish: false
     modifyOutputPath: false
     workingDirectory: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile'
@@ -101,35 +101,35 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy SimpleIdServer'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Startup\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Startup\bin\Debug\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\simpleidserver'
 
 - task: CopyFiles@2
   displayName: 'Copy SimpleIdServer website'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Website.Startup\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Website.Startup\bin\Debug\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\simpleidserverwebsite'
 
 - task: CopyFiles@2
   displayName: 'Copy SCIM'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup\bin\Debug\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\scim'
 
 - task: CopyFiles@2
   displayName: 'Copy Credential Issuer'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Startup\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Startup\bin\Debug\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\credentialissuer'
 
 - task: CopyFiles@2
   displayName: 'Copy Credential issuer website'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website.Startup\bin\Debug\net7.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website.Startup\bin\Debug\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\credentialissuerwebsite'
 
@@ -178,6 +178,6 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Mobile application'
   inputs:
-    PathtoPublish: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile\bin\Release\net7.0-android\publish'
+    PathtoPublish: '$(Build.Repository.LocalPath)\src\Mobile\SimpleIdServer.Mobile\bin\Release\net8.0-android\publish'
     ArtifactName: 'mobileApp'
     publishLocation: 'Container'
