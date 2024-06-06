@@ -10,7 +10,7 @@ import Installer from '@site/src/components/global/Installer';
 
 <DocsCards>
     <DocsCard>
-        <h2>LATEST STABLE 4.0.7</h2>
+        <h2>LATEST STABLE 5.0.0</h2>
         <h3>PLATFORM</h3>
         <Installers>
             <Installer title="Windows x64" icon="windows" link="https://github.com/simpleidserver/SimpleIdServer/releases/latest/download/SimpleIdServer-Windows-x64.zip" />
