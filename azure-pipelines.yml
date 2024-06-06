@@ -108,28 +108,28 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy SimpleIdServer website'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Website.Startup\bin\Debug\net8.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Website.Startup\bin\Release\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\simpleidserverwebsite'
 
 - task: CopyFiles@2
   displayName: 'Copy SCIM'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup\bin\Debug\net8.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\Scim\SimpleIdServer.Scim.Startup\bin\Release\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\scim'
 
 - task: CopyFiles@2
   displayName: 'Copy Credential Issuer'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Startup\bin\Debug\net8.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Startup\bin\Release\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\credentialissuer'
 
 - task: CopyFiles@2
   displayName: 'Copy Credential issuer website'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website.Startup\bin\Debug\net8.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website.Startup\bin\Release\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\credentialissuerwebsite'
 
