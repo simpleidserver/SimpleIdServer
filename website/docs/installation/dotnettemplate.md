@@ -165,6 +165,12 @@ cd src
 dotnet new credissuer -n CredentialIssuer
 ```
 
+:::danger
+
+If you are using version 5.0.0, you must install the NuGet package `Microsoft.IdentityModel.Protocols.OpenIdConnect` version `7.5.1`. Otherwise, the OpenIdConnect library will not be able to read the OpenID configuration from the well-known endpoint.
+
+:::
+
 The following files will be created within a new `src/CredentialIssuer` directory :
 
 * `CredentialIssuer.csproj` : Project file with the `SimpleIdServer.CredentialIssuer` NuGet package added.
