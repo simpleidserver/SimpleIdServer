@@ -101,7 +101,7 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy SimpleIdServer'
   inputs:
-    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Startup\bin\Debug\net8.0\publish'
+    SourceFolder: '$(Build.Repository.LocalPath)\src\IdServer\SimpleIdServer.IdServer.Startup\bin\Release\net8.0\publish'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)\simpleidserver'
 
