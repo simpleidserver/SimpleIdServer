@@ -31,6 +31,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
     public class AuthorizationRequestHandler : IAuthorizationRequestHandler
     {
         private readonly IAuthorizationRequestValidator _validator;
+        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IEnumerable<ITokenProfile> _tokenProfiles;
         private readonly IAuthorizationRequestEnricher _authorizationRequestEnricher;
         private readonly IUserRepository _userRepository;
@@ -39,6 +40,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IAuthorizationRequestValidator validator,
+            IAuthenticationHelper authenticationHelper,
             IEnumerable<ITokenProfile> tokenProfiles, 
             IAuthorizationRequestEnricher authorizationRequestEnricher,
             IUserRepository userRepository,
@@ -47,6 +49,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
+            _authenticationHelper = authenticationHelper;
             _tokenProfiles = tokenProfiles;
             _authorizationRequestEnricher = authorizationRequestEnricher;
             _userRepository = userRepository;
@@ -85,7 +88,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
             catch(OAuthAuthenticatedUserAmrMissingException ex)
             {
-                var amrAuthInfo = new AmrAuthInfo(context.User.Id, context.User.Name, context.User.Firstname, new List<KeyValuePair<string, string>>(), ex.AllAmrs, ex.Acr, ex.Amr);
+                var login = _authenticationHelper.GetLogin(context.User);
+                var amrAuthInfo = new AmrAuthInfo(context.User.Id, login, context.User.Email, new List<KeyValuePair<string, string>>(), ex.AllAmrs, ex.Acr, ex.Amr);
                 return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(), Constants.DefaultCurrentAmrCookieName }, amrAuthInfo);
             }
         }
