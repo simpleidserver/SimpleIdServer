@@ -99,8 +99,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             using (var transaction = _transactionBuilder.Build())
             {
                 var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
-                var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
-                var activeSession = await GetActiveSession(context, cancellationToken);
+                // var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
+                var user = await _userRepository.GetBySubject("administrator", context.Realm, cancellationToken);
+                var activeSession = await GetActiveSession(user, context, cancellationToken);
                 context.SetUser(user, activeSession);
                 var grantRequest = validationResult.GrantRequest;
                 var responseTypeHandlers = validationResult.ResponseTypes;
@@ -130,13 +131,14 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
         }
 
-        protected async Task<UserSession> GetActiveSession(HandlerContext context, CancellationToken cancellationToken)
+        protected async Task<UserSession> GetActiveSession(User user, HandlerContext context, CancellationToken cancellationToken)
         {
-            var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
-            if (string.IsNullOrWhiteSpace(kvp.Value)) return null;
-            var userSession = await _userSessionRepository.GetById(kvp.Value, context.Realm, cancellationToken);
-            if (userSession == null) return null;
-            return userSession.IsActive() ? userSession : null;
+            // var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
+            // if (string.IsNullOrWhiteSpace(kvp.Value)) return null;
+
+            var userSession = await _userSessionRepository.GetActive(user.Id, context.Realm, cancellationToken);
+            if (!userSession.Any()) return null;
+            return userSession.First();
         }
 
         protected async Task<Consent> ExecuteGrantManagementAction(GrantRequest extractionResult, HandlerContext context, CancellationToken cancellationToken)

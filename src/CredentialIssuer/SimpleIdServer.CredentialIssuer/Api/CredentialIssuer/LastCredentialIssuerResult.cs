@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer;
 
-public class CredentialIssuerResult
+public class LastCredentialIssuerResult
 {
     /// <summary>
     /// The credential issuer's identifier.
@@ -77,8 +77,8 @@ public class CredentialIssuerResult
     /// <summary>
     /// List of JSON Objects, each of them representing metadata about a separate credential type that the credential issuer can issue.
     /// </summary>
-    [JsonPropertyName(CredentialIssuerResultNames.CredentialsSupported)]
-    public Dictionary<string, JsonObject> CredentialsSupported { get; set; } = new Dictionary<string, JsonObject>();
+    [JsonPropertyName(CredentialIssuerResultNames.CredentialConfigurationSupported)]
+    public Dictionary<string, JsonObject> CredentialConfigurationsSupported { get; set; } = new Dictionary<string, JsonObject>();
 }
 
 public class CredentialIssuerDisplayResult

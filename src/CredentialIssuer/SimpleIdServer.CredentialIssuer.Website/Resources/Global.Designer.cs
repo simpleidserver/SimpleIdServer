@@ -340,6 +340,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential issuer DID.
+        /// </summary>
+        internal static string CredentialIssuerDid {
+            get {
+                return ResourceManager.GetString("CredentialIssuerDid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credential has been removed.
         /// </summary>
         internal static string CredentialRemoved {

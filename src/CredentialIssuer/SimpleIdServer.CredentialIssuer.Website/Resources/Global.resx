@@ -210,6 +210,9 @@
   <data name="CredentialIssuer" xml:space="preserve">
     <value>Credential issuer</value>
   </data>
+  <data name="CredentialIssuerDid" xml:space="preserve">
+    <value>Credential issuer DID</value>
+  </data>
   <data name="CredentialRemoved" xml:space="preserve">
     <value>Credential has been removed</value>
   </data>

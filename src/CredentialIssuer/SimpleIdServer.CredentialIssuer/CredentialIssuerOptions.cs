@@ -65,4 +65,15 @@ public class CredentialIssuerOptions
     /// Ignore the HTTPS certificate error.
     /// </summary>
     public bool IgnoreHttpsCertificateError { get; set; }
+
+    /// <summary>
+    /// Set the version of the credential issuer.
+    /// </summary>
+    public CredentialIssuerVersion Version { get; set; } = CredentialIssuerVersion.LAST;
+}
+
+public enum CredentialIssuerVersion
+{
+    LAST = 0,
+    ESBI = 1
 }

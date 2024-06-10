@@ -40,6 +40,7 @@ namespace SimpleIdServer.IdServer
         {
             public const string OpenIdCredential = "openid_credential";
             public const string CredentialConfigurationId = "credential_configuration_id";
+            public const string Format = "format";
         }
 
         public static class EndPoints
