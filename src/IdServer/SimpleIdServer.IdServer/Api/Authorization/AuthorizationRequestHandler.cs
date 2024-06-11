@@ -37,6 +37,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly IUserRepository _userRepository;
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly ITransactionBuilder _transactionBuilder;
+        private readonly IEnumerable<IWalletOAuthAuthorizationService> _walletOAuthAuthorizationServices;
+        private readonly IAmrHelper _amrHelper;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IAuthorizationRequestValidator validator,
@@ -46,6 +48,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             IUserRepository userRepository,
             IUserSessionResitory userSessionResitory,
             ITransactionBuilder transactionBuilder,
+            IEnumerable<IWalletOAuthAuthorizationService> walletOAuthAuthorizationServices,
+            IAmrHelper amrHelper,
             IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
@@ -55,21 +59,28 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _userRepository = userRepository;
             _userSessionRepository = userSessionResitory;
             _transactionBuilder = transactionBuilder;
+            _walletOAuthAuthorizationServices = walletOAuthAuthorizationServices;
+            _amrHelper = amrHelper;
             _options = options.Value;
         }
 
         public virtual async Task<AuthorizationResponse> Handle(HandlerContext context, CancellationToken token)
         {
+            string firstAmr = null;
             try
             {
-                    var result = await BuildResponse(context, token);
-                    var display = context.Request.RequestData.GetDisplayFromAuthorizationRequest();
-                    if (!string.IsNullOrWhiteSpace(display))
-                        context.Response.Add(AuthorizationRequestParameters.Display, display);
-                    var sessionState = BuildSessionState(context);
-                    if (!string.IsNullOrWhiteSpace(sessionState))
-                        context.Response.Add(AuthorizationRequestParameters.SessionState, sessionState);
-                    return result;
+                var validationResult = await _validator.ValidateAuthorizationRequest(context, token);
+                var acrValues = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
+                var claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest();
+                firstAmr = await GetFirstAmr(context.Realm, acrValues, claims, context.Client, token);
+                var result = await BuildResponse(context, firstAmr, validationResult, token);
+                var display = context.Request.RequestData.GetDisplayFromAuthorizationRequest();
+                if (!string.IsNullOrWhiteSpace(display))
+                    context.Response.Add(AuthorizationRequestParameters.Display, display);
+                var sessionState = BuildSessionState(context);
+                if (!string.IsNullOrWhiteSpace(sessionState))
+                    context.Response.Add(AuthorizationRequestParameters.SessionState, sessionState);
+                return result;
             }
             catch (OAuthUserConsentRequiredException ex)
             {
@@ -79,7 +90,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             catch (OAuthLoginRequiredException ex)
             {
                 context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { _options.GetSessionCookieName(), Constants.DefaultCurrentAmrCookieName });
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, firstAmr, true, new List<string> { _options.GetSessionCookieName(), Constants.DefaultCurrentAmrCookieName });
             }
             catch (OAuthSelectAccountRequiredException)
             {
@@ -94,17 +105,21 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
         }
 
-        protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, CancellationToken cancellationToken)
+        protected async Task<AuthorizationResponse> BuildResponse(HandlerContext context, string firstAmr, AuthorizationRequestValidationResult validationResult, CancellationToken cancellationToken)
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                var validationResult = await _validator.ValidateAuthorizationRequest(context, cancellationToken);
-                // var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
-                var user = await _userRepository.GetBySubject("administrator", context.Realm, cancellationToken);
-                var activeSession = await GetActiveSession(user, context, cancellationToken);
+                var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
+                var activeSession = await GetActiveSession(context, cancellationToken);
                 context.SetUser(user, activeSession);
                 var grantRequest = validationResult.GrantRequest;
                 var responseTypeHandlers = validationResult.ResponseTypes;
+                var oauthAuthorizationService = _walletOAuthAuthorizationServices.SingleOrDefault(w => w.Amr == firstAmr);
+                if(oauthAuthorizationService != null)
+                {
+                    return await oauthAuthorizationService.Handle(context, cancellationToken);
+                }
+
                 await _validator.ValidateAuthorizationRequestWhenUserIsAuthenticated(grantRequest, context, cancellationToken);
                 var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
                 var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
@@ -131,14 +146,22 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
         }
 
-        protected async Task<UserSession> GetActiveSession(User user, HandlerContext context, CancellationToken cancellationToken)
+        protected async Task<string> GetFirstAmr(string realm, IEnumerable<string> acrValues, IEnumerable<AuthorizedClaim> claims, Client client, CancellationToken cancellationToken)
         {
-            // var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
-            // if (string.IsNullOrWhiteSpace(kvp.Value)) return null;
+            var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, claims, client, cancellationToken);
+            if (acr == null)
+                return null;
 
-            var userSession = await _userSessionRepository.GetActive(user.Id, context.Realm, cancellationToken);
-            if (!userSession.Any()) return null;
-            return userSession.First();
+            return acr.AuthenticationMethodReferences.First();
+        }
+
+        protected async Task<UserSession> GetActiveSession(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
+            if (string.IsNullOrWhiteSpace(kvp.Value)) return null;
+            var userSession = await _userSessionRepository.GetById(kvp.Value, context.Realm, cancellationToken);
+            if (userSession == null) return null;
+            return userSession.IsActive() ? userSession : null;
         }
 
         protected async Task<Consent> ExecuteGrantManagementAction(GrantRequest extractionResult, HandlerContext context, CancellationToken cancellationToken)

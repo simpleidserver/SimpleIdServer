@@ -756,6 +756,9 @@
   <data name="RequestUriIsRequired" xml:space="preserve">
     <value>the request_uri is required</value>
   </data>
+  <data name="ResponseUriCannotBeUsedWithRedirectUri" xml:space="preserve">
+    <value>the response_uri cannot be used with redirect_uri</value>
+  </data>
   <data name="ScopeAlreadyExists" xml:space="preserve">
     <value>scope '{0}' already exists</value>
   </data>

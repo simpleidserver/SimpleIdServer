@@ -1978,6 +1978,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the response_uri cannot be used with redirect_uri.
+        /// </summary>
+        public static string ResponseUriCannotBeUsedWithRedirectUri {
+            get {
+                return ResourceManager.GetString("ResponseUriCannotBeUsedWithRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à scope &apos;{0}&apos; already exists.
         /// </summary>
         public static string ScopeAlreadyExists {

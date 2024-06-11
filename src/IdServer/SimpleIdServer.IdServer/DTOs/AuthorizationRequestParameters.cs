@@ -39,5 +39,6 @@ namespace SimpleIdServer.IdServer.DTOs
         public const string UserHint = "user_hint";
         public const string IssuerState = "issuer_state";
         public const string DPOPJkt = "dpop_jkt";
+        public const string ResponseUri = "response_uri";
     }
 }

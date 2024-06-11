@@ -188,6 +188,8 @@ namespace System.Text.Json.Nodes
 
         public static string GetResponseModeFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ResponseMode);
 
+        public static string GetResponseUriFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ResponseUri);
+
         public static string GetRedirectUriFromAuthorizationRequest(this JsonObject jObj)
         {
             var result = jObj.GetStr(AuthorizationRequestParameters.RedirectUri);

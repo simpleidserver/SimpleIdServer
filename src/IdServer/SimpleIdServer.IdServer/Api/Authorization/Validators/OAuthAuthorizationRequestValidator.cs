@@ -119,6 +119,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
                 var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
                 var responseMode = context.Request.RequestData.GetResponseModeFromAuthorizationRequest();
+                var responseUri = context.Request.RequestData.GetResponseUriFromAuthorizationRequest();
                 var unsupportedResponseTypes = responseTypes.Where(t => !client.ResponseTypes.Contains(t));
                 var redirectionUrls = await _clientHelper.GetRedirectionUrls(client, cancellationToken);
                 if (!string.IsNullOrWhiteSpace(redirectUri) && !redirectionUrls.Any(r =>
@@ -130,6 +131,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (!string.IsNullOrWhiteSpace(responseMode) && !_oauthResponseModes.Any(o => o.ResponseMode == responseMode)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.BadResponseMode, responseMode));
 
                 if (unsupportedResponseTypes.Any()) throw new OAuthException(ErrorCodes.UNSUPPORTED_RESPONSE_TYPE, string.Format(Global.BadResponseTypesClient, string.Join(",", unsupportedResponseTypes)));
+
+                if (!string.IsNullOrWhiteSpace(responseUri) && !string.IsNullOrWhiteSpace(redirectUri)) 
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ResponseUriCannotBeUsedWithRedirectUri);
             }
 
             async Task<Client> AuthenticateClient(string realm, string clientId, CancellationToken cancellationToken)
@@ -176,22 +180,22 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (prompt == PromptParameters.None)
                     throw new OAuthException(ErrorCodes.LOGIN_REQUIRED, Global.LoginIsRequired);
 
-                throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
+                throw new OAuthLoginRequiredException();
             }
 
             var activeSession = context.Session;
             if (activeSession == null)
-                throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken), true);
+                throw new OAuthLoginRequiredException(true);
 
             var maxAge = context.Request.RequestData.GetMaxAgeFromAuthorizationRequest();
             var idTokenHint = context.Request.RequestData.GetIdTokenHintFromAuthorizationRequest();
             if (maxAge != null)
             {
                 if (DateTime.UtcNow > activeSession.AuthenticationDateTime.AddSeconds(maxAge.Value))
-                    throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
+                    throw new OAuthLoginRequiredException();
             }
             else if (openidClient.DefaultMaxAge != null && DateTime.UtcNow > activeSession.AuthenticationDateTime.AddSeconds(openidClient.DefaultMaxAge.Value))
-                throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
+                throw new OAuthLoginRequiredException();
 
             if (!string.IsNullOrWhiteSpace(idTokenHint))
             {
@@ -206,7 +210,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             switch (prompt)
             {
                 case PromptParameters.Login:
-                    throw new OAuthLoginRequiredException(await GetFirstAmr(context.Realm, acrValues, claims, openidClient, cancellationToken));
+                    throw new OAuthLoginRequiredException();
                 case PromptParameters.Consent:
                     RedirectToConsentView(context);
                     break;
@@ -241,15 +245,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         {
             if (context.Client.IsConsentDisabled) return;
             throw new OAuthUserConsentRequiredException();
-        }
-
-        protected async Task<string> GetFirstAmr(string realm, IEnumerable<string> acrValues, IEnumerable<AuthorizedClaim> claims, Client client, CancellationToken cancellationToken)
-        {
-            var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, claims, client, cancellationToken);
-            if (acr == null)
-                return null;
-
-            return acr.AuthenticationMethodReferences.First();
         }
 
         protected JsonWebToken ExtractIdTokenHint(string realm, string idTokenHint)
