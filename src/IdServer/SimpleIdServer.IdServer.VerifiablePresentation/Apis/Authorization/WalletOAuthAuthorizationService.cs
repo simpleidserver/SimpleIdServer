@@ -25,7 +25,7 @@ public class WalletOAuthAuthorizationService : IWalletOAuthAuthorizationService
     {
         // https://hub.ebsi.eu/conformance/learn/verifiable-credential-issuance#id-token-request
         var targetUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
-        var scope = context.Request.RequestData.GetScopeName();
+        var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
         var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
         var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
         var clientId = $"{context.GetIssuer()}/{IdServer.Constants.EndPoints.Authorization}";
@@ -40,7 +40,7 @@ public class WalletOAuthAuthorizationService : IWalletOAuthAuthorizationService
                 { AuthorizationRequestParameters.ResponseMode, "direct_post" },
                 { AuthorizationRequestParameters.ClientId, clientId },
                 { AuthorizationRequestParameters.RedirectUri, redirectUri },
-                { AuthorizationRequestParameters.Scope, scope },
+                { AuthorizationRequestParameters.Scope, string.Join(" ", scopes) },
                 { AuthorizationRequestParameters.Nonce, nonce }
             }
         };
@@ -51,9 +51,10 @@ public class WalletOAuthAuthorizationService : IWalletOAuthAuthorizationService
         {
             { AuthorizationRequestParameters.ClientId, clientId },
             { AuthorizationRequestParameters.ResponseType, IdTokenResponseTypeHandler.RESPONSE_TYPE },
-            { AuthorizationRequestParameters.Scope, scope },
+            { AuthorizationRequestParameters.ResponseMode, "direct_post" },
+            { AuthorizationRequestParameters.Scope, string.Join(" ", scopes) },
             { AuthorizationRequestParameters.RedirectUri, redirectUri },
-            { AuthorizationRequestParameters.Resource, jwt }
+            { AuthorizationRequestParameters.Request, jwt }
         };
         return new RedirectURLAuthorizationResponse(targetUri, dic);
     }
