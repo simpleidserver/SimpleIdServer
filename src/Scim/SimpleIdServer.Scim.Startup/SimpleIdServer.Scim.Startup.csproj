@@ -23,4 +23,9 @@
 		<ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+	  <None Update="SimpleIdServer.Scim.xml">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

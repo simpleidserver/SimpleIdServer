@@ -25,7 +25,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using SimpleIdServer.Scim;
 
 namespace SimpleIdServer.Scim.Startup;
 
@@ -242,10 +241,7 @@ public class Program
         });
         InitializeDatabase(builder, app);
         app.UseAuthentication();
-        app.UseMvc(e =>
-        {
-            e.UseScim(opts.EnableRealm);
-        });
+        app.UseScim(opts.EnableRealm);
     }
 
     #region Database migration

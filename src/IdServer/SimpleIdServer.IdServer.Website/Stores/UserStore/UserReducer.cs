@@ -594,6 +594,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             {
                 IsLoading = false,
                 Groups = groups,
+                Count = groups.Count()
             };
         }
 

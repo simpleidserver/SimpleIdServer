@@ -3,6 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Description>SCIM2.0 implementation.</Description>
 	<LangVersion>latest</LangVersion>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
 	<PackageReference Include="MassTransit" Version="8.2.1" />
