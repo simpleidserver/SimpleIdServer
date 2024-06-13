@@ -119,11 +119,8 @@ public class VerificationMethodEncoding : IVerificationMethodEncoding
             case SignatureKeyEncodingTypes.MULTIBASE:
                 return _multicodecSerializer.Deserialize(verificationMethod.PublicKeyMultibase, verificationMethod.SecretKeyMultibase);
             case SignatureKeyEncodingTypes.JWK:
-                return new JsonWebKeySecurityKey(verificationMethod.PublicKeyJwk);
-                /*
                 return _verificationMethods.Single(v => v.Kty == verificationMethod.PublicKeyJwk.Kty && v.CrvOrSize == verificationMethod.PublicKeyJwk.Crv)
                     .Build(verificationMethod.PublicKeyJwk, verificationMethod.PrivateKeyJwk);
-                */
         }
 
         var curve = standard.SupportedCurves.Single();

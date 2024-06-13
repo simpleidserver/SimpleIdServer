@@ -1,12 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using System.Net.Http.Headers;
 using System.Security.Cryptography;
 
-namespace SimpleIdServer.Did.Crypto.SecurityKeys;
+namespace SimpleIdServer.Did.Crypto;
 
 public class JsonWebKeySecurityKey : IAsymmetricKey
 {
@@ -17,54 +15,52 @@ public class JsonWebKeySecurityKey : IAsymmetricKey
         _jwk = jwk;
     }
 
-    public string Kty => null;
+    public string Kty => string.Empty;
 
-    public string CrvOrSize => null;
+    public string CrvOrSize => string.Empty;
 
-    public string JwtAlg => throw new System.NotImplementedException();
+    public string JwtAlg => string.Empty;
 
     public SigningCredentials BuildSigningCredentials(string kid = null)
     {
-        return new SigningCredentials(_jwk, "EC256");
+        throw new System.NotImplementedException();
     }
 
     public bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName? alg = null)
     {
-        return false;
+        throw new System.NotImplementedException();
     }
 
     public JsonWebKey GetPrivateJwk()
     {
-        return null;
+        throw new System.NotImplementedException();
     }
 
     public byte[] GetPrivateKey()
     {
-        return null;
+        throw new System.NotImplementedException();
     }
 
     public JsonWebKey GetPublicJwk()
-    {
-        return _jwk;
-    }
+        => _jwk;
 
     public byte[] GetPublicKey(bool compressed = false)
     {
-        return null;
+        throw new System.NotImplementedException();
     }
 
     public void Import(byte[] publicKey, byte[] privateKey)
     {
-        return;
+        throw new System.NotImplementedException();
     }
 
     public void Import(JsonWebKey publicKey, JsonWebKey privateKey)
     {
-        return;
+        throw new System.NotImplementedException();
     }
 
     public byte[] SignHash(byte[] content, HashAlgorithmName alg)
     {
-        return null;
+        throw new System.NotImplementedException();
     }
 }
