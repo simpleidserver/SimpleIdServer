@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.AspNetCore.Routing;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Infrastructure;
 
@@ -8,7 +9,7 @@ namespace Microsoft.AspNetCore.Builder;
 
 public static class RouteBuilderExtensions
 {
-    public static WebApplication UseScim(this WebApplication webApp, bool usePrefix = false)
+    public static IRouteBuilder UseScim(this IRouteBuilder webApp, bool usePrefix = false)
     {
         webApp.ScimMapControllerRoute("getResourceTypes",
             pattern: SCIMEndpoints.ResourceType,
@@ -35,25 +36,25 @@ public static class RouteBuilderExtensions
         webApp.UseStandardScimEdp(SCIMEndpoints.User, usePrefix);
         webApp.UseStandardScimEdp(SCIMEndpoints.Group, usePrefix);
 
-        webApp.MapControllerRoute("catchAllGet",
-            pattern: "{*url}",
+        webApp.MapRoute("catchAllGet",
+            template: "{*url}",
             defaults: new { controller = "Default", action = "Get" });
-        webApp.MapControllerRoute("catchAllPut",
-            pattern: "{*url}",
+        webApp.MapRoute("catchAllPut",
+            template: "{*url}",
             defaults: new { controller = "Default", action = "Put" });
-        webApp.MapControllerRoute("catchAllPost",
-            pattern: "{*url}",
+        webApp.MapRoute("catchAllPost",
+            template: "{*url}",
             defaults: new { controller = "Default", action = "Post" });
-        webApp.MapControllerRoute("catchAllDelete",
-            pattern: "{*url}",
+        webApp.MapRoute("catchAllDelete",
+            template: "{*url}",
             defaults: new { controller = "Default", action = "Delete" });
-        webApp.MapControllerRoute("catchAllPatch",
-            pattern: "{*url}",
+        webApp.MapRoute("catchAllPatch",
+            template: "{*url}",
             defaults: new { controller = "Default", action = "Patch" });
         return webApp;
     }
 
-    public static WebApplication UseStandardScimEdp(this WebApplication webApp, string controllerName, bool usePrefix)
+    public static IRouteBuilder UseStandardScimEdp(this IRouteBuilder webApp, string controllerName, bool usePrefix)
     {
         webApp.ScimMapControllerRoute($"get{controllerName}",
             pattern: $"{(usePrefix ? "{prefix}/" : string.Empty)}{controllerName}",

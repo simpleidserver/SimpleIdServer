@@ -10,14 +10,14 @@ namespace SimpleIdServer.Scim.Infrastructure
     public static class EndpointRouteBuilderExtensions
     {
         public static void ScimMapControllerRoute(
-            this IEndpointRouteBuilder builder,
+            this IRouteBuilder builder,
             string name,
             [StringSyntax("Route")] string pattern,
             object? defaults = null,
             object? constraints = null,
             object? dataTokens = null)
         {
-            builder.MapControllerRoute(name, pattern, defaults, constraints, dataTokens);
+            builder.MapRoute(name, pattern, defaults, constraints, dataTokens);
             var edpsStore = GetEdpsStore(builder);
             edpsStore.AddRoute(
                 name,
@@ -27,6 +27,6 @@ namespace SimpleIdServer.Scim.Infrastructure
                 new RouteValueDictionary(dataTokens));
         }
 
-        private static IScimEndpointStore GetEdpsStore(IEndpointRouteBuilder builder) => builder.ServiceProvider.GetRequiredService<IScimEndpointStore>();
+        private static IScimEndpointStore GetEdpsStore(IRouteBuilder builder) => builder.ServiceProvider.GetRequiredService<IScimEndpointStore>();
     }
 }
