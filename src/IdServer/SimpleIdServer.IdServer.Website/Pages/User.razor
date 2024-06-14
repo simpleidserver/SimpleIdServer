@@ -21,6 +21,11 @@
     <RadzenBadge class="mb-3" Text="@userState.Value.User?.Source" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
 }
 
+@if(userState.Value.User != null)
+{
+    <RadzenBadge class="mb-3" IsPill=true Text="@(userState.Value.User.Status == UserStatus.ACTIVATED ? Global.Active : Global.Blocked)" BadgeStyle="@(userState.Value.User.Status == UserStatus.ACTIVATED ? BadgeStyle.Success : BadgeStyle.Danger)"></RadzenBadge>
+}
+
 <RadzenCardLoader Variant="Variant.Filled" IsLoading=@userState.Value.IsLoading>
     <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
         <Tabs>

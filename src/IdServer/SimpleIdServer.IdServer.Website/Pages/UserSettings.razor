@@ -20,6 +20,14 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Name</RadzenText>
         <RadzenTextBox Name="Login" @bind-Value="@updateUserSettings.Login" Class="w-100" Disabled=true></RadzenTextBox>
     </div>
+    <!-- Unblock datetime -->
+    @if(updateUserSettings.UnblockDateTime != null)
+    {
+        <div>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.UnblockDateTime</RadzenText>
+            <RadzenDatePicker Name="UnblockDateTime" @bind-Value=@updateUserSettings.UnblockDateTime Class="w-100" Disabled=true />
+        </div>
+    }
     <!-- Created at -->
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.CreatedAt</RadzenText>
@@ -78,6 +86,7 @@
         public string? Firstname { get; set; } = null;
         public string? Lastname { get; set; } = null;
         public string? NotificationMode { get; set; } = null;
+        public DateTime? UnblockDateTime { get; set; } = null;
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -111,7 +120,8 @@
             Email = this.User.Email,
             Firstname = this.User.Firstname,
             Lastname = this.User.Lastname,
-            NotificationMode = this.User.NotificationMode
+            NotificationMode = this.User.NotificationMode,
+            UnblockDateTime = this.User.UnblockDateTime
         };
     }
 

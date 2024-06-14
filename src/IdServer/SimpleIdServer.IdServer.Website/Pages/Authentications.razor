@@ -53,6 +53,10 @@
             {
                 isLoading = false;
             });
+            SubscribeToAction<GetUserLockingOptionsSuccessAction>((act) =>
+            {
+                isLoading = false;
+            });
         }
     }
 

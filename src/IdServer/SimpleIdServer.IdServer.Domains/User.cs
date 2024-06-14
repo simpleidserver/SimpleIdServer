@@ -137,12 +137,21 @@ namespace SimpleIdServer.IdServer.Domains
 
         #endregion
 
-        public bool IsBlocked() => Status == UserStatus.BLOCKED && UnblockDateTime >= DateTime.UtcNow;
+        public bool IsBlocked()
+        {
+            if (Status == UserStatus.BLOCKED && UnblockDateTime >= DateTime.UtcNow) return true;
+            if (Status == UserStatus.BLOCKED && UnblockDateTime < DateTime.UtcNow)
+            {
+                ResetLoginAttempt();
+            }
+
+            return false;
+        }
 
         public void LoginAttempt(int maxAttempt, int lockTimeInSeconds)
         {
             NbLoginAttempt++;
-            if (maxAttempt >= NbLoginAttempt)
+            if (NbLoginAttempt >= maxAttempt)
             {
                 UnblockDateTime = DateTime.UtcNow.AddSeconds(lockTimeInSeconds);
                 Status = UserStatus.BLOCKED;

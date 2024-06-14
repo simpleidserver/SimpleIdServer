@@ -718,6 +718,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Blocked.
+        /// </summary>
+        public static string Blocked {
+            get {
+                return ResourceManager.GetString("Blocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Realm cannot be added because the option is disabled.
         /// </summary>
         public static string CannotAddRealmBecauseOptionIsDisabled {
@@ -4500,6 +4509,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string UnassignResources {
             get {
                 return ResourceManager.GetString("UnassignResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Unblock datetime.
+        /// </summary>
+        public static string UnblockDateTime {
+            get {
+                return ResourceManager.GetString("UnblockDateTime", resourceCulture);
             }
         }
         

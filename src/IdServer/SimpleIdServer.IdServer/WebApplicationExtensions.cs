@@ -360,6 +360,12 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.FidoConfiguration,
                 defaults: new { controller = "FidoConfiguration", action = "Index" });
 
+            webApplication.SidMapControllerRoute("GetUserLockingOptions",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/userlockingoptions",
+                defaults: new { controller = "AuthenticationMethods", action = "GetUserLockingOptions" });
+            webApplication.SidMapControllerRoute("UpdateUserLockingOptions",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/userlockingoptions",
+                defaults: new { controller = "AuthenticationMethods", action = "UpdateUserLockingOptions" });
             webApplication.SidMapControllerRoute("getAllAuthMethods",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods,
                 defaults: new { controller = "AuthenticationMethods", action = "GetAll" });
@@ -369,12 +375,6 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("getAuthMethodConfigurations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
                 defaults: new { controller = "AuthenticationMethods", action = "Get" });
-            webApplication.SidMapControllerRoute("GetUserLockingOptions",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/userlockingoptions",
-                defaults: new { controller = "AuthenticationMethods", action = "GetUserLockingOptions" });
-            webApplication.SidMapControllerRoute("UpdateUserLockingOptions",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/userlockingoptions",
-                defaults: new { controller = "AuthenticationMethods", action = "UpdateUserLockingOptions" });
 
             webApplication.SidMapControllerRoute("getAllRegistrationWorkflows",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows,

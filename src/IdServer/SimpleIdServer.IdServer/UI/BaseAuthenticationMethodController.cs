@@ -218,8 +218,12 @@ namespace SimpleIdServer.IdServer.UI
                                 Amr = Amr,
                                 Login = viewModel.Login
                             });
-                            authenticationResult.AuthenticatedUser.LoginAttempt(options.MaxLoginAttempts, options.LockTimeInSeconds);
-                            UserRepository.Update(authenticationResult.AuthenticatedUser);
+                            if(authenticationResult.AuthenticatedUser != null)
+                            {
+                                authenticationResult.AuthenticatedUser.LoginAttempt(options.MaxLoginAttempts, options.LockTimeInSeconds);
+                                UserRepository.Update(authenticationResult.AuthenticatedUser);
+                            }
+
                             await transaction.Commit(token);
                             return View(viewModel);
                         }

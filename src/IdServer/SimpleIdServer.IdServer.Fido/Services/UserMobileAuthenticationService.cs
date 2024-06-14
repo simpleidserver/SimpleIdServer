@@ -47,17 +47,17 @@ public class UserMobileAuthenticationService : GenericAuthenticationService<Auth
 
     protected override async Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticateMobileViewModel viewModel, CancellationToken cancellationToken)
     {
-        if (authenticatedUser.IsBlocked()) return CredentialsValidationResult.Error("user_blocked", "user_blocked");
+        if (authenticatedUser.IsBlocked()) return CredentialsValidationResult.Error("user_blocked", "user_blocked", authenticatedUser);
         var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
         if (string.IsNullOrWhiteSpace(session))
         {
-            return CredentialsValidationResult.Error("unknown_session", "unknown_session");
+            return CredentialsValidationResult.Error("unknown_session", "unknown_session", authenticatedUser);
         }
 
         var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
         if (!sessionRecord.IsValidated)
         {
-            return CredentialsValidationResult.Error("session_not_validated", "session_not_validated");
+            return CredentialsValidationResult.Error("session_not_validated", "session_not_validated", authenticatedUser);
         }
 
         return CredentialsValidationResult.Ok(authenticatedUser);

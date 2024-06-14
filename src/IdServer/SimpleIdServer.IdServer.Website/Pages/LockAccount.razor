@@ -17,7 +17,7 @@
         base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            SubscribeToAction<UpdateAuthMethodSuccessAction>((act) =>
+            SubscribeToAction<UpdateUserLockingOptionsSuccessAction>((act) =>
             {
                 this.IsUpdating = false;
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserLockingOptionsUpdated });
