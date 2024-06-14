@@ -24,6 +24,7 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
     private readonly IConfiguration _configuration;
 
     public AuthenticateController(
+        IConfiguration configuration,
         IPasswordAuthenticationService userAuthenticationService,
         IAuthenticationSchemeProvider authenticationSchemeProvider,
         IOptions<IdServerHostOptions> options,
@@ -38,9 +39,8 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         IUserSessionResitory userSessionRepository,
         IUserTransformer userTransformer,
         IBusControl busControl,
-        IConfiguration configuration,
         IAntiforgery antiforgery,
-        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
+        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
     {
         _configuration = configuration;
     }

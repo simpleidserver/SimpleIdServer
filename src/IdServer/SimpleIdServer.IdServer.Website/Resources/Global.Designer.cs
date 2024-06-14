@@ -2599,6 +2599,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Lock account.
+        /// </summary>
+        public static string LockAccount {
+            get {
+                return ResourceManager.GetString("LockAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string Login {
@@ -4851,6 +4860,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string UserIdentifierDescription {
             get {
                 return ResourceManager.GetString("UserIdentifierDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Options have been updated.
+        /// </summary>
+        public static string UserLockingOptionsUpdated {
+            get {
+                return ResourceManager.GetString("UserLockingOptionsUpdated", resourceCulture);
             }
         }
         

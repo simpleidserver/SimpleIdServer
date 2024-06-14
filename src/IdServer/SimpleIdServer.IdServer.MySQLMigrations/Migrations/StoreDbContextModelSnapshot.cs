@@ -2225,6 +2225,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("longtext")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
+                    b.Property<int>("NbLoginAttempt")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "nb_login_attempt");
+
                     b.Property<string>("NotificationMode")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -2237,6 +2241,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "status");
+
+                    b.Property<DateTime?>("UnblockDateTime")
+                        .HasColumnType("datetime(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "unblock_datetime");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime(6)")

@@ -153,4 +153,7 @@
   <data name="title" xml:space="preserve">
     <value>Authenticate</value>
   </data>
+  <data name="user_blocked" xml:space="preserve">
+    <value>User account is blocked</value>
+  </data>
 </root>

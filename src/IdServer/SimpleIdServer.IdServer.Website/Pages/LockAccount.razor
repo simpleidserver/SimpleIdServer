@@ -1,0 +1,43 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService
+@inject IState<UserLockingOptionsState> userLockingOptionsState
+
+<RadzenCardLoader Variant="Variant.Filled" IsLoading=@userLockingOptionsState.Value.IsLoading>
+    <EditConfiguration PropertiesSaved=@SaveProperties Name=@userLockingOptionsState.Value.Options?.OptionsName Values="@userLockingOptionsState.Value.Options?.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+</RadzenCardLoader>
+
+@code {
+    bool IsUpdating { get; set; } = false;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<UpdateAuthMethodSuccessAction>((act) =>
+            {
+                this.IsUpdating = false;
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserLockingOptionsUpdated });
+                StateHasChanged();
+            });
+        }
+
+        return Task.CompletedTask;
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        dispatcher.Dispatch(new GetUserLockingOptionsAction());
+    }
+
+    private void SaveProperties(Dictionary<string, string> properties)
+    {
+        this.IsUpdating = true;
+        var act = new UpdateUserLockingOptionsAction { Values = properties };
+        dispatcher.Dispatch(act);
+    }
+}

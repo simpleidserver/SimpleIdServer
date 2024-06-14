@@ -2198,6 +2198,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
+                    b.Property<int>("NbLoginAttempt")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "nb_login_attempt");
+
                     b.Property<string>("NotificationMode")
                         .IsRequired()
                         .HasColumnType("TEXT")
@@ -2210,6 +2214,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "status");
+
+                    b.Property<DateTime?>("UnblockDateTime")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "unblock_datetime");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("TEXT")

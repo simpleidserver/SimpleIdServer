@@ -30,6 +30,7 @@ using SimpleIdServer.IdServer.Store.SqlSugar;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
+using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using SqlSugar;
@@ -211,10 +212,12 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
         o.Add<IdServerPasswordOptions>();
-        o.Add<FidoOptions>();
+        o.Add<WebauthnOptions>();
+        o.Add<MobileOptions>();
         o.Add<IdServerConsoleOptions>();
         o.Add<GotifyOptions>();
         o.Add<IdServerVpOptions>();
+        o.Add<UserLockingOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         o.UseEFConnector();
     });
@@ -388,12 +391,14 @@ void SeedData(WebApplication webApplication)
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<IdServerSmsOptions>());
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<IdServerPasswordOptions>());
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<IdServerVpOptions>());
-        configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<FidoOptions>());
+        configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<WebauthnOptions>());
+        configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<MobileOptions>());
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<IdServerConsoleOptions>());
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<GotifyOptions>());
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>());
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<GoogleOptionsLite>());
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<NegotiateOptionsLite>());
+        configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<UserLockingOptions>());
 
         transaction.Commit(CancellationToken.None).Wait();
     }

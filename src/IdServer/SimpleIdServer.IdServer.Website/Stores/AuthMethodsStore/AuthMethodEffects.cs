@@ -5,6 +5,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationMethods;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -93,6 +94,40 @@ public class AuthMethodEffects
         }
     }
 
+    [EffectMethod]
+    public async Task Handle(GetUserLockingOptionsAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri($"{baseUrl}/userlockingoptions")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<UserLockingResult>(json);
+        dispatcher.Dispatch(new GetUserLockingOptionsSuccessAction { UserLocking = result });
+    }
+
+    [EffectMethod]
+    public async Task Handle(UpdateUserLockingOptionsAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Put,
+            RequestUri = new Uri($"{baseUrl}/userlockingoptions"),
+            Content = new StringContent(JsonSerializer.Serialize(new UpdateUserLockingRequest
+            {
+                Values = action.Values
+            }), Encoding.UTF8, "application/json")
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new UpdateUserLockingOptionsSuccessAction());
+    }
+
     private async Task<string> GetBaseUrl()
     {
         if(_options.IsReamEnabled)
@@ -149,6 +184,26 @@ public class UpdateAuthMethodFailureAction
 }
 
 public class StartAddAcrMethodAction
+{
+
+}
+
+public class GetUserLockingOptionsAction
+{
+
+}
+
+public class GetUserLockingOptionsSuccessAction
+{
+    public UserLockingResult UserLocking { get; set; }
+}
+
+public class UpdateUserLockingOptionsAction
+{
+    public Dictionary<string, string> Values { get; set; }
+}
+
+public class UpdateUserLockingOptionsSuccessAction
 {
 
 }

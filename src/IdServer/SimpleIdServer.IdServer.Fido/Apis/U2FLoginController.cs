@@ -27,6 +27,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IUserRepository _userRepository;
         private readonly IDistributedCache _distributedCache;
         private readonly ITransactionBuilder _transactionBuilder;
+        private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
         private IFido2 _fido2;
 
         public U2FLoginController(
@@ -37,6 +38,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             IJwtBuilder jwtBuilder, 
             IDistributedCache distributedCache,
             ITransactionBuilder transactionBuilder,
+            IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
             IFido2 fido2) : base(tokenRepository, jwtBuilder)
         {
             _configuration = configuration;
@@ -44,6 +46,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _userRepository = userRepository;
             _distributedCache = distributedCache;
             _transactionBuilder = transactionBuilder;
+            _authenticationMethodServices = authenticationMethodServices;
             _fido2 = fido2;
         }
 
@@ -111,7 +114,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                var fidoOptions = GetOptions();
                 prefix = prefix ?? IdServer.Constants.DefaultRealm;
                 if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
@@ -125,6 +127,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                     return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(SimpleIdServer.IdServer.Resources.Global.UnknownUser, login));
 
                 var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
+                var fidoOptions = GetOptions(sessionRecord.CredentialType);
                 var options = sessionRecord.Options;
                 var storedCredentials = authenticatedUser.GetStoredFidoCredentials(sessionRecord.CredentialType);
                 IsUserHandleOwnerOfCredentialIdAsync callback = (args, cancellationToken) =>
@@ -146,7 +149,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 sessionRecord.IsValidated = true;
                 await _distributedCache.SetStringAsync(request.SessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
                 {
-                    SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
+                    SlidingExpiration = TimeSpan.FromSeconds(fidoOptions.U2FExpirationTimeInSeconds)
                 }, cancellationToken);
                 return NoContent();
             }
@@ -154,7 +157,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
         protected async Task<(BeginU2FLoginResult, IActionResult)> CommonBegin(string prefix, BeginU2FLoginRequest request, CancellationToken cancellationToken)
         {
-            var fidoOptions = GetOptions();
+            var fidoOptions = GetOptions(request.CredentialType);
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest));
@@ -187,7 +190,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var sessionRecord = new AuthenticationSessionRecord(options, request.Login, request.CredentialType);
             await _distributedCache.SetStringAsync(sessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
-                SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
+                SlidingExpiration = TimeSpan.FromSeconds(fidoOptions.U2FExpirationTimeInSeconds)
             }, cancellationToken);
             return (new BeginU2FLoginResult
             {
@@ -198,10 +201,11 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             }, null);
         }
 
-        private FidoOptions GetOptions()
+        private IFidoOptions GetOptions(string credentialType)
         {
-            var section = _configuration.GetSection(typeof(FidoOptions).Name);
-            return section.Get<FidoOptions>();
+            var authenticationMethodService = _authenticationMethodServices.Single(a => a.Amr == credentialType);
+            var section = _configuration.GetSection(authenticationMethodService.OptionsType.Name);
+            return section.Get(authenticationMethodService.OptionsType) as IFidoOptions;
         }
     }
 

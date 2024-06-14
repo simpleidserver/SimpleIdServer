@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.Apis;
@@ -28,7 +29,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
     {
         private readonly IDistributedCache _distributedCache;
 
-        public AuthenticateController(IAuthenticationHelper authenticationHelper,
+        public AuthenticateController(IConfiguration configuration,
+            IAuthenticationHelper authenticationHelper,
             IDistributedCache distributedCache,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IWebauthnAuthenticationService userAuthenticationService,
@@ -44,7 +46,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IUserTransformer userTransformer,
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _distributedCache = distributedCache;
         }

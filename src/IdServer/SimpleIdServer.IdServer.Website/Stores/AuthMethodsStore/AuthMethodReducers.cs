@@ -66,4 +66,33 @@ public class AuthMethodReducers
     }
 
     #endregion
+
+    #region UserLockingOptionsState
+
+    [ReducerMethod]
+    public static UserLockingOptionsState Reduce(UserLockingOptionsState state, GetUserLockingOptionsAction act) => new(true, null);
+
+    [ReducerMethod]
+    public static UserLockingOptionsState Reduce(UserLockingOptionsState state, GetUserLockingOptionsSuccessAction act) => new(false, act.UserLocking);
+
+    [ReducerMethod]
+    public static UserLockingOptionsState Reduce(UserLockingOptionsState state, UpdateUserLockingOptionsAction act)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static UserLockingOptionsState Reduce(UserLockingOptionsState state, UpdateUserLockingOptionsSuccessAction act)
+    {
+        return state with
+        {
+            IsLoading = false
+        };
+    }
+
+
+    #endregion
 }

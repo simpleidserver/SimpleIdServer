@@ -41,10 +41,10 @@ namespace SimpleIdServer.IdServer.Email.UI
             IAmrHelper amrHelper,
             IUserRepository userRepository, 
             IUserSessionResitory userSessionRepository,
-            IUserTransformer userTransformer, 
+            IUserTransformer userTransformer,
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configuration,notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _configuration = configuration;
         }
@@ -65,6 +65,7 @@ namespace SimpleIdServer.IdServer.Email.UI
 
         protected override void EnrichViewModel(AuthenticateEmailViewModel viewModel)
         {
+
         }
 
         private IdServerEmailOptions GetOptions()

@@ -369,6 +369,12 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("getAuthMethodConfigurations",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/{amr}",
                 defaults: new { controller = "AuthenticationMethods", action = "Get" });
+            webApplication.SidMapControllerRoute("GetUserLockingOptions",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/userlockingoptions",
+                defaults: new { controller = "AuthenticationMethods", action = "GetUserLockingOptions" });
+            webApplication.SidMapControllerRoute("UpdateUserLockingOptions",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/userlockingoptions",
+                defaults: new { controller = "AuthenticationMethods", action = "UpdateUserLockingOptions" });
 
             webApplication.SidMapControllerRoute("getAllRegistrationWorkflows",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows,

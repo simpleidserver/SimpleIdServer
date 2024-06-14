@@ -20,6 +20,9 @@
             <RadzenTabsItem Text="@Global.ExternalIdentityProviders">
                 <IdProviders></IdProviders>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="@Global.LockAccount">
+                <LockAccount></LockAccount>
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 </RadzenCardLoader>
@@ -28,7 +31,8 @@
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
         { "authmethods", 0 },
-        { "idproviders", 1 }
+        { "idproviders", 1 },
+        { "lockaccount", 2 }
     };
 
     [Parameter]

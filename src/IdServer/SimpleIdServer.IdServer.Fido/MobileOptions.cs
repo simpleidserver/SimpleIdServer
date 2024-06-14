@@ -5,13 +5,13 @@ using SimpleIdServer.Configuration;
 
 namespace SimpleIdServer.IdServer.Fido
 {
-    public class FidoOptions
+    public class MobileOptions
     {
         /// <summary>
         /// Expiration time in seconds of the U2F FIDO session identifier.
         /// </summary>
-        [ConfigurationRecord("Expiration time in MS of the session", null, order: 0)]
-        public TimeSpan U2FExpirationTimeInSeconds { get; set; } = TimeSpan.FromSeconds(5 * 60);
+        [ConfigurationRecord("Duration of the authentication/registration process in seconds", null, order: 0)]
+        public int U2FExpirationTimeInSeconds { get; set; } = 5 * 60;
         /// <summary>
         /// Enable or disable the developer mode.
         /// </summary>

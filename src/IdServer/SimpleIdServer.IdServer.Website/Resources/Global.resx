@@ -1833,4 +1833,10 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="Exception" xml:space="preserve">
     <value>Exception</value>
   </data>
+  <data name="LockAccount" xml:space="preserve">
+    <value>Lock account</value>
+  </data>
+  <data name="UserLockingOptionsUpdated" xml:space="preserve">
+    <value>Options have been updated</value>
+  </data>
 </root>

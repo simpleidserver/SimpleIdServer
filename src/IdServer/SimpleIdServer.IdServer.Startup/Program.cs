@@ -32,6 +32,7 @@ using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store.EF;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
+using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
@@ -200,10 +201,12 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
         o.Add<IdServerPasswordOptions>();
-        o.Add<FidoOptions>();
+        o.Add<WebauthnOptions>();
+        o.Add<MobileOptions>();
         o.Add<IdServerConsoleOptions>();
         o.Add<GotifyOptions>();
         o.Add<IdServerVpOptions>();
+        o.Add<UserLockingOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         o.UseEFConnector();
     });
@@ -415,12 +418,14 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerVpOptions>(dbContext);
-            AddMissingConfigurationDefinition<FidoOptions>(dbContext);
+            AddMissingConfigurationDefinition<WebauthnOptions>(dbContext);
+            AddMissingConfigurationDefinition<MobileOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
             AddMissingConfigurationDefinition<GotifyOptions>(dbContext);
             AddMissingConfigurationDefinition<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>(dbContext);
             AddMissingConfigurationDefinition<GoogleOptionsLite>(dbContext);
             AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);
+            AddMissingConfigurationDefinition<UserLockingOptions>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
 

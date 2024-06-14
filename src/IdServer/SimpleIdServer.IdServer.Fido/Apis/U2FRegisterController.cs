@@ -32,15 +32,17 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IFido2 _fido2;
         private readonly IDistributedCache _distributedCache;
         private readonly ITransactionBuilder _transactionBuilder;
+        private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
         private readonly IdServerHostOptions _idServerHostOptions;
 
         public U2FRegisterController(
-            IConfiguration configuration, 
-            IAuthenticationHelper authenticationHelper, 
-            IUserRepository userRepository, 
-            IFido2 fido2, 
-            IDistributedCache distributedCache, 
+            IConfiguration configuration,
+            IAuthenticationHelper authenticationHelper,
+            IUserRepository userRepository,
+            IFido2 fido2,
+            IDistributedCache distributedCache,
             ITransactionBuilder transactionBuilder,
+            IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             IOptions<IdServerHostOptions> idServerHostOptions) : base(tokenRepository, jwtBuilder)
@@ -51,6 +53,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _fido2 = fido2;
             _distributedCache = distributedCache;
             _transactionBuilder = transactionBuilder;
+            _authenticationMethodServices = authenticationMethodServices;
             _idServerHostOptions = idServerHostOptions.Value;
         }
 
@@ -118,7 +121,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         public async Task<IActionResult> End([FromRoute] string prefix, [FromBody] EndU2FRegisterRequest request, CancellationToken cancellationToken)
         {
             var transaction = _transactionBuilder.Build();
-            var fidoOptions = GetOptions();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
             if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
             if (string.IsNullOrWhiteSpace(request.SessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, EndU2FRegisterRequestNames.SessionId));
@@ -126,6 +128,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Resources.Global.SessionCannotBeExtracted);
             var sessionRecord = System.Text.Json.JsonSerializer.Deserialize<RegistrationSessionRecord>(session);
+            var fidoOptions = GetOptions(sessionRecord.CredentialType);
             var login = request.Login;
             var registrationProgress = await GetRegistrationProgress(sessionRecord);
             if (registrationProgress == null) return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.INVALID_REQUEST, Resources.Global.NotAllowedToRegister);
@@ -164,7 +167,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             sessionRecord.IsValidated = true;
             await _distributedCache.SetStringAsync(request.SessionId, System.Text.Json.JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
-                SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
+                SlidingExpiration = TimeSpan.FromSeconds(fidoOptions.U2FExpirationTimeInSeconds)
             }, cancellationToken);
 
             return await HandleWorkflowRegistration();
@@ -228,7 +231,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var cookieName = _idServerHostOptions.GetRegistrationCookieName();
             var cookieValue = string.Empty;
             if(Request.Cookies.ContainsKey(cookieName)) cookieValue = Request.Cookies[cookieName];
-            var fidoOptions = GetOptions();
+            var fidoOptions = GetOptions(request.CredentialType);
             var isAuthenticated = User.Identity.IsAuthenticated;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
@@ -263,7 +266,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var sessionRecord = new RegistrationSessionRecord(options, request.Login, request.CredentialType, cookieValue);
             await _distributedCache.SetStringAsync(sessionId, System.Text.Json.JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions
             {
-                SlidingExpiration = fidoOptions.U2FExpirationTimeInSeconds
+                SlidingExpiration = TimeSpan.FromSeconds(fidoOptions.U2FExpirationTimeInSeconds)
             }, cancellationToken);
             string nextRegistrationRedirectUrl = null;
             var registrationProgress = await GetRegistrationProgress();
@@ -283,10 +286,11 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             }, null);
         }
 
-        private FidoOptions GetOptions()
+        private IFidoOptions GetOptions(string credentialType)
         {
-            var section = _configuration.GetSection(typeof(FidoOptions).Name);
-            return section.Get<FidoOptions>();
+            var authenticationMethodService = _authenticationMethodServices.Single(a => a.Amr == credentialType);
+            var section = _configuration.GetSection(authenticationMethodService.OptionsType.Name);
+            return section.Get(authenticationMethodService.OptionsType) as IFidoOptions;
         }
 
         private record RegistrationSessionRecord

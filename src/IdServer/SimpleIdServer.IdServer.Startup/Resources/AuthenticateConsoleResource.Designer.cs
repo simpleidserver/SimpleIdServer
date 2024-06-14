@@ -167,5 +167,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
                 return ResourceManager.GetString("title", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User account is blocked.
+        /// </summary>
+        public static string user_blocked {
+            get {
+                return ResourceManager.GetString("user_blocked", resourceCulture);
+            }
+        }
     }
 }

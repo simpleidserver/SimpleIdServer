@@ -50,7 +50,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IUserTransformer userTransformer, 
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;
@@ -76,7 +76,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
 
         protected override void EnrichViewModel(AuthenticateMobileViewModel viewModel)
         {
-            var options = GetFidoOptions();
+            var options = GetMobileOptions();
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var realm = "/";
             if (!string.IsNullOrWhiteSpace(viewModel.Realm))
@@ -105,10 +105,10 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             return ValidationStatus.AUTHENTICATE;
         }
 
-        private FidoOptions GetFidoOptions()
+        private MobileOptions GetMobileOptions()
         {
-            var section = _configuration.GetSection(typeof(FidoOptions).Name);
-            return section.Get<FidoOptions>();
+            var section = _configuration.GetSection(typeof(MobileOptions).Name);
+            return section.Get<MobileOptions>();
         }
     }
 }

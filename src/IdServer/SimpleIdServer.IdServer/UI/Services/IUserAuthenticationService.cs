@@ -19,7 +19,8 @@ public enum ValidationStatus
     AUTHENTICATE = 0,
     INVALIDCREDENTIALS = 1,
     NOCONTENT = 2,
-    UNKNOWN_USER = 3
+    UNKNOWN_USER = 3,
+    BLOCKED = 4
 }
 
 public record CredentialsValidationResult
