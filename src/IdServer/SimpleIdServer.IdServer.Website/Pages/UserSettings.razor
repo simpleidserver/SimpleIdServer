@@ -28,6 +28,11 @@
             <RadzenDatePicker Name="UnblockDateTime" @bind-Value=@updateUserSettings.UnblockDateTime Class="w-100" Disabled=true />
         </div>
     }
+    <!-- Login attempt -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.NbLoginAttempt</RadzenText>
+        <RadzenNumeric Name="NbLoginAttempt" @bind-Value="@updateUserSettings.NbLoginAttempt" Class="w-100" Disabled=true></RadzenNumeric>
+    </div>
     <!-- Created at -->
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.CreatedAt</RadzenText>
@@ -87,6 +92,7 @@
         public string? Lastname { get; set; } = null;
         public string? NotificationMode { get; set; } = null;
         public DateTime? UnblockDateTime { get; set; } = null;
+        public int NbLoginAttempt { get; set; }
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -121,7 +127,8 @@
             Firstname = this.User.Firstname,
             Lastname = this.User.Lastname,
             NotificationMode = this.User.NotificationMode,
-            UnblockDateTime = this.User.UnblockDateTime
+            UnblockDateTime = this.User.UnblockDateTime,
+            NbLoginAttempt = this.User.NbLoginAttempt
         };
     }
 

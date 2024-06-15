@@ -1845,4 +1845,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="UnblockDateTime" xml:space="preserve">
     <value>Unblock datetime</value>
   </data>
+  <data name="NbLoginAttempt" xml:space="preserve">
+    <value>Number of login attempts</value>
+  </data>
 </root>

@@ -2871,6 +2871,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Number of login attempts.
+        /// </summary>
+        public static string NbLoginAttempt {
+            get {
+                return ResourceManager.GetString("NbLoginAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à No.
         /// </summary>
         public static string No {

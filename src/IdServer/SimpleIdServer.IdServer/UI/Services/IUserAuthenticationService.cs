@@ -43,15 +43,16 @@ public record CredentialsValidationResult
 
     public static CredentialsValidationResult Ok(User user) => new CredentialsValidationResult(user);
 
-    public static CredentialsValidationResult Error(ValidationStatus status, User authenticatedUser = null) => new CredentialsValidationResult(status)
+    public static CredentialsValidationResult Error(ValidationStatus status) => new CredentialsValidationResult(status);
+
+    public static CredentialsValidationResult InvalidCredentials(User authenticatedUser) => new CredentialsValidationResult(ValidationStatus.INVALIDCREDENTIALS)
     {
         AuthenticatedUser = authenticatedUser
     };
 
-    public static CredentialsValidationResult Error(string errorCode, string errorMessage, User authenticatedUser = null) => new CredentialsValidationResult(ValidationStatus.NOCONTENT)
+    public static CredentialsValidationResult Error(string errorCode, string errorMessage) => new CredentialsValidationResult(ValidationStatus.NOCONTENT)
     {
         ErrorCode = errorCode,
-        ErrorMessage = errorMessage,
-        AuthenticatedUser = authenticatedUser
+        ErrorMessage = errorMessage
     };
 }

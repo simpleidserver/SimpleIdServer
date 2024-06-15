@@ -52,17 +52,17 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
 
     protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticatePasswordViewModel viewModel, CancellationToken cancellationToken)
     {
-        if (authenticatedUser.IsBlocked()) return Task.FromResult(CredentialsValidationResult.Error("user_blocked", "user_blocked", authenticatedUser));
+        if (authenticatedUser.IsBlocked()) return Task.FromResult(CredentialsValidationResult.Error("user_blocked", "user_blocked"));
         var authService = _authServices.SingleOrDefault(s => s.Name == authenticatedUser.Source);
         if (authService != null)
         {
-            if (!authService.Authenticate(authenticatedUser, authenticatedUser.IdentityProvisioning, viewModel.Password)) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS, authenticatedUser));
+            if (!authService.Authenticate(authenticatedUser, authenticatedUser.IdentityProvisioning, viewModel.Password)) return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
         }
         else
         {
             var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
             var hash = PasswordHelper.ComputeHash(viewModel.Password, _options.IsPasswordEncodeInBase64);
-            if (credential == null || credential.Value != hash) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS, authenticatedUser));
+            if (credential == null || credential.Value != hash) return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
         }
 
         return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser));
