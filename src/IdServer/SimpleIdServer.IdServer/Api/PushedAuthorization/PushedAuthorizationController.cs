@@ -70,7 +70,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
                         ClientIdFromHttpRequestBody = jObjBody.GetClientId()
                     };
                     if (!_authenticateClient.TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingClientId);
-                    var validationResult = await _validator.ValidateAuthorizationRequest(context, clientId, token);
+                    var validationResult = await _validator.ValidateStandardAuthorizationRequest(context, clientId, token);
                     if(!string.IsNullOrWhiteSpace(authenticateInstruction.ClientAssertion))
                     {
                         var authHandler = _authenticationHandlers.Single(a => a.AuthMethod == OAuthClientPrivateKeyJwtAuthenticationHandler.AUTH_METHOD);

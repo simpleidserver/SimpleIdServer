@@ -164,6 +164,12 @@ public class AuthorizationController : Controller
         }
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Callback([FromRoute] string prefix, CancellationToken cancellationToken)
+    {
+        return null;
+    }
+
     private async Task BuildErrorResponse(HandlerContext context, OAuthException ex, bool returnsJSON = false)
     {
         var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();

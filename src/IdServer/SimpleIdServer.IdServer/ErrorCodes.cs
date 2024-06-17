@@ -8,6 +8,7 @@ namespace SimpleIdServer.IdServer
         public const string INVALID_CLIENT = "invalid_client";
         public const string INVALID_REDIRECT_URI = "invalid_redirect_uri";
         public const string INVALID_CLIENT_METADATA = "invalid_client_metadata";
+        public const string INVALID_CLIENT_METADATA_URI = "invalid_client_metadata_uri";
         public const string INVALID_SOFTWARE_STATEMENT = "invalid_software_statement";
         public const string INVALID_NETWORK = "invalid_network";
         public const string INVALID_GRANT = "invalid_grant";

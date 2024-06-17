@@ -13,6 +13,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Serialization;
 using System.Web;
 
 namespace System.Text.Json.Nodes
@@ -135,6 +136,15 @@ namespace System.Text.Json.Nodes
         public static string GetStateFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.State);
 
         public static string GetNonceFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.Nonce);
+
+        public static string GetClientMetadataUri(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ClientMetadataUri);
+
+        public static Client GetClientMetadata(this JsonObject jObj)
+        {
+            var clientMetadata = jObj.GetStr(AuthorizationRequestParameters.ClientMetadata);
+            if (clientMetadata == null) return null;
+            return JsonSerializer.Deserialize<Client>(clientMetadata);
+        }
 
         /// <summary>
         /// This parameter can be used to bind the issued authorization code to a specific key.

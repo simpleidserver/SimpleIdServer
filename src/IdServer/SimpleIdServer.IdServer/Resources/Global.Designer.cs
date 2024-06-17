@@ -700,6 +700,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the parameters client_metadata and client_metadata_uri cannot be used the same time.
+        /// </summary>
+        public static string CannotUseClientMetadataAndClientMetadataUri {
+            get {
+                return ResourceManager.GetString("CannotUseClientMetadataAndClientMetadataUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the certificate cannot be generated.
         /// </summary>
         public static string CertificateCannotBeGenerated {
@@ -903,6 +912,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string ClientIdentifierMustBeIdentical {
             get {
                 return ResourceManager.GetString("ClientIdentifierMustBeIdentical", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the client_metadata or client_metadata_uri parameter cannot be used with a pre-registered client.
+        /// </summary>
+        public static string ClientMetadataCannotBeUsedWithRegisteredClient {
+            get {
+                return ResourceManager.GetString("ClientMetadataCannotBeUsedWithRegisteredClient", resourceCulture);
             }
         }
         
@@ -1191,6 +1209,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string InvalidClientIdTokenHint {
             get {
                 return ResourceManager.GetString("InvalidClientIdTokenHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the client_metadata_uri in the Authorization Request returns an error or contains invalid data.
+        /// </summary>
+        public static string InvalidClientMetadataUri {
+            get {
+                return ResourceManager.GetString("InvalidClientMetadataUri", resourceCulture);
             }
         }
         
@@ -1974,6 +2001,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string RequestUriIsRequired {
             get {
                 return ResourceManager.GetString("RequestUriIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the parameter client_metadata or client_metadata_uri is required.
+        /// </summary>
+        public static string RequiredClientMetadataOrClientMetadataUri {
+            get {
+                return ResourceManager.GetString("RequiredClientMetadataOrClientMetadataUri", resourceCulture);
             }
         }
         

@@ -208,6 +208,8 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public bool IsPasswordEncodeInBase64 { get; set; } = false;
 
+        public IdServerTypes Type { get; set; } = IdServerTypes.STANDARD;
+
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 
         public string GetStringParameter(string name) => Parameters[name];
@@ -237,5 +239,11 @@ namespace SimpleIdServer.IdServer.Options
     {
         public string Name { get; set; }
         public string DisplayName { get; set; }
+    }
+
+    public enum IdServerTypes
+    {
+        STANDARD = 0,
+        SELFISSUED = 1
     }
 }
