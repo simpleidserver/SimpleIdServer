@@ -21,11 +21,17 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
             VcConstants.VerifiableCredentialJsonLdContext,
             configuration.JsonLdContext
         };
-        var type = new JsonArray
+        var types = new JsonArray
         {
             VcConstants.VerifiableCredentialType,
             configuration.Type
         };
+        if(configuration.AdditionalTypes != null)
+        {
+            foreach (var additionalType in configuration.AdditionalTypes.Where(a => !string.IsNullOrWhiteSpace(a)))
+                types.Add(additionalType);
+        }
+
         var credentialSubject = new JsonObject();
         var flatNodes = configuration.Claims.Select(c =>
         {
@@ -40,7 +46,7 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
         var result = new JsonObject
         {
             { "@context", ctx },
-            { "type", type },
+            { "types", types },
             { "credentialSubject", credentialSubject }
         };
         return result;

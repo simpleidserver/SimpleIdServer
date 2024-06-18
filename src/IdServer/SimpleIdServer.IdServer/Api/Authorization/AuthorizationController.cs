@@ -2,11 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Components.RenderTree;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -15,6 +17,7 @@ using SimpleIdServer.IdServer.Options;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -30,19 +33,22 @@ namespace SimpleIdServer.IdServer.Api.Authorization;
 public class AuthorizationController : Controller
 {
     private readonly IAuthorizationRequestHandler _authorizationRequestHandler;
+    private readonly IAuthorizationCallbackRequestHandler _authorizationCallbackRequestHandler;
     private readonly IResponseModeHandler _responseModeHandler;
     private readonly IDataProtector _dataProtector;
     private readonly IBusControl _busControl;
     private readonly IdServerHostOptions _options;
 
     public AuthorizationController(
-        IAuthorizationRequestHandler authorizationRequestHandler, 
+        IAuthorizationRequestHandler authorizationRequestHandler,
+        IAuthorizationCallbackRequestHandler authorizationCallbackRequestHandler,
         IResponseModeHandler responseModeHandler, 
         IDataProtectionProvider dataProtectionProvider, 
         IBusControl busControl,
         IOptions<IdServerHostOptions> options)
     {
         _authorizationRequestHandler = authorizationRequestHandler;
+        _authorizationCallbackRequestHandler = authorizationCallbackRequestHandler;
         _responseModeHandler = responseModeHandler;
         _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         _busControl = busControl;
@@ -167,7 +173,17 @@ public class AuthorizationController : Controller
     [HttpPost]
     public async Task<IActionResult> Callback([FromRoute] string prefix, CancellationToken cancellationToken)
     {
-        return null;
+        using (var activity = Tracing.IdServerActivitySource.StartActivity("Get authorization callback"))
+        {
+            var jObjBody = Request.Form.ToJsonObject();
+            prefix = prefix ?? Constants.DefaultRealm;
+            activity?.SetTag("realm", prefix);
+            var referer = string.Empty;
+            if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
+            await _authorizationCallbackRequestHandler.Handle(context, cancellationToken);
+            return null;
+        }
     }
 
     private async Task BuildErrorResponse(HandlerContext context, OAuthException ex, bool returnsJSON = false)

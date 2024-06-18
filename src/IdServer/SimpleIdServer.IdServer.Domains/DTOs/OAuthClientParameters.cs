@@ -89,5 +89,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string RedirectToRevokeSessionUI = "redirect_revoke_session_ui";
         public const string PreAuthCodeExpirationTimeInSeconds = "pre_auth_code_expiration_time";
         public const string SupportedAcrs = "supported_acrs";
+        public const string SubjectSyntaxTypesSupported = "subject_syntax_types_supported";
     }
 }

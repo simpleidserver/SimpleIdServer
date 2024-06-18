@@ -92,6 +92,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddCredentialIssuer(o =>
 {
+    o.Version = SimpleIdServer.IdServer.CredentialIssuer.CredentialIssuerVersion.ESBI;
     o.ClientId = builder.Configuration["Authorization:ClientId"];
     o.ClientSecret = builder.Configuration["Authorization:ClientSecret"];
     o.AuthorizationServer = builder.Configuration["Authorization:Issuer"];

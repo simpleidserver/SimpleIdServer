@@ -31,5 +31,7 @@ public class CredentialConfiguration
     [JsonPropertyName("displays")]
     public virtual List<CredentialConfigurationTranslation> Displays { get; set; } = new List<CredentialConfigurationTranslation>();
     [JsonIgnore]
+    public List<string> AdditionalTypes { get; set; } = new List<string>();
+    [JsonIgnore]
     public virtual List<Credential> Credentials { get; set; }
 }

@@ -113,6 +113,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 }
                 else
                 {
+                    var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
+                    var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
                     if (clientMetadata == null && string.IsNullOrWhiteSpace(clientMetadataUri))
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.RequiredClientMetadataOrClientMetadataUri);
                     if(clientMetadata == null)
@@ -132,6 +134,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                         }
                     }
 
+                    if ((clientMetadata.AuthorizationDataTypes == null || !clientMetadata.AuthorizationDataTypes.Any()) && authDetails != null && authDetails.Any())
+                        clientMetadata.AuthorizationDataTypes = authDetails.Select(a => a.Type).ToList();
+                    if(responseTypes != null)
+                        clientMetadata.ResponseTypes = responseTypes.ToList();
+                    clientMetadata.ClientId = clientId;
                     context.SetClient(clientMetadata);
                 }
             }

@@ -10,6 +10,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDid(this IServiceCollection services)
     {
         services.AddTransient<IDidFactoryResolver, DidFactoryResolver>();
+        services.AddTransient<IJwtVerifier, JwtVerifier>();
         return services;
     }
 }

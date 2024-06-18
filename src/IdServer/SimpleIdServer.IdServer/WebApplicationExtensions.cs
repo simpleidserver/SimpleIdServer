@@ -55,6 +55,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Authorization,
                 defaults: new { controller = "Authorization", action = "Get" });
 
+            webApplication.SidMapControllerRoute("authorizationCallback",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthorizationCallback,
+                defaults: new { controller = "Authorization", action = "Callback" });
+
             webApplication.SidMapControllerRoute("token",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Token,
                 defaults: new { controller = "Token", action = "Post" });

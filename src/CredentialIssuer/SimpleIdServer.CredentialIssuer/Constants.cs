@@ -28,6 +28,5 @@ public static class Constants
         SecurityAlgorithms.Aes128CbcHmacSha256,
         SecurityAlgorithms.Aes192CbcHmacSha384,
         SecurityAlgorithms.Aes256CbcHmacSha512
-
     };
 }

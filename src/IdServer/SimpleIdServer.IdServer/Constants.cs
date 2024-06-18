@@ -40,7 +40,13 @@ namespace SimpleIdServer.IdServer
         {
             public const string OpenIdCredential = "openid_credential";
             public const string CredentialConfigurationId = "credential_configuration_id";
+            public const string Format = "format";
         }
+
+        public static class StandardResponseModes
+        {
+            public const string DirectPost = "direct_post";
+        }    
 
         public static class EndPoints
         {
@@ -49,6 +55,7 @@ namespace SimpleIdServer.IdServer
             public const string TokenInfo = "token_info";
             public const string Jwks = "jwks";
             public const string Authorization = "authorization";
+            public const string AuthorizationCallback = "authorization/callback";
             public const string Registration = "register";
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
             public const string OpenIDConfiguration = ".well-known/openid-configuration";

@@ -1069,6 +1069,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the nonce claim is missing in the id_token.
+        /// </summary>
+        public static string IdTokenNonceMissing {
+            get {
+                return ResourceManager.GetString("IdTokenNonceMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the session is not active.
         /// </summary>
         public static string InactiveSession {
@@ -1371,6 +1380,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string InvalidLocahostRedirectUri {
             get {
                 return ResourceManager.GetString("InvalidLocahostRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the nonce is invalid and doesn&apos;t match the nonce present in the authorization request.
+        /// </summary>
+        public static string InvalidNonce {
+            get {
+                return ResourceManager.GetString("InvalidNonce", resourceCulture);
             }
         }
         

@@ -65,6 +65,10 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public double DefaultRefreshTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
+        /// Default expiration time of the authorization request callback.
+        /// </summary>
+        public double DefaultAuthorizationRequestCallbackExpirationTimeInSeconds { get; set; } = 60 * 30;
+        /// <summary>
         /// Default OTP issuer.
         /// </summary>
         public string OTPIssuer { get; set; } = "SimpleIdServer";

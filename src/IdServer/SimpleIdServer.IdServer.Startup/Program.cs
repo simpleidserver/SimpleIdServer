@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
+using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Console;
@@ -186,7 +187,10 @@ void ConfigureIdServer(IServiceCollection services)
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
-    services.AddDidKey();
+    services.AddDidKey(o =>
+    {
+        o.PublicKeyFormat = JsonWebKey2020Standard.TYPE;
+    });
     ConfigureDistributedCache();
 }
 

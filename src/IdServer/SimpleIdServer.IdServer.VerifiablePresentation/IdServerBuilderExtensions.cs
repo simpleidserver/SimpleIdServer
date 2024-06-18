@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.UI.Services;
+using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.VerifiablePresentation;
+using SimpleIdServer.IdServer.VerifiablePresentation.Apis.Authorization;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

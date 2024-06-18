@@ -244,6 +244,13 @@ namespace SimpleIdServer.IdServer.Domains
                 return SerializedJsonWebKeys.Select(j=> new JsonWebKey(j.SerializedJsonWebKey));
             }
         }
+
+        /// <summary>
+        /// Array of strings representing URI scheme identifiers and optionally method names of supported Subject Syntax Types.
+        /// For example : did:key, did:example, urn:ietf:params:oauth:jwk-thumbprint
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.SubjectSyntaxTypesSupported)]
+        public List<string> SubjectSyntaxTypesSupported { get; set; } = new List<string>();
         /// <summary>
         /// Cryptographic algorithm used to secure the JWS access token.
         /// </summary>

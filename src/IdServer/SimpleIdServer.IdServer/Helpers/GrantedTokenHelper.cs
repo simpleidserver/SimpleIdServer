@@ -45,6 +45,8 @@ namespace SimpleIdServer.IdServer.Helpers
         Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
         Task AddResetPasswordLink(string otpCode, string login, string realm, double expirationTimeInSeconds, CancellationToken cancellationToken);
         Task<ResetPasswordLink> GetResetPasswordLink(string otpCode, CancellationToken cancellationToken);
+        Task AddAuthorizationRequestCallback(string nonce, AuthorizationRequestCallbackRecord record, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<AuthorizationRequestCallbackRecord> GetAuthorizationRequestCallback(string nonce, CancellationToken cancellationToken);
     }
 
     public class AuthCode
@@ -53,6 +55,12 @@ namespace SimpleIdServer.IdServer.Helpers
         public string GrantId { get; set; }
         public string DPOPJkt { get; set; }
         public string SessionId { get; set; }
+    }
+
+    public class AuthorizationRequestCallbackRecord
+    {
+        public string JwksUri { get; set; }
+        public List<string> SubjectSyntaxTypesSupported { get; set; }
     }
 
     public class GrantedTokenHelper : IGrantedTokenHelper
@@ -357,6 +365,26 @@ namespace SimpleIdServer.IdServer.Helpers
             var payload = await _distributedCache.GetAsync(otpCode, cancellationToken);
             if (payload == null) return null;
             return JsonSerializer.Deserialize<ResetPasswordLink>(Encoding.UTF8.GetString(payload));
+        }
+
+        #endregion
+
+        #region Authorization request callback
+
+        public async Task AddAuthorizationRequestCallback(string nonce, AuthorizationRequestCallbackRecord record, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        {
+            var serializedRecord = JsonSerializer.Serialize(record);
+            await _distributedCache.SetAsync(nonce, Encoding.UTF8.GetBytes(serializedRecord), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
+        }
+
+        public async Task<AuthorizationRequestCallbackRecord> GetAuthorizationRequestCallback(string nonce, CancellationToken cancellationToken)
+        {
+            var cache = await _distributedCache.GetAsync(nonce, cancellationToken);
+            if (cache == null) return null;
+            return JsonSerializer.Deserialize<AuthorizationRequestCallbackRecord>(Encoding.UTF8.GetString(cache));
         }
 
         #endregion

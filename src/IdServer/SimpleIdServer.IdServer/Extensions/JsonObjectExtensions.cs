@@ -198,6 +198,8 @@ namespace System.Text.Json.Nodes
 
         public static string GetResponseModeFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ResponseMode);
 
+        public static string GetResponseUriFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ResponseUri);
+
         public static string GetRedirectUriFromAuthorizationRequest(this JsonObject jObj)
         {
             var result = jObj.GetStr(AuthorizationRequestParameters.RedirectUri);
@@ -290,6 +292,17 @@ namespace System.Text.Json.Nodes
 
             return result;
         }
+
+        #endregion
+
+        #region Authorization request callback
+
+        /// <summary>
+        /// Get the id_token from the authorization request callback request.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetIdTokenFromAuthorizationRequestCallback(this JsonObject jObj) => jObj.GetStr(AuthorizationResponseParameters.IdToken);
 
         #endregion
 

@@ -113,6 +113,7 @@ public class IdServerConfiguration
             })
             .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "sixtyFiveClient", "secondScope")
             .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "seventyClient", "openid", "profile", "role", "email")
+            .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "seventyFourClient", "openid", "profile")
             .AddClaim("degreeType", "BachelorDegree")
             .AddClaim("degreeName", "Bachelor of Science and Arts")
             .Build();
@@ -228,7 +229,8 @@ public class IdServerConfiguration
             ClientBuilder.BuildTraditionalWebsiteClient("seventyClient", "password", null, "http://localhost:8080").SetAccessTokenType(AccessTokenTypes.Reference).UseClientSecretPostAuthentication().AddScope(StandardScopes.OpenIdScope, StandardScopes.Role, StandardScopes.Profile, StandardScopes.Email).Build(),
             ClientBuilder.BuildApiClient("seventyOneClient", "password").AddScope(FirstScope).UseClientSecretBasicAuthentication().Build(),
             ClientBuilder.BuildCredentialIssuer("seventyTwoClient", "password").IsTransactionCodeRequired().AddScope(UniversityCredential).Build(),
-            ClientBuilder.BuildWalletClient("seventyThreeClient", "password").Build()
+            ClientBuilder.BuildWalletClient("seventyThreeClient", "password").Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("seventyFourClient", "password", null, "http://localhost:8080").DisableConsent().AddScope(StandardScopes.OpenIdScope, StandardScopes.Profile).Build(),
         };
 
     public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>

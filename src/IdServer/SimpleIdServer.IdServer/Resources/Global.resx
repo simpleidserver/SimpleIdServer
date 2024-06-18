@@ -453,6 +453,9 @@
   <data name="IdProvisioningTypeUnique" xml:space="preserve">
     <value>The same mapping type cannot be added twice.</value>
   </data>
+  <data name="IdTokenNonceMissing" xml:space="preserve">
+    <value>the nonce claim is missing in the id_token</value>
+  </data>
   <data name="InactiveSession" xml:space="preserve">
     <value>the session is not active</value>
   </data>
@@ -554,6 +557,9 @@
   </data>
   <data name="InvalidLocahostRedirectUri" xml:space="preserve">
     <value>redirect_uri must not contain localhost</value>
+  </data>
+  <data name="InvalidNonce" xml:space="preserve">
+    <value>the nonce is invalid and doesn't match the nonce present in the authorization request</value>
   </data>
   <data name="InvalidPendingDeviceCode" xml:space="preserve">
     <value>authorization request is still pending as the end user hasn't yet completed the user-interation steps</value>
