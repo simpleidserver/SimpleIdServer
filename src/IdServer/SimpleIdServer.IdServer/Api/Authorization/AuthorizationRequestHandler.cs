@@ -142,6 +142,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         protected async Task<AuthorizationResponse> BuildSelfIssuedResponse(HandlerContext context, CancellationToken cancellationToken)
         {
             var validationResult = await _validator.ValidateSelfIssuedAuthorizationRequest(context, cancellationToken);
+            
             return null;
         }
 

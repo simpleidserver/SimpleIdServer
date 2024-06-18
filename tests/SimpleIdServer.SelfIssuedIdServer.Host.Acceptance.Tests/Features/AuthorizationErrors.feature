@@ -49,8 +49,9 @@ Scenario: The client_metadata_uri must be valid
 
 Scenario: Response type is required
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key        | Value          |
-	| client_id  | client         |
+	| Key             | Value     |
+	| client_id       | client    |
+	| client_metadata | { }       |
 	
 	And extract JSON from body
 	
@@ -60,9 +61,10 @@ Scenario: Response type is required
 
 Scenario: Response type must be supported
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value        |
-	| response_type | invalid      |
-	| client_id     | client       |
+	| Key             | Value        |
+	| response_type   | invalid      |
+	| client_id       | client       |
+	| client_metadata | { }          |
 	
 	And extract JSON from body
 	
@@ -72,9 +74,10 @@ Scenario: Response type must be supported
 
 Scenario: Scope is required
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key           | Value        |
-	| response_type | code         |
-	| client_id     | client       |
+	| Key             | Value        |
+	| response_type   | code         |
+	| client_id       | client       |
+	| client_metadata | { }          |
 	
 	And extract JSON from body
 	
