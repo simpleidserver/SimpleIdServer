@@ -5,7 +5,7 @@ using SimpleIdServer.Configuration;
 
 namespace SimpleIdServer.IdServer.Fido
 {
-    public class WebauthnOptions
+    public class WebauthnOptions : IFidoOptions
     {
         /// <summary>
         /// Expiration time in seconds of the U2F FIDO session identifier.

@@ -27,29 +27,31 @@ public class LDAPRepresentationsExtractionJobOptions
 
     #region Groups
 
-    [ConfigurationRecord("Groups DN", "Full DN of LDAP tree where your groups are.", order: 6)]
+    [ConfigurationRecord("Synchronize groups", "Enable or disabled groups synchronization", order: 6)]
+    public bool IsGroupSyncEnabled { get; set; } = false;
+    [ConfigurationRecord("Groups DN", "Full DN of LDAP tree where your groups are.", order: 7, "IsGroupSyncEnabled=true")]
     public string GroupsDN { get; set; }
-    [ConfigurationRecord("Group object classes", "All values of LDAP objectClass attribute for groups in LDAP, divided by commas.", order: 7)]
+    [ConfigurationRecord("Group object classes", "All values of LDAP objectClass attribute for groups in LDAP, divided by commas.", order: 8, "IsGroupSyncEnabled=true")]
     public string GroupObjectClasses { get; set; } = "posixGroup";
-    [ConfigurationRecord("Membership Group LDAP Attribute.", "It is the name of the LDAP Attribute on the group, which is used for membership mappings, for example memberUid", order: 8)]
+    [ConfigurationRecord("Membership Group LDAP Attribute.", "It is the name of the LDAP Attribute on the group, which is used for membership mappings, for example memberUid", order: 9, "IsGroupSyncEnabled=true")]
     public string MembershipLDAPAttribute { get; set; }
-    [ConfigurationRecord("Membership User LDAP Attribute.", "It is the name of the LDAP Attribute on the user, which is used for membership mappings, for example uidNumber", order: 9)]
+    [ConfigurationRecord("Membership User LDAP Attribute.", "It is the name of the LDAP Attribute on the user, which is used for membership mappings, for example uidNumber", order: 10, "IsGroupSyncEnabled=true")]
     public string MembershipUserLDAPAttribute { get; set; }
-    [ConfigurationRecord("User Groups Retrieve Strategy", "Membership User LDAP Attribute.", order: 10)]
+    [ConfigurationRecord("User Groups Retrieve Strategy", "Membership User LDAP Attribute.", order: 11, "IsGroupSyncEnabled=true")]
     public LoadingStrategies RetrievingStrategies { get; set; }
-    [ConfigurationRecord("Member of LDAP Attribute", "Specifies the name of the LDAP Attribute on the LDAP user which contains the groups, which the user is member of.", order: 11, "RetrievingStrategies=LOAD_FROM_USER_MEMBEROF_ATTRIBUTE")]
+    [ConfigurationRecord("Member of LDAP Attribute", "Specifies the name of the LDAP Attribute on the LDAP user which contains the groups, which the user is member of.", order: 12, "RetrievingStrategies=LOAD_FROM_USER_MEMBEROF_ATTRIBUTE && IsGroupSyncEnabled=true")]
     public string MemberOfAttribute { get; set; }
 
     #endregion
 
-    [ConfigurationRecord("User Identifier LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier for objects in LDAP, objectSID for Active Directory or uidNumber of Open Ldap", order: 12)]
+    [ConfigurationRecord("User Identifier LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier for objects in LDAP, objectSID for Active Directory or uidNumber of Open Ldap", order: 13)]
     public string UserIdLDAPAttribute { get; set; }
-    [ConfigurationRecord("Group Identifier LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier for objects in LDAP, objectSID for Active Directory or gidNumber of Open Ldap", order: 13)]
+    [ConfigurationRecord("Group Identifier LDAP Attribute", "Name of the LDAP attribute, which is used as a unique object identifier for objects in LDAP, objectSID for Active Directory or gidNumber of Open Ldap", order: 14, "IsGroupSyncEnabled=true")]
     public string GroupIdLDAPAttribute { get; set; }
 
-    [ConfigurationRecord("Modification Date Attribute", "Name of the LDAP Attribute, which is used as the modification date for objects in LDAP", order: 14)]
+    [ConfigurationRecord("Modification Date Attribute", "Name of the LDAP Attribute, which is used as the modification date for objects in LDAP", order: 15)]
     public string ModificationDateAttribute { get; set; } = "modificationDate";
-    [ConfigurationRecord("Batch size", "Number of records", order: 15)]
+    [ConfigurationRecord("Batch size", "Number of records", order: 16)]
     public int BatchSize { get; set; } = 1;
 }
 

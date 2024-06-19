@@ -98,7 +98,7 @@
                     {
                         <div>
                             <div>
-                                <RadzenCheckBox @bind-Value="@property.ValueBoolean" Name="Checkbox" />
+                                <RadzenCheckBox @bind-Value="@property.ValueBoolean" Change="@((bool b) => Select(property, b))" Name="Checkbox" />
                                 <RadzenLabel Text="@property.DisplayName" Component="Checkbox" Style="margin-left: 8px; vertical-align: middle;" />
                             </div>
                             <p class="text-muted">@property.Description</p>
@@ -190,11 +190,17 @@
         Refresh();
     }
 
+    private void Select(EditableProperty p, bool o)
+    {
+        p.Value = o.ToString();
+        Refresh();
+    }
+
     private void Refresh()
     {
         var values = GetValues();
         var configuration = configurationDefsState.Value.ConfigurationDefs.Single(c => c.Id == Name);
-        Properties = AllProperties.Where(p => DisplayConditionEvaluator.IsValid(values, p.DisplayCondition)).ToList();
+        Properties = AllProperties.Where(p => DisplayConditionEvaluator.IsLogicalOperationValid(values, p.DisplayCondition)).ToList();
     }
 
     private Dictionary<string, string> GetValues()
