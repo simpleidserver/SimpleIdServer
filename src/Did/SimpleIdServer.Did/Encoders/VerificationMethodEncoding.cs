@@ -3,7 +3,6 @@
 
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.Multicodec;
-using SimpleIdServer.Did.Crypto.SecurityKeys;
 using SimpleIdServer.Did.Extensions;
 using SimpleIdServer.Did.Models;
 using System;

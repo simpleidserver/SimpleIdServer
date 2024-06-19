@@ -7,6 +7,6 @@ namespace SimpleIdServer.Did.Key;
 
 public class DidKeyOptions
 {
-    public string PublicKeyFormat { get; set; } = Ed25519VerificationKey2020Standard.TYPE;
+    public string PublicKeyFormat { get; set; }
     public bool EnableEncryptionKeyDerivation { get; set; } = false;
 }

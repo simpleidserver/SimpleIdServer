@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.Store.EF
 
         public Task<List<ConfigurationKeyPairValueRecord>> GetAll(CancellationToken cancellationToken)
         {
-            if (_dbContext.Database.GetPendingMigrations().Any()) return Task.FromResult(new List<ConfigurationKeyPairValueRecord>());
+            if (!_dbContext.Database.IsInMemory() && _dbContext.Database.GetPendingMigrations().Any()) return Task.FromResult(new List<ConfigurationKeyPairValueRecord>());
             return _dbContext.ConfigurationKeyPairValueRecords.ToListAsync(cancellationToken);
         }
 

@@ -4,6 +4,7 @@
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Did;
+using SimpleIdServer.Did.Jwt;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -18,23 +19,23 @@ namespace SimpleIdServer.IdServer.Api.Authorization;
 
 public interface IAuthorizationCallbackRequestValidator
 {
-    Task<AuthorizationRequestCallbackRecord> Validate(HandlerContext context, CancellationToken cancellationToken);
+    Task<JsonObject> Validate(HandlerContext context, CancellationToken cancellationToken);
 }
 
 public class AuthorizationCallbackRequestValidator : IAuthorizationCallbackRequestValidator
 {
     private readonly IGrantedTokenHelper _grantedTokenHelper;
-    private readonly IJwtVerifier _jwtVerifier;
+    private readonly IDidFactoryResolver _resolver;
 
     public AuthorizationCallbackRequestValidator(
         IGrantedTokenHelper grantedTokenHelper,
-        IJwtVerifier jwtVerifier)
+        IDidFactoryResolver resolver)
     {
         _grantedTokenHelper = grantedTokenHelper;
-        _jwtVerifier = jwtVerifier;
+        _resolver = resolver;
     }
 
-    public async Task<AuthorizationRequestCallbackRecord> Validate(HandlerContext context, CancellationToken cancellationToken)
+    public async Task<JsonObject> Validate(HandlerContext context, CancellationToken cancellationToken)
     {
         var idToken = context.Request.RequestData.GetIdTokenFromAuthorizationRequestCallback();
         if (idToken == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationResponseParameters.IdToken));
@@ -47,18 +48,20 @@ public class AuthorizationCallbackRequestValidator : IAuthorizationCallbackReque
         var authorizationRequestCallback = await _grantedTokenHelper.GetAuthorizationRequestCallback(nonce, cancellationToken);
         if (authorizationRequestCallback == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidNonce);
 
+        bool isValid = false;
         TokenValidationResult validationResult;
         try
         {
-            validationResult = await _jwtVerifier.VerifyWithJsonWebKey(idToken, cancellationToken);
+            var didHandler = DidJsonWebTokenHandler.New();
+            isValid = await didHandler.CheckJwt(idToken, _resolver, cancellationToken);
         }
         catch(InvalidOperationException ex)
         {
             throw new OAuthException(ErrorCodes.INVALID_REQUEST, ex.Message);
         }
 
-        if (!validationResult.IsValid)
-            throw new OAuthException(ErrorCodes.INVALID_REQUEST, validationResult.Exception.Message);
+        if (!isValid)
+            throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.BadIdToken);
 
         return authorizationRequestCallback;
     }

@@ -1,8 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Infrastructures;
+using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +23,7 @@ public interface IClientHelper
     Task<JsonWebKey> ResolveJsonWebKey(Client client, string kid, CancellationToken cancellationToken);
     Task<IEnumerable<JsonWebKey>> ResolveJsonWebKeys(Client client, CancellationToken cancellationToken);
     Task<IEnumerable<JsonWebKey>> ResolveJsonWebKeys(string jwksUri, CancellationToken cancellationToken);
+    Task<Client> ResolveSelfDeclaredClient(JsonObject request, CancellationToken cancellationToken);
 }
 
 public class OAuthClientHelper : IClientHelper
@@ -91,5 +95,31 @@ public class OAuthClientHelper : IClientHelper
             var jsonWebKeys = keysJson.Select(k => new JsonWebKey(k.ToString()));
             return jsonWebKeys;
         }
+    }
+
+    public async Task<Client> ResolveSelfDeclaredClient(JsonObject request, CancellationToken cancellationToken)
+    {
+        var clientMetadataUri = request.GetClientMetadataUri();
+        var clientMetadata = request.GetClientMetadata();
+        var clientId = request.GetClientId();
+        if (clientMetadata == null)
+        {
+            using (var httpClient = _httpClientFactory.GetHttpClient())
+            {
+                var requestMessage = new System.Net.Http.HttpRequestMessage
+                {
+                    Method = System.Net.Http.HttpMethod.Get,
+                    RequestUri = new Uri(clientMetadataUri)
+                };
+                var httpResponse = await httpClient.SendAsync(requestMessage, cancellationToken);
+                if (!httpResponse.IsSuccessStatusCode)
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA_URI, Global.InvalidClientMetadataUri);
+                var json = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+                clientMetadata = JsonSerializer.Deserialize<Client>(json);
+            }
+        }
+
+        clientMetadata.ClientId = clientId;
+        return clientMetadata;
     }
 }

@@ -130,8 +130,11 @@ public class SecuredDocument
         if (vcCredential == null) throw new ArgumentNullException(nameof(vcCredential));
         var verificationMethod = didDocument.VerificationMethod.SingleOrDefault(m => m.Id == verificationMethodId);
         if (verificationMethod == null) throw new ArgumentException($"The verification method {verificationMethodId} doesn't exist");
-        if(asymKey == null)
-            asymKey = _verificationMethodEncoding.Decode(verificationMethod);
+        if (asymKey == null)
+            if (verificationMethod.PrivateKeyJwk != null)
+                asymKey = new JsonWebKeySecurityKey(verificationMethod.PrivateKeyJwk);
+            else
+                asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         var signingCredentials = asymKey.BuildSigningCredentials();
         var claims = new Dictionary<string, object>
         {

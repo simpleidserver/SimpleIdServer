@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.Multicodec;
 using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Models;
@@ -43,10 +44,10 @@ public class DidKeyResolver : IDidResolver
         var verificationMethod = _serializer.Deserialize(multibaseValue, null);
         var builder = DidDocumentBuilder.New(did);
         var verificationMethodId = $"{did}#{multibaseValue}";
-        if(_options.PublicKeyFormat != Ed25519VerificationKey2020Standard.TYPE 
-            && _options.PublicKeyFormat != JsonWebKey2020Standard.TYPE)
-            throw new InvalidOperationException($"The key format {_options.PublicKeyFormat} is not supported");
-        builder.AddVerificationMethod(_options.PublicKeyFormat,
+        var publicKeyFormat = _options.PublicKeyFormat ?? Ed25519VerificationKey2020Standard.TYPE;
+        if (verificationMethod.GetType() == typeof(JsonWebKeySecurityKey))
+            publicKeyFormat = JsonWebKey2020Standard.TYPE;
+        builder.AddVerificationMethod(publicKeyFormat,
             verificationMethod,
             did,
             VerificationMethodUsages.AUTHENTICATION | VerificationMethodUsages.ASSERTION_METHOD |

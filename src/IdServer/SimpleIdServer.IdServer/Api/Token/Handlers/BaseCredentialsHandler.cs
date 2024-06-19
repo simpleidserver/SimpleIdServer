@@ -96,7 +96,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         {
             return new JsonObject
             {
-                [TokenResponseParameters.ExpiresIn] = context.Client.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds,
+                [TokenResponseParameters.ExpiresIn] = context.Client?.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds,
                 [TokenResponseParameters.Scope] = string.Join(" ", scopes)
             };
         }

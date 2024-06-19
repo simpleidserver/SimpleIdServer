@@ -187,10 +187,7 @@ void ConfigureIdServer(IServiceCollection services)
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
-    services.AddDidKey(o =>
-    {
-        o.PublicKeyFormat = JsonWebKey2020Standard.TYPE;
-    });
+    services.AddDidKey();
     ConfigureDistributedCache();
 }
 

@@ -113,6 +113,7 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         q = q.Normalize();
         var result = new JsonWebKey
         {
+            Alg = JwtAlg,
             Kty = Kty,
             Crv = CrvOrSize,
             X = Base64UrlEncoder.Encode(q.XCoord.GetEncoded()),

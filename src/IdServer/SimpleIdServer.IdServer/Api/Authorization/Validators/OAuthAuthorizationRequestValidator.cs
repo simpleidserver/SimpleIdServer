@@ -14,8 +14,6 @@ using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -117,23 +115,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                     var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
                     if (clientMetadata == null && string.IsNullOrWhiteSpace(clientMetadataUri))
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.RequiredClientMetadataOrClientMetadataUri);
-                    if(clientMetadata == null)
-                    {
-                        using (var httpClient = _httpClientFactory.GetHttpClient())
-                        {
-                            var requestMessage = new HttpRequestMessage
-                            {
-                                Method = HttpMethod.Get,
-                                RequestUri = new Uri(clientMetadataUri)
-                            };
-                            var httpResponse = await httpClient.SendAsync(requestMessage, cancellationToken);
-                            if (!httpResponse.IsSuccessStatusCode)
-                                throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA_URI, Global.InvalidClientMetadataUri);
-                            var json = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
-                            clientMetadata = JsonSerializer.Deserialize<Client>(json);
-                        }
-                    }
-
+                    clientMetadata = await _clientHelper.ResolveSelfDeclaredClient(context.Request.RequestData, cancellationToken);
                     if ((clientMetadata.AuthorizationDataTypes == null || !clientMetadata.AuthorizationDataTypes.Any()) && authDetails != null && authDetails.Any())
                         clientMetadata.AuthorizationDataTypes = authDetails.Select(a => a.Type).ToList();
                     if(responseTypes != null)

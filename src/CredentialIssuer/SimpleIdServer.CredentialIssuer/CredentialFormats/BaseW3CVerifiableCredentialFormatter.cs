@@ -54,12 +54,13 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
 
     public CredentialHeader ExtractHeader(JsonObject jsonObj)
     {
+        // TODO !!
         if (!jsonObj.ContainsKey("credential_definition")) return null;
         var credentialDefinition = jsonObj["credential_definition"].AsObject();
         if (credentialDefinition == null || !credentialDefinition.ContainsKey("type")) return null;
         var jArrTypes = credentialDefinition["type"].AsArray();
         if (jArrTypes == null) return null;
-        var filteredTypes = jArrTypes.Select(t => t.ToString()).Where(c => c != VcConstants.VerifiableCredentialType);
+        var filteredTypes = jArrTypes.Select(t => t.ToString()).Where(c => c != VcConstants.VerifiableCredentialType && c != VcConstants.VerifiableAttestation);
         if (filteredTypes.Count() != 1) return null;
         return new CredentialHeader
         {

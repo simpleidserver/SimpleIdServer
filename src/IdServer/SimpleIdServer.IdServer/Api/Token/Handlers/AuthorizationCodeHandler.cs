@@ -39,6 +39,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IGrantHelper _audienceHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly IClientRepository _clientRepository;
+        private readonly IClientHelper _clientHelper;
         private readonly ILogger<AuthorizationCodeHandler> _logger;
 
         public AuthorizationCodeHandler(
@@ -53,6 +55,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IDPOPProofValidator dpopProofValidator,
             IOptions<IdServerHostOptions> options,
             IEnumerable<ITokenProfile> tokenProfiles,
+            IClientRepository clientRepository,
+            IClientHelper clientHelper,
             ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _grantedTokenHelper = grantedTokenHelper;
@@ -63,6 +67,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _audienceHelper = audienceHelper;
             _busControl = busControl;
             _dpopProofValidator = dpopProofValidator;
+            _clientRepository = clientRepository;
+            _clientHelper = clientHelper;
             _logger = logger;
         }
 
@@ -78,11 +84,9 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 {
                     activity?.SetTag("grant_type", GRANT_TYPE);
                     activity?.SetTag("realm", context.Realm);
-                    _authorizationCodeGrantTypeValidator.Validate(context);
-                    var oauthClient = await AuthenticateClient(context, cancellationToken);
-                    context.SetClient(oauthClient);
-                    activity?.SetTag("client_id", oauthClient.ClientId);
-                    await _dpopProofValidator.Validate(context);
+                    // TODO !!!
+                    // _authorizationCodeGrantTypeValidator.Validate(context);
+                    if (Options.Type == IdServerTypes.STANDARD) await StandardClientAuthentication(context, cancellationToken);
                     var code = context.Request.RequestData.GetAuthorizationCode();
                     var redirectUri = context.Request.RequestData.GetRedirectUri();
                     var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
@@ -101,12 +105,16 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.BadAuthorizationCode);
                     }
 
+                    if (Options.Type == IdServerTypes.SELFISSUED) await SelfClientAuthentication(context, authCode, cancellationToken);
+                    activity?.SetTag("client_id", context.Client.ClientId);
                     CheckDPOPJkt(context, authCode);
                     var previousClientId = previousRequest.GetClientId();
                     var previousRedirectUrl = previousRequest.GetRedirectUri();
+                    var issuerState = previousRequest.GetIssuerState();
                     var claims = previousRequest.GetClaimsFromAuthorizationRequest();
-                    if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeNotIssuedByClient);
-                    if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.NotSameRedirectUri);
+                    // TODO !!!
+                    // if (!previousClientId.Equals(context.Client.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeNotIssuedByClient);
+                    // if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.NotSameRedirectUri);
                     await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
 
                     var scopes = GetScopes(previousRequest, context);
@@ -116,9 +124,18 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     scopeLst = extractionResult.Scopes;
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var result = BuildResult(context, extractionResult.Scopes);
-                    await Authenticate(previousRequest, context, authCode, cancellationToken);
+                    if(Options.Type == IdServerTypes.STANDARD) await Authenticate(previousRequest, context, authCode, cancellationToken);
+                    else
+                        context.SetUser(new User
+                        {
+                            Name = context.Client.ClientId
+                        }, null);
+
                     context.SetOriginalRequest(previousRequest);
-                    var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId };
+                    var additionalClaims = new Dictionary<string, object>();
+                    if (!string.IsNullOrWhiteSpace(issuerState))
+                        additionalClaims.Add(AuthorizationRequestParameters.IssuerState, issuerState);
+                    var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId, AdditionalClaims = additionalClaims };
                     foreach (var tokenBuilder in _tokenBuilders)
                     {
                         if (tokenBuilder.Name == TokenResponseParameters.RefreshToken && !extractionResult.Scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name)) continue;
@@ -130,7 +147,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         result.Add(kvp.Key, kvp.Value);
 
                     if (!string.IsNullOrWhiteSpace(authCode.GrantId))
-                        result.Add(TokenResponseParameters.GrantId, authCode.GrantId);
+                        result.Add(TokenResponseParameters.GrantId, authCode.GrantId);                        
 
                     await Enrich(context, result, cancellationToken);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
@@ -176,6 +193,23 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
                 }
             }
+        }
+
+        protected async Task StandardClientAuthentication(HandlerContext context, CancellationToken cancellationToken)
+        {
+            var oauthClient = await AuthenticateClient(context, cancellationToken);
+            context.SetClient(oauthClient);
+            await _dpopProofValidator.Validate(context);
+        }
+
+        protected async Task SelfClientAuthentication(HandlerContext context, AuthCode authCode, CancellationToken cancellationToken)
+        {
+            var clientId = authCode.OriginalRequest.GetClientIdFromAuthorizationRequest();
+            var client = await _clientRepository.GetByClientId(context.Realm, clientId, cancellationToken);
+            if (client == null)
+                client = await _clientHelper.ResolveSelfDeclaredClient(authCode.OriginalRequest, cancellationToken);
+
+            context.SetClient(client);
         }
 
         protected virtual Task Enrich(HandlerContext handlerContext, JsonObject result, CancellationToken cancellationToken)

@@ -14,4 +14,6 @@ public class CreateCredentialOfferRequest
     public List<string> CredentialConfigurationIds { get; set; } = new List<string>();
     [JsonPropertyName("sub")]
     public string Subject { get; set; }
+    [JsonPropertyName("issuer_state")]
+    public string IssuerState { get; set; }
 }

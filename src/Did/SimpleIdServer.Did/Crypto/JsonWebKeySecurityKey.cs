@@ -23,7 +23,7 @@ public class JsonWebKeySecurityKey : IAsymmetricKey
 
     public SigningCredentials BuildSigningCredentials(string kid = null)
     {
-        throw new System.NotImplementedException();
+        return new SigningCredentials(_jwk, _jwk.Alg);
     }
 
     public bool CheckHash(byte[] content, byte[] signature, HashAlgorithmName? alg = null)

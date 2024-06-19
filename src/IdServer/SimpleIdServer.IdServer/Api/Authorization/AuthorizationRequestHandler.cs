@@ -153,8 +153,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             var redirectUri = $"{context.GetIssuer()}/{Constants.EndPoints.AuthorizationCallback}";
             var targetUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-            var nonce = Guid.NewGuid().ToString();
             var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
+            var nonce = Guid.NewGuid().ToString();
             var descriptor = new SecurityTokenDescriptor
             {
                 Issuer = context.GetIssuer(),
@@ -182,10 +182,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 { AuthorizationRequestParameters.Request, jwt },
                 { AuthorizationRequestParameters.Nonce, nonce }
             };
-            await _grantedTokenHelper.AddAuthorizationRequestCallback(nonce, new AuthorizationRequestCallbackRecord
-            {
-
-            }, _options.DefaultAuthorizationRequestCallbackExpirationTimeInSeconds, cancellationToken);
+            await _grantedTokenHelper.AddAuthorizationRequestCallback(nonce, context.Request.RequestData, _options.DefaultAuthorizationRequestCallbackExpirationTimeInSeconds, cancellationToken);
             return new RedirectURLAuthorizationResponse(targetUri, dic);
         }
 

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.CredentialIssuer.Startup;
 using System.Net.Http;
+using SimpleIdServer.Did.Key;
+using SimpleIdServer.Did.Encoders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -102,6 +104,11 @@ builder.Services.AddCredentialIssuer(o =>
 {
     c.AddCredentialConfigurations(CredentialIssuerConfiguration.CredentialConfigurations);
     c.AddUserCredentialClaims(CredentialIssuerConfiguration.CredentialClaims);
+});
+
+builder.Services.AddDidKey(c =>
+{
+    c.PublicKeyFormat = JsonWebKey2020Standard.TYPE;
 });
 
 var app = builder.Build();

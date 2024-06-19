@@ -493,6 +493,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the identity token is invalid.
+        /// </summary>
+        public static string BadIdToken {
+            get {
+                return ResourceManager.GetString("BadIdToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à signature of the id_token_hint is not correct.
         /// </summary>
         public static string BadIdTokenHintSig {
