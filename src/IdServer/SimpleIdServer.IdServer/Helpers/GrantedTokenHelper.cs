@@ -59,8 +59,12 @@ namespace SimpleIdServer.IdServer.Helpers
 
     public class AuthorizationRequestCallbackRecord
     {
+        public string RedirectUri { get; set; }
         public string JwksUri { get; set; }
         public List<string> SubjectSyntaxTypesSupported { get; set; }
+        public List<AuthorizationData> AuthorizationDetails { get; set; }
+        public List<string> Scopes { get; set; }
+        public List<string> ResponseTypes { get; set; }
     }
 
     public class GrantedTokenHelper : IGrantedTokenHelper
