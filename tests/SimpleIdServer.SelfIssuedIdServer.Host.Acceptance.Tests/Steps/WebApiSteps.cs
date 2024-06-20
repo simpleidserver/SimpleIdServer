@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SimpleIdServer.DPoP;
+using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
@@ -49,6 +51,19 @@ public class WebApiSteps
             var mock = new Mock<IdServer.Infrastructures.IHttpClientFactory>();
             mock.Setup(m => m.GetHttpClient()).Returns(client);
             _scenarioContext.Set(new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "sidClient.crt")), "sidClient.crt");
+        }
+    }
+
+    [Given("build authorization request callback '(.*)'")]
+    public async Task GivenCreateAuthorizationRequestCallback(string nonce)
+    {
+        using (var scope = _factory.Services.CreateScope())
+        {
+            var grantedTokenHelper = scope.ServiceProvider.GetRequiredService<IGrantedTokenHelper>();
+            await grantedTokenHelper.AddAuthorizationRequestCallback(nonce, new System.Text.Json.Nodes.JsonObject
+            {
+                { AuthorizationRequestParameters.RedirectUri, "http://localhost" }
+            }, 200, CancellationToken.None);
         }
     }
 

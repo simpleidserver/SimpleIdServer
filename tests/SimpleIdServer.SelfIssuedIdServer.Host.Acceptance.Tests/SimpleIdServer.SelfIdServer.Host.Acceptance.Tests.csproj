@@ -6,6 +6,7 @@
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 	</PropertyGroup>
 	<ItemGroup>
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\AuthorizationErrors - Copy.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\AuthorizationErrors.feature.cs" />
 	</ItemGroup>
 	<ItemGroup>
@@ -28,15 +29,23 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Update="Features\AuthorizationCallbackErrors.feature.cs">
+	    <DependentUpon>AuthorizationCallbackErrors.feature</DependentUpon>
+	  </Compile>
 	  <Compile Update="Features\AuthorizationErrors.feature.cs">
 	    <DependentUpon>%(Filename)</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\AuthorizationCallbackErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\AuthorizationErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>

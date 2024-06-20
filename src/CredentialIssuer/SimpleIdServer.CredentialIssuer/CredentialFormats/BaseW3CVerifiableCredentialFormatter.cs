@@ -54,7 +54,6 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
 
     public CredentialHeader ExtractHeader(JsonObject jsonObj)
     {
-        // TODO !!
         if (!jsonObj.ContainsKey("credential_definition")) return null;
         var credentialDefinition = jsonObj["credential_definition"].AsObject();
         if (credentialDefinition == null || !credentialDefinition.ContainsKey("type")) return null;

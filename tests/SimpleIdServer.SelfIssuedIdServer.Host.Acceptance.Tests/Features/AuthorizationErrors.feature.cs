@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table1, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table9, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -141,20 +141,20 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table2.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "client_id",
                             "client"});
-                table2.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "client_metadata_uri",
                             "http://localhost"});
-                table2.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "client_metadata",
                             "{ }"});
 #line 15
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table2, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table10, "When ");
 #line hidden
 #line 21
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -194,14 +194,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table3.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "client_id",
                             "client"});
 #line 28
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table3, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table11, "When ");
 #line hidden
 #line 32
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -238,17 +238,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table4.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "client_id",
                             "client"});
-                table4.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "client_metadata_uri",
                             "http://clientmetadata.com"});
 #line 39
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table4, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table12, "When ");
 #line hidden
 #line 44
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -285,17 +285,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table5.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "client_id",
                             "client"});
-                table5.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "client_metadata",
                             "{ }"});
 #line 51
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table5, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table13, "When ");
 #line hidden
 #line 56
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -331,20 +331,20 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table6.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "response_type",
                             "invalid"});
-                table6.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "client_id",
                             "client"});
-                table6.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "client_metadata",
                             "{ }"});
 #line 63
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table6, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table14, "When ");
 #line hidden
 #line 69
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -380,20 +380,20 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table7.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table7.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "client_id",
                             "client"});
-                table7.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "client_metadata",
                             "{ }"});
 #line 76
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table7, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table15, "When ");
 #line hidden
 #line 82
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -407,6 +407,58 @@ this.ScenarioInitialize(scenarioInfo);
 #line 86
  testRunner.Then("JSON \'error_description\'=\'missing parameters scope,resource,authorization_details" +
                         "\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Redirect_uri is required")]
+        [Xunit.TraitAttribute("FeatureTitle", "AuthorizationErrors")]
+        [Xunit.TraitAttribute("Description", "Redirect_uri is required")]
+        public void Redirect_UriIsRequired()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Redirect_uri is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 88
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table16.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table16.AddRow(new string[] {
+                            "client_id",
+                            "client"});
+                table16.AddRow(new string[] {
+                            "client_metadata",
+                            "{ }"});
+                table16.AddRow(new string[] {
+                            "scope",
+                            "openid"});
+#line 89
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table16, "When ");
+#line hidden
+#line 96
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 98
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 99
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 100
+ testRunner.Then("JSON \'error_description\'=\'missing parameter redirect_uri\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

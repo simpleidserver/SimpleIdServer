@@ -1,11 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.SelfIdServer.Host.Acceptance.Tests.Steps;

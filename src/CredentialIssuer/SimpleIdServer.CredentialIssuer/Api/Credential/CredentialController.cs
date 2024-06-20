@@ -28,6 +28,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         private readonly IEnumerable<ICredentialFormatter> _formatters;
         private readonly ICredentialStore _credentialStore;
         private readonly ICredentialConfigurationStore _credentialConfigurationStore;
+        private readonly ICredentialOfferStore _credentialOfferStore;
         private readonly IUserCredentialClaimStore _userCredentialClaimStore;
         private readonly IEnumerable<IKeyProofTypeValidator> _keyProofTypeValidators;
         private readonly CredentialIssuerOptions _options;
@@ -36,6 +37,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             IEnumerable<ICredentialFormatter> formatters,
             ICredentialStore credentialStore,
             ICredentialConfigurationStore credentialConfigurationStore,
+            ICredentialOfferStore credentialOfferStore,
             IUserCredentialClaimStore userCredentialClaimStore,
             IEnumerable<IKeyProofTypeValidator> keyProofTypeValidators,
             IOptions<CredentialIssuerOptions> options)
@@ -43,6 +45,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             _formatters = formatters;
             _credentialStore = credentialStore;
             _credentialConfigurationStore = credentialConfigurationStore;
+            _credentialOfferStore = credentialOfferStore;
             _userCredentialClaimStore = userCredentialClaimStore;
             _keyProofTypeValidators = keyProofTypeValidators;
             _options = options.Value;
@@ -53,13 +56,14 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         {
             var subject = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
+            var issuerState = User.Claims.SingleOrDefault(c => c.Type == "issuer_state")?.Value;
             var authorizedScopes = new List<string>();
             if (!string.IsNullOrWhiteSpace(scope))
             {
                 authorizedScopes = scope.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
             }
 
-            var validationResult = await Validate(request, authorizedScopes, cancellationToken);
+            var validationResult = await Validate(request, issuerState, authorizedScopes, cancellationToken);
             if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
             if (!string.IsNullOrWhiteSpace(validationResult.Subject))
                 subject = validationResult.Subject;
@@ -138,7 +142,11 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             });
         }
 
-        private async Task<CredentialValidationResult> Validate(CredentialRequest credentialRequest, List<string> authorizedScopes, CancellationToken cancellationToken)
+        private async Task<CredentialValidationResult> Validate(
+            CredentialRequest credentialRequest, 
+            string issuerState,
+            List<string> authorizedScopes, 
+            CancellationToken cancellationToken)
         {
             string subject = null;
             string nonce = null;
@@ -177,6 +185,14 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                     return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_ENCRYPTION_PARAMETERS, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Enc)));
                 if (credentialRequest.CredentialResponseEncryption.Jwk == null)
                     return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_ENCRYPTION_PARAMETERS, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Jwk)));
+            }
+
+            if (!string.IsNullOrWhiteSpace(issuerState))
+            {
+                var credentialOffer = await _credentialOfferStore.GetByIssuerState(issuerState, cancellationToken);
+                if (credentialOffer == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_ISSUER_STATE));
+                var credentialConfiguration = await _credentialConfigurationStore.GetByServerId(credentialOffer.CredentialConfigurationIds.First(), cancellationToken);
+                // TODO
             }
 
             if (!string.IsNullOrWhiteSpace(credentialRequest.Format))

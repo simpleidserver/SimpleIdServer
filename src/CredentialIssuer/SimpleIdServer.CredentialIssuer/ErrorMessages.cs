@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string EXISTING_CREDENTIAL_CLAIM = "the credential configuration claim {0} already exists";
         public const string EXISTING_CREDENTIAL = "the credential {0} already exists";
         public const string INVALID_INCOMING_REQUEST = "the incoming request is not valid";
+        public const string INVALID_ISSUER_STATE = "the issuer_state is not valid";
         public const string INVALID_PROOF_FORMAT = "the proof format {0} is not supported";
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
         public const string INVALID_PROOF_SIG = "the proof signature is not correct";

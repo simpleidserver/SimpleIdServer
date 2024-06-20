@@ -55,7 +55,7 @@ public class AuthorizationCallbackRequestValidator : IAuthorizationCallbackReque
             var didHandler = DidJsonWebTokenHandler.New();
             isValid = await didHandler.CheckJwt(idToken, _resolver, cancellationToken);
         }
-        catch(InvalidOperationException ex)
+        catch(Exception ex)
         {
             throw new OAuthException(ErrorCodes.INVALID_REQUEST, ex.Message);
         }

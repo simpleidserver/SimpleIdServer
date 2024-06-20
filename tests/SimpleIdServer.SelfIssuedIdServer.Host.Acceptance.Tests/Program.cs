@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.SelfIdServer.Host.Acceptance.Tests;
 using System;
@@ -44,6 +45,7 @@ builder.Services.AddSIDIdentityServer(o =>
     .UseInMemoryMassTransit();
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
 var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));
+builder.Services.AddDidKey();
 builder.Services.Remove(antiforgeryService);
 builder.Services.Remove(memoryDistribution);
 builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();

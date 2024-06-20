@@ -84,3 +84,17 @@ Scenario: Scope is required
 	Then HTTP status code equals to '400'
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='missing parameters scope,resource,authorization_details'
+
+Scenario: Redirect_uri is required
+	When execute HTTP GET request 'http://localhost/authorization'
+	| Key             | Value        |
+	| response_type   | code         |
+	| client_id       | client       |
+	| client_metadata | { }          |
+	| scope           | openid       |
+	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '400'
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='missing parameter redirect_uri'

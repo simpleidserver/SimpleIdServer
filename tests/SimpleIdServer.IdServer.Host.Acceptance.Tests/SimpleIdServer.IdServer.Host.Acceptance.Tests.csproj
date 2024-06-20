@@ -67,6 +67,7 @@
 		<PackageReference Include="Moq" Version="4.20.70" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Console\SimpleIdServer.IdServer.Console.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj" />
