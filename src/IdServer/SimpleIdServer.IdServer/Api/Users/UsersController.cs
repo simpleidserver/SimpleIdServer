@@ -355,7 +355,7 @@ namespace SimpleIdServer.IdServer.Api.Users
 
                         if(request.Credential.CredentialType == Constants.Areas.Password)
                         {
-                            PasswordHelper.ComputeHash(request.Credential.Value, _options.IsPasswordEncodeInBase64);
+                            request.Credential.Value = PasswordHelper.ComputeHash(request.Credential.Value, _options.IsPasswordEncodeInBase64);
                         }
 
                         request.Credential.Id = Guid.NewGuid().ToString();
