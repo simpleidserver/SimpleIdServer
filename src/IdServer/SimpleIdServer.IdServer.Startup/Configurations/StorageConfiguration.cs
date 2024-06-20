@@ -14,6 +14,7 @@ namespace SimpleIdServer.IdServer.Startup.Configurations
         SQLSERVER = 1,
         POSTGRE = 2,
         MYSQL = 3,
-        SQLITE = 4
+        SQLITE = 4,
+        ORACLE = 5
     }
 }

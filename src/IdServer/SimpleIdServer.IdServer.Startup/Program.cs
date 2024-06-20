@@ -265,6 +265,13 @@ void ConfigureStorage(DbContextOptionsBuilder b)
     var conf = section.Get<StorageConfiguration>();
     switch (conf.Type)
     {
+        case StorageTypes.ORACLE:
+            b.UseOracle(conf.ConnectionString, o =>
+            {
+                o.MigrationsAssembly("SimpleIdServer.IdServer.OracleMigrations");
+                o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+            });
+            break;
         case StorageTypes.SQLSERVER:
             b.UseSqlServer(conf.ConnectionString, o =>
             {

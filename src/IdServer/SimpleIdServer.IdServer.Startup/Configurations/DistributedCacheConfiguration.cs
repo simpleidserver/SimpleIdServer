@@ -16,5 +16,6 @@ public enum DistributedCacheTypes
     REDIS = 2,
     POSTGRE = 3,
     MYSQL = 4,
-    SQLITE = 5
+    SQLITE = 5,
+    ORACLE = 6
 }

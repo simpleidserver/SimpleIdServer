@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Oracle.EntityFrameworkCore" Version="8.23.40" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Migrations\" />
+	</ItemGroup>
+</Project>
