@@ -31,8 +31,8 @@ public class VcBuilder
             Issuer = issuer,
             ValidFrom = validFrom,
             ValidUntil = validUntil,
-            IssuanceDate = DateTime.UtcNow,
-            Issued = DateTime.UtcNow
+            IssuanceDate = DateTime.UtcNow.Date,
+            Issued = DateTime.UtcNow.Date
         };
         credential.Context.Add(VcConstants.VerifiableCredentialJsonLdContext);
         credential.Context.Add(jsonLdContext);

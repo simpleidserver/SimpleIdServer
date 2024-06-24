@@ -25,6 +25,7 @@ public class JsonWebKeySecurityKey : IAsymmetricKey
 
     public SigningCredentials BuildSigningCredentials(string kid = null)
     {
+        _jwk.Kid = kid;
         return new SigningCredentials(_jwk, _jwk.Alg);
     }
 

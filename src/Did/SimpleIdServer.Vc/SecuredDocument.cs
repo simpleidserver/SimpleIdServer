@@ -135,7 +135,7 @@ public class SecuredDocument
                 asymKey = new JsonWebKeySecurityKey(verificationMethod.PrivateKeyJwk);
             else
                 asymKey = _verificationMethodEncoding.Decode(verificationMethod);
-        var signingCredentials = asymKey.BuildSigningCredentials($"{didDocument.Id}#{verificationMethod.Id}");
+        var signingCredentials = asymKey.BuildSigningCredentials(verificationMethod.Id);
         var claims = new Dictionary<string, object>
         {
             { "sub", subject },
@@ -145,13 +145,12 @@ public class SecuredDocument
         var securityTokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = didDocument.Id,
-            IssuedAt = DateTime.UtcNow,
+            IssuedAt = DateTime.UtcNow.Date,
             SigningCredentials = signingCredentials,
-            Claims = claims
+            Claims = claims,
+            NotBefore = DateTime.UtcNow.Date
         };
         var handler = new JsonWebTokenHandler();
-        CryptoProviderFactory cryptoProviderFactory = signingCredentials.CryptoProviderFactory ?? signingCredentials.Key.CryptoProviderFactory;
-        var signatureProvider = cryptoProviderFactory.CreateForSigning(signingCredentials.Key, signingCredentials.Algorithm);
         var result = handler.CreateToken(securityTokenDescriptor);
         return result;
     }

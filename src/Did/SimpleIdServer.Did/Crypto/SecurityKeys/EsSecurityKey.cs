@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Parameters;
@@ -10,8 +9,7 @@ using SimpleIdServer.Did;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Crypto.SecurityKeys;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Security.Cryptography;
 
 namespace SimpleIdServer.Did.Crypto.SecurityKeys
 {
@@ -23,7 +21,7 @@ namespace SimpleIdServer.Did.Crypto.SecurityKeys
 
         public EsSecurityKey()
         {
-            CryptoProviderFactory.CustomCryptoProvider = new EsCryptoProvider();
+            this.CryptoProviderFactory.CustomCryptoProvider = new EsCryptoProvider();
         }
 
         public EsSecurityKey(X9ECParameters curve, ECPublicKeyParameters publicKey, ECPrivateKeyParameters privateKey = null) : this()
@@ -42,7 +40,7 @@ namespace SimpleIdServer.Did.Crypto.SecurityKeys
         {
             get
             {
-                return _publicKey != null;
+                return _privateKey != null;
             }
         }
 
@@ -52,6 +50,19 @@ namespace SimpleIdServer.Did.Crypto.SecurityKeys
             {
                 return _privateKey == null ? PrivateKeyStatus.DoesNotExist : PrivateKeyStatus.Exists;
             }
+        }
+
+        public override bool CanComputeJwkThumbprint()
+        {
+            return true;
+        }
+
+        public override byte[] ComputeJwkThumbprint()
+        {
+            var q = _publicKey.Q;
+            var x = Base64UrlEncoder.Encode(q.XCoord.GetEncoded());
+            var y = Base64UrlEncoder.Encode(q.YCoord.GetEncoded());
+            return GenerateSha256Hash($"{{\"{"crv"}\":\"{Constants.StandardCrvOrSize.P256}\",\"{"kty"}\":\"{"EC"}\",\"{"x"}\":\"{x}\",\"{"y"}\":\"{y}\"}}");
         }
 
         public override int KeySize
@@ -64,6 +75,9 @@ namespace SimpleIdServer.Did.Crypto.SecurityKeys
                 return publicKey.Length;
             }
         }
+
+        private static byte[] GenerateSha256Hash(string input)
+            => SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(input));
     }
 }
 
@@ -102,13 +116,24 @@ public class EsSignatureProvider : SignatureProvider
 
     public override byte[] Sign(byte[] input)
     {
-        var signer = new DeterministicECDSA();
-        signer.SetPrivateKey(_securityKey.PrivateKey);
-        var sig = ECDSASignature.FromDER(signer.SignHash(input));
-        var lst = new List<byte>();
-        lst.AddRange(sig.R.ToByteArrayUnsigned());
-        lst.AddRange(sig.S.ToByteArrayUnsigned());
-        return lst.ToArray();
+        var ecDsaSigner = new ECDsaSigner();
+        ecDsaSigner.Init(true, _securityKey.PrivateKey);
+        byte[] hashedInput;
+        using (var hasher = SHA256.Create())
+        {
+            hashedInput = hasher.ComputeHash(input);
+        }
+
+        var output = ecDsaSigner.GenerateSignature(hashedInput);
+
+        var r = output[0].ToByteArrayUnsigned();
+        var s = output[1].ToByteArrayUnsigned();
+
+        var signature = new byte[r.Length + s.Length];
+        r.CopyTo(signature, 0);
+        s.CopyTo(signature, r.Length);
+
+        return signature;
     }
 
     public override bool Verify(byte[] input, byte[] signature)

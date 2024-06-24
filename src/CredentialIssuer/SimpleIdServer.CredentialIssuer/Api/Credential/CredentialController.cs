@@ -54,6 +54,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         [HttpPost]
         public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
+            // SIGNATURE FAILED : eyJhbGciOiJFUzI1NiIsImtpZCI6ImRpZDprZXk6ejJkbXpEODFjZ1B4OFZraTdKYnV1TW1GWXJXUGdZb3l0eWtVWjNleXFodDFqOUticzVVbVo0Y1g2ejUzYmlYTmRuTjI1UEY2b0ExajFDZjNKd1E2MkoyQ29aWFV1OEpBRzJXcEdhZmpXN21GSGoyTmtHZWQxRVcxenFNekhZaGhrcTZvcGJ5QWtKUGpCcmp6eHFLWTdZYnVpRjJIRDV6UnBHam85ZHR3Rlk3czhYQnR6USN6MmRtekQ4MWNnUHg4VmtpN0pidXVNbUZZcldQZ1lveXR5a1VaM2V5cWh0MWo5S2JzNVVtWjRjWDZ6NTNiaVhOZG5OMjVQRjZvQTFqMUNmM0p3UTYySjJDb1pYVXU4SkFHMldwR2Fmalc3bUZIajJOa0dlZDFFVzF6cU16SFloaGtxNm9wYnlBa0pQakJyanp4cUtZN1lidWlGMkhENXpScEdqbzlkdHdGWTdzOFhCdHpRIiwidHlwIjoiSldUIn0.eyJpc3MiOiJkaWQ6a2V5OnoyZG16RDgxY2dQeDhWa2k3SmJ1dU1tRllyV1BnWW95dHlrVVozZXlxaHQxajlLYnM1VW1aNGNYNno1M2JpWE5kbk4yNVBGNm9BMWoxQ2YzSndRNjJKMkNvWlhVdThKQUcyV3BHYWZqVzdtRkhqMk5rR2VkMUVXMXpxTXpIWWhoa3E2b3BieUFrSlBqQnJqenhxS1k3WWJ1aUYySEQ1elJwR2pvOWR0d0ZZN3M4WEJ0elEiLCJpYXQiOjE3MTkxODcyMDAsIm5iZiI6MTcxOTE4NzIwMCwic3ViIjoiZGlkOmtleTp6MmRtekQ4MWNnUHg4VmtpN0pidXVNbUZZcldQZ1lveXR5a1VaM2V5cWh0MWo5S2JvajdnOVBmWEp4YmJzNEtZZWd5cjdFTG5GVm5wRE16YkpKREROWmphdlg2anZ0RG1BTE1iWEFHVzY3cGRUZ0ZlYTJGckdHU0ZzOEVqeGk5Nm9GTEdIY0w0UDZiakxEUEJKRXZSUkhTckc0THNQbmU1MmZjenQyTVdqSExMSkJ2aEFDIiwianRpIjoiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvNDJmMDE3NmEtM2ZkZi00MTg3LTg1NTUtNTI0Mzk5NDZjZjhiIiwidmMiOnsiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Imh0dHBzOi8vd3d3LnczLm9yZy8yMDE4L2NyZWRlbnRpYWxzLzQyZjAxNzZhLTNmZGYtNDE4Ny04NTU1LTUyNDM5OTQ2Y2Y4YiIsInR5cGUiOlsiVmVyaWZpYWJsZUNyZWRlbnRpYWwiLCJWZXJpZmlhYmxlQXR0ZXN0YXRpb24iLCJDVFdhbGxldFNhbWVBdXRob3Jpc2VkSW5UaW1lIl0sImlzc3VlciI6ImRpZDprZXk6ejJkbXpEODFjZ1B4OFZraTdKYnV1TW1GWXJXUGdZb3l0eWtVWjNleXFodDFqOUticzVVbVo0Y1g2ejUzYmlYTmRuTjI1UEY2b0ExajFDZjNKd1E2MkoyQ29aWFV1OEpBRzJXcEdhZmpXN21GSGoyTmtHZWQxRVcxenFNekhZaGhrcTZvcGJ5QWtKUGpCcmp6eHFLWTdZYnVpRjJIRDV6UnBHam85ZHR3Rlk3czhYQnR6USIsImlzc3VhbmNlRGF0ZSI6IjIwMjQtMDYtMjRUMDA6MDA6MDBaIiwidmFsaWRGcm9tIjoiMjAyNC0wNi0yNFQwMDowMDowMFoiLCJpc3N1ZWQiOiIyMDI0LTA2LTI0VDAwOjAwOjAwWiIsImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImlkIjoiZGlkOmtleTp6MmRtekQ4MWNnUHg4VmtpN0pidXVNbUZZcldQZ1lveXR5a1VaM2V5cWh0MWo5S2JvajdnOVBmWEp4YmJzNEtZZWd5cjdFTG5GVm5wRE16YkpKREROWmphdlg2anZ0RG1BTE1iWEFHVzY3cGRUZ0ZlYTJGckdHU0ZzOEVqeGk5Nm9GTEdIY0w0UDZiakxEUEJKRXZSUkhTckc0THNQbmU1MmZjenQyTVdqSExMSkJ2aEFDIiwicGVyc29uYWxJZGVudGlmaWVyIjoiYWRtaW5pc3RyYXRvciJ9LCJjcmVkZW50aWFsU2NoZW1hIjp7ImlkIjoiaHR0cHM6Ly9hcGktcGlsb3QuZWJzaS5ldS90cnVzdGVkLXNjaGVtYXMtcmVnaXN0cnkvdjIvc2NoZW1hcy96M01nVUZVa2I3MjJ1cTR4M2R2NXlBSm1uTm16REZlSzVVQzh4ODNRb2VMSk0iLCJ0eXBlIjoiRnVsbEpzb25TY2hlbWFWYWxpZGF0b3IyMDIxIn19LCJleHAiOjE3MTkyNDQ1MTF9.hu5G-sfK0sJiO7gaYF38SOxp8GVZezP6tSA0L6sJOqP269Pe_BXhDa2DIjOsypagu03wna1qPByh5pGL6cqP_Q
             var requestSubject = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
             var issuerState = User.Claims.SingleOrDefault(c => c.Type == "issuer_state")?.Value;
@@ -99,10 +100,10 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 buildRequest.Type = validationResult.CredentialTemplate.Type;
                 buildRequest.CredentialConfiguration = validationResult.CredentialTemplate;
                 buildRequest.AdditionalTypes = validationResult.CredentialTemplate.AdditionalTypes;
-                buildRequest.ValidFrom = DateTime.UtcNow;
+                buildRequest.ValidFrom = DateTime.UtcNow.Date;
                 if (_options.CredentialExpirationTimeInSeconds != null)
                 {
-                    buildRequest.ValidUntil = DateTime.UtcNow.AddSeconds(_options.CredentialExpirationTimeInSeconds.Value);
+                    buildRequest.ValidUntil = DateTime.UtcNow.Date.AddSeconds(_options.CredentialExpirationTimeInSeconds.Value);
                 }
 
                 if(!string.IsNullOrWhiteSpace(validationResult.CredentialTemplate.CredentialSchemaId))
