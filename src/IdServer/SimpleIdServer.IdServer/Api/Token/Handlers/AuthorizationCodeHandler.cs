@@ -39,7 +39,6 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
     private readonly IGrantHelper _audienceHelper;
     private readonly IBusControl _busControl;
     private readonly IDPOPProofValidator _dpopProofValidator;
-    private readonly IClientRepository _clientRepository;
     private readonly IClientHelper _clientHelper;
     private readonly ILogger<AuthorizationCodeHandler> _logger;
 
@@ -55,7 +54,6 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
         IDPOPProofValidator dpopProofValidator,
         IOptions<IdServerHostOptions> options,
         IEnumerable<ITokenProfile> tokenProfiles,
-        IClientRepository clientRepository,
         IClientHelper clientHelper,
         ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
     {
@@ -67,7 +65,6 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
         _audienceHelper = audienceHelper;
         _busControl = busControl;
         _dpopProofValidator = dpopProofValidator;
-        _clientRepository = clientRepository;
         _clientHelper = clientHelper;
         _logger = logger;
     }
@@ -85,7 +82,6 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
                 activity?.SetTag("grant_type", GRANT_TYPE);
                 activity?.SetTag("realm", context.Realm);
                 _authorizationCodeGrantTypeValidator.Validate(context);
-                if (Options.Type == IdServerTypes.STANDARD) await StandardClientAuthentication(context, cancellationToken);
                 var code = context.Request.RequestData.GetAuthorizationCode();
                 var redirectUri = context.Request.RequestData.GetRedirectUri();
                 var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
@@ -104,7 +100,8 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
                     return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.BadAuthorizationCode);
                 }
 
-                if (Options.Type == IdServerTypes.SELFISSUED) await SelfClientAuthentication(context, authCode, cancellationToken);
+                await AuthenticateClient(context, authCode, cancellationToken); 
+                if (!context.Client.IsSelfIssueEnabled && string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.RedirectUri))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.RedirectUri));
                 activity?.SetTag("client_id", context.Client.ClientId);
                 CheckDPOPJkt(context, authCode);
                 var previousClientId = previousRequest.GetClientId();
@@ -112,7 +109,7 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
                 var issuerState = previousRequest.GetIssuerState();
                 var claims = previousRequest.GetClaimsFromAuthorizationRequest();
                 if (!previousClientId.Equals(context.Client.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeNotIssuedByClient);
-                if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.NotSameRedirectUri);
+                if (!context.Client.IsSelfIssueEnabled && !previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.NotSameRedirectUri);
                 await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
 
                 var scopes = GetScopes(previousRequest, context);
@@ -122,7 +119,7 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
                 scopeLst = extractionResult.Scopes;
                 activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                 var result = BuildResult(context, extractionResult.Scopes);
-                if(Options.Type == IdServerTypes.STANDARD) await Authenticate(previousRequest, context, authCode, cancellationToken);
+                if(!context.Client.IsSelfIssueEnabled) await Authenticate(previousRequest, context, authCode, cancellationToken);
                 else
                     context.SetUser(new User
                     {
@@ -193,21 +190,19 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
         }
     }
 
-    protected async Task StandardClientAuthentication(HandlerContext context, CancellationToken cancellationToken)
+    protected async Task AuthenticateClient(HandlerContext context, AuthCode authCode, CancellationToken cancellationToken)
     {
+        var clientId = context.Request.RequestData.GetClientId();
+        if(_clientHelper.IsNonPreRegisteredRelyingParty(clientId))
+        {
+            var client = await _clientHelper.ResolveSelfDeclaredClient(authCode.OriginalRequest, cancellationToken);
+            context.SetClient(client);
+            return;
+        }
+
         var oauthClient = await AuthenticateClient(context, cancellationToken);
         context.SetClient(oauthClient);
         await _dpopProofValidator.Validate(context);
-    }
-
-    protected async Task SelfClientAuthentication(HandlerContext context, AuthCode authCode, CancellationToken cancellationToken)
-    {
-        var clientId = authCode.OriginalRequest.GetClientIdFromAuthorizationRequest();
-        var client = await _clientRepository.GetByClientId(context.Realm, clientId, cancellationToken);
-        if (client == null)
-            client = await _clientHelper.ResolveSelfDeclaredClient(authCode.OriginalRequest, cancellationToken);
-
-        context.SetClient(client);
     }
 
     protected virtual Task Enrich(HandlerContext handlerContext, JsonObject result, CancellationToken cancellationToken)

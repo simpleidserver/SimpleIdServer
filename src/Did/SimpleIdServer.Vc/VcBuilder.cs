@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Vc.Models;
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Vc;
@@ -19,6 +20,7 @@ public class VcBuilder
         string jsonLdContext,
         string issuer, 
         string type,
+        List<string> additionalTypes,
         DateTime? validFrom = null, 
         DateTime? validUntil = null
         )
@@ -29,10 +31,14 @@ public class VcBuilder
             Issuer = issuer,
             ValidFrom = validFrom,
             ValidUntil = validUntil,
+            IssuanceDate = DateTime.UtcNow,
+            Issued = DateTime.UtcNow
         };
         credential.Context.Add(VcConstants.VerifiableCredentialJsonLdContext);
         credential.Context.Add(jsonLdContext);
         credential.Type.Add(VcConstants.VerifiableCredentialType);
+        if (additionalTypes != null)
+            credential.Type.AddRange(additionalTypes);
         credential.Type.Add(type);
         return new VcBuilder(credential);
     }
@@ -54,6 +60,16 @@ public class VcBuilder
             else (_credential.CredentialSubject as JsonArray).Add(record);
         }
 
+        return this;
+    }
+
+    public VcBuilder SetSchema(string id, string type)
+    {
+        _credential.Schema = new W3CVerifiableCredentialSchema
+        {
+            Id  = id,
+            Type = type
+        };
         return this;
     }
 

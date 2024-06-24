@@ -13,10 +13,10 @@ Scenario: ClientId is required
 	
 Scenario: When the client is not registered then only one parameter (client_metadata or client_metadata_uri) can be used
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key                 | Value            |
-	| client_id           | client           |
-	| client_metadata_uri | http://localhost |
-	| client_metadata     | { }              |
+	| Key                 | Value                |
+	| client_id           | did:client           |
+	| client_metadata_uri | http://localhost     |
+	| client_metadata     | { }                  |
 	
 	And extract JSON from body
 	
@@ -27,7 +27,7 @@ Scenario: When the client is not registered then only one parameter (client_meta
 Scenario: When the client is not registered then the parameter client_metadata or client_metadata_uri is required
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key                 | Value            |
-	| client_id           | client           |
+	| client_id           | did:client       |
 	
 	And extract JSON from body
 	
@@ -37,9 +37,9 @@ Scenario: When the client is not registered then the parameter client_metadata o
 	
 Scenario: The client_metadata_uri must be valid
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key                 | Value                     |
-	| client_id           | client                    |
-	| client_metadata_uri | http://clientmetadata.com |
+	| Key                 | Value                         |
+	| client_id           | did:client                    |
+	| client_metadata_uri | http://clientmetadata.com     |
 	
 	And extract JSON from body
 	
@@ -49,9 +49,9 @@ Scenario: The client_metadata_uri must be valid
 
 Scenario: Response type is required
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key             | Value     |
-	| client_id       | client    |
-	| client_metadata | { }       |
+	| Key             | Value         |
+	| client_id       | did:client    |
+	| client_metadata | { }           |
 	
 	And extract JSON from body
 	
@@ -61,10 +61,10 @@ Scenario: Response type is required
 
 Scenario: Response type must be supported
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key             | Value        |
-	| response_type   | invalid      |
-	| client_id       | client       |
-	| client_metadata | { }          |
+	| Key             | Value            |
+	| response_type   | invalid          |
+	| client_id       | did:client       |
+	| client_metadata | { }              |
 	
 	And extract JSON from body
 	
@@ -74,10 +74,10 @@ Scenario: Response type must be supported
 
 Scenario: Scope is required
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key             | Value        |
-	| response_type   | code         |
-	| client_id       | client       |
-	| client_metadata | { }          |
+	| Key             | Value            |
+	| response_type   | code             |
+	| client_id       | did:client       |
+	| client_metadata | { }              |
 	
 	And extract JSON from body
 	
@@ -87,11 +87,11 @@ Scenario: Scope is required
 
 Scenario: Redirect_uri is required
 	When execute HTTP GET request 'http://localhost/authorization'
-	| Key             | Value        |
-	| response_type   | code         |
-	| client_id       | client       |
-	| client_metadata | { }          |
-	| scope           | openid       |
+	| Key             | Value            |
+	| response_type   | code             |
+	| client_id       | did:client       |
+	| client_metadata | { }              |
+	| scope           | openid           |
 	
 	And extract JSON from body
 	

@@ -75,5 +75,12 @@ public class CredentialConfigurationBuilder
         return this;
     }
 
+    public CredentialConfigurationBuilder SetSchema(string id, string type)
+    {
+        _credentialConfiguration.CredentialSchemaId = id;
+        _credentialConfiguration.CredentialSchemaType = type;
+        return this;
+    }
+
     public CredentialConfiguration Build() => _credentialConfiguration;
 }

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Infrastructures;
@@ -23,6 +22,7 @@ public interface IClientHelper
     Task<JsonWebKey> ResolveJsonWebKey(Client client, string kid, CancellationToken cancellationToken);
     Task<IEnumerable<JsonWebKey>> ResolveJsonWebKeys(Client client, CancellationToken cancellationToken);
     Task<IEnumerable<JsonWebKey>> ResolveJsonWebKeys(string jwksUri, CancellationToken cancellationToken);
+    bool IsNonPreRegisteredRelyingParty(string clientId);
     Task<Client> ResolveSelfDeclaredClient(JsonObject request, CancellationToken cancellationToken);
 }
 
@@ -97,6 +97,12 @@ public class OAuthClientHelper : IClientHelper
         }
     }
 
+    public bool IsNonPreRegisteredRelyingParty(string clientId)
+    {
+        if (clientId.StartsWith($"{SimpleIdServer.Did.Constants.Scheme}:")) return true;
+        return false;
+    }
+
     public async Task<Client> ResolveSelfDeclaredClient(JsonObject request, CancellationToken cancellationToken)
     {
         var clientMetadataUri = request.GetClientMetadataUri();
@@ -120,6 +126,7 @@ public class OAuthClientHelper : IClientHelper
         }
 
         clientMetadata.ClientId = clientId;
+        clientMetadata.IsSelfIssueEnabled = true;
         return clientMetadata;
     }
 }

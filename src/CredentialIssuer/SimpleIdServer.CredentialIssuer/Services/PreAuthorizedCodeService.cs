@@ -37,8 +37,6 @@ public class PreAuthorizedCodeService : IPreAuthorizedCodeService
                 { "client_id", _options.ClientId },
                 { "client_secret", _options.ClientSecret },
                 { "grant_type", "urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code" },
-                { "subject_token", accessToken },
-                { "subject_token_type", "urn:ietf:params:oauth:token-type:access_token" },
                 { "scope", string.Join((" "), scopes) }
             };
             var requestMessage = new HttpRequestMessage

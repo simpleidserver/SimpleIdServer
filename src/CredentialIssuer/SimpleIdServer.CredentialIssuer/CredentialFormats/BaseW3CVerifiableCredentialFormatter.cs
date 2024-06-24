@@ -76,12 +76,17 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
             request.JsonLdContext,
             request.Issuer,
             request.Type,
+            request.AdditionalTypes,
             request.ValidFrom,
             request.ValidUntil);
-        builder.AddCredentialSubject(request.Subject, (b) =>
+        builder.AddCredentialSubject(request.RequestSubject, (b) =>
         {
+            b.SetPersonalIdentifier(request.Subject);
             Build(request.UserClaims, b.Build(), 1);
         });
+        if(request.Schema != null)
+            builder.SetSchema(request.Schema.Id, request.Schema.Type);
+
         return builder.Build();
     }
 

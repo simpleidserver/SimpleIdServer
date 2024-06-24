@@ -515,6 +515,11 @@ namespace SimpleIdServer.IdServer.Domains
         public double DPOPNonceLifetimeInSeconds { get; set; } = 5 * 60;
         [JsonPropertyName(OAuthClientParameters.IsRedirectUrlCaseSensitive)]
         public bool IsRedirectUrlCaseSensitive { get; set; } = false;
+        /// <summary>
+        /// Enable or disable self-issued.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.IsSelfIssueEnabled)]
+        public bool IsSelfIssueEnabled { get; set; }
         [JsonPropertyName(OAuthClientParameters.Parameters)]
         public JsonObject Parameters
         {

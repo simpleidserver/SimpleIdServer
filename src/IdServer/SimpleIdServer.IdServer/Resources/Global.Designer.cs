@@ -2077,6 +2077,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à self-issued request cannot request access to scope different to OPENID.
+        /// </summary>
+        public static string ScopeDifferentToOpenidCannotBeSelfIssued {
+            get {
+                return ResourceManager.GetString("ScopeDifferentToOpenidCannotBeSelfIssued", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The same mapping type cannot be added twice..
         /// </summary>
         public static string ScopeMapperTypeUnique {

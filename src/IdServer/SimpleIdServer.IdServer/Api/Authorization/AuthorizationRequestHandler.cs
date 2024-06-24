@@ -41,6 +41,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
+        private readonly IClientRepository _clientRepository;
+        private readonly IClientHelper _clientHelper;
         private readonly IdServerHostOptions _options;
 
         public AuthorizationRequestHandler(IAuthorizationRequestValidator validator,
@@ -52,6 +54,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder,
             IGrantedTokenHelper grantedTokenHelper,
+            IClientRepository clientRepository,
+            IClientHelper clientHelper,
             IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
@@ -63,6 +67,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _transactionBuilder = transactionBuilder;
             _jwtBuilder = jwtBuilder;
             _grantedTokenHelper = grantedTokenHelper;
+            _clientRepository = clientRepository;
+            _clientHelper = clientHelper;
             _options = options.Value;
         }
 
@@ -106,8 +112,16 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                if (_options.Type == IdServerTypes.STANDARD) return await BuildStandardResponse(transaction, context, cancellationToken);
-                return await BuildSelfIssuedResponse(context, cancellationToken);
+                var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
+                if (string.IsNullOrWhiteSpace(clientId))
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ClientId));
+                var client = await _clientRepository.GetByClientId(context.Realm, clientId, cancellationToken);
+                if (client != null)
+                    context.SetClient(client);
+                if (_clientHelper.IsNonPreRegisteredRelyingParty(clientId) || (client != null && client.IsSelfIssueEnabled))
+                    return await BuildSelfIssuedResponse(context, cancellationToken);
+
+                return await BuildStandardResponse(transaction, context, cancellationToken);
             }
         }
 

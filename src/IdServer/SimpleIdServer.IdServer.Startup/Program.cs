@@ -15,7 +15,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
-using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Console;
@@ -23,7 +22,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Notification.Gotify;
-using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
@@ -140,7 +138,6 @@ void ConfigureIdServer(IServiceCollection services)
 {
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
-            cb.Type = IdServerTypes.SELFISSUED;
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;

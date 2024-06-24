@@ -135,10 +135,11 @@ public class SecuredDocument
                 asymKey = new JsonWebKeySecurityKey(verificationMethod.PrivateKeyJwk);
             else
                 asymKey = _verificationMethodEncoding.Decode(verificationMethod);
-        var signingCredentials = asymKey.BuildSigningCredentials();
+        var signingCredentials = asymKey.BuildSigningCredentials($"{didDocument.Id}#{verificationMethod.Id}");
         var claims = new Dictionary<string, object>
         {
             { "sub", subject },
+            { "jti", vcCredential.Id },
             { "vc", new W3CVerifiableCredentialJsonSerializer().SerializeToDic(vcCredential) }
         };
         var securityTokenDescriptor = new SecurityTokenDescriptor

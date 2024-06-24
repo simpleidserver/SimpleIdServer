@@ -12,10 +12,24 @@ Scenario: Send 'grant_type=authorization_code' with no code parameter
 	And JSON '$.error_description'='missing parameter code'
 
 Scenario: Send 'grant_type=authorization_code,code=code' with no redirect_uri
+	Given authenticate a user
+	When execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value                 |
+	| response_type | code                  |
+	| client_id     | thirdClient           |
+	| state         | state                 |
+	| redirect_uri  | http://localhost:8080 |
+	| response_mode | query                 |
+	| scope         | secondScope			|
+
+	And extract parameter 'code' from redirect url
+
 	When execute HTTP POST request 'https://localhost:8080/token'
-	| Key        | Value              |
-	| grant_type | authorization_code |
-	| code       | code               |
+	| Key           | Value                 |
+	| client_id     | thirdClient			|
+	| client_secret | password     			|
+	| grant_type    | authorization_code	|
+	| code			| $code$				|
 
 	And extract JSON from body
 	Then HTTP status code equals to '400'
@@ -23,10 +37,22 @@ Scenario: Send 'grant_type=authorization_code,code=code' with no redirect_uri
 	And JSON '$.error_description'='missing parameter redirect_uri'
 	
 Scenario: Send 'grant_type=authorization_code,code=code,redirect_uri=http://localhost,client_id=firstClient,client_secret=password' with unauthorized grant_type
-	When execute HTTP POST request 'https://localhost:8080/token'
+	Given authenticate a user
+	When execute HTTP GET request 'https://localhost:8080/authorization'
+	| Key           | Value                 |
+	| response_type | code                  |
+	| client_id     | thirdClient           |
+	| state         | state                 |
+	| redirect_uri  | http://localhost:8080 |
+	| response_mode | query                 |
+	| scope         | secondScope			|
+
+	And extract parameter 'code' from redirect url
+
+	And execute HTTP POST request 'https://localhost:8080/token'
 	| Key           | Value              |
 	| grant_type    | authorization_code |
-	| code          | code  	         |
+	| code          | $code$  	         |
 	| redirect_uri  | http://localhost   |
 	| client_id     | firstClient        |
 	| client_secret | password           |

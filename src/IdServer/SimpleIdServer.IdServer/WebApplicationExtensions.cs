@@ -27,14 +27,6 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.UseAuthentication();
             webApplication.UseAuthorization();
 
-            RegisterSelfIssuedIdServerEdps(webApplication, opts, usePrefix);
-            if (opts.Type == IdServerTypes.STANDARD) RegisterStandardIdServerEdps(webApplication, opts, usePrefix);
-
-            return webApplication;
-        }
-
-        private static void RegisterSelfIssuedIdServerEdps(WebApplication webApplication, IdServerHostOptions opts, bool usePrefix)
-        {
             webApplication.SidMapControllerRoute("oauthConfiguration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.OAuthConfiguration,
                 defaults: new { controller = "OAuthConfiguration", action = "Get" });
@@ -86,10 +78,7 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("registerClientUpdate",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
                 defaults: new { controller = "Registration", action = "Update" });
-        }
 
-        private static void RegisterStandardIdServerEdps(WebApplication webApplication, IdServerHostOptions opts, bool usePrefix)
-        {
 
             webApplication.SidMapControllerRoute("userInfoGet",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
@@ -567,6 +556,8 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.MapControllerRoute(
                 name: "default",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{controller=Home}/{action=Index}/{id?}");
+
+            return webApplication;
         }
     }
 }

@@ -20,6 +20,12 @@ public class CredentialSubjectBuilder
         return new CredentialSubjectBuilder(jsonObj);
     }
 
+    public CredentialSubjectBuilder SetPersonalIdentifier(string personalIdentifier)
+    {
+        _jsonObj.Add("personalIdentifier", personalIdentifier);
+        return this;
+    }
+
     public CredentialSubjectBuilder AddClaim(string name, string value)
     {
         _jsonObj.Add(name, value);

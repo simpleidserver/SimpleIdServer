@@ -32,7 +32,8 @@ public class CredentialIssuerConfiguration
             .AddDisplay("University Credential", "en-US", "https://img.freepik.com/premium-vector/logo-university-name-logo-company-called-university_516670-732.jpg", "A square logo of a university", null,"#12107c", "#acd2b1")
             .Build(),
         CredentialConfigurationBuilder
-            .New(JwtVcJsonFormatter.FORMAT, "CTWalletSameAuthorisedInTime", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", additionalTypes: new List<string> { "VerifiableAttestation" })
+            .New(JwtVcJsonFormatter.FORMAT, "CTWalletSameAuthorisedInTime", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", additionalTypes: new List<string> { "VerifiableAttestation" }, scope: "wallet")
+            .SetSchema("https://api-pilot.ebsi.eu/trusted-schemas-registry/v2/schemas/z3MgUFUkb722uq4x3dv5yAJmnNmzDFeK5UC8x83QoeLJM", "FullJsonSchemaValidator2021")
             .Build()
     };
 

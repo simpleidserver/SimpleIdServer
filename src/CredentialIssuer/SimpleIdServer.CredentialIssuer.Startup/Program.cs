@@ -1,4 +1,5 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+﻿
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -99,6 +100,7 @@ builder.Services.AddCredentialIssuer(o =>
     o.ClientSecret = builder.Configuration["Authorization:ClientSecret"];
     o.AuthorizationServer = builder.Configuration["Authorization:Issuer"];
     o.IgnoreHttpsCertificateError = ignoreCertificateError;
+    o.IsDeveloperModeEnabled = true;
 })
 .UseInMemoryStore(c =>
 {
@@ -106,10 +108,7 @@ builder.Services.AddCredentialIssuer(o =>
     c.AddUserCredentialClaims(CredentialIssuerConfiguration.CredentialClaims);
 });
 
-builder.Services.AddDidKey(c =>
-{
-    c.PublicKeyFormat = JsonWebKey2020Standard.TYPE;
-});
+builder.Services.AddDidKey();
 
 var app = builder.Build();
 app.UseStaticFiles();

@@ -54,7 +54,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         [HttpPost]
         public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
-            var subject = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var requestSubject = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
             var issuerState = User.Claims.SingleOrDefault(c => c.Type == "issuer_state")?.Value;
             var authorizedScopes = new List<string>();
@@ -65,11 +65,10 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
 
             var validationResult = await Validate(request, issuerState, authorizedScopes, cancellationToken);
             if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
-            if (!string.IsNullOrWhiteSpace(validationResult.Subject))
-                subject = validationResult.Subject;
             var buildRequest = new BuildCredentialRequest
             {
-                Subject = subject,
+                RequestSubject = requestSubject,
+                Subject = validationResult.Subject,
                 Issuer = _options.DidDocument.Id
             };
             var claims = new List<CredentialUserClaimNode>();
@@ -99,13 +98,23 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 buildRequest.JsonLdContext = validationResult.CredentialTemplate.JsonLdContext;
                 buildRequest.Type = validationResult.CredentialTemplate.Type;
                 buildRequest.CredentialConfiguration = validationResult.CredentialTemplate;
+                buildRequest.AdditionalTypes = validationResult.CredentialTemplate.AdditionalTypes;
+                buildRequest.ValidFrom = DateTime.UtcNow;
                 if (_options.CredentialExpirationTimeInSeconds != null)
                 {
-                    buildRequest.ValidFrom = DateTime.UtcNow;
                     buildRequest.ValidUntil = DateTime.UtcNow.AddSeconds(_options.CredentialExpirationTimeInSeconds.Value);
                 }
 
-                var userCredentials = await _userCredentialClaimStore.Resolve(subject, validationResult.CredentialTemplate.Claims, cancellationToken);
+                if(!string.IsNullOrWhiteSpace(validationResult.CredentialTemplate.CredentialSchemaId))
+                {
+                    buildRequest.Schema = new CredentialSchema
+                    {
+                        Id = validationResult.CredentialTemplate.CredentialSchemaId,
+                        Type = validationResult.CredentialTemplate.CredentialSchemaType
+                    };
+                }
+
+                var userCredentials = await _userCredentialClaimStore.Resolve(validationResult.Subject, validationResult.CredentialTemplate.Claims, cancellationToken);
                 userClaims = userCredentials.Select(c =>
                 {
                     var cl = validationResult.CredentialTemplate.Claims.Single(cl => cl.SourceUserClaimName == c.Name);
@@ -137,6 +146,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
 
             return new OkObjectResult(new CredentialResult
             {
+                Format = validationResult.Formatter.Format,
                 Credential = credentialResult,
                 CNonce = validationResult.Nonce
             });
@@ -189,10 +199,11 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
 
             if (!string.IsNullOrWhiteSpace(issuerState))
             {
+                var formatter = _formatters.SingleOrDefault(f => f.Format == credentialRequest.Format);
                 var credentialOffer = await _credentialOfferStore.GetByIssuerState(issuerState, cancellationToken);
                 if (credentialOffer == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_ISSUER_STATE));
                 var credentialConfiguration = await _credentialConfigurationStore.GetByServerId(credentialOffer.CredentialConfigurationIds.First(), cancellationToken);
-                // TODO
+                return CredentialValidationResult.Ok(formatter, credentialConfiguration, credentialOffer.Subject, nonce);
             }
 
             if (!string.IsNullOrWhiteSpace(credentialRequest.Format))

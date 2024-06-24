@@ -789,6 +789,9 @@
   <data name="ScopeClaimMapperTokenClaimNameMustBeUnique" xml:space="preserve">
     <value>Token claim name must be unique</value>
   </data>
+  <data name="ScopeDifferentToOpenidCannotBeSelfIssued" xml:space="preserve">
+    <value>self-issued request cannot request access to scope different to OPENID</value>
+  </data>
   <data name="ScopeMapperTypeUnique" xml:space="preserve">
     <value>The same mapping type cannot be added twice.</value>
   </data>

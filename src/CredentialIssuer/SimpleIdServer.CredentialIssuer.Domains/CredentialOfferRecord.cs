@@ -15,7 +15,6 @@ public class CredentialOfferRecord
     public List<string> CredentialConfigurationIds { get; set; } = new List<string>();
     [JsonIgnore]
     public string? PreAuthorizedCode { get; set; } = null;
-    [JsonIgnore]
     public string? IssuerState { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
 }

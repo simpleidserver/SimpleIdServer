@@ -18,10 +18,7 @@ var s = new SymmetricSecurityKey(p)
     KeyId = Guid.NewGuid().ToString()
 };
 
-builder.Services.AddSIDIdentityServer(o =>
-{
-    o.Type = SimpleIdServer.IdServer.Options.IdServerTypes.SELFISSUED;
-})
+builder.Services.AddSIDIdentityServer()
     .UseInMemoryEFStore(o =>
     {
         o.AddInMemoryRealms(IdServerConfiguration.Realms);

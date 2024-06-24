@@ -10,7 +10,6 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
-using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,39 +24,33 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
     {
         private readonly IEnumerable<IResponseTypeHandler> _responseTypeHandlers;
         private readonly IUserHelper _userHelper;
-        private readonly IClientRepository _clientRepository;
         private readonly IGrantHelper _grantHelper;
         private readonly IAmrHelper _amrHelper;
         private readonly IExtractRequestHelper _extractRequestHelper;
         private readonly IEnumerable<IOAuthResponseMode> _oauthResponseModes;
         private readonly IClientHelper _clientHelper;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
         private readonly IdServerHostOptions _options;
 
         public OAuthAuthorizationRequestValidator(
             IEnumerable<IResponseTypeHandler> responseTypeHandlers, 
             IUserHelper userHelper, 
-            IClientRepository clientRepository, 
             IGrantHelper grantHelper, 
             IAmrHelper amrHelper, 
             IExtractRequestHelper extractRequestHelper, 
             IEnumerable<IOAuthResponseMode> oauthResponseModes, 
             IClientHelper clientHelper, 
             IJwtBuilder jwtBuilder,
-            Infrastructures.IHttpClientFactory httpClientFactory,
             IOptions<IdServerHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
             _userHelper = userHelper;
-            _clientRepository = clientRepository;
             _grantHelper = grantHelper;
             _amrHelper = amrHelper;
             _extractRequestHelper = extractRequestHelper;
             _oauthResponseModes = oauthResponseModes;
             _clientHelper = clientHelper;
             _jwtBuilder = jwtBuilder;
-            _httpClientFactory = httpClientFactory;
             _options = options.Value;
         }
 
@@ -69,48 +62,35 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 
         public virtual async Task<AuthorizationRequestValidationResult> ValidateStandardAuthorizationRequest(HandlerContext context, string clientId, CancellationToken cancellationToken)
         {
-            context.SetClient(await AuthenticateClient(context.Realm, clientId, cancellationToken));
+            if (context.Client == null)
+                throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
             return await CommonValidationAuthorizationRequest(context, cancellationToken);
-
-            async Task<Client> AuthenticateClient(string realm, string clientId, CancellationToken cancellationToken)
-            {
-                if (string.IsNullOrWhiteSpace(clientId))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ClientId));
-
-                var client = await _clientRepository.GetByClientId(realm, clientId, cancellationToken);
-                if (client == null)
-                    throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
-
-                return client;
-            }
         }
 
         public virtual async Task<AuthorizationRequestValidationResult> ValidateSelfIssuedAuthorizationRequest(HandlerContext context, CancellationToken cancellationToken)
         {
             await ValidateClient();
+            var scopes = context.Request.RequestData.GetScopes();
+            var unexpectedScopes = scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name);
+            if (unexpectedScopes.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ScopeDifferentToOpenidCannotBeSelfIssued);
             var result = await CommonValidationAuthorizationRequest(context, cancellationToken);
             return result;
 
             async Task ValidateClient()
             {
-                var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
-                if (string.IsNullOrWhiteSpace(clientId))
-                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ClientId));
-
                 var clientMetadataUri = context.Request.RequestData.GetClientMetadataUri();
                 var clientMetadata = context.Request.RequestData.GetClientMetadata();
                 if (!string.IsNullOrWhiteSpace(clientMetadataUri) && clientMetadata != null)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.CannotUseClientMetadataAndClientMetadataUri);
 
-                var client = await _clientRepository.GetByClientId(context.Realm, clientId, cancellationToken);
-                if (client != null)
+                if (context.Client != null)
                 {
-                    context.SetClient(client);
                     if (clientMetadata != null || !string.IsNullOrWhiteSpace(clientMetadataUri))
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ClientMetadataCannotBeUsedWithRegisteredClient);
                 }
                 else
                 {
+                    var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
                     var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();
                     if (clientMetadata == null && string.IsNullOrWhiteSpace(clientMetadataUri))

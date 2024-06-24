@@ -2,7 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.Did.Serializers;
 using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace SimpleIdServer.Did.Crypto;
 
@@ -46,7 +48,9 @@ public class JsonWebKeySecurityKey : IAsymmetricKey
 
     public byte[] GetPublicKey(bool compressed = false)
     {
-        throw new System.NotImplementedException();
+        _jwk.Alg = null;
+        var json = JsonWebKeySerializer.Write(_jwk);
+        return System.Text.Encoding.UTF8.GetBytes(json);
     }
 
     public void Import(byte[] publicKey, byte[] privateKey)

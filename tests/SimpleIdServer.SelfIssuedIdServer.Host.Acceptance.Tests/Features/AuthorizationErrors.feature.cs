@@ -146,7 +146,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table10.AddRow(new string[] {
                             "client_id",
-                            "client"});
+                            "did:client"});
                 table10.AddRow(new string[] {
                             "client_metadata_uri",
                             "http://localhost"});
@@ -199,7 +199,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table11.AddRow(new string[] {
                             "client_id",
-                            "client"});
+                            "did:client"});
 #line 28
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table11, "When ");
 #line hidden
@@ -243,7 +243,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table12.AddRow(new string[] {
                             "client_id",
-                            "client"});
+                            "did:client"});
                 table12.AddRow(new string[] {
                             "client_metadata_uri",
                             "http://clientmetadata.com"});
@@ -290,7 +290,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table13.AddRow(new string[] {
                             "client_id",
-                            "client"});
+                            "did:client"});
                 table13.AddRow(new string[] {
                             "client_metadata",
                             "{ }"});
@@ -339,7 +339,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "invalid"});
                 table14.AddRow(new string[] {
                             "client_id",
-                            "client"});
+                            "did:client"});
                 table14.AddRow(new string[] {
                             "client_metadata",
                             "{ }"});
@@ -388,7 +388,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "code"});
                 table15.AddRow(new string[] {
                             "client_id",
-                            "client"});
+                            "did:client"});
                 table15.AddRow(new string[] {
                             "client_metadata",
                             "{ }"});
@@ -438,7 +438,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "code"});
                 table16.AddRow(new string[] {
                             "client_id",
-                            "client"});
+                            "did:client"});
                 table16.AddRow(new string[] {
                             "client_metadata",
                             "{ }"});
