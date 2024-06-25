@@ -21,8 +21,7 @@ namespace SimpleIdServer.IdServer.Startup
     {
         private static AuthenticationSchemeProviderDefinition Facebook = AuthenticationSchemeProviderDefinitionBuilder.Create("facebook", "Facebook", typeof(FacebookHandler), typeof(FacebookOptionsLite)).Build();
         private static AuthenticationSchemeProviderDefinition Google = AuthenticationSchemeProviderDefinitionBuilder.Create("google", "Google", typeof(GoogleHandler), typeof(GoogleOptionsLite)).Build();
-        private static AuthenticationSchemeProviderDefinition Negotiate = AuthenticationSchemeProviderDefinitionBuilder.Create("negotiate", "Negotiate", typeof(NegotiateHandler), typeof(NegotiateOptionsLite)).Build();
-
+        
         private static IdentityProvisioningDefinition Scim = IdentityProvisioningDefinitionBuilder.Create<SCIMRepresentationsExtractionJobOptions>(SimpleIdServer.IdServer.Provisioning.SCIM.Services.SCIMProvisioningService.NAME, "SCIM")
             .AddUserSubjectMappingRule("$.userName")
             .AddUserPropertyMappingRule("$.name.familyName", nameof(User.Lastname))
@@ -99,7 +98,7 @@ namespace SimpleIdServer.IdServer.Startup
             ClientBuilder.BuildWalletClient("walletClient", "password")
                 .SetClientName("Wallet")
                 .Build(),
-            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://e1a9-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
+            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://0e42-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
                 .SetClientName("Credential issuer")
                 .AddScope(
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -199,8 +198,7 @@ namespace SimpleIdServer.IdServer.Startup
         public static ICollection<AuthenticationSchemeProviderDefinition> ProviderDefinitions => new List<AuthenticationSchemeProviderDefinition>
         {
             Facebook,
-            Google,
-            Negotiate
+            Google
         };
 
         public static ICollection<Language> Languages => new List<Language>
@@ -212,9 +210,6 @@ namespace SimpleIdServer.IdServer.Startup
         {
            AuthenticationSchemeProviderBuilder.Create(Facebook, "Facebook", "Facebook", "Facebook").Build(),
            AuthenticationSchemeProviderBuilder.Create(Google, "Google", "Google", "Google").Build(),
-           AuthenticationSchemeProviderBuilder.Create(Negotiate, "Negotiate", "Negotiate", "Negotiate")
-            .SetMappers(SimpleIdServer.IdServer.Constants.GetNegotiateIdProviderMappers())
-            .Build()
         };
 
         public static ICollection<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>

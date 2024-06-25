@@ -21,7 +21,6 @@ public class BuildCredentialRequest
 {
     public string Id { get; set; }
     public string Issuer { get; set; }
-    public string RequestSubject { get; set; }
     public string Subject { get; set; }
     public string Type { get; set; }
     public string JsonLdContext { get; set; }

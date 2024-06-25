@@ -6,7 +6,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.CredentialIssuer.CredentialFormats;
-using SimpleIdServer.CredentialIssuer.Domains;
 using SimpleIdServer.CredentialIssuer.Store;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
@@ -29,6 +28,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         private readonly ICredentialStore _credentialStore;
         private readonly ICredentialConfigurationStore _credentialConfigurationStore;
         private readonly ICredentialOfferStore _credentialOfferStore;
+        private readonly IDeferredCredentialStore _deferredCredentialStore;
         private readonly IUserCredentialClaimStore _userCredentialClaimStore;
         private readonly IEnumerable<IKeyProofTypeValidator> _keyProofTypeValidators;
         private readonly CredentialIssuerOptions _options;
@@ -38,6 +38,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             ICredentialStore credentialStore,
             ICredentialConfigurationStore credentialConfigurationStore,
             ICredentialOfferStore credentialOfferStore,
+            IDeferredCredentialStore deferredCredentialStore,
             IUserCredentialClaimStore userCredentialClaimStore,
             IEnumerable<IKeyProofTypeValidator> keyProofTypeValidators,
             IOptions<CredentialIssuerOptions> options)
@@ -46,6 +47,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             _credentialStore = credentialStore;
             _credentialConfigurationStore = credentialConfigurationStore;
             _credentialOfferStore = credentialOfferStore;
+            _deferredCredentialStore = deferredCredentialStore;
             _userCredentialClaimStore = userCredentialClaimStore;
             _keyProofTypeValidators = keyProofTypeValidators;
             _options = options.Value;
@@ -54,107 +56,149 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
         [HttpPost]
         public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
         {
-            var requestSubject = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
-            var issuerState = User.Claims.SingleOrDefault(c => c.Type == "issuer_state")?.Value;
             var authorizedScopes = new List<string>();
             if (!string.IsNullOrWhiteSpace(scope))
-            {
                 authorizedScopes = scope.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
-            }
 
-            var validationResult = await Validate(request, issuerState, authorizedScopes, cancellationToken);
+            var validationResult = await Validate(request, authorizedScopes, cancellationToken);
             if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
+            if (validationResult.CredentialConfiguration.IsDeferred)
+                return new OkObjectResult(await BuildDeferredCredential(validationResult, cancellationToken));
+
+            return new OkObjectResult(await BuildImmediateCredential(request, validationResult, cancellationToken));
+        }
+
+        #region Deferred credential
+
+        private async Task<CredentialResult> BuildDeferredCredential(
+            CredentialValidationResult validationResult,
+            CancellationToken cancellationToken)
+        {
+            var deferredCredential = new Domains.DeferredCredential
+            {
+                Status = Domains.DeferredCredentialStatus.PENDING,
+                TransactionId = Guid.NewGuid().ToString(),
+                CredentialConfigurationId = validationResult.CredentialConfiguration.Id,
+                CredentialId = validationResult.Credential?.Id
+            };
+            _deferredCredentialStore.Add(deferredCredential);
+            await _deferredCredentialStore.SaveChanges(cancellationToken);
+            return new CredentialResult
+            {
+                TransactionId = deferredCredential.TransactionId,   
+                CNonce = validationResult.Nonce
+            };
+
+        }
+
+        #endregion
+
+        #region Immediate credential
+
+        private async Task<CredentialResult> BuildImmediateCredential(CredentialRequest request,
+            CredentialValidationResult validationResult, 
+            CancellationToken cancellationToken)
+        {
+            var userDid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var buildRequest = new BuildCredentialRequest
             {
-                RequestSubject = requestSubject,
                 Subject = validationResult.Subject,
-                Issuer = _options.DidDocument.Id
+                Issuer = _options.DidDocument.Id,
+                JsonLdContext = validationResult.CredentialConfiguration.JsonLdContext,
+                Type = validationResult.CredentialConfiguration.Type,
+                CredentialConfiguration = validationResult.CredentialConfiguration,
+                AdditionalTypes = validationResult.CredentialConfiguration.AdditionalTypes,
             };
-            var claims = new List<CredentialUserClaimNode>();
-            List<CredentialUserClaimNode> userClaims = null;
+
+            if (!string.IsNullOrWhiteSpace(validationResult.CredentialConfiguration.CredentialSchemaId))
+            {
+                buildRequest.Schema = new CredentialSchema
+                {
+                    Id = validationResult.CredentialConfiguration.CredentialSchemaId,
+                    Type = validationResult.CredentialConfiguration.CredentialSchemaType
+                };
+            }
+
+            Dictionary<string, string> claims = null;
             if (validationResult.Credential != null)
-            {
-                buildRequest.Id = $"{validationResult.Credential.Configuration.BaseUrl}/{validationResult.Credential.CredentialId}";
-                buildRequest.JsonLdContext = validationResult.Credential.Configuration.JsonLdContext;
-                buildRequest.Type = validationResult.Credential.Configuration.Type;
-                buildRequest.ValidFrom = validationResult.Credential.IssueDateTime;
-                buildRequest.ValidUntil = validationResult.Credential.ExpirationDateTime;
-                buildRequest.CredentialConfiguration = validationResult.Credential.Configuration;
-                userClaims = validationResult.Credential.Claims.Select(c =>
-                {
-                    var cl = validationResult.CredentialTemplate.Claims.Single(cl => cl.SourceUserClaimName == c.Name);
-                    return new CredentialUserClaimNode
-                    {
-                        Level = cl.Name.Split('.').Count(),
-                        Name = cl.Name,
-                        Value = c.Value
-                    };
-                }).ToList();
-            }
+                claims = Enrich(buildRequest, validationResult.Credential);
             else
+                claims = await Enrich(buildRequest, validationResult.CredentialConfiguration, cancellationToken);
+
+            buildRequest.UserClaims = claims.Select(kvp =>
             {
-                buildRequest.Id = $"{validationResult.CredentialTemplate.BaseUrl}/{Guid.NewGuid()}";
-                buildRequest.JsonLdContext = validationResult.CredentialTemplate.JsonLdContext;
-                buildRequest.Type = validationResult.CredentialTemplate.Type;
-                buildRequest.CredentialConfiguration = validationResult.CredentialTemplate;
-                buildRequest.AdditionalTypes = validationResult.CredentialTemplate.AdditionalTypes;
-                buildRequest.ValidFrom = DateTime.UtcNow.Date;
-                if (_options.CredentialExpirationTimeInSeconds != null)
+                var cl = validationResult.CredentialConfiguration.Claims.Single(cl => cl.SourceUserClaimName == kvp.Key);
+                return new CredentialUserClaimNode
                 {
-                    buildRequest.ValidUntil = DateTime.UtcNow.Date.AddSeconds(_options.CredentialExpirationTimeInSeconds.Value);
-                }
-
-                if(!string.IsNullOrWhiteSpace(validationResult.CredentialTemplate.CredentialSchemaId))
-                {
-                    buildRequest.Schema = new CredentialSchema
-                    {
-                        Id = validationResult.CredentialTemplate.CredentialSchemaId,
-                        Type = validationResult.CredentialTemplate.CredentialSchemaType
-                    };
-                }
-
-                var userCredentials = await _userCredentialClaimStore.Resolve(validationResult.Subject, validationResult.CredentialTemplate.Claims, cancellationToken);
-                userClaims = userCredentials.Select(c =>
-                {
-                    var cl = validationResult.CredentialTemplate.Claims.Single(cl => cl.SourceUserClaimName == c.Name);
-                    return new CredentialUserClaimNode
-                    {
-                        Level = cl.Name.Split('.').Count(),
-                        Name = cl.Name,
-                        Value = c.Value
-                    };
-                }).ToList();
-            }
-
-            buildRequest.UserClaims = userClaims;
+                    Level = cl.Name.Split('.').Count(),
+                    Name = cl.Name,
+                    Value = kvp.Value
+                };
+            }).ToList();
             var formatter = validationResult.Formatter;
-            var credentialResult = formatter.Build(buildRequest, 
-                _options.DidDocument, 
-                _options.VerificationMethodId, 
+            var credentialResult = formatter.Build(buildRequest,
+                _options.DidDocument,
+                _options.VerificationMethodId,
                 _options.AsymmKey);
-            if(request.CredentialResponseEncryption != null)
+            if (request.CredentialResponseEncryption != null)
             {
                 var handler = new JsonWebTokenHandler();
                 var encKey = request.CredentialResponseEncryption.Jwk;
                 var encryptedCredential = handler.EncryptToken(credentialResult.ToJsonString(), new Microsoft.IdentityModel.Tokens.EncryptingCredentials(
-                    encKey,
+                encKey,
                     request.CredentialResponseEncryption.Alg,
                     request.CredentialResponseEncryption.Enc));
                 credentialResult = encryptedCredential;
             }
 
-            return new OkObjectResult(new CredentialResult
+            return new CredentialResult
             {
                 Format = validationResult.Formatter.Format,
                 Credential = credentialResult,
                 CNonce = validationResult.Nonce
-            });
+            };
         }
+
+        private Dictionary<string, string> Enrich(
+            BuildCredentialRequest buildRequest, 
+            Domains.Credential credential)
+        {
+            buildRequest.Id = $"{credential.Configuration.BaseUrl}/{credential.CredentialId}";
+            buildRequest.ValidFrom = credential.IssueDateTime;
+            buildRequest.ValidUntil = credential.ExpirationDateTime;
+            return credential.Claims.ToDictionary(c => c.Name, c => c.Value);
+        }
+
+        private async Task<Dictionary<string, string>> Enrich(
+            BuildCredentialRequest buildRequest,
+            Domains.CredentialConfiguration credentialConfiguration,
+            CancellationToken cancellationToken)
+        {
+            buildRequest.Id = $"{credentialConfiguration.BaseUrl}/{Guid.NewGuid()}";
+            buildRequest.ValidFrom = DateTime.UtcNow.Date;
+            if (_options.CredentialExpirationTimeInSeconds != null)
+            {
+                buildRequest.ValidUntil = DateTime.UtcNow.Date.AddSeconds(_options.CredentialExpirationTimeInSeconds.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(credentialConfiguration.CredentialSchemaId))
+            {
+                buildRequest.Schema = new CredentialSchema
+                {
+                    Id = credentialConfiguration.CredentialSchemaId,
+                    Type = credentialConfiguration.CredentialSchemaType
+                };
+            }
+
+            var userCredentials = await _userCredentialClaimStore.Resolve(buildRequest.Subject, credentialConfiguration.Claims, cancellationToken);
+            return userCredentials.ToDictionary(c => c.Name, c => c.Value);
+        }
+
+        #endregion
 
         private async Task<CredentialValidationResult> Validate(
             CredentialRequest credentialRequest, 
-            string issuerState,
             List<string> authorizedScopes, 
             CancellationToken cancellationToken)
         {
@@ -197,15 +241,6 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                     return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_ENCRYPTION_PARAMETERS, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialRequestNames.Jwk)));
             }
 
-            if (!string.IsNullOrWhiteSpace(issuerState))
-            {
-                var formatter = _formatters.SingleOrDefault(f => f.Format == credentialRequest.Format);
-                var credentialOffer = await _credentialOfferStore.GetByIssuerState(issuerState, cancellationToken);
-                if (credentialOffer == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.INVALID_ISSUER_STATE));
-                var credentialConfiguration = await _credentialConfigurationStore.GetByServerId(credentialOffer.CredentialConfigurationIds.First(), cancellationToken);
-                return CredentialValidationResult.Ok(formatter, credentialConfiguration, credentialOffer.Subject, nonce);
-            }
-
             if (!string.IsNullOrWhiteSpace(credentialRequest.Format))
             {
                 var formatter = _formatters.SingleOrDefault(f => f.Format == credentialRequest.Format);
@@ -214,7 +249,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
                 if (header == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED));
                 var credentialConfiguration = await _credentialConfigurationStore.GetByTypeAndFormat(header.Type, credentialRequest.Format, cancellationToken);
                 if (credentialConfiguration == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_TYPE, header.Type)));
-                if (!authorizedScopes.Any(s => credentialConfiguration.Scope == s)) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.Unauthorized, ErrorCodes.UNAUTHORIZED, string.Format(ErrorMessages.UNAUTHORIZED_TO_ACCESS, header.Type))); 
+                if (!string.IsNullOrWhiteSpace(credentialConfiguration.Scope) && !authorizedScopes.Any(s => credentialConfiguration.Scope == s)) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.Unauthorized, ErrorCodes.UNAUTHORIZED, string.Format(ErrorMessages.UNAUTHORIZED_TO_ACCESS, header.Type))); 
                 return CredentialValidationResult.Ok(formatter, credentialConfiguration, subject, nonce);
             }
 
@@ -229,25 +264,22 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
             {
             }
 
-            private CredentialValidationResult(ICredentialFormatter formatter, CredentialConfiguration credentialTemplate, string subject, string nonce)
+            private CredentialValidationResult(ICredentialFormatter formatter, Domains.CredentialConfiguration credentialConfiguration, string subject, string nonce)
             {
                 Formatter = formatter;
-                CredentialTemplate = credentialTemplate;
+                CredentialConfiguration = credentialConfiguration;
                 Subject = subject;
                 Nonce = nonce;
             }
 
-            private CredentialValidationResult(ICredentialFormatter formatter, Domains.Credential credential, string subject, string nonce)
+            private CredentialValidationResult(ICredentialFormatter formatter, Domains.Credential credential, string subject, string nonce) : this(formatter,  credential.Configuration, subject, nonce)
             {
-                Formatter = formatter;
                 Credential = credential;
-                Subject = subject;
-                Nonce = nonce;
             }
 
             public ICredentialFormatter Formatter { get; private set; }
 
-            public CredentialConfiguration CredentialTemplate { get; private set; }
+            public Domains.CredentialConfiguration CredentialConfiguration { get; private set; }
 
             public string Subject { get; private set; }
 
@@ -255,7 +287,8 @@ namespace SimpleIdServer.CredentialIssuer.Api.Credential
 
             public Domains.Credential Credential { get; private set; }
 
-            public static CredentialValidationResult Ok(ICredentialFormatter formatter, CredentialConfiguration credentialTemplate, string subject, string nonce) => new CredentialValidationResult(formatter, credentialTemplate, subject, nonce);
+            public static CredentialValidationResult Ok(ICredentialFormatter formatter, Domains.CredentialConfiguration credentialConfiguration, string subject, string nonce) 
+                => new CredentialValidationResult(formatter, credentialConfiguration, subject, nonce);
 
             public static CredentialValidationResult Ok(ICredentialFormatter formatter, Domains.Credential credential, string subject, string nonce) => new CredentialValidationResult(formatter, credential, subject, nonce);
 

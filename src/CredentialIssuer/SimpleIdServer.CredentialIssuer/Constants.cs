@@ -12,6 +12,7 @@ public static class Constants
     {
         public const string CredentialIssuer = ".well-known/openid-credential-issuer";
         public const string Credential = "credential";
+        public const string DeferredCredential = "deferred_credential";
         public const string CredentialOffer = "credential_offer";
         public const string CredentialConfigurations = "credential_configurations";
         public const string CredentialInstances = "credential_instances";

@@ -23,7 +23,8 @@ public class CredentialConfigurationBuilder
         string baseUrl,
         string scope = null,
         string id = null,
-        List<string> additionalTypes = null)
+        List<string> additionalTypes = null,
+        bool isDeferred = false)
     {
         return new CredentialConfigurationBuilder(new CredentialConfiguration
         {
@@ -36,7 +37,8 @@ public class CredentialConfigurationBuilder
             Scope = scope,
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow,
-            AdditionalTypes = additionalTypes ?? new List<string>()
+            AdditionalTypes = additionalTypes ?? new List<string>(),
+            IsDeferred = isDeferred
         });
     }
 

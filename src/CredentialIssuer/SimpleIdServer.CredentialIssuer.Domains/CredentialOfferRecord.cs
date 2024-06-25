@@ -11,10 +11,10 @@ public class CredentialOfferRecord
 {
     public string Id { get; set; } = null!;
     public string Subject { get; set; } = null!;
-    public List<string> GrantTypes { get; set; } = new List<string>();
-    public List<string> CredentialConfigurationIds { get; set; } = new List<string>();
     [JsonIgnore]
     public string? PreAuthorizedCode { get; set; } = null;
     public string? IssuerState { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
+    public List<string> GrantTypes { get; set; } = new List<string>();
+    public List<string> CredentialConfigurationIds { get; set; }
 }

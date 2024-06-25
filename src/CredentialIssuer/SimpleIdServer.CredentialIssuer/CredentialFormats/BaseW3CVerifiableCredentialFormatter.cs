@@ -54,10 +54,19 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
 
     public CredentialHeader ExtractHeader(JsonObject jsonObj)
     {
-        if (!jsonObj.ContainsKey("credential_definition")) return null;
-        var credentialDefinition = jsonObj["credential_definition"].AsObject();
-        if (credentialDefinition == null || !credentialDefinition.ContainsKey("type")) return null;
-        var jArrTypes = credentialDefinition["type"].AsArray();
+        JsonArray jArrTypes;
+        if (!jsonObj.ContainsKey("credential_definition"))
+        {
+            if (!jsonObj.ContainsKey("types")) return null;
+            jArrTypes = jsonObj["types"].AsArray();
+        }
+        else
+        {
+            var credentialDefinition = jsonObj["credential_definition"].AsObject();
+            if (credentialDefinition == null || !credentialDefinition.ContainsKey("type")) return null;
+            jArrTypes = credentialDefinition["type"].AsArray();
+        }
+
         if (jArrTypes == null) return null;
         var filteredTypes = jArrTypes.Select(t => t.ToString()).Where(c => c != VcConstants.VerifiableCredentialType && c != VcConstants.VerifiableAttestation);
         if (filteredTypes.Count() != 1) return null;
@@ -79,7 +88,7 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
             request.AdditionalTypes,
             request.ValidFrom,
             request.ValidUntil);
-        builder.AddCredentialSubject(request.RequestSubject, (b) =>
+        builder.AddCredentialSubject(request.Subject, (b) =>
         {
             b.SetPersonalIdentifier(request.Subject);
             Build(request.UserClaims, b.Build(), 1);

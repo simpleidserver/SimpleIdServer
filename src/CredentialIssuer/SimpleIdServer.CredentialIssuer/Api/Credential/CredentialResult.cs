@@ -18,4 +18,7 @@ public class CredentialResult
     [JsonPropertyName(CredentialResultNames.CNonceExpiresIn)]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string CNonceExpiresIn { get; set; }
+    [JsonPropertyName(CredentialResultNames.TransactionId)]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string TransactionId { get; set; }
 }

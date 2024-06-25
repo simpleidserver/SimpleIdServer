@@ -34,16 +34,13 @@ public interface ICreateCredentialOfferCommandHandler
 
 public class CreateCredentialOfferCommandHandler : ICreateCredentialOfferCommandHandler
 {
-    private readonly ICredentialOfferStore _credentialOfferStore;
     private readonly ICredentialConfigurationStore _credentialConfigurationStore;
     private readonly IPreAuthorizedCodeService _preAuthorizedCodeService;
 
     public CreateCredentialOfferCommandHandler(
-        ICredentialOfferStore credentialOfferStore,
         ICredentialConfigurationStore credentialConfigurationStore,
         IPreAuthorizedCodeService preAuthorizedCodeService)
     {
-        _credentialOfferStore = credentialOfferStore;
         _credentialConfigurationStore = credentialConfigurationStore;
         _preAuthorizedCodeService = preAuthorizedCodeService;
     }
@@ -59,16 +56,6 @@ public class CreateCredentialOfferCommandHandler : ICreateCredentialOfferCommand
             credentialOffer.IssuerState = Guid.NewGuid().ToString();
         }
 
-        // if (credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.PreAuthorizedCodeGrant))
-        // {
-        //     credentialOffer.PreAuthorizedCode = await _preAuthorizedCodeService.Get(
-        //         command.AccessToken, 
-        //         validationResult.CredentialConfigurations.Select(c => c.Scope).Distinct().ToList(), 
-        //         cancellationToken);
-        // }
-
-        _credentialOfferStore.Add(credentialOffer);
-        await _credentialOfferStore.SaveChanges(cancellationToken);
         return new CredentialCredentialOfferResult { CredentialOffer = credentialOffer };
     }
 
@@ -93,9 +80,9 @@ public class CreateCredentialOfferCommandHandler : ICreateCredentialOfferCommand
         {
             Id = Guid.NewGuid().ToString(),
             GrantTypes = command.Grants,
-            CredentialConfigurationIds = command.CredentialConfigurationIds,
             Subject = command.Subject,
             CreateDateTime = DateTime.UtcNow,
+            CredentialConfigurationIds = existingCredentials.Select(c => c.Id).ToList()
         };
         return CredentialOfferValidationResult.Ok(credentialOffer, existingCredentials);
     }

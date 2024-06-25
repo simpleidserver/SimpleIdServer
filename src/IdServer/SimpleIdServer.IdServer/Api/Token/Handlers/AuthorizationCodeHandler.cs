@@ -106,7 +106,6 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
                 CheckDPOPJkt(context, authCode);
                 var previousClientId = previousRequest.GetClientId();
                 var previousRedirectUrl = previousRequest.GetRedirectUri();
-                var issuerState = previousRequest.GetIssuerState();
                 var claims = previousRequest.GetClaimsFromAuthorizationRequest();
                 if (!previousClientId.Equals(context.Client.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeNotIssuedByClient);
                 if (!context.Client.IsSelfIssueEnabled && !previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.NotSameRedirectUri);
@@ -128,8 +127,6 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
 
                 context.SetOriginalRequest(previousRequest);
                 var additionalClaims = new Dictionary<string, object>();
-                if (!string.IsNullOrWhiteSpace(issuerState))
-                    additionalClaims.Add(AuthorizationRequestParameters.IssuerState, issuerState);
                 var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId, AdditionalClaims = additionalClaims };
                 foreach (var tokenBuilder in _tokenBuilders)
                 {

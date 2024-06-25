@@ -19,6 +19,8 @@ public class CredentialIssuerDbContext : DbContext
 
     public DbSet<UserCredentialClaim> UserCredentialClaims { get; set; }
 
+    public DbSet<DeferredCredential> DeferredCredentials { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -29,5 +31,7 @@ public class CredentialIssuerDbContext : DbContext
         modelBuilder.ApplyConfiguration(new CredentialOfferRecordConfiguration());
         modelBuilder.ApplyConfiguration(new UserCredentialClaimConfiguration());
         modelBuilder.ApplyConfiguration(new CredentialClaimConfiguration());
+        modelBuilder.ApplyConfiguration(new DeferredCredentialConfiguration());
+        modelBuilder.ApplyConfiguration(new DeferredCredentialClaimConfiguration());
     }
 }

@@ -30,6 +30,8 @@ public class CredentialConfiguration
     public string? CredentialSchemaId { get; set; } = null;
     [JsonIgnore]
     public string? CredentialSchemaType { get; set; } = null;
+    [JsonIgnore]
+    public bool IsDeferred { get; set; } = false;
     [JsonPropertyName("claims")]
     public virtual List<CredentialConfigurationClaim> Claims { get; set; } = new List<CredentialConfigurationClaim>();
     [JsonPropertyName("displays")]

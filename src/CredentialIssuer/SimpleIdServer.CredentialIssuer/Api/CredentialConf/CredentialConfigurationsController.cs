@@ -351,7 +351,8 @@ public class CredentialConfigurationsController : BaseController
             IssueDateTime = request.IssueDateTime,
             Subject = request.Subject,
             CredentialId = request.CredentialId,
-            Claims = claims
+            Claims = claims,
+            IsDeferred = credentialConfiguration.IsDeferred
         };
         _credentialStore.Add(record);
         await _credentialStore.SaveChanges(cancellationToken);
