@@ -8,6 +8,7 @@ using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 using SimpleIdServer.Did.Crypto.SecurityKeys;
+using SimpleIdServer.Did.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -77,7 +78,10 @@ public abstract class BaseESSignatureKey : IAsymmetricKey
         var sig = ExtractSignature(signature);
         var signer = new ECDsaSigner();
         signer.Init(false, _publicKey);
-        return signer.VerifySignature(content, sig.R, sig.S);
+        var hash = content;
+        if(alg != null)
+            hash = HashHelper.Hash(content, alg.Value);
+        return signer.VerifySignature(hash, sig.R, sig.S);
     }
 
     public byte[] SignHash(byte[] content, HashAlgorithmName alg)

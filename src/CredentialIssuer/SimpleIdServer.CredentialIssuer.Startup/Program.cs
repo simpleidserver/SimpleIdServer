@@ -7,9 +7,8 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.CredentialIssuer.Startup;
-using System.Net.Http;
 using SimpleIdServer.Did.Key;
-using SimpleIdServer.Did.Encoders;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 

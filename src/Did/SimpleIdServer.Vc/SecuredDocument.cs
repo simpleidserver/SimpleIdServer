@@ -173,7 +173,7 @@ public class SecuredDocument
             json = j.ToJsonString();
         }
 
-        return Hash(json, proof);
+         return Hash(json, proof);
     }
 
     private byte[] Hash(string json, ISignatureProof proof)

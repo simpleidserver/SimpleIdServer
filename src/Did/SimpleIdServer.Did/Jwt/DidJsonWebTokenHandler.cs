@@ -97,22 +97,8 @@ public class DidJsonWebTokenHandler
         var signature = Base64UrlEncoder.DecodeBytes(jsonWebToken.EncodedSignature);
         foreach (var assertionMethod in assertionMethods)
         {
-            if(assertionMethod.PublicKeyJwk != null)
-            {
-                var validationResult = handler.ValidateToken(jwt, new TokenValidationParameters
-                {
-                    IssuerSigningKey = assertionMethod.PublicKeyJwk,
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = false
-                });
-                if (validationResult.IsValid) return true;
-            }
-            else
-            {
-                var asymKey = _verificationMethodEncoding.Decode(assertionMethod);
-                if (asymKey.CheckHash(content, signature, HashAlgorithmName.SHA256)) return true;
-            }
+            var asymKey = _verificationMethodEncoding.Decode(assertionMethod);
+            if (asymKey.CheckHash(content, signature, HashAlgorithmName.SHA256)) return true;
         }
 
         return false;
@@ -129,22 +115,10 @@ public class DidJsonWebTokenHandler
         if (string.IsNullOrWhiteSpace(verificationMethodId)) throw new ArgumentNullException(nameof(verificationMethodId));
         var handler = new JsonWebTokenHandler();
         var verificationMethod = didDocument.VerificationMethod.Single(m => m.Id == verificationMethodId);
-        if(verificationMethod.PublicKeyJwk != null)
-        {
-            var validationResult = handler.ValidateToken(jwt, new TokenValidationParameters
-            {
-                IssuerSigningKey = verificationMethod.PublicKeyJwk,
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateLifetime = false
-            });
-            return validationResult.IsValid;
-        }
-
+        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         var jsonWebToken = handler.ReadJsonWebToken(jwt);
         var content = System.Text.Encoding.UTF8.GetBytes($"{jsonWebToken.EncodedHeader}.{jsonWebToken.EncodedPayload}");
         var signature = Base64UrlEncoder.DecodeBytes(jsonWebToken.EncodedSignature);
-        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         if (asymKey.CheckHash(content, signature, HashAlgorithmName.SHA256)) return true;
         return false;
     }

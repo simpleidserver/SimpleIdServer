@@ -4,7 +4,6 @@
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Did.Serializers;
 using System.Security.Cryptography;
-using System.Text.Json;
 
 namespace SimpleIdServer.Did.Crypto;
 
