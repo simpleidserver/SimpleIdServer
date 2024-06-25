@@ -113,6 +113,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Sto
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.SqlSugar.Startup", "src\IdServer\SimpleIdServer.IdServer.SqlSugar.Startup\SimpleIdServer.IdServer.SqlSugar.Startup.csproj", "{0D76EB63-29B1-4878-84D1-2D35897EE1FA}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.SelfIdServer.Host.Acceptance.Tests", "tests\SimpleIdServer.SelfIssuedIdServer.Host.Acceptance.Tests\SimpleIdServer.SelfIdServer.Host.Acceptance.Tests.csproj", "{467B3D10-E6C9-427F-A29F-373AE95ECF69}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -299,6 +301,10 @@ Global
 		{0D76EB63-29B1-4878-84D1-2D35897EE1FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D76EB63-29B1-4878-84D1-2D35897EE1FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D76EB63-29B1-4878-84D1-2D35897EE1FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{467B3D10-E6C9-427F-A29F-373AE95ECF69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{467B3D10-E6C9-427F-A29F-373AE95ECF69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{467B3D10-E6C9-427F-A29F-373AE95ECF69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{467B3D10-E6C9-427F-A29F-373AE95ECF69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -355,6 +361,7 @@ Global
 		{06BF894C-69D7-406A-A97F-BD990A3D59ED} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{BE501B31-2CF6-4218-AA74-F536C11AD9D7} = {06BF894C-69D7-406A-A97F-BD990A3D59ED}
 		{0D76EB63-29B1-4878-84D1-2D35897EE1FA} = {68306EFF-55D9-497B-9482-FEB81C485914}
+		{467B3D10-E6C9-427F-A29F-373AE95ECF69} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

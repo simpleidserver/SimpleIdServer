@@ -336,6 +336,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IAuthorizationRequestValidator, OAuthAuthorizationRequestValidator>();
             services.AddTransient<IAuthorizationRequestEnricher, AuthorizationRequestEnricher>();
             services.AddTransient<IUserConsentFetcher, OAuthUserConsentFetcher>();
+            services.AddTransient<IAuthorizationCallbackRequestHandler, AuthorizationCallbackRequestHandler>();
+            services.AddTransient<IAuthorizationCallbackRequestValidator, AuthorizationCallbackRequestValidator>();
             return services;
         }
 

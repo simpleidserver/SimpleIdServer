@@ -45,6 +45,8 @@ namespace SimpleIdServer.IdServer.Helpers
         Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken);
         Task AddResetPasswordLink(string otpCode, string login, string realm, double expirationTimeInSeconds, CancellationToken cancellationToken);
         Task<ResetPasswordLink> GetResetPasswordLink(string otpCode, CancellationToken cancellationToken);
+        Task AddAuthorizationRequestCallback(string nonce, JsonObject request, double validityPeriodsInSeconds, CancellationToken cancellationToken);
+        Task<JsonObject> GetAuthorizationRequestCallback(string nonce, CancellationToken cancellationToken);
     }
 
     public class AuthCode
@@ -357,6 +359,25 @@ namespace SimpleIdServer.IdServer.Helpers
             var payload = await _distributedCache.GetAsync(otpCode, cancellationToken);
             if (payload == null) return null;
             return JsonSerializer.Deserialize<ResetPasswordLink>(Encoding.UTF8.GetString(payload));
+        }
+
+        #endregion
+
+        #region Authorization request callback
+
+        public async Task AddAuthorizationRequestCallback(string nonce, JsonObject record, double validityPeriodsInSeconds, CancellationToken cancellationToken)
+        {
+            await _distributedCache.SetAsync(nonce, Encoding.UTF8.GetBytes(record.ToString()), new DistributedCacheEntryOptions
+            {
+                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+            }, cancellationToken);
+        }
+
+        public async Task<JsonObject> GetAuthorizationRequestCallback(string nonce, CancellationToken cancellationToken)
+        {
+            var cache = await _distributedCache.GetAsync(nonce, cancellationToken);
+            if (cache == null) return null;
+            return JsonSerializer.Deserialize<JsonObject>(Encoding.UTF8.GetString(cache));
         }
 
         #endregion

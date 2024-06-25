@@ -20,6 +20,8 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         [SugarColumn(IsNullable = true)]
         public string? TokenEndPointAuthMethod { get; set; } = null;
         public string ResponseTypes { get; set; }
+        [SugarColumn]
+        public string SubjectSyntaxTypesSupported { get; set; }
         [SugarColumn(IsNullable = true)]
         public string? JwksUri { get; set; } = null;
         public string Contacts { get; set; }
@@ -215,6 +217,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 TokenExchangeType = client.TokenExchangeType,
                 TokenExpirationTimeInSeconds = client.TokenExpirationTimeInSeconds,
                 TokenSignedResponseAlg = client.TokenSignedResponseAlg,
+                SubjectSyntaxTypesSupported = client.SubjectSyntaxTypesSupported == null ? string.Empty : string.Join(",", client.SubjectSyntaxTypesSupported),
                 ResponseTypes = client.ResponseTypes == null ? string.Empty : string.Join(",", client.ResponseTypes),
                 RedirectionUrls = client.RedirectionUrls == null ? string.Empty : string.Join(",", client.RedirectionUrls),
                 PostLogoutRedirectUris = client.PostLogoutRedirectUris == null ? string.Empty : string.Join(",", client.PostLogoutRedirectUris),
@@ -331,6 +334,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 UserInfoEncryptedResponseAlg = UserInfoEncryptedResponseAlg,
                 UpdateDateTime = UpdateDateTime,
                 CreateDateTime = CreateDateTime,
+                SubjectSyntaxTypesSupported = SubjectSyntaxTypesSupported == null ? new List<string>() : SubjectSyntaxTypesSupported.Split(',').ToList(),
                 ResponseTypes = ResponseTypes == null ? new List<string>() : ResponseTypes.Split(','),
                 RedirectionUrls = RedirectionUrls == null ? new List<string>() : RedirectionUrls.Split(','),
                 PostLogoutRedirectUris = PostLogoutRedirectUris == null ? new List<string>() : PostLogoutRedirectUris.Split(','),

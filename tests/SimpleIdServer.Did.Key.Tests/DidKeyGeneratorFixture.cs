@@ -21,4 +21,19 @@ public class DidKeyGeneratorFixture
         // ASSERT
         Assert.IsNotNull(resolved);
     }
+
+    [Test]
+    public async Task When_Generate_DidKey_Jwk_Then_DidDocument_Is_Correct()
+    {
+        // ARRANGE
+        var generator = DidKeyGenerator.New();
+        var resolver = DidKeyResolver.New();
+
+        // ACT
+        var did = generator.GenerateRandomJwk();
+        var resolved = await resolver.Resolve(did, CancellationToken.None);
+
+        // ASSERT
+        Assert.IsNotNull(resolved);
+    }
 }

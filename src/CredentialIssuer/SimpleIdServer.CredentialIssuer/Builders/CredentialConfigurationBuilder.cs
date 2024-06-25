@@ -3,6 +3,7 @@
 
 using SimpleIdServer.CredentialIssuer.Domains;
 using System;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.CredentialIssuer.Builders;
 
@@ -21,7 +22,8 @@ public class CredentialConfigurationBuilder
         string jsonLdContext, 
         string baseUrl,
         string scope = null,
-        string id = null)
+        string id = null,
+        List<string> additionalTypes = null)
     {
         return new CredentialConfigurationBuilder(new CredentialConfiguration
         {
@@ -34,6 +36,7 @@ public class CredentialConfigurationBuilder
             Scope = scope,
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow,
+            AdditionalTypes = additionalTypes ?? new List<string>()
         });
     }
 
@@ -69,6 +72,13 @@ public class CredentialConfigurationBuilder
         var builder = CredentialConfigurationClaimBuilder.New(name, sourceUserClaimName);
         if (callback != null) callback(builder);
         _credentialConfiguration.Claims.Add(builder.Build());
+        return this;
+    }
+
+    public CredentialConfigurationBuilder SetSchema(string id, string type)
+    {
+        _credentialConfiguration.CredentialSchemaId = id;
+        _credentialConfiguration.CredentialSchemaType = type;
         return this;
     }
 

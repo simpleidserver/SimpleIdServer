@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
     <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
   </ItemGroup>
 

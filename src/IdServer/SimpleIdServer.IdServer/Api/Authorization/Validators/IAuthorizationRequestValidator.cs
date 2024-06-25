@@ -10,8 +10,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 {
     public interface IAuthorizationRequestValidator
     {
-        Task<AuthorizationRequestValidationResult> ValidateAuthorizationRequest(HandlerContext context, CancellationToken cancellationToken);
-        Task<AuthorizationRequestValidationResult> ValidateAuthorizationRequest(HandlerContext context, string clientId, CancellationToken cancellationToken);
+        Task<AuthorizationRequestValidationResult> ValidateStandardAuthorizationRequest(HandlerContext context, CancellationToken cancellationToken);
+        Task<AuthorizationRequestValidationResult> ValidateStandardAuthorizationRequest(HandlerContext context, string clientId, CancellationToken cancellationToken);
+        Task<AuthorizationRequestValidationResult> ValidateSelfIssuedAuthorizationRequest(HandlerContext context, CancellationToken cancellationToken);
         Task ValidateAuthorizationRequestWhenUserIsAuthenticated(GrantRequest request, HandlerContext context, CancellationToken cancellationToken);
     }
 

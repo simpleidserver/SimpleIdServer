@@ -212,10 +212,10 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON exists \'$.credential.proof.verificationMethod\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 43
- testRunner.And("JSON exists \'$.credential.proof.proofValue\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON exists \'$.credential.proof.jws\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 44
- testRunner.And("JSON \'$.credential.proof.type\'=\'Ed25519Signature2020\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.credential.proof.type\'=\'JsonWebSignature2020\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 45
  testRunner.And("JSON \'$.credential.proof.proofPurpose\'=\'assertionMethod\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

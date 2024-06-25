@@ -71,7 +71,7 @@ public class SecuredVerifiableCredentialFixture
         Assert.IsTrue(isSignatureValid);
         Assert.True(credential.Proof != null);
         var proofValue = credential.Proof["proofValue"].ToString();
-        Assert.AreEqual("z2PC6JBDG1otY3PfnxGnvHCuh8tEqPPNpDggvsnzjr2yKxszQg5bJXsQhV1ZUTG6KBNGdvWVzVqFxtLagbdoRUjf6", proofValue);
+        Assert.AreEqual("zW3gwNq5uhWFj9UvZpLW57FqniTW21oKQ1JavgTtmarkPFekN4zEH3PzGBoCCG6CiLm9LzZiSWTKjPQyhFV44hD9", proofValue);
     }
 
     #endregion

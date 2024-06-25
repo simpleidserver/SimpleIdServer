@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,6 +33,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
         private readonly IBusControl _busControl;
         private readonly IDistributedCache _distributedCache;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _authenticationHandlers;
+        private readonly IClientRepository _clientRepository;
         private readonly IdServerHostOptions _options;
 
         public PushedAuthorizationController(
@@ -40,6 +42,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
             IBusControl busControl, 
             IDistributedCache distributedCache, 
             IEnumerable<IOAuthClientAuthenticationHandler> authenticationHandlers,
+            IClientRepository clientRepository,
             IOptions<IdServerHostOptions> options)
         {
             _validator = validator;
@@ -47,6 +50,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
             _busControl = busControl;
             _distributedCache = distributedCache;
             _authenticationHandlers = authenticationHandlers;
+            _clientRepository = clientRepository;
             _options = options.Value;
         }
 
@@ -70,7 +74,10 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
                         ClientIdFromHttpRequestBody = jObjBody.GetClientId()
                     };
                     if (!_authenticateClient.TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingClientId);
-                    var validationResult = await _validator.ValidateAuthorizationRequest(context, clientId, token);
+                    var client = await _clientRepository.GetByClientId(context.Realm, clientId, token);
+                    if (client != null)
+                        context.SetClient(client);
+                    var validationResult = await _validator.ValidateStandardAuthorizationRequest(context, clientId, token);
                     if(!string.IsNullOrWhiteSpace(authenticateInstruction.ClientAssertion))
                     {
                         var authHandler = _authenticationHandlers.Single(a => a.AuthMethod == OAuthClientPrivateKeyJwtAuthenticationHandler.AUTH_METHOD);

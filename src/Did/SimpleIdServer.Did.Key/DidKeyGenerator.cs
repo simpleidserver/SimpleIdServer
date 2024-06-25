@@ -32,4 +32,10 @@ public class DidKeyGenerator
         var ed25519 = Ed25519SignatureKey.Generate();
         return Generate(ed25519);
     }
+
+    public string GenerateRandomJwk()
+    {
+        var jsonWebKey = new JsonWebKeySecurityKey(ES256SignatureKey.Generate().GetPublicJwk());
+        return Generate(jsonWebKey);
+    }
 }

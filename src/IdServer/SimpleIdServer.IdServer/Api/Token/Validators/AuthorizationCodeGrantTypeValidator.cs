@@ -17,7 +17,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Validators
         public void Validate(HandlerContext context)
         {
             if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.Code))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.Code));
-            if (string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.RedirectUri))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.RedirectUri));
             var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
             OpenIdCredentialValidator.ValidateOpenIdCredential(authDetails);
         }

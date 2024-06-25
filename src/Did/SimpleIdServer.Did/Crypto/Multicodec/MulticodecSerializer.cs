@@ -58,7 +58,10 @@ public class MulticodecSerializer : IMulticodecSerializer
 
     public string SerializePublicKey(IAsymmetricKey signatureKey)
     {
-        var verificationMethod = _verificationMethods.Single(m => m.Kty == signatureKey.Kty && m.CrvOrSize == signatureKey.CrvOrSize);
+        var verificationMethod = _verificationMethods.SingleOrDefault(m => m.Kty == signatureKey.Kty && m.CrvOrSize == signatureKey.CrvOrSize);
+        if (verificationMethod == null && signatureKey.GetPublicJwk() != null)
+            verificationMethod = _verificationMethods.First(v => v.GetType() == typeof(JwkJcsPubVerificationMethod));
+
         var publicKey = verificationMethod.MulticodecPublicKeyHexValue.HexToByteArray().ToList();
         publicKey.AddRange(signatureKey.GetPublicKey());
         return MultibaseEncoding.Encode(publicKey.ToArray());

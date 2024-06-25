@@ -42,7 +42,7 @@ public class SecuredVerifiablePresentationFixture
         var ed25119Sig = Ed25519SignatureKey.Generate();
         var did = DidKeyGenerator.New().Generate(ed25119Sig);
         var didDocument = DidKeyResolver.New().Resolve(did, CancellationToken.None).Result;
-        var credential = VcBuilder.New("https://example.com/credentials/1872", null, did, "IDCardCredential")
+        var credential = VcBuilder.New("https://example.com/credentials/1872", null, did, "IDCardCredential", new List<string>())
             .AddCredentialSubject((act) =>
             {
                 act.AddClaim("given_name", "Fredrik");

@@ -30,19 +30,22 @@ namespace SimpleIdServer.IdServer.Api.Authorization;
 public class AuthorizationController : Controller
 {
     private readonly IAuthorizationRequestHandler _authorizationRequestHandler;
+    private readonly IAuthorizationCallbackRequestHandler _authorizationCallbackRequestHandler;
     private readonly IResponseModeHandler _responseModeHandler;
     private readonly IDataProtector _dataProtector;
     private readonly IBusControl _busControl;
     private readonly IdServerHostOptions _options;
 
     public AuthorizationController(
-        IAuthorizationRequestHandler authorizationRequestHandler, 
+        IAuthorizationRequestHandler authorizationRequestHandler,
+        IAuthorizationCallbackRequestHandler authorizationCallbackRequestHandler,
         IResponseModeHandler responseModeHandler, 
         IDataProtectionProvider dataProtectionProvider, 
         IBusControl busControl,
         IOptions<IdServerHostOptions> options)
     {
         _authorizationRequestHandler = authorizationRequestHandler;
+        _authorizationCallbackRequestHandler = authorizationCallbackRequestHandler;
         _responseModeHandler = responseModeHandler;
         _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         _busControl = busControl;
@@ -148,6 +151,44 @@ public class AuthorizationController : Controller
                     ErrorMessage = ex.Message
                 });
                 await BuildErrorResponse(context, ex, true);
+            }
+            catch (OAuthException ex)
+            {
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                await _busControl.Publish(new AuthorizationFailureEvent
+                {
+                    ClientId = context.Client?.ClientId,
+                    Realm = context.Realm,
+                    RequestJSON = jObjBody.ToString(),
+                    ErrorMessage = ex.Message
+                });
+                await BuildErrorResponse(context, ex);
+            }
+        }
+    }
+
+    [HttpPost]
+    public async Task Callback([FromRoute] string prefix, CancellationToken cancellationToken)
+    {
+        var jObjBody = Request.Form.ToJsonObject();
+        prefix = prefix ?? Constants.DefaultRealm;
+        var referer = string.Empty;
+        if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
+        var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
+        using (var activity = Tracing.IdServerActivitySource.StartActivity("Get authorization callback"))
+        {
+            try
+            {
+                activity?.SetTag("realm", prefix);
+                var authorizationResponse = await _authorizationCallbackRequestHandler.Handle(context, cancellationToken);
+                _responseModeHandler.Handle(context, authorizationResponse, HttpContext);
+                activity?.SetStatus(ActivityStatusCode.Ok, "Authorization Success");
+                await _busControl.Publish(new AuthorizationSuccessEvent
+                {
+                    ClientId = context.Client.ClientId,
+                    Realm = context.Realm,
+                    RequestJSON = jObjBody.ToString()
+                });
             }
             catch (OAuthException ex)
             {

@@ -27,181 +27,207 @@ using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Api.Token.Handlers
+namespace SimpleIdServer.IdServer.Api.Token.Handlers;
+
+public class AuthorizationCodeHandler : BaseCredentialsHandler
 {
-    public class AuthorizationCodeHandler : BaseCredentialsHandler
+    private readonly IGrantedTokenHelper _grantedTokenHelper;
+    private readonly IAuthorizationCodeGrantTypeValidator _authorizationCodeGrantTypeValidator;
+    private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
+    private readonly IUserRepository _userRepository;
+    private readonly IUserSessionResitory _userSessionRepository;
+    private readonly IGrantHelper _audienceHelper;
+    private readonly IBusControl _busControl;
+    private readonly IDPOPProofValidator _dpopProofValidator;
+    private readonly IClientHelper _clientHelper;
+    private readonly ILogger<AuthorizationCodeHandler> _logger;
+
+    public AuthorizationCodeHandler(
+        IGrantedTokenHelper grantedTokenHelper,
+        IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, 
+        IEnumerable<ITokenBuilder> tokenBuilders,
+        IUserRepository usrRepository,
+        IUserSessionResitory userSessionRepository,
+        IClientAuthenticationHelper clientAuthenticationHelper,
+        IGrantHelper audienceHelper,
+        IBusControl busControl,
+        IDPOPProofValidator dpopProofValidator,
+        IOptions<IdServerHostOptions> options,
+        IEnumerable<ITokenProfile> tokenProfiles,
+        IClientHelper clientHelper,
+        ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
     {
-        private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly IAuthorizationCodeGrantTypeValidator _authorizationCodeGrantTypeValidator;
-        private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
-        private readonly IUserRepository _userRepository;
-        private readonly IUserSessionResitory _userSessionRepository;
-        private readonly IGrantHelper _audienceHelper;
-        private readonly IBusControl _busControl;
-        private readonly IDPOPProofValidator _dpopProofValidator;
-        private readonly ILogger<AuthorizationCodeHandler> _logger;
+        _grantedTokenHelper = grantedTokenHelper;
+        _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
+        _tokenBuilders = tokenBuilders;
+        _userRepository = usrRepository;
+        _userSessionRepository = userSessionRepository;
+        _audienceHelper = audienceHelper;
+        _busControl = busControl;
+        _dpopProofValidator = dpopProofValidator;
+        _clientHelper = clientHelper;
+        _logger = logger;
+    }
 
-        public AuthorizationCodeHandler(
-            IGrantedTokenHelper grantedTokenHelper,
-            IAuthorizationCodeGrantTypeValidator authorizationCodeGrantTypeValidator, 
-            IEnumerable<ITokenBuilder> tokenBuilders,
-            IUserRepository usrRepository,
-            IUserSessionResitory userSessionRepository,
-            IClientAuthenticationHelper clientAuthenticationHelper,
-            IGrantHelper audienceHelper,
-            IBusControl busControl,
-            IDPOPProofValidator dpopProofValidator,
-            IOptions<IdServerHostOptions> options,
-            IEnumerable<ITokenProfile> tokenProfiles,
-            ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
+    public override string GrantType => GRANT_TYPE;
+    public const string GRANT_TYPE = "authorization_code";
+
+    public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
+    {
+        IEnumerable<string> scopeLst = new string[0];
+        using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Token"))
         {
-            _grantedTokenHelper = grantedTokenHelper;
-            _authorizationCodeGrantTypeValidator = authorizationCodeGrantTypeValidator;
-            _tokenBuilders = tokenBuilders;
-            _userRepository = usrRepository;
-            _userSessionRepository = userSessionRepository;
-            _audienceHelper = audienceHelper;
-            _busControl = busControl;
-            _dpopProofValidator = dpopProofValidator;
-            _logger = logger;
-        }
-
-        public override string GrantType => GRANT_TYPE;
-        public const string GRANT_TYPE = "authorization_code";
-
-        public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
-        {
-            IEnumerable<string> scopeLst = new string[0];
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Token"))
+            try
             {
-                try
+                activity?.SetTag("grant_type", GRANT_TYPE);
+                activity?.SetTag("realm", context.Realm);
+                _authorizationCodeGrantTypeValidator.Validate(context);
+                var code = context.Request.RequestData.GetAuthorizationCode();
+                var redirectUri = context.Request.RequestData.GetRedirectUri();
+                var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
+                var previousRequest = authCode?.OriginalRequest;
+                if (previousRequest == null)
                 {
-                    activity?.SetTag("grant_type", GRANT_TYPE);
-                    activity?.SetTag("realm", context.Realm);
-                    _authorizationCodeGrantTypeValidator.Validate(context);
-                    var oauthClient = await AuthenticateClient(context, cancellationToken);
-                    context.SetClient(oauthClient);
-                    activity?.SetTag("client_id", oauthClient.ClientId);
-                    await _dpopProofValidator.Validate(context);
-                    var code = context.Request.RequestData.GetAuthorizationCode();
-                    var redirectUri = context.Request.RequestData.GetRedirectUri();
-                    var authCode = await _grantedTokenHelper.GetAuthorizationCode(code, cancellationToken);
-                    var previousRequest = authCode?.OriginalRequest;
-                    if (previousRequest == null)
+                    // https://tools.ietf.org/html/rfc6749#section-4.1.2
+                    var searchResult = await _grantedTokenHelper.GetTokensByAuthorizationCode(code, cancellationToken);
+                    if (searchResult.Any())
                     {
-                        // https://tools.ietf.org/html/rfc6749#section-4.1.2
-                        var searchResult = await _grantedTokenHelper.GetTokensByAuthorizationCode(code, cancellationToken);
-                        if (searchResult.Any())
-                        {
-                            await _grantedTokenHelper.RemoveTokens(searchResult, cancellationToken);
-                            _logger.LogError($"authorization code '{code}' has already been used, all tokens previously issued have been revoked");
-                            return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeAlreadyUsed);
-                        }
-
-                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.BadAuthorizationCode);
+                        await _grantedTokenHelper.RemoveTokens(searchResult, cancellationToken);
+                        _logger.LogError($"authorization code '{code}' has already been used, all tokens previously issued have been revoked");
+                        return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeAlreadyUsed);
                     }
 
-                    CheckDPOPJkt(context, authCode);
-                    var previousClientId = previousRequest.GetClientId();
-                    var previousRedirectUrl = previousRequest.GetRedirectUri();
-                    var claims = previousRequest.GetClaimsFromAuthorizationRequest();
-                    if (!previousClientId.Equals(oauthClient.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeNotIssuedByClient);
-                    if (!previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.NotSameRedirectUri);
-                    await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
-
-                    var scopes = GetScopes(previousRequest, context);
-                    var resources = GetResources(previousRequest, context);
-                    var authDetails = previousRequest.GetAuthorizationDetailsFromAuthorizationRequest();
-                    var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, new List<string>(), authDetails, cancellationToken);
-                    scopeLst = extractionResult.Scopes;
-                    activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
-                    var result = BuildResult(context, extractionResult.Scopes);
-                    await Authenticate(previousRequest, context, authCode, cancellationToken);
-                    context.SetOriginalRequest(previousRequest);
-                    var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId };
-                    foreach (var tokenBuilder in _tokenBuilders)
-                    {
-                        if (tokenBuilder.Name == TokenResponseParameters.RefreshToken && !extractionResult.Scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name)) continue;
-                        await tokenBuilder.Build(parameters, context, cancellationToken, true);
-                    }
-
-                    AddTokenProfile(context);
-                    foreach (var kvp in context.Response.Parameters)
-                        result.Add(kvp.Key, kvp.Value);
-
-                    if (!string.IsNullOrWhiteSpace(authCode.GrantId))
-                        result.Add(TokenResponseParameters.GrantId, authCode.GrantId);
-
-                    await Enrich(context, result, cancellationToken);
-                    await _busControl.Publish(new TokenIssuedSuccessEvent
-                    {
-                        GrantType = GRANT_TYPE,
-                        ClientId = context.Client.ClientId,
-                        Scopes = extractionResult.Scopes,
-                        Realm = context.Realm
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Token has been issued");
-                    return new OkObjectResult(result);
+                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.BadAuthorizationCode);
                 }
-                catch (OAuthUnauthorizedException ex)
+
+                await AuthenticateClient(context, authCode, cancellationToken); 
+                if (!context.Client.IsSelfIssueEnabled && string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.RedirectUri))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.RedirectUri));
+                activity?.SetTag("client_id", context.Client.ClientId);
+                CheckDPOPJkt(context, authCode);
+                var previousClientId = previousRequest.GetClientId();
+                var previousRedirectUrl = previousRequest.GetRedirectUri();
+                var issuerState = previousRequest.GetIssuerState();
+                var claims = previousRequest.GetClaimsFromAuthorizationRequest();
+                if (!previousClientId.Equals(context.Client.ClientId, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.AuthorizationCodeNotIssuedByClient);
+                if (!context.Client.IsSelfIssueEnabled && !previousRedirectUrl.Equals(redirectUri, StringComparison.InvariantCultureIgnoreCase)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.NotSameRedirectUri);
+                await _grantedTokenHelper.RemoveAuthorizationCode(code, cancellationToken);
+
+                var scopes = GetScopes(previousRequest, context);
+                var resources = GetResources(previousRequest, context);
+                var authDetails = previousRequest.GetAuthorizationDetailsFromAuthorizationRequest();
+                var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, new List<string>(), authDetails, cancellationToken);
+                scopeLst = extractionResult.Scopes;
+                activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
+                var result = BuildResult(context, extractionResult.Scopes);
+                if(!context.Client.IsSelfIssueEnabled) await Authenticate(previousRequest, context, authCode, cancellationToken);
+                else
+                    context.SetUser(new User
+                    {
+                        Name = context.Client.ClientId
+                    }, null);
+
+                context.SetOriginalRequest(previousRequest);
+                var additionalClaims = new Dictionary<string, object>();
+                if (!string.IsNullOrWhiteSpace(issuerState))
+                    additionalClaims.Add(AuthorizationRequestParameters.IssuerState, issuerState);
+                var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId, AdditionalClaims = additionalClaims };
+                foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    await _busControl.Publish(new TokenIssuedFailureEvent
-                    {
-                        GrantType = GRANT_TYPE,
-                        ClientId = context.Client?.ClientId,
-                        Scopes = scopeLst,
-                        Realm = context.Realm,
-                        ErrorMessage = ex.Message
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
+                    if (tokenBuilder.Name == TokenResponseParameters.RefreshToken && !extractionResult.Scopes.Contains(Constants.StandardScopes.OfflineAccessScope.Name)) continue;
+                    await tokenBuilder.Build(parameters, context, cancellationToken, true);
                 }
-                catch (OAuthDPoPRequiredException ex)
+
+                AddTokenProfile(context);
+                foreach (var kvp in context.Response.Parameters)
+                    result.Add(kvp.Key, kvp.Value);
+
+                if (!string.IsNullOrWhiteSpace(authCode.GrantId))
+                    result.Add(TokenResponseParameters.GrantId, authCode.GrantId);                        
+
+                await Enrich(context, result, cancellationToken);
+                await _busControl.Publish(new TokenIssuedSuccessEvent
                 {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    context.Response.Response.Headers.Add(Constants.DPOPNonceHeaderName, ex.Nonce);
-                    return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
-                }
-                catch (OAuthException ex)
-                {
-                    await _busControl.Publish(new TokenIssuedFailureEvent
-                    {
-                        GrantType = GRANT_TYPE,
-                        ClientId = context.Client?.ClientId,
-                        Scopes = scopeLst,
-                        Realm = context.Realm,
-                        ErrorMessage = ex.Message
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
-                }
+                    GrantType = GRANT_TYPE,
+                    ClientId = context.Client.ClientId,
+                    Scopes = extractionResult.Scopes,
+                    Realm = context.Realm
+                });
+                activity?.SetStatus(ActivityStatusCode.Ok, "Token has been issued");
+                return new OkObjectResult(result);
             }
-        }
-
-        protected virtual Task Enrich(HandlerContext handlerContext, JsonObject result, CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        async Task Authenticate(JsonObject previousQueryParameters, HandlerContext handlerContext, AuthCode authCode, CancellationToken token)
-        {
-            if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
-                return;
-            var user = await _userRepository.GetBySubject(previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), handlerContext.Realm, token);
-            UserSession session = null;
-            if(!string.IsNullOrWhiteSpace(authCode.SessionId))
+            catch (OAuthUnauthorizedException ex)
             {
-                session = await _userSessionRepository.GetById(authCode.SessionId, handlerContext.Realm, token);
-                if (session != null && !session.IsActive()) session = null;
+                await _busControl.Publish(new TokenIssuedFailureEvent
+                {
+                    GrantType = GRANT_TYPE,
+                    ClientId = context.Client?.ClientId,
+                    Scopes = scopeLst,
+                    Realm = context.Realm,
+                    ErrorMessage = ex.Message
+                });
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
             }
-
-            handlerContext.SetUser(user, session);
+            catch (OAuthDPoPRequiredException ex)
+            {
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                context.Response.Response.Headers.Add(Constants.DPOPNonceHeaderName, ex.Nonce);
+                return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
+            }
+            catch (OAuthException ex)
+            {
+                await _busControl.Publish(new TokenIssuedFailureEvent
+                {
+                    GrantType = GRANT_TYPE,
+                    ClientId = context.Client?.ClientId,
+                    Scopes = scopeLst,
+                    Realm = context.Realm,
+                    ErrorMessage = ex.Message
+                });
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
+            }
         }
+    }
 
-        void CheckDPOPJkt(HandlerContext context, AuthCode authCode)
+    protected async Task AuthenticateClient(HandlerContext context, AuthCode authCode, CancellationToken cancellationToken)
+    {
+        var clientId = context.Request.RequestData.GetClientId();
+        if(_clientHelper.IsNonPreRegisteredRelyingParty(clientId))
         {
-            if (context.DPOPProof == null || string.IsNullOrWhiteSpace(authCode.DPOPJkt)) return;
-            if (context.DPOPProof.PublicKey().CreateThumbprint() != authCode.DPOPJkt) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, Global.DpopJktMismatch);
+            var client = await _clientHelper.ResolveSelfDeclaredClient(authCode.OriginalRequest, cancellationToken);
+            context.SetClient(client);
+            return;
         }
+
+        var oauthClient = await AuthenticateClient(context, cancellationToken);
+        context.SetClient(oauthClient);
+        await _dpopProofValidator.Validate(context);
+    }
+
+    protected virtual Task Enrich(HandlerContext handlerContext, JsonObject result, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    async Task Authenticate(JsonObject previousQueryParameters, HandlerContext handlerContext, AuthCode authCode, CancellationToken token)
+    {
+        if (!previousQueryParameters.ContainsKey(JwtRegisteredClaimNames.Sub))
+            return;
+        var user = await _userRepository.GetBySubject(previousQueryParameters[JwtRegisteredClaimNames.Sub].GetValue<string>(), handlerContext.Realm, token);
+        UserSession session = null;
+        if(!string.IsNullOrWhiteSpace(authCode.SessionId))
+        {
+            session = await _userSessionRepository.GetById(authCode.SessionId, handlerContext.Realm, token);
+            if (session != null && !session.IsActive()) session = null;
+        }
+
+        handlerContext.SetUser(user, session);
+    }
+
+    void CheckDPOPJkt(HandlerContext context, AuthCode authCode)
+    {
+        if (context.DPOPProof == null || string.IsNullOrWhiteSpace(authCode.DPOPJkt)) return;
+        if (context.DPOPProof.PublicKey().CreateThumbprint() != authCode.DPOPJkt) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, Global.DpopJktMismatch);
     }
 }

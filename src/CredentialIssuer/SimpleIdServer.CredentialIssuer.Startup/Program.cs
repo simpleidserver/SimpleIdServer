@@ -1,4 +1,5 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+﻿
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.CredentialIssuer.Startup;
+using SimpleIdServer.Did.Key;
 using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -92,16 +94,20 @@ builder.Services.AddControllers();
 
 builder.Services.AddCredentialIssuer(o =>
 {
+    o.Version = SimpleIdServer.IdServer.CredentialIssuer.CredentialIssuerVersion.ESBI;
     o.ClientId = builder.Configuration["Authorization:ClientId"];
     o.ClientSecret = builder.Configuration["Authorization:ClientSecret"];
     o.AuthorizationServer = builder.Configuration["Authorization:Issuer"];
     o.IgnoreHttpsCertificateError = ignoreCertificateError;
+    o.IsDeveloperModeEnabled = true;
 })
 .UseInMemoryStore(c =>
 {
     c.AddCredentialConfigurations(CredentialIssuerConfiguration.CredentialConfigurations);
     c.AddUserCredentialClaims(CredentialIssuerConfiguration.CredentialClaims);
 });
+
+builder.Services.AddDidKey();
 
 var app = builder.Build();
 app.UseStaticFiles();

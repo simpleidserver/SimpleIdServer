@@ -14,8 +14,8 @@ public class CredentialIssuerOptions
     public CredentialIssuerOptions()
     {
         var resolver = DidKeyResolver.New();
-        AsymmKey = Ed25519SignatureKey.Generate();
-        var did = DidKeyGenerator.New().Generate(AsymmKey);
+        AsymmKey = ES256SignatureKey.Generate();
+        var did = DidKeyGenerator.New().Generate(new JsonWebKeySecurityKey(AsymmKey.GetPublicJwk()));
         DidDocument = resolver.Resolve(did, CancellationToken.None).Result;
         VerificationMethodId = DidDocument.VerificationMethod.First().Id;
     }
@@ -65,4 +65,20 @@ public class CredentialIssuerOptions
     /// Ignore the HTTPS certificate error.
     /// </summary>
     public bool IgnoreHttpsCertificateError { get; set; }
+
+    /// <summary>
+    /// Set the version of the credential issuer.
+    /// </summary>
+    public CredentialIssuerVersion Version { get; set; } = CredentialIssuerVersion.LAST;
+
+    /// <summary>
+    /// Enable or disable the developer mode.
+    /// </summary>
+    public bool IsDeveloperModeEnabled { get; set; } = false;
+}
+
+public enum CredentialIssuerVersion
+{
+    LAST = 0,
+    ESBI = 1
 }

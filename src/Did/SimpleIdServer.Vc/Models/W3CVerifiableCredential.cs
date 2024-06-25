@@ -12,27 +12,36 @@ namespace SimpleIdServer.Vc.Models;
 /// </summary>
 public class W3CVerifiableCredential : BaseVerifiableDocument
 {
-    [JsonPropertyName("id")]
-    public string Id { get; set; }
     [JsonPropertyName("@context")]
     public List<string> Context { get; set; } = new List<string>();
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
     [JsonPropertyName("type")]
     public List<string> Type { get; set; } = new List<string>();
-    [JsonPropertyName("name")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Name { get; set; } = null;
-    [JsonPropertyName("description")]
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public string? Description { get; set; } = null;
     [JsonPropertyName("issuer")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string Issuer { get; set; }
+    [JsonPropertyName("issuanceDate")]
+    public DateTime IssuanceDate { get; set; }
     [JsonPropertyName("validFrom")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? ValidFrom { get; set; }
     [JsonPropertyName("validUntil")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public DateTime? ValidUntil { get; set; }
+    [JsonPropertyName("issued")]
+    public DateTime Issued { get; set; }
     [JsonPropertyName("credentialSubject")]
     public JsonNode CredentialSubject { get; set; }
+    [JsonPropertyName("credentialSchema")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public W3CVerifiableCredentialSchema Schema { get; set; }
+}
+
+public class W3CVerifiableCredentialSchema
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = null!;
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = null!;
 }

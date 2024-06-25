@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,7 +45,8 @@ public class CredentialsController : BaseController
         var credentialConfigurations = await _credentialConfigurationStore.GetAll(cancellationToken);
         return View(new CredentialsViewModel
         {
-            CredentialConfigurations = credentialConfigurations
+            CredentialConfigurations = credentialConfigurations,
+            IsDeveloperModeEnabled = _options.IsDeveloperModeEnabled
         });
     }
 
@@ -59,12 +61,15 @@ public class CredentialsController : BaseController
             CredentialConfigurationIds = new List<string> { request.ConfigurationId },
             Grants = new List<string>
             {
-                CredentialOfferResultNames.PreAuthorizedCodeGrant
+                CredentialOfferResultNames.PreAuthorizedCodeGrant,
+                CredentialOfferResultNames.AuthorizedCodeGrant
             },
             Subject = subject
         }, cancellationToken);
         if (result.Error != null)
             return Build(result.Error.Value);
+        var json = JsonSerializer.Serialize(result.CredentialOffer);
+        Response.Headers.Add("QRCode", json);
         return File(_getCredentialOfferQueryHandler.GetQrCode(new GetCredentialOfferQuery 
         { 
             CredentialOffer = result.CredentialOffer, 

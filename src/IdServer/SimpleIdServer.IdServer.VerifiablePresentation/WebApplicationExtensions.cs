@@ -32,6 +32,9 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpEndRegister,
                 defaults: new { controller = "VpRegister", action = "EndRegister" });
 
+            webApplication.SidMapControllerRoute("vpAuthorizePost",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizePost,
+                defaults: new { controller = "VpAuthorize", action = "Post" });
 
             return webApplication;
         }

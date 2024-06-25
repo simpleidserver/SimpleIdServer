@@ -115,6 +115,15 @@ namespace SimpleIdServer.CredentialIssuer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à QR code.
+        /// </summary>
+        public static string QrCode {
+            get {
+                return ResourceManager.GetString("QrCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Scan the QR code with your wallet application.
         /// </summary>
         public static string ScanQrCodeWithYourWalletApplication {

@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SimpleIdServer.Did.Jwt;
 
@@ -66,6 +68,19 @@ public class DidJsonWebTokenHandler
         return result;
     }
 
+    public async Task<bool> CheckJwt(
+        string jwtToken,
+        IDidFactoryResolver didFactoryResolver,
+        CancellationToken cancellationToken)
+    {
+        var handler = new JsonWebTokenHandler();
+        if (!handler.CanReadToken(jwtToken)) throw new InvalidOperationException("cannot read the Json Web Token");
+        var jwt = handler.ReadJsonWebToken(jwtToken);
+        var kid = jwt.Kid;
+        var did = await didFactoryResolver.Resolve(kid, cancellationToken);
+        return CheckJwt(jwtToken, did);
+    }
+
     public bool CheckJwt(
         string jwt,
         DidDocument didDocument)
@@ -99,11 +114,11 @@ public class DidJsonWebTokenHandler
         if (didDocument.AssertionMethod == null) throw new InvalidOperationException("There is no assertion method");
         if (string.IsNullOrWhiteSpace(verificationMethodId)) throw new ArgumentNullException(nameof(verificationMethodId));
         var handler = new JsonWebTokenHandler();
+        var verificationMethod = didDocument.VerificationMethod.Single(m => m.Id == verificationMethodId);
+        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         var jsonWebToken = handler.ReadJsonWebToken(jwt);
         var content = System.Text.Encoding.UTF8.GetBytes($"{jsonWebToken.EncodedHeader}.{jsonWebToken.EncodedPayload}");
         var signature = Base64UrlEncoder.DecodeBytes(jsonWebToken.EncodedSignature);
-        var verificationMethod = didDocument.VerificationMethod.Single(m => m.Id == verificationMethodId);
-        var asymKey = _verificationMethodEncoding.Decode(verificationMethod);
         if (asymKey.CheckHash(content, signature, HashAlgorithmName.SHA256)) return true;
         return false;
     }

@@ -37,7 +37,23 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer
         {
             var credentialTemplates = await _credentialConfigurationStore.GetAll(cancellationToken);
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var result = new CredentialIssuerResult
+            object result = null;
+            if (_options.Version == CredentialIssuerVersion.ESBI)
+                result = GetESBICredentialIssuer(issuer, credentialTemplates);
+            else
+                result = GetLastCredentialIssuer(issuer, credentialTemplates);
+            return new ContentResult
+            {
+                Content = JsonSerializer.Serialize(result),
+                StatusCode = (int)HttpStatusCode.OK,
+                ContentType = "application/json"
+            };
+        }
+
+        private object GetLastCredentialIssuer(string issuer, List<Domains.CredentialConfiguration> credentialTemplates)
+        {
+            // https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0.html
+            var result = new LastCredentialIssuerResult
             {
                 AuthorizationServers = new List<string>
                 {
@@ -45,18 +61,30 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialIssuer
                 },
                 CredentialIssuer = issuer,
                 CredentialEndpoint = $"{issuer}/{Constants.EndPoints.Credential}",
-                CredentialsSupported = credentialTemplates.ToDictionary(kvp =>kvp.ServerId, kvp => _serializer.Serialize(kvp)),
+                CredentialConfigurationsSupported = credentialTemplates.ToDictionary(kvp => kvp.ServerId, kvp => _serializer.Serialize(kvp)),
                 CredentialIdentifiersSupported = true,
                 CredentialResponseEncryptionAlgValuesSupported = Constants.AllEncAlgs,
                 CredentialResponseEncryptionEncValuesSupported = Constants.AllEncryptions,
                 RequireCredentialResponseEncryption = false
             };
-            return new ContentResult
+            return result;
+        }
+
+        private object GetESBICredentialIssuer(string issuer, List<Domains.CredentialConfiguration> credentialTemplates)
+        {
+            // https://openid.net/specs/openid-4-verifiable-credential-issuance-1_0-10.html#credential-metadata-object
+            var result = new ESBICredentialIssuerResult
             {
-                Content = JsonSerializer.Serialize(result),
-                StatusCode = (int)HttpStatusCode.OK,
-                ContentType = "application/json"
+                AuthorizationServer = _options.AuthorizationServer,
+                CredentialIssuer = issuer,
+                CredentialEndpoint = $"{issuer}/{Constants.EndPoints.Credential}",
+                CredentialsSupported = credentialTemplates.Select(kvp => _serializer.Serialize(kvp)).ToList(),
+                CredentialIdentifiersSupported = true,
+                CredentialResponseEncryptionAlgValuesSupported = Constants.AllEncAlgs,
+                CredentialResponseEncryptionEncValuesSupported = Constants.AllEncryptions,
+                RequireCredentialResponseEncryption = false
             };
+            return result;
         }
     }
 }

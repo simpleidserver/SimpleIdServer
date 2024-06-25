@@ -21,11 +21,17 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
             VcConstants.VerifiableCredentialJsonLdContext,
             configuration.JsonLdContext
         };
-        var type = new JsonArray
+        var types = new JsonArray
         {
             VcConstants.VerifiableCredentialType,
             configuration.Type
         };
+        if(configuration.AdditionalTypes != null)
+        {
+            foreach (var additionalType in configuration.AdditionalTypes.Where(a => !string.IsNullOrWhiteSpace(a)))
+                types.Add(additionalType);
+        }
+
         var credentialSubject = new JsonObject();
         var flatNodes = configuration.Claims.Select(c =>
         {
@@ -40,7 +46,7 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
         var result = new JsonObject
         {
             { "@context", ctx },
-            { "type", type },
+            { "types", types },
             { "credentialSubject", credentialSubject }
         };
         return result;
@@ -53,7 +59,7 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
         if (credentialDefinition == null || !credentialDefinition.ContainsKey("type")) return null;
         var jArrTypes = credentialDefinition["type"].AsArray();
         if (jArrTypes == null) return null;
-        var filteredTypes = jArrTypes.Select(t => t.ToString()).Where(c => c != VcConstants.VerifiableCredentialType);
+        var filteredTypes = jArrTypes.Select(t => t.ToString()).Where(c => c != VcConstants.VerifiableCredentialType && c != VcConstants.VerifiableAttestation);
         if (filteredTypes.Count() != 1) return null;
         return new CredentialHeader
         {
@@ -70,12 +76,17 @@ public abstract class BaseW3CVerifiableCredentialFormatter : ICredentialFormatte
             request.JsonLdContext,
             request.Issuer,
             request.Type,
+            request.AdditionalTypes,
             request.ValidFrom,
             request.ValidUntil);
-        builder.AddCredentialSubject(request.Subject, (b) =>
+        builder.AddCredentialSubject(request.RequestSubject, (b) =>
         {
+            b.SetPersonalIdentifier(request.Subject);
             Build(request.UserClaims, b.Build(), 1);
         });
+        if(request.Schema != null)
+            builder.SetSchema(request.Schema.Id, request.Schema.Type);
+
         return builder.Build();
     }
 

@@ -26,6 +26,6 @@ public class JwtVcJsonFormatter : BaseW3CVerifiableCredentialFormatter
         if (asymmetricKey == null) throw new ArgumentNullException(nameof(asymmetricKey));
         var credential = BuildCredential(request);
         return SecuredDocument.New()
-            .SecureJwt(request.Subject, didDocument, verificationMethodId, credential, asymKey: asymmetricKey);
+            .SecureJwt(request.RequestSubject, didDocument, verificationMethodId, credential, asymKey: asymmetricKey);
     }
 }

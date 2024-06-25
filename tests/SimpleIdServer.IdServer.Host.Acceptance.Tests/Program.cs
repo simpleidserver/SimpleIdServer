@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using SimpleIdServer.Did.Key;
 
 var builder = WebApplication.CreateBuilder(args);
 var p = GetKey(512);
@@ -69,6 +70,7 @@ builder.Services.Remove(antiforgeryService);
 builder.Services.Remove(memoryDistribution);
 builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
 builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
+builder.Services.AddDidKey();
 var app = builder.Build()
     .UseSID();
 app.Run();

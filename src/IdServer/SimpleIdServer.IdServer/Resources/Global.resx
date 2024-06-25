@@ -261,6 +261,9 @@
   <data name="BadGrantType" xml:space="preserve">
     <value>bad grant type</value>
   </data>
+  <data name="BadIdToken" xml:space="preserve">
+    <value>the identity token is invalid</value>
+  </data>
   <data name="BadIdTokenHintSig" xml:space="preserve">
     <value>signature of the id_token_hint is not correct</value>
   </data>
@@ -329,6 +332,9 @@
   </data>
   <data name="CannotReadCertificateStore" xml:space="preserve">
     <value>You don't have the permission to read the certificate store</value>
+  </data>
+  <data name="CannotUseClientMetadataAndClientMetadataUri" xml:space="preserve">
+    <value>the parameters client_metadata and client_metadata_uri cannot be used the same time</value>
   </data>
   <data name="CertificateCannotBeGenerated" xml:space="preserve">
     <value>the certificate cannot be generated</value>
@@ -399,6 +405,9 @@
   <data name="ClientIdentifierMustBeIdentical" xml:space="preserve">
     <value>client identifier must be identical</value>
   </data>
+  <data name="ClientMetadataCannotBeUsedWithRegisteredClient" xml:space="preserve">
+    <value>the client_metadata or client_metadata_uri parameter cannot be used with a pre-registered client</value>
+  </data>
   <data name="ClientNotificationTokenCannotExceed1024" xml:space="preserve">
     <value>client_notification_token must not exceed 1024 characters</value>
   </data>
@@ -447,6 +456,9 @@
   <data name="IdProvisioningTypeUnique" xml:space="preserve">
     <value>The same mapping type cannot be added twice.</value>
   </data>
+  <data name="IdTokenNonceMissing" xml:space="preserve">
+    <value>the nonce claim is missing in the id_token</value>
+  </data>
   <data name="InactiveSession" xml:space="preserve">
     <value>the session is not active</value>
   </data>
@@ -494,6 +506,9 @@
   </data>
   <data name="InvalidClientIdTokenHint" xml:space="preserve">
     <value>client_id contained in the id_token_hint is invalid</value>
+  </data>
+  <data name="InvalidClientMetadataUri" xml:space="preserve">
+    <value>the client_metadata_uri in the Authorization Request returns an error or contains invalid data</value>
   </data>
   <data name="InvalidDpopBoundToAccessToken" xml:space="preserve">
     <value>DPoP must be bound to the access token</value>
@@ -545,6 +560,9 @@
   </data>
   <data name="InvalidLocahostRedirectUri" xml:space="preserve">
     <value>redirect_uri must not contain localhost</value>
+  </data>
+  <data name="InvalidNonce" xml:space="preserve">
+    <value>the nonce is invalid and doesn't match the nonce present in the authorization request</value>
   </data>
   <data name="InvalidPendingDeviceCode" xml:space="preserve">
     <value>authorization request is still pending as the end user hasn't yet completed the user-interation steps</value>
@@ -756,6 +774,9 @@
   <data name="RequestUriIsRequired" xml:space="preserve">
     <value>the request_uri is required</value>
   </data>
+  <data name="RequiredClientMetadataOrClientMetadataUri" xml:space="preserve">
+    <value>the parameter client_metadata or client_metadata_uri is required</value>
+  </data>
   <data name="ScopeAlreadyExists" xml:space="preserve">
     <value>scope '{0}' already exists</value>
   </data>
@@ -767,6 +788,9 @@
   </data>
   <data name="ScopeClaimMapperTokenClaimNameMustBeUnique" xml:space="preserve">
     <value>Token claim name must be unique</value>
+  </data>
+  <data name="ScopeDifferentToOpenidCannotBeSelfIssued" xml:space="preserve">
+    <value>self-issued request cannot request access to scope different to OPENID</value>
   </data>
   <data name="ScopeMapperTypeUnique" xml:space="preserve">
     <value>The same mapping type cannot be added twice.</value>

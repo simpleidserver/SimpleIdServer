@@ -117,31 +117,32 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON \'credential_endpoint\'=\'http://localhost/credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 12
- testRunner.And("JSON \'$.credentials_supported.UniversityDegree_ldp_vc.@context[0]\'=\'https://www.w" +
-                        "3.org/2018/credentials/v1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.credential_configurations_supported.UniversityDegree_ldp_vc.@context[0]\'=" +
+                        "\'https://www.w3.org/2018/credentials/v1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 13
- testRunner.And("JSON \'$.credentials_supported.UniversityDegree_ldp_vc.@context[1]\'=\'https://www.w" +
-                        "3.org/2018/credentials/examples/v1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.credential_configurations_supported.UniversityDegree_ldp_vc.@context[1]\'=" +
+                        "\'https://www.w3.org/2018/credentials/examples/v1\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 14
- testRunner.And("JSON \'$.credentials_supported.UniversityDegree_ldp_vc.type[0]\'=\'VerifiableCredent" +
-                        "ial\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.credential_configurations_supported.UniversityDegree_ldp_vc.types[0]\'=\'Ve" +
+                        "rifiableCredential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 15
- testRunner.And("JSON \'$.credentials_supported.UniversityDegree_ldp_vc.type[1]\'=\'UniversityDegree\'" +
-                        "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.credential_configurations_supported.UniversityDegree_ldp_vc.types[1]\'=\'Un" +
+                        "iversityDegree\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 16
- testRunner.And("JSON \'$.credentials_supported.UniversityDegree_ldp_vc.format\'=\'ldp_vc\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.credential_configurations_supported.UniversityDegree_ldp_vc.format\'=\'ldp_" +
+                        "vc\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 17
- testRunner.And("JSON \'$.credentials_supported.UniversityDegree_ldp_vc.credentialSubject.given_nam" +
-                        "e.display[0].name\'=\'Given Name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.credential_configurations_supported.UniversityDegree_ldp_vc.credentialSub" +
+                        "ject.given_name.display[0].name\'=\'Given Name\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 18
- testRunner.And("JSON \'$.credentials_supported.UniversityDegree_ldp_vc.credentialSubject.given_nam" +
-                        "e.display[0].locale\'=\'en-US\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.credential_configurations_supported.UniversityDegree_ldp_vc.credentialSub" +
+                        "ject.given_name.display[0].locale\'=\'en-US\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
