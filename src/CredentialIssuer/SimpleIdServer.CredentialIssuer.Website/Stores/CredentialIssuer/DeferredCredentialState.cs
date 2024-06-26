@@ -13,6 +13,6 @@ public record DeferredCredentialState
 
     }
 
-    public DeferredCredential DeferredCredential { get; set; } = null;
+    public DeferredCredential DeferredCredential { get; set; } = new DeferredCredential();
     public bool IsLoading { get; set; } = true;
 }

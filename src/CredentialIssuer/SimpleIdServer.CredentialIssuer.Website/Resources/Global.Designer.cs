@@ -403,6 +403,24 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Claims of the deferred credential.
+        /// </summary>
+        internal static string DeferredCredentialClaims {
+            get {
+                return ResourceManager.GetString("DeferredCredentialClaims", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The deferred credential has been issued.
+        /// </summary>
+        internal static string DeferredCredentialIssued {
+            get {
+                return ResourceManager.GetString("DeferredCredentialIssued", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Issue the credentials.
         /// </summary>
         internal static string DeferredCredentialsDescription {
@@ -417,6 +435,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string DeferredCredentialsTitle {
             get {
                 return ResourceManager.GetString("DeferredCredentialsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Deferred credential.
+        /// </summary>
+        internal static string DeferredCredentialTitle {
+            get {
+                return ResourceManager.GetString("DeferredCredentialTitle", resourceCulture);
             }
         }
         
@@ -763,6 +790,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Transaction identifier.
+        /// </summary>
+        internal static string TransactionId {
+            get {
+                return ResourceManager.GetString("TransactionId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Type.
         /// </summary>
         internal static string Type {
@@ -777,6 +813,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string TypeHelper {
             get {
                 return ResourceManager.GetString("TypeHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Update.
+        /// </summary>
+        internal static string Update {
+            get {
+                return ResourceManager.GetString("Update", resourceCulture);
             }
         }
         

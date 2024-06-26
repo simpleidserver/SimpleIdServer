@@ -231,11 +231,20 @@
   <data name="CredentialTranslationUpdated" xml:space="preserve">
     <value>Translation has been updated</value>
   </data>
+  <data name="DeferredCredentialClaims" xml:space="preserve">
+    <value>Claims of the deferred credential</value>
+  </data>
+  <data name="DeferredCredentialIssued" xml:space="preserve">
+    <value>The deferred credential has been issued</value>
+  </data>
   <data name="DeferredCredentialsDescription" xml:space="preserve">
     <value>Issue the credentials</value>
   </data>
   <data name="DeferredCredentialsTitle" xml:space="preserve">
     <value>Deferred credentials</value>
+  </data>
+  <data name="DeferredCredentialTitle" xml:space="preserve">
+    <value>Deferred credential</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
@@ -351,11 +360,17 @@
   <data name="TextColorHelper" xml:space="preserve">
     <value>TextColorHelper</value>
   </data>
+  <data name="TransactionId" xml:space="preserve">
+    <value>Transaction identifier</value>
+  </data>
   <data name="Type" xml:space="preserve">
     <value>Type</value>
   </data>
   <data name="TypeHelper" xml:space="preserve">
     <value>TypeHelper</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
   </data>
   <data name="UpdateCredentialConfigurationClaim" xml:space="preserve">
     <value>Update translation</value>

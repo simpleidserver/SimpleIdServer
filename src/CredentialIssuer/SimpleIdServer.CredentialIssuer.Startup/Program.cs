@@ -1,9 +1,10 @@
-﻿
-// Copyright (c) SimpleIdServer. All rights reserved.
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.CredentialIssuer.Startup;
@@ -63,34 +64,7 @@ builder.Services.AddAuthentication(o =>
 });
 builder.Services.AddAuthorization(b =>
 {
-    b.AddPolicy("WebsiteAuthenticated", p =>
-    {
-        p.RequireAuthenticatedUser();
-    });
-    b.AddPolicy("ApiAuthenticated", p =>
-    {
-        p.AuthenticationSchemes.Clear();
-        p.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-        p.RequireAuthenticatedUser();
-    });
-    b.AddPolicy("credconfs", p =>
-    {
-        p.AuthenticationSchemes.Clear();
-        p.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-        p.RequireClaim("scope", "credconfs");
-    });
-    b.AddPolicy("credinstances", p =>
-    {
-        p.AuthenticationSchemes.Clear();
-        p.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-        p.RequireClaim("scope", "credinstances");
-    });
-    b.AddPolicy("deferredcreds", p =>
-    {
-        p.AuthenticationSchemes.Clear();
-        p.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-        p.RequireClaim("scope", "deferredcreds");
-    });
+    b.AddDefaultCredentialIssuerAuthorization();
 });
 builder.Services.AddLocalization();
 builder.Services.AddEndpointsApiExplorer();
@@ -111,6 +85,7 @@ builder.Services.AddCredentialIssuer(o =>
 {
     c.AddCredentialConfigurations(CredentialIssuerConfiguration.CredentialConfigurations);
     c.AddUserCredentialClaims(CredentialIssuerConfiguration.CredentialClaims);
+    c.AddDeferredCredentials(CredentialIssuerConfiguration.DeferredCredentials);
 });
 
 builder.Services.AddDidKey();

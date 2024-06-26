@@ -14,6 +14,6 @@ public record DeferredCredentialsState
         
     }
 
-    public SearchResult<DeferredCredential> DeferredCredentials { get; set; } = null;
+    public SearchResult<DeferredCredential> DeferredCredentials { get; set; } = new SearchResult<DeferredCredential>();
     public bool IsLoading { get; set; } = true;
 }

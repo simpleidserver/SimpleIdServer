@@ -87,7 +87,7 @@ public class DeferredCredentialController : BaseController
 
     [Authorize("deferredcreds")]
     [HttpPut("{id}/issue")]
-    public async Task<IActionResult> Issue(string id, IssueDeferredCredentialRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Issue(string id, [FromBody] IssueDeferredCredentialRequest request, CancellationToken cancellationToken)
     {
         if (request == null) return Build(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST));
         if (request.Claims == null) return Build(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, DeferredCredentialResultNames.Claims)));

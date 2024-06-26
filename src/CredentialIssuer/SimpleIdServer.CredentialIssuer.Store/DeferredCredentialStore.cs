@@ -4,6 +4,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.CredentialIssuer.Domains;
 using System.Linq.Dynamic.Core;
+using System.Xml;
 
 namespace SimpleIdServer.CredentialIssuer.Store;
 
@@ -53,7 +54,11 @@ public class DeferredCredentialStore : IDeferredCredentialStore
     }
 
     public Task<DeferredCredential> Get(string transactionId, CancellationToken cancellationToken)
-        => _dbContext.DeferredCredentials.Include(c => c.Claims).SingleOrDefaultAsync(d => d.TransactionId == transactionId, cancellationToken);
+        => _dbContext
+            .DeferredCredentials
+            .Include(c => c.Claims)
+            .Include(c => c.Configuration).ThenInclude(c => c.Claims).ThenInclude(c => c.Translations)
+            .SingleOrDefaultAsync(d => d.TransactionId == transactionId, cancellationToken);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);
