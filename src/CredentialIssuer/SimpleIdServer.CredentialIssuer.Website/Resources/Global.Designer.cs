@@ -187,6 +187,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Create datetime.
+        /// </summary>
+        internal static string CreateDateTime {
+            get {
+                return ResourceManager.GetString("CreateDateTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Claim has been added.
         /// </summary>
         internal static string CredentialClaimAdded {
@@ -390,6 +399,24 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string CredentialTranslationUpdated {
             get {
                 return ResourceManager.GetString("CredentialTranslationUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Issue the credentials.
+        /// </summary>
+        internal static string DeferredCredentialsDescription {
+            get {
+                return ResourceManager.GetString("DeferredCredentialsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Deferred credentials.
+        /// </summary>
+        internal static string DeferredCredentialsTitle {
+            get {
+                return ResourceManager.GetString("DeferredCredentialsTitle", resourceCulture);
             }
         }
         
@@ -687,6 +714,15 @@ namespace SimpleIdServer.CredentialIssuer.Website.Resources {
         internal static string SourceUserClaimNameHelper {
             get {
                 return ResourceManager.GetString("SourceUserClaimNameHelper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Status.
+        /// </summary>
+        internal static string Status {
+            get {
+                return ResourceManager.GetString("Status", resourceCulture);
             }
         }
         

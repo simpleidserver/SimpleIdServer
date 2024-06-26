@@ -85,6 +85,12 @@ builder.Services.AddAuthorization(b =>
         p.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
         p.RequireClaim("scope", "credinstances");
     });
+    b.AddPolicy("deferredcreds", p =>
+    {
+        p.AuthenticationSchemes.Clear();
+        p.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+        p.RequireClaim("scope", "deferredcreds");
+    });
 });
 builder.Services.AddLocalization();
 builder.Services.AddEndpointsApiExplorer();

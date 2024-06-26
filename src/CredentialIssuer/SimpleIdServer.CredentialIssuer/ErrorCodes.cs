@@ -1,19 +1,20 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-namespace SimpleIdServer.IdServer.CredentialIssuer
+namespace SimpleIdServer.IdServer.CredentialIssuer;
+
+public static class ErrorCodes
 {
-    public static class ErrorCodes
-    {
-        public const string INVALID_CREDENTIAL_REQUEST = "invalid_credential_request";
-        public const string INVALID_CREDENTIAL_OFFER_REQUEST = "invalid_credential_offer_request";
-        public const string INVALID_ENCRYPTION_PARAMETERS = "invalid_encryption_parameters";
-        public const string INVALID_REQUEST = "invalid_request";
-        public const string INVALID_TOKEN = "invalid_token";
-        public const string INVALID_PROOF = "invalid_proof";
-        public const string INVALID_CREDOFFER = "invalid_credoffer";
-        public const string UNAUTHORIZED = "unauthorized";
-        public const string UNSUPPORTED_CREDENTIAL_FORMAT = "unsupported_credential_format";
-        public const string UNSUPPORTED_CREDENTIAL_TYPE = "unsupported_credential_type";
-        public const string NOT_FOUND = "not_found";
-    }
+    public const string ISSUANCE_PENDING = "issuance_pending";
+    public const string INVALID_CREDENTIAL_REQUEST = "invalid_credential_request";
+    public const string INVALID_CREDENTIAL_OFFER_REQUEST = "invalid_credential_offer_request";
+    public const string INVALID_ENCRYPTION_PARAMETERS = "invalid_encryption_parameters";
+    public const string INVALID_REQUEST = "invalid_request";
+    public const string INVALID_TOKEN = "invalid_token";
+    public const string INVALID_PROOF = "invalid_proof";
+    public const string INVALID_CREDOFFER = "invalid_credoffer";
+    public const string UNAUTHORIZED = "unauthorized";
+    public const string UNSUPPORTED_CREDENTIAL_FORMAT = "unsupported_credential_format";
+    public const string UNSUPPORTED_CREDENTIAL_TYPE = "unsupported_credential_type";
+    public const string NOT_FOUND = "not_found";
+    public const string INVALID_TRANSACTION_ID = "invalid_transaction_id";
 }

@@ -1014,6 +1014,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public string ClientId { get; set; } = null!;
         public IEnumerable<string> ScopeNames { get; set; } = new List<string>();
     }
+    }
 
     public class RemoveSelectedClientScopesSuccessAction
     {

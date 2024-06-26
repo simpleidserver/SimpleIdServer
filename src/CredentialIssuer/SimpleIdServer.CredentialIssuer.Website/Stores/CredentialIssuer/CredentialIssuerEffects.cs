@@ -4,7 +4,9 @@ using Fluxor;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.CredentialIssuer.Api.CredentialConf;
 using SimpleIdServer.CredentialIssuer.Api.CredentialInstance;
+using SimpleIdServer.CredentialIssuer.Api.DeferredCredential;
 using SimpleIdServer.CredentialIssuer.Domains;
+using SimpleIdServer.CredentialIssuer.Store;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -405,6 +407,65 @@ public class CredentialIssuerEffects
         dispatcher.Dispatch(new RemoveCredentialInstanceSuccessAction { Id = action.Id });
     }
 
+    [EffectMethod]
+    public async Task Handle(GetDeferredCredentialAction action, IDispatcher dispatcher)
+    {
+        var url = $"{_options.CredentialIssuerUrl}/deferred_credential/{action.Id}";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri(url),
+            Method = HttpMethod.Get
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<DeferredCredential>(json);
+        dispatcher.Dispatch(new GetDeferredCredentialSuccessAction { DeferredCredential = result });
+    }
+
+    [EffectMethod]
+    public async Task Handle(IssueDeferredCredentialAction action, IDispatcher dispatcher)
+    {
+        var url = $"{_options.CredentialIssuerUrl}/deferred_credential/{action.Id}/issue";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri(url),
+            Method = HttpMethod.Put,
+            Content = new StringContent(JsonSerializer.Serialize(new IssueDeferredCredentialRequest
+            {
+                Claims = action.Claims
+            }), Encoding.UTF8, "application/json")
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new IssueDeferredCredentialSuccessAction { Claims = action.Claims, Id = action.Id });
+    }
+
+    [EffectMethod]
+    public async Task Handle(SearchDeferredCredentialsAction action, IDispatcher dispatcher)
+    {
+        var url = $"{_options.CredentialIssuerUrl}/deferred_credential/.search";
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri(url),
+            Method = HttpMethod.Post,
+            Content = new StringContent(JsonSerializer.Serialize(new SearchRequest
+            {
+                Filter = SanitizeExpression(action.Filter),
+                OrderBy = SanitizeExpression(action.OrderBy),
+                Skip = action.Skip,
+                Take = action.Take
+            }), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var searchResult = JsonSerializer.Deserialize<SearchResult<DeferredCredential>>(json);
+        dispatcher.Dispatch(new SearchDeferredCredentialsSuccessAction { DeferredCredentials = searchResult });
+
+        string SanitizeExpression(string expression) => expression.Replace("Value.", "");
+    }
+
     private string GetBaseUrl()
         => $"{_options.CredentialIssuerUrl}/credential_configurations";
 }
@@ -668,4 +729,39 @@ public class RemoveCredentialInstanceAction
 public class RemoveCredentialInstanceSuccessAction
 {
     public string Id { get; set; }
+}
+
+public class SearchDeferredCredentialsAction
+{
+    public string? Filter { get; set; } = null;
+    public string? OrderBy { get; set; } = null;
+    public int? Skip { get; set; } = null;
+    public int? Take { get; set; } = null;
+}
+
+public class SearchDeferredCredentialsSuccessAction
+{
+    public SearchResult<DeferredCredential> DeferredCredentials { get; set; }
+}
+
+public class GetDeferredCredentialAction
+{
+    public string Id { get; set; }
+}
+
+public class GetDeferredCredentialSuccessAction
+{
+    public DeferredCredential DeferredCredential { get; set; }
+}
+
+public class IssueDeferredCredentialAction
+{
+    public string Id { get; set; }
+    public Dictionary<string, string> Claims { get; set; }
+}
+
+public class IssueDeferredCredentialSuccessAction
+{
+    public string Id { get; set; }
+    public Dictionary<string, string> Claims { get; set; }
 }

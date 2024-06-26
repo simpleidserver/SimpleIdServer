@@ -159,6 +159,9 @@
   <data name="ClaimValueTypeHelper" xml:space="preserve">
     <value>ClaimValueTypeHelper</value>
   </data>
+  <data name="CreateDateTime" xml:space="preserve">
+    <value>Create datetime</value>
+  </data>
   <data name="CredentialClaimAdded" xml:space="preserve">
     <value>Claim has been added</value>
   </data>
@@ -227,6 +230,12 @@
   </data>
   <data name="CredentialTranslationUpdated" xml:space="preserve">
     <value>Translation has been updated</value>
+  </data>
+  <data name="DeferredCredentialsDescription" xml:space="preserve">
+    <value>Issue the credentials</value>
+  </data>
+  <data name="DeferredCredentialsTitle" xml:space="preserve">
+    <value>Deferred credentials</value>
   </data>
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
@@ -326,6 +335,9 @@
   </data>
   <data name="SourceUserClaimNameHelper" xml:space="preserve">
     <value>SourceUserClaimNameHelper</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Status</value>
   </data>
   <data name="Subject" xml:space="preserve">
     <value>Subject</value>

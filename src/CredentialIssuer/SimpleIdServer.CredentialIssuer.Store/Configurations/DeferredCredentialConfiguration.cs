@@ -4,7 +4,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleIdServer.CredentialIssuer.Domains;
-using System.Text.Json;
 
 namespace SimpleIdServer.CredentialIssuer.Store.Configurations;
 

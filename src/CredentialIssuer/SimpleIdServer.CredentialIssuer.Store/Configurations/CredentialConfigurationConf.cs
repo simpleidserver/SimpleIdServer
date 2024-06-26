@@ -14,6 +14,7 @@ namespace SimpleIdServer.CredentialIssuer.Store.Configurations
             builder.HasMany(c => c.Claims).WithOne(c => c.CredentialConfiguration).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.Displays).WithOne(c => c.CredentialConfiguration).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.Credentials).WithOne(c => c.Configuration).OnDelete(DeleteBehavior.Cascade);
+            builder.HasMany(c => c.DeferredCredentials).WithOne(c => c.Configuration).OnDelete(DeleteBehavior.Cascade);
             builder.Property(a => a.AdditionalTypes).HasConversion(
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None).ToList());

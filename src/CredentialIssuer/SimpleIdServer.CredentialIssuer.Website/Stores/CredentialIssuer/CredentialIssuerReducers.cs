@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using System.Data;
 
 namespace SimpleIdServer.CredentialIssuer.Website.Stores.CredentialIssuer;
 
@@ -420,6 +419,78 @@ public static class CredentialIssuerReducers
         {
             IsLoading = false,
             Credentials = state.Credentials
+        };
+    }
+
+    #endregion
+
+    #region DeferredCredentialsState
+
+    [ReducerMethod]
+    public static DeferredCredentialsState ReduceSearchDeferredCredentialsAction(DeferredCredentialsState state, SearchDeferredCredentialsAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static DeferredCredentialsState ReduceSearchDeferredCredentialsSuccessAction(DeferredCredentialsState state, SearchDeferredCredentialsSuccessAction action)
+    {
+        return state with
+        {
+            IsLoading = false,
+            DeferredCredentials = action.DeferredCredentials
+        };
+    }
+
+    #endregion
+
+    #region DeferredCredentialState
+
+    [ReducerMethod]
+    public static DeferredCredentialState ReduceGetDeferredCredentialAction(DeferredCredentialState state, GetDeferredCredentialAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static DeferredCredentialState ReduceGetDeferredCredentialSuccessAction(DeferredCredentialState state, GetDeferredCredentialSuccessAction action)
+    {
+        return state with
+        {
+            IsLoading = false,
+            DeferredCredential = action.DeferredCredential
+        };
+    }
+
+    [ReducerMethod]
+    public static DeferredCredentialState ReduceIssueDeferredCredentialAction(DeferredCredentialState state, IssueDeferredCredentialAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static DeferredCredentialState ReduceIssueDeferredCredentialSuccessAction(DeferredCredentialState state, IssueDeferredCredentialSuccessAction action)
+    {
+        var deferredCredential = state.DeferredCredential;
+        deferredCredential.Claims = action.Claims.Select(kvp => new Domains.DeferredCredentialClaim
+        {
+            Name = kvp.Key,
+            Value = kvp.Value
+        }).ToList();
+        deferredCredential.Status = Domains.DeferredCredentialStatus.ISSUED;
+        return state with
+        {
+            IsLoading = false,
+            DeferredCredential = deferredCredential
         };
     }
 
