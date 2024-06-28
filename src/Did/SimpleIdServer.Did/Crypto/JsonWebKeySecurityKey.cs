@@ -3,6 +3,7 @@
 
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Did.Serializers;
+using System;
 using System.Security.Cryptography;
 
 namespace SimpleIdServer.Did.Crypto;
@@ -24,6 +25,7 @@ public class JsonWebKeySecurityKey : IAsymmetricKey
 
     public SigningCredentials BuildSigningCredentials(string kid = null)
     {
+        if (_jwk == null) throw new InvalidOperationException("there is no private key");
         _jwk.Kid = kid;
         return new SigningCredentials(_jwk, _jwk.Alg);
     }
@@ -34,20 +36,17 @@ public class JsonWebKeySecurityKey : IAsymmetricKey
     }
 
     public JsonWebKey GetPrivateJwk()
-    {
-        throw new System.NotImplementedException();
-    }
+        => _jwk;
 
     public byte[] GetPrivateKey()
-    {
-        throw new System.NotImplementedException();
-    }
+        => GetPublicKey();
 
     public JsonWebKey GetPublicJwk()
         => _jwk;
 
     public byte[] GetPublicKey(bool compressed = false)
     {
+        if (_jwk == null) throw new InvalidOperationException("there is no public key");
         _jwk.Alg = null;
         var json = JsonWebKeySerializer.Write(_jwk);
         return System.Text.Encoding.UTF8.GetBytes(json);

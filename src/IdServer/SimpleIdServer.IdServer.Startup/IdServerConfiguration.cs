@@ -58,6 +58,22 @@ namespace SimpleIdServer.IdServer.Startup
             UpdateDateTime = DateTime.UtcNow
         };
 
+        public static Scope CtWalletScope = new Scope
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "ct_wallet",
+            Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
+            {
+                StandardRealms.Master
+            },
+            Type = ScopeTypes.APIRESOURCE,
+            Protocol = ScopeProtocols.OAUTH,
+            IsExposedInConfigurationEdp = true,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+
+
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -85,7 +101,8 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.CredentialConfigurations,
             SimpleIdServer.IdServer.Constants.StandardScopes.CredentialInstances,
             SimpleIdServer.IdServer.Constants.StandardScopes.DeferredCreds,
-            UniversityDegreeScope
+            UniversityDegreeScope,
+            CtWalletScope
         };
 
         public static ICollection<User> Users => new List<User>
@@ -99,12 +116,13 @@ namespace SimpleIdServer.IdServer.Startup
             ClientBuilder.BuildWalletClient("walletClient", "password")
                 .SetClientName("Wallet")
                 .Build(),
-            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://0e42-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
+            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://e1e9-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
                 .SetClientName("Credential issuer")
                 .AddScope(
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Profile,
-                    UniversityDegreeScope).Build(),
+                    UniversityDegreeScope,
+                    CtWalletScope).IsTransactionCodeRequired().Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("CredentialIssuer-manager", "password", null, "https://localhost:5006/*", "https://credentialissuerwebsite.simpleidserver.com/*", "https://credentialissuerwebsite.localhost.com/*", "http://credentialissuerwebsite.localhost.com/*", "https://credentialissuerwebsite.sid.svc.cluster.local/*").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("https://localhost:5006/signout-callback-oidc").AddPostLogoutUri("https://credissuer-website.sid.svc.cluster.local/signout-callback-oidc")
                 .AddPostLogoutUri("https://website.simpleidserver.com/signout-callback-oidc")
                 .AddAuthDataTypes("photo")

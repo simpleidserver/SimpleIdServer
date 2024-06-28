@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.CredentialIssuer;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -37,7 +38,9 @@ public class PreAuthorizedCodeService : IPreAuthorizedCodeService
                 { "client_id", _options.ClientId },
                 { "client_secret", _options.ClientSecret },
                 { "grant_type", "urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code" },
-                { "scope", string.Join((" "), scopes) }
+                { "subject_token", accessToken },
+                { "scope", string.Join((" "), scopes.Where(s => !string.IsNullOrWhiteSpace(s))) },
+                { "subject_token_type", "urn:ietf:params:oauth:token-type:access_token" }
             };
             var requestMessage = new HttpRequestMessage
             {

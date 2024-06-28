@@ -13,7 +13,10 @@ public class DidKeyResolverFixture
     {
         // ARRANGE
         var key = "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK";
-        var resolver = DidKeyResolver.New();
+        var resolver = DidKeyResolver.New(new DidKeyOptions
+        {
+            PublicKeyFormat = Ed25519VerificationKey2020Standard.TYPE
+        });
 
         // ACT
         var didDocument = await resolver.Resolve(key, CancellationToken.None);
@@ -36,7 +39,10 @@ public class DidKeyResolverFixture
     {
         // ARRANGE
         var key = "did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp";
-        var resolver = DidKeyResolver.New(new DidKeyOptions { PublicKeyFormat = JsonWebKey2020Standard.TYPE });
+        var resolver = DidKeyResolver.New(new DidKeyOptions 
+        { 
+            PublicKeyFormat = JsonWebKey2020Standard.TYPE 
+        });
 
         // ACT
         var didDocument = await resolver.Resolve(key, CancellationToken.None);

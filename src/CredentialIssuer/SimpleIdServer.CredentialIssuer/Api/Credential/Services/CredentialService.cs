@@ -92,7 +92,7 @@ public class CredentialService : ICredentialService
         var formatter = request.Formatter;
         var credentialResult = formatter.Build(buildRequest,
             _options.DidDocument,
-            _options.VerificationMethodId,
+            _options.DidDocument.VerificationMethod.First().Id,
             _options.AsymmKey);
         if (request.Encryption != null)
         {

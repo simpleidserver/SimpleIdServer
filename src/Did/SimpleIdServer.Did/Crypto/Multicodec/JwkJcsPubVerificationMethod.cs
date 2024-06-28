@@ -11,7 +11,7 @@ public class JwkJcsPubVerificationMethod : IVerificationMethod
 
     public string MulticodecPublicKeyHexValue => MULTICODES_HEX_VALUE;
 
-    public string MulticodecPrivateKeyHexValue => null;
+    public string MulticodecPrivateKeyHexValue => MULTICODES_HEX_VALUE;
 
     public int KeySize => 0;
 

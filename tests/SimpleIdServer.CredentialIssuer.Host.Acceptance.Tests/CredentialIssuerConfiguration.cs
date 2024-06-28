@@ -61,4 +61,9 @@ public class CredentialIssuerConfiguration
     {
         CredentialBuilder.New("MasterComputerScience", FirstCredentialConfiguration.Id, "user", DateTime.UtcNow).Build()
     };
+
+    public static List<DeferredCredential> DeferredCredentials = new List<DeferredCredential>
+    {
+        new DeferredCredential { TransactionId = "pendingTransaction", Status = DeferredCredentialStatus.PENDING }
+    };
 }

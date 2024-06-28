@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -71,10 +72,20 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
             {
                 activity?.SetTag("grant_type", GRANT_TYPE);
                 activity?.SetTag("realm", context.Realm);
-                var oauthClient = await AuthenticateClient(context, cancellationToken);
+                var clientId = context.Request.RequestData.GetClientId();
+                var oauthClient = new Client();
+                bool isClientExists = false;
+                if(!string.IsNullOrWhiteSpace(clientId))
+                {
+                    oauthClient = await AuthenticateClient(context, cancellationToken);
+                    isClientExists = true;
+                }
+
                 context.SetClient(oauthClient);
-                activity?.SetTag("client_id", oauthClient.Id);
                 var preAuthCode = await _validator.Validate(context, cancellationToken);
+                if (!isClientExists)
+                    oauthClient.ClientId = preAuthCode.ClientId;
+                activity?.SetTag("client_id", oauthClient.Id);
                 await _dpopProofValidator.Validate(context);
                 var scopes = preAuthCode.Scopes;
                 var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, new List<string>(), new List<string>(), new List<AuthorizationData>(), cancellationToken);

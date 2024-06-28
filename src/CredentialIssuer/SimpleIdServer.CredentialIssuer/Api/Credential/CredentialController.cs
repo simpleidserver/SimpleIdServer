@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.CredentialIssuer.Api.Credential.Services;
 using SimpleIdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.CredentialIssuer.CredentialFormats;
@@ -31,6 +32,7 @@ public class CredentialController : BaseController
     private readonly IUserCredentialClaimStore _userCredentialClaimStore;
     private readonly ICredentialService _credentialService;
     private readonly IEnumerable<IKeyProofTypeValidator> _keyProofTypeValidators;
+    private readonly CredentialIssuerOptions _options;
 
     public CredentialController(
         IEnumerable<ICredentialFormatter> formatters,
@@ -39,7 +41,8 @@ public class CredentialController : BaseController
         IDeferredCredentialStore deferredCredentialStore,
         IUserCredentialClaimStore userCredentialClaimStore,
         ICredentialService credentialService,
-        IEnumerable<IKeyProofTypeValidator> keyProofTypeValidators)
+        IEnumerable<IKeyProofTypeValidator> keyProofTypeValidators,
+        IOptions<CredentialIssuerOptions> options)
     {
         _formatters = formatters;
         _credentialStore = credentialStore;
@@ -48,6 +51,7 @@ public class CredentialController : BaseController
         _userCredentialClaimStore = userCredentialClaimStore;
         _credentialService = credentialService;
         _keyProofTypeValidators = keyProofTypeValidators;
+        _options = options.Value;
     }
 
     [HttpPost]
@@ -68,11 +72,12 @@ public class CredentialController : BaseController
 
     #region Deferred credential
 
-    private async Task<CredentialResult> BuildDeferredCredential(
+    private async Task<object> BuildDeferredCredential(
         CredentialRequest request,
         CredentialValidationResult validationResult,
         CancellationToken cancellationToken)
     {
+        var userDid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
         var deferredCredential = new Domains.DeferredCredential
         {
             Status = Domains.DeferredCredentialStatus.PENDING,
@@ -83,13 +88,20 @@ public class CredentialController : BaseController
             Nonce = validationResult.Nonce,
             EncryptionJwk = request.CredentialResponseEncryption == null ? null : JsonWebKeySerializer.Write(request.CredentialResponseEncryption?.Jwk),
             EncryptionAlg = request.CredentialResponseEncryption?.Alg,
-            EncryptionEnc = request.CredentialResponseEncryption?.Enc
+            EncryptionEnc = request.CredentialResponseEncryption?.Enc,
+            UserDid = userDid
         };
         _deferredCredentialStore.Add(deferredCredential);
         await _deferredCredentialStore.SaveChanges(cancellationToken);
-        return new CredentialResult
+        if(_options.Version == CredentialIssuerVersion.LAST)
+            return new CredentialResult
+            {
+                TransactionId = deferredCredential.TransactionId,   
+                CNonce = validationResult.Nonce
+            };
+        return new ESBICredentialResult
         {
-            TransactionId = deferredCredential.TransactionId,   
+            AcceptanceToken = deferredCredential.TransactionId,
             CNonce = validationResult.Nonce
         };
     }
@@ -177,7 +189,7 @@ public class CredentialController : BaseController
             if (header == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.INVALID_CREDENTIAL_REQUEST, ErrorMessages.CREDENTIAL_TYPE_CANNOT_BE_EXTRACTED));
             var credentialConfiguration = await _credentialConfigurationStore.GetByTypeAndFormat(header.Type, credentialRequest.Format, cancellationToken);
             if (credentialConfiguration == null) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.BadRequest, ErrorCodes.UNSUPPORTED_CREDENTIAL_TYPE, string.Format(ErrorMessages.UNSUPPORTED_CREDENTIAL_TYPE, header.Type)));
-            if (!string.IsNullOrWhiteSpace(credentialConfiguration.Scope) && !authorizedScopes.Any(s => credentialConfiguration.Scope == s)) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.Unauthorized, ErrorCodes.UNAUTHORIZED, string.Format(ErrorMessages.UNAUTHORIZED_TO_ACCESS, header.Type))); 
+            // if (!string.IsNullOrWhiteSpace(credentialConfiguration.Scope) && !authorizedScopes.Any(s => credentialConfiguration.Scope == s)) return CredentialValidationResult.Error(new ErrorResult(HttpStatusCode.Unauthorized, ErrorCodes.UNAUTHORIZED, string.Format(ErrorMessages.UNAUTHORIZED_TO_ACCESS, header.Type))); 
             return CredentialValidationResult.Ok(formatter, credentialConfiguration, subject, nonce);
         }
 

@@ -38,6 +38,8 @@ public class DeferredCredential
     public CredentialConfiguration Configuration { get; set; }
     [JsonPropertyName("claims")]
     public List<DeferredCredentialClaim> Claims { get; set; }
+    [JsonIgnore]
+    public string UserDid { get; set; }
 }
 
 public enum DeferredCredentialStatus

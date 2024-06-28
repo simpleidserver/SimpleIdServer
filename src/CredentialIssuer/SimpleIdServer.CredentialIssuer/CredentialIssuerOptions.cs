@@ -4,31 +4,15 @@
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.Did.Models;
-using System.Linq;
-using System.Threading;
 
 namespace SimpleIdServer.IdServer.CredentialIssuer;
 
 public class CredentialIssuerOptions
 {
-    public CredentialIssuerOptions()
-    {
-        var resolver = DidKeyResolver.New();
-        AsymmKey = ES256SignatureKey.Generate();
-        var did = DidKeyGenerator.New().Generate(new JsonWebKeySecurityKey(AsymmKey.GetPublicJwk()));
-        DidDocument = resolver.Resolve(did, CancellationToken.None).Result;
-        VerificationMethodId = DidDocument.VerificationMethod.First().Id;
-    }
-
     /// <summary>
     /// Did Document of the issuer. Contains only the public key.
     /// </summary>
     public DidDocument DidDocument { get; set; }
-
-    /// <summary>
-    /// Identifier of the verification method. It will be used to signed the verifiable credential.
-    /// </summary>
-    public string VerificationMethodId { get; set; }
 
     /// <summary>
     /// Private key used to sign the Verifiable Credential.
@@ -75,6 +59,13 @@ public class CredentialIssuerOptions
     /// Enable or disable the developer mode.
     /// </summary>
     public bool IsDeveloperModeEnabled { get; set; } = false;
+
+    public void GenerateRandomDidKey()
+    {
+        AsymmKey = ES256SignatureKey.Generate();
+        var exportResult = DidKeyGenerator.New().SetSignatureKey(AsymmKey).Export(false, true);
+        DidDocument = exportResult.Document;
+    }
 }
 
 public enum CredentialIssuerVersion

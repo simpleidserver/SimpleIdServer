@@ -115,11 +115,29 @@ namespace SimpleIdServer.CredentialIssuer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Pre-authorized.
+        /// </summary>
+        public static string PreAuthorized {
+            get {
+                return ResourceManager.GetString("PreAuthorized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à QR code.
         /// </summary>
         public static string QrCode {
             get {
                 return ResourceManager.GetString("QrCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Requires user PIN.
+        /// </summary>
+        public static string RequiresUserPin {
+            get {
+                return ResourceManager.GetString("RequiresUserPin", resourceCulture);
             }
         }
         

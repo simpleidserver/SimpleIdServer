@@ -13,7 +13,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string EXISTING_CREDENTIAL_CONFIGURATION = "credential configuration {0} already exists";
         public const string EXISTING_CREDENTIAL_CLAIM = "the credential configuration claim {0} already exists";
         public const string EXISTING_CREDENTIAL = "the credential {0} already exists";
-        public const string ISSUANCE_PENDING = "The Credential issuance is still pending.";
+        public const string ISSUANCE_PENDING = "The Credential issuance is still pending";
         public const string INVALID_TRANSACTION_ID = "The Deferred Credential Request contains an invalid transaction_id";
         public const string INVALID_INCOMING_REQUEST = "the incoming request is not valid";
         public const string INVALID_ISSUER_STATE = "the issuer_state is not valid";

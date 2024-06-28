@@ -10,4 +10,5 @@ public class CredentialResultNames
     public const string CNonce = "c_nonce";
     public const string CNonceExpiresIn = "c_nonce_expires_in";
     public const string TransactionId = "transaction_id";
+    public const string AcceptanceToken = "acceptance_token";
 }

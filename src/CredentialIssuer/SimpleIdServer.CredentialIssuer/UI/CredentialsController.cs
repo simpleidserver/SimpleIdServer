@@ -55,15 +55,16 @@ public class CredentialsController : BaseController
     {
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var subject = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var grants = new List<string>();
+        if (request.PreAuthorized)
+            grants.Add(CredentialOfferResultNames.PreAuthorizedCodeGrant);
+        else
+            grants.Add(CredentialOfferResultNames.AuthorizedCodeGrant);
         var result = await _createCredentialOfferCommandHandler.Handle(new CreateCredentialOfferCommand
         {
             AccessToken = await GetAccessToken(),
             CredentialConfigurationIds = new List<string> { request.ConfigurationId },
-            Grants = new List<string>
-            {
-                CredentialOfferResultNames.PreAuthorizedCodeGrant,
-                CredentialOfferResultNames.AuthorizedCodeGrant
-            },
+            Grants = grants,
             Subject = subject
         }, cancellationToken);
         if (result.Error != null)
@@ -82,4 +83,5 @@ public class CredentialsController : BaseController
 public class ShareCredentialRequest
 {
     public string ConfigurationId { get; set; }
+    public bool PreAuthorized { get; set; }
 }

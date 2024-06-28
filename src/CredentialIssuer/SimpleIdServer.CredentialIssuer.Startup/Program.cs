@@ -8,8 +8,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.CredentialIssuer.Startup;
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Key;
+using System.IO;
 using System.Net.Http;
+using System.Threading;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,10 +77,15 @@ builder.Services.AddControllers();
 
 builder.Services.AddCredentialIssuer(o =>
 {
+    var serializedPrivateKey = System.IO.File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "privatekey.json"));
+    var signatureKey = SignatureKeySerializer.Deserialize(serializedPrivateKey);
+    var publicDid = builder.Configuration["PublicDid"];
     o.Version = SimpleIdServer.IdServer.CredentialIssuer.CredentialIssuerVersion.ESBI;
     o.ClientId = builder.Configuration["Authorization:ClientId"];
     o.ClientSecret = builder.Configuration["Authorization:ClientSecret"];
     o.AuthorizationServer = builder.Configuration["Authorization:Issuer"];
+    o.DidDocument = DidKeyResolver.New().Resolve(publicDid, CancellationToken.None).Result;
+    o.AsymmKey = signatureKey;
     o.IgnoreHttpsCertificateError = ignoreCertificateError;
     o.IsDeveloperModeEnabled = true;
 })
@@ -89,6 +97,12 @@ builder.Services.AddCredentialIssuer(o =>
 });
 
 builder.Services.AddDidKey();
+
+static void GeneratePrivateKey()
+{
+    var did = DidKeyGenerator.New().GenerateRandomES256KKey().Export(false, true);
+    var serialized = SignatureKeySerializer.SerializedToJson(did.Key);
+}
 
 var app = builder.Build();
 app.UseStaticFiles();

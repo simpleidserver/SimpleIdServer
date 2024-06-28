@@ -56,6 +56,11 @@ public class CreateCredentialOfferCommandHandler : ICreateCredentialOfferCommand
             credentialOffer.IssuerState = Guid.NewGuid().ToString();
         }
 
+        if (credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.PreAuthorizedCodeGrant))
+        {
+            credentialOffer.PreAuthorizedCode = await _preAuthorizedCodeService.Get(command.AccessToken, validationResult.CredentialConfigurations.Select(c => c.Scope).Distinct().ToList(), cancellationToken);
+        }
+
         return new CredentialCredentialOfferResult { CredentialOffer = credentialOffer };
     }
 

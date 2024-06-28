@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.CredentialIssuer.Api.Credential;
 using SimpleIdServer.CredentialIssuer.Api.Credential.Services;
 using SimpleIdServer.CredentialIssuer.CredentialFormats;
@@ -13,7 +14,6 @@ using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,22 +25,38 @@ public class DeferredCredentialController : BaseController
     private readonly IDeferredCredentialStore _deferredCredentialStore;
     private readonly ICredentialService _credentialService;
     private readonly IEnumerable<ICredentialFormatter> _formatters;
+    private readonly CredentialIssuerOptions _options;
 
     public DeferredCredentialController(
         IDeferredCredentialStore deferredCredentialStore,
         ICredentialService credentialService,
-        IEnumerable<ICredentialFormatter> formatters)
+        IEnumerable<ICredentialFormatter> formatters,
+        IOptions<CredentialIssuerOptions> options)
     {
         _deferredCredentialStore = deferredCredentialStore;
         _credentialService = credentialService;
         _formatters = formatters;
+        _options = options.Value;
     }
 
     [HttpPost]
-    [Authorize("ApiAuthenticated")]
     public async Task<IActionResult> Get([FromBody] DeferredCredentialRequest request, CancellationToken cancellationToken)
     {
-        var userDid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+        if (_options.Version == CredentialIssuerVersion.ESBI)
+        {
+            if(Request.Headers.ContainsKey("Authorization"))
+            {
+                var authValue = Request.Headers["Authorization"].First();
+                if(!string.IsNullOrWhiteSpace(authValue) && authValue.StartsWith("Bearer"))
+                {
+                    request = new DeferredCredentialRequest
+                    {
+                        TransactionId = authValue.Split(" ").Last()
+                    };
+                }
+            }
+        }
+
         var validationResult = await Validate(request, cancellationToken);
         if (validationResult.ErrorResult != null) return Build(validationResult.ErrorResult.Value);
         var formatter = _formatters.Single(f => f.Format == validationResult.DeferredCredential.FormatterName);
@@ -56,7 +72,7 @@ public class DeferredCredentialController : BaseController
         }
 
         var result = _credentialService.BuildImmediateCredential(new BuildImmediateCredentialRequest(
-            userDid,
+            validationResult.DeferredCredential.UserDid,
             validationResult.DeferredCredential.Configuration,
             null,
             validationResult.DeferredCredential.Claims.ToDictionary(c => c.Name, c => c.Value),
@@ -109,7 +125,7 @@ public class DeferredCredentialController : BaseController
         CancellationToken cancellationToken)
     {
         if (request == null) return DeferredCredentialValidationResult.Error(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, ErrorMessages.INVALID_INCOMING_REQUEST));
-        if (string.IsNullOrWhiteSpace(request.TransactionId)) DeferredCredentialValidationResult.Error(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialResultNames.TransactionId)));
+        if (string.IsNullOrWhiteSpace(request.TransactionId)) return DeferredCredentialValidationResult.Error(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(ErrorMessages.MISSING_PARAMETER, CredentialResultNames.TransactionId)));
         var transaction = await _deferredCredentialStore.Get(request.TransactionId, cancellationToken);
         if (transaction == null) return DeferredCredentialValidationResult.Error(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_TRANSACTION_ID, ErrorMessages.INVALID_TRANSACTION_ID));
         if (transaction.Status == Domains.DeferredCredentialStatus.PENDING) return DeferredCredentialValidationResult.Error(new ErrorResult(System.Net.HttpStatusCode.BadRequest, ErrorCodes.ISSUANCE_PENDING, ErrorMessages.ISSUANCE_PENDING));

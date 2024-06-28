@@ -27,7 +27,7 @@ public class JsonWebKey2020Standard : IVerificationMethodStandard
     public SignatureKeyEncodingTypes SupportedEncoding => SignatureKeyEncodingTypes.JWK;
 
 
-    public IEnumerable<string> SupportedCurves { get; } = null;
+    public IEnumerable<string> SupportedCurves { get; set; } = null;
 
     public string BuildId(DidDocumentVerificationMethod verificationMethod, IAsymmetricKey asymmKey)
     {

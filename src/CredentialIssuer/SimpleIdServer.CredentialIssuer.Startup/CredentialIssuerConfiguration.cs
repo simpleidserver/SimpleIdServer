@@ -34,11 +34,27 @@ public class CredentialIssuerConfiguration
             .AddDisplay("University Credential", "en-US", "https://img.freepik.com/premium-vector/logo-university-name-logo-company-called-university_516670-732.jpg", "A square logo of a university", null,"#12107c", "#acd2b1")
             .Build(),
         CredentialConfigurationBuilder
-            .New(JwtVcJsonFormatter.FORMAT, "CTWalletSameAuthorisedInTime", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", additionalTypes: new List<string> { "VerifiableAttestation" }, isDeferred: false)
+            .New(JwtVcJsonFormatter.FORMAT, "CTWalletSameAuthorisedInTime", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", additionalTypes: new List<string> { "VerifiableAttestation" }, isDeferred: false, scope: "ct_wallet")
             .SetSchema("https://api-pilot.ebsi.eu/trusted-schemas-registry/v2/schemas/z3MgUFUkb722uq4x3dv5yAJmnNmzDFeK5UC8x83QoeLJM", "FullJsonSchemaValidator2021")
             .Build(),
         CredentialConfigurationBuilder
-            .New(JwtVcJsonFormatter.FORMAT, "CTWalletSameAuthorisedDeferred", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", additionalTypes: new List<string> { "VerifiableAttestation" }, isDeferred: true, id: "6fea9437-9379-4a22-b396-461c9c510011")
+            .New(JwtVcJsonFormatter.FORMAT, "CTWalletSameAuthorisedDeferred", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", additionalTypes: new List<string> { "VerifiableAttestation" }, isDeferred: true, id: "6fea9437-9379-4a22-b396-461c9c510011", scope: "ct_wallet")
+            .SetSchema("https://api-pilot.ebsi.eu/trusted-schemas-registry/v2/schemas/z3MgUFUkb722uq4x3dv5yAJmnNmzDFeK5UC8x83QoeLJM", "FullJsonSchemaValidator2021")
+            .AddClaim("given_name", "GivenName", (cb) =>
+            {
+                cb.AddTranslation("Given Name", "en-US");
+            })
+            .Build(),
+        CredentialConfigurationBuilder
+            .New(JwtVcJsonFormatter.FORMAT, "CTWalletSamePreAuthorisedInTime", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", additionalTypes: new List<string> { "VerifiableAttestation" }, scope: "ct_wallet")
+            .SetSchema("https://api-pilot.ebsi.eu/trusted-schemas-registry/v2/schemas/z3MgUFUkb722uq4x3dv5yAJmnNmzDFeK5UC8x83QoeLJM", "FullJsonSchemaValidator2021")
+            .AddClaim("given_name", "GivenName", (cb) =>
+            {
+                cb.AddTranslation("Given Name", "en-US");
+            })
+            .Build(),
+        CredentialConfigurationBuilder
+            .New(JwtVcJsonFormatter.FORMAT, "CTWalletSamePreAuthorisedDeferred", "https://www.w3.org/2018/credentials/examples/v1", "https://www.w3.org/2018/credentials", additionalTypes: new List<string> { "VerifiableAttestation" }, isDeferred: true, scope: "ct_wallet")
             .SetSchema("https://api-pilot.ebsi.eu/trusted-schemas-registry/v2/schemas/z3MgUFUkb722uq4x3dv5yAJmnNmzDFeK5UC8x83QoeLJM", "FullJsonSchemaValidator2021")
             .AddClaim("given_name", "GivenName", (cb) =>
             {

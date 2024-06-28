@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.CredentialIssuer.Domains;
 
@@ -11,7 +10,6 @@ public class CredentialOfferRecord
 {
     public string Id { get; set; } = null!;
     public string Subject { get; set; } = null!;
-    [JsonIgnore]
     public string? PreAuthorizedCode { get; set; } = null;
     public string? IssuerState { get; set; } = null;
     public DateTime CreateDateTime { get; set; }

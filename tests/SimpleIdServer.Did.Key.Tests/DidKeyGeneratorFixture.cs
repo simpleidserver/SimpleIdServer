@@ -15,8 +15,8 @@ public class DidKeyGeneratorFixture
         var resolver = DidKeyResolver.New();
 
         // ACT
-        var did = generator.GenerateRandom();
-        var resolved = await resolver.Resolve(did, CancellationToken.None);
+        var did = generator.GenerateRandomES256KKey().Export(false, false);
+        var resolved = await resolver.Resolve(did.Did, CancellationToken.None);
 
         // ASSERT
         Assert.IsNotNull(resolved);
@@ -30,8 +30,8 @@ public class DidKeyGeneratorFixture
         var resolver = DidKeyResolver.New();
 
         // ACT
-        var did = generator.GenerateRandomJwk();
-        var resolved = await resolver.Resolve(did, CancellationToken.None);
+        var did = generator.GenerateRandomES256KKey().Export(false, true);
+        var resolved = await resolver.Resolve(did.Did, CancellationToken.None);
 
         // ASSERT
         Assert.IsNotNull(resolved);
