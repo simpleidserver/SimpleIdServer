@@ -832,6 +832,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_resource_parameter_required");
 
+                    b.Property<bool>("IsSelfIssueEnabled")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_self_issue_enabled");
+
                     b.Property<bool>("IsTokenExchangeEnabled")
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_token_exchange_enabled");
@@ -911,6 +915,11 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Property<string>("SoftwareVersion")
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "software_version");
+
+                    b.Property<string>("SubjectSyntaxTypesSupported")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "subject_syntax_types_supported");
 
                     b.Property<string>("SubjectType")
                         .HasColumnType("TEXT")
@@ -1923,7 +1932,6 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ClientId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")

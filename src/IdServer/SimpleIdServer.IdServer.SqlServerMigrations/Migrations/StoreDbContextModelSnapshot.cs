@@ -845,6 +845,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("bit")
                         .HasAnnotation("Relational:JsonPropertyName", "is_resource_parameter_required");
 
+                    b.Property<bool>("IsSelfIssueEnabled")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_self_issue_enabled");
+
                     b.Property<bool>("IsTokenExchangeEnabled")
                         .HasColumnType("bit")
                         .HasAnnotation("Relational:JsonPropertyName", "is_token_exchange_enabled");
@@ -924,6 +928,11 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("SoftwareVersion")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "software_version");
+
+                    b.Property<string>("SubjectSyntaxTypesSupported")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "subject_syntax_types_supported");
 
                     b.Property<string>("SubjectType")
                         .HasColumnType("nvarchar(max)")
@@ -1942,7 +1951,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClientId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreateDateTime")

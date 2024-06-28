@@ -57,7 +57,6 @@ public class CredentialController : BaseController
     [HttpPost]
     public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
     {
-        // User subject must always be a DID.
         var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
         var authorizedScopes = new List<string>();
         if (!string.IsNullOrWhiteSpace(scope))

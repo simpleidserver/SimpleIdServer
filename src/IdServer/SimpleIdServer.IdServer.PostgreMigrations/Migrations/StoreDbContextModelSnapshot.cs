@@ -845,6 +845,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "is_resource_parameter_required");
 
+                    b.Property<bool>("IsSelfIssueEnabled")
+                        .HasColumnType("boolean")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_self_issue_enabled");
+
                     b.Property<bool>("IsTokenExchangeEnabled")
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "is_token_exchange_enabled");
@@ -924,6 +928,11 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<string>("SoftwareVersion")
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "software_version");
+
+                    b.Property<string>("SubjectSyntaxTypesSupported")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "subject_syntax_types_supported");
 
                     b.Property<string>("SubjectType")
                         .HasColumnType("text")
@@ -1942,7 +1951,6 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("ClientId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("CreateDateTime")
