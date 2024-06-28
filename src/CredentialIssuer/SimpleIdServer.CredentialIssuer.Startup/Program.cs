@@ -16,6 +16,8 @@ using System.Threading;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// GeneratePrivateKey();
+
 var ignoreCertificateError = bool.Parse(builder.Configuration["Authorization:IgnoreCertificateError"]);
 builder.Services.AddAuthentication(o =>
 {
@@ -100,7 +102,7 @@ builder.Services.AddDidKey();
 
 static void GeneratePrivateKey()
 {
-    var did = DidKeyGenerator.New().GenerateRandomES256KKey().Export(false, true);
+    var did = DidKeyGenerator.New().GenerateRandomES256Key().Export(false, true);
     var serialized = SignatureKeySerializer.SerializedToJson(did.Key);
 }
 

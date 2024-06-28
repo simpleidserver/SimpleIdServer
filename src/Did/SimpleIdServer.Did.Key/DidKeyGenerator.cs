@@ -47,6 +47,12 @@ public class DidKeyGenerator
         return this;
     }
 
+    public DidKeyGenerator GenerateRandomES256Key()
+    {
+        _key = ES256SignatureKey.Generate();
+        return this;
+    }
+
     public DidKeyExportResult Export(bool exportPrivateKey = false, bool isJsonEncoded = false)
     {
         if (_key == null) throw new InvalidOperationException("the key doesn't exist");
