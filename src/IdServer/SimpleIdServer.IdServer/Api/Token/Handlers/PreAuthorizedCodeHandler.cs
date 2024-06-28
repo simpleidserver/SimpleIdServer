@@ -83,8 +83,6 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
 
                 context.SetClient(oauthClient);
                 var preAuthCode = await _validator.Validate(context, cancellationToken);
-                if (!isClientExists)
-                    oauthClient.ClientId = preAuthCode.ClientId;
                 activity?.SetTag("client_id", oauthClient.Id);
                 await _dpopProofValidator.Validate(context);
                 var scopes = preAuthCode.Scopes;

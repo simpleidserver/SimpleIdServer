@@ -57,6 +57,7 @@ public class CredentialController : BaseController
     [HttpPost]
     public async Task<IActionResult> Get([FromBody] CredentialRequest request, CancellationToken cancellationToken)
     {
+        // User subject must always be a DID.
         var scope = User.Claims.SingleOrDefault(c => c.Type == "scope")?.Value;
         var authorizedScopes = new List<string>();
         if (!string.IsNullOrWhiteSpace(scope))
@@ -77,7 +78,6 @@ public class CredentialController : BaseController
         CredentialValidationResult validationResult,
         CancellationToken cancellationToken)
     {
-        var userDid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
         var deferredCredential = new Domains.DeferredCredential
         {
             Status = Domains.DeferredCredentialStatus.PENDING,
@@ -89,7 +89,8 @@ public class CredentialController : BaseController
             EncryptionJwk = request.CredentialResponseEncryption == null ? null : JsonWebKeySerializer.Write(request.CredentialResponseEncryption?.Jwk),
             EncryptionAlg = request.CredentialResponseEncryption?.Alg,
             EncryptionEnc = request.CredentialResponseEncryption?.Enc,
-            UserDid = userDid
+            UserDid = validationResult.Subject,
+            CreateDateTime = DateTime.UtcNow
         };
         _deferredCredentialStore.Add(deferredCredential);
         await _deferredCredentialStore.SaveChanges(cancellationToken);
@@ -114,18 +115,17 @@ public class CredentialController : BaseController
         CredentialValidationResult validationResult, 
         CancellationToken cancellationToken)
     {
-        var userDid = User.FindFirst(ClaimTypes.NameIdentifier).Value;
         Dictionary<string, string> claims = null;
         if (validationResult.Credential != null)
             claims = validationResult.Credential.Claims.ToDictionary(c => c.Name, c => c.Value);
         else
         {
-            var userClaims = await _userCredentialClaimStore.Resolve(userDid, validationResult.CredentialConfiguration.Claims, cancellationToken);
+            var userClaims = await _userCredentialClaimStore.Resolve(validationResult.Subject, validationResult.CredentialConfiguration.Claims, cancellationToken);
             claims = userClaims.ToDictionary(c => c.Name, c => c.Value);
         }
 
         return _credentialService.BuildImmediateCredential(new BuildImmediateCredentialRequest(
-            userDid, 
+            validationResult.Subject, 
             validationResult.CredentialConfiguration,
             validationResult.Credential,
             claims,
