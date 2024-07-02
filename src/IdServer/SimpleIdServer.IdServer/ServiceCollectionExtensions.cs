@@ -21,6 +21,7 @@ using SimpleIdServer.IdServer.Api.BCAuthorize;
 using SimpleIdServer.IdServer.Api.Configuration;
 using SimpleIdServer.IdServer.Api.DeviceAuthorization;
 using SimpleIdServer.IdServer.Api.Jwks;
+using SimpleIdServer.IdServer.Api.OpenIdConfiguration;
 using SimpleIdServer.IdServer.Api.Register;
 using SimpleIdServer.IdServer.Api.Token;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
@@ -371,6 +372,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddConfigurationApi(this IServiceCollection services)
         {
             services.AddTransient<IOAuthConfigurationRequestHandler, OAuthConfigurationRequestHandler>();
+            services.AddTransient<IOpenidConfigurationRequestHandler, OpenidConfigurationRequestHandler>();
             services.AddTransient<IOAuthWorkflowConverter, OAuthWorkflowConverter>();
             return services;
         }
