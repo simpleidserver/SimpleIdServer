@@ -117,8 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CannotExtractSignatureKey" xml:space="preserve">
+    <value>the signature key cannot be extracted</value>
+  </data>
+  <data name="EntityStatementIsExpired" xml:space="preserve">
+    <value>the entity statement {0} is expired</value>
+  </data>
   <data name="ImpossibleToExtractOpenidFederation" xml:space="preserve">
     <value>cannot extract the openid federation</value>
+  </data>
+  <data name="ImpossibleToResolveTrustChain" xml:space="preserve">
+    <value>impossible to resolve the trust chain</value>
   </data>
   <data name="InvalidIncomingRequest" xml:space="preserve">
     <value>the incoming request is invalid</value>

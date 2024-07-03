@@ -3,7 +3,7 @@
 
 namespace SimpleIdServer.IdServer.Federation;
 
-public static class ErrorCodes
+public class OpenidFederationOptions
 {
-    public const string InvalidIssuer = "invalid_issuer";
+    public string TokenSignedKid { get; set; }
 }

@@ -1,12 +1,33 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
 
+[DebuggerDisplay("Subject = {Sub}")]
 public class OpenidFederationResult
 {
+    [JsonIgnore]
+    public DateTime? ValidTo
+    {
+        get
+        {
+            return GetDateTime(Exp);
+        }
+    }
+
+    [JsonIgnore]
+    public DateTime? IssuedAt
+    {
+        get
+        {
+            return GetDateTime(Iat);
+        }
+    }
+
     /// <summary>
     /// The Entity Identifier of the issuer of the Entity Statement.
     /// </summary>
@@ -21,12 +42,14 @@ public class OpenidFederationResult
     /// Number. Time when this statement was issued
     /// </summary>
     [JsonPropertyName("iat")]
-    public int Iat { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? Iat { get; set; }
     /// <summary>
     /// Number. Expiration time after which the statement MUST NOT be accepted for processing.
     /// </summary>
     [JsonPropertyName("exp")]
-    public int Exp { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? Exp { get; set; }
     /// <summary>
     /// A JSON Web Key Set (JWKS) [RFC7517] representing the public part of the subject's Federation Entity signing keys. 
     /// </summary>
@@ -39,4 +62,10 @@ public class OpenidFederationResult
     public List<string> AuthorityHints { get; set; }
     [JsonPropertyName("metadata")]
     public OpenidFederationMetadataResult Metadata { get; set; }
+
+    private DateTime? GetDateTime(int? time)
+    {
+        if (time == null) return null;
+        return EpochTime.DateTime(time.Value);
+    }
 }

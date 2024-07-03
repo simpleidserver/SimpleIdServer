@@ -3,14 +3,19 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
+using SimpleIdServer.OpenidFederation.Builders;
+using SimpleIdServer.OpenidFederation.Clients;
+using SimpleIdServer.OpenidFederation.Resources;
 using SimpleIdServer.OpenidFederation.Stores;
 using System.Net;
 using System.Text.Json;
 
 namespace SimpleIdServer.OpenidFederation.Apis.FederationFetch;
 
-public class BaseFederationFetchController : Controller
+public abstract class BaseFederationFetchController : BaseOpenidFederationController
 {
     private readonly IFederationEntityStore _federationEntityStore;
     private readonly IDistributedCache _distributedCache;
@@ -26,21 +31,44 @@ public class BaseFederationFetchController : Controller
         _httpClientFactory = httpClientFactory;
     }
 
-    protected async Task Get(FederationFetchRequest request, string issuer, CancellationToken cancellationToken)
+    protected async Task<IActionResult> Get(FederationFetchRequest request, string realm, string issuer, CancellationToken cancellationToken)
     {
-        var validationResult = await Validate(request, issuer, cancellationToken);
-        await _distributedCache.GetAsync($"OpenidFederation_{request.Sub}", cancellationToken);
-
+        var signingCredential = GetSigningCredential(realm);
+        if (signingCredential == null) return Error(HttpStatusCode.InternalServerError, ErrorCodes.INVALID_ISSUER, Global.CannotExtractSignatureKey);
+        var validationResult = await Validate(
+            request, 
+            signingCredential,
+            realm,
+            issuer,
+            cancellationToken);
+        if (validationResult.ErrorCode != null) return Error(validationResult.HttpStatusCode, validationResult.ErrorCode, validationResult.ErrorMessage);
+        var handler = new JsonWebTokenHandler();
+        var jws = handler.CreateToken(JsonSerializer.Serialize(validationResult.OpenidFederationResult), new SigningCredentials(signingCredential.Key, signingCredential.Algorithm));
+        return new ContentResult
+        {
+            StatusCode = (int)HttpStatusCode.OK,
+            Content = jws,
+            ContentType = OpenidFederationConstants.EntityStatementContentType
+        };
     }
 
-    private async Task<FederationFetchValidationResult> Validate(FederationFetchRequest request, string issuer, CancellationToken cancellationToken)
+    protected abstract Task<OpenidFederationResult> BuildSelfIssuedFederationEntity(BuildFederationEntityRequest request, CancellationToken cancellationToken);
+
+    protected abstract SigningCredentials GetSigningCredential(string realm);
+
+    private async Task<FederationFetchValidationResult> Validate(
+        FederationFetchRequest request, 
+        SigningCredentials signingCredentials, 
+        string realm,
+        string issuer, 
+        CancellationToken cancellationToken)
     {
         if (request == null) return FederationFetchValidationResult.Error(ErrorCodes.INVALID_REQUEST, Resources.Global.InvalidIncomingRequest);
         if (string.IsNullOrWhiteSpace(request.Iss)) return FederationFetchValidationResult.Error(ErrorCodes.INVALID_REQUEST, string.Format(Resources.Global.MissingParameter, "iss"));
         if (request.Iss != issuer) return FederationFetchValidationResult.Error(ErrorCodes.INVALID_ISSUER, Resources.Global.InvalidIssuer);
         if(!string.IsNullOrWhiteSpace(request.Sub))
         {
-            var cacheKey = $"OpenidFederation_{request.Sub}";
+            var cacheKey = GetCacheKey(request.Sub);
             var entityStatement = await _federationEntityStore.Get(request.Sub, cancellationToken);
             if (entityStatement == null) return FederationFetchValidationResult.Error(ErrorCodes.NOT_FOUND, Resources.Global.UnknownEntityStatement);
             var cacheOpenidFederation = await _distributedCache.GetAsync(cacheKey, cancellationToken);
@@ -52,7 +80,7 @@ public class BaseFederationFetchController : Controller
                     if(openidFederation == null) return FederationFetchValidationResult.Error(ErrorCodes.INVALID_REQUEST, Resources.Global.ImpossibleToExtractOpenidFederation);
                     await _distributedCache.SetStringAsync(cacheKey, JsonSerializer.Serialize(openidFederation), new DistributedCacheEntryOptions
                     {
-                        // AbsoluteExpiration = openidFederation.Exp, // TODO
+                        AbsoluteExpiration = openidFederation.ValidTo
                     }, cancellationToken);
                     return FederationFetchValidationResult.Ok(openidFederation);
                 }
@@ -61,9 +89,17 @@ public class BaseFederationFetchController : Controller
             return FederationFetchValidationResult.Ok(JsonSerializer.Deserialize<OpenidFederationResult>(cacheOpenidFederation));
         }
 
-        // SELF !!
-        return FederationFetchValidationResult.Ok(null);
+        var selfIssuedEntityStatement = await BuildSelfIssuedFederationEntity(new BuildFederationEntityRequest
+        {
+            Credential = signingCredentials,
+            Issuer = GetAbsoluteUriWithVirtualPath(Request),
+            Realm = realm
+        }, cancellationToken);
+        return FederationFetchValidationResult.Ok(selfIssuedEntityStatement);
     }
+
+    private static string GetCacheKey(string sub)
+        => $"OpenidFederation_{sub}";
 
     private class FederationFetchValidationResult
     {

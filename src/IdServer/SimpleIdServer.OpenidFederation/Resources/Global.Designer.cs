@@ -22,7 +22,7 @@ namespace SimpleIdServer.OpenidFederation.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Global {
+    public class Global {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
@@ -36,7 +36,7 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         ///   Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.OpenidFederation.Resources.Global", typeof(Global).Assembly);
@@ -51,7 +51,7 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         ///   les recherches de ressources à l'aide de cette classe de ressource fortement typée.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,18 +61,45 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the signature key cannot be extracted.
+        /// </summary>
+        public static string CannotExtractSignatureKey {
+            get {
+                return ResourceManager.GetString("CannotExtractSignatureKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the entity statement {0} is expired.
+        /// </summary>
+        public static string EntityStatementIsExpired {
+            get {
+                return ResourceManager.GetString("EntityStatementIsExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à cannot extract the openid federation.
         /// </summary>
-        internal static string ImpossibleToExtractOpenidFederation {
+        public static string ImpossibleToExtractOpenidFederation {
             get {
                 return ResourceManager.GetString("ImpossibleToExtractOpenidFederation", resourceCulture);
             }
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à impossible to resolve the trust chain.
+        /// </summary>
+        public static string ImpossibleToResolveTrustChain {
+            get {
+                return ResourceManager.GetString("ImpossibleToResolveTrustChain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the incoming request is invalid.
         /// </summary>
-        internal static string InvalidIncomingRequest {
+        public static string InvalidIncomingRequest {
             get {
                 return ResourceManager.GetString("InvalidIncomingRequest", resourceCulture);
             }
@@ -81,7 +108,7 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         /// <summary>
         ///   Recherche une chaîne localisée semblable à the issuer is invalid.
         /// </summary>
-        internal static string InvalidIssuer {
+        public static string InvalidIssuer {
             get {
                 return ResourceManager.GetString("InvalidIssuer", resourceCulture);
             }
@@ -90,7 +117,7 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         /// <summary>
         ///   Recherche une chaîne localisée semblable à the parameter {0} is missing.
         /// </summary>
-        internal static string MissingParameter {
+        public static string MissingParameter {
             get {
                 return ResourceManager.GetString("MissingParameter", resourceCulture);
             }
@@ -99,7 +126,7 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         /// <summary>
         ///   Recherche une chaîne localisée semblable à the entity statement {0} doesn&apos;t exist.
         /// </summary>
-        internal static string UnknownEntityStatement {
+        public static string UnknownEntityStatement {
             get {
                 return ResourceManager.GetString("UnknownEntityStatement", resourceCulture);
             }

@@ -1,14 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
+using SimpleIdServer.OpenidFederation.Resources;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Text.Json;
 
-namespace SimpleIdServer.OpenidFederation;
+namespace SimpleIdServer.OpenidFederation.Clients;
 
 public class TrustChainResolver : IDisposable
 {
@@ -19,34 +21,35 @@ public class TrustChainResolver : IDisposable
         _httpClient = httpClient;
     }
 
+    public static TrustChainResolver New()
+        => new TrustChainResolver(new HttpClient());
+
     public static TrustChainResolver New(HttpClient httpClient)
         => new TrustChainResolver(httpClient);
 
-    public async Task<List<OpenidFederationResult>> ResolveTrustChains(string entityId, CancellationToken cancellationToken)
+    public async Task<OpenidTrustChain> ResolveTrustChains(string entityId, CancellationToken cancellationToken)
     {
-        var result = new ConcurrentBag<OpenidFederationResult>();
+        var result = new ConcurrentQueue<OpenidFederationResult>();
         await Extract(result, entityId, cancellationToken);
-        return result.ToList();
+        return new OpenidTrustChain(result.ToList());
     }
 
     public Task<OpenidFederationResult> ResolveOpenidFederation(string entityId, CancellationToken cancellationToken)
         => InternalResolveOpenidFederation(entityId, cancellationToken);
 
-    public void Dispose()
-    {
+    public void Dispose() =>
         _httpClient.Dispose();
-    }
 
-    private async Task<bool> Extract(ConcurrentBag<OpenidFederationResult> federationLst, string entityId, CancellationToken cancellationToken)
+    private async Task<bool> Extract(ConcurrentQueue<OpenidFederationResult> federationLst, string entityId, CancellationToken cancellationToken)
     {
         var openidFederation = await InternalResolveOpenidFederation(entityId, cancellationToken);
         if (openidFederation == null) return false;
-        federationLst.Add(openidFederation);
-        if(openidFederation.AuthorityHints != null && openidFederation.AuthorityHints.Any())
+        federationLst.Enqueue(openidFederation);
+        if (openidFederation.AuthorityHints != null && openidFederation.AuthorityHints.Any())
         {
             var taskLst = openidFederation.AuthorityHints.Select(h => Extract(federationLst, h, cancellationToken)).ToList();
             var authorityHintsResult = await Task.WhenAll(taskLst);
-            if (authorityHintsResult.Any(c => !c)) throw new InvalidOperationException("Impossible to resolve the trust chain");
+            if (authorityHintsResult.Any(c => !c)) throw new InvalidOperationException(Global.ImpossibleToResolveTrustChain);
         }
 
         return true;
@@ -75,8 +78,10 @@ public class TrustChainResolver : IDisposable
         {
             ValidateIssuer = false,
             ValidateLifetime = false,
+            ValidateAudience = false,
             IssuerSigningKey = jsonWebKey
         });
-        return validationResult.IsValid ? JsonSerializer.Deserialize<OpenidFederationResult>(Encoding.UTF8.GetString(Convert.FromBase64String(jwt.EncodedPayload))) : null;
+        var json = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(jwt.EncodedPayload));
+        return validationResult.IsValid ? JsonSerializer.Deserialize<OpenidFederationResult>(json) : null;
     }
 }
