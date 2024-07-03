@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store.Configurations;
 using SimpleIdServer.IdServer.Store.EF.Configurations;
+using SimpleIdServer.OpenidFederation.Domains;
+using SimpleIdServer.OpenidFederation.Stores;
 
 namespace SimpleIdServer.IdServer.Store.EF
 {
@@ -50,6 +52,7 @@ namespace SimpleIdServer.IdServer.Store.EF
         public DbSet<GotifySession> GotifySessions { get; set; }
         public DbSet<PresentationDefinition> PresentationDefinitions { get; set; }
         public DbSet<MessageBusErrorMessage> MessageBusErrorMessages { get; set; }
+        public DbSet<FederationEntity> FederationEntities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -111,6 +114,8 @@ namespace SimpleIdServer.IdServer.Store.EF
             builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConfiguration());
             builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConstraintConfiguration());
             builder.ApplyConfiguration(new MessageBusErrorMessageConfiguration());
+            builder.ApplyConfiguration(new FederationEntityConfiguration());
+            builder.ApplyConfiguration(new FederationEntityConfiguration());
         }
     }
 }

@@ -4,7 +4,7 @@
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.OpenidFederation;
+namespace SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
 
 [JsonConverter(typeof(OpenidFederationMetadataJsonConverter))]
 public class OpenidFederationMetadataResult

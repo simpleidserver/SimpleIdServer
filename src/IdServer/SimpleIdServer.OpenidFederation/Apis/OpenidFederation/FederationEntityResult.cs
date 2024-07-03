@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.OpenidFederation;
+namespace SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
 
 /// <summary>
 /// https://openid.net/specs/openid-federation-1_0.html#section-5.1.1.

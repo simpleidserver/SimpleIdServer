@@ -69,7 +69,7 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
         if(!string.IsNullOrWhiteSpace(request.Sub))
         {
             var cacheKey = GetCacheKey(request.Sub);
-            var entityStatement = await _federationEntityStore.Get(request.Sub, cancellationToken);
+            var entityStatement = await _federationEntityStore.Get(request.Sub, realm, cancellationToken);
             if (entityStatement == null) return FederationFetchValidationResult.Error(ErrorCodes.NOT_FOUND, Resources.Global.UnknownEntityStatement);
             var cacheOpenidFederation = await _distributedCache.GetAsync(cacheKey, cancellationToken);
             if (cacheOpenidFederation == null)

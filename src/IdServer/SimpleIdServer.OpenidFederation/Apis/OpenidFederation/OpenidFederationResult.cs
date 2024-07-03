@@ -43,13 +43,13 @@ public class OpenidFederationResult
     /// </summary>
     [JsonPropertyName("iat")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? Iat { get; set; }
+    public long? Iat { get; set; }
     /// <summary>
     /// Number. Expiration time after which the statement MUST NOT be accepted for processing.
     /// </summary>
     [JsonPropertyName("exp")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public int? Exp { get; set; }
+    public long? Exp { get; set; }
     /// <summary>
     /// A JSON Web Key Set (JWKS) [RFC7517] representing the public part of the subject's Federation Entity signing keys. 
     /// </summary>
@@ -59,11 +59,12 @@ public class OpenidFederationResult
     /// An array of strings representing the Entity Identifiers of Intermediate Entities or Trust Anchors that MAY issue Subordinate Statements about the Entity. 
     /// </summary>
     [JsonPropertyName("authority_hints")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public List<string> AuthorityHints { get; set; }
     [JsonPropertyName("metadata")]
-    public OpenidFederationMetadataResult Metadata { get; set; }
+    public OpenidFederationMetadataResult Metadata { get; set; } = new OpenidFederationMetadataResult();
 
-    private DateTime? GetDateTime(int? time)
+    private DateTime? GetDateTime(long? time)
     {
         if (time == null) return null;
         return EpochTime.DateTime(time.Value);

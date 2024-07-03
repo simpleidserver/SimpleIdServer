@@ -36,7 +36,7 @@ public class OpenidFederationController : BaseOpenidFederationController
         var realm = prefix ?? Constants.DefaultRealm;
         var issuer = GetAbsoluteUriWithVirtualPath(Request);
         var signingKeys = _keyStore.GetAllSigningKeys(realm);
-        var signingKey = signingKeys.FirstOrDefault(k => k.Algorithm == _options.TokenSignedKid);
+        var signingKey = signingKeys.FirstOrDefault(k => k.Kid == _options.TokenSignedKid);
         if (signingKey == null) return Error(System.Net.HttpStatusCode.InternalServerError, SimpleIdServer.OpenidFederation.ErrorCodes.INTERNAL_SERVER_ERROR, SimpleIdServer.OpenidFederation.Resources.Global.CannotExtractSignatureKey);
         var selfIssuedFederationEntity = await _federationEntityBuilder.BuildSelfIssued(new SimpleIdServer.OpenidFederation.Builders.BuildFederationEntityRequest
         {

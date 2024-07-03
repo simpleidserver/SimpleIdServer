@@ -3,7 +3,7 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Description>Support OPENID federation.</Description>
+		<Description>Support OPENID federation - openid_provider.</Description>
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />

@@ -56,6 +56,11 @@ builder.Services.AddSIDIdentityServer(o =>
     .AddConsoleNotification()
     .AddPwdAuthentication()
     .AddBackChannelAuthentication()
+    .AddOpenidFederation(o =>
+    {
+        o.IsFederationEnabled = true;
+        o.TokenSignedKid = "keyid";
+    })
     .AddAuthentication(o =>
     {
         o.AddMutualAuthentication(m =>
@@ -72,7 +77,8 @@ builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
 builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
 builder.Services.AddDidKey();
 var app = builder.Build()
-    .UseSID();
+    .UseSID()
+    .UseOpenidFederation();
 app.Run();
 
 static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())

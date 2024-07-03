@@ -51,7 +51,7 @@ public class FederationFetchController : BaseFederationFetchController
     protected override SigningCredentials GetSigningCredential(string realm)
     {
         var signingKeys = _keyStore.GetAllSigningKeys(realm);
-        var signingKey = signingKeys.FirstOrDefault(k => k.Algorithm == _options.TokenSignedKid);
+        var signingKey = signingKeys.FirstOrDefault(k => k.Kid == _options.TokenSignedKid);
         return signingKey;
     }
 }

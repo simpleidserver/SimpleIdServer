@@ -12,10 +12,13 @@ public abstract class BaseFederationEntityBuilder
 {
     public async Task<OpenidFederationResult> BuildSelfIssued(BuildFederationEntityRequest request, CancellationToken cancellationToken)
     {
+        var currentDateTime = DateTime.UtcNow;
         var result = new OpenidFederationResult
         {
             Iss = request.Issuer,
-            Sub = request.Issuer
+            Sub = request.Issuer,
+            Iat = EpochTime.GetIntDate(currentDateTime),
+            Exp = EpochTime.GetIntDate(currentDateTime.AddMinutes(5)) // Expiration time - 5 minutes.
         };
         var jwks = new OpenidFederationJwksResult
         {
@@ -25,9 +28,26 @@ public abstract class BaseFederationEntityBuilder
             }
         };
         result.Jwks = jwks;
+        var prefix = request.Realm;
+        if (!string.IsNullOrWhiteSpace(prefix))
+            prefix = $"{prefix}/";
+        if (IsFederationEnabled)
+        {
+            result.Metadata.FederationEntity = new FederationEntityResult
+            {
+                FederationFetchEndpoint = $"{request.Issuer}/{prefix}{OpenidFederationConstants.EndPoints.FederationFetch}",
+                FederationListEndpoint = $"{request.Issuer}/{prefix}{OpenidFederationConstants.EndPoints.FederationList}",
+                OrganizationName = OrganizationName
+            };
+        }
+
         await EnrichSelfIssued(result, request, cancellationToken);
         return result;
     }
+
+    protected abstract bool IsFederationEnabled { get; }
+
+    protected abstract string OrganizationName { get; }
 
     protected abstract Task EnrichSelfIssued(OpenidFederationResult federationEntity, BuildFederationEntityRequest request, CancellationToken cancellationToken);
 

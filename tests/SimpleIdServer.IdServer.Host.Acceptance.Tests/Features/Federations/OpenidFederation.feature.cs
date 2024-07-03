@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
+namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features.Federations
 {
     using TechTalk.SpecFlow;
     using System;
@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class SubjectTypeFeature : object, Xunit.IClassFixture<SubjectTypeFeature.FixtureData>, System.IDisposable
+    public partial class OpenidFederationFeature : object, Xunit.IClassFixture<OpenidFederationFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "SubjectType.feature"
+#line 1 "OpenidFederation.feature"
 #line hidden
         
-        public SubjectTypeFeature(SubjectTypeFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public OpenidFederationFeature(OpenidFederationFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "SubjectType", "\tCheck the different subject type", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/Federations", "OpenidFederation", "\tCheck result returned by the .well-known/openid-federation endpoint", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Get pairwise subject")]
-        [Xunit.TraitAttribute("FeatureTitle", "SubjectType")]
-        [Xunit.TraitAttribute("Description", "Get pairwise subject")]
-        public void GetPairwiseSubject()
+        [Xunit.SkippableFactAttribute(DisplayName="Get the openid-federation")]
+        [Xunit.TraitAttribute("FeatureTitle", "OpenidFederation")]
+        [Xunit.TraitAttribute("Description", "Get the openid-federation")]
+        public void GetTheOpenid_Federation()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get pairwise subject", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get the openid-federation", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,47 +98,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 5
- testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table496 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table153 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table496.AddRow(new string[] {
-                            "response_type",
-                            "id_token"});
-                table496.AddRow(new string[] {
-                            "client_id",
-                            "thirtyThreeClient"});
-                table496.AddRow(new string[] {
-                            "state",
-                            "state"});
-                table496.AddRow(new string[] {
-                            "response_mode",
-                            "query"});
-                table496.AddRow(new string[] {
-                            "scope",
-                            "openid email role"});
-                table496.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-                table496.AddRow(new string[] {
-                            "nonce",
-                            "nonce"});
-                table496.AddRow(new string[] {
-                            "display",
-                            "popup"});
-#line 6
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table496, "When ");
+#line 5
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/openid-federation\'", ((string)(null)), table153, "When ");
 #line hidden
-#line 17
- testRunner.And("extract parameter \'id_token\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 18
- testRunner.And("extract payload from JWT \'$id_token$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 20
- testRunner.Then("JWT has \'sub\'=\'ayv4P9i7vUdFDHPXKEY21d2zBHryA4k4PEO80sh4AiQ\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 8
+ testRunner.Then("HTTP header has \'Content-Type\'=\'application/entity-statement+jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -151,12 +118,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                SubjectTypeFeature.FeatureSetup();
+                OpenidFederationFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                SubjectTypeFeature.FeatureTearDown();
+                OpenidFederationFeature.FeatureTearDown();
             }
         }
     }

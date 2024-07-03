@@ -5,5 +5,7 @@ namespace SimpleIdServer.OpenidFederation.Domains;
 
 public class FederationEntity
 {
+    public string Id { get; set; }
     public string Sub { get; set; } = null!;
+    public string Realm { get; set; } = null!;
 }

@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.OpenidFederation;
+namespace SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
 
 public class OpenidFederationMetadataJsonConverter : JsonConverter<OpenidFederationMetadataResult>
 {
@@ -26,7 +26,7 @@ public class OpenidFederationMetadataJsonConverter : JsonConverter<OpenidFederat
             var prop = props.FirstOrDefault(p => p.Name == kvp.Key);
             if (prop.p == null)
             {
-                result.OtherParameters.Add(kvp.Key, JsonObject.Parse(kvp.Value.ToJsonString()).AsObject());
+                result.OtherParameters.Add(kvp.Key, JsonNode.Parse(kvp.Value.ToJsonString()).AsObject());
                 continue;
             }
 
@@ -42,13 +42,13 @@ public class OpenidFederationMetadataJsonConverter : JsonConverter<OpenidFederat
     public override void Write(Utf8JsonWriter writer, OpenidFederationMetadataResult value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        if(value.FederationEntity != null)
+        if (value.FederationEntity != null)
         {
             writer.WritePropertyName("federation_entity");
             writer.WriteRawValue(JsonSerializer.Serialize(value.FederationEntity));
         }
 
-        foreach(var kvp in value.OtherParameters)
+        foreach (var kvp in value.OtherParameters)
         {
             writer.WritePropertyName(kvp.Key);
             writer.WriteRawValue(JsonSerializer.Serialize(kvp.Value));
