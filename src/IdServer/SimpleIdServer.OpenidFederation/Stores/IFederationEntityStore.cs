@@ -7,6 +7,7 @@ namespace SimpleIdServer.OpenidFederation.Stores;
 
 public interface IFederationEntityStore
 {
-    Task<List<FederationEntity>> GetAll(string realm, CancellationToken cancellationToken);
-    Task<FederationEntity> Get(string sub, string realm, CancellationToken cancellationToken);
+    Task<List<FederationEntity>> GetAllSubordinates(string realm, CancellationToken cancellationToken);
+    Task<List<FederationEntity>> GetAllAuthorities(string realm, CancellationToken cancellationToken);
+    Task<FederationEntity> GetSubordinate(string sub, string realm, CancellationToken cancellationToken);
 }

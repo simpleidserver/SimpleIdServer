@@ -16,13 +16,18 @@ public class FederationEntityStore : IFederationEntityStore
         _dbContext = dbContext;
     }
 
-    public Task<FederationEntity> Get(string sub, string realm, CancellationToken cancellationToken)
+    public Task<FederationEntity> GetSubordinate(string sub, string realm, CancellationToken cancellationToken)
     {
-        return _dbContext.FederationEntities.FirstOrDefaultAsync(r => r.Sub == sub && r.Realm == realm, cancellationToken);
+        return _dbContext.FederationEntities.FirstOrDefaultAsync(r => r.Sub == sub && r.Realm == realm && r.IsSubordinate == true, cancellationToken);
     }
 
-    public Task<List<FederationEntity>> GetAll(string realm, CancellationToken cancellationToken)
+    public Task<List<FederationEntity>> GetAllSubordinates(string realm, CancellationToken cancellationToken)
     {
-        return _dbContext.FederationEntities.Where(f => f.Realm == realm).ToListAsync(cancellationToken);
+        return _dbContext.FederationEntities.Where(f => f.Realm == realm && f.IsSubordinate == true).ToListAsync(cancellationToken);
+    }
+
+    public Task<List<FederationEntity>> GetAllAuthorities(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.FederationEntities.Where(f => f.Realm == realm && f.IsSubordinate == false).ToListAsync(cancellationToken);
     }
 }

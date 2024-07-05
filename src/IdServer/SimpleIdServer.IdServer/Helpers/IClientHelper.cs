@@ -3,7 +3,6 @@
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Collections.Generic;
@@ -28,9 +27,9 @@ public interface IClientHelper
 
 public class OAuthClientHelper : IClientHelper
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly Helpers.IHttpClientFactory _httpClientFactory;
 
-    public OAuthClientHelper(IHttpClientFactory httpClientFactory)
+    public OAuthClientHelper(Helpers.IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
     }

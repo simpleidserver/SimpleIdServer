@@ -17,16 +17,16 @@ namespace SimpleIdServer.IdServer.Federation.Apis.FederationFetch;
 
 public class FederationFetchController : BaseFederationFetchController
 {
-    private readonly IFederationEntityBuilder _federationEntityBuilder;
+    private readonly IOpenidProviderFederationEntityBuilder _federationEntityBuilder;
     private readonly IKeyStore _keyStore;
     private readonly OpenidFederationOptions _options;
 
     public FederationFetchController(
-        IFederationEntityBuilder federationEntityBuilder,
+        IOpenidProviderFederationEntityBuilder federationEntityBuilder,
         IKeyStore keyStore,
         IFederationEntityStore federationEntityStore,
         IDistributedCache distributedCache,
-        IHttpClientFactory httpClientFactory,
+        Helpers.IHttpClientFactory httpClientFactory,
         IOptions<OpenidFederationOptions> options) : base(federationEntityStore, distributedCache, httpClientFactory)
     {
         _federationEntityBuilder = federationEntityBuilder;

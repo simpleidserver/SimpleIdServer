@@ -123,6 +123,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OpenidFedera
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OpenidFederation.Tests", "tests\SimpleIdServer.OpenidFederation.Tests\SimpleIdServer.OpenidFederation.Tests.csproj", "{7B4FB0E4-2B43-4EC4-B978-99E225FBC368}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Rp.Federation", "src\IdServer\SimpleIdServer.Rp.Federation\SimpleIdServer.Rp.Federation.csproj", "{DC1EBA7B-7458-4AC5-80D4-56E20541C4F4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -325,6 +327,10 @@ Global
 		{7B4FB0E4-2B43-4EC4-B978-99E225FBC368}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B4FB0E4-2B43-4EC4-B978-99E225FBC368}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B4FB0E4-2B43-4EC4-B978-99E225FBC368}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC1EBA7B-7458-4AC5-80D4-56E20541C4F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC1EBA7B-7458-4AC5-80D4-56E20541C4F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC1EBA7B-7458-4AC5-80D4-56E20541C4F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC1EBA7B-7458-4AC5-80D4-56E20541C4F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -386,6 +392,7 @@ Global
 		{4A7E1AFE-98FB-4B40-B41B-A912C448D020} = {0473E3F7-F4CB-4305-A980-174A953CF0DB}
 		{4D3F4A42-8997-4F4E-AD5D-1A26D25E94B0} = {0473E3F7-F4CB-4305-A980-174A953CF0DB}
 		{7B4FB0E4-2B43-4EC4-B978-99E225FBC368} = {033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}
+		{DC1EBA7B-7458-4AC5-80D4-56E20541C4F4} = {0473E3F7-F4CB-4305-A980-174A953CF0DB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

@@ -40,7 +40,6 @@ using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Infastructures;
-using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;

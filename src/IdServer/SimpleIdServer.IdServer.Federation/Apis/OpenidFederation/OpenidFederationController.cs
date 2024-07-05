@@ -17,12 +17,12 @@ namespace SimpleIdServer.IdServer.Federation.Apis.OpenidFederation;
 public class OpenidFederationController : BaseOpenidFederationController
 {
     private readonly IKeyStore _keyStore;
-    private readonly IFederationEntityBuilder _federationEntityBuilder;
+    private readonly IOpenidProviderFederationEntityBuilder _federationEntityBuilder;
     private readonly OpenidFederationOptions _options;
 
     public OpenidFederationController(
         IKeyStore keyStore,
-        IFederationEntityBuilder federationEntityBuilder,
+        IOpenidProviderFederationEntityBuilder federationEntityBuilder,
         IOptions<OpenidFederationOptions> options)
     {
         _keyStore = keyStore;

@@ -36,6 +36,7 @@ builder.Services.AddSIDIdentityServer(o =>
         o.AddInMemoryGroups(IdServerConfiguration.Groups);
         o.AddInMemoryUserSessions(IdServerConfiguration.Sessions);
         o.AddInMemoryDeviceCodes(IdServerConfiguration.DeviceAuthCodes);
+        o.AddInMemoryFederatonEntities(IdServerConfiguration.FederationEntities);
         o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),

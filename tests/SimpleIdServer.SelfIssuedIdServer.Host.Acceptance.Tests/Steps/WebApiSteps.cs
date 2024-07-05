@@ -48,7 +48,7 @@ public class WebApiSteps
                 AllowAutoRedirect = false
             });
             _scenarioContext.Set(_factory, "Factory");
-            var mock = new Mock<IdServer.Infrastructures.IHttpClientFactory>();
+            var mock = new Mock<SimpleIdServer.IdServer.Helpers.IHttpClientFactory>();
             mock.Setup(m => m.GetHttpClient()).Returns(client);
             _scenarioContext.Set(new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "sidClient.crt")), "sidClient.crt");
         }

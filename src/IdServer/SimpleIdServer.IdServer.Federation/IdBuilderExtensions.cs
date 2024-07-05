@@ -12,7 +12,7 @@ public static class IdBuilderExtensions
     {
         if (cb != null) builder.Services.Configure(cb);
         else builder.Services.Configure(cb);
-        builder.Services.AddTransient<IFederationEntityBuilder, FederationEntityBuilder>();
+        builder.Services.AddTransient<IOpenidProviderFederationEntityBuilder, OpenidProviderFederationEntityBuilder>();
         return builder;
     }
 }

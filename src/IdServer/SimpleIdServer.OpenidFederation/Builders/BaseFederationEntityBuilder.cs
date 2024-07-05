@@ -3,6 +3,7 @@
 
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
+using SimpleIdServer.OpenidFederation.Stores;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -10,8 +11,16 @@ namespace SimpleIdServer.OpenidFederation.Builders;
 
 public abstract class BaseFederationEntityBuilder
 {
+    private readonly IFederationEntityStore _federationEntityStore;
+
+    protected BaseFederationEntityBuilder(IFederationEntityStore federationEntityStore)
+    {
+        _federationEntityStore = federationEntityStore;
+    }
+
     public async Task<OpenidFederationResult> BuildSelfIssued(BuildFederationEntityRequest request, CancellationToken cancellationToken)
     {
+        var authorities = await _federationEntityStore.GetAllAuthorities(request.Realm, cancellationToken);
         var currentDateTime = DateTime.UtcNow;
         var result = new OpenidFederationResult
         {
@@ -28,6 +37,7 @@ public abstract class BaseFederationEntityBuilder
             }
         };
         result.Jwks = jwks;
+        result.AuthorityHints = authorities.Select(a => a.Sub).ToList();
         var prefix = request.Realm;
         if (!string.IsNullOrWhiteSpace(prefix))
             prefix = $"{prefix}/";

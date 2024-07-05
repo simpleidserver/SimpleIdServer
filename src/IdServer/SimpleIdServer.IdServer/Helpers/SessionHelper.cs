@@ -23,13 +23,13 @@ public interface ISessionHelper
 
 public class SessionHelper : ISessionHelper
 {
-    private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
+    private readonly Helpers.IHttpClientFactory _httpClientFactory;
     private readonly IJwtBuilder _jwtBuilder;
     private readonly IdServerHostOptions _options;
     private readonly ILogger<SessionHelper> _logger;
 
     public SessionHelper(
-        IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
+        Helpers.IHttpClientFactory httpClientFactory,
         IJwtBuilder jwtBuilder,
         IOptions<IdServerHostOptions> options,
         ILogger<SessionHelper> logger)

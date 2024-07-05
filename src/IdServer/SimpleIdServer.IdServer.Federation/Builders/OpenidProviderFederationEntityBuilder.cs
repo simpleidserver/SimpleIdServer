@@ -5,23 +5,25 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.OpenIdConfiguration;
 using SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
 using SimpleIdServer.OpenidFederation.Builders;
+using SimpleIdServer.OpenidFederation.Stores;
 using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Federation.Builders;
 
-public interface IFederationEntityBuilder
+public interface IOpenidProviderFederationEntityBuilder
 {
     Task<OpenidFederationResult> BuildSelfIssued(BuildFederationEntityRequest request, CancellationToken cancellationToken);
 }
 
-public class FederationEntityBuilder : BaseFederationEntityBuilder, IFederationEntityBuilder
+public class OpenidProviderFederationEntityBuilder : BaseFederationEntityBuilder, IOpenidProviderFederationEntityBuilder
 {
     private readonly OpenidFederationOptions _options;
     private readonly IOpenidConfigurationRequestHandler _openidConfigurationRequestHandler;
 
-    public FederationEntityBuilder(
+    public OpenidProviderFederationEntityBuilder(
         IOpenidConfigurationRequestHandler openidConfigurationRequestHandler, 
-        IOptions<OpenidFederationOptions> options)
+        IOptions<OpenidFederationOptions> options,
+        IFederationEntityStore federationEntityStore) : base(federationEntityStore)
     {
         _openidConfigurationRequestHandler = openidConfigurationRequestHandler;
         _options = options.Value;

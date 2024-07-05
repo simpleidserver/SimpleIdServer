@@ -25,7 +25,7 @@ namespace SimpleIdServer.IdServer.Jobs
     {
         private readonly IBCAuthorizeRepository _repository;
         private readonly ILogger<BCNotificationJob> _logger;
-        private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
+        private readonly Helpers.IHttpClientFactory _httpClientFactory;
         private readonly IEnumerable<ITokenBuilder> _tokenBuilders;
         private readonly IUserRepository _userRepository;
         private readonly IClientRepository _clientRepository;
@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.Jobs
         public BCNotificationJob(
             IBCAuthorizeRepository repository, 
             ILogger<BCNotificationJob> logger,
-            Infrastructures.IHttpClientFactory httpClientFactory, 
+            Helpers.IHttpClientFactory httpClientFactory, 
             IEnumerable<ITokenBuilder> tokenBuilders, 
             IUserRepository userRepository,
             IClientRepository clientRepository,

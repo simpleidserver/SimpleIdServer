@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                     AllowAutoRedirect = false
                 });
                 _scenarioContext.Set(_factory, "Factory");
-                var mock = new Mock<Infrastructures.IHttpClientFactory>();
+                var mock = new Mock<Helpers.IHttpClientFactory>();
                 mock.Setup(m => m.GetHttpClient()).Returns(client);
                 _scenarioContext.Set(new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "sidClient.crt")), "sidClient.crt");
             }

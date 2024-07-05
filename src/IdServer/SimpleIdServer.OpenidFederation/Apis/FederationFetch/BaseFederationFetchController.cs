@@ -19,12 +19,12 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
 {
     private readonly IFederationEntityStore _federationEntityStore;
     private readonly IDistributedCache _distributedCache;
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IdServer.Helpers.IHttpClientFactory _httpClientFactory;
 
     public BaseFederationFetchController(
         IFederationEntityStore federationEntityStore,
         IDistributedCache distributedCache,
-        IHttpClientFactory httpClientFactory)
+        IdServer.Helpers.IHttpClientFactory httpClientFactory)
     {
         _federationEntityStore = federationEntityStore;
         _distributedCache = distributedCache;
@@ -42,6 +42,7 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
             issuer,
             cancellationToken);
         if (validationResult.ErrorCode != null) return Error(validationResult.HttpStatusCode, validationResult.ErrorCode, validationResult.ErrorMessage);
+        // UPDATE ISS and JWKS !!!
         var handler = new JsonWebTokenHandler();
         var jws = handler.CreateToken(JsonSerializer.Serialize(validationResult.OpenidFederationResult), new SigningCredentials(signingCredential.Key, signingCredential.Algorithm));
         return new ContentResult
@@ -69,12 +70,12 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
         if(!string.IsNullOrWhiteSpace(request.Sub))
         {
             var cacheKey = GetCacheKey(request.Sub);
-            var entityStatement = await _federationEntityStore.Get(request.Sub, realm, cancellationToken);
+            var entityStatement = await _federationEntityStore.GetSubordinate(request.Sub, realm, cancellationToken);
             if (entityStatement == null) return FederationFetchValidationResult.Error(ErrorCodes.NOT_FOUND, Resources.Global.UnknownEntityStatement);
             var cacheOpenidFederation = await _distributedCache.GetAsync(cacheKey, cancellationToken);
             if (cacheOpenidFederation == null)
             {
-                using (var resolver = TrustChainResolver.New(_httpClientFactory.CreateClient()))
+                using (var resolver = TrustChainResolver.New(_httpClientFactory.GetHttpClient()))
                 {
                     var openidFederation = await resolver.ResolveOpenidFederation(request.Sub, cancellationToken);
                     if(openidFederation == null) return FederationFetchValidationResult.Error(ErrorCodes.INVALID_REQUEST, Resources.Global.ImpossibleToExtractOpenidFederation);

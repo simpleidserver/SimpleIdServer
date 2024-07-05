@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.OpenidFederation.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -274,6 +275,17 @@ public class IdServerConfiguration
             ExpirationDateTime = DateTime.UtcNow.AddDays(2),
             Status = DeviceAuthCodeStatus.PENDING,
             UserCode = Guid.NewGuid().ToString()
+        }
+    };
+
+    public static List<FederationEntity> FederationEntities = new List<FederationEntity>
+    {
+        new FederationEntity
+        {
+            Id = Guid.NewGuid().ToString(),
+            Realm = IdServer.Constants.DefaultRealm,
+            Sub = "http://rp.com",
+            IsSubordinate = true
         }
     };
 

@@ -4,7 +4,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.OpenidFederation.Stores;
 
-namespace SimpleIdServer.OpenidFederation.Apis.FederationList;
+namespace SimpleIdServer.IdServer.Federation.Apis.FederationList;
 
 public class FederationListController : Controller
 {
@@ -18,8 +18,8 @@ public class FederationListController : Controller
     [HttpGet]
     public async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? "master";
-        var result = await _federationEntityStore.GetAll(prefix, cancellationToken);
-        return new OkObjectResult(result);
+        prefix = prefix ?? IdServer.Constants.DefaultRealm;
+        var result = await _federationEntityStore.GetAllSubordinates(prefix, cancellationToken);
+        return new OkObjectResult(result.Select(r => r.Sub).ToArray());
     }
 }
