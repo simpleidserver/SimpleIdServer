@@ -18,7 +18,7 @@ namespace SimpleIdServer.Scim.PostgreMigrations.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("scim")
-                .HasAnnotation("ProductVersion", "7.0.18")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -219,7 +219,8 @@ namespace SimpleIdServer.Scim.PostgreMigrations.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("FullPath")
-                        .HasColumnType("text");
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
 
                     b.Property<bool>("IsComputed")
                         .HasColumnType("boolean");
@@ -263,11 +264,15 @@ namespace SimpleIdServer.Scim.PostgreMigrations.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FullPath");
+
                     b.HasIndex("ParentAttributeId");
 
                     b.HasIndex("RepresentationId");
 
                     b.HasIndex("SchemaAttributeId");
+
+                    b.HasIndex("ValueString");
 
                     b.ToTable("SCIMRepresentationAttributeLst", "scim");
                 });
