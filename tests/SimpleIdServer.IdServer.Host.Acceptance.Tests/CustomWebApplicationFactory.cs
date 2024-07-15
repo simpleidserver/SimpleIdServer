@@ -118,7 +118,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                 ClientRegistrationTypes = ClientRegistrationType.AUTOMATIC,
                 IsFederationEnabled = false,
                 OrganizationName = null,
-                SigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256)
+                SigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "rpKeyId" }, SecurityAlgorithms.RsaSha256)
             };
             _rpFederationEntityBuilder = new RpFederationEntityBuilder(Microsoft.Extensions.Options.Options.Create(_opts), new FakeFederationEntityStore());
         }

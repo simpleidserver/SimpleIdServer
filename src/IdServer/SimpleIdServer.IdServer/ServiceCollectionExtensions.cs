@@ -298,7 +298,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClaimsJwsPayloadEnricher, ClaimsJwsPayloadEnricher>();
             services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
-            services.AddTransient<IClientHelper, OAuthClientHelper>();
+            services.AddTransient<IClientHelper, StandardClientHelper>();
             services.AddTransient<IAmrHelper, AmrHelper>();
             services.AddTransient<IUmaPermissionTicketHelper, UMAPermissionTicketHelper>();
             services.AddTransient<IExtractRequestHelper, ExtractRequestHelper>();

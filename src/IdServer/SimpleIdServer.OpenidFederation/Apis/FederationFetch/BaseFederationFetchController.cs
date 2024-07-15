@@ -42,7 +42,6 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
             issuer,
             cancellationToken);
         if (validationResult.ErrorCode != null) return Error(validationResult.HttpStatusCode, validationResult.ErrorCode, validationResult.ErrorMessage);
-        // UPDATE ISS and JWKS !!!
         var handler = new JsonWebTokenHandler();
         var jws = handler.CreateToken(JsonSerializer.Serialize(validationResult.OpenidFederationResult), new SigningCredentials(signingCredential.Key, signingCredential.Algorithm));
         return new ContentResult
@@ -71,7 +70,7 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
         {
             var cacheKey = GetCacheKey(request.Sub);
             var entityStatement = await _federationEntityStore.GetSubordinate(request.Sub, realm, cancellationToken);
-            if (entityStatement == null) return FederationFetchValidationResult.Error(ErrorCodes.NOT_FOUND, Resources.Global.UnknownEntityStatement);
+            if (entityStatement == null) return FederationFetchValidationResult.Error(ErrorCodes.NOT_FOUND, string.Format(Resources.Global.UnknownEntityStatement, request.Sub));
             var cacheOpenidFederation = await _distributedCache.GetAsync(cacheKey, cancellationToken);
             if (cacheOpenidFederation == null)
             {
@@ -81,9 +80,10 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
                     if(openidFederation == null) return FederationFetchValidationResult.Error(ErrorCodes.INVALID_REQUEST, Resources.Global.ImpossibleToExtractOpenidFederation);
                     await _distributedCache.SetStringAsync(cacheKey, JsonSerializer.Serialize(openidFederation), new DistributedCacheEntryOptions
                     {
-                        AbsoluteExpiration = openidFederation.ValidTo
+                        AbsoluteExpiration = openidFederation.FederationResult.ValidTo
                     }, cancellationToken);
-                    return FederationFetchValidationResult.Ok(openidFederation);
+                    openidFederation.FederationResult.Iss = issuer;
+                    return FederationFetchValidationResult.Ok(openidFederation.FederationResult);
                 }
             }
 

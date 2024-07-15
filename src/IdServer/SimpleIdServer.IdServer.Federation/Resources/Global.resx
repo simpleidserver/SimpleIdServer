@@ -120,4 +120,10 @@
   <data name="InvalidIssuer" xml:space="preserve">
     <value>the issuer is not valid</value>
   </data>
+  <data name="MissingOpenidRpInEntityStatement" xml:space="preserve">
+    <value>the openid_relying_party doesn't exist in the entity statement</value>
+  </data>
+  <data name="NoTrustAnchorCanBeResolved" xml:space="preserve">
+    <value>no trust anchor can be resolved</value>
+  </data>
 </root>

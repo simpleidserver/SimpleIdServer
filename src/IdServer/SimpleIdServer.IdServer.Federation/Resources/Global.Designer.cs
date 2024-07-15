@@ -68,5 +68,23 @@ namespace SimpleIdServer.IdServer.Federation.Resources {
                 return ResourceManager.GetString("InvalidIssuer", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the openid_relying_party doesn&apos;t exist in the entity statement.
+        /// </summary>
+        internal static string MissingOpenidRpInEntityStatement {
+            get {
+                return ResourceManager.GetString("MissingOpenidRpInEntityStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à no trust anchor can be resolved.
+        /// </summary>
+        internal static string NoTrustAnchorCanBeResolved {
+            get {
+                return ResourceManager.GetString("NoTrustAnchorCanBeResolved", resourceCulture);
+            }
+        }
     }
 }

@@ -1681,6 +1681,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the openid_relying_party doesn&apos;t exist in the entity statement.
+        /// </summary>
+        public static string MissingOpenidRpInEntityStatement {
+            get {
+                return ResourceManager.GetString("MissingOpenidRpInEntityStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à missing parameter {0}.
         /// </summary>
         public static string MissingParameter {

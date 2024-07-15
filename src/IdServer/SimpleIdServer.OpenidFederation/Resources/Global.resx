@@ -123,6 +123,9 @@
   <data name="EntityStatementIsExpired" xml:space="preserve">
     <value>the entity statement {0} is expired</value>
   </data>
+  <data name="EntityStatementSignatureIsInvalid" xml:space="preserve">
+    <value>the entity statement {0} signature is invalid</value>
+  </data>
   <data name="ImpossibleToExtractOpenidFederation" xml:space="preserve">
     <value>cannot extract the openid federation</value>
   </data>
@@ -135,8 +138,14 @@
   <data name="InvalidIssuer" xml:space="preserve">
     <value>the issuer is invalid</value>
   </data>
+  <data name="IssuerMustBeEqualsToSubject" xml:space="preserve">
+    <value>the issuer must be equals to the sub in the first entity statement</value>
+  </data>
   <data name="MissingParameter" xml:space="preserve">
     <value>the parameter {0} is missing</value>
+  </data>
+  <data name="SubDifferentToPreviousIssuer" xml:space="preserve">
+    <value>the subject is different from the previous issuer</value>
   </data>
   <data name="UnknownEntityStatement" xml:space="preserve">
     <value>the entity statement {0} doesn't exist</value>

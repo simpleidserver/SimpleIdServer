@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table420 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table424 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'https://localhost:8080/jwks\'", ((string)(null)), table420, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/jwks\'", ((string)(null)), table424, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

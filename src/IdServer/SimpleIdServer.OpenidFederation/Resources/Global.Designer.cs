@@ -79,6 +79,15 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the entity statement {0} signature is invalid.
+        /// </summary>
+        public static string EntityStatementSignatureIsInvalid {
+            get {
+                return ResourceManager.GetString("EntityStatementSignatureIsInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à cannot extract the openid federation.
         /// </summary>
         public static string ImpossibleToExtractOpenidFederation {
@@ -115,11 +124,29 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the issuer must be equals to the sub in the first entity statement.
+        /// </summary>
+        public static string IssuerMustBeEqualsToSubject {
+            get {
+                return ResourceManager.GetString("IssuerMustBeEqualsToSubject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the parameter {0} is missing.
         /// </summary>
         public static string MissingParameter {
             get {
                 return ResourceManager.GetString("MissingParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the subject is different from the previous issuer.
+        /// </summary>
+        public static string SubDifferentToPreviousIssuer {
+            get {
+                return ResourceManager.GetString("SubDifferentToPreviousIssuer", resourceCulture);
             }
         }
         

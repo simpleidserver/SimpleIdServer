@@ -98,14 +98,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table155 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table159 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/openid-federation\'", ((string)(null)), table155, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/openid-federation\'", ((string)(null)), table159, "When ");
 #line hidden
 #line 8
+ testRunner.And("extract payload from HTTP body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 10
  testRunner.Then("HTTP header has \'Content-Type\'=\'application/entity-statement+jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 12
+ testRunner.Then("JWT has \'iss\'=\'https://localhost:8080\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 13
+ testRunner.And("JWT has \'sub\'=\'https://localhost:8080\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();

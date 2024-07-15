@@ -98,14 +98,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table423 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table427 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table423.AddRow(new string[] {
+                table427.AddRow(new string[] {
                             "request_uri",
                             "request"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table423, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table427, "When ");
 #line hidden
 #line 9
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -141,14 +141,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table424 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table428 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table424.AddRow(new string[] {
+                table428.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
 #line 16
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table424, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table428, "When ");
 #line hidden
 #line 20
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -184,17 +184,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table425 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table429 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table425.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table425.AddRow(new string[] {
+                table429.AddRow(new string[] {
                             "response_type",
                             "invalid"});
 #line 27
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table425, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table429, "When ");
 #line hidden
 #line 32
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -230,32 +230,32 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table426 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table430 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table426.AddRow(new string[] {
+                table430.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table426.AddRow(new string[] {
+                table430.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table426.AddRow(new string[] {
+                table430.AddRow(new string[] {
                             "state",
                             "state"});
-                table426.AddRow(new string[] {
+                table430.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table426.AddRow(new string[] {
+                table430.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8081"});
-                table426.AddRow(new string[] {
+                table430.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table426.AddRow(new string[] {
+                table430.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 39
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table426, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table430, "When ");
 #line hidden
 #line 49
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -292,35 +292,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table427 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table431 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table427.AddRow(new string[] {
+                table431.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table427.AddRow(new string[] {
+                table431.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table427.AddRow(new string[] {
+                table431.AddRow(new string[] {
                             "state",
                             "state"});
-                table427.AddRow(new string[] {
+                table431.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table427.AddRow(new string[] {
+                table431.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table427.AddRow(new string[] {
+                table431.AddRow(new string[] {
                             "scope",
                             "scope1"});
-                table427.AddRow(new string[] {
+                table431.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table427.AddRow(new string[] {
+                table431.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 56
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table427, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table431, "When ");
 #line hidden
 #line 66
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -356,35 +356,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table428 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table432 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table428.AddRow(new string[] {
+                table432.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table428.AddRow(new string[] {
+                table432.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table428.AddRow(new string[] {
+                table432.AddRow(new string[] {
                             "state",
                             "state"});
-                table428.AddRow(new string[] {
+                table432.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table428.AddRow(new string[] {
+                table432.AddRow(new string[] {
                             "scope",
                             "openid email role"});
-                table428.AddRow(new string[] {
+                table432.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8081"});
-                table428.AddRow(new string[] {
+                table432.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table428.AddRow(new string[] {
+                table432.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 74
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table428, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table432, "When ");
 #line hidden
 #line 85
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -420,35 +420,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table429 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table433 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table429.AddRow(new string[] {
+                table433.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table429.AddRow(new string[] {
+                table433.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table429.AddRow(new string[] {
+                table433.AddRow(new string[] {
                             "state",
                             "state"});
-                table429.AddRow(new string[] {
+                table433.AddRow(new string[] {
                             "response_mode",
                             "invalid"});
-                table429.AddRow(new string[] {
+                table433.AddRow(new string[] {
                             "scope",
                             "openid email role"});
-                table429.AddRow(new string[] {
+                table433.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table429.AddRow(new string[] {
+                table433.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table429.AddRow(new string[] {
+                table433.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 92
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table429, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table433, "When ");
 #line hidden
 #line 103
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -484,35 +484,35 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table430 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table434 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table430.AddRow(new string[] {
+                table434.AddRow(new string[] {
                             "response_type",
                             "id_token"});
-                table430.AddRow(new string[] {
+                table434.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table430.AddRow(new string[] {
+                table434.AddRow(new string[] {
                             "state",
                             "state"});
-                table430.AddRow(new string[] {
+                table434.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table430.AddRow(new string[] {
+                table434.AddRow(new string[] {
                             "scope",
                             "openid email role"});
-                table430.AddRow(new string[] {
+                table434.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table430.AddRow(new string[] {
+                table434.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table430.AddRow(new string[] {
+                table434.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 110
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table430, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table434, "When ");
 #line hidden
 #line 121
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -549,32 +549,32 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table431 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table435 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table431.AddRow(new string[] {
+                table435.AddRow(new string[] {
                             "response_type",
                             "code id_token"});
-                table431.AddRow(new string[] {
+                table435.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table431.AddRow(new string[] {
+                table435.AddRow(new string[] {
                             "state",
                             "state"});
-                table431.AddRow(new string[] {
+                table435.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table431.AddRow(new string[] {
+                table435.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table431.AddRow(new string[] {
+                table435.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table431.AddRow(new string[] {
+                table435.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 128
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table431, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table435, "When ");
 #line hidden
 #line 138
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -610,39 +610,39 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table432 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table436 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "state",
                             "state"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table432.AddRow(new string[] {
+                table436.AddRow(new string[] {
                             "grant_management_action",
                             "invalid"});
 #line 145
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table432, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table436, "When ");
 #line hidden
 #line 156
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -678,42 +678,42 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table433 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table437 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "state",
                             "state"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "grant_management_action",
                             "create"});
-                table433.AddRow(new string[] {
+                table437.AddRow(new string[] {
                             "grant_id",
                             "id"});
 #line 164
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table433, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table437, "When ");
 #line hidden
 #line 176
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -750,39 +750,39 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table434 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table438 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "state",
                             "state"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table434.AddRow(new string[] {
+                table438.AddRow(new string[] {
                             "grant_id",
                             "id"});
 #line 183
- testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table434, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/par\'", ((string)(null)), table438, "When ");
 #line hidden
 #line 194
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
