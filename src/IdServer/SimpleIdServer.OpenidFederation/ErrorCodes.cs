@@ -8,5 +8,6 @@ public static class ErrorCodes
     public const string INVALID_REQUEST = "invalid_request";
     public const string INVALID_ISSUER = "invalid_issuer";
     public const string INTERNAL_SERVER_ERROR = "internal_server_error";
+    public const string FEDERATION_IS_NOT_ENABLED = "federation_is_not_enabled";
     public const string NOT_FOUND = "not_found";
 }

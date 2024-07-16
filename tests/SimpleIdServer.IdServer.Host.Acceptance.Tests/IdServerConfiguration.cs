@@ -36,6 +36,9 @@ public class IdServerConfiguration
         { "fortyFourClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256)  },
         { "sixtySixClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256)  }
     };
+
+    public static SigningCredentials RpSigningCredential = new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "rpKeyId" }, SecurityAlgorithms.RsaSha256);
+
     public static Dictionary<string, EncryptingCredentials> ClientEncryptingCredentials = new Dictionary<string, EncryptingCredentials>
     {
         { "twentyFiveClient", new EncryptingCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256) },
@@ -284,8 +287,8 @@ public class IdServerConfiguration
         {
             Id = Guid.NewGuid().ToString(),
             Realm = IdServer.Constants.DefaultRealm,
-            Sub = "http://rp.com",
-            IsSubordinate = true
+            Sub = "http://ta.com",
+            IsSubordinate = false
         }
     };
 

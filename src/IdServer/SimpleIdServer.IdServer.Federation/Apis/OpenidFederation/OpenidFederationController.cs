@@ -34,7 +34,7 @@ public class OpenidFederationController : BaseOpenidFederationController
     public async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
     {
         var realm = prefix ?? Constants.DefaultRealm;
-        var issuer = GetAbsoluteUriWithVirtualPath(Request);
+        var issuer = this.GetAbsoluteUriWithVirtualPath();
         var signingKeys = _keyStore.GetAllSigningKeys(realm);
         var signingKey = signingKeys.FirstOrDefault(k => k.Kid == _options.TokenSignedKid);
         if (signingKey == null) return Error(System.Net.HttpStatusCode.InternalServerError, SimpleIdServer.OpenidFederation.ErrorCodes.INTERNAL_SERVER_ERROR, SimpleIdServer.OpenidFederation.Resources.Global.CannotExtractSignatureKey);

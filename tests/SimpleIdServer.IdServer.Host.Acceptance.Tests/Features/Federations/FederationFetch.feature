@@ -8,7 +8,7 @@ Scenario: Get the entity-statement of the RP
 	And extract payload from HTTP body
 
 	Then JWT has 'iss'='https://localhost:8080'
-	And JWT has 'sub'='rp'
+	And JWT has 'sub'='http://rp.com'
 
 Scenario: Get a self-signed entity statement
 	When execute HTTP GET request 'https://localhost:8080/federation_fetch?iss=https://localhost:8080'

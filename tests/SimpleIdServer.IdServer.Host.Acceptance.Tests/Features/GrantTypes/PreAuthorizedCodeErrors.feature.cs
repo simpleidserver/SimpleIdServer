@@ -99,17 +99,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table325 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table327 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table325.AddRow(new string[] {
+                table327.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table325.AddRow(new string[] {
+                table327.AddRow(new string[] {
                             "client_id",
                             "invalid"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table325, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table327, "When ");
 #line hidden
 #line 10
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -145,20 +145,20 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table326 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table328 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table326.AddRow(new string[] {
+                table328.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table326.AddRow(new string[] {
+                table328.AddRow(new string[] {
                             "client_id",
                             "fiftySevenClient"});
-                table326.AddRow(new string[] {
+                table328.AddRow(new string[] {
                             "client_secret",
                             "password"});
 #line 16
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table326, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table328, "When ");
 #line hidden
 #line 22
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -195,20 +195,20 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table327 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table329 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table327.AddRow(new string[] {
+                table329.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table327.AddRow(new string[] {
+                table329.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table327.AddRow(new string[] {
+                table329.AddRow(new string[] {
                             "client_secret",
                             "password"});
 #line 28
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table327, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table329, "When ");
 #line hidden
 #line 34
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -244,23 +244,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table328 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table330 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table328.AddRow(new string[] {
+                table330.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table328.AddRow(new string[] {
+                table330.AddRow(new string[] {
                             "client_id",
                             "sixtyClient"});
-                table328.AddRow(new string[] {
+                table330.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table328.AddRow(new string[] {
+                table330.AddRow(new string[] {
                             "pre-authorized_code",
                             "code"});
 #line 40
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table328, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table330, "When ");
 #line hidden
 #line 47
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -296,23 +296,23 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table329 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table331 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table329.AddRow(new string[] {
+                table331.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table329.AddRow(new string[] {
+                table331.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table329.AddRow(new string[] {
+                table331.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table329.AddRow(new string[] {
+                table331.AddRow(new string[] {
                             "pre-authorized_code",
                             "code"});
 #line 53
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table329, "When ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table331, "When ");
 #line hidden
 #line 60
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

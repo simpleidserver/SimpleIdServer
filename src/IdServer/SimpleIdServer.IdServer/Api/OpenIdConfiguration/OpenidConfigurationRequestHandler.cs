@@ -43,7 +43,7 @@ public class OpenidConfigurationRequestHandler : IOpenidConfigurationRequestHand
         _oauthConfigurationRequestHandler = configurationRequestHandler;
     }
 
-    public async Task<JsonObject> Handle(string issuer, string prefix, CancellationToken cancellationToken)
+    public virtual async Task<JsonObject> Handle(string issuer, string prefix, CancellationToken cancellationToken)
     {
         var result = await _oauthConfigurationRequestHandler.Handle(prefix, issuer, cancellationToken);
         var acrLst = await _authenticationContextClassReferenceRepository.GetAll(prefix, cancellationToken);

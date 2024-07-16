@@ -56,32 +56,34 @@ public class FederationClientHelper : StandardClientHelper
     private async Task<Client> ResolveClientByOpenidFederation(string realm, string clientId, CancellationToken cancellationToken)
     {
         const string metadataName = "openid_relying_party";
-        var resolver = TrustChainResolver.New();
-        List<OpenidTrustChain> trustChains = null;
-        try
+        using (var resolver = TrustChainResolver.New(HttpClientFactory.GetHttpClient()))
         {
-            trustChains = await resolver.ResolveTrustChains(clientId, cancellationToken);
+            List<OpenidTrustChain> trustChains = null;
+            try
+            {
+                trustChains = await resolver.ResolveTrustChains(clientId, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                var message = ex.ToString();
+                _logger.LogError(message);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, message);
+            }
+
+            var allAuthorities = await _federationEntityStore.GetAllAuthorities(realm, cancellationToken);
+            var allTrustAnchors = trustChains.Select(c => c.TrustAnchor);
+            var filteredTrustChain = trustChains.FirstOrDefault(tc => allAuthorities.Any(at => at.Sub == tc.TrustAnchor.FederationResult.Sub));
+            if (filteredTrustChain == null)
+                throw new OAuthException(ErrorCodes.MISSING_TRUST_ANCHOR, Resources.Global.NoTrustAnchorCanBeResolved);
+
+
+            var federationResult = filteredTrustChain.EntityStatements.First().FederationResult;
+            if (federationResult.Metadata == null ||
+                federationResult.Metadata.OtherParameters == null ||
+                !federationResult.Metadata.OtherParameters.ContainsKey(metadataName))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, Resources.Global.MissingOpenidRpInEntityStatement);
+            var client = JsonSerializer.Deserialize<Client>(federationResult.Metadata.OtherParameters[metadataName]);
+            return client;
         }
-        catch (Exception ex)
-        {
-            var message = ex.ToString();
-            _logger.LogError(message);
-            throw new OAuthException(ErrorCodes.INVALID_REQUEST, message);
-        }
-
-        var allAuthorities = await _federationEntityStore.GetAllAuthorities(realm, cancellationToken);
-        var allTrustAnchors = trustChains.Select(c => c.TrustAnchor);
-        var filteredTrustChain = trustChains.FirstOrDefault(tc => allAuthorities.Any(at => at.Sub == tc.TrustAnchor.FederationResult.Sub));
-        if (filteredTrustChain == null)
-            throw new OAuthException(ErrorCodes.MISSING_TRUST_ANCHOR, Resources.Global.NoTrustAnchorCanBeResolved);
-
-
-        var federationResult = filteredTrustChain.EntityStatements.First().FederationResult;
-        if (federationResult.Metadata == null ||
-            federationResult.Metadata.OtherParameters == null ||
-            !federationResult.Metadata.OtherParameters.ContainsKey(metadataName))
-            throw new OAuthException(ErrorCodes.INVALID_REQUEST, Resources.Global.MissingOpenidRpInEntityStatement);
-        var client = JsonSerializer.Deserialize<Client>(federationResult.Metadata.OtherParameters[metadataName]);
-        return client;
     }
 }

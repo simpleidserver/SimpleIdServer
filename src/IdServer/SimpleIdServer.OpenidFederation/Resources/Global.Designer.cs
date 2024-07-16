@@ -88,6 +88,15 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à .
+        /// </summary>
+        public static string FederationIsNotEnabled {
+            get {
+                return ResourceManager.GetString("FederationIsNotEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à cannot extract the openid federation.
         /// </summary>
         public static string ImpossibleToExtractOpenidFederation {

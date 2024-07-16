@@ -109,7 +109,7 @@ public class TrustChainResolver : IDisposable
         if (fetchResult == null) return false;
         var fullPath = $"{entityParentFullPath}{separator}{authorityHint}";
         federationLst.TryAdd(fullPath, fetchResult);
-        if(fetchResult.FederationResult.AuthorityHints != null &&  fetchResult.FederationResult.AuthorityHints.Any())
+        if(openidFederation.FederationResult.AuthorityHints != null && openidFederation.FederationResult.AuthorityHints.Any())
         {
             var taskLst = openidFederation.FederationResult.AuthorityHints.Select(h => ExtractTrustChainFromTaOrIntermediate(federationLst, fullPath, h, entityId, cancellationToken)).ToList();
             var authorityHintsResult = await Task.WhenAll(taskLst);

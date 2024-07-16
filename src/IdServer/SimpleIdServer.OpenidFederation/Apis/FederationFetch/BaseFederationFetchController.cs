@@ -76,14 +76,21 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
             {
                 using (var resolver = TrustChainResolver.New(_httpClientFactory.GetHttpClient()))
                 {
-                    var openidFederation = await resolver.ResolveOpenidFederation(request.Sub, cancellationToken);
-                    if(openidFederation == null) return FederationFetchValidationResult.Error(ErrorCodes.INVALID_REQUEST, Resources.Global.ImpossibleToExtractOpenidFederation);
+                    var resolvedOpenidFederation = await resolver.ResolveOpenidFederation(request.Sub, cancellationToken);
+                    if(resolvedOpenidFederation == null) return FederationFetchValidationResult.Error(ErrorCodes.INVALID_REQUEST, Resources.Global.ImpossibleToExtractOpenidFederation);
+                    var openidFederation = new OpenidFederationResult
+                    {
+                        Iat = resolvedOpenidFederation.FederationResult.Iat,
+                        Exp = resolvedOpenidFederation.FederationResult.Exp,
+                        Iss = issuer,
+                        Sub = resolvedOpenidFederation.FederationResult.Sub,
+                        Jwks = resolvedOpenidFederation.FederationResult.Jwks
+                    };
                     await _distributedCache.SetStringAsync(cacheKey, JsonSerializer.Serialize(openidFederation), new DistributedCacheEntryOptions
                     {
-                        AbsoluteExpiration = openidFederation.FederationResult.ValidTo
+                        AbsoluteExpiration = openidFederation.ValidTo
                     }, cancellationToken);
-                    openidFederation.FederationResult.Iss = issuer;
-                    return FederationFetchValidationResult.Ok(openidFederation.FederationResult);
+                    return FederationFetchValidationResult.Ok(openidFederation);
                 }
             }
 
@@ -93,7 +100,7 @@ public abstract class BaseFederationFetchController : BaseOpenidFederationContro
         var selfIssuedEntityStatement = await BuildSelfIssuedFederationEntity(new BuildFederationEntityRequest
         {
             Credential = signingCredentials,
-            Issuer = GetAbsoluteUriWithVirtualPath(Request),
+            Issuer = this.GetAbsoluteUriWithVirtualPath(),
             Realm = realm
         }, cancellationToken);
         return FederationFetchValidationResult.Ok(selfIssuedEntityStatement);

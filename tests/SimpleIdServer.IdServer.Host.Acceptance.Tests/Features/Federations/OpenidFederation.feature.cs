@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table159 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table161 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/openid-federation\'", ((string)(null)), table159, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/openid-federation\'", ((string)(null)), table161, "When ");
 #line hidden
 #line 8
  testRunner.And("extract payload from HTTP body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

@@ -115,7 +115,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
                 if (string.IsNullOrWhiteSpace(clientId))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ClientId));
-                var client = await _clientRepository.GetByClientId(context.Realm, clientId, cancellationToken);
+                var client = await _clientHelper.ResolveClient(context.Realm, clientId, cancellationToken);
                 if (client != null)
                     context.SetClient(client);
                 if (_clientHelper.IsNonPreRegisteredRelyingParty(clientId) || (client != null && client.IsSelfIssueEnabled))

@@ -126,6 +126,9 @@
   <data name="EntityStatementSignatureIsInvalid" xml:space="preserve">
     <value>the entity statement {0} signature is invalid</value>
   </data>
+  <data name="FederationIsNotEnabled" xml:space="preserve">
+    <value />
+  </data>
   <data name="ImpossibleToExtractOpenidFederation" xml:space="preserve">
     <value>cannot extract the openid federation</value>
   </data>

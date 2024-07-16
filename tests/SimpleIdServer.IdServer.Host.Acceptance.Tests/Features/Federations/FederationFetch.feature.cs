@@ -98,12 +98,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table153 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table155 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
  testRunner.When("execute HTTP GET request \'https://localhost:8080/federation_fetch?sub=http://rp.c" +
-                        "om&iss=https://localhost:8080\'", ((string)(null)), table153, "When ");
+                        "om&iss=https://localhost:8080\'", ((string)(null)), table155, "When ");
 #line hidden
 #line 8
  testRunner.And("extract payload from HTTP body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -112,7 +112,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JWT has \'iss\'=\'https://localhost:8080\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 11
- testRunner.And("JWT has \'sub\'=\'rp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JWT has \'sub\'=\'http://rp.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -136,12 +136,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table154 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table156 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 14
  testRunner.When("execute HTTP GET request \'https://localhost:8080/federation_fetch?iss=https://loc" +
-                        "alhost:8080\'", ((string)(null)), table154, "When ");
+                        "alhost:8080\'", ((string)(null)), table156, "When ");
 #line hidden
 #line 17
  testRunner.And("extract payload from HTTP body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

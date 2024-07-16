@@ -26,7 +26,7 @@ public class FederationFetchController : BaseFederationFetchController
         IKeyStore keyStore,
         IFederationEntityStore federationEntityStore,
         IDistributedCache distributedCache,
-        Helpers.IHttpClientFactory httpClientFactory,
+        IdServer.Helpers.IHttpClientFactory httpClientFactory,
         IOptions<OpenidFederationOptions> options) : base(federationEntityStore, distributedCache, httpClientFactory)
     {
         _federationEntityBuilder = federationEntityBuilder;

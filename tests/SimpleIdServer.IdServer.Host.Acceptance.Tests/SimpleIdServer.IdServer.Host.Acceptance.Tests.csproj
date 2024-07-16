@@ -71,6 +71,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
+	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.Authority.Federation\SimpleIdServer.Authority.Federation.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Console\SimpleIdServer.IdServer.Console.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj" />
@@ -100,6 +101,9 @@
 	  </Compile>
 	  <Compile Update="Features\Federations\FederationList.feature.cs">
 	    <DependentUpon>FederationList.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\Federations\AutomaticRegistration.feature.cs">
+	    <DependentUpon>AutomaticRegistration.feature</DependentUpon>
 	  </Compile>
 	  <Compile Update="Features\Federations\OpenidFederation.feature.cs">
 	    <DependentUpon>OpenidFederation.feature</DependentUpon>
@@ -286,6 +290,10 @@
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>
 	  <SpecFlowFeatureFiles Update="Features\Federations\FederationList.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\Federations\AutomaticRegistration.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

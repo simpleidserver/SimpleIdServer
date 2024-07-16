@@ -30,7 +30,7 @@ public class OpenidFederationController : BaseOpenidFederationController
     [HttpGet]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
-        var issuer = GetAbsoluteUriWithVirtualPath(Request);
+        var issuer = this.GetAbsoluteUriWithVirtualPath();
         if (_options.SigningCredentials == null) return Error(System.Net.HttpStatusCode.InternalServerError, SimpleIdServer.OpenidFederation.ErrorCodes.INTERNAL_SERVER_ERROR, SimpleIdServer.OpenidFederation.Resources.Global.CannotExtractSignatureKey);
         var selfIssuedFederationEntity = await _federationEntityBuilder.BuildSelfIssued(new SimpleIdServer.OpenidFederation.Builders.BuildFederationEntityRequest
         {
