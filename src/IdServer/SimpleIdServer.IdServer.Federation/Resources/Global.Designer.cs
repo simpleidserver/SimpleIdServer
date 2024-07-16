@@ -86,5 +86,14 @@ namespace SimpleIdServer.IdServer.Federation.Resources {
                 return ResourceManager.GetString("NoTrustAnchorCanBeResolved", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à only the following authentication methods {0} are supported.
+        /// </summary>
+        internal static string OnlyFollowingAuthMethodsAreSupported {
+            get {
+                return ResourceManager.GetString("OnlyFollowingAuthMethodsAreSupported", resourceCulture);
+            }
+        }
     }
 }

@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features.Federations
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Get the entity-statement of the RP")]
+        [Xunit.SkippableFactAttribute(DisplayName="Get a self-signed entity statement")]
         [Xunit.TraitAttribute("FeatureTitle", "FederationFetch")]
-        [Xunit.TraitAttribute("Description", "Get the entity-statement of the RP")]
-        public void GetTheEntity_StatementOfTheRP()
+        [Xunit.TraitAttribute("Description", "Get a self-signed entity statement")]
+        public void GetASelf_SignedEntityStatement()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get the entity-statement of the RP", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get a self-signed entity statement", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -98,12 +98,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table155 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table162 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'https://localhost:8080/federation_fetch?sub=http://rp.c" +
-                        "om&iss=https://localhost:8080\'", ((string)(null)), table155, "When ");
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/federation_fetch?iss=https://loc" +
+                        "alhost:8080\'", ((string)(null)), table162, "When ");
 #line hidden
 #line 8
  testRunner.And("extract payload from HTTP body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -112,44 +112,6 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JWT has \'iss\'=\'https://localhost:8080\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 11
- testRunner.And("JWT has \'sub\'=\'http://rp.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Get a self-signed entity statement")]
-        [Xunit.TraitAttribute("FeatureTitle", "FederationFetch")]
-        [Xunit.TraitAttribute("Description", "Get a self-signed entity statement")]
-        public void GetASelf_SignedEntityStatement()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Get a self-signed entity statement", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 13
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table156 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-#line 14
- testRunner.When("execute HTTP GET request \'https://localhost:8080/federation_fetch?iss=https://loc" +
-                        "alhost:8080\'", ((string)(null)), table156, "When ");
-#line hidden
-#line 17
- testRunner.And("extract payload from HTTP body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 19
- testRunner.Then("JWT has \'iss\'=\'https://localhost:8080\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 20
  testRunner.And("JWT has \'sub\'=\'https://localhost:8080\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

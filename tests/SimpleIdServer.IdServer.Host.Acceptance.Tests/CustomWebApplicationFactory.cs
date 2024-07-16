@@ -6,29 +6,27 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
-using SimpleIdServer.Authority.Federation;
-using SimpleIdServer.Authority.Federation.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Host.Acceptance.Tests.Middlewares;
 using SimpleIdServer.OpenidFederation;
 using SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
+using SimpleIdServer.OpenidFederation.Builders;
 using SimpleIdServer.OpenidFederation.Domains;
 using SimpleIdServer.OpenidFederation.Stores;
-using SimpleIdServer.Rp.Federation;
-using SimpleIdServer.Rp.Federation.Builders;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
@@ -102,29 +100,54 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
 
     public class FakeHttpMessageHandler : DelegatingHandler
     {
-        private IRpFederationEntityBuilder _rpFederationEntityBuilder;
-        private IAuthorityFederationEntityBuilder _authorityFederationEntityBuilder;
+        private RpFederationEntityBuilder _rpFederationEntityBuilder;
+        private AuthorityFederationEntityBuilder _authorityFederationEntityBuilder;
         private RpFederationOptions _rpOpts;
-        private AuthorityFederationOptions _taOpts;
+        private RpFederationOptions _taOpts;
         private readonly ScenarioContext _scenarioContext;
 
         public FakeHttpMessageHandler(
             ScenarioContext scenarioContext)
         {
-            var jsonWebKey = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential.SerializePublicJWK();
-            jsonWebKey.Alg = SecurityAlgorithms.RsaSha256;
-            jsonWebKey.Use = "sig";
+            var firstJsonWebKey = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential.SerializePublicJWK();
+            firstJsonWebKey.Alg = SecurityAlgorithms.RsaSha256;
+            firstJsonWebKey.Use = "sig";
+            var secondJsonWebKey = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpJwtSigningCredential.SerializePublicJWK();
+            secondJsonWebKey.Alg = SecurityAlgorithms.RsaSha256;
+            secondJsonWebKey.Use = "sig";
             var client = new Domains.Client
             {
                 ClientId = "http://rp.com",
                 ApplicationType = "web",
                 RedirectionUrls = new List<string>
+                {
+                    "https://openid.sunet.se/rp/callback"
+                },
+                RequestObjectSigningAlg = SecurityAlgorithms.RsaSha256,
+                Scopes = new List<Scope>
+                {
+                    new Scope
                     {
-                        "https://openid.sunet.se/rp/callback"
+                        Name = "openid"
                     },
-                RequestObjectSigningAlg = SecurityAlgorithms.RsaSha256
+                    new Scope
+                    {
+                        Name = "profile"
+                    }
+                },
+                ResponseTypes = new List<string>
+                {
+                    "code"
+                },
+                GrantTypes = new List<string>
+                {
+                    "authorization_code"
+                },
+                IsConsentDisabled = true,
+                TokenEndPointAuthMethod = "private_key_jwt"
             };
-            client.Add(OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential.Kid, jsonWebKey, "sig", SecurityKeyTypes.RSA);
+            client.Add(OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential.Kid, firstJsonWebKey, "sig", SecurityKeyTypes.RSA);
+            client.Add(OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpJwtSigningCredential.Kid, secondJsonWebKey, "sig", SecurityKeyTypes.RSA);
             _scenarioContext = scenarioContext;
             _rpOpts = new RpFederationOptions
             {
@@ -134,7 +157,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                 OrganizationName = null,
                 SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
             };
-            _taOpts = new AuthorityFederationOptions
+            _taOpts = new RpFederationOptions
             {
                 OrganizationName = "ta",
                 SigningCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "taKeyId" }, SecurityAlgorithms.RsaSha256)
@@ -242,6 +265,88 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                 StatusCode = HttpStatusCode.OK,
                 Content = new StringContent(jws, System.Text.Encoding.UTF8, OpenidFederationConstants.EntityStatementContentType)
             };
+        }
+    }
+
+    public class RpFederationOptions
+    {
+        /// <summary>
+        /// Enable or disable federation.
+        /// </summary>
+        public bool IsFederationEnabled { get; set; }
+        /// <summary>
+        /// Organization name.
+        /// </summary>
+        public string OrganizationName { get; set; }
+        /// <summary>
+        /// Key used to sign the response.
+        /// </summary>
+        public SigningCredentials SigningCredentials { get; set; }
+        /// <summary>
+        /// OPENID client of the relying party.
+        /// </summary>
+        public Client Client { get; set; }
+        /// <summary>
+        /// Client registration types the RP support.
+        /// </summary>
+        public ClientRegistrationType ClientRegistrationTypes { get; set; }
+    }
+
+    [Flags]
+    public enum ClientRegistrationType
+    {
+        AUTOMATIC = 1,
+        MANUAL = 2
+    }
+
+    public class RpFederationEntityBuilder : BaseFederationEntityBuilder
+    {
+        private readonly RpFederationOptions _options;
+
+        public RpFederationEntityBuilder(IOptions<RpFederationOptions> options, IFederationEntityStore federationEntityStore) : base(federationEntityStore)
+        {
+            _options = options.Value;
+        }
+
+        protected override bool IsFederationEnabled => _options.IsFederationEnabled;
+
+        protected override string OrganizationName => _options.OrganizationName;
+
+        protected override Task EnrichSelfIssued(OpenidFederationResult federationEntity, BuildFederationEntityRequest request, CancellationToken cancellationToken)
+        {
+            if (federationEntity.Metadata.OtherParameters == null)
+                federationEntity.Metadata.OtherParameters = new Dictionary<string, JsonObject>();
+            var client = JsonObject.Parse(JsonSerializer.Serialize(_options.Client)).AsObject();
+            var clientRegistrationTypes = new JsonArray();
+            if (_options.ClientRegistrationTypes.HasFlag(ClientRegistrationType.AUTOMATIC))
+                clientRegistrationTypes.Add("automatic");
+            if (_options.ClientRegistrationTypes.HasFlag(ClientRegistrationType.MANUAL))
+                clientRegistrationTypes.Add("manual");
+
+            client.Add("client_registration_types", clientRegistrationTypes);
+            federationEntity.Metadata.OtherParameters.Add("openid_relying_party", client);
+            return Task.CompletedTask;
+        }
+    }
+
+    public class AuthorityFederationEntityBuilder : BaseFederationEntityBuilder
+    {
+        private readonly RpFederationOptions _options;
+
+        public AuthorityFederationEntityBuilder(
+            IOptions<RpFederationOptions> options,
+            IFederationEntityStore federationEntityStore) : base(federationEntityStore)
+        {
+            _options = options.Value;
+        }
+
+        protected override bool IsFederationEnabled => true;
+
+        protected override string OrganizationName => _options.OrganizationName;
+
+        protected override Task EnrichSelfIssued(OpenidFederationResult federationEntity, BuildFederationEntityRequest request, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
     }
 

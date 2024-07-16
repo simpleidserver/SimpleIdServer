@@ -78,8 +78,8 @@ builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
 builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
 builder.Services.AddDidKey();
 var app = builder.Build()
-    .UseSID()
-    .UseOpenidFederation();
+    .UseOpenidFederation()
+    .UseSID();
 app.Run();
 
 static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())

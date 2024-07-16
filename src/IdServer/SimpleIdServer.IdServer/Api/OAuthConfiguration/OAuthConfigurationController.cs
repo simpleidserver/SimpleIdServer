@@ -29,7 +29,6 @@ namespace SimpleIdServer.IdServer.Api.Configuration
         [HttpGet]
         public virtual async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken token)
         {
-            prefix = prefix ?? Constants.DefaultRealm;
             return new OkObjectResult(await Build(prefix, token));
         }
 

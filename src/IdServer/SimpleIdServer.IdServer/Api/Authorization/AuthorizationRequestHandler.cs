@@ -41,7 +41,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly IClientRepository _clientRepository;
         private readonly IClientHelper _clientHelper;
         private readonly IdServerHostOptions _options;
 
@@ -54,7 +53,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder,
             IGrantedTokenHelper grantedTokenHelper,
-            IClientRepository clientRepository,
             IClientHelper clientHelper,
             IOptions<IdServerHostOptions> options)
         {
@@ -67,7 +65,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _transactionBuilder = transactionBuilder;
             _jwtBuilder = jwtBuilder;
             _grantedTokenHelper = grantedTokenHelper;
-            _clientRepository = clientRepository;
             _clientHelper = clientHelper;
             _options = options.Value;
         }

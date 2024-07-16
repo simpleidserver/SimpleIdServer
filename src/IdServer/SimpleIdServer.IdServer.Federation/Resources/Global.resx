@@ -126,4 +126,7 @@
   <data name="NoTrustAnchorCanBeResolved" xml:space="preserve">
     <value>no trust anchor can be resolved</value>
   </data>
+  <data name="OnlyFollowingAuthMethodsAreSupported" xml:space="preserve">
+    <value>only the following authentication methods {0} are supported</value>
+  </data>
 </root>

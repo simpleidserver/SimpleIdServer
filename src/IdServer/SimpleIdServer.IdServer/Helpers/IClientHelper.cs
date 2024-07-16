@@ -48,6 +48,14 @@ public class StandardClientHelper : IClientHelper
         }
     }
 
+    protected IClientRepository ClientRepository
+    {
+        get
+        {
+            return _clientRepository;
+        }
+    }
+
     public virtual async Task<IEnumerable<string>> GetRedirectionUrls(Client client, CancellationToken cancellationToken)
     {
         List<string> result = client.RedirectionUrls == null ? new List<string>() : client.RedirectionUrls.ToList();

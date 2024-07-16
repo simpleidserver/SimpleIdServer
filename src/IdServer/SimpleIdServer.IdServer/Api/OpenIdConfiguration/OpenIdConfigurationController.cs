@@ -29,7 +29,6 @@ namespace SimpleIdServer.IdServer.Api.OpenIdConfiguration
         public override async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            prefix = prefix ?? Constants.DefaultRealm;
             var result = await _openidConfigurationRequestHandler.Handle(issuer, prefix, cancellationToken);
             return new OkObjectResult(result);
         }

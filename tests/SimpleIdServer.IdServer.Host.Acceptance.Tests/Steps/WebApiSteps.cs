@@ -96,6 +96,27 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             }
         }
 
+        [Given("build client assertion for Relying Party")]
+        public void GivenClientAssertionForRp(Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var handler = new JsonWebTokenHandler();
+                var signingCredentials = IdServerConfiguration.RpJwtSigningCredential;
+                var claims = new Dictionary<string, object>();
+                foreach (var row in table.Rows)
+                    claims.Add(row["Key"].ToString(), ParseValue(_scenarioContext, row["Value"].ToString()));
+
+                var descritor = new SecurityTokenDescriptor
+                {
+                    Claims = claims,
+                    SigningCredentials = signingCredentials
+                };
+                var request = handler.CreateToken(descritor);
+                _scenarioContext.Set(request, "clientAssertion");
+            }
+        }
+
         [Given("build JWE request object for client '(.*)' and sign with the key '(.*)' and encrypt with the key '(.*)'")]
         public void GivenBuildJWERequestObject(string clientId, string sigKeyId, string encKeyId, Table table)
         {

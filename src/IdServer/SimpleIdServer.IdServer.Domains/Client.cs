@@ -640,5 +640,6 @@ namespace SimpleIdServer.IdServer.Domains
         public const string GRANTMANAGEMENT = "GRANTMANAGEMENT";
         public const string SAML = "SAML";
         public const string CREDENTIAL_ISSUER = "CREDENTIALISSUER";
+        public const string FEDERATION = "FEDERATION";
     }
 }
