@@ -87,6 +87,7 @@ public class TrustChainResolver : IDisposable
 
     private async Task<bool> ExtractTrustChainFromRp(EntityStatement entityStatement, ConcurrentDictionary<string, EntityStatement> federationLst, string entityId, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(entityId)) throw new InvalidOperationException(Global.SubjectIsRequiredInEntityStatement);
         federationLst.TryAdd(entityId, entityStatement);
         if (entityStatement.FederationResult.AuthorityHints != null && entityStatement.FederationResult.AuthorityHints.Any())
         {
@@ -151,6 +152,8 @@ public class TrustChainResolver : IDisposable
     private EntityStatement DeserializeEntityStatement(string content)
     {
         var handler = new JsonWebTokenHandler();
+        if (string.IsNullOrWhiteSpace(content)) throw new InvalidOperationException(Resources.Global.EntityStatementIsRequired);
+        if (!handler.CanReadToken(content)) throw new InvalidOperationException(Resources.Global.EntityStatementIsNotWellFormatted);
         var jwt = handler.ReadJsonWebToken(content);
         var json = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(jwt.EncodedPayload));
         return new EntityStatement(content, JsonSerializer.Deserialize<OpenidFederationResult>(json));
@@ -167,6 +170,7 @@ public class TrustChainResolver : IDisposable
         if (!httpResult.IsSuccessStatusCode) return null;
         var content = await httpResult.Content.ReadAsStringAsync(cancellationToken);
         var handler = new JsonWebTokenHandler();
+        if (!handler.CanReadToken(content)) return null;
         var jwt = handler.ReadJsonWebToken(content);
         var json = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(jwt.EncodedPayload));
         return new EntityStatement(content, JsonSerializer.Deserialize<OpenidFederationResult>(json));

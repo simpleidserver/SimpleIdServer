@@ -47,7 +47,7 @@ public class FederationRegistrationController : BaseOpenidFederationController
         {
             var entityStatement = await reader.ReadToEndAsync();
             prefix = prefix ?? Constants.DefaultRealm;
-            if (!Request.Headers.ContentType.Contains(OpenidFederationConstants.EntityStatementContentType))
+            if (!Request.Headers.ContentType.Any(c => c.StartsWith(OpenidFederationConstants.EntityStatementContentType)))
                 return Error(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Resources.Global.OnlyEntityStatementIsSupported);
             try
             {
@@ -78,7 +78,8 @@ public class FederationRegistrationController : BaseOpenidFederationController
             catch (OAuthException ex)
             {
                 _logger.LogError(ex.ToString());
-                return Error(ex.StatusCode.Value, ex.Code, ex.Message);
+                var statusCode = ex.StatusCode == null ? HttpStatusCode.BadRequest : ex.StatusCode.Value;
+                return Error(statusCode, ex.Code, ex.Message);
             }
         }
     }

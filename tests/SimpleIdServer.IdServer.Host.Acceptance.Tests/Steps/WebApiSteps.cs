@@ -96,6 +96,31 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             }
         }
 
+        [Given("build random entity statement")]
+        public void GivenBuildRandomEntityStatement(Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var signingCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = Guid.NewGuid().ToString() }, SecurityAlgorithms.RsaSha256);
+                var claims = new JsonObject();
+                foreach (var row in table.Rows)
+                {
+                    var key = row["Key"].ToString();
+                    JsonNode value = row["Value"].ToString();
+                    try
+                    {
+                        value = JsonNode.Parse(value.ToString());
+                    }
+                    catch { }
+                    claims.Add(key, value);
+                }
+
+                var handler = new JsonWebTokenHandler();
+                var request = handler.CreateToken(claims.ToJsonString(), signingCredentials);
+                _scenarioContext.Set(request, "entityStatement");
+            }
+        }
+
         [Given("build client assertion for Relying Party")]
         public void GivenClientAssertionForRp(Table table)
         {
@@ -315,6 +340,21 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             {
                 httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
             }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("execute HTTP POST request '(.*)', content-type '(.*)', content '(.*)'")]
+        public async Task WhenExecuteHttpPostWithContentType(string url, string contentType, string content)
+        {
+            content = ParseValue(_scenarioContext, content).ToString(); ;
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(url),
+                Content = new StringContent(content, Encoding.UTF8, contentType)
+            };
 
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");

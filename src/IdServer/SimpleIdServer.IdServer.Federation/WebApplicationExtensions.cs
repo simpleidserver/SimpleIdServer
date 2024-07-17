@@ -22,7 +22,7 @@ namespace Microsoft.AspNetCore.Builder
                 defaults: new { controller = "OpenidFederation", action = "Get" });
             webApplication.SidMapControllerRoute("federationRegistration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + OpenidFederationConstants.EndPoints.FederationRegistration,
-                defaults: new { controller = "FederationRegistration", action = "Get" });
+                defaults: new { controller = "FederationRegistration", action = "Post" });
             if (federationOpts.IsFederationEnabled)
             {
                 webApplication.SidMapControllerRoute("federationFetch",

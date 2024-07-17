@@ -79,6 +79,24 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the entity statement is not correctly formatted.
+        /// </summary>
+        public static string EntityStatementIsNotWellFormatted {
+            get {
+                return ResourceManager.GetString("EntityStatementIsNotWellFormatted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the entity statement is required.
+        /// </summary>
+        public static string EntityStatementIsRequired {
+            get {
+                return ResourceManager.GetString("EntityStatementIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the entity statement {0} signature is invalid.
         /// </summary>
         public static string EntityStatementSignatureIsInvalid {
@@ -88,7 +106,7 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à .
+        ///   Recherche une chaîne localisée semblable à the federation is not enabled.
         /// </summary>
         public static string FederationIsNotEnabled {
             get {
@@ -156,6 +174,15 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         public static string SubDifferentToPreviousIssuer {
             get {
                 return ResourceManager.GetString("SubDifferentToPreviousIssuer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à subject is required in the entity statement.
+        /// </summary>
+        public static string SubjectIsRequiredInEntityStatement {
+            get {
+                return ResourceManager.GetString("SubjectIsRequiredInEntityStatement", resourceCulture);
             }
         }
         

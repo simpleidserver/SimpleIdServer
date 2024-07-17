@@ -121,7 +121,7 @@ public class ClientRegistrationService : IClientRegistrationService
             {
                 var message = ex.ToString();
                 _logger.LogError(message);
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, message);
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, ex.Message);
             }
 
             var allAuthorities = await _federationEntityStore.GetAllAuthorities(realm, cancellationToken);
@@ -129,7 +129,6 @@ public class ClientRegistrationService : IClientRegistrationService
             var filteredTrustChain = trustChains.FirstOrDefault(tc => allAuthorities.Any(at => at.Sub == tc.TrustAnchor.FederationResult.Sub));
             if (filteredTrustChain == null)
                 throw new OAuthException(ErrorCodes.MISSING_TRUST_ANCHOR, Resources.Global.NoTrustAnchorCanBeResolved);
-
 
             var federationResult = filteredTrustChain.EntityStatements.First().FederationResult;
             if (federationResult.Metadata == null ||
@@ -147,7 +146,7 @@ public class ClientRegistrationService : IClientRegistrationService
             if (!metadata.ContainsKey(OAuthClientParameters.ClientRegistrationTypesSupported))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, Resources.Global.ClientRegistrationTypesMustBeSpecified);
 
-            var clientRegistrationTypes = metadata[OAuthClientParameters.ClientRegistrationTypesSupported] as JsonArray;
+            var clientRegistrationTypes = (metadata[OAuthClientParameters.ClientRegistrationTypesSupported] as JsonArray).Select(c => c.ToString());
             if(!clientRegistrationTypes.Contains(type))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Resources.Global.ClientRegistrationTypeNotSupported, type));
 

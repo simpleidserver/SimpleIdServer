@@ -123,11 +123,17 @@
   <data name="EntityStatementIsExpired" xml:space="preserve">
     <value>the entity statement {0} is expired</value>
   </data>
+  <data name="EntityStatementIsNotWellFormatted" xml:space="preserve">
+    <value>the entity statement is not correctly formatted</value>
+  </data>
+  <data name="EntityStatementIsRequired" xml:space="preserve">
+    <value>the entity statement is required</value>
+  </data>
   <data name="EntityStatementSignatureIsInvalid" xml:space="preserve">
     <value>the entity statement {0} signature is invalid</value>
   </data>
   <data name="FederationIsNotEnabled" xml:space="preserve">
-    <value />
+    <value>the federation is not enabled</value>
   </data>
   <data name="ImpossibleToExtractOpenidFederation" xml:space="preserve">
     <value>cannot extract the openid federation</value>
@@ -149,6 +155,9 @@
   </data>
   <data name="SubDifferentToPreviousIssuer" xml:space="preserve">
     <value>the subject is different from the previous issuer</value>
+  </data>
+  <data name="SubjectIsRequiredInEntityStatement" xml:space="preserve">
+    <value>subject is required in the entity statement</value>
   </data>
   <data name="UnknownEntityStatement" xml:space="preserve">
     <value>the entity statement {0} doesn't exist</value>
