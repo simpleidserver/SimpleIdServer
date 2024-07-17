@@ -24,8 +24,4 @@ public class RpFederationOptions
     /// OPENID client of the relying party.
     /// </summary>
     public Client Client { get; set; }
-    /// <summary>
-    /// Client registration types the RP support.
-    /// </summary>
-    public ClientRegistrationType ClientRegistrationTypes { get; set; }
 }

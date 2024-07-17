@@ -363,6 +363,8 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.UserInfoSignedResponseAlg)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? UserInfoSignedResponseAlg { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.ClientRegistrationTypesSupported)]
+        public List<string> ClientRegistrationTypesSupported { get; set; } = new List<string>();
         [JsonPropertyName(OAuthClientParameters.UserInfoEncryptedResponseAlg)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         /// <summary>
@@ -503,6 +505,8 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
         [JsonPropertyName(OAuthClientParameters.ClientType)]
         public string? ClientType { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.ExpirationDateTime)]
+        public DateTime? ExpirationDateTime { get; set; } = null;
         /// <summary>
         /// Nonce is required in the DPoP proof.
         /// </summary>

@@ -2,7 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using SimpleIdServer.IdServer.Api.OpenIdConfiguration;
 using SimpleIdServer.IdServer.Federation;
+using SimpleIdServer.IdServer.Federation.Apis.OpenidConfiguration;
 using SimpleIdServer.IdServer.Federation.Builders;
 using SimpleIdServer.IdServer.Federation.Helpers;
 using SimpleIdServer.IdServer.Helpers;
@@ -18,6 +20,9 @@ public static class IdBuilderExtensions
         builder.Services.AddTransient<IOpenidProviderFederationEntityBuilder, OpenidProviderFederationEntityBuilder>();
         builder.Services.RemoveAll<IClientHelper>();
         builder.Services.AddTransient<IClientHelper, FederationClientHelper>();
+        builder.Services.RemoveAll<IOpenidConfigurationRequestHandler>();
+        builder.Services.AddTransient<IOpenidConfigurationRequestHandler, FederationOpenidConfigurationRequestHandler>();
+        builder.Services.AddTransient<IClientRegistrationService, ClientRegistrationService>();
         return builder;
     }
 }

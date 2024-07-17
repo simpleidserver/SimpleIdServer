@@ -17,10 +17,13 @@ namespace Microsoft.AspNetCore.Builder
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var federationOpts = webApplication.Services.GetRequiredService<IOptions<OpenidFederationOptions>>().Value;
             var usePrefix = opts.UseRealm;
-            webApplication.SidMapControllerRoute("wsfederationMetadata",
+            webApplication.SidMapControllerRoute("openidFederationMetadata",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + OpenidFederationConstants.EndPoints.OpenidFederation,
                 defaults: new { controller = "OpenidFederation", action = "Get" });
-            if(federationOpts.IsFederationEnabled)
+            webApplication.SidMapControllerRoute("federationRegistration",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + OpenidFederationConstants.EndPoints.FederationRegistration,
+                defaults: new { controller = "FederationRegistration", action = "Get" });
+            if (federationOpts.IsFederationEnabled)
             {
                 webApplication.SidMapControllerRoute("federationFetch",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + OpenidFederationConstants.EndPoints.FederationFetch,

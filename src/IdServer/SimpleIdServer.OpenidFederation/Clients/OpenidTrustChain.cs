@@ -25,6 +25,13 @@ public class OpenidTrustChain
             return EntityStatements.LastOrDefault();
         }
     }
+    public DateTime? ExpirationDateTime
+    {
+        get
+        {
+            return EntityStatements == null ? null : EntityStatements.Select(s => s.FederationResult.ValidTo).Where(v => v != null).Min();
+        }
+    }
 
     public OpenidTrustChainValidationResult Validate()
     {

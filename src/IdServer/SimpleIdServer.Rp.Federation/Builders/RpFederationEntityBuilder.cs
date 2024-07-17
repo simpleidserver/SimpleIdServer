@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.Extensions.Options;
+using SimpleIdServer.OpenidFederation;
 using SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
 using SimpleIdServer.OpenidFederation.Builders;
 using SimpleIdServer.OpenidFederation.Stores;
@@ -33,14 +34,7 @@ public class RpFederationEntityBuilder : BaseFederationEntityBuilder, IRpFederat
         if (federationEntity.Metadata.OtherParameters == null)
             federationEntity.Metadata.OtherParameters = new Dictionary<string, JsonObject>();
         var client = JsonObject.Parse(JsonSerializer.Serialize(_options.Client)).AsObject();
-        var clientRegistrationTypes = new JsonArray();
-        if (_options.ClientRegistrationTypes.HasFlag(ClientRegistrationType.AUTOMATIC))
-            clientRegistrationTypes.Add("automatic");
-        if (_options.ClientRegistrationTypes.HasFlag(ClientRegistrationType.MANUAL))
-            clientRegistrationTypes.Add("manual");
-
-        client.Add("client_registration_types", clientRegistrationTypes);
-        federationEntity.Metadata.OtherParameters.Add("openid_relying_party", client);
+        federationEntity.Metadata.OtherParameters.Add(EntityStatementTypes.OpenidRelyingParty, client);
         return Task.CompletedTask;
     }
 }

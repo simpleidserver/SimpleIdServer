@@ -61,6 +61,24 @@ namespace SimpleIdServer.IdServer.Federation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the client registration type {0} is not supported by the RP.
+        /// </summary>
+        internal static string ClientRegistrationTypeNotSupported {
+            get {
+                return ResourceManager.GetString("ClientRegistrationTypeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the client_registration_types must be specified by the RP entity statement.
+        /// </summary>
+        internal static string ClientRegistrationTypesMustBeSpecified {
+            get {
+                return ResourceManager.GetString("ClientRegistrationTypesMustBeSpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the issuer is not valid.
         /// </summary>
         internal static string InvalidIssuer {
@@ -84,6 +102,15 @@ namespace SimpleIdServer.IdServer.Federation.Resources {
         internal static string NoTrustAnchorCanBeResolved {
             get {
                 return ResourceManager.GetString("NoTrustAnchorCanBeResolved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à only entity statement is supported.
+        /// </summary>
+        internal static string OnlyEntityStatementIsSupported {
+            get {
+                return ResourceManager.GetString("OnlyEntityStatementIsSupported", resourceCulture);
             }
         }
         

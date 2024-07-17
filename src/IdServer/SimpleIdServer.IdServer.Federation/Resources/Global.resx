@@ -117,6 +117,12 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ClientRegistrationTypeNotSupported" xml:space="preserve">
+    <value>the client registration type {0} is not supported by the RP</value>
+  </data>
+  <data name="ClientRegistrationTypesMustBeSpecified" xml:space="preserve">
+    <value>the client_registration_types must be specified by the RP entity statement</value>
+  </data>
   <data name="InvalidIssuer" xml:space="preserve">
     <value>the issuer is not valid</value>
   </data>
@@ -125,6 +131,9 @@
   </data>
   <data name="NoTrustAnchorCanBeResolved" xml:space="preserve">
     <value>no trust anchor can be resolved</value>
+  </data>
+  <data name="OnlyEntityStatementIsSupported" xml:space="preserve">
+    <value>only entity statement is supported</value>
   </data>
   <data name="OnlyFollowingAuthMethodsAreSupported" xml:space="preserve">
     <value>only the following authentication methods {0} are supported</value>

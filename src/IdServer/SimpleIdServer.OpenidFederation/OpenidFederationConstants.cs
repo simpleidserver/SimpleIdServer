@@ -10,6 +10,7 @@ public static class OpenidFederationConstants
         public const string OpenidFederation = ".well-known/openid-federation";
         public const string FederationFetch = "federation_fetch";
         public const string FederationList = "federation_list";
+        public const string FederationRegistration = "federation_registration";
     }
 
     public const string EntityStatementContentType = "application/entity-statement+jwt";

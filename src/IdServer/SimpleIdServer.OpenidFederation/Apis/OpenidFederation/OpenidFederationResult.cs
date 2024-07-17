@@ -63,6 +63,9 @@ public class OpenidFederationResult
     public List<string> AuthorityHints { get; set; }
     [JsonPropertyName("metadata")]
     public OpenidFederationMetadataResult Metadata { get; set; } = new OpenidFederationMetadataResult();
+    [JsonPropertyName("trust_anchor_id")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? TrustAnchorId { get; set; } = null;
 
     private DateTime? GetDateTime(long? time)
     {

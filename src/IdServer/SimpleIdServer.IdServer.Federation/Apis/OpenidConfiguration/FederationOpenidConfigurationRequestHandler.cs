@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Api.OpenIdConfiguration;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
+using SimpleIdServer.OpenidFederation;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -30,10 +31,14 @@ public class FederationOpenidConfigurationRequestHandler : OpenidConfigurationRe
     public override async Task<JsonObject> Handle(string issuer, string prefix, CancellationToken cancellationToken)
     {
         var result = await base.Handle(issuer, prefix, cancellationToken);
+        if (!string.IsNullOrWhiteSpace(prefix))
+            prefix = $"{prefix}/";
         result.Add("client_registration_types_supported", JsonSerializer.SerializeToNode(new List<string>
         {
-            "automatic"
+            ClientRegistrationMethods.Explicit,
+            ClientRegistrationMethods.Automatic
         }));
+        result.Add("federation_registration_endpoint", $"{issuer}/{prefix}{OpenidFederationConstants.EndPoints.FederationRegistration}");
         return result;
     }
 }

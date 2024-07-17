@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.OpenIdConfiguration;
+using SimpleIdServer.OpenidFederation;
 using SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
 using SimpleIdServer.OpenidFederation.Builders;
 using SimpleIdServer.OpenidFederation.Stores;
@@ -38,6 +39,6 @@ public class OpenidProviderFederationEntityBuilder : BaseFederationEntityBuilder
         var openidProvider = await _openidConfigurationRequestHandler.Handle(federationEntity.Iss, request.Realm, cancellationToken);
         if (federationEntity.Metadata.OtherParameters == null)
             federationEntity.Metadata.OtherParameters = new Dictionary<string, JsonObject>();
-        federationEntity.Metadata.OtherParameters.Add("openid_provider", openidProvider);
+        federationEntity.Metadata.OtherParameters.Add(EntityStatementTypes.OpenidProvider, openidProvider);
     }
 }

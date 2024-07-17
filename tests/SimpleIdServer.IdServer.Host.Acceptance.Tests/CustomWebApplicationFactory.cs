@@ -118,6 +118,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
             var client = new Domains.Client
             {
                 ClientId = "http://rp.com",
+                ClientRegistrationTypesSupported = new List<string>
+                {
+                    ClientRegistrationMethods.Automatic
+                },
                 ApplicationType = "web",
                 RedirectionUrls = new List<string>
                 {
@@ -152,7 +156,6 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
             _rpOpts = new RpFederationOptions
             {
                 Client = client,
-                ClientRegistrationTypes = ClientRegistrationType.AUTOMATIC,
                 IsFederationEnabled = false,
                 OrganizationName = null,
                 SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
@@ -286,17 +289,6 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
         /// OPENID client of the relying party.
         /// </summary>
         public Client Client { get; set; }
-        /// <summary>
-        /// Client registration types the RP support.
-        /// </summary>
-        public ClientRegistrationType ClientRegistrationTypes { get; set; }
-    }
-
-    [Flags]
-    public enum ClientRegistrationType
-    {
-        AUTOMATIC = 1,
-        MANUAL = 2
     }
 
     public class RpFederationEntityBuilder : BaseFederationEntityBuilder
@@ -317,13 +309,6 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
             if (federationEntity.Metadata.OtherParameters == null)
                 federationEntity.Metadata.OtherParameters = new Dictionary<string, JsonObject>();
             var client = JsonObject.Parse(JsonSerializer.Serialize(_options.Client)).AsObject();
-            var clientRegistrationTypes = new JsonArray();
-            if (_options.ClientRegistrationTypes.HasFlag(ClientRegistrationType.AUTOMATIC))
-                clientRegistrationTypes.Add("automatic");
-            if (_options.ClientRegistrationTypes.HasFlag(ClientRegistrationType.MANUAL))
-                clientRegistrationTypes.Add("manual");
-
-            client.Add("client_registration_types", clientRegistrationTypes);
             federationEntity.Metadata.OtherParameters.Add("openid_relying_party", client);
             return Task.CompletedTask;
         }

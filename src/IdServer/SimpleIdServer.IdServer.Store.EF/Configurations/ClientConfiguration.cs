@@ -11,6 +11,9 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<Client> builder)
         {
             builder.HasKey(c => c.Id);
+            builder.Property(a => a.ClientRegistrationTypesSupported).HasConversion(
+                v => string.Join(',', v),
+                v => v.Split(',', StringSplitOptions.None).ToList());
             builder.Property(a => a.GrantTypes).HasConversion(
                 v => string.Join(',', v),
                 v => v.Split(',', StringSplitOptions.None).ToList());

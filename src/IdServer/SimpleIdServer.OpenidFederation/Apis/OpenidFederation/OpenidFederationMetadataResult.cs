@@ -9,7 +9,7 @@ namespace SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
 [JsonConverter(typeof(OpenidFederationMetadataJsonConverter))]
 public class OpenidFederationMetadataResult
 {
-    [JsonPropertyName("federation_entity")]
+    [JsonPropertyName(EntityStatementTypes.FederationEntity)]
     public FederationEntityResult FederationEntity { get; set; }
     public Dictionary<string, JsonObject> OtherParameters { get; set; } = new Dictionary<string, JsonObject>();
 }

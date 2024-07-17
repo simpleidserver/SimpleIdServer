@@ -27,10 +27,19 @@ public class TrustChainResolver : IDisposable
     public static TrustChainResolver New(HttpClient httpClient)
         => new TrustChainResolver(httpClient);
 
-    public async Task<List<OpenidTrustChain>> ResolveTrustChains(string entityId, CancellationToken cancellationToken)
+    public async Task<List<OpenidTrustChain>> ResolveTrustChainsFromClientId(string entityId, CancellationToken cancellationToken)
     {
+        var entityStatement = await GetOpenidFederation(entityId, cancellationToken);
+        if (entityStatement == null) return new List<OpenidTrustChain>();
+        return await ResolveTrustChains(entityStatement, cancellationToken);
+    }
+
+    public async Task<List<OpenidTrustChain>> ResolveTrustChains(string content, CancellationToken cancellationToken)
+    {
+        var entityStatement = DeserializeEntityStatement(content);
+        if (entityStatement == null) return new List<OpenidTrustChain>();
         var dic = new ConcurrentDictionary<string, EntityStatement>();
-        await ExtractTrustChainFromRp(dic, entityId, cancellationToken);
+        await ExtractTrustChainFromRp(entityStatement, dic, entityStatement.FederationResult.Sub, cancellationToken);
         return Transform(dic);
     }
 
@@ -76,14 +85,12 @@ public class TrustChainResolver : IDisposable
     public void Dispose() =>
         _httpClient.Dispose();
 
-    private async Task<bool> ExtractTrustChainFromRp(ConcurrentDictionary<string, EntityStatement> federationLst, string entityId, CancellationToken cancellationToken)
+    private async Task<bool> ExtractTrustChainFromRp(EntityStatement entityStatement, ConcurrentDictionary<string, EntityStatement> federationLst, string entityId, CancellationToken cancellationToken)
     {
-        var openidFederation = await InternalResolveOpenidFederation(entityId, cancellationToken);
-        if (openidFederation == null) return false;
-        federationLst.TryAdd(entityId, openidFederation);
-        if (openidFederation.FederationResult.AuthorityHints != null && openidFederation.FederationResult.AuthorityHints.Any())
+        federationLst.TryAdd(entityId, entityStatement);
+        if (entityStatement.FederationResult.AuthorityHints != null && entityStatement.FederationResult.AuthorityHints.Any())
         {
-            var taskLst = openidFederation.FederationResult.AuthorityHints.Select(h => ExtractTrustChainFromTaOrIntermediate(federationLst, entityId, h, entityId, cancellationToken)).ToList();
+            var taskLst = entityStatement.FederationResult.AuthorityHints.Select(h => ExtractTrustChainFromTaOrIntermediate(federationLst, entityId, h, entityId, cancellationToken)).ToList();
             var authorityHintsResult = await Task.WhenAll(taskLst);
             if (authorityHintsResult.Any(c => !c)) throw new InvalidOperationException(Global.ImpossibleToResolveTrustChain);
         }
@@ -123,6 +130,13 @@ public class TrustChainResolver : IDisposable
 
     private async Task<EntityStatement?> InternalResolveOpenidFederation(string entityId, CancellationToken cancellationToken)
     {
+        var content = await GetOpenidFederation(entityId, cancellationToken);
+        if (content == null) return null;
+        return DeserializeEntityStatement(content);
+    }
+
+    private async Task<string?> GetOpenidFederation(string entityId, CancellationToken cancellationToken)
+    {
         var requestMessage = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
@@ -131,6 +145,11 @@ public class TrustChainResolver : IDisposable
         var httpResult = await _httpClient.SendAsync(requestMessage, cancellationToken);
         if (!httpResult.IsSuccessStatusCode) return null;
         var content = await httpResult.Content.ReadAsStringAsync(cancellationToken);
+        return content;
+    }
+
+    private EntityStatement DeserializeEntityStatement(string content)
+    {
         var handler = new JsonWebTokenHandler();
         var jwt = handler.ReadJsonWebToken(content);
         var json = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(jwt.EncodedPayload));
