@@ -58,3 +58,14 @@ Scenario: Error is returned when a random entity statement is generated with a t
 	Then HTTP status code equals to '400'	
 	Then JSON 'error'='invalid_request'
 	Then JSON 'error_description'='impossible to resolve the trust chain'
+
+Scenario: Error is returned when the client registration type is not equal to explicit
+	Given build entity statement for RP with automatic registration
+
+	When execute HTTP POST request 'https://localhost:8080/federation_registration', content-type 'application/entity-statement+jwt', content '$entityStatement$'
+	
+	And extract JSON from body
+
+	Then HTTP status code equals to '400'	
+	Then JSON 'error'='invalid_request'
+	Then JSON 'error_description'='the client registration type explicit is not supported by the RP'

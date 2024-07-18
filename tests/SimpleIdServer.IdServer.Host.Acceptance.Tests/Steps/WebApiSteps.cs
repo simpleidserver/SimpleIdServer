@@ -10,6 +10,7 @@ using Moq;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
+using SimpleIdServer.OpenidFederation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -118,6 +119,126 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                 var handler = new JsonWebTokenHandler();
                 var request = handler.CreateToken(claims.ToJsonString(), signingCredentials);
                 _scenarioContext.Set(request, "entityStatement");
+            }
+        }
+
+        [Given("build entity statement for RP")]
+        public void GivenBuildEntityStatementForRp()
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var client = new Domains.Client
+                {
+                    ClientId = "http://rp.com",
+                    ClientRegistrationTypesSupported = new List<string>
+                    {
+                        ClientRegistrationMethods.Explicit
+                    },
+                    ApplicationType = "web",
+                    RedirectionUrls = new List<string>
+                    {
+                        "https://openid.sunet.se/rp/callback"
+                    },
+                    RequestObjectSigningAlg = SecurityAlgorithms.RsaSha256,
+                    Scopes = new List<Domains.Scope>
+                    {
+                        new Domains.Scope
+                        {
+                            Name = "openid"
+                        },
+                        new Domains.Scope
+                        {
+                            Name = "profile"
+                        }
+                    },
+                    ResponseTypes = new List<string>
+                    {
+                        "code"
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code"
+                    },
+                    IsConsentDisabled = true,
+                    TokenEndPointAuthMethod = "private_key_jwt"
+                };
+                var rpOpts = new RpFederationOptions
+                {
+                    Client = client,
+                    IsFederationEnabled = false,
+                    OrganizationName = null,
+                    SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
+                };
+                var rpFederationEntityBuilder = new RpFederationEntityBuilder(Microsoft.Extensions.Options.Options.Create(rpOpts), new FakeRPFederationEntityStore());
+                var result = rpFederationEntityBuilder.BuildSelfIssued(new OpenidFederation.Builders.BuildFederationEntityRequest
+                {
+                    Credential = rpOpts.SigningCredentials,
+                    Issuer = "http://rp.com",
+                    Realm = null
+                }, CancellationToken.None).Result;
+                var handler = new JsonWebTokenHandler();
+                var jws = handler.CreateToken(JsonSerializer.Serialize(result), new SigningCredentials(rpOpts.SigningCredentials.Key, rpOpts.SigningCredentials.Algorithm));
+                _scenarioContext.Set(jws, "entityStatement");
+            }
+        }
+
+        [Given("build entity statement for RP with automatic registration")]
+        public void GivenBuildEntityStatementForRpWithAutomaticRegistration()
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var client = new Domains.Client
+                {
+                    ClientId = "http://rp.com",
+                    ClientRegistrationTypesSupported = new List<string>
+                    {
+                        ClientRegistrationMethods.Automatic
+                    },
+                    ApplicationType = "web",
+                    RedirectionUrls = new List<string>
+                    {
+                        "https://openid.sunet.se/rp/callback"
+                    },
+                    RequestObjectSigningAlg = SecurityAlgorithms.RsaSha256,
+                    Scopes = new List<Domains.Scope>
+                    {
+                        new Domains.Scope
+                        {
+                            Name = "openid"
+                        },
+                        new Domains.Scope
+                        {
+                            Name = "profile"
+                        }
+                    },
+                    ResponseTypes = new List<string>
+                    {
+                        "code"
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code"
+                    },
+                    IsConsentDisabled = true,
+                    TokenEndPointAuthMethod = "private_key_jwt"
+                };
+                var rpOpts = new RpFederationOptions
+                {
+                    Client = client,
+                    IsFederationEnabled = false,
+                    OrganizationName = null,
+                    SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
+                };
+                var rpFederationEntityBuilder = new RpFederationEntityBuilder(Microsoft.Extensions.Options.Options.Create(rpOpts), new FakeRPFederationEntityStore());
+                var result = rpFederationEntityBuilder.BuildSelfIssued(new OpenidFederation.Builders.BuildFederationEntityRequest
+                {
+                    Credential = rpOpts.SigningCredentials,
+                    Issuer = "http://rp.com",
+                    Realm = null
+                }, CancellationToken.None).Result;
+                var handler = new JsonWebTokenHandler();
+                var jws = handler.CreateToken(JsonSerializer.Serialize(result), new SigningCredentials(rpOpts.SigningCredentials.Key, rpOpts.SigningCredentials.Algorithm));
+                _scenarioContext.Set(jws, "entityStatement");
             }
         }
 

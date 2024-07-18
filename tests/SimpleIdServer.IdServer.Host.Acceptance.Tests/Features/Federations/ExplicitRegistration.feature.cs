@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features.Federations
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public partial class ExplicitRegistrationErrorsFeature : object, Xunit.IClassFixture<ExplicitRegistrationErrorsFeature.FixtureData>, System.IDisposable
+    public partial class ExplicitRegistrationFeature : object, Xunit.IClassFixture<ExplicitRegistrationFeature.FixtureData>, System.IDisposable
     {
         
         private static TechTalk.SpecFlow.ITestRunner testRunner;
@@ -28,10 +28,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features.Federations
         
         private Xunit.Abstractions.ITestOutputHelper _testOutputHelper;
         
-#line 1 "ExplicitRegistrationErrors.feature"
+#line 1 "ExplicitRegistration.feature"
 #line hidden
         
-        public ExplicitRegistrationErrorsFeature(ExplicitRegistrationErrorsFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
+        public ExplicitRegistrationFeature(ExplicitRegistrationFeature.FixtureData fixtureData, SimpleIdServer_IdServer_Host_Acceptance_Tests_XUnitAssemblyFixture assemblyFixture, Xunit.Abstractions.ITestOutputHelper testOutputHelper)
         {
             this._testOutputHelper = testOutputHelper;
             this.TestInitialize();
@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features.Federations
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/Federations", "ExplicitRegistrationErrors", "\tCheck the errors returned during explicit registration", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/Federations", "ExplicitRegistration", "\tCheck explicit registration", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -80,14 +80,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features.Federations
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when wrong content-type is passed")]
-        [Xunit.TraitAttribute("FeatureTitle", "ExplicitRegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when wrong content-type is passed")]
-        public void ErrorIsReturnedWhenWrongContent_TypeIsPassed()
+        [Xunit.SkippableFactAttribute(DisplayName="Check access token can be returned when using explicit client registration")]
+        [Xunit.TraitAttribute("FeatureTitle", "ExplicitRegistration")]
+        [Xunit.TraitAttribute("Description", "Check access token can be returned when using explicit client registration")]
+        public void CheckAccessTokenCanBeReturnedWhenUsingExplicitClientRegistration()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when wrong content-type is passed", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Check access token can be returned when using explicit client registration", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -99,205 +99,29 @@ this.ScenarioInitialize(scenarioInfo);
             {
                 this.ScenarioStart();
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/federation_registration\', conte" +
-                        "nt-type \'application/json\', content \'{}\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.Given("build entity statement for RP", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 7
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/federation_registration\', conte" +
+                        "nt-type \'application/entity-statement+jwt\', content \'$entityStatement$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 9
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 10
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract payload from HTTP body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 11
- testRunner.Then("JSON \'error_description\'=\'only entity statement is supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.Then("HTTP header has \'Content-Type\'=\'application/entity-statement+jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when invalid entity-statement is passed")]
-        [Xunit.TraitAttribute("FeatureTitle", "ExplicitRegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when invalid entity-statement is passed")]
-        public void ErrorIsReturnedWhenInvalidEntity_StatementIsPassed()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when invalid entity-statement is passed", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 12
+ testRunner.And("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
 #line 13
-this.ScenarioInitialize(scenarioInfo);
+ testRunner.And("JWT has \'iss\'=\'https://localhost:8080\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
 #line 14
- testRunner.When("execute HTTP POST request \'https://localhost:8080/federation_registration\', conte" +
-                        "nt-type \'application/entity-statement+jwt\', content \'hello\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+ testRunner.And("JWT has \'sub\'=\'http://rp.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 16
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 18
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 19
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 20
- testRunner.Then("JSON \'error_description\'=\'the entity statement is not correctly formatted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when there is no subject in the entity statement")]
-        [Xunit.TraitAttribute("FeatureTitle", "ExplicitRegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when there is no subject in the entity statement")]
-        public void ErrorIsReturnedWhenThereIsNoSubjectInTheEntityStatement()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when there is no subject in the entity statement", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 22
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table162 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table162.AddRow(new string[] {
-                            "state",
-                            "state"});
-#line 23
- testRunner.Given("build random entity statement", ((string)(null)), table162, "Given ");
-#line hidden
-#line 27
- testRunner.When("execute HTTP POST request \'https://localhost:8080/federation_registration\', conte" +
-                        "nt-type \'application/entity-statement+jwt\', content \'$entityStatement$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 29
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 31
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 32
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 33
- testRunner.Then("JSON \'error_description\'=\'subject is required in the entity statement\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when there is no trusted anchor")]
-        [Xunit.TraitAttribute("FeatureTitle", "ExplicitRegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when there is no trusted anchor")]
-        public void ErrorIsReturnedWhenThereIsNoTrustedAnchor()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when there is no trusted anchor", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 35
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table163 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table163.AddRow(new string[] {
-                            "sub",
-                            "sub"});
-#line 36
- testRunner.Given("build random entity statement", ((string)(null)), table163, "Given ");
-#line hidden
-#line 40
- testRunner.When("execute HTTP POST request \'https://localhost:8080/federation_registration\', conte" +
-                        "nt-type \'application/entity-statement+jwt\', content \'$entityStatement$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 42
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 44
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 45
- testRunner.Then("JSON \'error\'=\'missing_trust_anchor\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 46
- testRunner.Then("JSON \'error_description\'=\'no trust anchor can be resolved\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when a random entity statement is generated with a trusted anch" +
-            "or")]
-        [Xunit.TraitAttribute("FeatureTitle", "ExplicitRegistrationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when a random entity statement is generated with a trusted anch" +
-            "or")]
-        public void ErrorIsReturnedWhenARandomEntityStatementIsGeneratedWithATrustedAnchor()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when a random entity statement is generated with a trusted anch" +
-                    "or", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 48
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table164 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table164.AddRow(new string[] {
-                            "sub",
-                            "sub"});
-                table164.AddRow(new string[] {
-                            "authority_hints",
-                            "[\"http://ta.com\"]"});
-#line 49
- testRunner.Given("build random entity statement", ((string)(null)), table164, "Given ");
-#line hidden
-#line 54
- testRunner.When("execute HTTP POST request \'https://localhost:8080/federation_registration\', conte" +
-                        "nt-type \'application/entity-statement+jwt\', content \'$entityStatement$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 56
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 58
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 59
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 60
- testRunner.Then("JSON \'error_description\'=\'impossible to resolve the trust chain\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 15
+ testRunner.And("JWT has \'trust_anchor_id\'=\'http://ta.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -310,12 +134,12 @@ this.ScenarioInitialize(scenarioInfo);
             
             public FixtureData()
             {
-                ExplicitRegistrationErrorsFeature.FeatureSetup();
+                ExplicitRegistrationFeature.FeatureSetup();
             }
             
             void System.IDisposable.Dispose()
             {
-                ExplicitRegistrationErrorsFeature.FeatureTearDown();
+                ExplicitRegistrationFeature.FeatureTearDown();
             }
         }
     }

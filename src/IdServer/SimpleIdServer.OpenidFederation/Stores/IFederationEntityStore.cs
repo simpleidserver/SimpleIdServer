@@ -10,4 +10,5 @@ public interface IFederationEntityStore
     Task<List<FederationEntity>> GetAllSubordinates(string realm, CancellationToken cancellationToken);
     Task<List<FederationEntity>> GetAllAuthorities(string realm, CancellationToken cancellationToken);
     Task<FederationEntity> GetSubordinate(string sub, string realm, CancellationToken cancellationToken);
+    void Add(FederationEntity federationEntity);
 }
