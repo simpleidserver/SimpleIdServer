@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\IdServer\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj" />
+    <ProjectReference Include="..\..\IdServer\SimpleIdServer.OpenidFederation.Store.EF\SimpleIdServer.OpenidFederation.Store.EF.csproj" />
     <ProjectReference Include="..\..\IdServer\SimpleIdServer.Rp.Federation\SimpleIdServer.Rp.Federation.csproj" />
   </ItemGroup>
 </Project>

@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Startup.Converters;
+using SimpleIdServer.OpenidFederation.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -262,6 +263,17 @@ namespace SimpleIdServer.IdServer.Startup
         public static List<PresentationDefinition> PresentationDefinitions = new List<PresentationDefinition>
         {
             PresentationDefinitionBuilder.New("universitydegree_vp", "University Degree").AddLdpVcInputDescriptor("UniversityDegree", "UniversityDegree", "UniversityDegree").Build()
+        };
+
+        public static List<FederationEntity> FederationEntities = new List<FederationEntity>
+        {
+            new FederationEntity
+            {
+                Id  = Guid.NewGuid().ToString(),
+                IsSubordinate = false,
+                Realm = IdServer.Constants.DefaultRealm,
+                Sub = "http://localhost:7000"
+            }
         };
     }
 }

@@ -12,6 +12,7 @@ public static class ServiceCollectionExtensions
     {
         services.Configure(cbOptions);
         services.AddTransient<IRpFederationEntityBuilder, RpFederationEntityBuilder>();
+        services.AddTransient<SimpleIdServer.IdServer.Helpers.IHttpClientFactory, SimpleIdServer.IdServer.Helpers.HttpClientFactory>();
         return services;
     }
 }

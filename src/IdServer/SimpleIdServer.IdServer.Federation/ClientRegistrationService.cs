@@ -168,6 +168,8 @@ public class ClientRegistrationService : IClientRegistrationService
         newClient.ClientType = ClientTypes.FEDERATION;
         newClient.ClientSecret = Guid.NewGuid().ToString();
         newClient.ExpirationDateTime = trustChain.ExpirationDateTime;
+        newClient.UpdateDateTime = DateTime.UtcNow;
+        newClient.CreateDateTime = DateTime.UtcNow;
         _clientRepository.Add(newClient);
         return newClient;
     }

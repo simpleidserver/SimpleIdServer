@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
     {
         services.Configure(authorityOptions);
         services.AddTransient<IAuthorityFederationEntityBuilder, AuthorityFederationEntityBuilder>();
+        services.AddTransient<SimpleIdServer.IdServer.Helpers.IHttpClientFactory, SimpleIdServer.IdServer.Helpers.HttpClientFactory>();
         return services;
     }
 }

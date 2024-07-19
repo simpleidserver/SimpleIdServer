@@ -20,7 +20,7 @@ public abstract class BaseFederationEntityBuilder
 
     public async Task<OpenidFederationResult> BuildSelfIssued(BuildFederationEntityRequest request, CancellationToken cancellationToken)
     {
-        var authorities = await _federationEntityStore.GetAllAuthorities(request.Realm, cancellationToken);
+        var authorities = await _federationEntityStore.GetAllAuthorities(request.Realm ?? string.Empty, cancellationToken);
         var currentDateTime = DateTime.UtcNow;
         var result = new OpenidFederationResult
         {

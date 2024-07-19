@@ -7,6 +7,6 @@ public class FederationEntity
 {
     public string Id { get; set; }
     public string Sub { get; set; } = null!;
-    public string Realm { get; set; } = null!;
+    public string? Realm { get; set; } = null;
     public bool IsSubordinate { get; set; } = false;
 }

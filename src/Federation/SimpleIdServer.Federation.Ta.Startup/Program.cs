@@ -4,6 +4,8 @@ using SimpleIdServer.OpenidFederation.Store.EF;
 using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddControllers();
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddAuthorityFederation(o =>
 {
     o.OrganizationName = "Trust anchor";

@@ -2,11 +2,10 @@
   "profiles": {
     "SimpleIdServer.Federation.Rp.Startup": {
       "commandName": "Project",
-      "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:5425;http://localhost:5426"
+      "applicationUrl": "http://localhost:7001"
     }
   }
 }
