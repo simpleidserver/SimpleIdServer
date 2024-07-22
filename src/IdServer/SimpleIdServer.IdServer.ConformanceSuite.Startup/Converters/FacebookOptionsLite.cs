@@ -7,9 +7,9 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup.Converters
 {
     public class FacebookOptionsLite : IDynamicAuthenticationOptions<FacebookOptions>
     {
-        [SimpleIdServer.Configuration.ConfigurationRecord("AppId", "Application identifier", 0)]
+        [SimpleIdServer.IdServer.ConfigurationRecord("AppId", "Application identifier", 0)]
         public string AppId { get; set; }
-        [SimpleIdServer.Configuration.ConfigurationRecord("AppSecret", "Application secret", 1, null, Configuration.CustomConfigurationRecordType.PASSWORD)]
+        [SimpleIdServer.IdServer.ConfigurationRecord("AppSecret", "Application secret", 1, null, SimpleIdServer.IdServer.CustomConfigurationRecordType.PASSWORD)]
         public string AppSecret { get; set; }
 
         public FacebookOptions Convert() => new FacebookOptions

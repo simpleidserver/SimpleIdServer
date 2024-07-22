@@ -7,9 +7,9 @@ namespace SimpleIdServer.IdServer.ConformanceSuite.Startup.Converters
 {
     public class OpenIdConnectLiteOptions : IDynamicAuthenticationOptions<OpenIdConnectOptions>
     {
-        [SimpleIdServer.Configuration.ConfigurationRecord("ClientId", "Client Identifier", order: 0)]
+        [SimpleIdServer.IdServer.ConfigurationRecord("ClientId", "Client Identifier", order: 0)]
         public string ClientId { get; set; }
-        [SimpleIdServer.Configuration.ConfigurationRecord("ClientSecret", "Client Secret", order: 1)]
+        [SimpleIdServer.IdServer.ConfigurationRecord("ClientSecret", "Client Secret", order: 1)]
         public string ClientSecret { get; set; }
 
         public OpenIdConnectOptions Convert()
