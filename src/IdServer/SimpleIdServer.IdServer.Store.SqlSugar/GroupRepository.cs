@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 

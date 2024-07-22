@@ -103,7 +103,8 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.CredentialInstances,
             SimpleIdServer.IdServer.Constants.StandardScopes.DeferredCreds,
             UniversityDegreeScope,
-            CtWalletScope
+            CtWalletScope,
+            SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities
         };
 
         public static ICollection<User> Users => new List<User>
@@ -158,7 +159,8 @@ namespace SimpleIdServer.IdServer.Startup
                     SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Realms, 
-                    SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
+                    SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
+                    SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users, 
@@ -173,7 +175,8 @@ namespace SimpleIdServer.IdServer.Startup
                 SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Clients, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
-                SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
+                SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
+                SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").EnableClientGrantType().AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Users,
@@ -188,7 +191,8 @@ namespace SimpleIdServer.IdServer.Startup
                 SimpleIdServer.IdServer.Constants.StandardScopes.CertificateAuthorities,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms,
-                SimpleIdServer.IdServer.Constants.StandardScopes.Groups).Build(),
+                SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
+                SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
             WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("NAME").Build(),
             ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code")
                 .AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile)
@@ -272,7 +276,8 @@ namespace SimpleIdServer.IdServer.Startup
                 Id  = Guid.NewGuid().ToString(),
                 IsSubordinate = false,
                 Realm = IdServer.Constants.DefaultRealm,
-                Sub = "http://localhost:7000"
+                Sub = "http://localhost:7000",
+                CreateDateTime = DateTime.UtcNow
             }
         };
     }

@@ -124,6 +124,15 @@ namespace SimpleIdServer.OpenidFederation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Impossible to fetch the entity statement.
+        /// </summary>
+        public static string ImpossibleToFetchEntityStatement {
+            get {
+                return ResourceManager.GetString("ImpossibleToFetchEntityStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à impossible to resolve the trust chain.
         /// </summary>
         public static string ImpossibleToResolveTrustChain {

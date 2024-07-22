@@ -54,6 +54,28 @@
                         </div>
                     </div>
                 }
+
+                @if(Client.ClientType == ClientTypes.FEDERATION)
+                {
+                    <!-- Client registration types -->
+                    <div class="row mt-1">
+                        <div class="col-md-2">
+                            <RadzenLabel Text="@Global.ClientRegistrationTypes" Style="padding: 0px;" />
+                        </div>
+                        <div class="col">
+                            <RadzenTextBox Name="ConcatenatedClientRegistrationTypes" @bind-Value="@updateClient.ConcatenatedClientRegistrationTypes" Class="w-100" Disabled=true></RadzenTextBox>
+                        </div>
+                    </div>
+                    <!-- Expiration time -->
+                    <div class="row mt-1">
+                        <div class="col-md-2">
+                            <RadzenLabel Text="@Global.ClientExpirationTime" Style="padding: 0px;" />
+                        </div>
+                        <div class="col">
+                            <RadzenDatePicker @bind-Value=@updateClient.ExpirationDateTime Class="w-100" Disabled=true />
+                        </div>
+                    </div>
+                }
             </RadzenAccordionItem>
             @if (Client.ClientType == ClientTypes.CREDENTIAL_ISSUER || 
                 Client.ClientType == ClientTypes.SPA || 
@@ -106,7 +128,7 @@
                 </RadzenAccordionItem>
             }
 
-            @if(Client.ClientType != WsFederationConstants.CLIENT_TYPE)
+            @if(Client.ClientType != WsFederationConstants.CLIENT_TYPE && Client.ClientType != ClientTypes.FEDERATION)
             {
                 <RadzenAccordionItem Text="@Global.CapabilityConfig" Selected=true>
                     <!-- Grant types -->
@@ -418,9 +440,11 @@
         public bool IsRedirectUrlCaseSensitive { get; set; }
         public bool RedirectToRevokeSessionUI { get; set; }
         public string MetadataUrl { get; set; }
+        public string ConcatenatedClientRegistrationTypes { get; set; }
         public ICollection<string> DefaultAcrValues { get; set; }
         public TokenExchangeTypes? TokenExchangeType { get; set;  }
         public AccessTokenTypes AccessTokenType { get; set;  }
+        public DateTime? ExpirationDateTime { get; set; } = null;
     }
 
     UpdateClient updateClient = new UpdateClient();
@@ -464,7 +488,9 @@
             RedirectToRevokeSessionUI = this.Client.RedirectToRevokeSessionUI,
             TokenExchangeType = this.Client.TokenExchangeType,
             AccessTokenType = this.Client.AccessTokenType,
-            DefaultAcrValues = this.Client.DefaultAcrValues.Where(a => !string.IsNullOrWhiteSpace(a)).ToList()
+            ConcatenatedClientRegistrationTypes = this.Client.ClientRegistrationTypesSupported == null ? string.Empty : string.Join(";", this.Client.ClientRegistrationTypesSupported),
+            DefaultAcrValues = this.Client.DefaultAcrValues.Where(a => !string.IsNullOrWhiteSpace(a)).ToList(),
+            ExpirationDateTime = this.Client.ExpirationDateTime
         };
         if (this.Client.GrantTypes.Contains(ClientCredentialsHandler.GRANT_TYPE))
             updateClient.IsClientCredentialsGrantTypeEnabled = true;

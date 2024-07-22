@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Api.Auditing;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

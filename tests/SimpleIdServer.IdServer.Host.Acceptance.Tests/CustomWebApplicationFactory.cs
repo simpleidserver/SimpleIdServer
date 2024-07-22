@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Host.Acceptance.Tests.Middlewares;
 using SimpleIdServer.OpenidFederation;
 using SimpleIdServer.OpenidFederation.Apis.OpenidFederation;
@@ -337,6 +338,16 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
 
     public class FakeRPFederationEntityStore : IFederationEntityStore
     {
+        public void Add(FederationEntity federationEntity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FederationEntity> GetByUrl(string realm, string url, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<FederationEntity>> GetAllAuthorities(string realm, CancellationToken cancellationToken)
         {
             return Task.FromResult(new List<FederationEntity>
@@ -360,10 +371,35 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
         {
             throw new NotImplementedException();
         }
+
+        public Task<SearchResult<FederationEntity>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FederationEntity> Get(string id, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Remove(FederationEntity federationEntity)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class FakeTAFederationEntityStore : IFederationEntityStore
     {
+        public void Add(FederationEntity federationEntity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FederationEntity> GetByUrl(string realm, string url, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<List<FederationEntity>> GetAllAuthorities(string realm, CancellationToken cancellationToken)
         {
             return Task.FromResult(new List<FederationEntity>
@@ -384,6 +420,21 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
         }
 
         public Task<FederationEntity> GetSubordinate(string sub, string realm, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<SearchResult<FederationEntity>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<FederationEntity> Get(string id, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Remove(FederationEntity federationEntity)
         {
             throw new NotImplementedException();
         }

@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Api.Clients;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.WsFederation;
@@ -257,7 +258,7 @@ public class ClientEffects
         {
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{clientId}"),
+                RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(clientId)}"),
                 Method = HttpMethod.Delete
             };
             await httpClient.SendAsync(requestMessage);
@@ -273,7 +274,7 @@ public class ClientEffects
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{action.ClientId}"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(action.ClientId)}"),
             Method = HttpMethod.Get
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
@@ -345,7 +346,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -398,7 +399,7 @@ public class ClientEffects
         {
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{act.ClientId}/scopes/{scopeName}"),
+                RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/scopes/{scopeName}"),
                 Method = HttpMethod.Delete
             };
             await httpClient.SendAsync(requestMessage);
@@ -416,7 +417,7 @@ public class ClientEffects
         {
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{act.ClientId}/scopes"),
+                RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/scopes"),
                 Method = HttpMethod.Post,
                 Content = new StringContent(JsonSerializer.Serialize(new AddClientScopeRequest
                 {
@@ -436,7 +437,7 @@ public class ClientEffects
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}/sigkey/generate"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/sigkey/generate"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(new GenerateSigKeyRequest
             {
@@ -481,7 +482,7 @@ public class ClientEffects
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}/enckey/generate"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/enckey/generate"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(new GenerateEncKeyRequest
             {
@@ -525,7 +526,7 @@ public class ClientEffects
         var jsonWebKey = act.Credentials.SerializePublicJWK();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}/sigkey"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/sigkey"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(new AddSigKeyRequest
             {
@@ -547,7 +548,7 @@ public class ClientEffects
         var jsonWebKey = act.Credentials.SerializePublicJWK();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}/enckey"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/enckey"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(new AddSigKeyRequest
             {
@@ -570,7 +571,7 @@ public class ClientEffects
         {
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{act.ClientId}/keys/{keyId}"),
+                RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/keys/{keyId}"),
                 Method = HttpMethod.Delete
             };
             await httpClient.SendAsync(requestMessage);
@@ -602,7 +603,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -626,7 +627,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}/credentials"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/credentials"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -655,7 +656,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}/roles"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/roles"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -696,7 +697,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{act.ClientId}/advanced"),
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/advanced"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };

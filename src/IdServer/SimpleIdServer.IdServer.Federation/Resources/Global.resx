@@ -123,6 +123,12 @@
   <data name="ClientRegistrationTypesMustBeSpecified" xml:space="preserve">
     <value>the client_registration_types must be specified by the RP entity statement</value>
   </data>
+  <data name="FederationEntityAlreadyExists" xml:space="preserve">
+    <value>federation entity already exists</value>
+  </data>
+  <data name="FederationEntityUnknown" xml:space="preserve">
+    <value>the federation entity doesn't exist</value>
+  </data>
   <data name="InvalidIssuer" xml:space="preserve">
     <value>the issuer is not valid</value>
   </data>
@@ -137,5 +143,8 @@
   </data>
   <data name="OnlyFollowingAuthMethodsAreSupported" xml:space="preserve">
     <value>only the following authentication methods {0} are supported</value>
+  </data>
+  <data name="OpenidFederationCannotBeResolved" xml:space="preserve">
+    <value>the openid-federation cannot be resolved</value>
   </data>
 </root>

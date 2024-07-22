@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.ErrorMessages;
 using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Stores;
 using System.Text;

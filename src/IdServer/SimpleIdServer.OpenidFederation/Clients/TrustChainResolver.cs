@@ -138,15 +138,22 @@ public class TrustChainResolver : IDisposable
 
     private async Task<string?> GetOpenidFederation(string entityId, CancellationToken cancellationToken)
     {
-        var requestMessage = new HttpRequestMessage
+        try
         {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri($"{entityId}/{OpenidFederationConstants.EndPoints.OpenidFederation}")
-        };
-        var httpResult = await _httpClient.SendAsync(requestMessage, cancellationToken);
-        if (!httpResult.IsSuccessStatusCode) return null;
-        var content = await httpResult.Content.ReadAsStringAsync(cancellationToken);
-        return content;
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{entityId}/{OpenidFederationConstants.EndPoints.OpenidFederation}")
+            };
+            var httpResult = await _httpClient.SendAsync(requestMessage, cancellationToken);
+            if (!httpResult.IsSuccessStatusCode) return null;
+            var content = await httpResult.Content.ReadAsStringAsync(cancellationToken);
+            return content;
+        }
+        catch
+        {
+            throw new InvalidOperationException(Resources.Global.ImpossibleToExtractOpenidFederation);
+        }
     }
 
     private EntityStatement DeserializeEntityStatement(string content)
@@ -161,18 +168,25 @@ public class TrustChainResolver : IDisposable
 
     private async Task<EntityStatement?> Fetch(string fetchUrl, string issuer, string sub, CancellationToken cancellationToken)
     {
-        var requestMessage = new HttpRequestMessage
+        try
         {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri($"{fetchUrl}?iss={issuer}&sub={sub}")
-        };
-        var httpResult = await _httpClient.SendAsync(requestMessage, cancellationToken);
-        if (!httpResult.IsSuccessStatusCode) return null;
-        var content = await httpResult.Content.ReadAsStringAsync(cancellationToken);
-        var handler = new JsonWebTokenHandler();
-        if (!handler.CanReadToken(content)) return null;
-        var jwt = handler.ReadJsonWebToken(content);
-        var json = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(jwt.EncodedPayload));
-        return new EntityStatement(content, JsonSerializer.Deserialize<OpenidFederationResult>(json));
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{fetchUrl}?iss={issuer}&sub={sub}")
+            };
+            var httpResult = await _httpClient.SendAsync(requestMessage, cancellationToken);
+            if (!httpResult.IsSuccessStatusCode) return null;
+            var content = await httpResult.Content.ReadAsStringAsync(cancellationToken);
+            var handler = new JsonWebTokenHandler();
+            if (!handler.CanReadToken(content)) return null;
+            var jwt = handler.ReadJsonWebToken(content);
+            var json = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(jwt.EncodedPayload));
+            return new EntityStatement(content, JsonSerializer.Deserialize<OpenidFederationResult>(json));
+        }
+        catch
+        {
+            throw new InvalidOperationException(Resources.Global.ImpossibleToFetchEntityStatement);
+        }
     }
 }

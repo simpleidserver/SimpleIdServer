@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Api.Register;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -152,6 +153,7 @@ public class ClientsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
+            id = System.Web.HttpUtility.UrlDecode(id);
             await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
             var result = await _clientRepository.GetByClientId(prefix, id, cancellationToken);
             if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));

@@ -23,6 +23,15 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("federationRegistration",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + OpenidFederationConstants.EndPoints.FederationRegistration,
                 defaults: new { controller = "FederationRegistration", action = "Post" });
+            webApplication.SidMapControllerRoute("addFederationEntity",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + OpenidFederationConstants.EndPoints.FederationEntities + "/trustanchors",
+                defaults: new { controller = "FederationEntities", action = "AddTrustAnchor" });
+            webApplication.SidMapControllerRoute("searchFederationEntities",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + OpenidFederationConstants.EndPoints.FederationEntities + "/.search",
+                defaults: new { controller = "FederationEntities", action = "SearchFederationEntities" });
+            webApplication.SidMapControllerRoute("removeFederationEntity",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + OpenidFederationConstants.EndPoints.FederationEntities + "/{id}",
+                defaults: new { controller = "FederationEntities", action = "Delete" });
             if (federationOpts.IsFederationEnabled)
             {
                 webApplication.SidMapControllerRoute("federationFetch",

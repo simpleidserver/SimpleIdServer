@@ -138,6 +138,9 @@
   <data name="ImpossibleToExtractOpenidFederation" xml:space="preserve">
     <value>cannot extract the openid federation</value>
   </data>
+  <data name="ImpossibleToFetchEntityStatement" xml:space="preserve">
+    <value>Impossible to fetch the entity statement</value>
+  </data>
   <data name="ImpossibleToResolveTrustChain" xml:space="preserve">
     <value>impossible to resolve the trust chain</value>
   </data>

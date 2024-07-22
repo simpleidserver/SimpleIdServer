@@ -8,8 +8,6 @@ using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
-using SimpleIdServer.IdServer.Website.Stores.UserStore;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {

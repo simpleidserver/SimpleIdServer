@@ -79,6 +79,24 @@ namespace SimpleIdServer.IdServer.Federation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à federation entity already exists.
+        /// </summary>
+        internal static string FederationEntityAlreadyExists {
+            get {
+                return ResourceManager.GetString("FederationEntityAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the federation entity doesn&apos;t exist.
+        /// </summary>
+        internal static string FederationEntityUnknown {
+            get {
+                return ResourceManager.GetString("FederationEntityUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the issuer is not valid.
         /// </summary>
         internal static string InvalidIssuer {
@@ -120,6 +138,15 @@ namespace SimpleIdServer.IdServer.Federation.Resources {
         internal static string OnlyFollowingAuthMethodsAreSupported {
             get {
                 return ResourceManager.GetString("OnlyFollowingAuthMethodsAreSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the openid-federation cannot be resolved.
+        /// </summary>
+        internal static string OpenidFederationCannotBeResolved {
+            get {
+                return ResourceManager.GetString("OpenidFederationCannotBeResolved", resourceCulture);
             }
         }
     }
