@@ -36,9 +36,16 @@ public class FederationClientHelper : StandardClientHelper
     {
         var result = await base.ResolveClient(realm, clientId, cancellationToken);
         if (result == null)
-            result = await _clientRegistrationService.AutomaticRegisterClient(realm, clientId, cancellationToken);
+        {
+            if (Uri.TryCreate(clientId, UriKind.Absolute, out Uri uri) && uri != null && uri.Scheme != null && uri.Scheme.StartsWith("http", StringComparison.InvariantCultureIgnoreCase))
+            {
+                result = await _clientRegistrationService.AutomaticRegisterClient(realm, clientId, cancellationToken);
+            }
+        }
         else
+        {
             await RenewClientTrustChain(realm, result, cancellationToken);
+        }
 
         return result;
     }
