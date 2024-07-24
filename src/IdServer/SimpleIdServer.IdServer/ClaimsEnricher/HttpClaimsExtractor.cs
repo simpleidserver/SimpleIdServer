@@ -18,9 +18,9 @@ namespace SimpleIdServer.IdServer.ClaimsEnricher
     /// </summary>
     public class HttpClaimsExtractor : IRelayClaimsExtractor
     {
-        private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
+        private readonly Helpers.IHttpClientFactory _httpClientFactory;
 
-        public HttpClaimsExtractor(Infrastructures.IHttpClientFactory httpClientFactory)
+        public HttpClaimsExtractor(Helpers.IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }

@@ -18,6 +18,7 @@ Scenario: Use 'client_credentials' grant type to get an access token
 	And access_token audience contains 'firstClient'
 	And access_token audience contains 'secondClient'
 	And access_token scope contains 'firstScope'
+	And access_token scope contains 'firstScope'
 	And access_token alg equals to 'RS256'
 	And access_token kid equals to 'keyid'
 

@@ -4,10 +4,12 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.OpenidFederation.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using static SimpleIdServer.IdServer.Constants;
 
@@ -35,6 +37,11 @@ public class IdServerConfiguration
         { "fortyFourClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256)  },
         { "sixtySixClient", new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaSha256)  }
     };
+
+    public static SigningCredentials RpSigningCredential = new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "rpKeyId" }, SecurityAlgorithms.RsaSha256);
+
+    public static SigningCredentials RpJwtSigningCredential = new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "rpJwtKeyId" }, SecurityAlgorithms.RsaSha256);
+
     public static Dictionary<string, EncryptingCredentials> ClientEncryptingCredentials = new Dictionary<string, EncryptingCredentials>
     {
         { "twentyFiveClient", new EncryptingCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = "keyId" }, SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256) },
@@ -277,6 +284,17 @@ public class IdServerConfiguration
         }
     };
 
+    public static List<FederationEntity> FederationEntities = new List<FederationEntity>
+    {
+        new FederationEntity
+        {
+            Id = Guid.NewGuid().ToString(),
+            Realm = IdServer.Constants.DefaultRealm,
+            Sub = "http://ta.com",
+            IsSubordinate = false
+        }
+    };
+
     public static List<User> Users = new List<User>
     {
         User,
@@ -301,4 +319,16 @@ public class IdServerConfiguration
     {
         SimpleIdServer.IdServer.Constants.StandardRealms.Master
     };
+
+    private static X509SecurityKey GenerateRandomSelfSignedCertificate()
+    {
+        var ecdsa = ECDsa.Create();
+        var req = new CertificateRequest("cn=selfSigned", ecdsa, HashAlgorithmName.SHA256);
+        var cert = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(2));
+        var key = new X509SecurityKey(cert)
+        {
+            KeyId = "selfSignedId"
+        };
+        return key;
+    }
 }

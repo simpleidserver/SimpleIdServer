@@ -1,12 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +17,7 @@ namespace SimpleIdServer.IdServer.Api.Configuration
 {
     public interface IOAuthConfigurationRequestHandler
     {
-        Task Enrich(string prefix, JsonObject jObj, string issuer, CancellationToken cancellationToken);
+        Task<JsonObject> Handle(string prefix, string issuer, CancellationToken cancellationToken);
     }
 
     public class OAuthConfigurationRequestHandler : IOAuthConfigurationRequestHandler
@@ -30,7 +28,6 @@ namespace SimpleIdServer.IdServer.Api.Configuration
         private readonly IEnumerable<IGrantTypeHandler> _grantTypeHandlers;
         private readonly IEnumerable<IOAuthClientAuthenticationHandler> _oauthClientAuthenticationHandlers;
         private readonly IOAuthWorkflowConverter _oauthWorkflowConverter;
-        private readonly IdServerHostOptions _options;
 
         public OAuthConfigurationRequestHandler(
             IScopeRepository scopeRepository, 
@@ -38,8 +35,7 @@ namespace SimpleIdServer.IdServer.Api.Configuration
             IEnumerable<IOAuthResponseMode> oauthResponseModes,
             IEnumerable<IGrantTypeHandler> grantTypeHandlers, 
             IEnumerable<IOAuthClientAuthenticationHandler> oauthClientAuthenticationHandlers,
-            IOAuthWorkflowConverter oauthWorkflowConverter,
-            IOptions<IdServerHostOptions> options)
+            IOAuthWorkflowConverter oauthWorkflowConverter)
         {
             _scopeRepository = scopeRepository;
             _authorizationGrantTypeHandlers = authorizationGrantTypeHandlers;
@@ -47,14 +43,30 @@ namespace SimpleIdServer.IdServer.Api.Configuration
             _grantTypeHandlers = grantTypeHandlers;
             _oauthClientAuthenticationHandlers = oauthClientAuthenticationHandlers;
             _oauthWorkflowConverter = oauthWorkflowConverter;
-            _options = options.Value;
         }
 
         protected IOAuthWorkflowConverter WorkflowConverter => _oauthWorkflowConverter;
 
-        public virtual async Task Enrich(string prefix, JsonObject jObj, string issuer, CancellationToken cancellationToken)
+        public virtual async Task<JsonObject> Handle(string prefix, string issuer, CancellationToken cancellationToken)
         {
-            var realm = prefix ?? Constants.DefaultRealm;
+            var subUrl = string.Empty;
+            var issuerStr = issuer;
+            if (!string.IsNullOrWhiteSpace(prefix))
+            {
+                issuerStr = $"{issuer}/{prefix}";
+                subUrl = $"{prefix}/";
+            }
+
+            var jObj = new JsonObject
+            {
+                [OAuthConfigurationNames.Issuer] = issuerStr,
+                [OAuthConfigurationNames.AuthorizationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Authorization}",
+                [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Registration}",
+                [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Token}",
+                [OAuthConfigurationNames.RevocationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Token}/revoke",
+                [OAuthConfigurationNames.JwksUri] = $"{issuer}/{subUrl}{Constants.EndPoints.Jwks}",
+                [OAuthConfigurationNames.IntrospectionEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.TokenInfo}"
+            };
             var scopes = (await _scopeRepository.GetAllExposedScopes(prefix, cancellationToken)).Select(s => s.Name);
             jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);
             jObj.Add(OAuthConfigurationNames.ScopesSupported, JsonSerializer.SerializeToNode(scopes));
@@ -63,6 +75,7 @@ namespace SimpleIdServer.IdServer.Api.Configuration
             jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JsonSerializer.SerializeToNode(GetGrantTypes()));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JsonSerializer.SerializeToNode(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
+            return jObj;
         }
 
         protected List<string> GetGrantTypes()

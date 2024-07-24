@@ -36,6 +36,7 @@ builder.Services.AddSIDIdentityServer(o =>
         o.AddInMemoryGroups(IdServerConfiguration.Groups);
         o.AddInMemoryUserSessions(IdServerConfiguration.Sessions);
         o.AddInMemoryDeviceCodes(IdServerConfiguration.DeviceAuthCodes);
+        o.AddInMemoryFederatonEntities(IdServerConfiguration.FederationEntities);
         o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
@@ -56,6 +57,11 @@ builder.Services.AddSIDIdentityServer(o =>
     .AddConsoleNotification()
     .AddPwdAuthentication()
     .AddBackChannelAuthentication()
+    .AddOpenidFederation(o =>
+    {
+        o.IsFederationEnabled = true;
+        o.TokenSignedKid = "keyid";
+    })
     .AddAuthentication(o =>
     {
         o.AddMutualAuthentication(m =>
@@ -72,6 +78,7 @@ builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
 builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
 builder.Services.AddDidKey();
 var app = builder.Build()
+    .UseOpenidFederation()
     .UseSID();
 app.Run();
 

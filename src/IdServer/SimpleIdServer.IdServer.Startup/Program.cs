@@ -130,7 +130,8 @@ app
     .UseFIDO()
     .UseSamlIdp()
     .UseGotifyNotification()
-    .UseAutomaticConfiguration();
+    .UseAutomaticConfiguration()
+    .UseOpenidFederation();
 
 app.Run();
 
@@ -181,6 +182,10 @@ void ConfigureIdServer(IServiceCollection services)
                 m.AllowedCertificateTypes = CertificateTypes.All;
                 m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
             });
+        })
+        .AddOpenidFederation(o =>
+        {
+            o.IsFederationEnabled = true;
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
@@ -368,6 +373,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.PresentationDefinitions.Any())
                 dbContext.PresentationDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions);
+
+            if(!dbContext.FederationEntities.Any())
+                dbContext.FederationEntities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.FederationEntities);
 
             if (!dbContext.Acrs.Any())
             {

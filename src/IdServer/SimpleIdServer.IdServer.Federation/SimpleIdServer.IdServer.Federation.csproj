@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Support OPENID federation - openid_provider.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.OpenidFederation\SimpleIdServer.OpenidFederation.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Resources\Global.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Global.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Global.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Global.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+</Project>

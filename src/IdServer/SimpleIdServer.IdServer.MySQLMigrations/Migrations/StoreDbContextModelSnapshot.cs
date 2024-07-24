@@ -757,6 +757,11 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("longtext")
                         .HasAnnotation("Relational:JsonPropertyName", "client_id");
 
+                    b.Property<string>("ClientRegistrationTypesSupported")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "client_registration_types_supported");
+
                     b.Property<string>("ClientSecret")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -799,6 +804,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<double?>("DefaultMaxAge")
                         .HasColumnType("double")
                         .HasAnnotation("Relational:JsonPropertyName", "default_max_age");
+
+                    b.Property<DateTime?>("ExpirationDateTime")
+                        .HasColumnType("datetime(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "expiration_datetime");
 
                     b.Property<bool>("FrontChannelLogoutSessionRequired")
                         .HasColumnType("tinyint(1)")
@@ -2465,6 +2474,34 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.ToTable("UserSession");
 
                     b.HasAnnotation("Relational:JsonPropertyName", "sessions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenidFederation.Domains.FederationEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
+
+                    b.Property<bool>("IsSubordinate")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_subordinate");
+
+                    b.Property<string>("Realm")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "realm");
+
+                    b.Property<string>("Sub")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "sub");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FederationEntities");
                 });
 
             modelBuilder.Entity("TranslationUMAResource", b =>

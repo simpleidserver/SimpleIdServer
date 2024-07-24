@@ -213,7 +213,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 throw new OAuthException(ErrorCodes.INVALID_AUTHORIZATION_DETAILS, string.Format(Global.UnsupportedAuthorizationDetailTypes, string.Join(",", unsupportedAuthorizationDetailsTypes.Select(t => t.Type))));
 
             OpenIdCredentialValidator.ValidateOpenIdCredential(authDetails);
-            await CommonValidate(context, cancellationToken);
+             await CommonValidate(context, cancellationToken);
             var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
             var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var responseTypes = context.Request.RequestData.GetResponseTypesFromAuthorizationRequest();

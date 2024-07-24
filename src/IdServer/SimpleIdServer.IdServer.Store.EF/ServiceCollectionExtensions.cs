@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Store.EF;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.OpenidFederation.Stores;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -58,6 +59,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IKeyValueRepository, KeyValueRepository>();
             services.AddTransient<IMessageBusErrorStore, MessageBusErrorStore>();
             services.AddTransient<ITransactionBuilder, EFTransactionBuilder>();
+            services.AddTransient<IFederationEntityStore, FederationEntityStore>();
         }
     }
 }

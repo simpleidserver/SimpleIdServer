@@ -1,0 +1,104 @@
+﻿@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+@using SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore;
+@using SimpleIdServer.IdServer.Website.Stores.FederationEntityStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<UpdateAcrState> updateAcrState
+@inject IState<AuthMethodsState> authMethodsStates
+@inject NotificationService notificationService
+@inject Radzen.DialogService dialogService
+@inject IDispatcher dispatcher
+@inject IState<AddFederationEntityState> addFederationEntityState
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="@Global.FederationEntityType">
+            <div class="row gy-4 mt-1">
+                @foreach (var federationType in FederationEntityTypes)
+                {
+                    <div class="col-md-6">
+                        <RadzenCard @onclick="() => SelectFederationType(federationType)" class="@(SelectedFederationEntityType != null && SelectedFederationEntityType.Name == federationType.Name ? "selected selectable" : "selectable")">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <RadzenImage Path="@federationType.PictureUrl" Style="width: 60px" />
+                                </div>
+                                <div class="col">
+                                    <h5>@federationType.Name</h5>
+                                    <p class="text-muted">@(new MarkupString(federationType.ShortDescription))</p>
+                                </div>
+                            </div>
+                        </RadzenCard>
+                    </div>
+                }
+            </div>
+
+            <hr />
+
+            @if (SelectedFederationEntityType != null)
+            {
+                <h5><RadzenIcon Icon="info" /> @SelectedFederationEntityType.Name</h5>
+                <p class="text-muted">@(new MarkupString(SelectedFederationEntityType.Description))</p>
+            }
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Properties" Disabled="@(SelectedFederationEntityType == null)">
+            <RadzenTemplateForm Submit=@AddTrustAnchor TItem="TrustAnchor" Data=@trustAnchor>
+                @if (!addFederationEntityState.Value.IsAdding && !string.IsNullOrWhiteSpace(addFederationEntityState.Value.ErrorMessage))
+                {
+                    <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@addFederationEntityState.Value.ErrorMessage</RadzenAlert>
+                }
+                <div>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Url</RadzenText>
+                    <RadzenTextBox Name="Url" @bind-Value="@trustAnchor.Url" Class="w-100"></RadzenTextBox>
+                    <RadzenRequiredValidator Component="Url" Text="@Global.UrlIsRequired"></RadzenRequiredValidator>
+                </div>
+                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(addFederationEntityState.Value.IsAdding ? Global.Adding : Global.Save)" Disabled="@(addFederationEntityState.Value.IsAdding)" />
+            </RadzenTemplateForm>
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    record FederationEntityType
+    {
+        public string Name { get; set; } = null!;
+        public string ShortDescription { get; set; } = null!;
+        public string Description { get; set; } = null!;
+        public string PictureUrl { get; set; } = null!;
+    }
+
+    record TrustAnchor
+    {
+        public string Url { get; set; }
+    }
+
+    ICollection<FederationEntityType> FederationEntityTypes { get; set; } = new List<FederationEntityType>
+    {
+        new FederationEntityType { Name = Global.TrustAnchor, ShortDescription = Global.TrustAnchorShortDescription, Description = Global.TrustAnchorDescription,  PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/trust-anchor.png" }
+    };
+
+    TrustAnchor trustAnchor { get; set; } = new TrustAnchor();
+    FederationEntityType? SelectedFederationEntityType { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        SubscribeToAction<AddTrustedAnchorSuccessAction>(async (act) =>
+        {
+            dialogService.Close();
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.TrustAnchorAdded });
+            StateHasChanged();
+        });
+        dispatcher.Dispatch(new StartAddTrustAnchorAction());
+    }
+
+    void SelectFederationType(FederationEntityType federationEntityType)
+    {
+        SelectedFederationEntityType = federationEntityType;
+    }
+
+    void AddTrustAnchor(TrustAnchor trustAnchor)
+    {
+        dispatcher.Dispatch(new AddTrustedAnchorAction { Url = trustAnchor.Url });
+    }
+}

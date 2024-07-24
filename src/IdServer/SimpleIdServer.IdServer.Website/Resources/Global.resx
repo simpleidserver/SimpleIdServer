@@ -1848,4 +1848,52 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="NbLoginAttempt" xml:space="preserve">
     <value>Number of login attempts</value>
   </data>
+  <data name="ClientRegistrationTypes" xml:space="preserve">
+    <value>Client registration types</value>
+  </data>
+  <data name="ClientExpirationTime" xml:space="preserve">
+    <value>Expiration time</value>
+  </data>
+  <data name="AddTrustAnchor" xml:space="preserve">
+    <value>Add trust anchor</value>
+  </data>
+  <data name="TrustAnchorsDescription" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="TrustAnchorsTitle" xml:space="preserve">
+    <value>Trust anchors</value>
+  </data>
+  <data name="AddFederationEntity" xml:space="preserve">
+    <value>Add federation entity</value>
+  </data>
+  <data name="FederationEntitiesDescription" xml:space="preserve">
+    <value>Manage the trust anchors used by the identity server.</value>
+  </data>
+  <data name="FederationEntitiesTitle" xml:space="preserve">
+    <value>Federation entities</value>
+  </data>
+  <data name="TrustAnchor" xml:space="preserve">
+    <value>Trust anchor</value>
+  </data>
+  <data name="TrustEntity" xml:space="preserve">
+    <value>Trust entity</value>
+  </data>
+  <data name="TrustAnchorShortDescription" xml:space="preserve">
+    <value>Entity that represents a trusted third party</value>
+  </data>
+  <data name="TrustAnchorDescription" xml:space="preserve">
+    <value>A Trust Anchor is an Entity whose main purpose is to issue statements about Entities</value>
+  </data>
+  <data name="UrlIsRequired" xml:space="preserve">
+    <value>Url is required</value>
+  </data>
+  <data name="TrustAnchorAdded" xml:space="preserve">
+    <value>Trust anchor has been added</value>
+  </data>
+  <data name="FederationEntityType" xml:space="preserve">
+    <value>Entity type</value>
+  </data>
+  <data name="SelectedFederationEntitiesRemoved" xml:space="preserve">
+    <value>The selected federation entities have been removed</value>
+  </data>
 </root>

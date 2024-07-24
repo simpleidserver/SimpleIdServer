@@ -57,6 +57,9 @@ According to the [specification](https://openid.bitbucket.io/fapi/fapi-2_0-secur
     <DocsCard header="SAML2.0 SP" href="saml">
         <p>A Service Provider (SP) is the entity providing the service, typically in the form of an application</p>
     </DocsCard>
+    <DocsCard header="Openid federation RP" href="openidfederation">
+        <p>A server-side application running on your infrastructure that utilizes OPENID federation.</p>
+    </DocsCard>
 </DocsCards>
 
 ## Identity provisioning

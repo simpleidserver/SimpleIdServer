@@ -24,7 +24,7 @@ namespace SimpleIdServer.IdServer.UI
     {
         private readonly IDataProtector _dataProtector;
         private readonly IClientRepository _clientRepository;
-        private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
+        private readonly Helpers.IHttpClientFactory _httpClientFactory;
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IBCAuthorizeRepository _bcAuthorizeRepository;
         private readonly ILogger<BackChannelConsentsController> _logger;
@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.UI
         public BackChannelConsentsController(
             IDataProtectionProvider dataProtectionProvider,
             IClientRepository clientRepository,
-            IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
+            Helpers.IHttpClientFactory httpClientFactory,
             IAuthenticationHelper authenticationHelper,
             IBCAuthorizeRepository bcAuthorizeRepository,
             ILogger<BackChannelConsentsController> logger)

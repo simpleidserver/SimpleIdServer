@@ -21,6 +21,7 @@ using SimpleIdServer.IdServer.Api.BCAuthorize;
 using SimpleIdServer.IdServer.Api.Configuration;
 using SimpleIdServer.IdServer.Api.DeviceAuthorization;
 using SimpleIdServer.IdServer.Api.Jwks;
+using SimpleIdServer.IdServer.Api.OpenIdConfiguration;
 using SimpleIdServer.IdServer.Api.Register;
 using SimpleIdServer.IdServer.Api.Token;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
@@ -39,7 +40,6 @@ using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Infastructures;
-using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
@@ -298,7 +298,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClaimsJwsPayloadEnricher, ClaimsJwsPayloadEnricher>();
             services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
-            services.AddTransient<IClientHelper, OAuthClientHelper>();
+            services.AddTransient<IClientHelper, StandardClientHelper>();
             services.AddTransient<IAmrHelper, AmrHelper>();
             services.AddTransient<IUmaPermissionTicketHelper, UMAPermissionTicketHelper>();
             services.AddTransient<IExtractRequestHelper, ExtractRequestHelper>();
@@ -371,6 +371,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddConfigurationApi(this IServiceCollection services)
         {
             services.AddTransient<IOAuthConfigurationRequestHandler, OAuthConfigurationRequestHandler>();
+            services.AddTransient<IOpenidConfigurationRequestHandler, OpenidConfigurationRequestHandler>();
             services.AddTransient<IOAuthWorkflowConverter, OAuthWorkflowConverter>();
             return services;
         }

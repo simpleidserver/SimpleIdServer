@@ -50,6 +50,13 @@ namespace SimpleIdServer.OpenIdConnect
             DPoPSecurityKeyRotationInSeconds = dpopSecuritykeyRotationInSeconds;
         }
 
+        public void UseFederationAutomaticRegistration(SigningCredentials signingCredentials)
+        {
+            RequestType = RequestTypes.REQUEST;
+            ClientAuthenticationType = ClientAuthenticationTypes.PRIVATE_KEY_JWT;
+            SigningCredentials = signingCredentials;
+        }
+
         /// <summary>
         /// Send large authorization by using PAR.
         /// </summary>

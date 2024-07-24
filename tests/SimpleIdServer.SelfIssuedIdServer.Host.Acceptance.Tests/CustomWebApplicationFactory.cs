@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
+using SimpleIdServer.Did.Crypto;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -32,8 +33,8 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
         builder.UseContentRoot(Directory.GetCurrentDirectory());
         builder.ConfigureTestServices(s =>
         {
-            s.RemoveAll<IdServer.Infrastructures.IHttpClientFactory>();
-            var mo = new Mock<IdServer.Infrastructures.IHttpClientFactory>();
+            s.RemoveAll<SimpleIdServer.IdServer.Helpers.IHttpClientFactory>();
+            var mo = new Mock<SimpleIdServer.IdServer.Helpers.IHttpClientFactory>();
             mo.Setup(m => m.GetHttpClient())
                 .Returns(() =>
                 {
@@ -46,7 +47,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
                     var fakeHttpMessageHandler = new FakeHttpMessageHandler(_scenarioContext);
                     return new HttpClient(fakeHttpMessageHandler);
                 });
-            s.AddSingleton<IdServer.Infrastructures.IHttpClientFactory>(mo.Object);
+            s.AddSingleton<SimpleIdServer.IdServer.Helpers.IHttpClientFactory>(mo.Object);
         });
     }
 }

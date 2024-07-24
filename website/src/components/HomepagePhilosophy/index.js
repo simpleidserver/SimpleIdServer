@@ -9,6 +9,8 @@ export default function HomepagePhilosophy() {
         <div class="container">
             <h1>Why SimpleIdServer</h1>
                 SimpleIdServer is the first Free Open Source Identity Management solution using .NET.
+                <br />
+                <b>The comparison table was written on July 24, 2024.</b>
                 <div class="table-container" role="table" aria-label="Destinations">
                     <div class="flex-table header" role="rowgroup">
                         <div class="flex-row first" role="columnheader"></div>
@@ -77,6 +79,12 @@ export default function HomepagePhilosophy() {
                         <div class="flex-row first" role="cell">SCIM2.0</div>
                         <div class="flex-row" role="cell"><Greencheck className={styles.greencheck} /></div>
                         <div class="flex-row" role="cell"><Greencheck className={styles.greencheck} /></div>
+                        <div class="flex-row" role="cell"><Redcheck className={styles.redCheck} /></div>
+                    </div>
+                    <div class="flex-table" role="rowgroup">
+                        <div class="flex-row first" role="cell">Openid federation</div>
+                        <div class="flex-row" role="cell"><Greencheck className={styles.greencheck} /></div>
+                        <div class="flex-row" role="cell"><Redcheck className={styles.redCheck} /></div>
                         <div class="flex-row" role="cell"><Redcheck className={styles.redCheck} /></div>
                     </div>
                     <div class="flex-table" role="rowgroup">

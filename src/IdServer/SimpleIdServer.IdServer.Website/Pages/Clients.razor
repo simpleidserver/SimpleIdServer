@@ -48,7 +48,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="true" SortProperty="Value.ClientId" Title="@Global.Identifier" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.ClientId" Path="@($"/clients/{data.Value.ClientId}/settings")" />
+                <RadzenLink Text="@data.Value.ClientId" Path="@($"/clients/{System.Web.HttpUtility.UrlEncode(data.Value.ClientId)}/settings")" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientName" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />

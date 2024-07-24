@@ -13,13 +13,13 @@ namespace SimpleIdServer.IdServer.Notification.Gotify.Apis;
 public class GotifyConnectionsController
 {
     private readonly IConfiguration _configuration;
-    private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
+    private readonly Helpers.IHttpClientFactory _httpClientFactory;
     private readonly IGotiySessionStore _gotiySessionStore;
     private readonly ITransactionBuilder _transactionBuilder;
 
     public GotifyConnectionsController(
         IConfiguration configuration,
-        Infrastructures.IHttpClientFactory httpClientFactory,
+        Helpers.IHttpClientFactory httpClientFactory,
         IGotiySessionStore gotiySessionStore,
         ITransactionBuilder transactionBuilder)
     {

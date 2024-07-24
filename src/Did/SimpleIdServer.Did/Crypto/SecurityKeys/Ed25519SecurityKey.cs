@@ -14,7 +14,7 @@ public class Ed25519SecurityKey : AsymmetricSecurityKey
 
     public Ed25519SecurityKey()
     {
-        CryptoProviderFactory.CustomCryptoProvider = new Ed25519CryptoProvider();
+        this.CryptoProviderFactory.CustomCryptoProvider = new Ed25519CryptoProvider();
     }
 
     public Ed25519SecurityKey(Ed25519PublicKeyParameters publicKey, Ed25519PrivateKeyParameters privateKey = null) : this()

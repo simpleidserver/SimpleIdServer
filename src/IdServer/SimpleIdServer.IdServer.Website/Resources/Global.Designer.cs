@@ -232,6 +232,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add federation entity.
+        /// </summary>
+        public static string AddFederationEntity {
+            get {
+                return ResourceManager.GetString("AddFederationEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Add group.
         /// </summary>
         public static string AddGroup {
@@ -318,6 +327,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string AddScope {
             get {
                 return ResourceManager.GetString("AddScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add trust anchor.
+        /// </summary>
+        public static string AddTrustAnchor {
+            get {
+                return ResourceManager.GetString("AddTrustAnchor", resourceCulture);
             }
         }
         
@@ -1015,11 +1033,29 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Expiration time.
+        /// </summary>
+        public static string ClientExpirationTime {
+            get {
+                return ResourceManager.GetString("ClientExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client identifier.
         /// </summary>
         public static string ClientIdentifier {
             get {
                 return ResourceManager.GetString("ClientIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client registration types.
+        /// </summary>
+        public static string ClientRegistrationTypes {
+            get {
+                return ResourceManager.GetString("ClientRegistrationTypes", resourceCulture);
             }
         }
         
@@ -1749,6 +1785,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ExtractionResult {
             get {
                 return ResourceManager.GetString("ExtractionResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Manage the trust anchors used by the identity server..
+        /// </summary>
+        public static string FederationEntitiesDescription {
+            get {
+                return ResourceManager.GetString("FederationEntitiesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Federation entities.
+        /// </summary>
+        public static string FederationEntitiesTitle {
+            get {
+                return ResourceManager.GetString("FederationEntitiesTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Entity type.
+        /// </summary>
+        public static string FederationEntityType {
+            get {
+                return ResourceManager.GetString("FederationEntityType", resourceCulture);
             }
         }
         
@@ -3890,6 +3953,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The selected federation entities have been removed.
+        /// </summary>
+        public static string SelectedFederationEntitiesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedFederationEntitiesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected grants have been rejected.
         /// </summary>
         public static string SelectedGrantsRemoved {
@@ -4477,6 +4549,69 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Trust anchor.
+        /// </summary>
+        public static string TrustAnchor {
+            get {
+                return ResourceManager.GetString("TrustAnchor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Trust anchor has been added.
+        /// </summary>
+        public static string TrustAnchorAdded {
+            get {
+                return ResourceManager.GetString("TrustAnchorAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A Trust Anchor is an Entity whose main purpose is to issue statements about Entities.
+        /// </summary>
+        public static string TrustAnchorDescription {
+            get {
+                return ResourceManager.GetString("TrustAnchorDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à TODO.
+        /// </summary>
+        public static string TrustAnchorsDescription {
+            get {
+                return ResourceManager.GetString("TrustAnchorsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Entity that represents a trusted third party.
+        /// </summary>
+        public static string TrustAnchorShortDescription {
+            get {
+                return ResourceManager.GetString("TrustAnchorShortDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Trust anchors.
+        /// </summary>
+        public static string TrustAnchorsTitle {
+            get {
+                return ResourceManager.GetString("TrustAnchorsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Trust entity.
+        /// </summary>
+        public static string TrustEntity {
+            get {
+                return ResourceManager.GetString("TrustEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Try to extract the users.
         /// </summary>
         public static string TryExtractUsers {
@@ -4644,6 +4779,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Url {
             get {
                 return ResourceManager.GetString("Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Url is required.
+        /// </summary>
+        public static string UrlIsRequired {
+            get {
+                return ResourceManager.GetString("UrlIsRequired", resourceCulture);
             }
         }
         

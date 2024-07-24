@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.OpenidFederation.Domains;
 
 namespace SimpleIdServer.IdServer.Store.EF;
 
@@ -191,6 +192,17 @@ public class IdServerInMemoryStoreBuilder
         if (!storeDbContext.DeviceAuthCodes.Any())
         {
             storeDbContext.DeviceAuthCodes.AddRange(deviceCodes);
+        }
+
+        return this;
+    }
+
+    public IdServerInMemoryStoreBuilder AddInMemoryFederatonEntities(ICollection<FederationEntity> federationEntities)
+    {
+        var storeDbContext = _serviceProvider.GetService<StoreDbContext>();
+        if (!storeDbContext.FederationEntities.Any())
+        {
+            storeDbContext.FederationEntities.AddRange(federationEntities);
         }
 
         return this;

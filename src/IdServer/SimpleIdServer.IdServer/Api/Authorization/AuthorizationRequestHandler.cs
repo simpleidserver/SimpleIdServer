@@ -41,7 +41,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IGrantedTokenHelper _grantedTokenHelper;
-        private readonly IClientRepository _clientRepository;
         private readonly IClientHelper _clientHelper;
         private readonly IdServerHostOptions _options;
 
@@ -54,7 +53,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder,
             IGrantedTokenHelper grantedTokenHelper,
-            IClientRepository clientRepository,
             IClientHelper clientHelper,
             IOptions<IdServerHostOptions> options)
         {
@@ -67,7 +65,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             _transactionBuilder = transactionBuilder;
             _jwtBuilder = jwtBuilder;
             _grantedTokenHelper = grantedTokenHelper;
-            _clientRepository = clientRepository;
             _clientHelper = clientHelper;
             _options = options.Value;
         }
@@ -115,7 +112,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
                 if (string.IsNullOrWhiteSpace(clientId))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.ClientId));
-                var client = await _clientRepository.GetByClientId(context.Realm, clientId, cancellationToken);
+                var client = await _clientHelper.ResolveClient(context.Realm, clientId, cancellationToken);
                 if (client != null)
                     context.SetClient(client);
                 if (_clientHelper.IsNonPreRegisteredRelyingParty(clientId) || (client != null && client.IsSelfIssueEnabled))
@@ -126,25 +123,25 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         }
 
         protected async Task<AuthorizationResponse> BuildStandardResponse(
-            ITransaction transaction, 
-            HandlerContext context, 
+            ITransaction transaction,
+            HandlerContext context,
             CancellationToken cancellationToken)
         {
-            var validationResult = await _validator.ValidateStandardAuthorizationRequest(context, cancellationToken);
-            var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
-            var activeSession = await GetActiveSession(context, cancellationToken);
-            context.SetUser(user, activeSession);
-            var grantRequest = validationResult.GrantRequest;
-            var responseTypeHandlers = validationResult.ResponseTypes;
-            await _validator.ValidateAuthorizationRequestWhenUserIsAuthenticated(grantRequest, context, cancellationToken);
-            var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
-            var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
-            if (!string.IsNullOrWhiteSpace(state))
-                context.Response.Add(AuthorizationResponseParameters.State, state);
-
-            _authorizationRequestEnricher.Enrich(context);
             try
             {
+                var validationResult = await _validator.ValidateStandardAuthorizationRequest(context, cancellationToken);
+                var user = await _userRepository.GetBySubject(context.Request.UserSubject, context.Realm, cancellationToken);
+                var activeSession = await GetActiveSession(context, cancellationToken);
+                context.SetUser(user, activeSession);
+                var grantRequest = validationResult.GrantRequest;
+                var responseTypeHandlers = validationResult.ResponseTypes;
+                await _validator.ValidateAuthorizationRequestWhenUserIsAuthenticated(grantRequest, context, cancellationToken);
+                var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
+                var redirectUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
+                if (!string.IsNullOrWhiteSpace(state))
+                    context.Response.Add(AuthorizationResponseParameters.State, state);
+
+                _authorizationRequestEnricher.Enrich(context);
                 var grant = await ExecuteGrantManagementAction(grantRequest, context, cancellationToken);
                 foreach (var responseTypeHandler in responseTypeHandlers)
                     await responseTypeHandler.Enrich(new EnrichParameter { AuthorizationDetails = grantRequest.AuthorizationDetails, Scopes = grantRequest.Scopes, Audiences = grantRequest.Audiences, GrantId = grant?.Id, Claims = context.Request.RequestData.GetClaimsFromAuthorizationRequest() }, context, cancellationToken);
@@ -156,7 +153,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             }
             finally
             {
-                _userRepository.Update(context.User);
+                if(context.User != null)
+                    _userRepository.Update(context.User);
                 await transaction.Commit(cancellationToken);
             }
         }

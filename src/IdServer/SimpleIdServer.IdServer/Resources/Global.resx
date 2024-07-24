@@ -657,6 +657,9 @@
   <data name="MissingIdTokenHint" xml:space="preserve">
     <value>id_token_hint parameter is missing</value>
   </data>
+  <data name="MissingOpenidRpInEntityStatement" xml:space="preserve">
+    <value>the openid_relying_party doesn't exist in the entity statement</value>
+  </data>
   <data name="MissingParameter" xml:space="preserve">
     <value>missing parameter {0}</value>
   </data>

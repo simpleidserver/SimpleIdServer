@@ -14,5 +14,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.OpenidFederation\SimpleIdServer.OpenidFederation.csproj" />
 	</ItemGroup>
 </Project>

@@ -3,8 +3,8 @@
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Infrastructures;
 using SimpleIdServer.IdServer.Resources;
+using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,16 +23,37 @@ public interface IClientHelper
     Task<IEnumerable<JsonWebKey>> ResolveJsonWebKeys(Client client, CancellationToken cancellationToken);
     Task<IEnumerable<JsonWebKey>> ResolveJsonWebKeys(string jwksUri, CancellationToken cancellationToken);
     bool IsNonPreRegisteredRelyingParty(string clientId);
+    Task<Client> ResolveClient(string realm, string clientId, CancellationToken cancellationToken);
     Task<Client> ResolveSelfDeclaredClient(JsonObject request, CancellationToken cancellationToken);
 }
 
-public class OAuthClientHelper : IClientHelper
+public class StandardClientHelper : IClientHelper
 {
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly Helpers.IHttpClientFactory _httpClientFactory;
+    private readonly IClientRepository _clientRepository;
 
-    public OAuthClientHelper(IHttpClientFactory httpClientFactory)
+    public StandardClientHelper(
+        Helpers.IHttpClientFactory httpClientFactory,
+        IClientRepository clientRepository)
     {
         _httpClientFactory = httpClientFactory;
+        _clientRepository = clientRepository;
+    }
+
+    protected IHttpClientFactory HttpClientFactory
+    {
+        get
+        {
+            return _httpClientFactory;
+        }
+    }
+
+    protected IClientRepository ClientRepository
+    {
+        get
+        {
+            return _clientRepository;
+        }
     }
 
     public virtual async Task<IEnumerable<string>> GetRedirectionUrls(Client client, CancellationToken cancellationToken)
@@ -102,6 +123,9 @@ public class OAuthClientHelper : IClientHelper
         if (clientId.StartsWith($"{SimpleIdServer.Did.Constants.Scheme}:")) return true;
         return false;
     }
+
+    public virtual Task<Client> ResolveClient(string realm, string clientId, CancellationToken cancellationToken)
+        => _clientRepository.GetByClientId(realm, clientId, cancellationToken);
 
     public async Task<Client> ResolveSelfDeclaredClient(JsonObject request, CancellationToken cancellationToken)
     {

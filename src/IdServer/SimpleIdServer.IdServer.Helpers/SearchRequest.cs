@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.Stores;
+namespace SimpleIdServer.IdServer.Helpers;
 
 public class SearchRequest
 {

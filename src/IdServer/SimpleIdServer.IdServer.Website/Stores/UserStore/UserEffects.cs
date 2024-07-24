@@ -7,6 +7,7 @@ using Radzen;
 using SimpleIdServer.IdServer.Api.Users;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Website.Stores.Base;
 using SimpleIdServer.IdServer.Website.Stores.ScopeStore;

@@ -1,0 +1,6 @@
+@TaApi_HostAddress = http://localhost:5189
+
+GET {{TaApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
