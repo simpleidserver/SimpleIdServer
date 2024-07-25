@@ -1,10 +1,12 @@
 ﻿@page "/clients"
+@inject CurrentRealm currentRealm
 @inject IState<SearchClientsState> clientState
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
@@ -69,6 +71,8 @@
 @code {
     bool selectAll = false;
     RadzenDataGrid<SelectableClient> clientsGrid;
+    [Parameter]
+    public string? realm { get; set; } = null;
 
     protected override void OnAfterRender(bool firstRender)
     {

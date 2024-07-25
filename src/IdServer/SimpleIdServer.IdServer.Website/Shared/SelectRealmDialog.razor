@@ -35,7 +35,6 @@
 
     void SubmitSelectRealm(RealmForm realm)
     {
-        dispatcher.Dispatch(new SelectRealmAction { Realm = realm.Name });
-        this.dialogService.Close();
+        navigationManager.NavigateTo($"/{realm.Name}");
     }
 }

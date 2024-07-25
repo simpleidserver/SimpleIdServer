@@ -1,6 +1,8 @@
-﻿<Fluxor.Blazor.Web.StoreInitializer />
+﻿@using SimpleIdServer.IdServer.Website.Infrastructures;
 
-<Router AppAssembly="@typeof(IdServerRouter).Assembly">
+<Fluxor.Blazor.Web.StoreInitializer />
+
+<RealmRouter AppAssembly="@typeof(IdServerRouter).Assembly">
     <Found Context="routeData">
         <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
@@ -11,4 +13,4 @@
             <p role="alert">Sorry, there's nothing at this address.</p>
         </LayoutView>
     </NotFound>
-</Router>
+</RealmRouter>

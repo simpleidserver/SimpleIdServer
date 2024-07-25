@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 using System.Security.Claims;
 
@@ -34,6 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<NotificationService>();
             services.AddScoped<ContextMenuService>();
             services.AddScoped<TooltipService>();
+            services.AddSingleton<CurrentRealm>();
             services.AddSingleton<IWebsiteHttpClientFactory, WebsiteHttpClientFactory>();
             if (callbackOptions == null) services.Configure<IdServerWebsiteOptions>((o) => { });
             else services.Configure(callbackOptions);

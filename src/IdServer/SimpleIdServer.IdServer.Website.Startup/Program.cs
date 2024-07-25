@@ -31,6 +31,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
+app.Services.AddSIDWebsite();
 app.UseStaticFiles();
 app.UseRequestLocalization(e =>
 {

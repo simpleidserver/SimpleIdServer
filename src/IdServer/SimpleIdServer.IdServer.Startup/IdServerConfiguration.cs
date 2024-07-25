@@ -118,7 +118,7 @@ namespace SimpleIdServer.IdServer.Startup
             ClientBuilder.BuildWalletClient("walletClient", "password")
                 .SetClientName("Wallet")
                 .Build(),
-            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://8028-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
+            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://6991-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
                 .SetClientName("Credential issuer")
                 .AddScope(
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -144,6 +144,7 @@ namespace SimpleIdServer.IdServer.Startup
                 .SetBackChannelLogoutUrl("https://localhost:5002/bc-logout")
                 .SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png")
                 .AddScope(
+                    SimpleIdServer.IdServer.Constants.StandardScopes.Role,
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Profile, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
