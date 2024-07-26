@@ -7,6 +7,7 @@
 @using System.Security.Cryptography.X509Certificates;
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
+@inject IUrlHelper urlHelper
 @inject NotificationService notificationService
 @inject IJSRuntime JS
 @inject IDispatcher dispatcher
@@ -51,7 +52,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Identifier" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.SubjectName" Path="@($"/certificateauthorities/{data.Value.Id}/details")" />
+                <RadzenLink Text="@data.Value.SubjectName" Path="@(urlHelper.GetUrl($"/certificateauthorities/{data.Value.Id}/details"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Source" Width="80px">
@@ -79,11 +80,6 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                caGrid.Reload();
-                StateHasChanged();
-            });
             SubscribeToAction<RemoveSelectedCertificateAuthoritiesSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedCertificateAuthoritiesRemoved });

@@ -5,6 +5,7 @@
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 @inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
 @inject IState<ScopeMappersState> scopeMappersState
 @inject NotificationService notificationService
 
@@ -35,7 +36,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="@Global.Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{Scope.Id}/mappers/" + data.Value.Id)" />
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/scopes/{Scope.Id}/mappers/" + data.Value.Id))" />
             </Template>        
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="@Global.Type" Filterable="false" Sortable="false" Width="80px">

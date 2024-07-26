@@ -7,9 +7,10 @@
 @inject NavigationManager navigationManager
 @inject IState<CertificateAuthorityState> certificateAuthorityState
 @inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/certificateauthorities" Text="@Global.CertificateAuthoritiesTitle" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/certificateauthorities")" Text="@Global.CertificateAuthoritiesTitle" />
     <RadzenBreadCrumbItem Text="@Global.CertificateAuthorityDetailsTitle" />
 </RadzenBreadCrumb>
 
@@ -53,13 +54,6 @@
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
-        if (firstRender)
-        {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/certificateauthorities");
-            });
-        }
     }
 
     protected override void OnParametersSet()

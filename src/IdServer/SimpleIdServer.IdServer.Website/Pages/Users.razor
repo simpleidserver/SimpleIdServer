@@ -4,6 +4,7 @@
 @inject NotificationService notificationService 
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
+@inject IUrlHelper urlHelper
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
@@ -48,7 +49,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="true" Title="Id" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Id" Path="@($"/users/{data.Value.Id}/settings")" />
+                <RadzenLink Text="@data.Value.Id" Path="@(urlHelper.GetUrl($"/users/{data.Value.Id}/settings"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Name" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />
@@ -86,11 +87,6 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                gridUsers.Reload();
-                StateHasChanged();
-            });
             SubscribeToAction<AddUserSuccessAction>(async (act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.UserAdded });

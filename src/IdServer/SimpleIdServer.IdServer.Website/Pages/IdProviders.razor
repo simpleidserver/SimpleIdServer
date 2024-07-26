@@ -4,6 +4,7 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
+@inject IUrlHelper urlHelper
 @inject NotificationService notificationService
 @inject IState<SearchIdProvidersState> searchIdProvidersState
 @inject IDispatcher dispatcher
@@ -41,7 +42,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.DisplayName" Path="@($"/authentications/idproviders/{data.Value.Name}/details")" />
+                <RadzenLink Text="@data.Value.DisplayName" Path="@(urlHelper.GetUrl($"/authentications/idproviders/{data.Value.Name}/details"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdProvider" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
@@ -64,11 +65,6 @@
             SubscribeToAction<RemoveSelectedIdProvidersSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdProvidersRemoved });
-                StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                idProvidersGrid.Reload();
                 StateHasChanged();
             });
             if (!searchIdProvidersState.Value.IsLoading)

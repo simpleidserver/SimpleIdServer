@@ -7,11 +7,12 @@
 @inject NavigationManager navigationManager
 @inject DialogService dialogService
 @layout MainLayout
+@inject IUrlHelper urlHelper
 @inject IState<IdentityProvisioningState> identityProvisioningState
 @inject IDispatcher dispatcher
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/identityprovisioning" Text="@Global.IdentityProvisioning" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/identityprovisioning")" Text="@Global.IdentityProvisioning" />
     <RadzenBreadCrumbItem Text="@Global.IdentityProvisioningDetails" />
 </RadzenBreadCrumb>
 
@@ -109,10 +110,6 @@
                     Draggable = true
                 });
                 StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/identityprovisioning");
             });
         }
     }

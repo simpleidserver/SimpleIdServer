@@ -95,7 +95,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
             var providers = await GetAuthenticationSchemeProviders();
             var provider = providers.FirstOrDefault(p => p.Name == name);
-            return providers == null ? null : Convert(provider);
+            return provider == null ? null : Convert(provider);
         }
 
         private async Task<IEnumerable<Domains.AuthenticationSchemeProvider>> GetAuthenticationSchemeProviders()

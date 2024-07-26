@@ -58,11 +58,6 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                auditEvtsGrid.Reload();
-                StateHasChanged();
-            });
             if (!searchAuditingRecordsState.Value.IsLoading)
                 auditEvtsGrid.Reload();
         }

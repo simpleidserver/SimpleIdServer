@@ -4,6 +4,7 @@
 @inject IDispatcher dispatcher
 @inject IState<SearchUserSessionsState> userSessionsState
 @inject IState<UpdateUserState> updateUserState
+@inject IUrlHelper urlHelper
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 
@@ -33,7 +34,7 @@
             <Template Context="data">
                 @foreach(var clientId in data.ClientIds)
                 {
-                    <RadzenLink Text="@clientId" Path="@($"/clients/{clientId}/settings")" />
+                    <RadzenLink Text="@clientId" Path="@(urlHelper.GetUrl($"/clients/{clientId}/settings"))" />
                 }
             </Template>
         </RadzenDataGridColumn>

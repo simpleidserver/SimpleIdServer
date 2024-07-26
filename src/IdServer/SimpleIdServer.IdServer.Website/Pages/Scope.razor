@@ -7,11 +7,12 @@
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
 @layout MainLayout
+@inject IUrlHelper urlHelper
 @inject IState<ScopeState> scopeState
 @inject IDispatcher dispatcher
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/scopes" Text="@Global.Scopes" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/scopes")" Text="@Global.Scopes" />
     <RadzenBreadCrumbItem Text="@Global.ScopeDetails" />
 </RadzenBreadCrumb>
 
@@ -88,10 +89,6 @@
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
                 StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/scopes");
             });
         }
     }

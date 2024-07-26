@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
+using SimpleIdServer.IdServer.Website.Helpers;
 using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 using System.Security.Claims;
@@ -29,6 +30,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
             });
             services.AddTransient<SidCookieEventHandler>();
+            services.AddTransient<IUrlHelper, UrlHelper>();
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<IGroupService, GroupEffects>();
             services.AddScoped<DialogService>();

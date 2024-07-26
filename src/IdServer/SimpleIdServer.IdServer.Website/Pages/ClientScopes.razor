@@ -12,6 +12,7 @@
 @inject ContextMenuService contextMenuService
 @inject TooltipService tooltipService
 @inject NotificationService notificationService
+@inject IUrlHelper urlHelper
 
 <RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="@Global.AddClientScope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
@@ -40,7 +41,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Id}/settings")" />
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/scopes/{data.Value.Id}/settings"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">

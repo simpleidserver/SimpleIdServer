@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
@@ -12,13 +12,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
     {
         private readonly IWebsiteHttpClientFactory _httpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly CurrentRealm _currentRealm;
 
-        public IdServerConfigurationEffects(IWebsiteHttpClientFactory httpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public IdServerConfigurationEffects(
+            IWebsiteHttpClientFactory httpClientFactory, 
+            IOptions<IdServerWebsiteOptions> options, 
+            CurrentRealm currentRealm)
         {
             _httpClientFactory = httpClientFactory;
             _options = options.Value;
-            _sessionStorage = sessionStorage;
+            _currentRealm = currentRealm;
         }
 
         [EffectMethod]
@@ -43,8 +46,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
         {
             if(_options.IsReamEnabled)
             {
-                var realm = await _sessionStorage.GetAsync<string>("realm");
-                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier: SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}";
             }
 

@@ -14,9 +14,10 @@
 @inject IGroupService groupService
 @inject IState<GroupState> groupState
 @inject IState<GroupHierarchyState> groupHierarchyState
+@inject IUrlHelper urlHelper
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/groups" Text="@Global.Groups" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/groups")" Text="@Global.Groups" />
     <RadzenBreadCrumbItem Text="@Global.GroupDetails" />
 </RadzenBreadCrumb>
 
@@ -85,10 +86,6 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/groups");
-            });
             SubscribeToAction<GetGroupSuccessAction>((act) =>
             {
                 currentGroup = act.Group;
@@ -161,7 +158,7 @@
 
     string GetGroupLink(RadzenTreeItem data)
     {
-        return $"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children";
+        return urlHelper.GetUrl($"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children");
     }
 
     bool HasChildren(object data)

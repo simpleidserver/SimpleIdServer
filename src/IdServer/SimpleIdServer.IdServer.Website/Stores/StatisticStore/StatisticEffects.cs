@@ -4,6 +4,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Statistics;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
@@ -12,13 +13,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly CurrentRealm _currentRealm;
 
-        public StatisticEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public StatisticEffects(
+            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            IOptions<IdServerWebsiteOptions> options, 
+            CurrentRealm currentRealm)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _sessionStorage= sessionStorage;
+            _currentRealm = currentRealm;
         }
 
         [EffectMethod]
@@ -41,8 +45,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
         {
             if (_options.IsReamEnabled)
             {
-                var realm = await _sessionStorage.GetAsync<string>("realm");
-                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/stats";
             }
 

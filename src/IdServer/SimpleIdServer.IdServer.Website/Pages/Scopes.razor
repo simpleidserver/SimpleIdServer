@@ -5,6 +5,7 @@
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IUrlHelper urlHelper
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
@@ -48,7 +49,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Id}/settings")" />
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/scopes/{data.Value.Id}/settings"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
@@ -101,11 +102,6 @@
             SubscribeToAction<RemoveSelectedScopesSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedScopesRemoved });
-                StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                scopesGrid.Reload();
                 StateHasChanged();
             });
             if (!scopesState.Value.IsLoading)

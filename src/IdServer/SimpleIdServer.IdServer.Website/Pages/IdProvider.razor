@@ -7,9 +7,10 @@
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
 @inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/authentications/idproviders" Text="@Global.IdentityProviders" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/authentications/idproviders")" Text="@Global.IdentityProviders" />
     <RadzenBreadCrumbItem Text="@Global.IdentityProviderDetails" />
 </RadzenBreadCrumb>
 
@@ -50,10 +51,6 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/authentications/idproviders");
-            });
             SubscribeToAction<GetIdProviderFailureAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });

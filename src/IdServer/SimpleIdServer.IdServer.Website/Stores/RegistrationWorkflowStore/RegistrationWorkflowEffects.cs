@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -15,13 +15,16 @@ public class RegistrationWorkflowEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
-    private readonly ProtectedSessionStorage _sessionStorage;
+    private readonly CurrentRealm _currentRealm;
 
-    public RegistrationWorkflowEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+    public RegistrationWorkflowEffects(
+        IWebsiteHttpClientFactory websiteHttpClientFactory, 
+        IOptions<IdServerWebsiteOptions> options, 
+        CurrentRealm currentRealm)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
-        _sessionStorage = sessionStorage;
+        _currentRealm = currentRealm;
     }
 
     [EffectMethod]
@@ -150,8 +153,7 @@ public class RegistrationWorkflowEffects
     {
         if(_options.IsReamEnabled)
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/registrationworkflows";
         }
 

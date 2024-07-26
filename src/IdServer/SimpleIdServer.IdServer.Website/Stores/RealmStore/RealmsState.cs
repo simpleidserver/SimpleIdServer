@@ -17,6 +17,5 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 
         public bool IsLoading { get; set; } = true;
         public IEnumerable<Domains.Realm> Realms { get; set; }
-        public string? ActiveRealm { get; set; } = SimpleIdServer.IdServer.Constants.DefaultRealm;
     }
 }

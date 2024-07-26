@@ -5,6 +5,7 @@
 @inject IDispatcher dispatcher
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
+@inject IUrlHelper urlHelper
 
 <RadzenButton class="mb-1" Click="@(args => AddMember())" Icon="add" Text="@Global.AddMember" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
 
@@ -33,7 +34,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableGroupMember" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/groups/{data.Value.Id}/children")" />
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/groups/{data.Value.Id}/children"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableGroupMember" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />

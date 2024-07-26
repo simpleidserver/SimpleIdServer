@@ -11,10 +11,11 @@
 @inject IDispatcher dispatcher
 @inject IState<ScopeState> scopeState
 @inject NotificationService notificationService
+@inject IUrlHelper urlHelper
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/scopes" Text="@Global.Scopes" />
-    <RadzenBreadCrumbItem Path=@("/scopes/" + id + "/mappers") Text="@Global.ScopeDetails" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/scopes")" Text="@Global.Scopes" />
+    <RadzenBreadCrumbItem Path=@(urlHelper.GetUrl("/scopes/" + id + "/mappers")) Text="@Global.ScopeDetails" />
     <RadzenBreadCrumbItem Text="@Global.MapperDetails" />
 </RadzenBreadCrumb>
 
@@ -88,10 +89,6 @@
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeClaimMapperUpdated });
                 StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/scopes");
             });
         }
     }

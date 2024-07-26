@@ -1,5 +1,6 @@
 ﻿@page "/realm"
 @using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.StatisticStore;
@@ -8,7 +9,9 @@
 @inject IState<StatisticsState> statisticsState
 @inject IDispatcher dispatcher
 @inject DialogService dialogService
+@inject IUrlHelper urlHelper
 @inject NavigationManager navigationManager
+@inject CurrentRealm currentRealm
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 <style>
@@ -118,11 +121,11 @@
     string GetFederationMetadataUrl() => $"{GetBaseUrl()}/FederationMetadata/2007-06/FederationMetadata.xml";
     string GetSamlMetadataUrl() => $"{GetBaseUrl()}/saml/metadata";
     string GetSCIMSchemasUrl() => $"{Options.Value.SCIMUrl}/Schemas";
-    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}" : Options.Value.IdServerBaseUrl;
+    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{currentRealm.Identifier}" : Options.Value.IdServerBaseUrl;
 
     void AddRealm()
     {
-        navigationManager.NavigateTo("/realm/add");
+        navigationManager.NavigateTo(urlHelper.GetUrl("/realm/add"));
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -130,10 +133,7 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                dispatcher.Dispatch(new GetStatisticsAction());
-            });
+            dispatcher.Dispatch(new GetStatisticsAction());
             dispatcher.Dispatch(new GetStatisticsAction());
         }
     }
@@ -142,7 +142,7 @@
     {
         await dialogService.OpenAsync<SelectRealmDialog>(Global.SelectRealm, new Dictionary<string, object>
         {
-            { "activeRealm", realmsState.Value.ActiveRealm }
+            { "activeRealm", currentRealm.Identifier }
         }, new DialogOptions
         {
             Width = "700px",

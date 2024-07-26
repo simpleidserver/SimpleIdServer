@@ -16,10 +16,11 @@
 @inject IDispatcher dispatcher
 @inject IState<ScopeState> scopeState
 @inject NotificationService notificationService
+@inject IUrlHelper urlHelper
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/identityprovisioning" Text="@Global.IdentityProvisioning" />
-    <RadzenBreadCrumbItem Path=@("/identityprovisioning/" + id + "/mappingrules") Text="@Global.IdentityProvisioningDetails" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/identityprovisioning")" Text="@Global.IdentityProvisioning" />
+    <RadzenBreadCrumbItem Path=@(urlHelper.GetUrl("/identityprovisioning/" + id + "/mappingrules")) Text="@Global.IdentityProvisioningDetails" />
     <RadzenBreadCrumbItem Text="Mapper details" />
 </RadzenBreadCrumb>
 
@@ -64,10 +65,6 @@
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
                 StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/identityprovisioning");
             });
         }
     }

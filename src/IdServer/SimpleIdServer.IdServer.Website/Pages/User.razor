@@ -7,10 +7,11 @@
 @inject NavigationManager navigationManager
 @layout MainLayout
 @inject IState<UserState> userState
+@inject IUrlHelper urlHelper
 @inject IDispatcher dispatcher
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/users" Text="@Global.Users" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/users")" Text="@Global.Users" />
     <RadzenBreadCrumbItem Text="@Global.UserDetails" />
 </RadzenBreadCrumb>
 
@@ -82,10 +83,6 @@
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
                 StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/users");
             });
         }
     }

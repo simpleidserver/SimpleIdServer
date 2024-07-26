@@ -6,12 +6,13 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
+@inject IUrlHelper urlHelper
 @layout MainLayout
 @inject IState<ClientState> clientState
 @inject IDispatcher dispatcher
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/clients" Text="@Global.ClientsTitle" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/clients")" Text="@Global.ClientsTitle" />
     <RadzenBreadCrumbItem Text="@Global.ClientDetailsTitle" />
 </RadzenBreadCrumb>
 
@@ -68,13 +69,6 @@
     protected override void OnAfterRender(bool firstRender)
     {
         base.OnAfterRender(firstRender);
-        if(firstRender)
-        {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/clients");
-            });
-        }
     }
 
     protected override void OnParametersSet()
@@ -94,6 +88,6 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/clients/{System.Web.HttpUtility.UrlEncode(id)}/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/clients/{System.Web.HttpUtility.UrlEncode(id)}/{rec.Key}"));
     }
 }

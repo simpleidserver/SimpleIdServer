@@ -8,11 +8,12 @@
 @inject IDispatcher dispatcher
 @inject NavigationManager navigationManager
 @inject NotificationService notificationService
+@inject IUrlHelper urlHelper
 @inject IState<IdProviderState> idProviderState
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/authentications/idproviders" Text="@Global.IdentityProviders" />
-    <RadzenBreadCrumbItem Path=@($"/authentications/idproviders/{id}/mappers") Text="@Global.IdentityProviderMappers" />
+    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/authentications/idproviders")" Text="@Global.IdentityProviders" />
+    <RadzenBreadCrumbItem Path=@(urlHelper.GetUrl($"/authentications/idproviders/{id}/mappers")) Text="@Global.IdentityProviderMappers" />
     <RadzenBreadCrumbItem Text="@(mapper?.Name)" />
 </RadzenBreadCrumb>
 
@@ -56,10 +57,6 @@
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProviderMapperUpdated });
                 StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/idproviders");
             });
         }
     }

@@ -1,16 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Users;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.Website.Stores.Base;
-using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.Json;
@@ -22,12 +19,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
+        private readonly CurrentRealm _currentRealm;
 
-        public UserEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, ProtectedSessionStorage sessionStorage, IOptions<IdServerWebsiteOptions> websiteOptions)
+        public UserEffects(
+            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            CurrentRealm currentRealm, 
+            IOptions<IdServerWebsiteOptions> websiteOptions)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
-            _sessionStorage = sessionStorage;
+            _currentRealm = currentRealm;
             _options = websiteOptions.Value;
         }
 
@@ -418,8 +418,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         private async Task<string> GetRealm()
         {
             if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return realmStr;
         }
     }

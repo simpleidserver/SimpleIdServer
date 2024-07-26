@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+﻿@using SimpleIdServer.IdServer.Website.Infrastructures
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
 @using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
 @using SimpleIdServer.IdServer.Website.Stores.LanguageStore;
@@ -7,10 +8,12 @@
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject CurrentRealm currentRealm
 @inject IState<RealmsState> state
 @inject IState<LanguagesState> languagesState
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
 @inject DialogService dialogService
 @inject NavigationManager Navigation
 
@@ -53,26 +56,26 @@
     {
         <RadzenSidebar @bind-Expanded="@sidebarExpanded">
             <RadzenPanelMenu>
-                <RadzenPanelMenuItem Text=@(string.Format(Global.ActiveRealm, activeRealm)) Path="/realm" />
+                <RadzenPanelMenuItem Text=@(string.Format(Global.ActiveRealm, activeRealm)) Path="@(urlHelper.GetUrl("/realm"))" />
                 <RadzenPanelMenuItem Text="@Global.Manage" />
-                <RadzenPanelMenuItem Text="@Global.Clients" Icon="apps" Path="/clients" />
-                <RadzenPanelMenuItem Text="@Global.Scopes" Icon="visibility" Path="/scopes" />
+                <RadzenPanelMenuItem Text="@Global.Clients" Icon="apps" Path="@(urlHelper.GetUrl("/clients"))" />
+                <RadzenPanelMenuItem Text="@Global.Scopes" Icon="visibility" Path="@(urlHelper.GetUrl("/scopes"))" />
                 <RadzenPanelMenuItem Text="@Global.UserMgt">
-                    <RadzenPanelMenuItem Text="@Global.Users" Icon="person" Path="/users" />
-                    <RadzenPanelMenuItem Text="@Global.Groups" Icon="group" Path="/groups" />
+                    <RadzenPanelMenuItem Text="@Global.Users" Icon="person" Path="@(urlHelper.GetUrl("/users"))" />
+                    <RadzenPanelMenuItem Text="@Global.Groups" Icon="group" Path="@(urlHelper.GetUrl("/groups"))" />
                 </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem Text="@Global.Authentication">
-                    <RadzenPanelMenuItem Text="@Global.AuthenticationContext" Icon="security" Path="/acrs" />
-                    <RadzenPanelMenuItem Text="@Global.Authentication" Icon="person" Path="/authentications/authmethods" />
+                    <RadzenPanelMenuItem Text="@Global.AuthenticationContext" Icon="security" Path="@(urlHelper.GetUrl("/acrs"))" />
+                    <RadzenPanelMenuItem Text="@Global.Authentication" Icon="person" Path="@(urlHelper.GetUrl("/authentications/authmethods"))" />
                 </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem Text="@Global.IdentityProvisioning">
-                    <RadzenPanelMenuItem Text="@Global.ManualIdentityProvisioning" Icon="back_hand" Path="/registrationworkflows"></RadzenPanelMenuItem>
-                    <RadzenPanelMenuItem Text="@Global.AutomaticIdentityProvisioning" Icon="refresh" Path="/identityprovisioning" />
+                    <RadzenPanelMenuItem Text="@Global.ManualIdentityProvisioning" Icon="back_hand" Path="@(urlHelper.GetUrl("/registrationworkflows"))"></RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="@Global.AutomaticIdentityProvisioning" Icon="refresh" Path="@(urlHelper.GetUrl("/identityprovisioning"))" />
                 </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem Text="@Global.Configure" />
-                <RadzenPanelMenuItem Text="@Global.CertificateAuthoritiesTitle" Icon="shield" Path="/certificateauthorities" />
-                <RadzenPanelMenuItem Text="@Global.FederationEntitiesTitle" Icon="anchor" Path="/federationentities" />
-                <RadzenPanelMenuItem Text="@Global.Auditing" Icon="source" Path="/auditing" />
+                <RadzenPanelMenuItem Text="@Global.CertificateAuthoritiesTitle" Icon="shield" Path="@(urlHelper.GetUrl("/certificateauthorities"))" />
+                <RadzenPanelMenuItem Text="@Global.FederationEntitiesTitle" Icon="anchor" Path="@(urlHelper.GetUrl("/federationentities"))" />
+                <RadzenPanelMenuItem Text="@Global.Auditing" Icon="source" Path="@(urlHelper.GetUrl("/auditing"))" />
             </RadzenPanelMenu>
         </RadzenSidebar>
         <RadzenBody>
@@ -116,20 +119,10 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
+            this.activeRealm = currentRealm.Identifier;
             SubscribeToAction<GetAllConfigurationDefinitionsSuccessAction>((act) =>
             {
                 isLoading = false;
-                StateHasChanged();
-            });
-            SubscribeToAction<GetActiveSuccessRealmAction>((act) =>
-            {
-                activeRealm = act.Realm;
-                dispatcher.Dispatch(new GetAllConfigurationDefinitionsAction());
-                StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                activeRealm = act.Realm;
                 StateHasChanged();
             });
         }
@@ -139,11 +132,11 @@
     {
         base.OnInitialized();
         this.isLoading = true;
-        dispatcher.Dispatch(new GetActiveRealmAction());
         dispatcher.Dispatch(new GetAllRealmAction());
         dispatcher.Dispatch(new GetAllAuthMethodAction());
         dispatcher.Dispatch(new GetLanguagesAction());
         dispatcher.Dispatch(new GetAllRegistrationWorkflowsAction());
         dispatcher.Dispatch(new GetAllAcrsAction());
+        dispatcher.Dispatch(new GetAllConfigurationDefinitionsAction());
     }
 }
