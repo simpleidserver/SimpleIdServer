@@ -56,7 +56,7 @@
     {
         <RadzenSidebar @bind-Expanded="@sidebarExpanded">
             <RadzenPanelMenu>
-                <RadzenPanelMenuItem Text=@(string.Format(Global.ActiveRealm, activeRealm)) Path="@(urlHelper.GetUrl("/realm"))" />
+                <RadzenPanelMenuItem Text=@(string.Format(Global.ActiveRealm, activeRealm)) Path="@(urlHelper.GetUrl("/realm/overview"))" />
                 <RadzenPanelMenuItem Text="@Global.Manage" />
                 <RadzenPanelMenuItem Text="@Global.Clients" Icon="apps" Path="@(urlHelper.GetUrl("/clients"))" />
                 <RadzenPanelMenuItem Text="@Global.Scopes" Icon="visibility" Path="@(urlHelper.GetUrl("/scopes"))" />

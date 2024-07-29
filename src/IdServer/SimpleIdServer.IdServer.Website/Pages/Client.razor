@@ -43,6 +43,9 @@
             <RadzenTabsItem Text="@Global.Advanced">
                 <ClientAdvanced Client="@clientState.Value.Client"></ClientAdvanced>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="@Global.Realms">
+                <ClientRealms Client="@clientState.Value.Client"></ClientRealms>
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 </RadzenCardLoader>
@@ -55,7 +58,8 @@
         { "keys", 2 },
         { "credentials", 3 },
         { "roles", 4 },
-        { "advanced", 5 }
+        { "advanced", 5 },
+        { "realms", 6 }
     };
 
     [Parameter]

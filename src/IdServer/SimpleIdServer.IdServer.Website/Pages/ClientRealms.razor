@@ -1,0 +1,194 @@
+﻿@using SimpleIdServer.IdServer.Website.Infrastructures
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<RealmsState> realmsState
+@inject IDispatcher dispatcher
+@inject CurrentRealm currentRealm
+@inject NotificationService notificationService
+
+<p class="text-muted">
+    @Global.ClientRealmsDescription
+</p>
+
+<RadzenRow Gap="1rem">    
+    <RadzenColumn Size="5">
+        <h4>@Global.AvailableRealms</h4>
+        <RadzenDataGrid AllowFiltering="true"
+                        AllowColumnResize="true"
+                        AllowAlternatingRows="false"
+                        AllowSorting="true"
+                        PageSize="30"
+                        AllowPaging="true"
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        ShowPagingSummary="true"
+                        IsLoading="false"
+                        RowRender="@RowRender"
+                        Count="@NbAvailable"
+                        Data="@AvailableRealms"
+                        TItem="SelecteableRealm"
+                        ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn TItem="SelecteableRealm" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <HeaderTemplate>
+                        <RadzenCheckBox @bind-Value=@selectAllAvailable Change="@(args => ToggleAvailableAll(args))" TValue="bool" />
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleAvailableChanged(args, data))" TValue="bool" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelecteableRealm" Property="Name" Title="@Global.Name" Filterable="false" Sortable="false" Width="80px" />
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenColumn>
+    <RadzenColumn>
+        <RadzenStack>
+            <RadzenButton Text="@Global.AssignRealms" Icon="add" Click="@(() => Assign())" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Text="@Global.UnassignRealms" Icon="remove" Click=@(() => Unassign()) ButtonStyle="ButtonStyle.Primary" />
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="5">
+        <h4>@Global.AssignedRealms</h4>
+        <RadzenDataGrid AllowFiltering="true"
+                        AllowColumnResize="true"
+                        AllowAlternatingRows="false"
+                        AllowSorting="true"
+                        PageSize="30"
+                        AllowPaging="true"
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        ShowPagingSummary="true"
+                        IsLoading="false"
+                        RowRender="@RowRender"
+                        Count="@NbAssigned"
+                        Data="@AssignedRealms"
+                        TItem="SelecteableRealm"
+                        ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn TItem="SelecteableRealm" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <HeaderTemplate>
+                        <RadzenCheckBox @bind-Value=@selectAllAssigned Change="@(args => ToggleAssignedAll(args))" TValue="bool" />
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        @if(data.Name != currentRealm.Identifier)
+                        {
+                            <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleAvailableChanged(args, data))" TValue="bool" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelecteableRealm" Property="Name" Title="@Global.Name" Filterable="false" Sortable="false" Width="80px" />
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    bool selectAllAvailable = false;
+    bool selectAllAssigned = false;
+    record SelecteableRealm
+    {
+        public bool IsSelected { get; set; }
+        public string Name { get; set; }
+    }
+
+    List<SelecteableRealm> AvailableRealms { get; set;} = new List<SelecteableRealm>();
+    List<SelecteableRealm> AssignedRealms { get; set; } = new List<SelecteableRealm>();
+    int NbAssigned { get; set; }
+    int NbAvailable { get; set; }
+
+    private SimpleIdServer.IdServer.Domains.Client _client;
+
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Client Client
+    {
+        get
+        {
+            return _client;
+        }
+        set
+        {
+            _client = value;
+            Initialize();
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<GetAllRealmSuccessAction>((act) =>
+            {
+                Initialize();
+            });
+            SubscribeToAction<UpdateClientRealmsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ClientsRealmsUpdated });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void Assign()
+    {
+        var assignedRealms = AssignedRealms.Select(r => new SelecteableRealm { IsSelected = r.IsSelected, Name = r.Name }).ToList();
+        assignedRealms.AddRange(AvailableRealms.Where(r => r.IsSelected).Select(r => new SelecteableRealm { IsSelected = false, Name = r.Name }));
+        AvailableRealms = AvailableRealms.Where(r => !r.IsSelected).ToList();
+        AssignedRealms = assignedRealms;
+        NbAssigned = AssignedRealms.Count();
+        NbAvailable = AvailableRealms.Count();
+        selectAllAvailable = false;
+        dispatcher.Dispatch(new UpdateClientRealmsAction { ClientId = _client.ClientId, Realms = AssignedRealms.Select(r => r.Name).ToList() });
+    }
+
+    void Unassign()
+    {
+        var availableRealms = AvailableRealms.Select(r => new SelecteableRealm { IsSelected = r.IsSelected, Name = r.Name }).ToList();
+        availableRealms.AddRange(AssignedRealms.Where(r => r.IsSelected).Select(r => new SelecteableRealm { IsSelected = false, Name = r.Name }));
+        AssignedRealms = AssignedRealms.Where(r => !r.IsSelected).ToList();
+        AvailableRealms = availableRealms;
+        NbAssigned = AssignedRealms.Count();
+        NbAvailable = availableRealms.Count();
+        selectAllAssigned = false;
+        dispatcher.Dispatch(new UpdateClientRealmsAction { ClientId = _client.ClientId, Realms = AssignedRealms.Select(r => r.Name).ToList() });
+    }
+
+    void ToggleAssignedAll(bool isSelected)
+    {
+        foreach (var assignedRealm in AssignedRealms.Where(r => r.Name != currentRealm.Identifier))
+            assignedRealm.IsSelected = isSelected;
+    }
+
+    void ToggleAvailableAll(bool isSelected)
+    {
+        foreach (var availableRealm in AvailableRealms)
+            availableRealm.IsSelected = isSelected;
+    }
+
+    void ToggleAvailableChanged(bool isSelected, SelecteableRealm realm)
+    {
+        realm.IsSelected = isSelected;
+    }
+
+    void Initialize()
+    {
+        if (_client == null || string.IsNullOrWhiteSpace(_client.Id) || realmsState.Value.Realms == null || !realmsState.Value.Realms.Any() || AvailableRealms.Any()) return;
+        AssignedRealms = _client.Realms.Select(r => new SelecteableRealm { Name = r.Name }).ToList();
+        AvailableRealms = realmsState.Value.Realms.Where(r => !_client.Realms.Any(cr => cr.Name == r.Name)).Select(cr => new SelecteableRealm
+        {
+            Name = cr.Name
+        }).ToList();
+        NbAvailable = AvailableRealms.Count();
+        NbAssigned = AssignedRealms.Count();
+    }
+
+
+    void RowRender(RowRenderEventArgs<SelecteableRealm> row)
+    {
+        const string className = "class";
+        if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+}

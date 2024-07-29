@@ -727,6 +727,25 @@ public class ClientEffects
         }
     }
 
+    [EffectMethod]
+    public async Task Handle(UpdateClientRealmsAction act, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetClientsUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var request = new UpdateClientRealmsRequest
+        {
+            Realms = act.Realms
+        };
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/realms"),
+            Method = HttpMethod.Put,
+            Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new UpdateClientRealmsSuccessAction());
+    }
+
     private async Task CreateClient(Domains.Client client, IDispatcher dispatcher, string clientType, PemResult pemResult = null, string jsonWebKey = null)
     {
         var baseUrl = await GetClientsUrl();
@@ -1249,3 +1268,14 @@ public class StartAddClientAction
 }
 
 public class StartGenerateClientKeyAction { }
+
+public class UpdateClientRealmsAction
+{
+    public string ClientId { get; set; }
+    public List<string> Realms { get; set; }
+}
+
+public class UpdateClientRealmsSuccessAction
+{
+
+}

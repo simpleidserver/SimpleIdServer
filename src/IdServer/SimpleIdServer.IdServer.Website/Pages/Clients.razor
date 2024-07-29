@@ -5,74 +5,84 @@
 @inject IUrlHelper urlHelper
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
+@inject CurrentRealm curentRealm
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 
-<div class="row">
-    <div class="col">
-        <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.Clients" TextStyle="TextStyle.DisplayH3" />
-        <p>
-            @Global.ClientsDescription
-        </p>
-    </div>
-    <div class="col-3">
-        <RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="@Global.AddClient" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    </div>
-</div>
+<RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="@Global.AddClient" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<AuthorizeView Roles=@(@"master\clients\manage")>
+    <Authorized>
+        <div class="row">
+            <div class="col">
+                <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.Clients" TextStyle="TextStyle.DisplayH3" />
+                <p>
+                    @Global.ClientsDescription
+                </p>
+            </div>
+            <div class="col-3">
+                <RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="@Global.AddClient" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+            </div>
+        </div>
 
-<RadzenDataGrid @ref="clientsGrid" 
-        AllowFiltering="true" 
-        AllowColumnResize="true"
-        AllowAlternatingRows="false" 
-        AllowSorting="true" 
-        PageSize="30" 
-        AllowPaging="true" 
-        PagerHorizontalAlign="HorizontalAlign.Left" 
-        ShowPagingSummary="true"
-        IsLoading="@clientState.Value.IsLoading"
-        Count="@clientState.Value.Count"
-        Data="@clientState.Value.Clients"
-        LoadData="@LoadData"
-        RowRender="@RowRender"
-        TItem="SelectableClient" 
-        ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="true" SortProperty="Value.ClientId" Title="@Global.Identifier" Width="80px">
-            <Template Context="data">
-                <RadzenLink Text="@data.Value.ClientId" Path="@(urlHelper.GetUrl($"/clients/{System.Web.HttpUtility.UrlEncode(data.Value.ClientId)}/settings"))" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientName" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" Title="Type" Width="80px">
-            <Template Context="data">
-                <RadzenBadge Text="@data.Value.ClientType" IsPill="true" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClient" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+        <RadzenDataGrid @ref="clientsGrid"
+                        AllowFiltering="true"
+                        AllowColumnResize="true"
+                        AllowAlternatingRows="false"
+                        AllowSorting="true"
+                        PageSize="30"
+                        AllowPaging="true"
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        ShowPagingSummary="true"
+                        IsLoading="@clientState.Value.IsLoading"
+                        Count="@clientState.Value.Count"
+                        Data="@clientState.Value.Clients"
+                        LoadData="@LoadData"
+                        RowRender="@RowRender"
+                        TItem="SelectableClient"
+                        ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <HeaderTemplate>
+                        <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="true" SortProperty="Value.ClientId" Title="@Global.Identifier" Width="80px">
+                    <Template Context="data">
+                        <RadzenLink Text="@data.Value.ClientId" Path="@(urlHelper.GetUrl($"/clients/{System.Web.HttpUtility.UrlEncode(data.Value.ClientId)}/settings"))" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientName" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" Title="Type" Width="80px">
+                    <Template Context="data">
+                        <RadzenBadge Text="@data.Value.ClientType" IsPill="true" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableClient" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </Authorized>
+    <NotAuthorized>
+        <p>You're not authorized.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     bool selectAll = false;
     RadzenDataGrid<SelectableClient> clientsGrid;
     [Parameter]
     public string? realm { get; set; } = null;
+    [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -136,6 +146,8 @@
 
     async void AddClient() 
     {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
         await dialogService.OpenAsync<AddClientDialog>(Global.AddClient, new Dictionary<string, object>(), new DialogOptions
         {
             Width = "700px",

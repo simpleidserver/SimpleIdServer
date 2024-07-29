@@ -512,6 +512,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addClientRole",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/roles",
                 defaults: new { controller = "Clients", action = "AddRole" });
+            webApplication.SidMapControllerRoute("updateClientRealms",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/realms",
+                defaults: new { controller = "Clients", action = "UpdateRealms" });
 
             webApplication.SidMapControllerRoute("searchGroups",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/.search",

@@ -298,6 +298,7 @@ public class UserRepository : IUserRepository
                     .Include(u => u.Credentials)
                     .Include(u => u.ExternalAuthProviders)
                     .Include(u => u.Groups).ThenInclude(u => u.Group)
+                    .Include(u => u.RealmRoles).ThenInclude(r => r.Permissions)
                     .Include(u => u.Devices)
                     .Include(u => u.OAuthUserClaims)
                     .Include(u => u.Realms);

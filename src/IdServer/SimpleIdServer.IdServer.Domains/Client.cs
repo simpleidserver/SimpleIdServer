@@ -553,7 +553,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.AccessTokenType)]
         public AccessTokenTypes AccessTokenType { get; set; } = AccessTokenTypes.Jwt;
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.Realms)]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         [JsonIgnore]
         public ICollection<DeviceAuthCode> DeviceAuthCodes { get; set; } = new List<DeviceAuthCode>();

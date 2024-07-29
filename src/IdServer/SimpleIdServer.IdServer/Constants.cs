@@ -26,7 +26,8 @@ namespace SimpleIdServer.IdServer
         public static List<string> RealmStandardClients = new List<string>
         {
             "website",
-            "urn:website"
+            "urn:website",
+            "SIDS-manager"
         };
 
         public static List<string> RealmStandardScopes = new List<string>
@@ -795,8 +796,39 @@ namespace SimpleIdServer.IdServer
                 Name = Constants.DefaultRealm,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                Description = Constants.DefaultRealm
+                Description = Constants.DefaultRealm,
+                Roles = new List<RealmRole>
+                {
+                    new RealmRole
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "administrator",
+                        Permissions = new List<RealmRolePermission>
+                        {
+                            new RealmRolePermission { Id = Guid.NewGuid().ToString(), Component = StandardComponents.Clients, PossibleActions = ActionTypes.Manage }
+                        },
+                        UpdateDateTime = DateTime.UtcNow,                        
+                        CreateDateTime = DateTime.UtcNow,
+                    }
+                }
             };
+        }
+
+        public static class StandardComponents
+        {
+            public const string Realms = "realms";
+            public const string Clients = "clients";
+            public const string Scopes = "scopes";
+            public const string Users = "users";
+            public const string Groups = "groups";
+            public const string Acrs = "acrs";
+            public const string Authentication = "authentication";
+            public const string ExternalIdProviders = "externalidentityproviders";
+            public const string ManualIdProvisioning = "manualidprovisioning";
+            public const string AutomaticIdProvisioning = "automaticidprovisioning";
+            public const string CertificateAuthorities = "certificateauthorities";
+            public const string Auditing = "auditing";
+            public const string TurstAnchors = "trustanchors";
         }
 
         public static ICollection<string> AllUserClaims = new List<string>

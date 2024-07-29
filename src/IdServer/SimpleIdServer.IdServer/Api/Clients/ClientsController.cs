@@ -743,4 +743,35 @@ public class ClientsController : BaseController
             }
         }
     }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateRealms([FromRoute] string prefix, string id, [FromBody] UpdateClientRealmsRequest request, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        using (var activity = Tracing.IdServerActivitySource.StartActivity("Update client realms"))
+        {
+            try
+            {
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    activity?.SetTag("realm", prefix);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
+                    var result = await _clientRepository.GetByClientId(prefix, id, cancellationToken);
+                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                    var realms = await _realmRepository.GetAll(cancellationToken);
+                    result.Realms = realms.Where(r => r.Name == prefix || request.Realms.Contains(r.Name)).ToList();
+                    result.UpdateDateTime = DateTime.UtcNow;
+                    _clientRepository.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    return new NoContentResult();
+                }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
+                return BuildError(ex);
+            }
+        }
+    }
 }

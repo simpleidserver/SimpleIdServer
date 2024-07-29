@@ -1,4 +1,4 @@
-﻿@page "/realm"
+﻿@page "/realm/{action}"
 @using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
@@ -26,116 +26,44 @@
 
 @if(Options.Value.IsReamEnabled)
 {
-    <div>
+    <div class="mb-1">
         <RadzenButton Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.AddRealm" />
         <RadzenButton Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.ChooseRealm" />
     </div>    
 }
 
-<RadzenRow Gap="1rem" class="mt-2">
-    <!-- Servers -->
-    <RadzenColumn Size="6">
-        <RadzenCardLoader Variant="Variant.Filled" IsLoading=false>
-            <RadzenText TextStyle="TextStyle.DisplayH6">Servers</RadzenText>
-            <!-- OpenID Connect -->
-            <div class="row">
-                <div class="col-2">
-                    <RadzenLabel Text="@Global.OpenIdConnect" Style="padding: 0px;" />
-                </div>
-                <div class="col">
-                    <RadzenTextBox Value=@GetOpenIdConnectUrl() Class="w-100"></RadzenTextBox>
-                </div>
-            </div>
-            <!-- Id server swagger endpoint -->
-            <div class="row mt-2">
-                <div class="col-2">
-                    <RadzenLabel Text="@Global.IdServerSwagger" Style="padding: 0px;"></RadzenLabel>
-                </div>
-                <div class="col">
-                    <RadzenTextBox Value=@GetIdServerSwaggerUrl() Class="w-100"></RadzenTextBox>
-                </div>
-            </div>
-            <!-- WSFederation -->
-            <div class="row mt-2">
-                <div class="col-2">
-                    <RadzenLabel Text="@Global.WsFederation" Style="padding: 0px;"></RadzenLabel>
-                </div>
-                <div class="col">
-                    <RadzenTextBox Value=@GetFederationMetadataUrl() Class="w-100"></RadzenTextBox>
-                </div>
-            </div>
-            <!-- SAML -->
-            <div class="row mt-2">
-                <div class="col-2">
-                    <RadzenLabel Text="@Global.Saml" Style="padding: 0px;"></RadzenLabel>
-                </div>
-                <div class="col">
-                    <RadzenTextBox Value=@GetSamlMetadataUrl() Class="w-100"></RadzenTextBox>
-                </div>
-            </div>
-            <!-- SCIM Endpoint -->
-            <div class="row mt-2">
-                <div class="col-2">
-                    <RadzenLabel Text="@Global.ScimEdp" Style="padding: 0px;"></RadzenLabel>
-                </div>
-                <div class="col">
-                    <RadzenTextBox Value=@GetSCIMSchemasUrl() Class="w-100"></RadzenTextBox>
-                </div>
-            </div>
-        </RadzenCardLoader>
-    </RadzenColumn>
-    <!-- Number of clients -->
-    <RadzenColumn Size="3">
-        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
-            <RadzenText TextStyle="TextStyle.DisplayH6">@Global.Users</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbUsers</RadzenText>
-        </RadzenCardLoader>
-    </RadzenColumn>
-    <!-- Number of users -->
-    <RadzenColumn Size="3">
-        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
-            <RadzenText TextStyle="TextStyle.DisplayH6">@Global.Clients</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3">@statisticsState.Value.NbClients</RadzenText>
-        </RadzenCardLoader>
-    </RadzenColumn>
-    <!-- Authentication success today -->
-    <RadzenColumn Size="6">
-        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
-            <RadzenText TextStyle="TextStyle.DisplayH6">@Global.SuccessAuthentication</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3" class="green">@statisticsState.Value.NbValidAuthentications</RadzenText>
-        </RadzenCardLoader>
-    </RadzenColumn>
-    <!-- Authentication attempt today -->
-    <RadzenColumn Size="6">
-        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@statisticsState.Value.IsLoading>
-            <RadzenText TextStyle="TextStyle.DisplayH6">@Global.AttemptAuthentication</RadzenText>
-            <RadzenText TextStyle="TextStyle.DisplayH3" class="red">@statisticsState.Value.NbInvalidAuthentications</RadzenText>
-        </RadzenCardLoader>
-    </RadzenColumn>
-</RadzenRow>
+<RadzenCard>
+    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+        <Tabs>
+            <RadzenTabsItem Text="@Global.Details">
+                <RealmDetails></RealmDetails>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
 
 @code {
-    string activeRealm;
-    string GetOpenIdConnectUrl() => $"{GetBaseUrl()}/.well-known/openid-configuration";
-    string GetIdServerSwaggerUrl() => $"{GetBaseUrl()}/swagger";
-    string GetFederationMetadataUrl() => $"{GetBaseUrl()}/FederationMetadata/2007-06/FederationMetadata.xml";
-    string GetSamlMetadataUrl() => $"{GetBaseUrl()}/saml/metadata";
-    string GetSCIMSchemasUrl() => $"{Options.Value.SCIMUrl}/Schemas";
-    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{currentRealm.Identifier}" : Options.Value.IdServerBaseUrl;
+    private Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    {
+        { "overview", 0 }
+    };
+
+    int selectedIndex = 0;
+
+    [Parameter]
+    public string? action { get; set; } = null;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(action)) action = "overview";
+        selectedIndex = mappingActionNameToIndex[action];
+
+    }
 
     void AddRealm()
     {
-        navigationManager.NavigateTo(urlHelper.GetUrl("/realm/add"));
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        base.OnAfterRender(firstRender);
-        if (firstRender)
-        {
-            dispatcher.Dispatch(new GetStatisticsAction());
-            dispatcher.Dispatch(new GetStatisticsAction());
-        }
+        navigationManager.NavigateTo(urlHelper.GetUrl("/addrealm"));
     }
 
     async void ChooseRealm()
@@ -150,5 +78,11 @@
             Resizable = true,
             Draggable = true
         });
+    }
+
+    void OnChange(int index)
+    {
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/realm/{rec.Key}"));
     }
 }

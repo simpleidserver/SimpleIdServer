@@ -118,6 +118,8 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<RealmUser> Realms { get; set; } = new List<RealmUser>();
         [JsonIgnore]
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
+        [JsonIgnore]
+        public List<RealmRole> RealmRoles { get; set; }
 
 
         #region User claims
@@ -343,6 +345,22 @@ namespace SimpleIdServer.IdServer.Domains
                         Description = g.Group.Description,
                         Id = g.Group.Id
                     }
+                }).ToList(),
+                RealmRoles = RealmRoles.Select(r => new RealmRole
+                {
+                    CreateDateTime = r.CreateDateTime,
+                    Description = r.Description,
+                    Id = r.Id,
+                    Name = r.Name,
+                    RealmName = r.RealmName,
+                    UpdateDateTime = r.UpdateDateTime,
+                    Permissions = r.Permissions.Select(p => new RealmRolePermission
+                    {
+                        Id = p.Id,
+                        Component = p.Component,
+                        PossibleActions = p.PossibleActions,
+                        RoleName = p.RoleName
+                    }).ToList()
                 }).ToList()
             };
         }
