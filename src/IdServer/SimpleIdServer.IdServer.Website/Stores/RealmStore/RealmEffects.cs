@@ -137,6 +137,17 @@ public class RealmEffects
         var httpResult = await httpClient.SendAsync(requestMessage);
         var content = await httpResult.Content.ReadAsStringAsync();
         var realmRole = JsonSerializer.Deserialize<RealmRole>(content);
+        var scopes = new List<RealmRoleScope>();
+        var scopesArray = JsonObject.Parse(content)["scopes"].AsArray();
+        foreach(var scopeObj in scopesArray)
+        {
+            scopes.Add(new RealmRoleScope
+            {
+                Scope = JsonSerializer.Deserialize<Scope>(scopeObj["scope"].ToJsonString())
+            });
+        }
+
+        realmRole.Scopes = scopes;
         dispatcher.Dispatch(new GetRealmRoleSuccessAction { RealmRole = realmRole });
     }
 

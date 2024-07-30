@@ -99,6 +99,6 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/users/{id}/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/users/{id}/{rec.Key}"));
     }
 }

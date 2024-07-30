@@ -148,7 +148,7 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/groups/{id}/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/groups/{id}/{rec.Key}"));
     }
 
     string GetGroupName(RadzenTreeItem data)
@@ -158,7 +158,7 @@
 
     string GetGroupLink(RadzenTreeItem data)
     {
-        return urlHelper.GetUrl($"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children");
+        return urlHelper.GetUrl(urlHelper.GetUrl($"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children"));
     }
 
     bool HasChildren(object data)

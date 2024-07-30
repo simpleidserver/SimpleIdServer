@@ -105,6 +105,6 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value.Item1 == index && kvp.Value.Item2.Contains(scopeState.Value.Scope.Type));
-        navigationManager.NavigateTo($"/scopes/{id}/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/scopes/{id}/{rec.Key}"));
     }
 }

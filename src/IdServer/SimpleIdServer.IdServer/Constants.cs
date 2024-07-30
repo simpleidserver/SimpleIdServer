@@ -840,17 +840,7 @@ namespace SimpleIdServer.IdServer
                 Name = Constants.DefaultRealm,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                Description = Constants.DefaultRealm,
-                Roles = new List<RealmRole>
-                {
-                    new RealmRole
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = "administrator",
-                        UpdateDateTime = DateTime.UtcNow,                        
-                        CreateDateTime = DateTime.UtcNow,
-                    }
-                }
+                Description = Constants.DefaultRealm
             };
         }
 

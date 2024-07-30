@@ -329,9 +329,6 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.RealmRoles.Any())
                 dbContext.RealmRoles.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RealmRoles);
 
-            if (!dbContext.Users.Any())
-                dbContext.Users.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Users);
-
             if (!dbContext.Clients.Any())
                 dbContext.Clients.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients);
 
@@ -367,6 +364,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.Groups.Any())
                 dbContext.Groups.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Groups);
+
+            if (!dbContext.Users.Any())
+                dbContext.Users.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Users);
 
             if (!dbContext.SerializedFileKeys.Any())
             {
