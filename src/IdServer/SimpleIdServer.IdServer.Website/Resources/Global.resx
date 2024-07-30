@@ -1920,4 +1920,19 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="ClientsRealmsUpdated" xml:space="preserve">
     <value>The client realms have been updated</value>
   </data>
+  <data name="NotAuthorized" xml:space="preserve">
+    <value>You are not authorized</value>
+  </data>
+  <data name="SelectedRealmRolesRemoved" xml:space="preserve">
+    <value>the selected realm roles are removed</value>
+  </data>
+  <data name="Permissions" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="Component" xml:space="preserve">
+    <value>Component</value>
+  </data>
+  <data name="AddPermission" xml:space="preserve">
+    <value>Add permission</value>
+  </data>
 </root>

@@ -69,14 +69,6 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        public UserBuilder AddRealmRoles(IEnumerable<RealmRole> realmRoles)
-        {
-            if (_user.RealmRoles == null)
-                _user.RealmRoles = new List<RealmRole>();
-            _user.RealmRoles.AddRange(realmRoles);
-            return this;
-        }
-
         public UserBuilder SetEmailVerified(bool emailVerified)
         {
             _user.EmailVerified = emailVerified;

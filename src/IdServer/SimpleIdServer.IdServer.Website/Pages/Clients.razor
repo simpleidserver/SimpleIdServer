@@ -12,8 +12,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 
-<RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="@Global.AddClient" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-<AuthorizeView Roles=@(@"master\clients\manage")>
+<SidAuthorizeView Roles=@($"{curentRealm.Identifier}/clients/manage,{curentRealm.Identifier}/clients/view")>
     <Authorized>
         <div class="row">
             <div class="col">
@@ -73,9 +72,9 @@
         </RadzenDataGrid>
     </Authorized>
     <NotAuthorized>
-        <p>You're not authorized.</p>
+        <p>@Global.NotAuthorized</p>
     </NotAuthorized>
-</AuthorizeView>
+</SidAuthorizeView>
 
 @code {
     bool selectAll = false;

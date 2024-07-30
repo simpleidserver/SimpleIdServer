@@ -13,6 +13,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasKey(s => s.Id);
             builder.HasMany(s => s.ClaimMappers).WithOne(s => s.Scope).OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(s => s.Realms).WithMany(s => s.Scopes);
+            builder.HasMany(s => s.RealmRoles).WithOne(s => s.Scope).HasForeignKey(c => c.ScopeId);
         }
     }
 }

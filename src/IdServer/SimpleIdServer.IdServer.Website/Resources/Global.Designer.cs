@@ -295,6 +295,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add permission.
+        /// </summary>
+        public static string AddPermission {
+            get {
+                return ResourceManager.GetString("AddPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Add realm.
         /// </summary>
         public static string AddRealm {
@@ -1236,6 +1245,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ClientsTitle {
             get {
                 return ResourceManager.GetString("ClientsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Component.
+        /// </summary>
+        public static string Component {
+            get {
+                return ResourceManager.GetString("Component", resourceCulture);
             }
         }
         
@@ -3006,6 +3024,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à You are not authorized.
+        /// </summary>
+        public static string NotAuthorized {
+            get {
+                return ResourceManager.GetString("NotAuthorized", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Notification mode.
         /// </summary>
         public static string NotificationMode {
@@ -3155,6 +3182,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Pending {
             get {
                 return ResourceManager.GetString("Pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Permissions.
+        /// </summary>
+        public static string Permissions {
+            get {
+                return ResourceManager.GetString("Permissions", resourceCulture);
             }
         }
         
@@ -4075,6 +4111,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedIdProvidersRemoved {
             get {
                 return ResourceManager.GetString("SelectedIdProvidersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the selected realm roles are removed.
+        /// </summary>
+        public static string SelectedRealmRolesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedRealmRolesRemoved", resourceCulture);
             }
         }
         

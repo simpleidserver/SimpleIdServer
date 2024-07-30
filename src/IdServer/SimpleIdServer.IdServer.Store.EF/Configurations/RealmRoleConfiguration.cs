@@ -11,7 +11,6 @@ public class RealmRoleConfiguration : IEntityTypeConfiguration<RealmRole>
     public void Configure(EntityTypeBuilder<RealmRole> builder)
     {
         builder.HasKey(r => r.Id);
-        builder.HasMany(r => r.Permissions).WithOne(p => p.Role).HasForeignKey(p => p.RoleName);
-        builder.HasMany(r => r.Groups).WithOne(p => p.RealmRole).HasForeignKey(p => p.RealmRoleId);
+        builder.HasMany(r => r.Scopes).WithOne(p => p.Role).HasForeignKey(p => p.RealmRoleId);
     }
 }

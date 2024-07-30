@@ -38,6 +38,9 @@
             <RadzenTabsItem Text="@Global.Details">
                 <RealmDetails></RealmDetails>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="@Global.Roles">
+                <RealmRoles></RealmRoles>
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
 </RadzenCard>
@@ -45,7 +48,8 @@
 @code {
     private Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
     {
-        { "overview", 0 }
+        { "overview", 0 },
+        { "roles", 1 }
     };
 
     int selectedIndex = 0;

@@ -12,5 +12,5 @@ public static class RealmRoleNames
     public const string Realm = "realm";
     public const string CreateDateTime = "create_datetime";
     public const string UpdateDateTime = "update_datetime";
-    public const string Permissions = "permissions";
+    public const string Scopes = "scopes";
 }

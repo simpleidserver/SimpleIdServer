@@ -1,0 +1,160 @@
+﻿@page "/realm/{realmName}/roles/{roleId}"
+@using SimpleIdServer.IdServer.Website.Infrastructures
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IUrlHelper urlHelper
+@inject IDispatcher dispatcher
+@inject IState<RealmRoleState> realmRoleState
+@inject ContextMenuService contextMenuService
+@inject CurrentRealm currentRealm
+
+<div class="mb-1">
+    <RadzenBreadCrumb>
+        <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/realm/overview")" Text="@Global.Realm" />
+        <RadzenBreadCrumbItem Text="@Global.Permissions" />
+    </RadzenBreadCrumb>
+</div>
+
+<div class="mb-1">
+    <RadzenButton Click="@(args => AddRealmRolePermission())" Icon="add" Text="@Global.AddPermission" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    <RadzenButton Click="@(args => Save())" Icon="save" Text="@Global.Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+</div>
+
+<RadzenCard>
+    <RadzenDataGrid AllowFiltering="true"
+                    AllowColumnResize="true"
+                    AllowAlternatingRows="false"
+                    AllowSorting="true"
+                    PageSize="30"
+                    AllowPaging="true"
+                    PagerHorizontalAlign="HorizontalAlign.Left"
+                    ShowPagingSummary="true"
+                    IsLoading="@realmRoleState.Value.IsLoading"
+                    Count="@Permissions.Count"
+                    Data="@Permissions"
+                    RowRender="@RowRender"
+                    TItem="SelectableRealmRolePermission"
+                    ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="SelectableRealmRolePermission" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                </HeaderTemplate>
+                <Template Context="data">
+                    <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableRealmRolePermission" Property="Permission.Component" Filterable="false" Sortable="false" Title="@Global.Component" Width="80px" />
+            <RadzenDataGridColumn TItem="SelectableRealmRolePermission" Filterable="false" Sortable="false" Title="@Global.Permissions" Width="80px">
+                <Template Context="data">
+                    <RadzenBadge Text="@data.Permission.Action" IsPill="true" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableRealmRolePermission" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    [Parameter]
+    public string realmName { get; set; }
+    [Parameter]
+    public string roleId { get; set; }
+    bool selectAll;
+
+    List<SelectableRealmRolePermission> Permissions { get; set; } = new List<SelectableRealmRolePermission>();
+
+    record SelectableRealmRolePermission
+    {
+        public bool IsSelected { get; set; }
+        public RealmRolePermission Permission { get; set; }
+    }
+
+    record RealmRolePermission
+    {
+        public string Id { get; set; }
+        public string Component { get; set; }
+        public string Action { get; set; }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<GetRealmRoleSuccessAction>((act) =>
+            {
+                Permissions = act.RealmRole.Scopes.Select(p =>
+                {
+                    var splitted = p.Scope.Name.Split('/');
+                    var result = new SelectableRealmRolePermission
+                    {
+                        Permission = new RealmRolePermission
+                        {
+                            Id = p.ScopeId,
+                            Component = splitted[1],
+                            Action = splitted.Last(),
+                        }
+                    };
+                    return result;
+                }).ToList();
+                StateHasChanged();
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(roleId)) return;
+        dispatcher.Dispatch(new GetRealmRoleAction { Realm = currentRealm.Identifier, RoleId = roleId });
+    }
+
+    void ShowMoreContextMenu(SelectableRealmRolePermission client, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+        {
+            Permissions = Permissions.Where(p => !p.IsSelected).ToList();
+            selectAll = false;
+            StateHasChanged();
+        });
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        foreach (var permission in Permissions)
+            permission.IsSelected = isSelected;
+    }
+
+    void ToggleChanged(bool isSelected, SelectableRealmRolePermission permission)
+    {
+        permission.IsSelected = isSelected;
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableRealmRolePermission> row)
+    {
+        const string className = "class";
+        if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void AddRealmRolePermission()
+    {
+
+    }
+
+    void Save()
+    {
+        
+    }
+}

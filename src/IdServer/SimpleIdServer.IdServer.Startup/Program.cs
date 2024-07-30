@@ -319,11 +319,15 @@ void SeedData(WebApplication application, string scimBaseUrl)
         {
             var isInMemory = dbContext.Database.IsInMemory();
             if (!isInMemory) dbContext.Database.Migrate();
+
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
 
             if (!dbContext.Scopes.Any())
                 dbContext.Scopes.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Scopes);
+
+            if (!dbContext.RealmRoles.Any())
+                dbContext.RealmRoles.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RealmRoles);
 
             if (!dbContext.Users.Any())
                 dbContext.Users.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Users);
@@ -360,6 +364,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.RegistrationWorkflows.Any())
                 dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
+
+            if (!dbContext.Groups.Any())
+                dbContext.Groups.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Groups);
 
             if (!dbContext.SerializedFileKeys.Any())
             {

@@ -31,8 +31,6 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<GroupUser> Users { get; set; } = new List<GroupUser>();
         [JsonIgnore]
         public ICollection<GroupRealm> Realms { get; set; } = new List<GroupRealm>();
-        [JsonIgnore]
-        public List<GroupRealmRole> RealmRoles { get; set; }
 
         public List<string> ResolveAllPath()
         {

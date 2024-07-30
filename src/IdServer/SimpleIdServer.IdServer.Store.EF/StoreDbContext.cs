@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer.Store.EF
         public DbSet<UMAResource> UmaResources { get; set; }
         public DbSet<UMAPendingRequest> UmaPendingRequest { get; set; }
         public DbSet<Realm> Realms { get; set; }
+        public DbSet<RealmRole> RealmRoles { get; set; }
         public DbSet<SerializedFileKey> SerializedFileKeys { get; set; }
         public DbSet<AuditEvent> AuditEvents { get; set; }
         public DbSet<CertificateAuthority> CertificateAuthorities { get; set; }
@@ -115,8 +116,7 @@ namespace SimpleIdServer.IdServer.Store.EF
             builder.ApplyConfiguration(new MessageBusErrorMessageConfiguration());
             builder.ApplyConfiguration(new FederationEntityConfiguration());
             builder.ApplyConfiguration(new RealmRoleConfiguration());
-            builder.ApplyConfiguration(new RealmRolePermissionConfiguration());
-            builder.ApplyConfiguration(new GroupRealmRoleConfiguration());
+            builder.ApplyConfiguration(new RealmRoleScopeConfiguration());
         }
     }
 }

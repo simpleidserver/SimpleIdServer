@@ -548,6 +548,15 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addRealm",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "Add" });
+            webApplication.SidMapControllerRoute("searchRealmRoles",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/.search",
+                defaults: new { controller = "Realms", action = "SearchRoles" });
+            webApplication.SidMapControllerRoute("getRealmRole",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "GetRole" });
+            webApplication.SidMapControllerRoute("removeRealmRole",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "RemoveRole" });
 
             webApplication.SidMapControllerRoute("getAllLanguages",
                 pattern: Constants.EndPoints.Languages,

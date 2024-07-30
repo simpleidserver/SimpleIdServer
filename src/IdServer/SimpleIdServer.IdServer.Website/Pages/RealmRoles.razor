@@ -1,0 +1,115 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Website.Infrastructures
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<RealmRolesState> realmRolesState
+@inject IUrlHelper urlHelper
+@inject IDispatcher dispatcher
+@inject CurrentRealm currentRealm
+@inject NotificationService notificationService
+@inject ContextMenuService contextMenuService
+
+<RadzenDataGrid @ref="realmRolesGrid"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@realmRolesState.Value.IsLoading"
+                Count="@realmRolesState.Value.Count"
+                Data="@realmRolesState.Value.RealmRoles"
+                LoadData="@LoadData"
+                RowRender="@RowRender"
+                TItem="SelectableRealmRole"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableRealmRole" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableRealmRole" Filterable="false" Sortable="true" SortProperty="Value.Name" Title="@Global.Name" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/realm/{data.Value.RealmName}/roles/{data.Value.Id}"))" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableRealmRole" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableRealmRole" Property="Value.CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableRealmRole" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    bool selectAll;
+    RadzenDataGrid<SelectableRealmRole> realmRolesGrid;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<RemoveSelectedRealmRolesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedRealmRolesRemoved });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void ToggleChanged(bool isSelected, SelectableRealmRole realmRole)
+    {
+        var act = new ToggleRealmRoleAction { IsSelected = isSelected, RealmRoleId = realmRole.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllRealmRolesAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new SearchRealmRolesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, Realm = currentRealm.Identifier };
+        dispatcher.Dispatch(act);
+    }
+
+    void ShowMoreContextMenu(SelectableRealmRole client, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Delete", Value = 1 }
+        }, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                var realmRoleIds = realmRolesState.Value.RealmRoles?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                var act = new RemoveSelectedRealmRolesAction { RealmRoleIds = realmRoleIds };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableRealmRole> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+}

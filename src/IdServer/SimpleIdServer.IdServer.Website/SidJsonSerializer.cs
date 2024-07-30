@@ -23,6 +23,18 @@ public class SidJsonSerializer
         return searchResult;
     }
 
+    public static SearchResult<RealmRole> DeserializeSearchRealmRoles(string json)
+    {
+        var result = Deserialize<SearchResult<RealmRole>>(json);
+        foreach (var client in result.Content)
+        {
+            client.CreateDateTime = client.CreateDateTime.ToLocalTime();
+            client.UpdateDateTime = client.UpdateDateTime.ToLocalTime();
+        }
+
+        return result;
+    }
+
     public static SearchResult<Client> DeserializeSearchClients(string json)
     {
         var result = Deserialize<SearchResult<Client>>(json);

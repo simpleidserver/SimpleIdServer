@@ -103,12 +103,45 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.DeferredCreds,
             UniversityDegreeScope,
             CtWalletScope,
-            SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities
+            SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities,
+            SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole,
+            SimpleIdServer.IdServer.Constants.StandardScopes.MasterRealmClientsManageRole,
+            SimpleIdServer.IdServer.Constants.StandardScopes.MasterRealmClientsViewRole,
+        };
+
+        public static ICollection<RealmRole> RealmRoles = new List<RealmRole>
+        {
+            SimpleIdServer.IdServer.Constants.StandardRealmRoles.MasterAdministratorRole
+        };
+
+        public static ICollection<Group> Groups => new List<Group>
+        {
+            new Group
+            {
+                Id = Guid.NewGuid().ToString(),
+                CreateDateTime = DateTime.UtcNow,
+                FullPath = "administrator",
+                Realms = new List<SimpleIdServer.IdServer.Domains.GroupRealm>
+                {
+                    new SimpleIdServer.IdServer.Domains.GroupRealm
+                    {
+                        RealmsName = SimpleIdServer.IdServer.Constants.StandardRealms.Master.Name
+                    }
+                },
+                Name = "administrator",
+                Description = "Administration role",
+                Roles = new List<SimpleIdServer.IdServer.Domains.Scope>
+                {
+                    SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole,
+                    SimpleIdServer.IdServer.Constants.StandardScopes.MasterRealmClientsManageRole,
+                    SimpleIdServer.IdServer.Constants.StandardScopes.MasterRealmClientsViewRole
+                }
+            }
         };
 
         public static ICollection<User> Users => new List<User>
         {
-            UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddRealmRoles(SimpleIdServer.IdServer.Constants.StandardRealms.Master.Roles).GenerateRandomTOTPKey().Build(),
+            UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(Groups.First()).GenerateRandomTOTPKey().Build(),
             UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
         };
 
@@ -160,6 +193,7 @@ namespace SimpleIdServer.IdServer.Startup
                     SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Realms, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
+                    SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole,
                     SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, 

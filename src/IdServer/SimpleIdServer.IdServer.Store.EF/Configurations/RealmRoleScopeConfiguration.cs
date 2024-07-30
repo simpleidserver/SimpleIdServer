@@ -6,10 +6,10 @@ using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.EF.Configurations;
 
-public class GroupRealmRoleConfiguration : IEntityTypeConfiguration<GroupRealmRole>
+public class RealmRoleScopeConfiguration : IEntityTypeConfiguration<RealmRoleScope>
 {
-    public void Configure(EntityTypeBuilder<GroupRealmRole> builder)
+    public void Configure(EntityTypeBuilder<RealmRoleScope> builder)
     {
-        builder.HasKey(g => new { g.RealmRoleId, g.GroupId });
+        builder.HasKey(r => new { r.ScopeId, r.RealmRoleId });
     }
 }

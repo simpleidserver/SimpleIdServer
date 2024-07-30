@@ -1,0 +1,29 @@
+﻿@using System.Security.Claims
+@if(isAuthorized)
+{
+    @Authorized
+}
+else if(NotAuthorized != null)
+{
+    @NotAuthorized
+}
+
+@code {
+    [Parameter] public RenderFragment Authorized { get; set; }
+    [Parameter] public RenderFragment NotAuthorized { get; set; }
+    [Parameter] public string Roles { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
+    public bool isAuthorized { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender)
+        {
+            var authState = authenticationStateTask.Result;
+            var user = authState.User;
+            var roles = Roles.Split(',');
+            isAuthorized = user.Claims.Any(c => c.Type == ClaimTypes.Role && roles.Contains(c.Value));
+            StateHasChanged();
+        }
+    }
+}

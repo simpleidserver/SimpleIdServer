@@ -3,10 +3,10 @@
 
 namespace SimpleIdServer.IdServer.Domains;
 
-public class GroupRealmRole
+public class RealmRoleScope
 {
-    public string GroupId { get; set; } = null!;
     public string RealmRoleId { get; set; } = null!;
-    public Group Group { get; set; } = null!;
-    public RealmRole RealmRole { get; set; } = null!;
+    public string ScopeId { get; set; } = null!;
+    public RealmRole Role { get; set; } = null!;
+    public Scope Scope { get; set; } = null!;
 }

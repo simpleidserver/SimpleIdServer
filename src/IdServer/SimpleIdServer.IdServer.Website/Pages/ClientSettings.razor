@@ -1,4 +1,5 @@
 ﻿@using SimpleIdServer.IdServer.Api.Token.Handlers;
+@using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
@@ -9,6 +10,7 @@
 @using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IDispatcher dispatcher
+@inject CurrentRealm currentRealm
 @inject IState<UpdateClientState> updateClientState
 @inject IState<AcrsState> acrsState
 @inject TooltipService tooltipService
@@ -375,8 +377,12 @@
             }
         </Items>
     </RadzenAccordion>
-
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateClientState.Value.IsUpdating />
+    
+    <SidAuthorizeView Roles=@($"{currentRealm.Identifier}/clients/manage")>
+        <Authorized>
+            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateClientState.Value.IsUpdating />
+        </Authorized>
+    </SidAuthorizeView>    
 </RadzenTemplateForm>
 
 

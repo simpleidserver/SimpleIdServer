@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 using SqlSugar;
@@ -41,5 +42,20 @@ public class RealmRepository : IRealmRepository
             Description = realm.Description,
             RealmsName = realm.Name
         };
+    }
+
+    public Task<SearchResult<RealmRole>> SearchRoles(string realm, SearchRequest request, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<RealmRole> GetRole(string id, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void DeleteRole(RealmRole role)
+    {
+        throw new NotImplementedException();
     }
 }

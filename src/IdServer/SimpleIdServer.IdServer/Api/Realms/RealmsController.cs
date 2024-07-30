@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -15,7 +16,6 @@ using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace SimpleIdServer.IdServer.Api.Realms;
 
@@ -133,6 +133,61 @@ public class RealmsController : BaseController
                 activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
                 return BuildError(ex);
             }
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SearchRoles(string id, [FromBody] SearchRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
+            var result = await _realmRepository.SearchRoles(id, request, cancellationToken);
+            return new OkObjectResult(result);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetRole(string id, string roleId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
+            var result = await _realmRepository.GetRole(roleId, cancellationToken);
+            if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRealmRole, id));
+            return new OkObjectResult(result);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> RemoveRole(string id, string roleId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
+                var result = await _realmRepository.GetRole(roleId, cancellationToken);
+                if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRealmRole, id));
+                _realmRepository.DeleteRole(result);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
+            }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
         }
     }
 }

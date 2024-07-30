@@ -23,10 +23,6 @@ public class RealmRole
     public string RealmName { get; set; } = null!;
     [JsonIgnore]
     public Realm Realm { get; set; } = null!;
-    [JsonPropertyName(RealmRoleNames.Permissions)]
-    public List<RealmRolePermission> Permissions { get; set; }
-    [JsonIgnore]
-    public List<GroupRealmRole> Groups { get; set; }
-    [JsonIgnore]
-    public List<User> Users { get; set; }
+    [JsonPropertyName(RealmRoleNames.Scopes)]
+    public List<RealmRoleScope> Scopes { get; set; }
 }

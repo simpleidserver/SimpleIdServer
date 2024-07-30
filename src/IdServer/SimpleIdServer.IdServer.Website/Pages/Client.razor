@@ -1,4 +1,5 @@
 ﻿@page "/clients/{id}/{action}"
+@using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
@@ -6,49 +7,57 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
+@inject CurrentRealm currentRealm
 @inject IUrlHelper urlHelper
 @layout MainLayout
 @inject IState<ClientState> clientState
 @inject IDispatcher dispatcher
 
-<RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/clients")" Text="@Global.ClientsTitle" />
-    <RadzenBreadCrumbItem Text="@Global.ClientDetailsTitle" />
-</RadzenBreadCrumb>
+<SidAuthorizeView Roles=@($"{currentRealm.Identifier}/clients/manage,{currentRealm.Identifier}/clients/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/clients")" Text="@Global.ClientsTitle" />
+            <RadzenBreadCrumbItem Text="@Global.ClientDetailsTitle" />
+        </RadzenBreadCrumb>
 
-<RadzenText class="mt-3 mb-3 no-margin" Text="@clientState.Value.Client.ClientId" TextStyle="TextStyle.DisplayH3" />
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@clientState.Value.Client.ClientId" TextStyle="TextStyle.DisplayH3" />
 
-<div class="mb-1">
-    <RadzenBadge Text="@clientState.Value.Client.ClientType" IsPill="true" />
-</div>
+        <div class="mb-1">
+            <RadzenBadge Text="@clientState.Value.Client.ClientType" IsPill="true" />
+        </div>
 
-<RadzenCardLoader Variant="Variant.Filled" IsLoading=@clientState.Value.IsLoading>
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="@Global.Details">
-                <ClientSettings Client="@clientState.Value.Client"></ClientSettings>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.ClientScopes">
-                <ClientScopes Client="@clientState.Value.Client"></ClientScopes>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Keys">
-                <ClientKeys Client="@clientState.Value.Client"></ClientKeys>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Credentials">
-                <ClientCredentials Client="@clientState.Value.Client"></ClientCredentials>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Roles">
-                <ClientRoles Client="@clientState.Value.Client"></ClientRoles>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Advanced">
-                <ClientAdvanced Client="@clientState.Value.Client"></ClientAdvanced>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Realms">
-                <ClientRealms Client="@clientState.Value.Client"></ClientRealms>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
-</RadzenCardLoader>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@clientState.Value.IsLoading>
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.Details">
+                        <ClientSettings Client="@clientState.Value.Client"></ClientSettings>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.ClientScopes">
+                        <ClientScopes Client="@clientState.Value.Client"></ClientScopes>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Keys">
+                        <ClientKeys Client="@clientState.Value.Client"></ClientKeys>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Credentials">
+                        <ClientCredentials Client="@clientState.Value.Client"></ClientCredentials>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Roles">
+                        <ClientRoles Client="@clientState.Value.Client"></ClientRoles>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Advanced">
+                        <ClientAdvanced Client="@clientState.Value.Client"></ClientAdvanced>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Realms">
+                        <ClientRealms Client="@clientState.Value.Client"></ClientRealms>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        <p>@Global.NotAuthorized</p>
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>

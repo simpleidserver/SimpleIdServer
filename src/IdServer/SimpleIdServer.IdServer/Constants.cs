@@ -3,7 +3,9 @@
 
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -759,6 +761,48 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            public static Scope WebsiteAdministratorRole = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "SIDS-manager/administrator",
+                Type = ScopeTypes.ROLE,
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                Description = "Administrator",
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+            };
+            public static Scope MasterRealmClientsManageRole = new Scope
+            {
+                Id = "0aa10a0b-ad82-4a71-acd2-b4ba8503d253",
+                Name = "master/clients/manage",
+                Type = ScopeTypes.ROLE,
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                Description = "Manage master clients",
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+            };
+            public static Scope MasterRealmClientsViewRole = new Scope
+            {
+                Id = "f8b6cabe-d485-4412-89c3-c2861c32f6b3",
+                Name = "master/clients/view",
+                Type = ScopeTypes.ROLE,
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                Description = "View master clients",
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+            };
         }
 
         public static class StandardAcrs
@@ -803,14 +847,33 @@ namespace SimpleIdServer.IdServer
                     {
                         Id = Guid.NewGuid().ToString(),
                         Name = "administrator",
-                        Permissions = new List<RealmRolePermission>
-                        {
-                            new RealmRolePermission { Id = Guid.NewGuid().ToString(), Component = StandardComponents.Clients, PossibleActions = ActionTypes.Manage }
-                        },
                         UpdateDateTime = DateTime.UtcNow,                        
                         CreateDateTime = DateTime.UtcNow,
                     }
                 }
+            };
+        }
+
+        public static class StandardRealmRoles
+        {
+            public static Domains.RealmRole MasterAdministratorRole = new RealmRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "administrator",
+                RealmName = Constants.DefaultRealm,
+                Scopes = new List<RealmRoleScope>
+                {
+                    new RealmRoleScope
+                    {
+                        ScopeId = "0aa10a0b-ad82-4a71-acd2-b4ba8503d253"
+                    },
+                    new RealmRoleScope
+                    {
+                        ScopeId = "f8b6cabe-d485-4412-89c3-c2861c32f6b3"
+                    }
+                },
+                UpdateDateTime = DateTime.UtcNow,
+                CreateDateTime = DateTime.UtcNow,
             };
         }
 

@@ -40,17 +40,6 @@ namespace SimpleIdServer.IdServer.Extractors
                 var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
                 foreach (var role in roles)
                     newContext.User.AddClaim(Constants.UserClaims.Role, role);
-                var realmRoles = newContext.User.RealmRoles;
-                foreach(var realmRole in realmRoles)
-                {
-                    foreach (var permission in realmRole.Permissions)
-                    {
-                        if (permission.PossibleActions.HasFlag(ActionTypes.View))
-                            newContext.User.AddClaim(Constants.UserClaims.Role, $"{realmRole.RealmName}\\{permission.Component}\\view");
-                        if (permission.PossibleActions.HasFlag(ActionTypes.Manage))
-                            newContext.User.AddClaim(Constants.UserClaims.Role, $"{realmRole.RealmName}\\{permission.Component}\\manage");
-                    }
-                }
             }
 
             return Extract(newContext, mappingRules);

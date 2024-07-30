@@ -38,7 +38,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Array of strings that specifies the claims.
         /// </summary>
         [JsonPropertyName(ScopeNames.Mappers)]
-        public ICollection<ScopeClaimMapper> ClaimMappers { get; set; }= new List<ScopeClaimMapper>();
+        public ICollection<ScopeClaimMapper> ClaimMappers { get; set; } = new List<ScopeClaimMapper>();
         [JsonIgnore]
         public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
         [JsonIgnore]
@@ -49,6 +49,8 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         [JsonIgnore]
         public ICollection<Group> Groups { get; set; } = new List<Group>();
+        [JsonIgnore]
+        public ICollection<RealmRoleScope> RealmRoles { get; set; } = new List<RealmRoleScope>();
 
         public static Scope Create(string scopeName)
         {
