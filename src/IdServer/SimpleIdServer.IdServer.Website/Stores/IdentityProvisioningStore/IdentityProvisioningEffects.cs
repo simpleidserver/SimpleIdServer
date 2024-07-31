@@ -18,16 +18,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly CurrentRealm _currentRealm;
 
         public IdentityProvisioningEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options, 
-            CurrentRealm currentRealm)
+            IOptions<IdServerWebsiteOptions> options)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _currentRealm = currentRealm;
         }
 
         [EffectMethod]
@@ -305,7 +302,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var baseUrl = $"{_options.IdServerBaseUrl}/errormessages";
             if (_options.IsReamEnabled)
             {
-                var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 baseUrl = $"{_options.IdServerBaseUrl}/{realmStr}/errormessages";
             }
 
@@ -328,7 +326,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         {
             if(_options.IsReamEnabled)
             {
-                var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/provisioning";
             }
 

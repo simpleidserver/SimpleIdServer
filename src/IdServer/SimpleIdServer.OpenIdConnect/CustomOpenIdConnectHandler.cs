@@ -72,6 +72,16 @@ namespace SimpleIdServer.OpenIdConnect
         {
         }
 
+        public override Task<bool> ShouldHandleRequestAsync()
+        {
+            if(Options.IsRealmEnabled)
+            {
+                return Task.FromResult($"/{RealmContext.Instance().Realm}{Options.CallbackPath}" == Request.Path);
+            }
+
+            return Task.FromResult(Options.CallbackPath == Request.Path);
+        }
+
         public override Task<bool> HandleRequestAsync()
         {
             if (Options.RemoteSignOutPath.HasValue && Options.RemoteSignOutPath == Request.Path)
@@ -837,7 +847,7 @@ namespace SimpleIdServer.OpenIdConnect
                 ClientId = Options.ClientId,
                 EnableTelemetryParameters = !Options.DisableTelemetry,
                 IssuerAddress = configuration?.AuthorizationEndpoint ?? string.Empty,
-                RedirectUri = properties.GetParameter<string>(OpenIdConnectParameterNames.RedirectUri) ?? BuildRedirectUri(Options.CallbackPath),
+                RedirectUri = properties.GetParameter<string>(OpenIdConnectParameterNames.RedirectUri) ?? BuildRedirectUri(Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath),
                 Resource = Options.Resource,
                 ResponseType = Options.ResponseType,
                 Prompt = properties.GetParameter<string>(OpenIdConnectParameterNames.Prompt) ?? Options.Prompt,
@@ -888,6 +898,7 @@ namespace SimpleIdServer.OpenIdConnect
                 WriteNonceCookie(message.Nonce);
             }
 
+            Options.CorrelationCookie.Path = Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath;
             GenerateCorrelationId(properties);
 
             var redirectContext = new RedirectContext(Context, Scheme, Options, properties)
@@ -959,6 +970,7 @@ namespace SimpleIdServer.OpenIdConnect
                 throw new ArgumentNullException(nameof(nonce));
             }
 
+            Options.NonceCookie.Path = Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath;
             var cookieOptions = Options.NonceCookie.Build(Context, Clock.UtcNow);
 
             Response.Cookies.Append(

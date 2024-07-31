@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
@@ -12,16 +13,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
     {
         private readonly IWebsiteHttpClientFactory _httpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly CurrentRealm _currentRealm;
 
         public IdServerConfigurationEffects(
             IWebsiteHttpClientFactory httpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options, 
-            CurrentRealm currentRealm)
+            IOptions<IdServerWebsiteOptions> options)
         {
             _httpClientFactory = httpClientFactory;
             _options = options.Value;
-            _currentRealm = currentRealm;
         }
 
         [EffectMethod]
@@ -46,7 +44,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
         {
             if(_options.IsReamEnabled)
             {
-                var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier: SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}";
             }
 

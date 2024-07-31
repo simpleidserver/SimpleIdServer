@@ -7,13 +7,12 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
-@inject CurrentRealm currentRealm
 @inject IUrlHelper urlHelper
 @layout MainLayout
 @inject IState<ClientState> clientState
 @inject IDispatcher dispatcher
 
-<SidAuthorizeView Roles=@($"{currentRealm.Identifier}/clients/manage,{currentRealm.Identifier}/clients/view")>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/view")>
     <Authorized>
         <RadzenBreadCrumb>
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/clients")" Text="@Global.ClientsTitle" />

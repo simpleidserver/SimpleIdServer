@@ -3,7 +3,6 @@
 using Fluxor;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
-using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Website.Stores.LanguageStore;
 

@@ -30,14 +30,6 @@ namespace SimpleIdServer.IdServer.Website.Controllers
             }, "oidc");
         }
 
-        [Route("switch")]
-        public async Task<IActionResult> Switch(string realm)
-        {
-            var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Redirect($"{issuer}/{realm}/clients");
-        }
-
         [Route("oidccallback")]
         public IActionResult OidcSignoutCallback()
         {

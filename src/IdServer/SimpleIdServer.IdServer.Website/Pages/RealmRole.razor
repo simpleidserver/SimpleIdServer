@@ -1,4 +1,5 @@
 ﻿@page "/realm/{realmName}/roles/{roleId}"
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore
@@ -7,7 +8,6 @@
 @inject IDispatcher dispatcher
 @inject IState<RealmRoleState> realmRoleState
 @inject ContextMenuService contextMenuService
-@inject CurrentRealm currentRealm
 
 <div class="mb-1">
     <RadzenBreadCrumb>
@@ -112,7 +112,7 @@
     {
         base.OnParametersSet();
         if (string.IsNullOrWhiteSpace(roleId)) return;
-        dispatcher.Dispatch(new GetRealmRoleAction { Realm = currentRealm.Identifier, RoleId = roleId });
+        dispatcher.Dispatch(new GetRealmRoleAction { Realm = RealmContext.Instance().Realm, RoleId = roleId });
     }
 
     void ShowMoreContextMenu(SelectableRealmRolePermission client, MouseEventArgs args)

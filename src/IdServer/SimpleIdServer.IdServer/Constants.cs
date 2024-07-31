@@ -41,9 +41,7 @@ namespace SimpleIdServer.IdServer
             StandardScopes.OpenIdScope.Name,
             StandardScopes.Profile.Name,
             StandardScopes.SAMLProfile.Name,
-            StandardScopes.WebsiteAdministratorRole.Name,
-            StandardScopes.MasterRealmClientsManageRole.Name,
-            StandardScopes.MasterRealmClientsViewRole.Name
+            StandardScopes.WebsiteAdministratorRole.Name
         };
 
         public static class StandardAuthorizationDetails
@@ -782,34 +780,6 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
             };
-            public static Scope MasterRealmClientsManageRole = new Scope
-            {
-                Id = "0aa10a0b-ad82-4a71-acd2-b4ba8503d253",
-                Name = "master/clients/manage",
-                Type = ScopeTypes.ROLE,
-                Realms = new List<Domains.Realm>
-                {
-                    StandardRealms.Master
-                },
-                Protocol = ScopeProtocols.OAUTH,
-                Description = "Manage master clients",
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-            };
-            public static Scope MasterRealmClientsViewRole = new Scope
-            {
-                Id = "f8b6cabe-d485-4412-89c3-c2861c32f6b3",
-                Name = "master/clients/view",
-                Type = ScopeTypes.ROLE,
-                Realms = new List<Domains.Realm>
-                {
-                    StandardRealms.Master
-                },
-                Protocol = ScopeProtocols.OAUTH,
-                Description = "View master clients",
-                CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow,
-            };
         }
 
         public static class StandardGroups
@@ -830,9 +800,7 @@ namespace SimpleIdServer.IdServer
                 Description = "Administration role",
                 Roles = new List<SimpleIdServer.IdServer.Domains.Scope>
                 {
-                    StandardScopes.WebsiteAdministratorRole,
-                    StandardScopes.MasterRealmClientsManageRole,
-                    StandardScopes.MasterRealmClientsViewRole
+                    StandardScopes.WebsiteAdministratorRole
                 }
             };
         }
@@ -867,7 +835,7 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardRealms.Master
                 }
-            };            
+            };
         }
 
         public static class StandardRealms
@@ -883,25 +851,7 @@ namespace SimpleIdServer.IdServer
 
         public static class StandardRealmRoles
         {
-            public static Domains.RealmRole MasterAdministratorRole = new RealmRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "administrator",
-                RealmName = Constants.DefaultRealm,
-                Scopes = new List<RealmRoleScope>
-                {
-                    new RealmRoleScope
-                    {
-                        ScopeId = "0aa10a0b-ad82-4a71-acd2-b4ba8503d253"
-                    },
-                    new RealmRoleScope
-                    {
-                        ScopeId = "f8b6cabe-d485-4412-89c3-c2861c32f6b3"
-                    }
-                },
-                UpdateDateTime = DateTime.UtcNow,
-                CreateDateTime = DateTime.UtcNow,
-            };
+            public static Domains.RealmRole MasterAdministratorRole = RealmRoleBuilder.BuildAdministrativeRole(Constants.StandardRealms.Master);
         }
 
         public static class StandardComponents

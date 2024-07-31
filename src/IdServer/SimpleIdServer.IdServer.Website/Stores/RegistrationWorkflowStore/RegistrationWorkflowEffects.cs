@@ -4,6 +4,7 @@
 using Fluxor;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
@@ -15,16 +16,13 @@ public class RegistrationWorkflowEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
-    private readonly CurrentRealm _currentRealm;
 
     public RegistrationWorkflowEffects(
         IWebsiteHttpClientFactory websiteHttpClientFactory, 
-        IOptions<IdServerWebsiteOptions> options, 
-        CurrentRealm currentRealm)
+        IOptions<IdServerWebsiteOptions> options)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
-        _currentRealm = currentRealm;
     }
 
     [EffectMethod]
@@ -153,7 +151,8 @@ public class RegistrationWorkflowEffects
     {
         if(_options.IsReamEnabled)
         {
-            var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/registrationworkflows";
         }
 

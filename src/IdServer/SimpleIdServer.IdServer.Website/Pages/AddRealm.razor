@@ -47,7 +47,7 @@
             SubscribeToAction<AddRealmSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.RealmAdded });
-                navigationManager.NavigateTo(urlHelper.GetUrl("/clients"));
+                navigationManager.NavigateTo(urlHelper.GetUrl("/realm/overview"));
             });
         }
     }

@@ -1,4 +1,5 @@
 ﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore
@@ -6,7 +7,6 @@
 @inject IState<RealmRolesState> realmRolesState
 @inject IUrlHelper urlHelper
 @inject IDispatcher dispatcher
-@inject CurrentRealm currentRealm
 @inject NotificationService notificationService
 @inject ContextMenuService contextMenuService
 
@@ -81,7 +81,7 @@
 
     void LoadData(LoadDataArgs args)
     {
-        var act = new SearchRealmRolesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, Realm = currentRealm.Identifier };
+        var act = new SearchRealmRolesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, Realm = RealmContext.Instance().Realm };
         dispatcher.Dispatch(act);
     }
 

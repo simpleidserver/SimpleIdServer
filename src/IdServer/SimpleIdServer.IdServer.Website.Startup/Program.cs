@@ -33,7 +33,6 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.Services.AddSIDWebsite();
-app.UseSidWebsite(isRealmEnabled);
 app.UseStaticFiles();
 app.UseRequestLocalization(e =>
 {
@@ -41,6 +40,7 @@ app.UseRequestLocalization(e =>
     e.AddSupportedCultures("en");
     e.AddSupportedUICultures("en");
 });
+app.UseSidWebsite(isRealmEnabled);
 app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();

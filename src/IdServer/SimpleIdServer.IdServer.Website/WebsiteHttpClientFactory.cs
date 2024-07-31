@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.Website
 {
     public interface IWebsiteHttpClientFactory
     {
-        Task<HttpClient> Build();
+        Task<HttpClient> Build(string realm = null);
         HttpClient Get();
     }
 
@@ -37,9 +37,9 @@ namespace SimpleIdServer.IdServer.Website
             _jsonWebTokenHandler = new JsonWebTokenHandler();
         }
 
-        public async Task<HttpClient> Build()
+        public async Task<HttpClient> Build(string realm = null)
         {
-            var token = await GetAccessToken();
+            var token = await GetAccessToken(realm);
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
             var acceptLanguage = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             if (_httpClient.DefaultRequestHeaders.Contains("Language"))
@@ -53,7 +53,7 @@ namespace SimpleIdServer.IdServer.Website
 
         public HttpClient Get() => _httpClient;
 
-        private async Task<GetAccessTokenResult> GetAccessToken()
+        private async Task<GetAccessTokenResult> GetAccessToken(string realm = null)
         {
             await _lck.WaitAsync();
             if (_accessToken != null && _accessToken.IsValid)
@@ -65,13 +65,16 @@ namespace SimpleIdServer.IdServer.Website
             try
             {
                 var content = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
-                new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
-                new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities"),
-                new KeyValuePair<string, string>("grant_type", "client_credentials")
-            };
-                var url = !_idServerWebsiteOptions.IsReamEnabled ? $"{_securityOptions.Issuer}/token" : $"{_securityOptions.Issuer}/{IdServer.Constants.DefaultRealm}/token";
+                {
+                    new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
+                    new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
+                    new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities"),
+                    new KeyValuePair<string, string>("grant_type", "client_credentials")
+                };
+                var url = _securityOptions.Issuer;
+                if (!string.IsNullOrWhiteSpace(realm))
+                    url += $"/{realm}";
+                url += "/token";
                 var httpRequest = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,

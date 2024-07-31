@@ -363,7 +363,12 @@ void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
 
             if (!dbContext.Groups.Any())
-                dbContext.Groups.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Groups);
+            {
+                var administrativeGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup;
+                foreach (var s in SimpleIdServer.IdServer.Constants.StandardRealmRoles.MasterAdministratorRole.Scopes.Select(s => s.Scope))
+                    administrativeGroup.Roles.Add(s);
+                dbContext.Groups.Add(administrativeGroup);
+            }
 
             if (!dbContext.Users.Any())
                 dbContext.Users.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Users);

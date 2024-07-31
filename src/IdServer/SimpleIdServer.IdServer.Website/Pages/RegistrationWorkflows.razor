@@ -1,12 +1,12 @@
 ﻿@page "/registrationworkflows"
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
-@inject CurrentRealm currentRealm
 @inject NotificationService notificationService
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
@@ -178,7 +178,7 @@
 
     async Task<string> GetRealm()
     {
-        var realmStr = !string.IsNullOrWhiteSpace(currentRealm.Identifier) ? currentRealm.Identifier : SimpleIdServer.IdServer.Constants.DefaultRealm;
+        var realmStr = !string.IsNullOrWhiteSpace(RealmContext.Instance()?.Realm) ? RealmContext.Instance()?.Realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
         return realmStr;
     }
 }

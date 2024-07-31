@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
@@ -17,16 +18,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly CurrentRealm _currentRealm;
 
         public AcrEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options, 
-            CurrentRealm currentRealm)
+            IOptions<IdServerWebsiteOptions> options)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _currentRealm = currentRealm;
         }
 
 
@@ -119,7 +117,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         {
             if(_options.IsReamEnabled)
             {
-                var realm = _currentRealm.Identifier;
+                var realm = RealmContext.Instance()?.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/acrs";
             }

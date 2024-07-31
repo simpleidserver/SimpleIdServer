@@ -17,16 +17,13 @@ public class CertificateAuthorityEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
-    private readonly CurrentRealm _currentRealm;
 
     public CertificateAuthorityEffects(
         IWebsiteHttpClientFactory websiteHttpClientFactory, 
-        IOptions<IdServerWebsiteOptions> options,
-        CurrentRealm currentRealm)
+        IOptions<IdServerWebsiteOptions> options)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
-        _currentRealm = currentRealm;
     }
 
     [EffectMethod]
@@ -232,7 +229,8 @@ public class CertificateAuthorityEffects
     {
         if (_options.IsReamEnabled)
         {
-            var realmStr = !string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? _currentRealm.Identifier : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/cas";
         }
 

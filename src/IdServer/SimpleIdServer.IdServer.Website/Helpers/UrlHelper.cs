@@ -1,8 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using SimpleIdServer.IdServer.Website.Infrastructures;
-
 namespace SimpleIdServer.IdServer.Website.Helpers;
 
 public interface IUrlHelper
@@ -12,13 +10,9 @@ public interface IUrlHelper
 
 public class UrlHelper : IUrlHelper
 {
-    private readonly CurrentRealm _currentRealm;
-
-    public UrlHelper(CurrentRealm currentRealm)
-    {
-        _currentRealm = currentRealm;    
-    }
-
     public string GetUrl(string url)
-        => string.IsNullOrWhiteSpace(_currentRealm.Identifier) ? url : $"/{_currentRealm.Identifier}{url}";
+    {
+        var realmContext = IdServer.Helpers.RealmContext.Instance();
+        return string.IsNullOrWhiteSpace(realmContext.Realm) ? url : $"/{realmContext.Realm}{url}";
+    }
 }

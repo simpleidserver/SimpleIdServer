@@ -4,6 +4,7 @@
 @inject IDispatcher dispatcher
 @inject NavigationManager navigationManager
 @inject Radzen.DialogService dialogService
+@inject IUrlHelper urlHelper
 
 <RadzenTemplateForm Submit=@SubmitSelectRealm TItem="RealmForm" Data=@realmForm>
     <!-- Realm -->
@@ -35,6 +36,6 @@
 
     void SubmitSelectRealm(RealmForm realm)
     {
-        navigationManager.NavigateTo($"/switch?realm={realm.Name}");
+        navigationManager.NavigateTo($"/{realm.Name}/realm/overview", true);
     }
 }

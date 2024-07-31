@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Website.Infrastructures
+﻿@using SimpleIdServer.IdServer.Helpers
+@using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
 @using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 @using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
@@ -8,7 +9,6 @@
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
-@inject CurrentRealm currentRealm
 @inject IState<RealmsState> state
 @inject IState<LanguagesState> languagesState
 @inject ContextMenuService contextMenuService
@@ -119,7 +119,7 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            this.activeRealm = currentRealm.Identifier;
+            this.activeRealm = RealmContext.Instance()?.Realm;
             SubscribeToAction<GetAllConfigurationDefinitionsSuccessAction>((act) =>
             {
                 isLoading = false;

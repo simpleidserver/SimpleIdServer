@@ -1,11 +1,11 @@
-﻿@using SimpleIdServer.IdServer.Website.Infrastructures
+﻿@using SimpleIdServer.IdServer.Helpers
+@using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<RealmsState> realmsState
 @inject IDispatcher dispatcher
-@inject CurrentRealm currentRealm
 @inject NotificationService notificationService
 
 <p class="text-muted">
@@ -70,7 +70,7 @@
                         <RadzenCheckBox @bind-Value=@selectAllAssigned Change="@(args => ToggleAssignedAll(args))" TValue="bool" />
                     </HeaderTemplate>
                     <Template Context="data">
-                        @if(data.Name != currentRealm.Identifier)
+                        @if(data.Name != RealmContext.Instance()?.Realm)
                         {
                             <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleAvailableChanged(args, data))" TValue="bool" />
                         }
@@ -155,7 +155,7 @@
 
     void ToggleAssignedAll(bool isSelected)
     {
-        foreach (var assignedRealm in AssignedRealms.Where(r => r.Name != currentRealm.Identifier))
+        foreach (var assignedRealm in AssignedRealms.Where(r => r.Name != RealmContext.Instance()?.Realm))
             assignedRealm.IsSelected = isSelected;
     }
 

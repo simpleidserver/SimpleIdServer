@@ -1,5 +1,6 @@
 ﻿@page "/realm/{action}"
 @using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
@@ -11,7 +12,6 @@
 @inject DialogService dialogService
 @inject IUrlHelper urlHelper
 @inject NavigationManager navigationManager
-@inject CurrentRealm currentRealm
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 <style>
@@ -78,7 +78,7 @@
     {
         await dialogService.OpenAsync<SelectRealmDialog>(Global.SelectRealm, new Dictionary<string, object>
         {
-            { "activeRealm", currentRealm.Identifier }
+            { "activeRealm", RealmContext.Instance().Realm }
         }, new DialogOptions
         {
             Width = "700px",

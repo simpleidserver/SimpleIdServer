@@ -4,6 +4,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
@@ -11,12 +12,13 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Api.Realms;
 
@@ -85,12 +87,8 @@ public class RealmsController : BaseController
                     var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
                     if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
                     var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
-                    var administratorRole = Constants.StandardRealmRoles.MasterAdministratorRole;
-                    administratorRole.Id = Guid.NewGuid().ToString();
-                    realm.Roles = new List<RealmRole>
-                    {
-                        administratorRole
-                    };
+                    var administratorRole = RealmRoleBuilder.BuildAdministrativeRole(realm);
+                    realm.Roles = new[] { administratorRole };
                     var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
                     var groups = await _groupRepository.GetAllByStrictFullPath(Constants.DefaultRealm, Constants.RealmStandardGroupsFullPath, cancellationToken);
                     var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
@@ -107,6 +105,12 @@ public class RealmsController : BaseController
                     foreach(var group in groups)
                     {
                         group.Realms.Add(new GroupRealm { RealmsName = request.Name });
+                        if(group.FullPath == StandardGroups.AdministratorGroup.FullPath)
+                        {
+                            foreach(var scope in administratorRole.Scopes.Select(s => s.Scope))
+                                group.Roles.Add(scope);
+                        }
+
                         _groupRepository.Update(group);
                     }
 

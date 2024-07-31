@@ -103,19 +103,12 @@ namespace SimpleIdServer.IdServer.Startup
             UniversityDegreeScope,
             CtWalletScope,
             SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities,
-            SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole,
-            SimpleIdServer.IdServer.Constants.StandardScopes.MasterRealmClientsManageRole,
-            SimpleIdServer.IdServer.Constants.StandardScopes.MasterRealmClientsViewRole,
+            SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole
         };
 
         public static ICollection<RealmRole> RealmRoles = new List<RealmRole>
         {
             SimpleIdServer.IdServer.Constants.StandardRealmRoles.MasterAdministratorRole
-        };
-
-        public static ICollection<SimpleIdServer.IdServer.Domains.Group> Groups => new List<SimpleIdServer.IdServer.Domains.Group>
-        {
-            SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup
         };
 
         public static ICollection<User> Users => new List<User>

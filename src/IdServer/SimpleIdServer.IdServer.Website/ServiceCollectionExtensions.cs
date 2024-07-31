@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
 using SimpleIdServer.IdServer.Website.Helpers;
@@ -42,7 +43,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddScoped<NotificationService>();
             services.AddScoped<ContextMenuService>();
             services.AddScoped<TooltipService>();
-            services.AddSingleton<CurrentRealm>();
             services.AddSingleton<IWebsiteHttpClientFactory, WebsiteHttpClientFactory>();
             if (callbackOptions == null) services.Configure<IdServerWebsiteOptions>((o) => { });
             else services.Configure(callbackOptions);
@@ -123,12 +123,12 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 services.AddPerRequestCookieOptions((options, httpContext) =>
                 {
-                    var tenant = httpContext.RequestServices.GetRequiredService<CurrentRealm>().Identifier;
+                    var realm = RealmContext.Instance().Realm;
                     options.DataProtectionProvider = httpContext
                         .RequestServices.GetRequiredService<IDataProtectionProvider>()
-                        .CreateProtector($"App.Tenants.{tenant}");
+                        .CreateProtector($"App.Tenants.{realm}");
 
-                    options.Cookie.Name = $"{tenant}-Cookie";
+                    options.Cookie.Name = $"{realm}-Cookie";
                 });
             }
 

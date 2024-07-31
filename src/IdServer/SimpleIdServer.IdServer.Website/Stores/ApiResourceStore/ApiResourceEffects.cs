@@ -18,16 +18,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly CurrentRealm _currentRealm;
 
         public ApiResourceEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options, 
-            CurrentRealm currentRealm)
+            IOptions<IdServerWebsiteOptions> options)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _currentRealm = currentRealm;
         }
 
         [EffectMethod]
@@ -155,7 +152,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         {
             if (_options.IsReamEnabled)
             {
-                var realm = _currentRealm.Identifier;
+                var realm = RealmContext.Instance()?.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/{subUrl}";
             }

@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Net;
 
 namespace SimpleIdServer.IdServer.Website.Middlewares;
@@ -24,8 +23,17 @@ public class RealmMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        var routeValues = context.Request.RouteValues;
         var path = context.Request.Path.Value;
+        if(path.EndsWith(".js") 
+            || path.EndsWith(".css") 
+            || path.EndsWith(".svg")
+            || path.EndsWith(".woff")
+            || path.StartsWith("/_blazor"))
+        {
+            await _next.Invoke(context);
+            return;
+        }
+
         if(string.IsNullOrWhiteSpace(path))
         {
             ReturnNotFound(context);
@@ -59,7 +67,7 @@ public class RealmMiddleware
     private async Task<IEnumerable<Realm>> GetRealms()
     {
         var url = $"{_options.IdServerBaseUrl}/realms";
-        var httpClient = await _websiteHttpClientFactory.Build();
+        var httpClient = await _websiteHttpClientFactory.Build(Constants.DefaultRealm);
         var requestMessage = new HttpRequestMessage
         {
             RequestUri = new Uri(url),
