@@ -9,6 +9,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Resources.Designer.cs">

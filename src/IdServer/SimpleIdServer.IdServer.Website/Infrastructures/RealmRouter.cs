@@ -66,7 +66,6 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         {
             var realms = await GetRealms(options);
             var realm = string.IsNullOrWhiteSpace(locationPath) ? Constants.DefaultRealm : locationPath.Split("/").First();
-            _serviceProvider.GetRequiredService<CurrentRealm>().Identifier = realm;
             var pathWithoutRealm = locationPath.Replace(realm, string.Empty);
             if (!IsMatch(pathWithoutRealm, _routeableComponents, out routeParameters, out handlerContext))
             {

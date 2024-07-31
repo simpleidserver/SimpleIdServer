@@ -73,7 +73,6 @@ namespace SimpleIdServer.IdServer.Startup
             UpdateDateTime = DateTime.UtcNow
         };
 
-
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -114,34 +113,14 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardRealmRoles.MasterAdministratorRole
         };
 
-        public static ICollection<Group> Groups => new List<Group>
+        public static ICollection<SimpleIdServer.IdServer.Domains.Group> Groups => new List<SimpleIdServer.IdServer.Domains.Group>
         {
-            new Group
-            {
-                Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
-                CreateDateTime = DateTime.UtcNow,
-                FullPath = "administrator",
-                Realms = new List<SimpleIdServer.IdServer.Domains.GroupRealm>
-                {
-                    new SimpleIdServer.IdServer.Domains.GroupRealm
-                    {
-                        RealmsName = SimpleIdServer.IdServer.Constants.StandardRealms.Master.Name
-                    }
-                },
-                Name = "administrator",
-                Description = "Administration role",
-                Roles = new List<SimpleIdServer.IdServer.Domains.Scope>
-                {
-                    SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole,
-                    SimpleIdServer.IdServer.Constants.StandardScopes.MasterRealmClientsManageRole,
-                    SimpleIdServer.IdServer.Constants.StandardScopes.MasterRealmClientsViewRole
-                }
-            }
+            SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup
         };
 
         public static ICollection<User> Users => new List<User>
         {
-            UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(Groups.First()).GenerateRandomTOTPKey().Build(),
+            SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser,
             UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
         };
 

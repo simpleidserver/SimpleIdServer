@@ -3,9 +3,8 @@
 
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.IdServer.Api.Realms;
+using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -22,7 +21,12 @@ namespace SimpleIdServer.IdServer
 
         public static List<string> RealmStandardUsers = new List<string>
         {
-            "administrator"
+            StandardUsers.AdministratorUser.Name
+        };
+
+        public static List<string> RealmStandardGroupsFullPath = new List<string>
+        {
+            StandardGroups.AdministratorGroup.FullPath
         };
 
         public static List<string> RealmStandardClients = new List<string>
@@ -36,7 +40,10 @@ namespace SimpleIdServer.IdServer
         {
             StandardScopes.OpenIdScope.Name,
             StandardScopes.Profile.Name,
-            StandardScopes.SAMLProfile.Name
+            StandardScopes.SAMLProfile.Name,
+            StandardScopes.WebsiteAdministratorRole.Name,
+            StandardScopes.MasterRealmClientsManageRole.Name,
+            StandardScopes.MasterRealmClientsViewRole.Name
         };
 
         public static class StandardAuthorizationDetails
@@ -803,6 +810,36 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
             };
+        }
+
+        public static class StandardGroups
+        {
+            public static Domains.Group AdministratorGroup = new Domains.Group
+            {
+                Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
+                CreateDateTime = DateTime.UtcNow,
+                FullPath = "administrator",
+                Realms = new List<GroupRealm>
+                {
+                    new GroupRealm
+                    {
+                        RealmsName = StandardRealms.Master.Name
+                    }
+                },
+                Name = "administrator",
+                Description = "Administration role",
+                Roles = new List<SimpleIdServer.IdServer.Domains.Scope>
+                {
+                    StandardScopes.WebsiteAdministratorRole,
+                    StandardScopes.MasterRealmClientsManageRole,
+                    StandardScopes.MasterRealmClientsViewRole
+                }
+            };
+        }
+
+        public static class StandardUsers
+        {
+            public static User AdministratorUser = UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorGroup).GenerateRandomTOTPKey().Build();
         }
 
         public static class StandardAcrs

@@ -4,8 +4,10 @@ using Fluxor;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SimpleIdServer.IdServer.UI;
@@ -21,6 +23,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddSIDWebsite(this IServiceCollection services, Action<IdServerWebsiteOptions>? callbackOptions = null)
         {
+            var opts = new IdServerWebsiteOptions();
+            if (callbackOptions != null) callbackOptions(opts);
             services.AddFluxor(o =>
             {
                 o.ScanAssemblies(typeof(ServiceCollectionExtensions).Assembly);
@@ -29,6 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     rdt.Name = "SimpleIdServer";
                 });
             });
+            services.AddHttpContextAccessor();
             services.AddTransient<SidCookieEventHandler>();
             services.AddTransient<IUrlHelper, UrlHelper>();
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
@@ -44,7 +49,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddDefaultSecurity(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddDefaultSecurity(this IServiceCollection services, IConfiguration configuration, bool isRealmEnabled)
         {
             string authoritySectionName = nameof(IdServerWebsiteOptions.IdServerBaseUrl);
             string defaultSecurityOptionsSectionName = nameof(DefaultSecurityOptions);
@@ -89,6 +94,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     config.BackchannelHttpHandler = handler;
                 }
 
+                config.IsRealmEnabled = isRealmEnabled;
                 config.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
                 config.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
                 config.Authority = defaultSecurityOptions.Issuer;
@@ -113,6 +119,18 @@ namespace Microsoft.Extensions.DependencyInjection
                     foreach (string scope in scopes) config.Scope.Add(scope);
                 }
             });
+            if (isRealmEnabled)
+            {
+                services.AddPerRequestCookieOptions((options, httpContext) =>
+                {
+                    var tenant = httpContext.RequestServices.GetRequiredService<CurrentRealm>().Identifier;
+                    options.DataProtectionProvider = httpContext
+                        .RequestServices.GetRequiredService<IDataProtectionProvider>()
+                        .CreateProtector($"App.Tenants.{tenant}");
+
+                    options.Cookie.Name = $"{tenant}-Cookie";
+                });
+            }
 
             services.AddAuthorization(config =>
             {
@@ -130,6 +148,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton(defaultSecurityOptions);
             return services;
+        }
+
+        private static void AddPerRequestCookieOptions(this IServiceCollection services, Action<CookieAuthenticationOptions, HttpContext> configAction)
+        {
+            services.AddSingleton<IOptionsMonitor<CookieAuthenticationOptions>, CookieOptionsMonitor>();
+            services.AddSingleton<IConfigureOptions<CookieAuthenticationOptions>>(provider =>
+            {
+                var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
+                return new CookieConfigureNamedOptions(httpContextAccessor, configAction);
+            });
         }
     }
 }

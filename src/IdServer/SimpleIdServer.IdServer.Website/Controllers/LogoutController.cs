@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -27,6 +28,14 @@ namespace SimpleIdServer.IdServer.Website.Controllers
             {
                 RedirectUri = redirectUri
             }, "oidc");
+        }
+
+        [Route("switch")]
+        public async Task<IActionResult> Switch(string realm)
+        {
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return Redirect($"{issuer}/{realm}/clients");
         }
 
         [Route("oidccallback")]

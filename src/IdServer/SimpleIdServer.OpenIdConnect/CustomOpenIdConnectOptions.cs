@@ -21,6 +21,7 @@ namespace SimpleIdServer.OpenIdConnect
         public bool IsDPoPUsed { get; private set; } = false;
         public bool IsDPoPNonceEnabled { get; private set; } = false;
         public double DPoPSecurityKeyRotationInSeconds { get; private set; } = 5 * 60;
+        public bool IsRealmEnabled { get; set; } = false;
 
         /// <summary>
         /// Use MTLS as Proof of Possession.

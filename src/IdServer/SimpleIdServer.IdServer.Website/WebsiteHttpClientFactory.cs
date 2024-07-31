@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using System.Globalization;
 using System.Text.Json.Nodes;
@@ -15,14 +16,16 @@ namespace SimpleIdServer.IdServer.Website
     public class WebsiteHttpClientFactory : IWebsiteHttpClientFactory
     {
         private readonly DefaultSecurityOptions _securityOptions;
+        private readonly IdServerWebsiteOptions _idServerWebsiteOptions;
         private static SemaphoreSlim _lck = new SemaphoreSlim(1);
         private readonly HttpClient _httpClient;
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
         private GetAccessTokenResult _accessToken;
 
-        public WebsiteHttpClientFactory(DefaultSecurityOptions securityOptions)
+        public WebsiteHttpClientFactory(DefaultSecurityOptions securityOptions, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
         {
             _securityOptions = securityOptions;
+            _idServerWebsiteOptions = idServerWebsiteOptions.Value;
             var handler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
@@ -39,13 +42,13 @@ namespace SimpleIdServer.IdServer.Website
             var token = await GetAccessToken();
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
             var acceptLanguage = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-            if(_httpClient.DefaultRequestHeaders.Contains("Language"))
+            if (_httpClient.DefaultRequestHeaders.Contains("Language"))
             {
                 _httpClient.DefaultRequestHeaders.Remove("Language");
             }
 
             _httpClient.DefaultRequestHeaders.Add("Language", acceptLanguage);
-            return _httpClient;   
+            return _httpClient;
         }
 
         public HttpClient Get() => _httpClient;
@@ -68,10 +71,11 @@ namespace SimpleIdServer.IdServer.Website
                 new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities"),
                 new KeyValuePair<string, string>("grant_type", "client_credentials")
             };
+                var url = !_idServerWebsiteOptions.IsReamEnabled ? $"{_securityOptions.Issuer}/token" : $"{_securityOptions.Issuer}/{IdServer.Constants.DefaultRealm}/token";
                 var httpRequest = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
-                    RequestUri = new Uri($"{_securityOptions.Issuer}/token"),
+                    RequestUri = new Uri(url),
                     Content = new FormUrlEncodedContent(content)
                 };
                 _httpClient.DefaultRequestHeaders.Clear();

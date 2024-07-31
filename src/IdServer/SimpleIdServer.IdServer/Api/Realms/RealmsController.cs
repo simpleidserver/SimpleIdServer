@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
@@ -26,6 +27,7 @@ public class RealmsController : BaseController
     private readonly IClientRepository _clientRepository;
     private readonly IScopeRepository _scopeRepository;
     private readonly IFileSerializedKeyStore _fileSerializedKeyStore;
+    private readonly IGroupRepository _groupRepository;
     private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly ILogger<RealmsController> _logger;
@@ -36,6 +38,7 @@ public class RealmsController : BaseController
         IClientRepository clientRepository,
         IScopeRepository scopeRepository,
         IFileSerializedKeyStore fileSerializedKeyStore,
+        IGroupRepository groupRepository,
         IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
         ITransactionBuilder transactionBuilder,
         ITokenRepository tokenRepository,
@@ -47,6 +50,7 @@ public class RealmsController : BaseController
         _clientRepository = clientRepository;
         _scopeRepository = scopeRepository;
         _fileSerializedKeyStore = fileSerializedKeyStore;
+        _groupRepository = groupRepository;
         _transactionBuilder = transactionBuilder;
         _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
         _logger = logger;
@@ -81,7 +85,14 @@ public class RealmsController : BaseController
                     var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
                     if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
                     var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
+                    var administratorRole = Constants.StandardRealmRoles.MasterAdministratorRole;
+                    administratorRole.Id = Guid.NewGuid().ToString();
+                    realm.Roles = new List<RealmRole>
+                    {
+                        administratorRole
+                    };
                     var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
+                    var groups = await _groupRepository.GetAllByStrictFullPath(Constants.DefaultRealm, Constants.RealmStandardGroupsFullPath, cancellationToken);
                     var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
                     var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
                     var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
@@ -91,6 +102,12 @@ public class RealmsController : BaseController
                     {
                         user.Realms.Add(new RealmUser { RealmsName = request.Name });
                         _userRepository.Update(user);
+                    }
+
+                    foreach(var group in groups)
+                    {
+                        group.Realms.Add(new GroupRealm { RealmsName = request.Name });
+                        _groupRepository.Update(group);
                     }
 
                     foreach (var client in clients)

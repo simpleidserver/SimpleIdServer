@@ -6,18 +6,19 @@ builder.Configuration.AddJsonFile("appsettings.json")
     .AddEnvironmentVariables();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+var isRealmEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
 builder.Services.AddSIDWebsite(o =>
 {
     o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
     o.SCIMUrl = builder.Configuration["ScimBaseUrl"];
-    o.IsReamEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
+    o.IsReamEnabled = isRealmEnabled;
 });
 bool forceHttps = false;
 var forceHttpsStr = builder.Configuration["forceHttps"];
 if (!string.IsNullOrWhiteSpace(forceHttpsStr) && bool.TryParse(forceHttpsStr, out bool r))
     forceHttps = r;
 
-builder.Services.AddDefaultSecurity(builder.Configuration);
+builder.Services.AddDefaultSecurity(builder.Configuration, isRealmEnabled);
 builder.Services.AddLocalization();
 
 var app = builder.Build();
@@ -32,6 +33,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.Services.AddSIDWebsite();
+app.UseSidWebsite(isRealmEnabled);
 app.UseStaticFiles();
 app.UseRequestLocalization(e =>
 {
