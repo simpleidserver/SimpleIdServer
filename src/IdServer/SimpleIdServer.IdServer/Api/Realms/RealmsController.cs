@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-
+using MassTransit.Initializers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Builders;
@@ -201,6 +201,33 @@ public class RealmsController : BaseController
                 var result = await _realmRepository.GetRole(roleId, cancellationToken);
                 if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRealmRole, id));
                 _realmRepository.DeleteRole(result);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
+            }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateRoleScopes(string id, string roleId, [FromBody] UpdateRealmRolesRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
+                var result = await _realmRepository.GetRole(roleId, cancellationToken);
+                if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRealmRole, id));
+                var scopes = await _scopeRepository.Get(request.ScopeIds, cancellationToken);
+                result.Scopes = scopes.Select(r => new RealmRoleScope
+                {
+                    ScopeId = r.Id
+                }).ToList();
+                _realmRepository.Update(result);
                 await transaction.Commit(cancellationToken);
                 return new NoContentResult();
             }

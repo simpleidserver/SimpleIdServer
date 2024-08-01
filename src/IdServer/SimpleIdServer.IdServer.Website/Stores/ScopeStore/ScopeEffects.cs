@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Scopes;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -277,6 +276,22 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(GetAllRealmScopesAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetScopesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{baseUrl}/realmscopes")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var content = await httpResult.Content.ReadAsStringAsync();
+            var scopes = JsonSerializer.Deserialize<List<Scope>>(content);
+            dispatcher.Dispatch(new GetAllRealmScopesSuccessAction { Scopes = scopes });
+        }
+
         private async Task<string> GetScopesUrl()
         {
             if (_options.IsReamEnabled)
@@ -452,4 +467,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
     public class StartAddScopeAction { }
 
     public class StartUpdateScopeMapperAction { }
+
+    public class GetAllRealmScopesAction
+    {
+
+    }
+
+    public class GetAllRealmScopesSuccessAction
+    {
+        public List<Domains.Scope> Scopes { get; set; }
+    }
 }

@@ -411,6 +411,9 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Auditing + "/.search",
                 defaults: new { controller = "Auditing", action = "Search" });
 
+            webApplication.SidMapControllerRoute("getAllRealmScopes",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/realmscopes",
+                defaults: new { controller = "Scopes", action = "GetAllRealmScopes" });
             webApplication.SidMapControllerRoute("searchScopes",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/.search",
                 defaults: new { controller = "Scopes", action = "Search" });
@@ -557,6 +560,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("removeRealmRole",
                 pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
                 defaults: new { controller = "Realms", action = "RemoveRole" });
+            webApplication.SidMapControllerRoute("updateRealmRoles",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "UpdateRoleScopes" });
 
             webApplication.SidMapControllerRoute("getAllLanguages",
                 pattern: Constants.EndPoints.Languages,

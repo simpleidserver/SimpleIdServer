@@ -88,6 +88,23 @@ public class ScopesController : BaseController
         }
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAllRealmScopes([FromRoute] string prefix, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        try
+        {
+            await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+            var scopes = await _scopeRepository.GetAllRealmScopes(prefix, cancellationToken);
+            return new OkObjectResult(scopes);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
+
     #endregion
 
     #region CRUD

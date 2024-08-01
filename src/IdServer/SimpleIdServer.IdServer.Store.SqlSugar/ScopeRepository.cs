@@ -17,6 +17,11 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             _dbContext = dbContext;
         }
 
+        public Task<List<Scope>> Get(List<string> ids, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Add(Scope scope)
         {
             _dbContext.Client.InsertNav(SugarScope.Transform(scope))
@@ -119,6 +124,11 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 Count = nb,
                 Content = scopes.Select(s => s.ToDomain()).ToList()
             };
+        }
+
+        public Task<List<Scope>> GetAllRealmScopes(string realm, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
     }
 }

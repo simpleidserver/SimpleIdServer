@@ -2446,6 +2446,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the realm {0} doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownRealm {
+            get {
+                return ResourceManager.GetString("UnknownRealm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the realm role {0} doesn&apos;t exist.
         /// </summary>
         public static string UnknownRealmRole {

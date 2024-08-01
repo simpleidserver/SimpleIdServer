@@ -15,5 +15,6 @@ public interface IRealmRepository
     Task<RealmRole> GetRole(string id, CancellationToken cancellationToken);
     Task<SearchResult<RealmRole>> SearchRoles(string realm, SearchRequest request, CancellationToken cancellationToken);
     void Add(Realm realm);
+    void Update(RealmRole realm);
     void DeleteRole(RealmRole role);
 }

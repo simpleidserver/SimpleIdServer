@@ -1935,4 +1935,13 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="AddPermission" xml:space="preserve">
     <value>Add permission</value>
   </data>
+  <data name="RealmRoleScopesUpdated" xml:space="preserve">
+    <value>Roles have been updated</value>
+  </data>
+  <data name="RealmPermissions" xml:space="preserve">
+    <value>Realm permissions</value>
+  </data>
+  <data name="RealmPermissionsDescription" xml:space="preserve">
+    <value>Select one or more permissions assigned to the realm. You must reconnect to the administration website for the changes to take effect.</value>
+  </data>
 </root>

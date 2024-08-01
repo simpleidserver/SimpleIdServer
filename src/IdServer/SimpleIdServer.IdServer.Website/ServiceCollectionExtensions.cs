@@ -4,13 +4,11 @@ using Fluxor;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
-using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
 using SimpleIdServer.IdServer.Website.Helpers;
@@ -35,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 });
             });
             services.AddHttpContextAccessor();
-            services.AddTransient<SidCookieEventHandler>();
+            services.AddTransient<IUserSessionResitory, UserSessionRepository>();
             services.AddTransient<IUrlHelper, UrlHelper>();
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<IGroupService, GroupEffects>();
@@ -73,12 +71,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = "oidc";
             })
-            .AddCookie(options =>
+            .AddIdServerCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, options =>
             {
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.HttpOnly = true;
-                options.EventsType = typeof(SidCookieEventHandler);
             })
             .AddCustomOpenIdConnect("oidc", config =>
             {
@@ -119,18 +116,6 @@ namespace Microsoft.Extensions.DependencyInjection
                     foreach (string scope in scopes) config.Scope.Add(scope);
                 }
             });
-            if (isRealmEnabled)
-            {
-                services.AddPerRequestCookieOptions((options, httpContext) =>
-                {
-                    var realm = RealmContext.Instance().Realm;
-                    options.DataProtectionProvider = httpContext
-                        .RequestServices.GetRequiredService<IDataProtectionProvider>()
-                        .CreateProtector($"App.Tenants.{realm}");
-
-                    options.Cookie.Name = $"{realm}-Cookie";
-                });
-            }
 
             services.AddAuthorization(config =>
             {
@@ -148,16 +133,6 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton(defaultSecurityOptions);
             return services;
-        }
-
-        private static void AddPerRequestCookieOptions(this IServiceCollection services, Action<CookieAuthenticationOptions, HttpContext> configAction)
-        {
-            services.AddSingleton<IOptionsMonitor<CookieAuthenticationOptions>, CookieOptionsMonitor>();
-            services.AddSingleton<IConfigureOptions<CookieAuthenticationOptions>>(provider =>
-            {
-                var httpContextAccessor = provider.GetRequiredService<IHttpContextAccessor>();
-                return new CookieConfigureNamedOptions(httpContextAccessor, configAction);
-            });
         }
     }
 }

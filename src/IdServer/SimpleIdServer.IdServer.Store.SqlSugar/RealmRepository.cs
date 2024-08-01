@@ -58,4 +58,8 @@ public class RealmRepository : IRealmRepository
     {
         throw new NotImplementedException();
     }
+    public void Update(RealmRole realm)
+    {
+        throw new NotImplementedException();
+    }
 }

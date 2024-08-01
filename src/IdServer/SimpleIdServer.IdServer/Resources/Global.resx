@@ -912,6 +912,9 @@
   <data name="UnknownPresentationDefinition" xml:space="preserve">
     <value>the presentation definition {0} doesn't exist</value>
   </data>
+  <data name="UnknownRealm" xml:space="preserve">
+    <value>the realm {0} doesn't exist</value>
+  </data>
   <data name="UnknownRealmRole" xml:space="preserve">
     <value>the realm role {0} doesn't exist</value>
   </data>

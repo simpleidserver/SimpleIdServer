@@ -3,9 +3,12 @@
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<RealmScopesState> realmScopesState
 @inject IUrlHelper urlHelper
 @inject IDispatcher dispatcher
+@inject NotificationService notificationService
 @inject IState<RealmRoleState> realmRoleState
 @inject ContextMenuService contextMenuService
 
@@ -16,9 +19,16 @@
     </RadzenBreadCrumb>
 </div>
 
-<div class="mb-1">
-    <RadzenButton Click="@(args => AddRealmRolePermission())" Icon="add" Text="@Global.AddPermission" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    <RadzenButton Click="@(args => Save())" Icon="save" Text="@Global.Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<div class="row mb-1">
+    <div class="col">
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.RealmPermissions" TextStyle="TextStyle.DisplayH3" />
+        <p>
+            @Global.RealmPermissionsDescription
+        </p>
+    </div>
+    <div class="col-3">
+        <RadzenButton Click="@(args => Save())" Icon="save" Text="@Global.Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </div>
 </div>
 
 <RadzenCard>
@@ -30,7 +40,7 @@
                     AllowPaging="true"
                     PagerHorizontalAlign="HorizontalAlign.Left"
                     ShowPagingSummary="true"
-                    IsLoading="@realmRoleState.Value.IsLoading"
+                    IsLoading="@isLoading"
                     Count="@Permissions.Count"
                     Data="@Permissions"
                     RowRender="@RowRender"
@@ -38,9 +48,6 @@
                     ColumnWidth="300px">
         <Columns>
             <RadzenDataGridColumn TItem="SelectableRealmRolePermission" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-                <HeaderTemplate>
-                    <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-                </HeaderTemplate>
                 <Template Context="data">
                     <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
                 </Template>
@@ -48,12 +55,14 @@
             <RadzenDataGridColumn TItem="SelectableRealmRolePermission" Property="Permission.Component" Filterable="false" Sortable="false" Title="@Global.Component" Width="80px" />
             <RadzenDataGridColumn TItem="SelectableRealmRolePermission" Filterable="false" Sortable="false" Title="@Global.Permissions" Width="80px">
                 <Template Context="data">
-                    <RadzenBadge Text="@data.Permission.Action" IsPill="true" />
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="SelectableRealmRolePermission" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-                <Template Context="data">
-                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    @if(data.Permission.Action == ComponentActions.Manage)
+                    {
+                        <RadzenBadge Text="@Global.Manage" IsPill="true" />
+                    }
+                    else
+                    {
+                        <RadzenBadge Text="@Global.View" IsPill="true" />
+                    }
                 </Template>
             </RadzenDataGridColumn>
         </Columns>
@@ -66,6 +75,7 @@
     [Parameter]
     public string roleId { get; set; }
     bool selectAll;
+    bool isLoading = true;
 
     List<SelectableRealmRolePermission> Permissions { get; set; } = new List<SelectableRealmRolePermission>();
 
@@ -79,7 +89,7 @@
     {
         public string Id { get; set; }
         public string Component { get; set; }
-        public string Action { get; set; }
+        public ComponentActions Action { get; set; }
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -87,22 +97,29 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
+            SubscribeToAction<GetAllRealmScopesSuccessAction>((act) =>
+            {
+                dispatcher.Dispatch(new GetRealmRoleAction { Realm = RealmContext.Instance().Realm, RoleId = roleId });
+            });
             SubscribeToAction<GetRealmRoleSuccessAction>((act) =>
             {
-                Permissions = act.RealmRole.Scopes.Select(p =>
+                Permissions = realmScopesState.Value.Scopes.Select(s => new SelectableRealmRolePermission
                 {
-                    var splitted = p.Scope.Name.Split('/');
-                    var result = new SelectableRealmRolePermission
+                    IsSelected = act.RealmRole.Scopes.Any(r => r.Scope?.Id == s.Id),
+                    Permission = new RealmRolePermission
                     {
-                        Permission = new RealmRolePermission
-                        {
-                            Id = p.Scope.Id,
-                            Component = splitted[1],
-                            Action = splitted.Last(),
-                        }
-                    };
-                    return result;
+                        Component = s.Component,
+                        Id = s.Id,
+                        Action = s.Action.Value
+                    }
                 }).ToList();
+                isLoading = false;
+                StateHasChanged();
+            });
+            SubscribeToAction<UpdateRealmRoleScopesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.RealmRoleScopesUpdated });
+                isLoading = false;
                 StateHasChanged();
             });
         }
@@ -112,26 +129,7 @@
     {
         base.OnParametersSet();
         if (string.IsNullOrWhiteSpace(roleId)) return;
-        dispatcher.Dispatch(new GetRealmRoleAction { Realm = RealmContext.Instance().Realm, RoleId = roleId });
-    }
-
-    void ShowMoreContextMenu(SelectableRealmRolePermission client, MouseEventArgs args)
-    {
-        contextMenuService.Open(args, new List<ContextMenuItem>
-        {
-            new ContextMenuItem { Text = "Delete", Value = 1 }
-        }, (a) =>
-        {
-            Permissions = Permissions.Where(p => !p.IsSelected).ToList();
-            selectAll = false;
-            StateHasChanged();
-        });
-    }
-
-    void ToggleAll(bool isSelected)
-    {
-        foreach (var permission in Permissions)
-            permission.IsSelected = isSelected;
+        dispatcher.Dispatch(new GetAllRealmScopesAction());
     }
 
     void ToggleChanged(bool isSelected, SelectableRealmRolePermission permission)
@@ -148,13 +146,11 @@
             row.Attributes.Remove(className);
     }
 
-    void AddRealmRolePermission()
-    {
-
-    }
-
     void Save()
     {
-        
+        isLoading = false;
+        var selectedScopeIds = Permissions.Where(p => p.IsSelected).Select(p => p.Permission.Id).ToList();
+        dispatcher.Dispatch(new UpdateRealmRoleScopesAction { Realm = RealmContext.Instance().Realm, RoleId = roleId, ScopeIds = selectedScopeIds });
+        StateHasChanged();
     }
 }

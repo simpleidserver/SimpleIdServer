@@ -3357,6 +3357,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Realm permissions.
+        /// </summary>
+        public static string RealmPermissions {
+            get {
+                return ResourceManager.GetString("RealmPermissions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select one or more permissions assigned to the realm. You must reconnect to the administration website for the changes to take effect..
+        /// </summary>
+        public static string RealmPermissionsDescription {
+            get {
+                return ResourceManager.GetString("RealmPermissionsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Roles have been updated.
+        /// </summary>
+        public static string RealmRoleScopesUpdated {
+            get {
+                return ResourceManager.GetString("RealmRoleScopesUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Realms.
         /// </summary>
         public static string Realms {

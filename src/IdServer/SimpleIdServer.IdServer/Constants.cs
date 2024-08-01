@@ -41,7 +41,8 @@ namespace SimpleIdServer.IdServer
             StandardScopes.OpenIdScope.Name,
             StandardScopes.Profile.Name,
             StandardScopes.SAMLProfile.Name,
-            StandardScopes.WebsiteAdministratorRole.Name
+            StandardScopes.WebsiteAdministratorRole.Name,
+            StandardScopes.Role.Name
         };
 
         public static class StandardAuthorizationDetails

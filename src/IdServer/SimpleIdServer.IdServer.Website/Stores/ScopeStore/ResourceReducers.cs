@@ -330,5 +330,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         }
 
         #endregion
+
+        #region RealmScopesState
+
+
+        [ReducerMethod]
+        public static RealmScopesState ReduceGetAllRealmScopesAction(RealmScopesState state, GetAllRealmScopesAction act) => state with
+        {
+            IsLoading = true
+        };
+
+
+        [ReducerMethod]
+        public static RealmScopesState ReduceGetAllRealmScopesSuccessAction(RealmScopesState state, GetAllRealmScopesSuccessAction act) => state with
+        {
+            IsLoading = false,
+            Scopes = act.Scopes
+        };
+
+        #endregion
     }
 }

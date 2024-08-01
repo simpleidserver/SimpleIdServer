@@ -18,6 +18,15 @@ public class ScopeRepository : IScopeRepository
         _dbContext = dbContext;
     }
 
+    public Task<List<Scope>> Get(List<string> ids, CancellationToken cancellationToken)
+    {
+        return _dbContext.Scopes
+                .Include(s => s.Realms)
+                .Include(s => s.ClaimMappers)
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync(cancellationToken);
+    }
+
     public Task<Scope> Get(string realm, string id, CancellationToken cancellationToken)
     {
         return _dbContext.Scopes
@@ -57,6 +66,14 @@ public class ScopeRepository : IScopeRepository
         return _dbContext.Scopes
                 .Include(s => s.Realms)
                 .Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm))
+                .ToListAsync(cancellationToken);
+    }
+
+    public Task<List<Scope>> GetAllRealmScopes(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.Scopes
+                .Include(s => s.Realms)
+                .Where(s => s.Component != null && s.Realms.Any(r => r.Name == realm))
                 .ToListAsync(cancellationToken);
     }
 

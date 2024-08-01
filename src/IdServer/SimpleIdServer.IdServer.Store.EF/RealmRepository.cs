@@ -57,4 +57,8 @@ public class RealmRepository : IRealmRepository
     {
         _dbContext.RealmRoles.Remove(role);
     }
+
+    public void Update(RealmRole realm)
+    {
+    }
 }

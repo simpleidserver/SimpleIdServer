@@ -34,6 +34,10 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         [JsonPropertyName(ScopeNames.UpdateDatetime)]
         public DateTime UpdateDateTime { get; set; }
+        [JsonPropertyName(ScopeNames.Component)]
+        public string? Component { set; get; } = null;
+        [JsonPropertyName(ScopeNames.Action)]
+        public ComponentActions? Action { get; set; }
         /// <summary>
         /// Array of strings that specifies the claims.
         /// </summary>
@@ -102,4 +106,10 @@ namespace SimpleIdServer.IdServer.Domains
         SAML = 1,
         OAUTH = 2
     }
+}
+
+public enum ComponentActions
+{
+    Manage = 0,
+    View = 1
 }

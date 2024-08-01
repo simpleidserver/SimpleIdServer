@@ -14,6 +14,8 @@ public class RealmRoleBuilder
         {
             Id = Guid.NewGuid().ToString(),
             Name = $"{realm.Name}/clients/manage",
+            Component = "clients",
+            Action = ComponentActions.Manage,
             Type = ScopeTypes.ROLE,
             Realms = new List<Domains.Realm>
             {
@@ -28,6 +30,8 @@ public class RealmRoleBuilder
         {
             Id = Guid.NewGuid().ToString(),
             Name = $"{realm.Name}/clients/view",
+            Component = "clients",
+            Action = ComponentActions.View,
             Type = ScopeTypes.ROLE,
             Realms = new List<Domains.Realm>
             {

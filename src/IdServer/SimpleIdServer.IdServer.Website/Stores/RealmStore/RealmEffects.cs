@@ -3,7 +3,6 @@
 
 using Fluxor;
 using Microsoft.Extensions.Options;
-using Microsoft.VisualBasic;
 using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
@@ -151,6 +150,25 @@ public class RealmEffects
         dispatcher.Dispatch(new GetRealmRoleSuccessAction { RealmRole = realmRole });
     }
 
+    [EffectMethod]
+    public async Task Handle(UpdateRealmRoleScopesAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = GetRealmsUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var request = new UpdateRealmRolesRequest
+        {
+            ScopeIds = action.ScopeIds
+        };
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{action.Realm}/roles/{action.RoleId}"),
+            Method = HttpMethod.Put,
+            Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new UpdateRealmRoleScopesSuccessAction());
+    }
+
     private string GetRealmsUrl() => $"{_options.IdServerBaseUrl}/realms";
 }
 
@@ -227,4 +245,16 @@ public class GetRealmRoleAction
 public class GetRealmRoleSuccessAction
 {
     public RealmRole RealmRole { get; set; }
+}
+
+public class UpdateRealmRoleScopesAction
+{
+    public string Realm { get; set; }
+    public string RoleId { get; set; }
+    public List<string> ScopeIds { get; set; }
+}
+
+public class UpdateRealmRoleScopesSuccessAction
+{
+
 }
