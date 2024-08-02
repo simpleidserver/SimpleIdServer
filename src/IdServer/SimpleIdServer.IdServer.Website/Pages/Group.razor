@@ -16,7 +16,7 @@
 @inject IState<GroupHierarchyState> groupHierarchyState
 @inject IUrlHelper urlHelper
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/groups/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/groups/view")>
+<SidAuthorizeView Roles=@("/groups/manage,/groups/view")>
     <Authorized>
         <RadzenBreadCrumb>
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/groups")" Text="@Global.Groups" />

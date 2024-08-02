@@ -7,10 +7,9 @@ namespace Microsoft.AspNetCore.Builder;
 
 public static class ApplicationBuilderExtensions
 {
-    public static IApplicationBuilder UseSidWebsite(this IApplicationBuilder builder, bool isRealmEnabled)
+    public static IApplicationBuilder UseSidWebsite(this IApplicationBuilder builder)
     {
-        if(isRealmEnabled)
-            builder.UseMiddleware<RealmMiddleware>();
+        builder.UseMiddleware<RealmMiddleware>();
         return builder;
     }
 }

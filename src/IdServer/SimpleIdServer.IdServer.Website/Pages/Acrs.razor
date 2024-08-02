@@ -19,7 +19,7 @@
 @inject IState<RegistrationWorkflowsState> registrationWorkflowsState
 @inject DefaultSecurityOptions securityOptions
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/acrs/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/acrs/view")>
+<SidAuthorizeView Roles=@("/acrs/manage,/acrs/view")>
     <Authorized>
         <div class="row">
             <div class="col">
@@ -29,7 +29,7 @@
                 </p>
             </div>
             <div class="col-3">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/acrs/manage")>
+                <SidAuthorizeView Roles=@("/acrs/manage")>
                     <Authorized>
                         <RadzenButton class="mb-1" Click="@(args => AddAcr())" Icon="add" Text="@Global.AddAcr" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
                     </Authorized>
@@ -96,7 +96,7 @@
                 <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
-                        <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/acrs/manage")>
+                        <SidAuthorizeView Roles=@("/acrs/manage")>
                             <Authorized>
                                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                             </Authorized>

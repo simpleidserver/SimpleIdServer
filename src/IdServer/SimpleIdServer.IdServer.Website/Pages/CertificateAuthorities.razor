@@ -13,7 +13,7 @@
 @inject IDispatcher dispatcher
 @inject IState<SearchCertificateAuthoritiesState> searchCertificateAuthoritiesState
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/view")>
+<SidAuthorizeView Roles=@("/certificateauthorities/manage,/certificateauthorities/view")>
     <Authorized>
         <div class="row">
             <div class="col">
@@ -23,7 +23,7 @@
                 </p>
             </div>
             <div class="col-3">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage")>
+                <SidAuthorizeView Roles=@("/certificateauthorities/manage")>
                     <Authorized>
                         <RadzenButton class="mb-1" Click="@(args => AddCertificateAuthority())" Icon="add" Text="@Global.AddCertificateAuthority" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
                     </Authorized>
@@ -71,7 +71,7 @@
                 <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
-                        <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage")>
+                        <SidAuthorizeView Roles=@("/certificateauthorities/manage")>
                             <Authorized>
                                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                             </Authorized>

@@ -11,7 +11,7 @@
 @inject IState<ScopeState> scopeState
 @inject IDispatcher dispatcher
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/view")>
+<SidAuthorizeView Roles=@($"/scopes/manage,/scopes/view")>
     <Authorized>
         <RadzenBreadCrumb>
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/scopes")" Text="@Global.Scopes" />

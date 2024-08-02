@@ -31,7 +31,10 @@ public class RealmMiddleware
     private readonly IdServerWebsiteOptions _options;
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
 
-    public RealmMiddleware(RequestDelegate next, IOptions<IdServerWebsiteOptions> options, IWebsiteHttpClientFactory websiteHttpClientFactory)
+    public RealmMiddleware(
+        RequestDelegate next, 
+        IOptions<IdServerWebsiteOptions> options, 
+        IWebsiteHttpClientFactory websiteHttpClientFactory)
     {
         _next = next;
         _options = options.Value;
@@ -42,7 +45,8 @@ public class RealmMiddleware
     {
         var path = context.Request.Path.Value;
         if(_excludedFileExtensions.Any(r => path.EndsWith(r)) 
-            || _excludedRoutes.Any(r => path.StartsWith(r)))
+            || _excludedRoutes.Any(r => path.StartsWith(r))
+            || !_options.IsReamEnabled)
         {
             await _next.Invoke(context);
             return;

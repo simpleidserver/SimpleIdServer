@@ -8,7 +8,7 @@
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/trustanchors/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/trustanchors/view")>
+<SidAuthorizeView Roles=@("/trustanchors/manage,/trustanchors/view")>
     <Authorized>
         <div class="row">
             <div class="col">
@@ -18,7 +18,7 @@
                 </p>
             </div>
             <div class="col-3">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/trustanchors/manage")>
+                <SidAuthorizeView Roles=@("/trustanchors/manage")>
                     <Authorized>
                         <RadzenButton class="mb-1" Click="@(args => AddFederationEntity())" Icon="add" Text="@Global.AddFederationEntity" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
                     </Authorized>
@@ -60,7 +60,7 @@
                 <RadzenDataGridColumn TItem="SelectableFederationEntity" Property="FederationEntity.CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.CreateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableFederationEntity" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
-                        <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/trustanchors/manage")>
+                        <SidAuthorizeView Roles=@("/trustanchors/manage")>
                             <Authorized>
                                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                             </Authorized>

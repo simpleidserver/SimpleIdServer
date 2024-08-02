@@ -64,7 +64,7 @@
                     <Template Context="data">
                         @if(data.IsExported && data.StartImportDateTime == null)
                         {
-                            <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/manage")>
+                            <SidAuthorizeView Roles=@("/automaticidprovisioning/manage")>
                                 <Authorized>
                                     <RadzenButton Click=@(args => Import(data)) Icon="launch" MouseEnter="@(args => ShowTooltip(args, Global.ImportUsersAndGroupsTooltip))" />
                                 </Authorized>

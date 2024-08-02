@@ -52,6 +52,8 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         Type handlerContext = null;
         if (!options.Value.IsReamEnabled)
         {
+            if (!locationPath.StartsWith("/"))
+                locationPath = $"/{locationPath}";
             if (!IsMatch(locationPath, _routeableComponents, out routeParameters, out handlerContext))
             {
                 _renderHandle.Render(NotFound);

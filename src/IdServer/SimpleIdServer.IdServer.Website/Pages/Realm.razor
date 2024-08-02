@@ -36,7 +36,7 @@
     </div>    
 }
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/realms/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/realms/view")>
+<SidAuthorizeView Roles=@($"/realms/manage,/realms/view")>
     <Authorized>
         <RadzenCard>
             <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">

@@ -12,7 +12,7 @@
 @inject IState<ClientState> clientState
 @inject IDispatcher dispatcher
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/view")>
+<SidAuthorizeView Roles=@("/clients/manage,/clients/view")>
     <Authorized>
         <RadzenBreadCrumb>
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/clients")" Text="@Global.ClientsTitle" />

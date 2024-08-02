@@ -5,7 +5,7 @@
 @inject NotificationService notificationService
 @inject IState<UserLockingOptionsState> userLockingOptionsState
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/authentication/manage")>
+<SidAuthorizeView Roles=@($"/authentication/manage")>
     <Authorized>
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@userLockingOptionsState.Value.IsLoading>
             <EditConfiguration PropertiesSaved=@SaveProperties Name=@userLockingOptionsState.Value.Options?.OptionsName Values="@userLockingOptionsState.Value.Options?.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>

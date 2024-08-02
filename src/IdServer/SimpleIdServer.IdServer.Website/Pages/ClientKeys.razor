@@ -20,7 +20,7 @@
             <RadzenTextBox Name="JWKSUrl" @bind-Value="@updateJWKSUrl.Url" Disabled=@(!isJWKSUrlUsed) Class="w-100"></RadzenTextBox>
             <RadzenRequiredValidator Component="JWKSUrl" Text="@Global.UrlRequired"></RadzenRequiredValidator>
         </div>
-        <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/manage")>
+        <SidAuthorizeView Roles=@("/clients/manage")>
             <Authorized>
                 <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Update" Disabled=@(!isJWKSUrlUsed) />
             </Authorized>
@@ -31,7 +31,7 @@
 <hr />
 
 <div>
-    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/manage")>
+    <SidAuthorizeView Roles=@("/clients/manage")>
         <Authorized>
             <RadzenButton class="mb-1" Click="@(args => GenerateKey())" Icon="add" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" Text="@Global.GenerateNewKey" />
         </Authorized>
@@ -69,7 +69,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                 <Template Context="data">µ
-                    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/manage")>
+                    <SidAuthorizeView Roles=@("/clients/manage")>
                         <Authorized>
                             <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />                        
                         </Authorized>

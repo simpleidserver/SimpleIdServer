@@ -9,7 +9,7 @@
 @inject IDispatcher dispatcher
 @inject IUrlHelper urlHelper
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/view")>
+<SidAuthorizeView Roles=@("/certificateauthorities/manage,/certificateauthorities/view")>
     <Authorized>
         <RadzenBreadCrumb>
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/certificateauthorities")" Text="@Global.CertificateAuthoritiesTitle" />

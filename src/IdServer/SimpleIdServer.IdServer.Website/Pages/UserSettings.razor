@@ -73,7 +73,7 @@
             @bind-Value=@updateUserSettings.NotificationMode></RadzenDropDown>
         
     </div>
-    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage")>
+    <SidAuthorizeView Roles=@($"/users/manage")>
         <Authorized>
             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateUserState.Value.IsUpdating />
         </Authorized>

@@ -9,7 +9,7 @@
 
 <p class="text-muted">@Global.UserGroupsDescription</p>
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage")>
+<SidAuthorizeView Roles=@($"/users/manage")>
     <Authorized>
         <RadzenButton class="mb-1" Click="@(args => AssignGroups())" Icon="add" Text="@Global.AssignGroups" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     </Authorized>
@@ -42,7 +42,7 @@
         <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdatedAt" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUserGroup" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage")>
+                <SidAuthorizeView Roles=@($"/users/manage")>
                     <Authorized>
                         <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                     </Authorized>

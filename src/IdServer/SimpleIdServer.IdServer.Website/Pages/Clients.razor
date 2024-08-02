@@ -12,7 +12,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 
-<SidAuthorizeView Roles=@($"{RealmContext.Instance()?.Realm}/clients/manage,{RealmContext.Instance()?.Realm}/clients/view")>
+<SidAuthorizeView Roles=@("/clients/manage,/clients/view")>
     <Authorized>
         <div class="row">
             <div class="col">
@@ -22,7 +22,7 @@
                 </p>
             </div>
             <div class="col-3">
-                <SidAuthorizeView Roles=@($"{RealmContext.Instance()?.Realm}/clients/manage")>
+                <SidAuthorizeView Roles=@("/clients/manage")>
                     <Authorized>
                         <RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="@Global.AddClient" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
                     </Authorized>

@@ -11,7 +11,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/groups/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/groups/view")>
+<SidAuthorizeView Roles=@("/groups/manage,/groups/view")>
     <Authorized>
         <div class="row">
             <div class="col">
@@ -21,7 +21,7 @@
                 </p>
             </div>
             <div class="col-3">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/groups/manage")>
+                <SidAuthorizeView Roles=@("/groups/manage")>
                     <Authorized>
                         <RadzenButton class="mb-1" Click="@(args => AddGroup())" Icon="add" Text="@Global.AddGroup" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
                     </Authorized>
@@ -63,7 +63,7 @@
                 <RadzenDataGridColumn TItem="SelectableGroup" Property="Group.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableGroup" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
-                        <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/groups/manage")>
+                        <SidAuthorizeView Roles=@("/groups/manage")>
                             <Authorized>
                                 <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                             </Authorized>

@@ -8,7 +8,7 @@
 @inject IUrlHelper urlHelper
 @inject DialogService dialogService
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/manage")>
+<SidAuthorizeView Roles=@($"/automaticidprovisioning/manage")>
     <Authorized>
         <RadzenButton class="mb-1" Click="@(args => AddMappingRule())" Icon="add" Text="@Global.AddMappingRule" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     </Authorized>
@@ -60,7 +60,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/manage")>
+                <SidAuthorizeView Roles=@($"/automaticidprovisioning/manage")>
                     <Authorized>
                         <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                     </Authorized>

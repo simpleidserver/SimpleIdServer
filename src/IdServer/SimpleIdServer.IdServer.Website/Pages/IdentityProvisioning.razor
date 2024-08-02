@@ -11,7 +11,7 @@
 @inject IState<IdentityProvisioningState> identityProvisioningState
 @inject IDispatcher dispatcher
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/view")>
+<SidAuthorizeView Roles=@("/automaticidprovisioning/manage,/automaticidprovisioning/view")>
     <Authorized>
         <RadzenBreadCrumb>
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/identityprovisioning")" Text="@Global.IdentityProvisioning" />
@@ -22,7 +22,7 @@
 
         <div>
             <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="@Global.Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-            <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/manage")>
+            <SidAuthorizeView Roles=@("/automaticidprovisioning/manage")>
                 <Authorized>
                     <RadzenButton class="mb-1" Click="@(args => TestIdentityProvisioning())" Icon="launch" Text="@Global.TryExtractUsers" ButtonStyle="ButtonStyle.Secondary" Disabled=@isTesting Size="ButtonSize.Medium"></RadzenButton>
                 </Authorized>

@@ -9,7 +9,7 @@
 @inject IState<ScopeMappersState> scopeMappersState
 @inject NotificationService notificationService
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/manage")>
+<SidAuthorizeView Roles=@($"/scopes/manage")>
     <Authorized>
         <RadzenButton class="mb-1" Click="@(args => AddMapper())" Icon="add" Text="@Global.AddMapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     </Authorized>
@@ -61,7 +61,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/manage")>
+                <SidAuthorizeView Roles=@($"/scopes/manage")>
                     <Authorized>
                         <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                     </Authorized>

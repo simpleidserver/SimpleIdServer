@@ -1,9 +1,13 @@
 ﻿@using System.Security.Claims
-@if(isAuthorized)
+@using Microsoft.Extensions.Options
+@using SimpleIdServer.IdServer.Website
+@inject IOptions<IdServerWebsiteOptions> options
+
+@if (isAuthorized)
 {
     @Authorized
 }
-else if(NotAuthorized != null)
+else if (NotAuthorized != null)
 {
     @NotAuthorized
 }
@@ -17,11 +21,15 @@ else if(NotAuthorized != null)
 
     protected override void OnAfterRender(bool firstRender)
     {
-        if(firstRender)
+        if (firstRender)
         {
             var authState = authenticationStateTask.Result;
             var user = authState.User;
-            var roles = Roles.Split(',');
+            var roles = Roles.Split(',').Select(r =>
+            {
+                var realm = !options.Value.IsReamEnabled ? SimpleIdServer.IdServer.Constants.DefaultRealm : SimpleIdServer.IdServer.Helpers.RealmContext.Instance().Realm;
+                return $"{realm}{r}";
+            });
             isAuthorized = user.Claims.Any(c => c.Type == ClaimTypes.Role && roles.Contains(c.Value));
             StateHasChanged();
         }

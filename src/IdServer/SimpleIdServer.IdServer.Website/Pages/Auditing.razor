@@ -7,7 +7,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.Auditing;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/auditing/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/auditing/view")>
+<SidAuthorizeView Roles=@($"/auditing/manage,/auditing/view")>
     <Authorized>
         <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.Auditing" TextStyle="TextStyle.DisplayH3" />
 

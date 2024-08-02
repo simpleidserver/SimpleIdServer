@@ -44,7 +44,7 @@
     </RadzenColumn>
     <RadzenColumn>
         <RadzenStack>
-            <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/manage")>
+            <SidAuthorizeView Roles=@("/clients/manage")>
                 <Authorized>
                     <RadzenButton Text="@Global.AssignRealms" Icon="add" Click="@(() => Assign())" ButtonStyle="ButtonStyle.Primary" />
                     <RadzenButton Text="@Global.UnassignRealms" Icon="remove" Click=@(() => Unassign()) ButtonStyle="ButtonStyle.Primary" />

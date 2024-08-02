@@ -6,7 +6,7 @@
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/groups/manage")>
+<SidAuthorizeView Roles=@("/groups/manage")>
     <Authorized>
         <RadzenButton class="mb-1" Click="@(args => AddRole())" Icon="add" Text="@Global.AddRole" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     </Authorized>
@@ -40,7 +40,7 @@
         <RadzenDataGridColumn TItem="SelectableGroupRole" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" SortOrder=SortOrder.Descending Title="@Global.UpdateDateTime" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableGroupRole" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/groups/manage")>
+                <SidAuthorizeView Roles=@("/groups/manage")>
                     <Authorized>
                         <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                     </Authorized>

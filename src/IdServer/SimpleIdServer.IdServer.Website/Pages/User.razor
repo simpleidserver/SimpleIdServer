@@ -10,7 +10,7 @@
 @inject IUrlHelper urlHelper
 @inject IDispatcher dispatcher
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/view")>
+<SidAuthorizeView Roles=@($"/users/manage,/users/view")>
     <Authorized>
         <RadzenBreadCrumb>
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/users")" Text="@Global.Users" />

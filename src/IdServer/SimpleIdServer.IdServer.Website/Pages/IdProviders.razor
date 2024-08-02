@@ -13,7 +13,7 @@
     @Global.IdentityProvidersDescription
 </p>
 
-<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/authentication/manage")>
+<SidAuthorizeView Roles=@($"/authentication/manage")>
     <Authorized>
         <RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="@Global.AddIdentityProvider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
     </Authorized>
@@ -52,7 +52,7 @@
         <RadzenDataGridColumn TItem="SelectableIdProvider" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/authentication/manage")>
+                <SidAuthorizeView Roles=@($"/authentication/manage")>
                     <Authorized>
                         <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
                     </Authorized>

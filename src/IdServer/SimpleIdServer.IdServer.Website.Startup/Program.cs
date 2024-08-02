@@ -40,7 +40,7 @@ app.UseRequestLocalization(e =>
     e.AddSupportedCultures("en");
     e.AddSupportedUICultures("en");
 });
-app.UseSidWebsite(isRealmEnabled);
+app.UseSidWebsite();
 app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();

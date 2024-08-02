@@ -35,7 +35,7 @@
             </p>
         </div>
     }
-    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/manage")>
+    <SidAuthorizeView Roles=@($"/scopes/manage")>
         <Authorized>
             <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateScopeState.Value.IsUpdating />
         </Authorized>

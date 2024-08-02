@@ -73,7 +73,7 @@
             break;
     }
 
-    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage")>
+    <SidAuthorizeView Roles=@("/certificateauthorities/manage")>
         <Authorized>
             <RadzenButton class="mt-1" Click=@(a => Download()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.Download" />
         </Authorized>
