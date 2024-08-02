@@ -23,6 +23,7 @@
                 IsLoading="@realmScopesState.Value.IsLoading"
                 Count="@realmScopesState.Value.Scopes.Count()"
                 Data="@realmScopesState.Value.Scopes"
+                LoadData="@LoadData"
                 TItem="Domains.Scope"
                 ColumnWidth="300px">
     <Columns>
@@ -50,14 +51,14 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            if (!realmScopesState.Value.IsLoading && scopesGrid != null)
-                dispatcher.Dispatch(new GetAllRealmScopesAction());
+            if (realmScopesState.Value.IsLoading && scopesGrid != null)
+                scopesGrid.Reload();
         }
     }
 
     void LoadData(LoadDataArgs args)
     {
-        var act = new SearchRealmRolesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, Realm = RealmContext.Instance().Realm };
+        var act = new GetAllRealmScopesAction { };
         dispatcher.Dispatch(act);
     }
 }

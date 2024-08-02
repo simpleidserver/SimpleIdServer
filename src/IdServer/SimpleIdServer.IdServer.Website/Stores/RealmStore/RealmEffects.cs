@@ -109,12 +109,3 @@ public class AddRealmSuccessAction
     public string Name { get; set; }
     public string Description { get; set; }
 }
-
-public class SearchRealmRolesAction
-{
-    public string Realm { get; set; }
-    public string? Filter { get; set; } = null;
-    public string? OrderBy { get; set; } = null;
-    public int? Skip { get; set; } = null;
-    public int? Take { get; set; } = null;
-}
