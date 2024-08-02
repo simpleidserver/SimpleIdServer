@@ -804,11 +804,27 @@ namespace SimpleIdServer.IdServer
                     StandardScopes.WebsiteAdministratorRole
                 }
             };
+            public static Domains.Group AdministratorReadonlyGroup = new Domains.Group
+            {
+                Id = "7a3014a3-5985-4986-bfcc-8e574fb6da27",
+                CreateDateTime = DateTime.UtcNow,
+                FullPath = "administrator-ro",
+                Realms = new List<GroupRealm>
+                {
+                    new GroupRealm
+                    {
+                        RealmsName = StandardRealms.Master.Name
+                    }
+                },
+                Name = "administrator-ro",
+                Description = "Administration role readonly"
+            };
         }
 
         public static class StandardUsers
         {
             public static User AdministratorUser = UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorGroup).GenerateRandomTOTPKey().Build();
+            public static User AdministratorReadonlyUser = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
         }
 
         public static class StandardAcrs
@@ -848,28 +864,6 @@ namespace SimpleIdServer.IdServer
                 UpdateDateTime = DateTime.UtcNow,
                 Description = Constants.DefaultRealm
             };
-        }
-
-        public static class StandardRealmRoles
-        {
-            public static Domains.RealmRole MasterAdministratorRole = RealmRoleBuilder.BuildAdministrativeRole(Constants.StandardRealms.Master);
-        }
-
-        public static class StandardComponents
-        {
-            public const string Realms = "realms";
-            public const string Clients = "clients";
-            public const string Scopes = "scopes";
-            public const string Users = "users";
-            public const string Groups = "groups";
-            public const string Acrs = "acrs";
-            public const string Authentication = "authentication";
-            public const string ExternalIdProviders = "externalidentityproviders";
-            public const string ManualIdProvisioning = "manualidprovisioning";
-            public const string AutomaticIdProvisioning = "automaticidprovisioning";
-            public const string CertificateAuthorities = "certificateauthorities";
-            public const string Auditing = "auditing";
-            public const string TurstAnchors = "trustanchors";
         }
 
         public static ICollection<string> AllUserClaims = new List<string>

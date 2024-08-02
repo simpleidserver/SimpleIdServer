@@ -11,58 +11,66 @@
 @inject IState<ScopeState> scopeState
 @inject IDispatcher dispatcher
 
-<RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/scopes")" Text="@Global.Scopes" />
-    <RadzenBreadCrumbItem Text="@Global.ScopeDetails" />
-</RadzenBreadCrumb>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/scopes")" Text="@Global.Scopes" />
+            <RadzenBreadCrumbItem Text="@Global.ScopeDetails" />
+        </RadzenBreadCrumb>
 
-<RadzenText class="mt-3 mb-3 no-margin" Text="@scopeState.Value.Scope?.Name" TextStyle="TextStyle.DisplayH3" />
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@scopeState.Value.Scope?.Name" TextStyle="TextStyle.DisplayH3" />
 
-<div class="mb-1">
-    @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
-    {
-        <RadzenBadge Text="@Global.IdentityScope" IsPill="true" />
-    }
-    else
-    {
-        <RadzenBadge Text="@Global.ApiScope" IsPill="true" />
-    }
-
-    @if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
-    {
-        <RadzenBadge Text="@Global.OpenId" IsPill="true" />
-    }
-    else if (scopeState.Value.Scope.Protocol == ScopeProtocols.SAML)
-    {
-        <RadzenBadge Text="@Global.Saml" IsPill="true" />
-    }
-    else if (scopeState.Value.Scope.Protocol == ScopeProtocols.OAUTH)
-    {
-        <RadzenBadge Text="@Global.OAuth" IsPill="true" />
-    }
-</div>
-
-<RadzenCardLoader Variant="Variant.Filled" IsLoading=scopeState.Value.IsLoading>
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="@Global.Details">
-                <ScopeSettings Scope="@scopeState.Value.Scope"></ScopeSettings>
-            </RadzenTabsItem>
+        <div class="mb-1">
             @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
             {
-                <RadzenTabsItem Text="@Global.Mappers">
-                    <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
-                </RadzenTabsItem>
+                <RadzenBadge Text="@Global.IdentityScope" IsPill="true" />
             }
-            else if(scopeState.Value.Scope.Type == ScopeTypes.APIRESOURCE)
+            else
             {
-                <RadzenTabsItem Text="@Global.ApiResources">
-                    <ScopeResources Scope="@scopeState.Value.Scope"></ScopeResources>
-                </RadzenTabsItem>
+                <RadzenBadge Text="@Global.ApiScope" IsPill="true" />
             }
-        </Tabs>
-    </RadzenTabs>
-</RadzenCardLoader>
+
+            @if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
+            {
+                <RadzenBadge Text="@Global.OpenId" IsPill="true" />
+            }
+            else if (scopeState.Value.Scope.Protocol == ScopeProtocols.SAML)
+            {
+                <RadzenBadge Text="@Global.Saml" IsPill="true" />
+            }
+            else if (scopeState.Value.Scope.Protocol == ScopeProtocols.OAUTH)
+            {
+                <RadzenBadge Text="@Global.OAuth" IsPill="true" />
+            }
+        </div>
+
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=scopeState.Value.IsLoading>
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.Details">
+                        <ScopeSettings Scope="@scopeState.Value.Scope"></ScopeSettings>
+                    </RadzenTabsItem>
+                    @if (scopeState.Value.Scope.Type == ScopeTypes.IDENTITY)
+                    {
+                        <RadzenTabsItem Text="@Global.Mappers">
+                            <ScopeMappers Scope="@scopeState.Value.Scope"></ScopeMappers>
+                        </RadzenTabsItem>
+                    }
+                    else if (scopeState.Value.Scope.Type == ScopeTypes.APIRESOURCE)
+                    {
+                        <RadzenTabsItem Text="@Global.ApiResources">
+                            <ScopeResources Scope="@scopeState.Value.Scope"></ScopeResources>
+                        </RadzenTabsItem>
+                    }
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
 
 @code {
     Dictionary<string, (int, IEnumerable<ScopeTypes>)> mappingActionNameToIndex = new Dictionary<string, (int, IEnumerable<ScopeTypes>)>

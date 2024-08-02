@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.Extractors
             {
                 var grpPathLst = newContext.User.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct().ToList();
                 var allGroups = await _groupRepository.GetAllByStrictFullPath(context.Realm, grpPathLst, CancellationToken.None);
-                var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
+                var roles = allGroups.SelectMany(g => g.Roles).Where(r => r.Realms.Any(re => re.Name == context.Realm)).Select(r => r.Name).Distinct();
                 foreach (var role in roles)
                     newContext.User.AddClaim(Constants.UserClaims.Role, role);
             }

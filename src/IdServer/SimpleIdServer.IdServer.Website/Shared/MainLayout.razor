@@ -38,6 +38,9 @@
             </div>
             <div class="ml-auto"></div>
             <div class="p-2">
+                <RadzenText Style="margin: 0; color: white;" Text="@string.Format(Global.Welcome, userName)" />
+            </div>
+            <div class="p-2">
                 @if(!languagesState.Value.IsLoading)
                 {
                     <RadzenDropDown Name="UserPropertyName" Class="w-100"
@@ -94,6 +97,8 @@
     bool sidebarExpanded = true;
     bool isLoading = true;
     string activeRealm;
+    string userName { get; set; }
+    @inject AuthenticationStateProvider GetAuthenticationStateAsync
 
     public string CurrentLanguage
     {
@@ -125,6 +130,8 @@
                 isLoading = false;
                 StateHasChanged();
             });
+            var authState = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
+            userName = authState.User.Identity.Name;
         }
     }
 

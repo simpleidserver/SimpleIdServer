@@ -11,7 +11,11 @@
 
 <p class="text-muted">@Global.ClaimsDescription</p>
 
-<RadzenButton class="mb-1" Click="@(args => AddClaim())" Icon="add" Text="@Global.AddClaim" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddClaim())" Icon="add" Text="@Global.AddClaim" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
 
 <div class="mb-1">
     <RadzenCheckBox @bind-Value=@resolveRoles Change=@ResolveRoles TValue="bool" />
@@ -39,7 +43,11 @@
             <Template Context="data">
                 @if(!data.IsRole)
                 {
-                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage")>
+                        <Authorized>
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                        </Authorized>
+                    </SidAuthorizeView>
                 }
             </Template>
         </RadzenDataGridColumn>

@@ -108,7 +108,10 @@
             }
         </RadzenStack>
 
-        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? (IsAddForm ? Global.Adding : Global.Updating) : (IsAddForm ? Global.Add : Global.Update))" Disabled=@IsUpdating Click="@(args => UpdateConfiguration())" />
+        @if(IsEnabled)
+        {
+            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? (IsAddForm ? Global.Adding : Global.Updating) : (IsAddForm ? Global.Add : Global.Update))" Disabled=@IsUpdating Click="@(args => UpdateConfiguration())" />
+        }
     </RadzenTemplateForm>
 }
     
@@ -121,6 +124,8 @@
     public bool IsUpdating { get; set; }
     [Parameter]
     public bool IsAddForm { get; set; } = false;
+    [Parameter]
+    public bool IsEnabled { get; set; } = true;
     [Parameter]
     public EventCallback<Dictionary<string, string>> PropertiesSaved { get; set; }
     List<EditableProperty> AllProperties { get; set; }

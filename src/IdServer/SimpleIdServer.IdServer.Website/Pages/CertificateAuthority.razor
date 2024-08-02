@@ -9,32 +9,39 @@
 @inject IDispatcher dispatcher
 @inject IUrlHelper urlHelper
 
-<RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/certificateauthorities")" Text="@Global.CertificateAuthoritiesTitle" />
-    <RadzenBreadCrumbItem Text="@Global.CertificateAuthorityDetailsTitle" />
-</RadzenBreadCrumb>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/certificateauthorities")" Text="@Global.CertificateAuthoritiesTitle" />
+            <RadzenBreadCrumbItem Text="@Global.CertificateAuthorityDetailsTitle" />
+        </RadzenBreadCrumb>
 
-<RadzenText class="mt-3 mb-3" Text="@certificateAuthorityState.Value.CertificateAuthority?.SubjectName" TextStyle="TextStyle.DisplayH3" />
+        <RadzenText class="mt-3 mb-3" Text="@certificateAuthorityState.Value.CertificateAuthority?.SubjectName" TextStyle="TextStyle.DisplayH3" />
 
-@if (certificateAuthorityState.Value.CertificateAuthority != null)
-{
-    <div class="mb-1">
-        <RadzenBadge Text="@(Enum.GetName(typeof(CertificateAuthoritySources), certificateAuthorityState.Value.CertificateAuthority.Source))" IsPill="true" />
-    </div>    
-}
+        @if (certificateAuthorityState.Value.CertificateAuthority != null)
+        {
+            <div class="mb-1">
+                <RadzenBadge Text="@(Enum.GetName(typeof(CertificateAuthoritySources), certificateAuthorityState.Value.CertificateAuthority.Source))" IsPill="true" />
+            </div>
+        }
 
-<RadzenCardLoader Variant="Variant.Filled" IsLoading=certificateAuthorityState.Value.IsLoading>
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="@Global.Details">
-                <CertificateAuthorityDetails></CertificateAuthorityDetails>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.ClientCertificates">
-                <CertificateAuthorityClients CertificateAuthority="@certificateAuthorityState.Value?.CertificateAuthority"></CertificateAuthorityClients>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
-</RadzenCardLoader>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=certificateAuthorityState.Value.IsLoading>
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.Details">
+                        <CertificateAuthorityDetails></CertificateAuthorityDetails>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.ClientCertificates">
+                        <CertificateAuthorityClients CertificateAuthority="@certificateAuthorityState.Value?.CertificateAuthority"></CertificateAuthorityClients>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
@@ -68,6 +75,6 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/certificateauthorities/{id}/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/certificateauthorities/{id}/{rec.Key}"));
     }
 }

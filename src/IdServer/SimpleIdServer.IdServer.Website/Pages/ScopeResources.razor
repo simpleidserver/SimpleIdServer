@@ -10,9 +10,13 @@
 @inject IState<ApiResourcesState> searchApiResourcesState
 @inject NotificationService notificationService
 
-<div class="mb-1">
-    <RadzenButton Click="@(args => AddResource())" Icon="add" Text="@Global.AddApiResource" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-</div>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/manage")>
+    <Authorized>
+        <div class="mb-1">
+            <RadzenButton Click="@(args => AddResource())" Icon="add" Text="@Global.AddApiResource" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+        </div>
+    </Authorized>
+</SidAuthorizeView>
 
 <p class="text-muted">
     @((MarkupString)(Global.ScopeResourcesDescription))
@@ -52,7 +56,11 @@
                     <RadzenDataGridColumn TItem="SelectableApiResource" Property="Value.Description" Title="@Global.Description" Filterable="false" Sortable="false" Width="80px" />
                     <RadzenDataGridColumn TItem="SelectableApiResource" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                            <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/manage")>
+                                <Authorized>
+                                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                                </Authorized>
+                            </SidAuthorizeView>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -60,8 +68,12 @@
         </RadzenColumn>
         <RadzenColumn>
             <RadzenStack>
-                <RadzenButton Text="@Global.AssignResources" Icon="add" Click="@(() => Assign())" ButtonStyle="ButtonStyle.Primary" />
-                <RadzenButton Text="@Global.UnassignResources" Icon="remove" Click=@(() => Unassign()) ButtonStyle="ButtonStyle.Primary" />
+                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/scopes/manage")>
+                    <Authorized>
+                        <RadzenButton Text="@Global.AssignResources" Icon="add" Click="@(() => Assign())" ButtonStyle="ButtonStyle.Primary" />
+                        <RadzenButton Text="@Global.UnassignResources" Icon="remove" Click=@(() => Unassign()) ButtonStyle="ButtonStyle.Primary" />
+                    </Authorized>
+                </SidAuthorizeView>
             </RadzenStack>
         </RadzenColumn>
         <RadzenColumn Size="5">

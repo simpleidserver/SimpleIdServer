@@ -67,7 +67,11 @@
             <RadzenDataGridColumn TItem="Consent" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.CreatedAt" Width="80px" />
             <RadzenDataGridColumn TItem="Consent" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                 <Template Context="data">
-                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage")>
+                        <Authorized>
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                        </Authorized>
+                    </SidAuthorizeView>
                 </Template>
             </RadzenDataGridColumn>
         </Columns>

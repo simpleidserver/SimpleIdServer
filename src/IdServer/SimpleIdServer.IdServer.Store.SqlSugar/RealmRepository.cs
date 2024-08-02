@@ -43,23 +43,4 @@ public class RealmRepository : IRealmRepository
             RealmsName = realm.Name
         };
     }
-
-    public Task<SearchResult<RealmRole>> SearchRoles(string realm, SearchRequest request, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<RealmRole> GetRole(string id, CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void DeleteRole(RealmRole role)
-    {
-        throw new NotImplementedException();
-    }
-    public void Update(RealmRole realm)
-    {
-        throw new NotImplementedException();
-    }
 }

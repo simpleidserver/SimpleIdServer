@@ -14,7 +14,12 @@
 @inject NotificationService notificationService
 @inject IUrlHelper urlHelper
 
-<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="@Global.AddClientScope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="@Global.AddClientScope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -59,7 +64,11 @@
         <RadzenDataGridColumn TItem="SelectableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/clients/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
             </Template>
         </RadzenDataGridColumn>
     </Columns>

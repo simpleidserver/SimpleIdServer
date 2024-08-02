@@ -11,36 +11,47 @@
 @inject IState<IdentityProvisioningState> identityProvisioningState
 @inject IDispatcher dispatcher
 
-<RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/identityprovisioning")" Text="@Global.IdentityProvisioning" />
-    <RadzenBreadCrumbItem Text="@Global.IdentityProvisioningDetails" />
-</RadzenBreadCrumb>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/identityprovisioning")" Text="@Global.IdentityProvisioning" />
+            <RadzenBreadCrumbItem Text="@Global.IdentityProvisioningDetails" />
+        </RadzenBreadCrumb>
 
-<RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH3" />
+        <RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH3" />
 
-<div>
-    <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="@Global.Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    <RadzenButton class="mb-1" Click="@(args => TestIdentityProvisioning())" Icon="launch" Text="@Global.TryExtractUsers" ButtonStyle="ButtonStyle.Secondary" Disabled=@isTesting Size="ButtonSize.Medium"></RadzenButton>
-</div>
+        <div>
+            <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="@Global.Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+            <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/manage")>
+                <Authorized>
+                    <RadzenButton class="mb-1" Click="@(args => TestIdentityProvisioning())" Icon="launch" Text="@Global.TryExtractUsers" ButtonStyle="ButtonStyle.Secondary" Disabled=@isTesting Size="ButtonSize.Medium"></RadzenButton>
+                </Authorized>
+            </SidAuthorizeView>
+        </div>
 
-<RadzenCardLoader IsLoading=@identityProvisioningState.Value.IsLoading Variant="Variant.Filled">
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="@Global.Details">
-                <IdentityProvisioningDetails IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningDetails>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Properties">
-                <IdentityProvisioningProperties IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningProperties>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.MappingRules">
-                <IdentityProvisioningMappingRules IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningMappingRules>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Histories" >
-                <IdentityProvisioningHistories IdentityProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningHistories>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
-</RadzenCardLoader>
+        <RadzenCardLoader IsLoading=@identityProvisioningState.Value.IsLoading Variant="Variant.Filled">
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.Details">
+                        <IdentityProvisioningDetails IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningDetails>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Properties">
+                        <IdentityProvisioningProperties IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningProperties>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.MappingRules">
+                        <IdentityProvisioningMappingRules IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningMappingRules>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Histories">
+                        <IdentityProvisioningHistories IdentityProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningHistories>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
@@ -126,7 +137,7 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/identityprovisioning/{id}/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/identityprovisioning/{id}/{rec.Key}"));
     }
 
     void ExtractUsers()

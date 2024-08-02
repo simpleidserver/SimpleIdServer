@@ -132,7 +132,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 if (user == null) return new NotFoundResult();
                 var grpPathLst = user.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct().ToList();
                 var allGroups = await _groupRepository.GetAllByStrictFullPath(prefix, grpPathLst, cancellationToken);
-                var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
+                var roles = allGroups.SelectMany(g => g.Roles).Where(r => r.Realms.Any(re => re.Name == prefix)).Select(r => r.Name).Distinct();
                 return new OkObjectResult(roles);
             }
             catch (OAuthException ex)

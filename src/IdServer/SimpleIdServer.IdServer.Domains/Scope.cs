@@ -53,8 +53,6 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         [JsonIgnore]
         public ICollection<Group> Groups { get; set; } = new List<Group>();
-        [JsonIgnore]
-        public ICollection<RealmRoleScope> RealmRoles { get; set; } = new List<RealmRoleScope>();
 
         public static Scope Create(string scopeName)
         {

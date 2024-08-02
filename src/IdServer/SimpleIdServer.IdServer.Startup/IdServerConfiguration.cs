@@ -106,14 +106,10 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole
         };
 
-        public static ICollection<RealmRole> RealmRoles = new List<RealmRole>
-        {
-            SimpleIdServer.IdServer.Constants.StandardRealmRoles.MasterAdministratorRole
-        };
-
         public static ICollection<User> Users => new List<User>
         {
             SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser,
+            SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser,
             UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
         };
 

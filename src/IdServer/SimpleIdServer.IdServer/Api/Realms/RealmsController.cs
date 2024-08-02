@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -88,7 +87,6 @@ public class RealmsController : BaseController
                     if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
                     var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                     var administratorRole = RealmRoleBuilder.BuildAdministrativeRole(realm);
-                    realm.Roles = new[] { administratorRole };
                     var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
                     var groups = await _groupRepository.GetAllByStrictFullPath(Constants.DefaultRealm, Constants.RealmStandardGroupsFullPath, cancellationToken);
                     var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
@@ -107,7 +105,7 @@ public class RealmsController : BaseController
                         group.Realms.Add(new GroupRealm { RealmsName = request.Name });
                         if(group.FullPath == StandardGroups.AdministratorGroup.FullPath)
                         {
-                            foreach(var scope in administratorRole.Scopes.Select(s => s.Scope))
+                            foreach(var scope in administratorRole)
                                 group.Roles.Add(scope);
                         }
 
@@ -154,88 +152,6 @@ public class RealmsController : BaseController
                 activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
                 return BuildError(ex);
             }
-        }
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> SearchRoles(string id, [FromBody] SearchRequest request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
-            var result = await _realmRepository.SearchRoles(id, request, cancellationToken);
-            return new OkObjectResult(result);
-        }
-        catch (OAuthException ex)
-        {
-            _logger.LogError(ex.ToString());
-            return BuildError(ex);
-        }
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetRole(string id, string roleId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
-            var result = await _realmRepository.GetRole(roleId, cancellationToken);
-            if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRealmRole, id));
-            return new OkObjectResult(result);
-        }
-        catch (OAuthException ex)
-        {
-            _logger.LogError(ex.ToString());
-            return BuildError(ex);
-        }
-    }
-
-    [HttpDelete]
-    public async Task<IActionResult> RemoveRole(string id, string roleId, CancellationToken cancellationToken)
-    {
-        try
-        {
-            using (var transaction = _transactionBuilder.Build())
-            {
-                await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
-                var result = await _realmRepository.GetRole(roleId, cancellationToken);
-                if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRealmRole, id));
-                _realmRepository.DeleteRole(result);
-                await transaction.Commit(cancellationToken);
-                return new NoContentResult();
-            }
-        }
-        catch (OAuthException ex)
-        {
-            _logger.LogError(ex.ToString());
-            return BuildError(ex);
-        }
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> UpdateRoleScopes(string id, string roleId, [FromBody] UpdateRealmRolesRequest request, CancellationToken cancellationToken)
-    {
-        try
-        {
-            using (var transaction = _transactionBuilder.Build())
-            {
-                await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
-                var result = await _realmRepository.GetRole(roleId, cancellationToken);
-                if (result == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRealmRole, id));
-                var scopes = await _scopeRepository.Get(request.ScopeIds, cancellationToken);
-                result.Scopes = scopes.Select(r => new RealmRoleScope
-                {
-                    ScopeId = r.Id
-                }).ToList();
-                _realmRepository.Update(result);
-                await transaction.Commit(cancellationToken);
-                return new NoContentResult();
-            }
-        }
-        catch (OAuthException ex)
-        {
-            _logger.LogError(ex.ToString());
-            return BuildError(ex);
         }
     }
 }

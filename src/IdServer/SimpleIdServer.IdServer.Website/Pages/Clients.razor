@@ -22,7 +22,11 @@
                 </p>
             </div>
             <div class="col-3">
-                <RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="@Global.AddClient" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                <SidAuthorizeView Roles=@($"{RealmContext.Instance()?.Realm}/clients/manage")>
+                    <Authorized>
+                        <RadzenButton class="mb-1" Click="@(args => AddClient())" Icon="add" Text="@Global.AddClient" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                    </Authorized>
+                </SidAuthorizeView>
             </div>
         </div>
 

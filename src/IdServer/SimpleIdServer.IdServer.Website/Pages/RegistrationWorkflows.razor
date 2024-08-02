@@ -16,66 +16,82 @@
 @inject IState<RealmsState> realmsState
 @inject IDispatcher dispatcher
 
-<div class="row mt-3 mb-3 ">
-    <div class="col">
-        <RadzenText class="no-margin" Text="@Global.RegistrationWorkflows" TextStyle="TextStyle.DisplayH3" />
-    </div>
-    <div class="col-md-3">
-        <RadzenButton class="mb-1" Click="@(args => AddRegistrationWorkflow())" Icon="add" Text="@Global.AddRegistrationWorkflow" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    </div>
-</div>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/manualidprovisioning/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/manualidprovisioning/view")>
+    <Authorized>
+        <div class="row mt-3 mb-3 ">
+            <div class="col">
+                <RadzenText class="no-margin" Text="@Global.RegistrationWorkflows" TextStyle="TextStyle.DisplayH3" />
+            </div>
+            <div class="col-md-3">
+                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/manualidprovisioning/manage")>
+                    <Authorized>
+                        <RadzenButton class="mb-1" Click="@(args => AddRegistrationWorkflow())" Icon="add" Text="@Global.AddRegistrationWorkflow" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                    </Authorized>
+                </SidAuthorizeView>
+            </div>
+        </div>
 
-<RadzenDataGrid @ref="registrationWorkflowsGrid"
-                AllowFiltering="false"
-                AllowColumnResize="true"
-                AllowAlternatingRows="false"
-                AllowSorting="false"
-                PageSize="30"
-                AllowPaging="false"
-                PagerHorizontalAlign="HorizontalAlign.Left"
-                ShowPagingSummary="false"
-                IsLoading="@registrationWorkflowsState.Value.IsLoading"
-                Count="@registrationWorkflowsState.Value.Count"
-                Data="@registrationWorkflowsState.Value.RegistrationWorkflows"
-                LoadData="@LoadData"
-                RowRender="@RowRender"
-                TItem="SelectableRegistrationWorkflow"
-                ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.Name">
-            <Template Context="data">
-                <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.RegistrationWorkflow.Name</RadzenLink>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.RegistrationMethods">
-            <Template Context="data">
-                @foreach(var step in data.RegistrationWorkflow.Steps)
-                {
-                    <RadzenBadge Text="@step" IsPill="true" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.IsDefault">
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value="@data.RegistrationWorkflow.IsDefault" Change="@(args => ToggleIsDefault(args, data))" TValue="bool"></RadzenCheckBox>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Property="RegistrationWorkflow.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.UpdateDateTime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+        <RadzenDataGrid @ref="registrationWorkflowsGrid"
+                        AllowFiltering="false"
+                        AllowColumnResize="true"
+                        AllowAlternatingRows="false"
+                        AllowSorting="false"
+                        PageSize="30"
+                        AllowPaging="false"
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        ShowPagingSummary="false"
+                        IsLoading="@registrationWorkflowsState.Value.IsLoading"
+                        Count="@registrationWorkflowsState.Value.Count"
+                        Data="@registrationWorkflowsState.Value.RegistrationWorkflows"
+                        LoadData="@LoadData"
+                        RowRender="@RowRender"
+                        TItem="SelectableRegistrationWorkflow"
+                        ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <HeaderTemplate>
+                        <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.Name">
+                    <Template Context="data">
+                        <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.RegistrationWorkflow.Name</RadzenLink>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.RegistrationMethods">
+                    <Template Context="data">
+                        @foreach (var step in data.RegistrationWorkflow.Steps)
+                        {
+                            <RadzenBadge Text="@step" IsPill="true" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.IsDefault">
+                    <Template Context="data">
+                        <RadzenCheckBox @bind-Value="@data.RegistrationWorkflow.IsDefault" Change="@(args => ToggleIsDefault(args, data))" TValue="bool"></RadzenCheckBox>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Property="RegistrationWorkflow.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.UpdateDateTime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/manualidprovisioning/manage")>
+                            <Authorized>
+                                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                            </Authorized>
+                        </SidAuthorizeView>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+
+    </Authorized>
+    <NotAuthorized>
+
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     bool selectAll = false;
@@ -97,7 +113,7 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
                 StateHasChanged();
             });
-            if (!registrationWorkflowsState.Value.IsLoading)
+            if (!registrationWorkflowsState.Value.IsLoading && registrationWorkflowsGrid != null)
                 registrationWorkflowsGrid.Reload();
         }
     }

@@ -10,6 +10,23 @@ namespace SimpleIdServer.IdServer.Website.Middlewares;
 
 public class RealmMiddleware
 {
+    private static List<string> _excludedRoutes = new List<string>
+    {
+        "/_blazor",
+        "/logout",
+        "/Culture",
+        "/login",
+        "/callback",
+        "/signout-callback-oidc",
+        "/oidccallback",
+        "/bc-logout"
+    };
+    private static List<string> _excludedFileExtensions = new List<string>
+    {
+        ".js",
+        ".css",
+        ".woff"
+    };
     private readonly RequestDelegate _next;
     private readonly IdServerWebsiteOptions _options;
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
@@ -24,11 +41,8 @@ public class RealmMiddleware
     public async Task InvokeAsync(HttpContext context)
     {
         var path = context.Request.Path.Value;
-        if(path.EndsWith(".js") 
-            || path.EndsWith(".css") 
-            || path.EndsWith(".svg")
-            || path.EndsWith(".woff")
-            || path.StartsWith("/_blazor"))
+        if(_excludedFileExtensions.Any(r => path.EndsWith(r)) 
+            || _excludedRoutes.Any(r => path.StartsWith(r)))
         {
             await _next.Invoke(context);
             return;

@@ -19,82 +19,97 @@
 @inject IState<RegistrationWorkflowsState> registrationWorkflowsState
 @inject DefaultSecurityOptions securityOptions
 
-<div class="row">
-    <div class="col">
-        <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.AcrsTitle" TextStyle="TextStyle.DisplayH3" />
-        <p>
-            @Global.AcrsDescription
-        </p>
-    </div>
-    <div class="col-3">
-        <RadzenButton class="mb-1" Click="@(args => AddAcr())" Icon="add" Text="@Global.AddAcr" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    </div>
-</div>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/acrs/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/acrs/view")>
+    <Authorized>
+        <div class="row">
+            <div class="col">
+                <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.AcrsTitle" TextStyle="TextStyle.DisplayH3" />
+                <p>
+                    @Global.AcrsDescription
+                </p>
+            </div>
+            <div class="col-3">
+                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/acrs/manage")>
+                    <Authorized>
+                        <RadzenButton class="mb-1" Click="@(args => AddAcr())" Icon="add" Text="@Global.AddAcr" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                    </Authorized>
+                </SidAuthorizeView>
+            </div>
+        </div>
 
-<RadzenDataGrid @ref="acrsGrid" 
-                AllowFiltering="true"
-                AllowColumnResize="true"
-                AllowAlternatingRows="false"
-                AllowSorting="true"
-                PageSize="30"
-                AllowPaging="true"
-                PagerHorizontalAlign="HorizontalAlign.Left"
-                ShowPagingSummary="true"
-                IsLoading="@acrsState.Value.IsLoading"
-                Count="@acrsState.Value.Count"
-                Data="@acrsState.Value.Acrs"
-                LoadData="@LoadData"
-                RowRender="@RowRender"
-                TItem="SelectableAcr"
-                ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
-            <Template Context="data">
-                @if(activeRealm == SimpleIdServer.IdServer.Constants.DefaultRealm)
-                {
-                    <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.Value.Name</RadzenLink>
-                }
-                else
-                {
-                    <RadzenText>@data.Value.Name</RadzenText>
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="@Global.DisplayName" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.RegistrationWorkflow" Width="80px">
-            <Template Context="data">                
-                <RadzenDropDown Data=@registrationWorkflowsState.Value.RegistrationWorkflows.Select(r => r.RegistrationWorkflow)
-                    TextProperty="Name"
-                    ValueProperty="Id"
-                    TValue="string"
-                    @bind-Value=@data.Value.RegistrationWorkflowId
-                    Change=@((obj) => UpdateRegistrationWorkflow(obj,  data))/>
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
-            <Template Context="data">
-                @foreach(var amr in data.Value.AuthenticationMethodReferences)
-                {
-                    <RadzenBadge Text="@amr" IsPill="true" />
-                }
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+        <RadzenDataGrid @ref="acrsGrid"
+                        AllowFiltering="true"
+                        AllowColumnResize="true"
+                        AllowAlternatingRows="false"
+                        AllowSorting="true"
+                        PageSize="30"
+                        AllowPaging="true"
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        ShowPagingSummary="true"
+                        IsLoading="@acrsState.Value.IsLoading"
+                        Count="@acrsState.Value.Count"
+                        Data="@acrsState.Value.Acrs"
+                        LoadData="@LoadData"
+                        RowRender="@RowRender"
+                        TItem="SelectableAcr"
+                        ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <HeaderTemplate>
+                        <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
+                    <Template Context="data">
+                        @if (activeRealm == SimpleIdServer.IdServer.Constants.DefaultRealm)
+                        {
+                            <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.Value.Name</RadzenLink>
+                        }
+                        else
+                        {
+                            <RadzenText>@data.Value.Name</RadzenText>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="@Global.DisplayName" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.RegistrationWorkflow" Width="80px">
+                    <Template Context="data">
+                        <RadzenDropDown Data=@registrationWorkflowsState.Value.RegistrationWorkflows.Select(r => r.RegistrationWorkflow)
+                                        TextProperty="Name"
+                                        ValueProperty="Id"
+                                        TValue="string"
+                                        @bind-Value=@data.Value.RegistrationWorkflowId
+                                        Change=@((obj) => UpdateRegistrationWorkflow(obj, data)) />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
+                    <Template Context="data">
+                        @foreach (var amr in data.Value.AuthenticationMethodReferences)
+                        {
+                            <RadzenBadge Text="@amr" IsPill="true" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/acrs/manage")>
+                            <Authorized>
+                                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                            </Authorized>
+                        </SidAuthorizeView>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     RadzenDataGrid<SelectableAcr> acrsGrid;
@@ -111,7 +126,7 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedAcrsRemoved });
                 StateHasChanged();
             });
-            if (!acrsState.Value.IsLoading)
+            if (!acrsState.Value.IsLoading && acrsGrid != null)
                 acrsGrid.Reload();
         }
     }

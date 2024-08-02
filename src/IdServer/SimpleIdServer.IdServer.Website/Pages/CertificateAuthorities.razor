@@ -13,63 +13,78 @@
 @inject IDispatcher dispatcher
 @inject IState<SearchCertificateAuthoritiesState> searchCertificateAuthoritiesState
 
-<div class="row">
-    <div class="col">
-        <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.CertificateAuthoritiesTitle" TextStyle="TextStyle.DisplayH3" />
-        <p>
-            @((MarkupString)(Global.CertificateAuthoritiesDescription))
-        </p>
-    </div>
-    <div class="col-3">
-        <RadzenButton class="mb-1" Click="@(args => AddCertificateAuthority())" Icon="add" Text="@Global.AddCertificateAuthority" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
-    </div>
-</div>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/view")>
+    <Authorized>
+        <div class="row">
+            <div class="col">
+                <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.CertificateAuthoritiesTitle" TextStyle="TextStyle.DisplayH3" />
+                <p>
+                    @((MarkupString)(Global.CertificateAuthoritiesDescription))
+                </p>
+            </div>
+            <div class="col-3">
+                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage")>
+                    <Authorized>
+                        <RadzenButton class="mb-1" Click="@(args => AddCertificateAuthority())" Icon="add" Text="@Global.AddCertificateAuthority" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                    </Authorized>
+                </SidAuthorizeView>
+            </div>
+        </div>
 
-<RadzenDataGrid @ref="caGrid"
-                AllowFiltering="true"
-                AllowColumnResize="true"
-                AllowAlternatingRows="false"
-                AllowSorting="true"
-                PageSize="30"
-                AllowPaging="true"
-                PagerHorizontalAlign="HorizontalAlign.Left"
-                ShowPagingSummary="true"
-                IsLoading="@searchCertificateAuthoritiesState.Value.IsLoading"
-                Count="@searchCertificateAuthoritiesState.Value.Count"
-                Data="@searchCertificateAuthoritiesState.Value.CertificateAuthorities"
-                LoadData="@LoadData"
-                RowRender="@RowRender"
-                TItem="SelectableCertificateAuthority"
-                ColumnWidth="300px">
-    <Columns>
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
-            <HeaderTemplate>
-                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
-            </HeaderTemplate>
-            <Template Context="data">
-                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Identifier" Width="80px">
-            <Template Context="data">
-                <RadzenLink Text="@data.Value.SubjectName" Path="@(urlHelper.GetUrl($"/certificateauthorities/{data.Value.Id}/details"))" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Source" Width="80px">
-            <Template Context="data">
-                <RadzenBadge Text="@(Enum.GetName(typeof(CertificateAuthoritySources), data.Value.Source))" IsPill="true" />
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.StartDatetime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.EndDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.EndDatetime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
-            <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+        <RadzenDataGrid @ref="caGrid"
+                        AllowFiltering="true"
+                        AllowColumnResize="true"
+                        AllowAlternatingRows="false"
+                        AllowSorting="true"
+                        PageSize="30"
+                        AllowPaging="true"
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        ShowPagingSummary="true"
+                        IsLoading="@searchCertificateAuthoritiesState.Value.IsLoading"
+                        Count="@searchCertificateAuthoritiesState.Value.Count"
+                        Data="@searchCertificateAuthoritiesState.Value.CertificateAuthorities"
+                        LoadData="@LoadData"
+                        RowRender="@RowRender"
+                        TItem="SelectableCertificateAuthority"
+                        ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <HeaderTemplate>
+                        <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                    </HeaderTemplate>
+                    <Template Context="data">
+                        <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Identifier" Width="80px">
+                    <Template Context="data">
+                        <RadzenLink Text="@data.Value.SubjectName" Path="@(urlHelper.GetUrl($"/certificateauthorities/{data.Value.Id}/details"))" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Source" Width="80px">
+                    <Template Context="data">
+                        <RadzenBadge Text="@(Enum.GetName(typeof(CertificateAuthoritySources), data.Value.Source))" IsPill="true" />
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.StartDatetime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.EndDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.EndDatetime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage")>
+                            <Authorized>
+                                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                            </Authorized>
+                        </SidAuthorizeView>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     bool selectAll = false;

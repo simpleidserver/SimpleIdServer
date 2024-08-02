@@ -81,7 +81,7 @@ public class GroupRepository : IGroupRepository
     public async Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarGroup>()
-            .Includes(g => g.Roles)
+            .Includes(g => g.Roles, r => r.Realms)
             .Includes(c => c.Realms)
             .Where(g => fullPathLst.Contains(g.FullPath) && g.Realms.Any(r => r.RealmsName == realm))
             .ToListAsync(cancellationToken);

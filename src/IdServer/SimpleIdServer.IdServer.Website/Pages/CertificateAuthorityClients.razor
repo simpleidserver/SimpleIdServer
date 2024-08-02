@@ -10,7 +10,11 @@
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
 
-<RadzenButton class="mb-1" Click="@(args => AddCertificateClient())" Icon="add" Text="@Global.AddClientCertificate" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddCertificateClient())" Icon="add" Text="@Global.AddClientCertificate" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
 
 <RadzenDataGrid @ref="caGrid"
                 AllowFiltering="true"
@@ -41,7 +45,11 @@
         <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.EndDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.EndDatetime" Width="80px" SortOrder="SortOrder.Descending" />
         <RadzenDataGridColumn TItem="SelectableClientCertificate" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/certificateauthorities/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
             </Template>
         </RadzenDataGridColumn>
     </Columns>

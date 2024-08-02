@@ -10,50 +10,57 @@
 @inject IUrlHelper urlHelper
 @inject IDispatcher dispatcher
 
-<RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/users")" Text="@Global.Users" />
-    <RadzenBreadCrumbItem Text="@Global.UserDetails" />
-</RadzenBreadCrumb>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/users")" Text="@Global.Users" />
+            <RadzenBreadCrumbItem Text="@Global.UserDetails" />
+        </RadzenBreadCrumb>
 
-<RadzenText class="mt-3 mb-3 no-margin" Text="@userState.Value.User?.Name" TextStyle="TextStyle.DisplayH3" />
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@userState.Value.User?.Name" TextStyle="TextStyle.DisplayH3" />
 
-@if (!string.IsNullOrWhiteSpace(userState.Value.User?.Source))
-{
-    <RadzenBadge class="mb-3" Text="@userState.Value.User?.Source" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
-}
+        @if (!string.IsNullOrWhiteSpace(userState.Value.User?.Source))
+        {
+            <RadzenBadge class="mb-3" Text="@userState.Value.User?.Source" IsPill="true" BadgeStyle="BadgeStyle.Info"></RadzenBadge>
+        }
 
-@if(userState.Value.User != null)
-{
-    <RadzenBadge class="mb-3" IsPill=true Text="@(userState.Value.User.Status == UserStatus.ACTIVATED ? Global.Active : Global.Blocked)" BadgeStyle="@(userState.Value.User.Status == UserStatus.ACTIVATED ? BadgeStyle.Success : BadgeStyle.Danger)"></RadzenBadge>
-}
+        @if (userState.Value.User != null)
+        {
+            <RadzenBadge class="mb-3" IsPill=true Text="@(userState.Value.User.Status == UserStatus.ACTIVATED ? Global.Active : Global.Blocked)" BadgeStyle="@(userState.Value.User.Status == UserStatus.ACTIVATED ? BadgeStyle.Success : BadgeStyle.Danger)"></RadzenBadge>
+        }
 
-<RadzenCardLoader Variant="Variant.Filled" IsLoading=@userState.Value.IsLoading>
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="@Global.Details">
-                <UserSettings User="@userState.Value.User"></UserSettings>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Consents" >
-                <UserConsents User="@userState.Value.User"></UserConsents>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Credentials">
-                <UserCredentials User="@userState.Value.User"></UserCredentials>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Groups">
-                <UserGroups User="@userState.Value.User"></UserGroups>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Claims">
-                <UserClaims UserId="@userState.Value.User?.Id"></UserClaims>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Sessions">
-                <UserSessions User="@userState.Value.User"></UserSessions>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.ExternalIdProviders">
-                <UserProfiles User="@userState.Value.User"></UserProfiles>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
-</RadzenCardLoader>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@userState.Value.IsLoading>
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.Details">
+                        <UserSettings User="@userState.Value.User"></UserSettings>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Consents">
+                        <UserConsents User="@userState.Value.User"></UserConsents>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Credentials">
+                        <UserCredentials User="@userState.Value.User"></UserCredentials>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Groups">
+                        <UserGroups User="@userState.Value.User"></UserGroups>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Claims">
+                        <UserClaims UserId="@userState.Value.User?.Id"></UserClaims>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Sessions">
+                        <UserSessions User="@userState.Value.User"></UserSessions>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.ExternalIdProviders">
+                        <UserProfiles User="@userState.Value.User"></UserProfiles>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>

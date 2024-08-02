@@ -1944,4 +1944,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="RealmPermissionsDescription" xml:space="preserve">
     <value>Select one or more permissions assigned to the realm. You must reconnect to the administration website for the changes to take effect.</value>
   </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Welcome {0}</value>
+  </data>
 </root>

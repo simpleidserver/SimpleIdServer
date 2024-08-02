@@ -9,7 +9,14 @@
 
 @if (IdProvisioning != null && IdProvisioning.Definition != null)
 {
-    <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvisioning.Definition.OptionsName Values="@IdProvisioning.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/automaticidprovisioning/manage")>
+        <Authorized>
+            <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvisioning.Definition.OptionsName Values="@IdProvisioning.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+        </Authorized>
+        <NotAuthorized>
+            <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvisioning.Definition.OptionsName Values="@IdProvisioning.Values" IsEnabled=false IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+        </NotAuthorized>
+    </SidAuthorizeView>
 }
 
 @code {

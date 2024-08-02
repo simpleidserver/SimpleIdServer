@@ -36,18 +36,25 @@
     </div>    
 }
 
-<RadzenCard>
-    <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="@Global.Details">
-                <RealmDetails></RealmDetails>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.Roles">
-                <RealmRoles></RealmRoles>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
-</RadzenCard>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/realms/manage,{IdServer.Helpers.RealmContext.Instance()?.Realm}/realms/view")>
+    <Authorized>
+        <RadzenCard>
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.Details">
+                        <RealmDetails></RealmDetails>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Roles">
+                        <RealmRoles></RealmRoles>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCard>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     private Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>

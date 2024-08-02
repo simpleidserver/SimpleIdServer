@@ -10,7 +10,12 @@
 
 <p class="text-muted">@Global.UserSessionsDescription</p>
 
-<RadzenButton class="mb-1" Click="@(args => RevokeSessions())" Icon="delete" Text="@Global.RevokeSessions" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => RevokeSessions())" Icon="delete" Text="@Global.RevokeSessions" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
+
 <RadzenDataGrid @ref="sessionsGrid"
             AllowFiltering="true"
             AllowColumnResize="true"
@@ -59,7 +64,11 @@
             <Template Context="data">
                 @if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.Now)
                 {
-                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    <SidAuthorizeView Roles=@($"{IdServer.Helpers.RealmContext.Instance()?.Realm}/users/manage")>
+                        <Authorized>
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                        </Authorized>
+                    </SidAuthorizeView>
                 }
             </Template>
         </RadzenDataGridColumn>
