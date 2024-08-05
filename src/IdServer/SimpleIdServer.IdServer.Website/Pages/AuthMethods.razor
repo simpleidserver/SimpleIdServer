@@ -1,5 +1,6 @@
 ﻿@inject IState<AuthMethodsState> authMethodsState
 @inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Api.AuthenticationMethods
@@ -160,7 +161,7 @@
     string GetAuthMethodUrl(AuthenticationMethodResult authMethod)
     {
         if (string.IsNullOrWhiteSpace(authMethod.OptionsName)) return null;
-        return "/authentications/authmethods/" + authMethod.Id + "/options";
+        return urlHelper.GetUrl("/authentications/authmethods/" + authMethod.Id + "/options");
     }
 
     string GetPicture(AuthenticationMethodResult authMethod)

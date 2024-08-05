@@ -3,6 +3,7 @@
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using SimpleIdServer.IdServer.Auth;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Middlewares;
 
 namespace SimpleIdServer.IdServer.WsFederation.Auth

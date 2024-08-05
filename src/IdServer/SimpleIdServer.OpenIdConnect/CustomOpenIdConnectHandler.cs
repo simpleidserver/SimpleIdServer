@@ -9,9 +9,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.DPoP;
+using SimpleIdServer.IdServer.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -33,6 +35,8 @@ namespace SimpleIdServer.OpenIdConnect
 {
     public class CustomOpenIdConnectHandler : RemoteAuthenticationHandler<CustomOpenIdConnectOptions>, IAuthenticationSignOutHandler
     {
+        private Dictionary<string, ConfigurationManager<OpenIdConnectConfiguration>> RealmConfigurationManagers = new Dictionary<string, ConfigurationManager<OpenIdConnectConfiguration>>();
+        private Dictionary<string, OpenIdConnectConfiguration> RealmOpenidConfigurations = new Dictionary<string, OpenIdConnectConfiguration>();
         private const string NonceProperty = "N";
         private const string HeaderValueEpocDate = "Thu, 01 Jan 1970 00:00:00 GMT";
         private const string PushedAuthorizationRequestEndpoint = "pushed_authorization_request_endpoint";
@@ -66,6 +70,16 @@ namespace SimpleIdServer.OpenIdConnect
 
         public CustomOpenIdConnectHandler(IOptionsMonitor<CustomOpenIdConnectOptions> options, ILoggerFactory logger, HtmlEncoder htmlEncoder, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
+        }
+
+        public override Task<bool> ShouldHandleRequestAsync()
+        {
+            if(Options.IsRealmEnabled)
+            {
+                return Task.FromResult($"/{RealmContext.Instance().Realm}{Options.CallbackPath}" == Request.Path);
+            }
+
+            return Task.FromResult(Options.CallbackPath == Request.Path);
         }
 
         public override Task<bool> HandleRequestAsync()
@@ -246,15 +260,11 @@ namespace SimpleIdServer.OpenIdConnect
 
             Logger.EnteringOpenIdAuthenticationHandlerHandleSignOutAsync(GetType().FullName!);
 
-            if (_configuration == null && Options.ConfigurationManager != null)
-            {
-                _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
-            }
-
+            var configuration = await GetConfiguration();
             var message = new OpenIdConnectMessage()
             {
                 EnableTelemetryParameters = !Options.DisableTelemetry,
-                IssuerAddress = _configuration?.EndSessionEndpoint ?? string.Empty,
+                IssuerAddress = configuration?.EndSessionEndpoint ?? string.Empty,
 
                 // Redirect back to SigneOutCallbackPath first before user agent is redirected to actual post logout redirect uri
                 PostLogoutRedirectUri = BuildRedirectUriIfRelative(Options.SignedOutCallbackPath)
@@ -456,13 +466,10 @@ namespace SimpleIdServer.OpenIdConnect
                     return HandleRequestResult.Fail(CreateOpenIdConnectProtocolException(authorizationResponse, response: null), properties);
                 }
 
-                if (_configuration == null && Options.ConfigurationManager != null)
-                {
-                    Logger.UpdatingConfiguration();
-                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
-                }
 
-                PopulateSessionProperties(authorizationResponse, properties);
+                var configuration = await GetConfiguration();
+
+                PopulateSessionProperties(authorizationResponse, properties, configuration);
 
                 ClaimsPrincipal? user = null;
                 JwtSecurityToken? jwt = null;
@@ -473,7 +480,7 @@ namespace SimpleIdServer.OpenIdConnect
                 if (!string.IsNullOrEmpty(authorizationResponse.IdToken))
                 {
                     Logger.ReceivedIdToken();
-                    user = ValidateToken(authorizationResponse.IdToken, properties, validationParameters, out jwt);
+                    user = ValidateToken(authorizationResponse.IdToken, properties, validationParameters, configuration, out jwt);
 
                     nonce = jwt.Payload.Nonce;
                     if (!string.IsNullOrEmpty(nonce))
@@ -521,7 +528,7 @@ namespace SimpleIdServer.OpenIdConnect
 
                     if (!authorizationCodeReceivedContext.HandledCodeRedemption)
                     {
-                        tokenEndpointResponse = await RedeemAuthorizationCodeAsync(tokenEndpointRequest!);
+                        tokenEndpointResponse = await RedeemAuthorizationCodeAsync(tokenEndpointRequest!, configuration: configuration);
                     }
 
                     var tokenResponseReceivedContext = await RunTokenResponseReceivedEventAsync(authorizationResponse, tokenEndpointResponse!, user, properties);
@@ -541,7 +548,7 @@ namespace SimpleIdServer.OpenIdConnect
 
                     // At least a cursory validation is required on the new IdToken, even if we've already validated the one from the authorization response.
                     // And we'll want to validate the new JWT in ValidateTokenResponse.
-                    var tokenEndpointUser = ValidateToken(tokenEndpointResponse.IdToken, properties, validationParameters, out var tokenEndpointJwt);
+                    var tokenEndpointUser = ValidateToken(tokenEndpointResponse.IdToken, properties, validationParameters, configuration, out var tokenEndpointJwt);
 
                     // Avoid reading & deleting the nonce cookie, running the event, etc, if it was already done as part of the authorization response validation.
                     if (user == null)
@@ -595,7 +602,7 @@ namespace SimpleIdServer.OpenIdConnect
 
                 if (Options.GetClaimsFromUserInfoEndpoint)
                 {
-                    return await GetUserInformationAsync(tokenEndpointResponse ?? authorizationResponse, jwt!, user!, properties!);
+                    return await GetUserInformationAsync(tokenEndpointResponse ?? authorizationResponse, jwt!, user!, properties!, configuration);
                 }
                 else
                 {
@@ -644,10 +651,9 @@ namespace SimpleIdServer.OpenIdConnect
                 var response = dic.First(kvp => kvp.Key == ResponseParameterName).Value[0];
                 var handler = new JsonWebTokenHandler();
                 var payload = handler.ReadJsonWebToken(response);
-                if (_configuration == null && Options.ConfigurationManager != null)
-                    _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+                var configuration = await GetConfiguration();
 
-                var jsonWebKey = _configuration.JsonWebKeySet.Keys.FirstOrDefault(k => k.KeyId == payload.Kid);
+                var jsonWebKey = configuration.JsonWebKeySet.Keys.FirstOrDefault(k => k.KeyId == payload.Kid);
                 if (jsonWebKey == null)
                     return new AuthorizationExtractionResult { IsValid = false, ErrorResult = CustomHandlerRequestResults.UnknownJWK };
                 var validationResult = new JsonWebTokenHandler().ValidateToken(response, new TokenValidationParameters
@@ -675,9 +681,10 @@ namespace SimpleIdServer.OpenIdConnect
         /// <returns><see cref="HandleRequestResult"/> which is used to determine if the remote authentication was successful.</returns>
         protected virtual async Task<HandleRequestResult> GetUserInformationAsync(
             OpenIdConnectMessage message, JwtSecurityToken jwt,
-            ClaimsPrincipal principal, AuthenticationProperties properties)
+            ClaimsPrincipal principal, AuthenticationProperties properties,
+            OpenIdConnectConfiguration configuration)
         {
-            var userInfoEndpoint = _configuration?.UserInfoEndpoint;
+            var userInfoEndpoint = configuration?.UserInfoEndpoint;
 
             if (string.IsNullOrEmpty(userInfoEndpoint))
             {
@@ -833,18 +840,14 @@ namespace SimpleIdServer.OpenIdConnect
             }
             Logger.PostAuthenticationLocalRedirect(properties.RedirectUri);
 
-            if (_configuration == null && Options.ConfigurationManager != null)
-            {
-                _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
-            }
-
-            CheckOptions();
+            var configuration = await GetConfiguration();
+            CheckOptions(configuration);
             var message = new OpenIdConnectMessage
             {
                 ClientId = Options.ClientId,
                 EnableTelemetryParameters = !Options.DisableTelemetry,
-                IssuerAddress = _configuration?.AuthorizationEndpoint ?? string.Empty,
-                RedirectUri = properties.GetParameter<string>(OpenIdConnectParameterNames.RedirectUri) ?? BuildRedirectUri(Options.CallbackPath),
+                IssuerAddress = configuration?.AuthorizationEndpoint ?? string.Empty,
+                RedirectUri = properties.GetParameter<string>(OpenIdConnectParameterNames.RedirectUri) ?? BuildRedirectUri(Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath),
                 Resource = Options.Resource,
                 ResponseType = Options.ResponseType,
                 Prompt = properties.GetParameter<string>(OpenIdConnectParameterNames.Prompt) ?? Options.Prompt,
@@ -895,6 +898,7 @@ namespace SimpleIdServer.OpenIdConnect
                 WriteNonceCookie(message.Nonce);
             }
 
+            Options.CorrelationCookie.Path = Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath;
             GenerateCorrelationId(properties);
 
             var redirectContext = new RedirectContext(Context, Scheme, Options, properties)
@@ -927,7 +931,7 @@ namespace SimpleIdServer.OpenIdConnect
                     "Cannot redirect to the authorization endpoint, the configuration may be missing or invalid.");
             }
 
-            await BuildAuthorizationRequest(message);
+            await BuildAuthorizationRequest(message, configuration);
             if (Options.AuthenticationMethod == OpenIdConnectRedirectBehavior.RedirectGet)
             {
                 var redirectUri = message.CreateAuthenticationRequestUrl();
@@ -966,6 +970,7 @@ namespace SimpleIdServer.OpenIdConnect
                 throw new ArgumentNullException(nameof(nonce));
             }
 
+            Options.NonceCookie.Path = Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath;
             var cookieOptions = Options.NonceCookie.Build(Context, Clock.UtcNow);
 
             Response.Cookies.Append(
@@ -1210,7 +1215,7 @@ namespace SimpleIdServer.OpenIdConnect
         }
 
         // Note this modifies properties if Options.UseTokenLifetime
-        private ClaimsPrincipal ValidateToken(string idToken, AuthenticationProperties properties, TokenValidationParameters validationParameters, out JwtSecurityToken jwt)
+        private ClaimsPrincipal ValidateToken(string idToken, AuthenticationProperties properties, TokenValidationParameters validationParameters, OpenIdConnectConfiguration configuration, out JwtSecurityToken jwt)
         {
             if (!Options.SecurityTokenValidator.CanReadToken(idToken))
             {
@@ -1218,13 +1223,13 @@ namespace SimpleIdServer.OpenIdConnect
                 throw new SecurityTokenException(string.Format(CultureInfo.InvariantCulture, Resources.UnableToValidateToken, idToken));
             }
 
-            if (_configuration != null)
+            if (configuration != null)
             {
-                var issuer = new[] { _configuration.Issuer };
+                var issuer = new[] { configuration.Issuer };
                 validationParameters.ValidIssuers = validationParameters.ValidIssuers?.Concat(issuer) ?? issuer;
 
-                validationParameters.IssuerSigningKeys = validationParameters.IssuerSigningKeys?.Concat(_configuration.SigningKeys)
-                    ?? _configuration.SigningKeys;
+                validationParameters.IssuerSigningKeys = validationParameters.IssuerSigningKeys?.Concat(configuration.SigningKeys)
+                    ?? configuration.SigningKeys;
             }
 
             var principal = Options.SecurityTokenValidator.ValidateToken(idToken, validationParameters, out SecurityToken validatedToken);
@@ -1262,7 +1267,7 @@ namespace SimpleIdServer.OpenIdConnect
             return principal;
         }
 
-        private async Task BuildAuthorizationRequest(OpenIdConnectMessage message)
+        private async Task BuildAuthorizationRequest(OpenIdConnectMessage message, OpenIdConnectConfiguration configuration)
         {
             if (Options.RequestType == RequestTypes.NONE) return;
             switch (Options.RequestType)
@@ -1287,7 +1292,7 @@ namespace SimpleIdServer.OpenIdConnect
                         return;
                     }
 
-                    var parUrl = _configuration.AdditionalData[PushedAuthorizationRequestEndpoint].ToString();
+                    var parUrl = configuration.AdditionalData[PushedAuthorizationRequestEndpoint].ToString();
                     var dic = new Dictionary<string, string>
                     {
                         { RequestParameterName, request },
@@ -1311,15 +1316,15 @@ namespace SimpleIdServer.OpenIdConnect
             throw new NotImplementedException($"Request {Options.RequestType} is not yet implemented");
         }
 
-        private void CheckOptions()
+        private void CheckOptions(OpenIdConnectConfiguration configuration)
         {
             if ((Options.RequestType == RequestTypes.REQUEST || Options.RequestType == RequestTypes.PAR) && Options.SigningCredentials == null)
                 throw new InvalidOperationException("SigningCredentials is required when request type is equals to request");
 
-            if(!_configuration.AdditionalData.ContainsKey(PushedAuthorizationRequestEndpoint) && Options.RequestType == RequestTypes.PAR)
+            if(!configuration.AdditionalData.ContainsKey(PushedAuthorizationRequestEndpoint) && Options.RequestType == RequestTypes.PAR)
                 throw new InvalidOperationException("Identity Server doesn't support PAR request");
 
-            if (_configuration.AdditionalData.ContainsKey(RequirePushedAuthorizationRequests) && bool.TryParse(_configuration.AdditionalData[RequirePushedAuthorizationRequests].ToString(), out bool requiredPushedAuthorizationRequests) && requiredPushedAuthorizationRequests && Options.RequestType != RequestTypes.PAR)
+            if (configuration.AdditionalData.ContainsKey(RequirePushedAuthorizationRequests) && bool.TryParse(configuration.AdditionalData[RequirePushedAuthorizationRequests].ToString(), out bool requiredPushedAuthorizationRequests) && requiredPushedAuthorizationRequests && Options.RequestType != RequestTypes.PAR)
                 throw new InvalidOperationException("Pushed Authorization Request must be used");
 
             if (Options.ClientAuthenticationType == ClientAuthenticationTypes.CLIENT_SECRET_POST && string.IsNullOrWhiteSpace(Options.ClientSecret))
@@ -1338,16 +1343,16 @@ namespace SimpleIdServer.OpenIdConnect
             public string RequestUri { get; set; }
         }
 
-        private void PopulateSessionProperties(OpenIdConnectMessage message, AuthenticationProperties properties)
+        private void PopulateSessionProperties(OpenIdConnectMessage message, AuthenticationProperties properties, OpenIdConnectConfiguration configuration)
         {
             if (!string.IsNullOrEmpty(message.SessionState))
             {
                 properties.Items[OpenIdConnectSessionProperties.SessionState] = message.SessionState;
             }
 
-            if (!string.IsNullOrEmpty(_configuration?.CheckSessionIframe))
+            if (!string.IsNullOrEmpty(configuration?.CheckSessionIframe))
             {
-                properties.Items[OpenIdConnectSessionProperties.CheckSessionIFrame] = _configuration.CheckSessionIframe;
+                properties.Items[OpenIdConnectSessionProperties.CheckSessionIFrame] = configuration.CheckSessionIframe;
             }
         }
 
@@ -1356,10 +1361,10 @@ namespace SimpleIdServer.OpenIdConnect
         /// </summary>
         /// <param name="tokenEndpointRequest">The request that will be sent to the token endpoint and is available for customization.</param>
         /// <returns>OpenIdConnect message that has tokens inside it.</returns>
-        protected virtual async Task<OpenIdConnectMessage> RedeemAuthorizationCodeAsync(OpenIdConnectMessage tokenEndpointRequest, string dpopNonce = null)
+        protected virtual async Task<OpenIdConnectMessage> RedeemAuthorizationCodeAsync(OpenIdConnectMessage tokenEndpointRequest, string dpopNonce = null, OpenIdConnectConfiguration configuration = null)
         {
             Logger.RedeemingCodeForTokens();
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpointRequest.TokenEndpoint ?? _configuration?.TokenEndpoint);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpointRequest.TokenEndpoint ?? configuration?.TokenEndpoint);
             requestMessage.Content = new FormUrlEncodedContent(tokenEndpointRequest.Parameters);
             HttpResponseMessage responseMessage = null;
             switch(Options.ClientAuthenticationType)
@@ -1371,7 +1376,7 @@ namespace SimpleIdServer.OpenIdConnect
                     else responseMessage = await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
                     break;
                 case ClientAuthenticationTypes.TLS_CLIENT_AUTH:
-                    var mtlsEndpointAliases = _configuration.AdditionalData[MtlsEndpointAliasesName];
+                    var mtlsEndpointAliases = configuration.AdditionalData[MtlsEndpointAliasesName];
                     var type = mtlsEndpointAliases.GetType();
                     var getValueMethod = type.GetMethods(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).First(m => m.Name == "GetValue" && m.GetParameters().Length == 1);
                     var val = getValueMethod.Invoke(mtlsEndpointAliases, new object[] { TokenEndpointParameterName });
@@ -1420,7 +1425,7 @@ namespace SimpleIdServer.OpenIdConnect
 
             if (!responseMessage.IsSuccessStatusCode)
             {
-                if (message.Error == "use_dpop_nonce") return await RedeemAuthorizationCodeAsync(tokenEndpointRequest, responseMessage.Headers.First(h => h.Key == "DPoP-Nonce").Value.First());
+                if (message.Error == "use_dpop_nonce") return await RedeemAuthorizationCodeAsync(tokenEndpointRequest, responseMessage.Headers.First(h => h.Key == "DPoP-Nonce").Value.First(), configuration);
                 throw CreateOpenIdConnectProtocolException(message, responseMessage);
             }
 
@@ -1430,7 +1435,7 @@ namespace SimpleIdServer.OpenIdConnect
             {
                 RotateDPoPSecurityKey();
                 var handler = new DPoPHandler();
-                var dpop = handler.Create("POST", _configuration.TokenEndpoint, _dPoPSecurityKey, SecurityAlgorithms.EcdsaSha256, dpopNonce);
+                var dpop = handler.Create("POST", configuration.TokenEndpoint, _dPoPSecurityKey, SecurityAlgorithms.EcdsaSha256, dpopNonce);
                 requestMessage.Headers.Add("DPoP", dpop.Token);
                 return await Backchannel.SendAsync(requestMessage, Context.RequestAborted);
             }
@@ -1461,6 +1466,46 @@ namespace SimpleIdServer.OpenIdConnect
             }
 
             return BuildRedirectUri(uri);
+        }
+
+        private async Task<OpenIdConnectConfiguration> GetConfiguration()
+        {
+            if (this.Options.IsRealmEnabled)
+            {
+                var realm = RealmContext.Instance().Realm ?? "master";
+                if (!RealmConfigurationManagers.ContainsKey(realm))
+                {
+                    var metadataAdr = Options.Authority;
+                    if (!metadataAdr.EndsWith('/'))
+                        metadataAdr += "/";
+                    metadataAdr += $"{realm}/.well-known/openid-configuration";
+                    var configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(metadataAdr, new OpenIdConnectConfigurationRetriever(), new HttpDocumentRetriever(Options.Backchannel)
+                    {
+                        RequireHttps = Options.RequireHttpsMetadata
+                    })
+                    {
+                        RefreshInterval = Options.RefreshInterval,
+                        AutomaticRefreshInterval = Options.AutomaticRefreshInterval
+                    };
+                    RealmConfigurationManagers.Add(realm, configurationManager);
+                }
+
+                if(!RealmOpenidConfigurations.ContainsKey(realm))
+                {
+                    var configuration = await RealmConfigurationManagers[realm].GetConfigurationAsync(Context.RequestAborted);
+                    RealmOpenidConfigurations.Add(realm, configuration);
+                }
+
+                return RealmOpenidConfigurations[realm];
+            }
+
+            if (_configuration == null && Options.ConfigurationManager != null)
+            {
+                Logger.UpdatingConfiguration();
+                _configuration = await Options.ConfigurationManager.GetConfigurationAsync(Context.RequestAborted);
+            }
+
+            return _configuration;
         }
 
         private OpenIdConnectProtocolException CreateOpenIdConnectProtocolException(OpenIdConnectMessage message, HttpResponseMessage? response)

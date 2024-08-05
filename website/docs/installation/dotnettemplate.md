@@ -79,7 +79,7 @@ cd src
 dotnet new idserverwebsite -n IdServerWebsite
 ```
 
-Run the `IdServerWebsite` project, it must listens on the url `https://localhost:5002`.
+Run the `IdServerWebsite` project, it must listens on the url `https://localhost:5002/master/clients`.
 
 ```
 cd src/IdServerWebsite

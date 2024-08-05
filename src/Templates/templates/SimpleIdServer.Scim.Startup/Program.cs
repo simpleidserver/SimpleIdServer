@@ -241,7 +241,10 @@ public class Program
         });
         InitializeDatabase(builder, app);
         app.UseAuthentication();
-        app.UseScim(opts.EnableRealm);
+        app.UseMvc(o =>
+        {
+            o.UseScim(opts.EnableRealm);
+        });
     }
 
     #region Database migration

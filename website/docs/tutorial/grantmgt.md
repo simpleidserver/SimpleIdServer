@@ -63,7 +63,7 @@ The source code of this project can be found [here](https://github.com/simpleids
 
 Utilize the administration UI to create a client certificate.
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. In the Certificate Authorities screen, choose a Certificate Authority from the available options. Remember that the selected Certificate Authority should be trusted by your machine. You can download the certificate and import it into the appropriate Certificate Store.
 3. Click on the `Client Certificates` tab and then proceed to click on the `Add Client Certificate` button.
 4. Set the value of the Subject Name to `CN=fapiGrant` and click on the `Add` button.
@@ -73,7 +73,7 @@ Utilize the administration UI to create a client certificate.
 
 Utilize the administration UI to configure a new OpenID client :
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. In the Clients screen, click on `Add client` button.
 3. Select `FAPI2.0`.
 4. Select `Grant Management` and click on next.

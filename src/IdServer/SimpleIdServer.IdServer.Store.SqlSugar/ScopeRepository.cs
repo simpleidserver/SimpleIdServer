@@ -17,6 +17,11 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             _dbContext = dbContext;
         }
 
+        public Task<List<Scope>> Get(List<string> ids, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Add(Scope scope)
         {
             _dbContext.Client.InsertNav(SugarScope.Transform(scope))
@@ -119,6 +124,15 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 Count = nb,
                 Content = scopes.Select(s => s.ToDomain()).ToList()
             };
+        }
+
+        public async Task<List<Scope>> GetAllRealmScopes(string realm, CancellationToken cancellationToken)
+        {
+            var result = await _dbContext.Client.Queryable<SugarScope>()
+                .Includes(s => s.Realms)
+                .Where(s => s.Component != null && s.Realms.Any(r => r.RealmsName == realm))
+                .ToListAsync(cancellationToken);
+            return result.Select(s => s.ToDomain()).ToList();
         }
     }
 }

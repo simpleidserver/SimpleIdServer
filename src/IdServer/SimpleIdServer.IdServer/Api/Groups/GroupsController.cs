@@ -74,6 +74,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                var rootGroup = result;
                 if (splittedFullPath.Count() > 1)
                     rootGroup = await _groupRepository.GetByStrictFullPath(prefix, splittedFullPath[0], cancellationToken);
+                result.Roles = result.Roles.Where(r => r.Realms.Any(re => re.Name == prefix)).ToList();
                 return new OkObjectResult(new GetGroupResult
                 {
                     Target = result,

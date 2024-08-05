@@ -4,6 +4,8 @@ using Fluxor;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Configuration.DTOs;
+using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
@@ -12,13 +14,13 @@ public class ConfigurationDefinitionEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
-    private readonly ProtectedSessionStorage _sessionStorage;
 
-    public ConfigurationDefinitionEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+    public ConfigurationDefinitionEffects(
+        IWebsiteHttpClientFactory websiteHttpClientFactory, 
+        IOptions<IdServerWebsiteOptions> options)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
-        _sessionStorage = sessionStorage;
     }
 
     [EffectMethod]
@@ -40,8 +42,8 @@ public class ConfigurationDefinitionEffects
     {
         if(_options.IsReamEnabled)
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/confdefs";
         }
 

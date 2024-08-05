@@ -34,11 +34,15 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         [JsonPropertyName(ScopeNames.UpdateDatetime)]
         public DateTime UpdateDateTime { get; set; }
+        [JsonPropertyName(ScopeNames.Component)]
+        public string? Component { set; get; } = null;
+        [JsonPropertyName(ScopeNames.Action)]
+        public ComponentActions? Action { get; set; }
         /// <summary>
         /// Array of strings that specifies the claims.
         /// </summary>
         [JsonPropertyName(ScopeNames.Mappers)]
-        public ICollection<ScopeClaimMapper> ClaimMappers { get; set; }= new List<ScopeClaimMapper>();
+        public ICollection<ScopeClaimMapper> ClaimMappers { get; set; } = new List<ScopeClaimMapper>();
         [JsonIgnore]
         public ICollection<ApiResource> ApiResources { get; set; } = new List<ApiResource>();
         [JsonIgnore]
@@ -100,4 +104,10 @@ namespace SimpleIdServer.IdServer.Domains
         SAML = 1,
         OAUTH = 2
     }
+}
+
+public enum ComponentActions
+{
+    Manage = 0,
+    View = 1
 }

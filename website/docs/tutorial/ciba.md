@@ -32,7 +32,7 @@ To implement the CIBA in a console application, you'll need to follow the follow
 
 Utilize the administration UI to create a client certificate.
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. In the Certificate Authorities screen, choose a Certificate Authority from the available options. Remember that the selected Certificate Authority should be trusted by your machine. You can download the certificate and import it into the appropriate Certificate Store.
 3. Click on the `Client Certificates` tab and then proceed to click on the `Add Client Certificate` button.
 4. Set the value of the Subject Name to `CN=client` and click on the `Add` button.
@@ -42,7 +42,7 @@ Utilize the administration UI to create a client certificate.
 
 Utilize the administration UI to configure a new OpenID client :
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. In the Clients screen, click on `Add client` button.
 3. Choose `FAPI2.0`.
 4. Select `Device` and click on next.

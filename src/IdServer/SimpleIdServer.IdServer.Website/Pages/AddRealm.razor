@@ -1,4 +1,4 @@
-﻿@page "/realm/add"
+﻿@page "/addrealm"
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Resources
 @inject IState<UpdateRealmState> updateRealmState
@@ -6,6 +6,7 @@
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
+@inject IUrlHelper urlHelper
 
 <RadzenCard>
     <RadzenTemplateForm Submit=@SubmitAddRealm TItem="AddRealmForm" Data=@addRealmForm>
@@ -46,7 +47,7 @@
             SubscribeToAction<AddRealmSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.RealmAdded });
-                navigationManager.NavigateTo("/clients");
+                navigationManager.NavigateTo(urlHelper.GetUrl("/realm/overview"));
             });
         }
     }

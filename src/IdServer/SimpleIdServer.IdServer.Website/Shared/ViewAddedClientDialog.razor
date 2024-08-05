@@ -1,5 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Html;
 @using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
+@using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
@@ -72,7 +74,7 @@
     string GetOpenIdConnectUrl() => $"{GetBaseUrl()}/.well-known/openid-configuration";
     string GetFederationMetadataUrl() => $"{GetBaseUrl()}/FederationMetadata/2007-06/FederationMetadata.xml";
     string GetSamlMetadataUrl() => $"{GetBaseUrl()}/saml/metadata";
-    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{realmsState.Value.ActiveRealm}" : Options.Value.IdServerBaseUrl;
+    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{RealmContext.Instance().Realm}" : Options.Value.IdServerBaseUrl;
 
     [Parameter]
     public AddClientSuccessAction Client { get; set; }

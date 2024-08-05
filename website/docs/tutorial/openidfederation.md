@@ -220,7 +220,7 @@ dotnet run --urls=http://localhost:7000
 
 Utilize the administration UI to add a trust anchor :
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 
 2. On the Trust anchors screen, click on the `Add federation entity` button.
 

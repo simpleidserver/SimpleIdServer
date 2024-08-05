@@ -1,0 +1,64 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
+@using SimpleIdServer.IdServer.Website.Infrastructures
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<RealmScopesState> realmScopesState
+@inject IUrlHelper urlHelper
+@inject IDispatcher dispatcher
+@inject NotificationService notificationService
+@inject ContextMenuService contextMenuService
+
+<RadzenDataGrid @ref="scopesGrid"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@realmScopesState.Value.IsLoading"
+                Count="@realmScopesState.Value.Scopes.Count()"
+                Data="@realmScopesState.Value.Scopes"
+                LoadData="@LoadData"
+                TItem="Domains.Scope"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="Domains.Scope" Property="Component" Filterable="false" Sortable="false" Title="@Global.Component" Width="80px" />
+        <RadzenDataGridColumn TItem="Domains.Scope" Filterable="false" Sortable="false" Title="@Global.Permissions" Width="80px">
+            <Template Context="data">
+                @if (data.Action == ComponentActions.Manage)
+                {
+                    <RadzenBadge Text="@Global.Manage" IsPill="true" />
+                }
+                else
+                {
+                    <RadzenBadge Text="@Global.View" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<Domains.Scope> scopesGrid;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            if (realmScopesState.Value.IsLoading && scopesGrid != null)
+                scopesGrid.Reload();
+        }
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new GetAllRealmScopesAction { };
+        dispatcher.Dispatch(act);
+    }
+}

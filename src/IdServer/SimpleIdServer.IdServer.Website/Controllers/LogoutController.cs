@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace SimpleIdServer.IdServer.Website.Controllers
@@ -12,11 +13,12 @@ namespace SimpleIdServer.IdServer.Website.Controllers
     public class LogoutController : Controller
     {
         private readonly IDistributedCache _distributedCache;
+        private readonly IdServerWebsiteOptions _options;
 
-        public LogoutController(IDistributedCache distributedCache)
+        public LogoutController(IDistributedCache distributedCache, IOptions<IdServerWebsiteOptions> options)
         {
             _distributedCache = distributedCache;
-
+            _options = options.Value;
         }
 
         [Route("logout")]
@@ -31,10 +33,10 @@ namespace SimpleIdServer.IdServer.Website.Controllers
 
         [Route("oidccallback")]
         public IActionResult OidcSignoutCallback()
-        {
+        {            
             return SignOut(new AuthenticationProperties
             {
-                RedirectUri = Url.Content("~/")
+                RedirectUri = Url.Content(_options.IsReamEnabled ? "~/master/clients" : "~/")
             }, CookieAuthenticationDefaults.AuthenticationScheme);
         }
 

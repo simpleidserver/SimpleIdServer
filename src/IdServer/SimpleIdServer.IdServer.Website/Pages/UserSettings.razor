@@ -73,8 +73,13 @@
             @bind-Value=@updateUserSettings.NotificationMode></RadzenDropDown>
         
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateUserState.Value.IsUpdating />
+    <SidAuthorizeView Roles=@($"/users/manage")>
+        <Authorized>
+            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateUserState.Value.IsUpdating />
+        </Authorized>
+    </SidAuthorizeView>
 </RadzenTemplateForm>
+
 @code {
     [Parameter]
     public SimpleIdServer.IdServer.Domains.User User { get; set; }

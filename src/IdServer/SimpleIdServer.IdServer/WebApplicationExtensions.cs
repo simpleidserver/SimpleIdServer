@@ -411,6 +411,9 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Auditing + "/.search",
                 defaults: new { controller = "Auditing", action = "Search" });
 
+            webApplication.SidMapControllerRoute("getAllRealmScopes",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/realmscopes",
+                defaults: new { controller = "Scopes", action = "GetAllRealmScopes" });
             webApplication.SidMapControllerRoute("searchScopes",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/.search",
                 defaults: new { controller = "Scopes", action = "Search" });
@@ -512,6 +515,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addClientRole",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/roles",
                 defaults: new { controller = "Clients", action = "AddRole" });
+            webApplication.SidMapControllerRoute("updateClientRealms",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/realms",
+                defaults: new { controller = "Clients", action = "UpdateRealms" });
 
             webApplication.SidMapControllerRoute("searchGroups",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/.search",
@@ -545,6 +551,18 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addRealm",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "Add" });
+            webApplication.SidMapControllerRoute("searchRealmRoles",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/.search",
+                defaults: new { controller = "Realms", action = "SearchRoles" });
+            webApplication.SidMapControllerRoute("getRealmRole",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "GetRole" });
+            webApplication.SidMapControllerRoute("removeRealmRole",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "RemoveRole" });
+            webApplication.SidMapControllerRoute("updateRealmRoles",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "UpdateRoleScopes" });
 
             webApplication.SidMapControllerRoute("getAllLanguages",
                 pattern: Constants.EndPoints.Languages,

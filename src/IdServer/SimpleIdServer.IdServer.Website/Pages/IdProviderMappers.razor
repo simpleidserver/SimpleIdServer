@@ -5,6 +5,7 @@
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
 @inject DialogService dialogService
+@inject IUrlHelper urlHelper
 @inject NotificationService notificationService
 @inject IState<IdProviderMappersState> idProviderMappersState
 
@@ -37,7 +38,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="@Global.Name" Width="80px">
                 <Template Context="data">
-                    <RadzenLink Text="@data.Value.Name" Path="@($"/authentications/idproviders/{IdProvider.Name}/mappers/{data.Value.Id}")" />
+                    <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/authentications/idproviders/{IdProvider.Name}/mappers/{data.Value.Id}"))" />
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">

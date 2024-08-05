@@ -171,4 +171,7 @@
   <data name="user_already_exists" xml:space="preserve">
     <value>User with same login already exists</value>
   </data>
+  <data name="user_blocked" xml:space="preserve">
+    <value>User account is blocked</value>
+  </data>
 </root>

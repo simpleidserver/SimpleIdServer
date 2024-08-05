@@ -6,7 +6,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store.Configurations;
 using SimpleIdServer.IdServer.Store.EF.Configurations;
 using SimpleIdServer.OpenidFederation.Domains;
-using SimpleIdServer.OpenidFederation.Stores;
 
 namespace SimpleIdServer.IdServer.Store.EF
 {
@@ -114,7 +113,6 @@ namespace SimpleIdServer.IdServer.Store.EF
             builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConfiguration());
             builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConstraintConfiguration());
             builder.ApplyConfiguration(new MessageBusErrorMessageConfiguration());
-            builder.ApplyConfiguration(new FederationEntityConfiguration());
             builder.ApplyConfiguration(new FederationEntityConfiguration());
         }
     }

@@ -8,8 +8,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
+using SimpleIdServer.IdServer.Website.Helpers;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 using System.Security.Claims;
 
@@ -19,6 +22,8 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         public static IServiceCollection AddSIDWebsite(this IServiceCollection services, Action<IdServerWebsiteOptions>? callbackOptions = null)
         {
+            var opts = new IdServerWebsiteOptions();
+            if (callbackOptions != null) callbackOptions(opts);
             services.AddFluxor(o =>
             {
                 o.ScanAssemblies(typeof(ServiceCollectionExtensions).Assembly);
@@ -27,7 +32,9 @@ namespace Microsoft.Extensions.DependencyInjection
                     rdt.Name = "SimpleIdServer";
                 });
             });
-            services.AddTransient<SidCookieEventHandler>();
+            services.AddHttpContextAccessor();
+            services.AddTransient<IUserSessionResitory, UserSessionRepository>();
+            services.AddTransient<IUrlHelper, UrlHelper>();
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<IGroupService, GroupEffects>();
             services.AddScoped<DialogService>();
@@ -40,7 +47,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddDefaultSecurity(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddDefaultSecurity(this IServiceCollection services, IConfiguration configuration, bool isRealmEnabled)
         {
             string authoritySectionName = nameof(IdServerWebsiteOptions.IdServerBaseUrl);
             string defaultSecurityOptionsSectionName = nameof(DefaultSecurityOptions);
@@ -64,12 +71,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = "oidc";
             })
-            .AddCookie(options =>
+            .AddIdServerCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, options =>
             {
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.HttpOnly = true;
-                options.EventsType = typeof(SidCookieEventHandler);
             })
             .AddCustomOpenIdConnect("oidc", config =>
             {
@@ -85,6 +91,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     config.BackchannelHttpHandler = handler;
                 }
 
+                config.IsRealmEnabled = isRealmEnabled;
                 config.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
                 config.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
                 config.Authority = defaultSecurityOptions.Issuer;

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
@@ -95,7 +96,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
             var providers = await GetAuthenticationSchemeProviders();
             var provider = providers.FirstOrDefault(p => p.Name == name);
-            return providers == null ? null : Convert(provider);
+            return provider == null ? null : Convert(provider);
         }
 
         private async Task<IEnumerable<Domains.AuthenticationSchemeProvider>> GetAuthenticationSchemeProviders()

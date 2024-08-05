@@ -1,18 +1,16 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.DPoP;
-using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api.Clients;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
-using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.WsFederation;
 using System.Globalization;
 using System.Linq.Dynamic.Core;
@@ -26,13 +24,13 @@ public class ClientEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _configuration;
-    private readonly ProtectedSessionStorage _sessionStorage;
 
-    public ClientEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> configuration, ProtectedSessionStorage sessionStorage)
+    public ClientEffects(
+        IWebsiteHttpClientFactory websiteHttpClientFactory, 
+        IOptions<IdServerWebsiteOptions> configuration)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _configuration = configuration.Value;
-        _sessionStorage = sessionStorage;
     }
 
     [EffectMethod]
@@ -726,6 +724,25 @@ public class ClientEffects
         }
     }
 
+    [EffectMethod]
+    public async Task Handle(UpdateClientRealmsAction act, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetClientsUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var request = new UpdateClientRealmsRequest
+        {
+            Realms = act.Realms
+        };
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/realms"),
+            Method = HttpMethod.Put,
+            Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new UpdateClientRealmsSuccessAction());
+    }
+
     private async Task CreateClient(Domains.Client client, IDispatcher dispatcher, string clientType, PemResult pemResult = null, string jsonWebKey = null)
     {
         var baseUrl = await GetClientsUrl();
@@ -756,20 +773,12 @@ public class ClientEffects
     {
         if (_configuration.IsReamEnabled)
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_configuration.IdServerBaseUrl}/{realmStr}/{subUrl}";
         }
 
         return $"{_configuration.IdServerBaseUrl}/{subUrl}";
-    }
-
-    private async Task<string> GetRealm()
-    {
-        if (!_configuration.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
-        var realm = await _sessionStorage.GetAsync<string>("realm");
-        var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
-        return realmStr;
     }
 }
 
@@ -1257,3 +1266,14 @@ public class StartAddClientAction
 }
 
 public class StartGenerateClientKeyAction { }
+
+public class UpdateClientRealmsAction
+{
+    public string ClientId { get; set; }
+    public List<string> Realms { get; set; }
+}
+
+public class UpdateClientRealmsSuccessAction
+{
+
+}

@@ -5,10 +5,15 @@
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 @inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
 @inject IState<ScopeMappersState> scopeMappersState
 @inject NotificationService notificationService
 
-<RadzenButton class="mb-1" Click="@(args => AddMapper())" Icon="add" Text="@Global.AddMapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<SidAuthorizeView Roles=@($"/scopes/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddMapper())" Icon="add" Text="@Global.AddMapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -35,7 +40,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="@Global.Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{Scope.Id}/mappers/" + data.Value.Id)" />
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/scopes/{Scope.Id}/mappers/" + data.Value.Id))" />
             </Template>        
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="@Global.Type" Filterable="false" Sortable="false" Width="80px">
@@ -56,7 +61,11 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableScopeMapper" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                <SidAuthorizeView Roles=@($"/scopes/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
             </Template>
         </RadzenDataGridColumn>
     </Columns>

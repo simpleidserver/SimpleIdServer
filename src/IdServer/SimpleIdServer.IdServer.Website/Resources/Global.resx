@@ -1896,4 +1896,55 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="SelectedFederationEntitiesRemoved" xml:space="preserve">
     <value>The selected federation entities have been removed</value>
   </data>
+  <data name="Resources" xml:space="preserve">
+    <value>Resources</value>
+  </data>
+  <data name="Realms" xml:space="preserve">
+    <value>Realms</value>
+  </data>
+  <data name="AssignedRealms" xml:space="preserve">
+    <value>Assigned realms</value>
+  </data>
+  <data name="AssignRealms" xml:space="preserve">
+    <value>Assign realms</value>
+  </data>
+  <data name="AvailableRealms" xml:space="preserve">
+    <value>Available realms</value>
+  </data>
+  <data name="UnassignRealms" xml:space="preserve">
+    <value>Unassign realms</value>
+  </data>
+  <data name="ClientRealmsDescription" xml:space="preserve">
+    <value>Select one or more realms</value>
+  </data>
+  <data name="ClientsRealmsUpdated" xml:space="preserve">
+    <value>The client realms have been updated</value>
+  </data>
+  <data name="NotAuthorized" xml:space="preserve">
+    <value>You are not authorized</value>
+  </data>
+  <data name="SelectedRealmRolesRemoved" xml:space="preserve">
+    <value>the selected realm roles are removed</value>
+  </data>
+  <data name="Permissions" xml:space="preserve">
+    <value>Permissions</value>
+  </data>
+  <data name="Component" xml:space="preserve">
+    <value>Component</value>
+  </data>
+  <data name="AddPermission" xml:space="preserve">
+    <value>Add permission</value>
+  </data>
+  <data name="RealmRoleScopesUpdated" xml:space="preserve">
+    <value>Roles have been updated</value>
+  </data>
+  <data name="RealmPermissions" xml:space="preserve">
+    <value>Realm permissions</value>
+  </data>
+  <data name="RealmPermissionsDescription" xml:space="preserve">
+    <value>Select one or more permissions assigned to the realm. You must reconnect to the administration website for the changes to take effect.</value>
+  </data>
+  <data name="Welcome" xml:space="preserve">
+    <value>Welcome {0}</value>
+  </data>
 </root>

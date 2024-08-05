@@ -41,11 +41,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             return result.Select(r => r.ToDomain()).ToList();
         }
 
-        public Task<int> SaveChanges(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
         private static SugarConfigurationKeyPairValueRecord Transform(ConfigurationKeyPairValueRecord keyValue)
         {
             return new SugarConfigurationKeyPairValueRecord

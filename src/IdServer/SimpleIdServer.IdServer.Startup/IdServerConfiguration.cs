@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
@@ -74,7 +73,6 @@ namespace SimpleIdServer.IdServer.Startup
             UpdateDateTime = DateTime.UtcNow
         };
 
-
         public static ICollection<Scope> Scopes => new List<Scope>
         {
             SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -104,12 +102,14 @@ namespace SimpleIdServer.IdServer.Startup
             SimpleIdServer.IdServer.Constants.StandardScopes.DeferredCreds,
             UniversityDegreeScope,
             CtWalletScope,
-            SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities
+            SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities,
+            SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole
         };
 
         public static ICollection<User> Users => new List<User>
         {
-            UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").GenerateRandomTOTPKey().Build(),
+            SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser,
+            SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser,
             UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
         };
 
@@ -118,7 +118,7 @@ namespace SimpleIdServer.IdServer.Startup
             ClientBuilder.BuildWalletClient("walletClient", "password")
                 .SetClientName("Wallet")
                 .Build(),
-            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://3f18-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
+            ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://8028-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
                 .SetClientName("Credential issuer")
                 .AddScope(
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope,
@@ -144,6 +144,7 @@ namespace SimpleIdServer.IdServer.Startup
                 .SetBackChannelLogoutUrl("https://localhost:5002/bc-logout")
                 .SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png")
                 .AddScope(
+                    SimpleIdServer.IdServer.Constants.StandardScopes.Role,
                     SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Profile, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
@@ -160,6 +161,7 @@ namespace SimpleIdServer.IdServer.Startup
                     SimpleIdServer.IdServer.Constants.StandardScopes.Clients,
                     SimpleIdServer.IdServer.Constants.StandardScopes.Realms, 
                     SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
+                    SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole,
                     SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, 
@@ -275,7 +277,7 @@ namespace SimpleIdServer.IdServer.Startup
             {
                 Id  = Guid.NewGuid().ToString(),
                 IsSubordinate = false,
-                Realm = IdServer.Constants.DefaultRealm,
+                Realm = SimpleIdServer.IdServer.Constants.DefaultRealm,
                 Sub = "http://localhost:7000",
                 CreateDateTime = DateTime.UtcNow
             }

@@ -86,7 +86,7 @@ Now, SimpleIdServer is ready to be used, and the services can be accessed throug
 | Service                     | Url                                               |
 | --------------------------- | ------------------------------------------------- |
 | IdServer                    | https://idserver.localhost.com/master             |
-| IdServerWebsite             | https://website.localhost.com                     |
+| IdServerWebsite             | https://website.localhost.com/master/clients      |
 | Scim                        | https://scim.localhost.com                        |
 | CredentialIssuer            | https://credentialissuer.localhost.com            |
 | CredentialIssuerWebsite     | https://credentialissuerwebsite.localhost.com     |
@@ -121,7 +121,7 @@ Now, SimpleIdServer is ready to be used, and the services can be accessed throug
 | Service                     | Url                                                       |
 | --------------------------- | --------------------------------------------------------- |
 | IdServer                    | https://idserver.sid.svc.cluster.local/master             |
-| IdServerWebsite             | https://website.sid.svc.cluster.local                     |
+| IdServerWebsite             | https://website.sid.svc.cluster.local/master/clients      |
 | Scim                        | https://scim.sid.svc.cluster.local                        |
 | CredentialIssuer            | https://credentialissuer.sid.svc.cluster.local            |
 | CredentialIssuerWebsite     | https://credentialissuerwebsite.sid.svc.cluster.local     |

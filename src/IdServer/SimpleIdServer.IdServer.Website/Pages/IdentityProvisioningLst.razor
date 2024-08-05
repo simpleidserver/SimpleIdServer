@@ -5,6 +5,7 @@
 @inject NotificationService notificationService
 @inject DialogService dialogService
 @inject ContextMenuService contextMenuService
+@inject IUrlHelper urlHelper
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
@@ -35,7 +36,7 @@
     <Columns>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
             <Template Context="data">                
-                <RadzenLink Text="@data.Value.Name" Path="@($"/identityprovisioning/{data.Value.Id}/details")" />
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/identityprovisioning/{data.Value.Id}/details"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdentityProvisioning" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
@@ -65,11 +66,6 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                identityProvisioningGrid.Reload();
-                StateHasChanged();
-            });
             if (!searchIdentityProvisioningState.Value.IsLoading)
                 identityProvisioningGrid.Reload();
         }

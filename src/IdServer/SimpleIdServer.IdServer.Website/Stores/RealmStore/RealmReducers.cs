@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
-using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
 {
@@ -17,36 +16,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
         public static RealmsState ReduceGetAllRealmSuccessAction(RealmsState state, GetAllRealmSuccessAction act) => new(false, act.Realms);
 
         [ReducerMethod]
-        public static RealmsState ReduceSelectRealmAction(RealmsState state, SelectRealmAction act)
-        {
-            return state with
-            {
-                ActiveRealm = null,
-                IsLoading = true
-            };
-        }
-
-        [ReducerMethod]
-        public static RealmsState ReduceGetActiveSuccessRealmAction(RealmsState state, GetActiveSuccessRealmAction act)
-        {
-            return state with
-            {
-                IsLoading = false,
-                ActiveRealm = act.Realm
-            };
-        }
-
-        [ReducerMethod]
-        public static RealmsState ReduceSelectRealmSuccessAction(RealmsState state, SelectRealmSuccessAction act)
-        {
-            return state with
-            {
-                IsLoading = false,
-                ActiveRealm = act.Realm
-            };
-        }
-
-        [ReducerMethod]
         public static RealmsState ReduceAddRealmSuccessAction(RealmsState state, AddRealmSuccessAction act)
         {
             var realms = state.Realms.ToList();
@@ -59,8 +28,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.RealmStore
             });
             return state with
             {
-                Realms = realms,
-                ActiveRealm = act.Name
+                Realms = realms
             };
         }
 

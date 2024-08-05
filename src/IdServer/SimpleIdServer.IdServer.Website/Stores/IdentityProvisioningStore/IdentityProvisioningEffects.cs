@@ -1,14 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.ErrorMessages;
 using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Provisioning;
-using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -19,13 +18,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdentityProvisioningEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public IdentityProvisioningEffects(
+            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            IOptions<IdServerWebsiteOptions> options)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _sessionStorage = sessionStorage;
         }
 
         [EffectMethod]
@@ -303,8 +302,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var baseUrl = $"{_options.IdServerBaseUrl}/errormessages";
             if (_options.IsReamEnabled)
             {
-                var realm = await _sessionStorage.GetAsync<string>("realm");
-                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 baseUrl = $"{_options.IdServerBaseUrl}/{realmStr}/errormessages";
             }
 
@@ -327,8 +326,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         {
             if(_options.IsReamEnabled)
             {
-                var realm = await _sessionStorage.GetAsync<string>("realm");
-                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/provisioning";
             }
 

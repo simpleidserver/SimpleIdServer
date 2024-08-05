@@ -5,9 +5,18 @@
 @inject NotificationService notificationService
 @inject IState<UserLockingOptionsState> userLockingOptionsState
 
-<RadzenCardLoader Variant="Variant.Filled" IsLoading=@userLockingOptionsState.Value.IsLoading>
-    <EditConfiguration PropertiesSaved=@SaveProperties Name=@userLockingOptionsState.Value.Options?.OptionsName Values="@userLockingOptionsState.Value.Options?.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
-</RadzenCardLoader>
+<SidAuthorizeView Roles=@($"/authentication/manage")>
+    <Authorized>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@userLockingOptionsState.Value.IsLoading>
+            <EditConfiguration PropertiesSaved=@SaveProperties Name=@userLockingOptionsState.Value.Options?.OptionsName Values="@userLockingOptionsState.Value.Options?.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@userLockingOptionsState.Value.IsLoading>
+            <EditConfiguration PropertiesSaved=@SaveProperties Name=@userLockingOptionsState.Value.Options?.OptionsName Values="@userLockingOptionsState.Value.Options?.Values" IsEnabled=false IsAddForm=false></EditConfiguration>
+        </RadzenCardLoader>
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     bool IsUpdating { get; set; } = false;

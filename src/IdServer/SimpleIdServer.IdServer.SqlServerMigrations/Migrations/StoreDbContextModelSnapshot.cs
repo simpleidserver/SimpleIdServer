@@ -1812,6 +1812,14 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
+                    b.Property<int?>("Action")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "action");
+
+                    b.Property<string>("Component")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "component");
+
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");

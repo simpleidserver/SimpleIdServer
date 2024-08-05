@@ -7,25 +7,32 @@
 @inject NavigationManager navigationManager
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 
-<div class="mt-3 mb-3">
-    <RadzenText class="no-margin" Text="@Global.Authentications" TextStyle="TextStyle.DisplayH3" />
-</div>
+<SidAuthorizeView Roles=@($"/authentication/manage,/authentication/view")>
+    <Authorized>
+        <div class="mt-3 mb-3">
+            <RadzenText class="no-margin" Text="@Global.Authentications" TextStyle="TextStyle.DisplayH3" />
+        </div>
 
-<RadzenCardLoader Variant="Variant.Filled" IsLoading=@isLoading>
-    <RadzenTabs Change="@OnChange" @bind-SelectedIndex="selectedIndex">
-        <Tabs>
-            <RadzenTabsItem Text="@Global.AuthenticationMethods">
-                <AuthMethods></AuthMethods>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.ExternalIdentityProviders">
-                <IdProviders></IdProviders>
-            </RadzenTabsItem>
-            <RadzenTabsItem Text="@Global.LockAccount">
-                <LockAccount></LockAccount>
-            </RadzenTabsItem>
-        </Tabs>
-    </RadzenTabs>
-</RadzenCardLoader>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@isLoading>
+            <RadzenTabs Change="@OnChange" @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.AuthenticationMethods">
+                        <AuthMethods></AuthMethods>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.ExternalIdentityProviders">
+                        <IdProviders></IdProviders>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.LockAccount">
+                        <LockAccount></LockAccount>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>

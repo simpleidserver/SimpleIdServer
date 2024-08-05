@@ -2,10 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Federation.Apis.FederationEntity;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.OpenidFederation.Domains;
 using System.Text;
 using System.Text.Json;
@@ -17,13 +17,13 @@ public class FederationEntityEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
-    private readonly ProtectedSessionStorage _sessionStorage;
 
-    public FederationEntityEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+    public FederationEntityEffects(
+        IWebsiteHttpClientFactory websiteHttpClientFactory, 
+        IOptions<IdServerWebsiteOptions> options)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
-        _sessionStorage = sessionStorage;
     }
 
     [EffectMethod]
@@ -102,8 +102,8 @@ public class FederationEntityEffects
     {
         if (_options.IsReamEnabled)
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/federationentities";
         }
 

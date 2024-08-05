@@ -10,7 +10,7 @@ To implement SAML2.0 in a regular web application, you'll need to follow the fol
 
 Utilize the administration UI to configure a new SAML2.0 SP (Service Provider) client :
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. On the Clients screen, click on the `Add client` button.
 3. Select `SAML SP` and click on next.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.

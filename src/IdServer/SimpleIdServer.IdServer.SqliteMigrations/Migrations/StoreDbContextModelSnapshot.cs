@@ -1795,6 +1795,14 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
+                    b.Property<int?>("Action")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "action");
+
+                    b.Property<string>("Component")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "component");
+
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");

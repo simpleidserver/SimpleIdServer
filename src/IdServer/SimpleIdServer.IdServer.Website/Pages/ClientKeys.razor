@@ -20,14 +20,22 @@
             <RadzenTextBox Name="JWKSUrl" @bind-Value="@updateJWKSUrl.Url" Disabled=@(!isJWKSUrlUsed) Class="w-100"></RadzenTextBox>
             <RadzenRequiredValidator Component="JWKSUrl" Text="@Global.UrlRequired"></RadzenRequiredValidator>
         </div>
-        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Update" Disabled=@(!isJWKSUrlUsed) />
+        <SidAuthorizeView Roles=@("/clients/manage")>
+            <Authorized>
+                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Update" Disabled=@(!isJWKSUrlUsed) />
+            </Authorized>
+        </SidAuthorizeView>
     </RadzenTemplateForm>
 </div>
 
 <hr />
 
 <div>
-    <RadzenButton class="mb-1" Click="@(args => GenerateKey())" Icon="add" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" Text="@Global.GenerateNewKey" />
+    <SidAuthorizeView Roles=@("/clients/manage")>
+        <Authorized>
+            <RadzenButton class="mb-1" Click="@(args => GenerateKey())" Icon="add" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium" Text="@Global.GenerateNewKey" />
+        </Authorized>
+    </SidAuthorizeView>
 
     <RadzenDataGrid AllowFiltering="true"
                     AllowColumnResize="true"
@@ -60,8 +68,12 @@
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
-                <Template Context="data">
-                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                <Template Context="data">µ
+                    <SidAuthorizeView Roles=@("/clients/manage")>
+                        <Authorized>
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />                        
+                        </Authorized>
+                    </SidAuthorizeView>
                 </Template>
             </RadzenDataGridColumn>
         </Columns>

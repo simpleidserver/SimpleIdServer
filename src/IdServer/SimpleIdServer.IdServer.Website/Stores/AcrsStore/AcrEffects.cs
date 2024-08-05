@@ -6,6 +6,8 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
+using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -16,16 +18,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
 
         public AcrEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options, 
-            ProtectedSessionStorage sessionStorage)
+            IOptions<IdServerWebsiteOptions> options)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _sessionStorage = sessionStorage;
         }
 
 
@@ -118,8 +117,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         {
             if(_options.IsReamEnabled)
             {
-                var realm = await _sessionStorage.GetAsync<string>("realm");
-                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/acrs";
             }
 

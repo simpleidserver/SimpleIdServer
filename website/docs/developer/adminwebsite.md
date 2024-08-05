@@ -127,7 +127,7 @@ Edit the `Pages/_Host.cshtml` and relace the content with the following code.
 </html>
 ```
 
-Run the application, and navigate to the [administration website](https://localhost:5002).
+Run the application, and navigate to the [administration website](https://localhost:5002/master/clients).
 
 ```
 dotnet run --urls https://*:5002

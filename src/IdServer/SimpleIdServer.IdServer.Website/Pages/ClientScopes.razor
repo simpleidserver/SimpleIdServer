@@ -12,8 +12,14 @@
 @inject ContextMenuService contextMenuService
 @inject TooltipService tooltipService
 @inject NotificationService notificationService
+@inject IUrlHelper urlHelper
 
-<RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="@Global.AddClientScope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+
+<SidAuthorizeView Roles=@("/clients/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="@Global.AddClientScope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -40,7 +46,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/scopes/{data.Value.Id}/settings")" />
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/scopes/{data.Value.Id}/settings"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
@@ -58,7 +64,11 @@
         <RadzenDataGridColumn TItem="SelectableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                <SidAuthorizeView Roles=@("/clients/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
             </Template>
         </RadzenDataGridColumn>
     </Columns>

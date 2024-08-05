@@ -69,7 +69,8 @@ const sidebars = {
       type: 'category',
       label: 'Migrations',
       items: [
-        'migrations/403to404'
+        'migrations/403to404',
+        'migrations/500to501'
       ]
     },
     {
