@@ -23,7 +23,7 @@ In this tutorial, we will configure a `read` permission for the `shopApi`.
 
 Utilize the administration UI to configure a new permission :
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. On the Scopes screen, click on the `Add scope` button.
 3. Select `API value` and click on next.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.

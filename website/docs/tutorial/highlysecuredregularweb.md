@@ -33,7 +33,7 @@ To incorporate all the FAPI recommendations into your regular web application, i
 
 Utilize the administration UI to create a client certificate.
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. In the Certificate Authorities screen, choose a Certificate Authority from the available options. Remember that the selected Certificate Authority should be trusted by your machine. You can download the certificate and import it into the appropriate Certificate Store.
 3. Click on the `Client Certificates` tab and then proceed to click on the `Add Client Certificate` button.
 4. Set the value of the Subject Name to `CN=websiteFAPI` and click on the `Add` button.
@@ -41,7 +41,7 @@ Utilize the administration UI to create a client certificate.
 
 ### 2. Configure an application
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. On the Clients screen, click on the `Add client` button.
 3. Choose `FAPI2.0` template.
 4. Select `Highly secure Web Application` and click on next.
@@ -182,7 +182,7 @@ To incorporate all the FAPI recommendations into your regular web application, i
 
 ### 1. Configure an application
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. On the Clients screen, click on the `Add client` button.
 3. Choose `FAPI2.0` template.
 4. Select `Highly secure Web Application` and click on next.

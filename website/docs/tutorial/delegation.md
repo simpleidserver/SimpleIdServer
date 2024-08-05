@@ -21,7 +21,7 @@ graph LR;
 
 ## 1. Define the first permission
 
-1. Open the Identity Server website at [https://localhost:5002](https://localhost:5002).
+1. Open the Identity Server website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. Open the Scopes screen and click on the `Add scope` button.
 3. Select `API value` and click on next.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.
@@ -42,7 +42,7 @@ graph LR;
 
 ## 2. Define the second permission
 
-1. Open the Identity Server website at [https://localhost:5002](https://localhost:5002).
+1. Open the Identity Server website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. Open the Scopes screen, click on the `Add scope` button.
 3. Select `API value` and click on next.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.
@@ -63,7 +63,7 @@ graph LR;
 
 ## 3. Configure the website
 
-1. Open the Identity Server website at [https://localhost:5002](https://localhost:5002).
+1. Open the Identity Server website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. On the Client screen, click on the `Add client button`.
 3. Select `web application` and click on next.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.
@@ -79,7 +79,7 @@ graph LR;
 
 ## 4. Configure the API
 
-1. Open the Identity Server website at [https://localhost:5002](https://localhost:5002).
+1. Open the Identity Server website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. On the Client screen, click on the `Add client button`.
 3. Select `machine` and click on next.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.

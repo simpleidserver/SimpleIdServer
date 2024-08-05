@@ -19,7 +19,7 @@ function HomepageHeader() {
         <div className={styles.link}>
           <Link
             className="button button--secondary button--lg"
-            to="https://website.simpleidserver.com">
+            to="https://website.simpleidserver.com/master/clients">
             Identity server  
           </Link>
           <Link

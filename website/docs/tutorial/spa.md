@@ -18,7 +18,7 @@ To implement the Authorization Code Flow with PKCE in your SPA, you'll need to f
 
 Utilize the administration UI to configure a new OpenID client :
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. On the Clients screen, click on the `Add client` button.
 3. Select `User Agent Base application` and click on next.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.

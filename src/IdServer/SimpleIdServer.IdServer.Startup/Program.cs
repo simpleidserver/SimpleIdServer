@@ -360,10 +360,8 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.RegistrationWorkflows.Any())
                 dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
 
-
             MigrateGroups(dbContext);
             MigrateUsers(dbContext);
-
             if (!dbContext.SerializedFileKeys.Any())
             {
                 dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"));
@@ -529,36 +527,76 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name);
             if (admGroup == null)
             {
-                dbContext.Groups.Add(SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup);
                 admGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup;
+                dbContext.Groups.Add(admGroup);
             }
 
             if (admRoGroup == null)
             {
-                dbContext.Groups.Add(SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup);
                 admRoGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup;
+                dbContext.Groups.Add(admRoGroup);
             }
 
             var scopes = RealmRoleBuilder.BuildAdministrativeRole(SimpleIdServer.IdServer.Constants.StandardRealms.Master);
-            // TODO : check scope already exists.
-            dbContext.Scopes.AddRange(scopes);
-            foreach (var scope in scopes)
+            var allScopeNames = dbContext.Scopes.Select(s => s.Name);
+            var unknownScopes = scopes.Where(s => !allScopeNames.Contains(s.Name));
+            dbContext.Scopes.AddRange(unknownScopes);
+            foreach (var scope in unknownScopes)
             {
                 if (!admGroup.Roles.Any(r => r.Name == scope.Name))
                     admGroup.Roles.Add(scope);
             }
 
-            foreach(var scope in scopes.Where(s => s.Action == ComponentActions.View))
+            foreach(var scope in unknownScopes.Where(s => s.Action == ComponentActions.View))
             {
                 if (!admRoGroup.Roles.Any(r => r.Name == scope.Name))
                     admRoGroup.Roles.Add(scope);
             }
+
+            var existingAdministratorRole = dbContext.Scopes.FirstOrDefault(s => s.Name == SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole.Name);
+            if (existingAdministratorRole == null)
+            {
+                existingAdministratorRole = SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole;
+                dbContext.Scopes.Add(existingAdministratorRole);
+            }
+
+            if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole.Name))
+                admGroup.Roles.Add(existingAdministratorRole);
         }
 
         void MigrateUsers(StoreDbContext dbContext)
         {
-            if (!dbContext.Users.Any())
-                dbContext.Users.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Users);
+            var isUserExists = dbContext.Users
+                .Any(c => c.Name == "user");
+            var existingAdministratorUser = dbContext.Users
+                .Include(u => u.Groups).ThenInclude(u => u.Group)
+                .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser.Name);
+            var existingAdministratorRoUser = dbContext.Users
+                .Include(u => u.Groups).ThenInclude(u => u.Group)
+                .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser.Name);
+            if(!isUserExists)
+                dbContext.Users.Add(UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build());
+            if(existingAdministratorUser == null)
+                dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser);
+            else if(!existingAdministratorRoUser.Groups.Any(g => g.Group.Name != SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name))
+            {
+                var grp = dbContext.Groups.First(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name);
+                existingAdministratorRoUser.Groups.Add(new GroupUser
+                {
+                    Group = grp
+                });
+            }
+
+            if (existingAdministratorUser == null)
+                dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser);
+            else if(!existingAdministratorUser.Groups.Any(g => g.Group.Name != SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))
+            {
+                var grp = dbContext.Groups.First(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name);
+                existingAdministratorUser.Groups.Add(new GroupUser
+                {
+                    Group = grp
+                });
+            }
         }
     }
 }

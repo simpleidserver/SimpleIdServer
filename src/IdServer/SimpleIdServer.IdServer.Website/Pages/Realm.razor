@@ -27,7 +27,7 @@
 @if(Options.Value.IsReamEnabled)
 {
     <div class="mb-1">
-        <SidAuthorizeView Roles="SIDS-manager/administrator">
+        <SidAuthorizeView Roles="SIDS-manager/administrator" IsRealmEnabled=false>
             <Authorized>
                 <RadzenButton Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.AddRealm" />
             </Authorized>

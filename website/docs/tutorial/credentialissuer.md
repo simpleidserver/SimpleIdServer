@@ -18,7 +18,7 @@ If a `university_degree` scope is configured, then skip this step.
 
 Utilize the administration UI to configure a new scope :
 
-1. Open the IdentityServer website at [https://localhost:5002](https://localhost:5002).
+1. Open the IdentityServer website at [https://localhost:5002/master/clients](https://localhost:5002/master/clients).
 2. On the Scopes screen, click on the `Add scope` button.
 3. Select API value and click on next.
 4. Fill-in the form like this and click on the Save button to confirm the creation.
@@ -32,7 +32,7 @@ Utilize the administration UI to configure a new scope :
 
 Utilize the administration UI to configure a new OpenID client :
 
-1. Open the IdentityServer website at https://localhost:5002.
+1. Open the IdentityServer website at https://localhost:5002/master/clients.
 2. In the Clients screen, click on `Add client` button.
 3. Select `Credential Issuer`.
 4. Fill-in the form like this and click on the `Save` button to confirm the creation.

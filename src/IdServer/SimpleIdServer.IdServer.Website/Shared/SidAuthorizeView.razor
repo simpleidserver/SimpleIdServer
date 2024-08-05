@@ -16,6 +16,7 @@ else if (NotAuthorized != null)
     [Parameter] public RenderFragment Authorized { get; set; }
     [Parameter] public RenderFragment NotAuthorized { get; set; }
     [Parameter] public string Roles { get; set; }
+    [Parameter] public bool IsRealmEnabled { get; set;} = true;
     [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
     public bool isAuthorized { get; set; }
 
@@ -25,11 +26,11 @@ else if (NotAuthorized != null)
         {
             var authState = authenticationStateTask.Result;
             var user = authState.User;
-            var roles = Roles.Split(',').Select(r =>
+            var roles = IsRealmEnabled ? Roles.Split(',').Select(r =>
             {
                 var realm = !options.Value.IsReamEnabled ? SimpleIdServer.IdServer.Constants.DefaultRealm : SimpleIdServer.IdServer.Helpers.RealmContext.Instance().Realm;
                 return $"{realm}{r}";
-            });
+            }) : Roles.Split(',');
             isAuthorized = user.Claims.Any(c => c.Type == ClaimTypes.Role && roles.Contains(c.Value));
             StateHasChanged();
         }
