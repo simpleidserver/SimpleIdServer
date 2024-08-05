@@ -446,7 +446,7 @@ namespace SimpleIdServer.Scim.Api
                 if (!_options.IsFullRepresentationReturned)
                 {
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty, updateResult.Result.PatchOperations));
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
                 else
@@ -455,7 +455,7 @@ namespace SimpleIdServer.Scim.Api
                     representation = getRepresentationResult.Result;
                     await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty, updateResult.Result.PatchOperations));
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
             }
@@ -520,7 +520,7 @@ namespace SimpleIdServer.Scim.Api
                 {
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                     if (IsPublishEvtsEnabled)
-                        await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                        await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty, patchRes.Result.PatchOperations));
                     
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
@@ -530,7 +530,7 @@ namespace SimpleIdServer.Scim.Api
                     representation = getRepresentationResult.Result;
                     await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty, patchRes.Result.PatchOperations));
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
             }

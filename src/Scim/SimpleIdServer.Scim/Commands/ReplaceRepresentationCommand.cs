@@ -3,6 +3,7 @@
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Infrastructure;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Commands
 {
@@ -28,15 +29,16 @@ namespace SimpleIdServer.Scim.Commands
     {
         public bool IsReplaced { get; private set; }
         public SCIMRepresentation Representation {  get; private set; }
+        public List<SCIMPatchResult> PatchOperations { get; private set; } = new List<SCIMPatchResult>();
 
         public ReplaceRepresentationResult()
         {
-
         }
 
-        public ReplaceRepresentationResult(SCIMRepresentation representation)
+        public ReplaceRepresentationResult(SCIMRepresentation representation, List<SCIMPatchResult> patchOperations)
         {
             Representation = representation;
+            PatchOperations = patchOperations;
         }
 
         public static ReplaceRepresentationResult NoReplacement()
@@ -44,9 +46,9 @@ namespace SimpleIdServer.Scim.Commands
             return new ReplaceRepresentationResult { IsReplaced = false };
         }
 
-        public static ReplaceRepresentationResult Ok(SCIMRepresentation representation)
+        public static ReplaceRepresentationResult Ok(SCIMRepresentation representation, List<SCIMPatchResult> patchOperations)
         {
-            return new ReplaceRepresentationResult { IsReplaced = true, Representation = representation };
+            return new ReplaceRepresentationResult { IsReplaced = true, Representation = representation, PatchOperations = patchOperations };
         }
     }
 }

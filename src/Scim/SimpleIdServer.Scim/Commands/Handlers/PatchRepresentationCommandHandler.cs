@@ -82,7 +82,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             existingRepresentation.Apply(references, patchResultLst);
-            return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.Ok(existingRepresentation));
+            return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.Ok(existingRepresentation, patchResultLst));
         }
 
         private void CheckParameter(PatchRepresentationParameter patchRepresentation)
