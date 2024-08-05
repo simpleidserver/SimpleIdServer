@@ -20,6 +20,7 @@ using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Notification.Gotify;
@@ -321,15 +322,11 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             var isInMemory = dbContext.Database.IsInMemory();
             if (!isInMemory) dbContext.Database.Migrate();
 
+            var masterRealm = dbContext.Realms.FirstOrDefault(r => r.Name == SimpleIdServer.IdServer.Constants.StandardRealms.Master.Name) ?? SimpleIdServer.IdServer.Constants.StandardRealms.Master;
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
-
-            if (!dbContext.Scopes.Any())
-                dbContext.Scopes.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Scopes);
-
-            if (!dbContext.Clients.Any())
-                dbContext.Clients.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients);
-
+            var unsupportedScopes = MigrateScopes(dbContext, masterRealm);
+            MigrateClients(dbContext, unsupportedScopes);
             if (!dbContext.UmaPendingRequest.Any())
                 dbContext.UmaPendingRequest.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PendingRequests);
 
@@ -360,8 +357,8 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.RegistrationWorkflows.Any())
                 dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
 
-            MigrateGroups(dbContext);
-            MigrateUsers(dbContext);
+            var groups = MigrateGroups(dbContext, masterRealm);
+            MigrateUsers(dbContext, groups.adminGroup, groups.adminRoGroup);
             if (!dbContext.SerializedFileKeys.Any())
             {
                 dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"));
@@ -517,7 +514,44 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             }
         }
 
-        void MigrateGroups(StoreDbContext dbContext)
+        List<Scope> MigrateScopes(StoreDbContext dbContext, Realm masterRealm)
+        {
+            var allScopeNames = dbContext.Scopes.Select(s => s.Name);
+            var unsupportedScopes = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Scopes.Where(s => !allScopeNames.Contains(s.Name));
+            foreach (var scope in unsupportedScopes)
+                scope.Realms = new List<Realm>
+                {
+                    masterRealm
+                };
+            dbContext.Scopes.AddRange(unsupportedScopes);
+            return unsupportedScopes.ToList();
+        }
+
+        void MigrateClients(StoreDbContext dbContext, List<Scope> unsupportedScopes)
+        {
+            var confClientIds = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Select(c => c.ClientId);
+            var allClientIds = dbContext.Clients.Select(s => s.ClientId);
+            var unknownClients = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Where(c => !allClientIds.Contains(c.ClientId));
+            var knownClients = dbContext.Clients
+                .Include(c => c.Scopes)
+                .Where(c => confClientIds.Contains(c.ClientId));
+            foreach (var unknownClient in unknownClients)
+                dbContext.Clients.Add(unknownClient);
+            foreach (var knownClient in knownClients)
+            {
+                var cl = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Single(c => c.ClientId == knownClient.ClientId);
+                foreach (var scope in cl.Scopes)
+                {
+                    if(!knownClient.Scopes.Any(s => s.Name == scope.Name))
+                    {
+                        var existingScope = dbContext.Scopes.SingleOrDefault(s => s.Name == scope.Name) ?? unsupportedScopes.Single(s => s.Name == scope.Name);
+                        knownClient.Scopes.Add(existingScope);
+                    }
+                }
+            }
+        }
+
+        (Group adminGroup, Group adminRoGroup) MigrateGroups(StoreDbContext dbContext, Realm masterRealm)
         {
             var admGroup = dbContext.Groups.Include(g => g.Realms)
                 .Include(g => g.Roles)
@@ -528,16 +562,24 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             if (admGroup == null)
             {
                 admGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup;
-                dbContext.Groups.Add(admGroup);
+                admGroup.Realms = new List<GroupRealm>();
+                masterRealm.Groups.Add(new GroupRealm
+                {
+                    Group = admGroup
+                });
             }
 
             if (admRoGroup == null)
             {
                 admRoGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup;
-                dbContext.Groups.Add(admRoGroup);
+                admRoGroup.Realms = new List<GroupRealm>();
+                masterRealm.Groups.Add(new GroupRealm
+                {
+                    Group = admRoGroup
+                });
             }
 
-            var scopes = RealmRoleBuilder.BuildAdministrativeRole(SimpleIdServer.IdServer.Constants.StandardRealms.Master);
+            var scopes = RealmRoleBuilder.BuildAdministrativeRole(masterRealm);
             var allScopeNames = dbContext.Scopes.Select(s => s.Name);
             var unknownScopes = scopes.Where(s => !allScopeNames.Contains(s.Name));
             dbContext.Scopes.AddRange(unknownScopes);
@@ -557,14 +599,18 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             if (existingAdministratorRole == null)
             {
                 existingAdministratorRole = SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole;
+                existingAdministratorRole.Realms.Clear();
+                existingAdministratorRole.Realms.Add(masterRealm);
                 dbContext.Scopes.Add(existingAdministratorRole);
             }
 
             if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole.Name))
                 admGroup.Roles.Add(existingAdministratorRole);
+
+            return (admGroup, admRoGroup);
         }
 
-        void MigrateUsers(StoreDbContext dbContext)
+        void MigrateUsers(StoreDbContext dbContext, Group adminGroup, Group adminRoGroup)
         {
             var isUserExists = dbContext.Users
                 .Any(c => c.Name == "user");
@@ -576,25 +622,23 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser.Name);
             if(!isUserExists)
                 dbContext.Users.Add(UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build());
-            if(existingAdministratorUser == null)
-                dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser);
-            else if(!existingAdministratorRoUser.Groups.Any(g => g.Group.Name != SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name))
+            if (existingAdministratorRoUser == null)
+                dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser);
+            else if(!existingAdministratorRoUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name))
             {
-                var grp = dbContext.Groups.First(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name);
                 existingAdministratorRoUser.Groups.Add(new GroupUser
                 {
-                    Group = grp
+                    Group = adminRoGroup
                 });
             }
 
             if (existingAdministratorUser == null)
                 dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser);
-            else if(!existingAdministratorUser.Groups.Any(g => g.Group.Name != SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))
+            else if(!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))
             {
-                var grp = dbContext.Groups.First(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name);
                 existingAdministratorUser.Groups.Add(new GroupUser
                 {
-                    Group = grp
+                    Group = adminGroup
                 });
             }
         }
