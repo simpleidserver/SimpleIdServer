@@ -138,7 +138,7 @@ app
     .UseSamlIdp()
     .UseGotifyNotification()
     .UseAutomaticConfiguration();
-SeedData(app);
+// SeedData(app);
 app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
@@ -148,7 +148,7 @@ void ConfigureIdServer(IServiceCollection services)
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
-            cb.IsPasswordEncodeInBase64 = true;
+            cb.IsPasswordEncodeInBase64 = false;
         }, cookie: c =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix))

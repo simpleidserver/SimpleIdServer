@@ -25,6 +25,8 @@ public class SugarUser
     public DateTime UpdateDateTime { get; set; }
     [SugarColumn(IsNullable = true)]
     public string? Source { get; set; } = null;
+    public DateTime? UnblockDateTime { get; set; }
+    public int NbLoginAttempt { get; set; }
     [SugarColumn(IsNullable = true)]
     public string? IdentityProvisioningId { get; set; } = null;
     [SugarColumn(IsNullable = true)]
@@ -65,6 +67,8 @@ public class SugarUser
             Name = user.Name,
             Source = user.Source,
             Status = user.Status,
+            UnblockDateTime = user.UnblockDateTime,
+            NbLoginAttempt = user.NbLoginAttempt,
             IdentityProvisioningId = user.IdentityProvisioningId,
             EncodedPicture = user.EncodedPicture,
             UpdateDateTime = user.UpdateDateTime,
@@ -96,6 +100,8 @@ public class SugarUser
             IdentityProvisioningId = IdentityProvisioningId,
             Source = Source,
             Email = Email,
+            UnblockDateTime = UnblockDateTime,
+            NbLoginAttempt = NbLoginAttempt,
             EmailVerified = EmailVerified,
             Firstname = Firstname,
             Status = Status,

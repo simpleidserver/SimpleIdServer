@@ -29,8 +29,6 @@ public class DeviceAuthCodeRepository : IDeviceAuthCodeRepository
 
     public void Add(DeviceAuthCode deviceAuthCode) => _dbContext.DeviceAuthCodes.Add(deviceAuthCode);
 
-    public Task<int> SaveChanges(CancellationToken cancellationToken) => _dbContext.SaveChangesAsync(cancellationToken);
-
     public void Update(DeviceAuthCode deviceAuthCode)
     {
     }

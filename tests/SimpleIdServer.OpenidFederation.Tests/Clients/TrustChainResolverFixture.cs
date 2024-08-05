@@ -17,7 +17,7 @@ public class TrustChainResolverFixture
         var resolver = TrustChainResolver.New();
 
         // ACT
-        var trustChain = await resolver.ResolveTrustChains(entityId, CancellationToken.None);
+        var trustChain = await resolver.ResolveTrustChainsFromClientId(entityId, CancellationToken.None);
         var validationResult = trustChain.Select(v => v.Validate());
 
         // ACT

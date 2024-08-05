@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IBusControl _busControl;
         private readonly IDPOPProofValidator _dpopProofValidator;
+        private readonly ITransactionBuilder _transactionBuilder;
 
         public DeviceCodeHandler(
             IClientAuthenticationHelper clientAuthenticationHelper,
@@ -38,7 +39,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IDeviceCodeGrantTypeValidator validator,
             IAuthenticationHelper authenticationHelper,
             IBusControl busControl,
-            IDPOPProofValidator dpopProofValidator) : base(clientAuthenticationHelper, tokenProfiles, options)
+            IDPOPProofValidator dpopProofValidator,
+            ITransactionBuilder transactionBuilder) : base(clientAuthenticationHelper, tokenProfiles, options)
         {
             _validator = validator;
             _busControl = busControl;
@@ -46,6 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             _tokenBuilders = tokenBuilders;
             _authenticationHelper = authenticationHelper;
             _dpopProofValidator = dpopProofValidator;
+            _transactionBuilder = transactionBuilder;
         }
 
         public override string GrantType => GRANT_TYPE;
@@ -56,54 +59,57 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             IEnumerable<string> scopeLst = null;
             using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Token"))
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("grant_type", GRANT_TYPE);
-                    activity?.SetTag("realm", context.Realm);
-                    var oauthClient = await AuthenticateClient(context, cancellationToken);
-                    context.SetClient(oauthClient);
-                    activity?.SetTag("client_id", oauthClient.ClientId);
-                    await _dpopProofValidator.Validate(context);
-                    var deviceAuthCode = await _validator.Validate(context, cancellationToken);
-                    scopeLst = deviceAuthCode.Scopes;
-                    activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
-                    var user = await _authenticationHelper.GetUserByLogin(deviceAuthCode.UserLogin, context.Realm, cancellationToken);
-                    context.SetUser(user, null);
-                    foreach (var tokenBuilder in _tokenBuilders)
-                        await tokenBuilder.Build(new BuildTokenParameter { Scopes = deviceAuthCode.Scopes }, context, cancellationToken);
-
-                    AddTokenProfile(context);
-                    var result = BuildResult(context, deviceAuthCode.Scopes);
-                    foreach (var kvp in context.Response.Parameters)
-                        result.Add(kvp.Key, kvp.Value);
-
-                    deviceAuthCode.Send();
-                    await _busControl.Publish(new TokenIssuedSuccessEvent
+                    try
                     {
-                        GrantType = GRANT_TYPE,
-                        ClientId = context.Client.ClientId,
-                        Scopes = deviceAuthCode.Scopes,
-                        Realm = context.Realm
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Token has been issued");
-                    return new OkObjectResult(result);
-                }
-                catch(OAuthException ex)
-                {
-                    await _busControl.Publish(new TokenIssuedFailureEvent
+                        activity?.SetTag("grant_type", GRANT_TYPE);
+                        activity?.SetTag("realm", context.Realm);
+                        var oauthClient = await AuthenticateClient(context, cancellationToken);
+                        context.SetClient(oauthClient);
+                        activity?.SetTag("client_id", oauthClient.ClientId);
+                        await _dpopProofValidator.Validate(context);
+                        var deviceAuthCode = await _validator.Validate(context, cancellationToken);
+                        scopeLst = deviceAuthCode.Scopes;
+                        activity?.SetTag("scopes", string.Join(",", deviceAuthCode.Scopes));
+                        var user = await _authenticationHelper.GetUserByLogin(deviceAuthCode.UserLogin, context.Realm, cancellationToken);
+                        context.SetUser(user, null);
+                        foreach (var tokenBuilder in _tokenBuilders)
+                            await tokenBuilder.Build(new BuildTokenParameter { Scopes = deviceAuthCode.Scopes }, context, cancellationToken);
+
+                        AddTokenProfile(context);
+                        var result = BuildResult(context, deviceAuthCode.Scopes);
+                        foreach (var kvp in context.Response.Parameters)
+                            result.Add(kvp.Key, kvp.Value);
+
+                        deviceAuthCode.Send();
+                        await _busControl.Publish(new TokenIssuedSuccessEvent
+                        {
+                            GrantType = GRANT_TYPE,
+                            ClientId = context.Client.ClientId,
+                            Scopes = deviceAuthCode.Scopes,
+                            Realm = context.Realm
+                        });
+                        activity?.SetStatus(ActivityStatusCode.Ok, "Token has been issued");
+                        return new OkObjectResult(result);
+                    }
+                    catch (OAuthException ex)
                     {
-                        GrantType = GRANT_TYPE,
-                        ClientId = context.Client?.ClientId,
-                        Scopes = scopeLst,
-                        Realm = context.Realm,
-                        ErrorMessage = ex.Message
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
-                }
-                finally
-                {
-                    await _deviceAuthCodeRepository.SaveChanges(cancellationToken);
+                        await _busControl.Publish(new TokenIssuedFailureEvent
+                        {
+                            GrantType = GRANT_TYPE,
+                            ClientId = context.Client?.ClientId,
+                            Scopes = scopeLst,
+                            Realm = context.Realm,
+                            ErrorMessage = ex.Message
+                        });
+                        activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                        return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
+                    }
+                    finally
+                    {
+                        await transaction.Commit(cancellationToken);
+                    }
                 }
             }
         }

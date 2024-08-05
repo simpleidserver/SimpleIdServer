@@ -44,11 +44,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             return result?.ToDomain();
         }
 
-        public Task<int> SaveChanges(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
         private static SugarDeviceAuthCode Transform(DeviceAuthCode authCode)
         {
             return new SugarDeviceAuthCode

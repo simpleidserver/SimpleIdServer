@@ -18,6 +18,8 @@ public class SugarScope
     public bool IsExposedInConfigurationEdp { get; set; }
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    public ComponentActions? Action { get; set; }
+    public string? Component { set; get; } = null;
 
     [Navigate(NavigateType.OneToMany, nameof(SugarScopeClaimMapper.ScopeId))]
     public List<SugarScopeClaimMapper> ClaimMappers { get; set; }
@@ -37,6 +39,8 @@ public class SugarScope
             IsExposedInConfigurationEdp = scope.IsExposedInConfigurationEdp,
             Type = scope.Type,
             UpdateDateTime = scope.UpdateDateTime,
+            Component = scope.Component,
+            Action = scope.Action,
             Protocol = scope.Protocol,
             Realms = scope.Realms == null ? new List<SugarRealm>() : scope.Realms.Select(r => new SugarRealm
             {
@@ -59,6 +63,8 @@ public class SugarScope
             IsExposedInConfigurationEdp = IsExposedInConfigurationEdp,
             CreateDateTime = CreateDateTime,
             UpdateDateTime = UpdateDateTime,
+            Component = Component,
+            Action = Action,
             ClaimMappers = ClaimMappers == null ? new List<ScopeClaimMapper>() : ClaimMappers.Select(m => m.ToDomain()).ToList(),
             Realms = Realms == null ? new List<Realm>() : Realms.Select(r => r.ToDomain()).ToList(),
             ApiResources = ApiResources == null ? new List<ApiResource>() : ApiResources.Select(r => r.ToDomain()).ToList()

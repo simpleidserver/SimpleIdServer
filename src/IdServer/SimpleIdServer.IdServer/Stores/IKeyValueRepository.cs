@@ -14,5 +14,4 @@ public interface IKeyValueRepository
     Task<List<ConfigurationKeyPairValueRecord>> GetAll(CancellationToken cancellationToken);
     void Add(ConfigurationKeyPairValueRecord keyValue);
     void Update(ConfigurationKeyPairValueRecord keyValue);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
 }

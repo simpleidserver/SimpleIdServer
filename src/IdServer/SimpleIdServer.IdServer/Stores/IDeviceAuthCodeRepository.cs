@@ -13,5 +13,4 @@ public interface IDeviceAuthCodeRepository
     void Delete(DeviceAuthCode deviceAuthCode);
     void Add(DeviceAuthCode deviceAuthCode);
     void Update(DeviceAuthCode deviceAuthCode);
-    Task<int> SaveChanges(CancellationToken cancellationToken);
 }

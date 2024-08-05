@@ -25,6 +25,7 @@
 	  <PackageReference Include="SimpleIdServer.IdServer" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Provisioning.LDAP" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Provisioning.SCIM" Version="5.0.*-*" />
+	  <PackageReference Include="SimpleIdServer.IdServer.Federation" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Configuration" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Configuration.Redis" Version="5.0.*-*" />	  
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />

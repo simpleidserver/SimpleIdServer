@@ -126,9 +126,13 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             };
         }
 
-        public Task<List<Scope>> GetAllRealmScopes(string realm, CancellationToken cancellationToken)
+        public async Task<List<Scope>> GetAllRealmScopes(string realm, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var result = await _dbContext.Client.Queryable<SugarScope>()
+                .Includes(s => s.Realms)
+                .Where(s => s.Component != null && s.Realms.Any(r => r.RealmsName == realm))
+                .ToListAsync(cancellationToken);
+            return result.Select(s => s.ToDomain()).ToList();
         }
     }
 }

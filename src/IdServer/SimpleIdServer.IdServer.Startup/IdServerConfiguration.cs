@@ -277,7 +277,7 @@ namespace SimpleIdServer.IdServer.Startup
             {
                 Id  = Guid.NewGuid().ToString(),
                 IsSubordinate = false,
-                Realm = IdServer.Constants.DefaultRealm,
+                Realm = SimpleIdServer.IdServer.Constants.DefaultRealm,
                 Sub = "http://localhost:7000",
                 CreateDateTime = DateTime.UtcNow
             }

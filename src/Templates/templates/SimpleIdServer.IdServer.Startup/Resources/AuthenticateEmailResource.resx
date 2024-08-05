@@ -177,6 +177,9 @@
   <data name="unknown_user" xml:space="preserve">
     <value>The given email does not correspond to any user</value>
   </data>
+  <data name="user_blocked" xml:space="preserve">
+    <value>User account is blocked</value>
+  </data>
   <data name="user_exists" xml:space="preserve">
     <value>User with the same name already exists</value>
   </data>

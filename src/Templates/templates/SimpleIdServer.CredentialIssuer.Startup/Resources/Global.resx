@@ -135,6 +135,15 @@
   <data name="Loading" xml:space="preserve">
     <value>Loading</value>
   </data>
+  <data name="PreAuthorized" xml:space="preserve">
+    <value>Pre-authorized</value>
+  </data>
+  <data name="QrCode" xml:space="preserve">
+    <value>QR code</value>
+  </data>
+  <data name="RequiresUserPin" xml:space="preserve">
+    <value>Requires user PIN</value>
+  </data>
   <data name="ScanQrCodeWithYourWalletApplication" xml:space="preserve">
     <value>Scan the QR code with your wallet application</value>
   </data>
