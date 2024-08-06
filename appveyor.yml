@@ -25,12 +25,10 @@ deploy:
     secure: kSru0/Mz8HMao/s+D3eNoTjOdwYRKMESn144kSw8tWrIKZGNCWDKL5Zh57ca9LwP
   on:
     branch: master
-    appveyor_repo_tag: true
 - provider: GitHub
   auth_token:
     secure: FJAvb5bFQzM98phfQ2/dLL7I10Hvof/fdHorRLuDId8PyjAxcdkfWYf5fZ0/0g+e
   artifact: /.*\.zip/
   on:
     branch: master
-    appveyor_repo_tag: true
   
