@@ -229,7 +229,7 @@ spec:
       subdomain: localhost
       containers:
       - name: scim-deploy
-        image: simpleidserver/scim:4.0.8
+        image: simpleidserver/scim:5.0.1
         ports:
           - containerPort: 80
         env:
@@ -266,7 +266,7 @@ spec:
       subdomain: localhost
       containers:
       - name: idserver-deploy
-        image: simpleidserver/idserver:4.0.8
+        image: simpleidserver/idserver:5.0.1
         ports:
           - containerPort: 80
         env:
@@ -309,7 +309,7 @@ spec:
       subdomain: localhost
       containers:
       - name: website-deploy
-        image: simpleidserver/website:4.0.8
+        image: simpleidserver/website:5.0.1
         ports:
           - containerPort: 80
         env:
@@ -350,7 +350,7 @@ spec:
       subdomain: localhost
       containers:
       - name: credentialissuer-deploy
-        image: simpleidserver/credentialissuer:4.0.8
+        image: simpleidserver/credentialissuer:5.0.1
         ports:
           - containerPort: 80
         env:
@@ -385,7 +385,7 @@ spec:
       subdomain: localhost
       containers:
       - name: credentialissuerwebsite-deploy
-        image: simpleidserver/credentialissuerwebsite:4.0.8
+        image: simpleidserver/credentialissuerwebsite:5.0.1
         ports:
           - containerPort: 80
         env:

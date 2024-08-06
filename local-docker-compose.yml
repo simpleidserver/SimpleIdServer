@@ -72,7 +72,7 @@ services:
       VIRTUAL_HOST: "website.localhost.com"
       ASPNETCORE_URLS : "http://*:80"
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
-      DefaultSecurityOptions__Issuer: "https://idserver.localhost.com/master"
+      DefaultSecurityOptions__Issuer: "https://idserver.localhost.com"
       DefaultSecurityOptions__IgnoreCertificateError: "true"
       IdServerBaseUrl: "https://idserver.localhost.com"
       ScimBaseUrl: "https://scim.localhost.com"
