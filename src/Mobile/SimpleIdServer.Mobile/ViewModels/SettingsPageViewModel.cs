@@ -140,7 +140,8 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         _isLoading = true;
         var ed25519 = Ed25519SignatureKey.Generate();
         var generator = DidKeyGenerator.New();
-        var did = generator.Generate(ed25519);
+        generator.SetSignatureKey(ed25519);
+        var did = generator.Export(false).Did;
         await _didRecordState.Update(new DidRecord { Did = did, PrivaterKey = ed25519.GetPrivateKey() });
         Did = did;
         var cmd = (Command)GenerateDidKeyCommand;
