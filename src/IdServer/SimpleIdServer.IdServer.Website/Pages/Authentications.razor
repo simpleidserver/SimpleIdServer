@@ -4,6 +4,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
 @inject NavigationManager navigationManager
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 
@@ -78,6 +79,6 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/authentications/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/authentications/{rec.Key}"));
     }
 }
