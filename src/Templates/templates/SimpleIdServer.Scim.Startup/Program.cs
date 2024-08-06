@@ -233,7 +233,7 @@ public class Program
 
     private static void ConfigureApp(WebApplicationBuilder builder, WebApplication app)
     {
-        var opts = app.Services.GetRequiredService<IOptions<SCIMHostOptions>>().Value;
+        var opts = app.Services.GetRequiredService<IOptions<SimpleIdServer.Scim.SCIMHostOptions>>().Value;
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
