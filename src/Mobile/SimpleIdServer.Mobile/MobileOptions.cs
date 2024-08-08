@@ -11,5 +11,6 @@
         public bool IsDev { get; set; } = true;
         public string ClientId { get; set; } = "walletClient";
         public string ClientSecret = "password";
+        public string VcVersion { get; set; } = SupportedVcVersions.ESBI;
     }
 }

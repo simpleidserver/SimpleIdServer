@@ -97,6 +97,11 @@
 	  <Compile Update="NotificationPage.xaml.cs">
 	    <DependentUpon>NotificationPage.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Resources\Global.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Global.resx</DependentUpon>
+	  </Compile>
 	  <Compile Update="WalletPage.xaml.cs">
 	    <DependentUpon>WalletPage.xaml</DependentUpon>
 	  </Compile>
@@ -115,6 +120,13 @@
 	  <Compile Update="EnrollPage.xaml.cs">
 	    <DependentUpon>EnrollPage.xaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Global.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Global.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>

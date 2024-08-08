@@ -2,16 +2,15 @@
 
 namespace SimpleIdServer.Mobile.DTOs;
 
-public class CredentialDefinitionResult
+public abstract class BaseCredentialDefinitionResult
 {
     [JsonPropertyName("format")]
     public string Format { get; set; }
     [JsonPropertyName("display")]
     public List<CredentialDefinitionDisplayResult> Display { get; set; }
-    [JsonPropertyName("type")]
-    public IEnumerable<string> Type { get; set; }
-}
 
+    public abstract List<string> GetTypes();
+}
 public class CredentialDefinitionDisplayResult
 {
     [JsonPropertyName("name")]
@@ -19,7 +18,7 @@ public class CredentialDefinitionDisplayResult
     [JsonPropertyName("description")]
     public string Description { get; set; }
     [JsonPropertyName("locale")]
-    public string Locale {  get; set; }
+    public string Locale { get; set; }
     [JsonPropertyName("background_color")]
     public string BackgroundColor { get; set; }
     [JsonPropertyName("text_color")]

@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
+using SimpleIdServer.Mobile.Clients;
 using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
 using SimpleIdServer.Mobile.ViewModels;
@@ -35,11 +36,17 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
+		builder.Services.AddTransient<ICredentialIssuerClient, CredentialIssuerClient>();
+		builder.Services.AddTransient<ISidServerClient, SidServerClient>();
+		builder.Services.AddTransient<IVerifiableCredentialFactory, VerifiableCredentialFactory>();
+		builder.Services.AddTransient<IVerifiableCredentialsService, ESBIVerifiableCredentialService>();
+		builder.Services.AddTransient<IVerifiableCredentialsService, VerifiableCredentialService>();
 		builder.Services.AddTransient<IPromptService, PromptService>();
         builder.Services.AddTransient<IOTPService, OTPService>();
 		builder.Services.AddTransient<INavigationService, NavigationService>();
 		builder.Services.AddTransient<IUrlService, UrlService>();
 		builder.Services.AddTransient<Factories.IHttpClientFactory, Factories.HttpClientFactory>();
+		builder.Services.AddTransient<ICredentialIssuerClient, CredentialIssuerClient>();
 		builder.Services.AddSingleton(new OtpListState());
 		builder.Services.AddSingleton(new CredentialListState());
 		builder.Services.AddSingleton(new VerifiableCredentialListState());

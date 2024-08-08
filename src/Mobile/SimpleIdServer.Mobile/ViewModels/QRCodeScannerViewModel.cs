@@ -366,7 +366,7 @@ public class QRCodeScannerViewModel
             using (var httpClient = _httpClientFactory.Build())
             {
                 var credentialDefinition = await GetCredentialDefinition(httpClient, credentialOffer);
-                var serializedCredentialDef = credentialDefinition.CredentialsSupported
+                var serializedCredentialDef = credentialDefinition.CredentialsConfigurationsSupported
                     .Single(kvp => kvp.Key == credentialOffer.CredentialConfigurationIds.Single())
                     .Value.ToJsonString();
                 var offeredCredential = JsonSerializer.Deserialize<CredentialDefinitionResult>(serializedCredentialDef);
