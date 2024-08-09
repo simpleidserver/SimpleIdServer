@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Mobile.DTOs;
 
-public class BaseCredentialResult
+public abstract class BaseCredentialResult
 {
     [JsonPropertyName("format")]
     public string Format { get; set; }
@@ -13,4 +13,6 @@ public class BaseCredentialResult
     public string CNonce { get; set; }
     [JsonPropertyName("c_nonce_expires_in")]
     public string CNonceExpires { get; set; }
+
+    public abstract string GetTransactionId();
 }

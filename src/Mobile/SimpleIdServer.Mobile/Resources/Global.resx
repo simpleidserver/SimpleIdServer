@@ -117,16 +117,43 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AuthorizationServerCannotBeResolved" xml:space="preserve">
+    <value>The authorization server cannot be resolved</value>
+  </data>
+  <data name="BadAuthorizationRequest" xml:space="preserve">
+    <value>The authorization request is invalid</value>
+  </data>
+  <data name="BadPostAuthorizationRequest" xml:space="preserve">
+    <value>The post authorization request is invalid</value>
+  </data>
   <data name="CannotExtractCredentialDefinition" xml:space="preserve">
     <value>the credential definition cannot be extracted</value>
   </data>
+  <data name="CannotGetCredential" xml:space="preserve">
+    <value>An error occured while trying to get the verifiable credential</value>
+  </data>
+  <data name="CannotGetTokenWithAuthorizationCode" xml:space="preserve">
+    <value>Cannot get the access token with the authorization code</value>
+  </data>
+  <data name="CannotGetTokenWithPreAuthorizedCode" xml:space="preserve">
+    <value>Cannot get the access token with pre-authorized code</value>
+  </data>
   <data name="CredentialOfferMustContainsOneCredential" xml:space="preserve">
     <value>credential offer must contain only one credential</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
   </data>
   <data name="GrantsCannotBeNull" xml:space="preserve">
     <value>the grants present in the credential offer is not defined</value>
   </data>
   <data name="PreAuthorizedCodeMissing" xml:space="preserve">
     <value>the pre authorized code is missing</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="VerifiableCredentialEnrolled" xml:space="preserve">
+    <value>The verifiable credential has been enrolled</value>
   </data>
 </root>

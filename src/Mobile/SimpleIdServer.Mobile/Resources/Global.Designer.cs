@@ -61,6 +61,33 @@ namespace SimpleIdServer.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The authorization server cannot be resolved.
+        /// </summary>
+        internal static string AuthorizationServerCannotBeResolved {
+            get {
+                return ResourceManager.GetString("AuthorizationServerCannotBeResolved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The authorization request is invalid.
+        /// </summary>
+        internal static string BadAuthorizationRequest {
+            get {
+                return ResourceManager.GetString("BadAuthorizationRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The post authorization request is invalid.
+        /// </summary>
+        internal static string BadPostAuthorizationRequest {
+            get {
+                return ResourceManager.GetString("BadPostAuthorizationRequest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the credential definition cannot be extracted.
         /// </summary>
         internal static string CannotExtractCredentialDefinition {
@@ -70,11 +97,47 @@ namespace SimpleIdServer.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à An error occured while trying to get the verifiable credential.
+        /// </summary>
+        internal static string CannotGetCredential {
+            get {
+                return ResourceManager.GetString("CannotGetCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cannot get the access token with the authorization code.
+        /// </summary>
+        internal static string CannotGetTokenWithAuthorizationCode {
+            get {
+                return ResourceManager.GetString("CannotGetTokenWithAuthorizationCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cannot get the access token with pre-authorized code.
+        /// </summary>
+        internal static string CannotGetTokenWithPreAuthorizedCode {
+            get {
+                return ResourceManager.GetString("CannotGetTokenWithPreAuthorizedCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à credential offer must contain only one credential.
         /// </summary>
         internal static string CredentialOfferMustContainsOneCredential {
             get {
                 return ResourceManager.GetString("CredentialOfferMustContainsOneCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Error.
+        /// </summary>
+        internal static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
             }
         }
         
@@ -93,6 +156,24 @@ namespace SimpleIdServer.Mobile.Resources {
         internal static string PreAuthorizedCodeMissing {
             get {
                 return ResourceManager.GetString("PreAuthorizedCodeMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Success.
+        /// </summary>
+        internal static string Success {
+            get {
+                return ResourceManager.GetString("Success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The verifiable credential has been enrolled.
+        /// </summary>
+        internal static string VerifiableCredentialEnrolled {
+            get {
+                return ResourceManager.GetString("VerifiableCredentialEnrolled", resourceCulture);
             }
         }
     }

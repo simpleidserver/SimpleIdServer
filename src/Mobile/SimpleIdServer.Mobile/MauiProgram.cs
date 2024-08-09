@@ -38,7 +38,7 @@ public static class MauiProgram
 			});
 		builder.Services.AddTransient<ICredentialIssuerClient, CredentialIssuerClient>();
 		builder.Services.AddTransient<ISidServerClient, SidServerClient>();
-		builder.Services.AddTransient<IVerifiableCredentialFactory, VerifiableCredentialFactory>();
+		builder.Services.AddTransient<IVerifiableCredentialResolver, VerifiableCredentialResolver>();
 		builder.Services.AddTransient<IVerifiableCredentialsService, ESBIVerifiableCredentialService>();
 		builder.Services.AddTransient<IVerifiableCredentialsService, VerifiableCredentialService>();
 		builder.Services.AddTransient<IPromptService, PromptService>();

@@ -21,9 +21,9 @@ public class VerifiableCredentialService : BaseGenericVerifiableCredentialServic
         }
     }
 
-    protected async override Task<(BaseCredentialDefinitionResult credDef, BaseCredentialIssuer credIssuer)?> Extract(CredentialOffer credentialOffer)
+    protected async override Task<(BaseCredentialDefinitionResult credDef, BaseCredentialIssuer credIssuer)?> Extract(CredentialOffer credentialOffer, CancellationToken cancellationToken)
     {
-        var credentialIssuer = await CredentialIssuerClient.GetCredentialIssuer<CredentialIssuerResult>(credentialOffer);
+        var credentialIssuer = await CredentialIssuerClient.GetCredentialIssuer<CredentialIssuerResult>(credentialOffer, cancellationToken);
         var serializedCredentialDef = credentialIssuer.CredentialsConfigurationsSupported
             .SingleOrDefault(kvp => kvp.Key == credentialOffer.CredentialConfigurationIds.Single()).Value?.ToJsonString();
         if (serializedCredentialDef == null) return null;
@@ -31,7 +31,7 @@ public class VerifiableCredentialService : BaseGenericVerifiableCredentialServic
         return (credentialDef, credentialIssuer);
     }
 
-    protected override async Task<BaseCredentialResult> GetCredential(BaseCredentialIssuer credentialIssuer, BaseCredentialDefinitionResult credentialDefinition, CredentialProofRequest proofRequest, string accessToken)
+    protected override async Task<BaseCredentialResult> GetCredential(BaseCredentialIssuer credentialIssuer, BaseCredentialDefinitionResult credentialDefinition, CredentialProofRequest proofRequest, string accessToken, CancellationToken cancellationToken)
     {
         var credentialRequest = new GetCredentialRequest
         {
@@ -42,7 +42,7 @@ public class VerifiableCredentialService : BaseGenericVerifiableCredentialServic
             },
             Proof = proofRequest
         };
-        var result = await CredentialIssuerClient.GetCredential<GetCredentialRequest, CredentialResult>(credentialIssuer.CredentialEndpoint, credentialRequest, accessToken);
+        var result = await CredentialIssuerClient.GetCredential<GetCredentialRequest, CredentialResult>(credentialIssuer.CredentialEndpoint, credentialRequest, accessToken, cancellationToken);
         return result;
     }
 }

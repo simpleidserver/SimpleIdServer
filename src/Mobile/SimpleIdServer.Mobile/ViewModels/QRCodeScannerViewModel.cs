@@ -21,6 +21,7 @@ using SimpleIdServer.Did.Key;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
 using Comet.Reflection;
+using SimpleIdServer.Mobile.Resources;
 #if IOS
 using Firebase.CloudMessaging;
 #endif
@@ -38,6 +39,7 @@ public class QRCodeScannerViewModel
     private readonly IOTPService _otpService;
     private readonly INavigationService _navigationService;
     private readonly IUrlService _urlService;
+    private readonly IVerifiableCredentialResolver _verifiableCredentialResolver;
     private readonly Factories.IHttpClientFactory _httpClientFactory;
     private readonly OtpListState _otpListState;
     private readonly CredentialListState _credentialListState;
@@ -52,6 +54,7 @@ public class QRCodeScannerViewModel
         IOTPService otpService,
         INavigationService navigationService,
         IUrlService urlService,
+        IVerifiableCredentialResolver verifiableCredentialResolver,
         Factories.IHttpClientFactory httpClientFactory,
         OtpListState otpListState,
         CredentialListState credentialListState,
@@ -63,6 +66,7 @@ public class QRCodeScannerViewModel
         _promptService = promptService;
         _otpService = otpService;
         _urlService = urlService;
+        _verifiableCredentialResolver = verifiableCredentialResolver;
         _httpClientFactory = httpClientFactory;
         _options = options.Value;
         _otpListState = otpListState;
@@ -356,6 +360,31 @@ public class QRCodeScannerViewModel
         {
             var serializedQueryParams = qrCodeValue.Replace(openidCredentialOfferScheme, string.Empty);
             var encodedJson = HttpUtility.UrlDecode(serializedQueryParams);
+            var verifiableCredential = await _verifiableCredentialResolver.Resolve(encodedJson);
+            if(!string.IsNullOrWhiteSpace(verifiableCredential.ErrorMessage))
+            {
+                await _promptService.ShowAlert(Global.Error, verifiableCredential.ErrorMessage);
+                return;
+            }
+
+            verifiableCredential.VerifiableCredential.Credential;
+
+            await _verifiableCredentialListState.AddVerifiableCredentialRecord(new VerifiableCredentialRecord
+            {
+                Id = w3cVc.Id,
+                Format = _vcFormat,
+                Name = display.Name,
+                Description = display.Description,
+                ValidFrom = w3cVc.ValidFrom,
+                ValidUntil = w3cVc.ValidUntil,
+                Type = types.First(),
+                SerializedVc = serializedVc,
+                BackgroundColor = display.BackgroundColor,
+                TextColor = display.TextColor,
+                Logo = display.Logo?.Uri
+            });
+            await _promptService.ShowAlert(Global.Success, Global.VerifiableCredentialEnrolled);
+            /*
             var credentialOffer = JsonSerializer.Deserialize<CredentialOffer>(encodedJson);
             if (credentialOffer.CredentialConfigurationIds.Count() != 1)
             {
@@ -405,6 +434,7 @@ public class QRCodeScannerViewModel
                 });
                 await _promptService.ShowAlert("Success", "The verifiable credential has been enrolled");
             }
+            */
         }
 
         async Task<CredentialIssuerResult> GetCredentialDefinition(HttpClient httpClient, CredentialOffer credentialOffer)
