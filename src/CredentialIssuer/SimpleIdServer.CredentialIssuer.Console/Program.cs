@@ -11,7 +11,7 @@ var publicKey = "did:key:z2dmzD81cgPx8Vki7JbuuMmFYrWPgYoytykUZ3eyqht1j9Kbrz1hh3C
 var serializedPrivateKey = System.IO.File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "privatekey.json"));
 var privateKey = SignatureKeySerializer.Deserialize(serializedPrivateKey);
 
-DeferredCredential();
+PreAuthorisedAndDeferredCredential();
 
 void InTimeCredential()
 {
@@ -20,6 +20,7 @@ void InTimeCredential()
     var q = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
     var resolver = VerifiableCredentialOfferResolverFactory.Build();
     var vc = resolver.ResolveByUrl(HttpUtility.UrlDecode(q["credential_offer_uri"]), publicKey, privateKey, CancellationToken.None).Result;
+    Console.WriteLine(vc.Status);
 }
 
 void DeferredCredential()
@@ -36,12 +37,26 @@ void DeferredCredential()
 
 void PreAuthorisedInTimeCredential()
 {
-
+    const string pin = "6267";
+    var intentData = "openid-credential-offer://?credential_offer_uri=https%3A%2F%2Fapi-conformance.ebsi.eu%2Fconformance%2Fv3%2Fissuer-mock%2Foffers%2Fd9a9e596-2e4e-437d-ad8a-0cb54519f2ed";
+    var uri = Uri.TryCreate(intentData, UriKind.Absolute, out Uri r);
+    var q = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
+    var resolver = VerifiableCredentialOfferResolverFactory.Build();
+    var vc = resolver.ResolveByUrl(HttpUtility.UrlDecode(q["credential_offer_uri"]), publicKey, privateKey, pin, CancellationToken.None).Result;
+    Console.WriteLine(vc.Status);
 }
 
 void PreAuthorisedAndDeferredCredential()
 {
-
+    const string pin = "6267";
+    var intentData = "openid-credential-offer://?credential_offer_uri=https%3A%2F%2Fapi-conformance.ebsi.eu%2Fconformance%2Fv3%2Fissuer-mock%2Foffers%2F2b9fbcb2-b466-4c59-844f-c5d51a1e64b4";
+    var uri = Uri.TryCreate(intentData, UriKind.Absolute, out Uri r);
+    var q = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
+    var resolver = VerifiableCredentialOfferResolverFactory.Build();
+    var vc = resolver.ResolveByUrl(HttpUtility.UrlDecode(q["credential_offer_uri"]), publicKey, privateKey, pin, CancellationToken.None).Result;
+    Thread.Sleep(6000);
+    vc = vc.Retry(CancellationToken.None).Result;
+    Console.WriteLine(vc.Status);
 }
 
 string GenerateDidKey()

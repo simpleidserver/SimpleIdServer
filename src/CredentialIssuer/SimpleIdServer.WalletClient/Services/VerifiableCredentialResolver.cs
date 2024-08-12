@@ -1,5 +1,4 @@
 ﻿using SimpleIdServer.Did.Crypto;
-using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.Factories;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +12,9 @@ namespace SimpleIdServer.WalletClient.Services;
 public interface IVerifiableCredentialResolver
 {
     Task<RequestVerifiableCredentialResult> ResolveByUrl(string credentialOfferUrl, string publicDid, IAsymmetricKey privateKey, CancellationToken cancellationToken);
+    Task<RequestVerifiableCredentialResult> ResolveByUrl(string credentialOfferUrl, string publicDid, IAsymmetricKey privateKey, string pin, CancellationToken cancellationToken);
     Task<RequestVerifiableCredentialResult> Resolve(string credentialOffer, string publicDid, IAsymmetricKey privateKey, CancellationToken cancellationToken);
+    Task<RequestVerifiableCredentialResult> Resolve(string credentialOffer, string publicDid, IAsymmetricKey privateKey, string pin, CancellationToken cancellationToken);
 }
 
 public class VerifiableCredentialResolver : IVerifiableCredentialResolver
@@ -27,7 +28,10 @@ public class VerifiableCredentialResolver : IVerifiableCredentialResolver
         _verifiableCredentialsServices = verifiableCredentialsServices;
     }
 
-    public async Task<RequestVerifiableCredentialResult> ResolveByUrl(string credentialOfferUrl, string publicDid, IAsymmetricKey privateKey, CancellationToken cancellationToken)
+    public Task<RequestVerifiableCredentialResult> ResolveByUrl(string credentialOfferUrl, string publicDid, IAsymmetricKey privateKey, CancellationToken cancellationToken)
+        => ResolveByUrl(credentialOfferUrl, publicDid, privateKey, null, cancellationToken);
+
+    public async Task<RequestVerifiableCredentialResult> ResolveByUrl(string credentialOfferUrl, string publicDid, IAsymmetricKey privateKey, string pin, CancellationToken cancellationToken)
     {
         using (var httpClient = _httpClientFactory.Build())
         {
@@ -38,16 +42,19 @@ public class VerifiableCredentialResolver : IVerifiableCredentialResolver
             };
             var httpResult = await httpClient.SendAsync(requestMessage, cancellationToken);
             var content = await httpResult.Content.ReadAsStringAsync(cancellationToken);
-            return await Resolve(content, publicDid, privateKey, cancellationToken);
+            return await Resolve(content, publicDid, privateKey, pin, cancellationToken);
         }
     }
 
     public Task<RequestVerifiableCredentialResult> Resolve(string credentialOffer, string publicDid, IAsymmetricKey privateKey, CancellationToken cancellationToken)
+        => Resolve(credentialOffer, publicDid, privateKey, null, cancellationToken);
+
+    public Task<RequestVerifiableCredentialResult> Resolve(string credentialOffer, string publicDid, IAsymmetricKey privateKey, string pin, CancellationToken cancellationToken)
     {
         var version = SupportedVcVersions.LATEST;
         var jsonObj = JsonObject.Parse(credentialOffer).AsObject();
-        if(jsonObj.ContainsKey("credentials")) version = SupportedVcVersions.ESBI;
-        var service = _verifiableCredentialsServices.Single(v => v.Version ==  version);
-        return service.Request(credentialOffer, publicDid, privateKey, cancellationToken);        
+        if (jsonObj.ContainsKey("credentials")) version = SupportedVcVersions.ESBI;
+        var service = _verifiableCredentialsServices.Single(v => v.Version == version);
+        return service.Request(credentialOffer, publicDid, privateKey, pin, cancellationToken);
     }
 }

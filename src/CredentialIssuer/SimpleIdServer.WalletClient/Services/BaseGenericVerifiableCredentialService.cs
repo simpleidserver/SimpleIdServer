@@ -24,7 +24,7 @@ namespace SimpleIdServer.WalletClient.Services;
 
 public interface IVerifiableCredentialsService
 {
-    Task<RequestVerifiableCredentialResult> Request(string credentialOfferJson, string publicDid, IAsymmetricKey privateKey, CancellationToken cancellationToken);
+    Task<RequestVerifiableCredentialResult> Request(string credentialOfferJson, string publicDid, IAsymmetricKey privateKey, string pin, CancellationToken cancellationToken);
     string Version { get; }
 }
 
@@ -89,7 +89,7 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         }
     }
 
-    public async Task<RequestVerifiableCredentialResult> Request(string credentialOfferJson, string publicDid, IAsymmetricKey privateKey, CancellationToken cancellationToken)
+    public async Task<RequestVerifiableCredentialResult> Request(string credentialOfferJson, string publicDid, IAsymmetricKey privateKey, string pin, CancellationToken cancellationToken)
     {
         var resolver = _resolvers.SingleOrDefault(r => publicDid.StartsWith($"did:{r.Method}"));
         if(resolver == null)
@@ -124,7 +124,7 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         CredentialTokenResult tokenResult;
         if(credentialOffer.Grants.PreAuthorizedCodeGrant != null)
         {
-            tokenResult = await GetTokenWithPreAuthorizedCodeGrant(didDocument.Id, privateKey, credentialOffer, extractionResult.Value.credIssuer, openidConfiguration, extractionResult.Value.credDef, cancellationToken);
+            tokenResult = await GetTokenWithPreAuthorizedCodeGrant(didDocument.Id, privateKey, credentialOffer, extractionResult.Value.credIssuer, openidConfiguration, extractionResult.Value.credDef, pin, cancellationToken);
         }
         else
         {
@@ -183,9 +183,9 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
 
     #region Pre-authorized code
 
-    private async Task<CredentialTokenResult> GetTokenWithPreAuthorizedCodeGrant<T>(string publicDid, IAsymmetricKey privateKey, T credentialOffer, DTOs.BaseCredentialIssuer credentialIssuer, OpenidConfigurationResult openidConfigurationResult, BaseCredentialDefinitionResult credDerf, CancellationToken cancellationToken) where T : BaseCredentialOffer
+    private async Task<CredentialTokenResult> GetTokenWithPreAuthorizedCodeGrant<T>(string publicDid, IAsymmetricKey privateKey, T credentialOffer, DTOs.BaseCredentialIssuer credentialIssuer, OpenidConfigurationResult openidConfigurationResult, BaseCredentialDefinitionResult credDerf, string pin, CancellationToken cancellationToken) where T : BaseCredentialOffer
     {
-        var tokenResult = await _sidServerClient.GetAccessTokenWithPreAuthorizedCode(publicDid, openidConfigurationResult.TokenEndpoint, credentialOffer.Grants.PreAuthorizedCodeGrant.PreAuthorizedCode, cancellationToken);
+        var tokenResult = await _sidServerClient.GetAccessTokenWithPreAuthorizedCode(publicDid, openidConfigurationResult.TokenEndpoint, credentialOffer.Grants.PreAuthorizedCodeGrant.PreAuthorizedCode, pin, cancellationToken);
         if (tokenResult == null)
             return CredentialTokenResult.Nok(Global.CannotGetTokenWithPreAuthorizedCode);
 
