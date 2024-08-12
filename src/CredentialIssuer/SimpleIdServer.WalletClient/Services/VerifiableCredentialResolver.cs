@@ -1,4 +1,5 @@
 ﻿using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.Factories;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ public class VerifiableCredentialResolver : IVerifiableCredentialResolver
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IEnumerable<IVerifiableCredentialsService> _verifiableCredentialsServices;
-
+    
     public VerifiableCredentialResolver(IHttpClientFactory httpClientFactory, IEnumerable<IVerifiableCredentialsService> verifiableCredentialsServices)
     {
         _httpClientFactory = httpClientFactory;

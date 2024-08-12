@@ -17,6 +17,11 @@ public class DeferredCredentialIssuer : GenericDeferredCredentialIssuer<Credenti
 
     public override string Version => SupportedVcVersions.LATEST;
 
+    protected override bool HasPendingState(DeferredCredentialResult<CredentialResult> credential)
+    {
+        return credential.ErrorCode == "issuance_pending";
+    }
+
     protected override Task<DeferredCredentialResult<CredentialResult>> GetDeferredCredential(BaseCredentialIssuer credentialIssuer, string transactionId, CancellationToken cancellationToken)
         => _credentialIssuerClient.GetDeferredCredential(credentialIssuer.DeferredCredentialEndpoint, transactionId, cancellationToken);
 }

@@ -17,6 +17,11 @@ public class ESBIDeferredCredentialIssuer : GenericDeferredCredentialIssuer<ESBI
     }
     public override string Version => SupportedVcVersions.ESBI;
 
+    protected override bool HasPendingState(DeferredCredentialResult<ESBICredentialResult> credential)
+    {
+        return credential.ErrorMessage == "Deferred credential not available yet";
+    }
+
     protected override Task<DeferredCredentialResult<ESBICredentialResult>> GetDeferredCredential(BaseCredentialIssuer credentialIssuer, string transactionId, CancellationToken cancellationToken)
         => _credentialIssuerClient.GetEsbiDeferredCredential(credentialIssuer.DeferredCredentialEndpoint, transactionId, cancellationToken);
 }

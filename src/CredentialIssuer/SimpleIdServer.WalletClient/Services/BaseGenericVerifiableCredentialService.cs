@@ -5,8 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.Did;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Models;
-using SimpleIdServer.Vc.Models;
 using SimpleIdServer.WalletClient.Clients;
+using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.DTOs;
 using SimpleIdServer.WalletClient.Resources;
 using System;
@@ -30,16 +30,32 @@ public interface IVerifiableCredentialsService
 
 public record RequestVerifiableCredentialResult
 {
+    private IDeferredCredentialIssuer _issuer;
+    private BaseCredentialIssuer _credentialIssuer;
+    private ICredentialFormatter _formatter;
+
     private RequestVerifiableCredentialResult()
     {
-        
+
     }
 
     public CredentialIssuerResult VerifiableCredential { get; private set; }
     public string ErrorMessage { get; private set; }
+    public string TransactionId { get; private set; }
+    public CredentialStatus Status { get; private set; }
 
-    public static RequestVerifiableCredentialResult Ok(CredentialIssuerResult result) => new RequestVerifiableCredentialResult { VerifiableCredential = result };
-    public static RequestVerifiableCredentialResult Nok(string errorMessage) => new RequestVerifiableCredentialResult { ErrorMessage = errorMessage };
+    public static RequestVerifiableCredentialResult Ok(CredentialIssuerResult result) => new RequestVerifiableCredentialResult { VerifiableCredential = result, Status = CredentialStatus.ISSUED };
+    public static RequestVerifiableCredentialResult Nok(string errorMessage) => new RequestVerifiableCredentialResult { ErrorMessage = errorMessage, Status = CredentialStatus.ERROR };
+    public static RequestVerifiableCredentialResult Pending(string transactionId, BaseCredentialIssuer credentialIssuer, IDeferredCredentialIssuer issuer, ICredentialFormatter formatter) 
+        => new RequestVerifiableCredentialResult { TransactionId = transactionId, Status = CredentialStatus.PENDING, _issuer = issuer, _credentialIssuer = credentialIssuer, _formatter = formatter };
+
+    public async Task<RequestVerifiableCredentialResult> Retry(CancellationToken cancellationToken)
+    {
+        var issueResult = await _issuer.Issue(_formatter, _credentialIssuer, TransactionId, cancellationToken);
+        if (!string.IsNullOrWhiteSpace(issueResult.errorMessage)) return RequestVerifiableCredentialResult.Nok(issueResult.errorMessage);
+        if (issueResult.credentialIssuer.Status == CredentialStatus.PENDING) return RequestVerifiableCredentialResult.Pending(TransactionId, _credentialIssuer, _issuer, _formatter);
+        return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(issueResult.credentialIssuer.Credential));
+    }
 }
 
 public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCredentialsService where T : BaseCredentialOffer
@@ -48,12 +64,20 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
     private readonly ISidServerClient _sidServerClient;
     private readonly IEnumerable<IDeferredCredentialIssuer> _issuers;
     private readonly IEnumerable<IDidResolver> _resolvers;
+    private readonly IEnumerable<ICredentialFormatter> _formatters;
 
-    public BaseGenericVerifiableCredentialService(ICredentialIssuerClient credentialIssuerClient, ISidServerClient sidServerClient, IEnumerable<IDidResolver> resolvers)
+    public BaseGenericVerifiableCredentialService(
+        ICredentialIssuerClient credentialIssuerClient, 
+        ISidServerClient sidServerClient, 
+        IEnumerable<IDidResolver> resolvers, 
+        IEnumerable<IDeferredCredentialIssuer> issuers,
+        IEnumerable<ICredentialFormatter> formatters)
     {
         _credentialIssuerClient = credentialIssuerClient;
         _sidServerClient = sidServerClient;
         _resolvers = resolvers;
+        _issuers = issuers;
+        _formatters = formatters;
     }
 
     public abstract string Version { get; }
@@ -85,6 +109,12 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
             return RequestVerifiableCredentialResult.Nok(Global.CannotExtractCredentialDefinition);
         }
 
+        var formatter = _formatters.SingleOrDefault(f => f.Format == extractionResult.Value.credDef.Format);
+        if(formatter == null)
+        {
+            return RequestVerifiableCredentialResult.Nok(string.Format(Global.FormatIsNotSupported, extractionResult.Value.credDef.Format));
+        }
+
         var didDocument = await resolver.Resolve(publicDid, cancellationToken);
         var credIssuer = extractionResult.Value.credIssuer;
         var authorizationServers = credIssuer.GetAuthorizationServers();
@@ -110,12 +140,16 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         if(!string.IsNullOrWhiteSpace(transaction))
         {
             var issuer = _issuers.Single(r => r.Version == Version);
-            // TODO
-            return null;
+            var issueResult = await issuer.Issue(formatter, credIssuer, transaction, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(issueResult.errorMessage)) return RequestVerifiableCredentialResult.Nok(issueResult.errorMessage);
+            if (issueResult.credentialIssuer.Status == CredentialStatus.PENDING) return RequestVerifiableCredentialResult.Pending(transaction, credIssuer, issuer, formatter);
+            return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(issueResult.credentialIssuer.Credential));
         }
-
-        var credential = JsonSerializer.Deserialize<W3CVerifiableCredential>(result.Credential);
-        return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(credential));
+        else
+        {
+            var credential = formatter.Extract(result.Credential.ToString());
+            return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(credential));
+        }
     }
 
     protected abstract Task<(BaseCredentialDefinitionResult credDef, DTOs.BaseCredentialIssuer credIssuer)?> Extract(T credentialOffer, CancellationToken cancellationToken);

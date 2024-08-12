@@ -142,6 +142,15 @@ namespace SimpleIdServer.WalletClient.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The format {0} is not supported.
+        /// </summary>
+        internal static string FormatIsNotSupported {
+            get {
+                return ResourceManager.GetString("FormatIsNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The grants present in the credential offer is not defined.
         /// </summary>
         internal static string GrantsCannotBeNull {

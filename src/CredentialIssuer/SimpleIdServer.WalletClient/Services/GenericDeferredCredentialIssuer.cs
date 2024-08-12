@@ -1,7 +1,6 @@
-﻿using SimpleIdServer.Vc.Models;
-using SimpleIdServer.WalletClient.Clients;
+﻿using SimpleIdServer.WalletClient.Clients;
+using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.DTOs;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,14 +10,16 @@ public abstract class GenericDeferredCredentialIssuer<T> : IDeferredCredentialIs
 {
     public abstract string Version { get; }
 
-    public async Task<(CredentialIssuerResult credentialIssuer, string errorMessage)> Issue(BaseCredentialIssuer credentialIssuer, string transactionId, CancellationToken cancellationToken)
+    public async Task<(CredentialIssuerResult credentialIssuer, string errorMessage)> Issue(ICredentialFormatter formatter, BaseCredentialIssuer credentialIssuer, string transactionId, CancellationToken cancellationToken)
     {
         var result = await GetDeferredCredential(credentialIssuer, transactionId, cancellationToken);
-        if (result.ErrorCode == "issuance_pending") return (CredentialIssuerResult.Pending(), null);
+        if (HasPendingState(result)) return (CredentialIssuerResult.Pending(), null);
         if (!string.IsNullOrWhiteSpace(result.ErrorMessage)) return (null, result.ErrorMessage);
-        var credential = JsonSerializer.Deserialize<W3CVerifiableCredential>(result.VerifiableCredential.Credential);
+        var credential = formatter.Extract(result.VerifiableCredential.Credential.ToString());
         return (CredentialIssuerResult.Issue(credential), null);
     }
+
+    protected abstract bool HasPendingState(DeferredCredentialResult<T> credential);
 
     protected abstract Task<DeferredCredentialResult<T>> GetDeferredCredential(BaseCredentialIssuer credentialIssuer, string transactionId, CancellationToken cancellationToken);
 }

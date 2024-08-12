@@ -144,6 +144,9 @@
   <data name="DidFormatIsNotSupported" xml:space="preserve">
     <value>The did format is not supported</value>
   </data>
+  <data name="FormatIsNotSupported" xml:space="preserve">
+    <value>The format {0} is not supported</value>
+  </data>
   <data name="GrantsCannotBeNull" xml:space="preserve">
     <value>The grants present in the credential offer is not defined</value>
   </data>

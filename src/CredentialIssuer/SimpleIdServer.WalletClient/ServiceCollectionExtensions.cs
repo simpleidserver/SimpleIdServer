@@ -1,7 +1,7 @@
 ﻿using SimpleIdServer.Did.Key;
-using SimpleIdServer.Did;
 using SimpleIdServer.WalletClient;
 using SimpleIdServer.WalletClient.Clients;
+using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.Factories;
 using SimpleIdServer.WalletClient.Services;
 using System;
@@ -22,6 +22,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDeferredCredentialIssuer, ESBIDeferredCredentialIssuer>();
         services.AddTransient<IDeferredCredentialIssuer, DeferredCredentialIssuer>();
         services.AddTransient<IVerifiableCredentialResolver, VerifiableCredentialResolver>();
+        services.AddTransient<ICredentialFormatter, JwtVcFormatter>();
+        services.AddTransient<ICredentialFormatter, LdpVcFormatter>();
         services.AddDidKey();
         return services;
     }

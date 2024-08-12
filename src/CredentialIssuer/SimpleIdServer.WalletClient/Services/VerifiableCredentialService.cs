@@ -1,5 +1,6 @@
 ﻿using SimpleIdServer.Did;
 using SimpleIdServer.WalletClient.Clients;
+using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.DTOs;
 using SimpleIdServer.WalletClient.DTOs.Latest;
 using System.Collections.Generic;
@@ -15,7 +16,9 @@ public class VerifiableCredentialService : BaseGenericVerifiableCredentialServic
     public VerifiableCredentialService(
         ICredentialIssuerClient credentialIssuerClient, 
         ISidServerClient sidServerClient,
-        IEnumerable<IDidResolver> resolvers) : base(credentialIssuerClient, sidServerClient, resolvers)
+        IEnumerable<IDidResolver> resolvers,
+        IEnumerable<IDeferredCredentialIssuer> issuers,
+        IEnumerable<ICredentialFormatter> formatters) : base(credentialIssuerClient, sidServerClient, resolvers, issuers, formatters)
     {
     }
 

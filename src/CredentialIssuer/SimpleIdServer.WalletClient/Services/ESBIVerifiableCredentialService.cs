@@ -1,5 +1,6 @@
 ﻿using SimpleIdServer.Did;
 using SimpleIdServer.WalletClient.Clients;
+using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.DTOs;
 using SimpleIdServer.WalletClient.DTOs.ESBI;
 using System.Collections.Generic;
@@ -14,7 +15,9 @@ public class ESBIVerifiableCredentialService : BaseGenericVerifiableCredentialSe
     public ESBIVerifiableCredentialService(
         ICredentialIssuerClient credentialIssuerClient,
         ISidServerClient sidServerClient,
-        IEnumerable<IDidResolver> resolvers) : base(credentialIssuerClient, sidServerClient, resolvers)
+        IEnumerable<IDidResolver> resolvers,
+        IEnumerable<IDeferredCredentialIssuer> issuers,
+        IEnumerable<ICredentialFormatter> formatters) : base(credentialIssuerClient, sidServerClient, resolvers, issuers, formatters)
     {
     }
 
