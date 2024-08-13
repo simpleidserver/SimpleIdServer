@@ -19,7 +19,7 @@ void InTimeCredential()
     var uri = Uri.TryCreate(intentData, UriKind.Absolute, out Uri r);
     var q = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
     var resolver = VerifiableCredentialOfferResolverFactory.Build();
-    var vc = resolver.ResolveByUrl(HttpUtility.UrlDecode(q["credential_offer_uri"]), publicKey, privateKey, CancellationToken.None).Result;
+    var vc = resolver.Resolve(q, publicKey, privateKey, CancellationToken.None).Result;
     Console.WriteLine(vc.Status);
 }
 
@@ -29,7 +29,7 @@ void DeferredCredential()
     var uri = Uri.TryCreate(intentData, UriKind.Absolute, out Uri r);
     var q = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
     var resolver = VerifiableCredentialOfferResolverFactory.Build();
-    var vc = resolver.ResolveByUrl(HttpUtility.UrlDecode(q["credential_offer_uri"]), publicKey, privateKey, CancellationToken.None).Result;
+    var vc = resolver.Resolve(q, publicKey, privateKey, CancellationToken.None).Result;
     Thread.Sleep(6000);
     vc = vc.Retry(CancellationToken.None).Result;
     Console.WriteLine(vc.Status);
@@ -42,7 +42,7 @@ void PreAuthorisedInTimeCredential()
     var uri = Uri.TryCreate(intentData, UriKind.Absolute, out Uri r);
     var q = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
     var resolver = VerifiableCredentialOfferResolverFactory.Build();
-    var vc = resolver.ResolveByUrl(HttpUtility.UrlDecode(q["credential_offer_uri"]), publicKey, privateKey, pin, CancellationToken.None).Result;
+    var vc = resolver.Resolve(q, publicKey, privateKey, pin, CancellationToken.None).Result;
     Console.WriteLine(vc.Status);
 }
 
@@ -53,7 +53,7 @@ void PreAuthorisedAndDeferredCredential()
     var uri = Uri.TryCreate(intentData, UriKind.Absolute, out Uri r);
     var q = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
     var resolver = VerifiableCredentialOfferResolverFactory.Build();
-    var vc = resolver.ResolveByUrl(HttpUtility.UrlDecode(q["credential_offer_uri"]), publicKey, privateKey, pin, CancellationToken.None).Result;
+    var vc = resolver.Resolve(q, publicKey, privateKey, pin, CancellationToken.None).Result;
     Thread.Sleep(6000);
     vc = vc.Retry(CancellationToken.None).Result;
     Console.WriteLine(vc.Status);

@@ -160,6 +160,15 @@ namespace SimpleIdServer.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Retry to get the deferred credential.
+        /// </summary>
+        internal static string RetryGetDeferredCredential {
+            get {
+                return ResourceManager.GetString("RetryGetDeferredCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Success.
         /// </summary>
         internal static string Success {
@@ -174,6 +183,15 @@ namespace SimpleIdServer.Mobile.Resources {
         internal static string VerifiableCredentialEnrolled {
             get {
                 return ResourceManager.GetString("VerifiableCredentialEnrolled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à VC Enrollment.
+        /// </summary>
+        internal static string VerifiableCredentialEnrollment {
+            get {
+                return ResourceManager.GetString("VerifiableCredentialEnrollment", resourceCulture);
             }
         }
     }

@@ -36,17 +36,14 @@ public static class MauiProgram
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 				fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
 			});
-		builder.Services.AddTransient<ICredentialIssuerClient, CredentialIssuerClient>();
+		builder.Services.AddWalletClient();
 		builder.Services.AddTransient<ISidServerClient, SidServerClient>();
-		builder.Services.AddTransient<IVerifiableCredentialResolver, VerifiableCredentialResolver>();
-		builder.Services.AddTransient<IVerifiableCredentialsService, ESBIVerifiableCredentialService>();
-		builder.Services.AddTransient<IVerifiableCredentialsService, VerifiableCredentialService>();
 		builder.Services.AddTransient<IPromptService, PromptService>();
         builder.Services.AddTransient<IOTPService, OTPService>();
 		builder.Services.AddTransient<INavigationService, NavigationService>();
 		builder.Services.AddTransient<IUrlService, UrlService>();
+		builder.Services.AddTransient<IVcService, VcService>();
 		builder.Services.AddTransient<Factories.IHttpClientFactory, Factories.HttpClientFactory>();
-		builder.Services.AddTransient<ICredentialIssuerClient, CredentialIssuerClient>();
 		builder.Services.AddSingleton(new OtpListState());
 		builder.Services.AddSingleton(new CredentialListState());
 		builder.Services.AddSingleton(new VerifiableCredentialListState());
@@ -58,6 +55,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<ViewOtpListPage>();
 		builder.Services.AddTransient<QRCodeScannerPage>();
 		builder.Services.AddTransient<WalletPage>();
+		builder.Services.AddTransient<PinModal>();
 		builder.Services.AddTransient<ViewCredentialListPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
         builder.Services.AddTransient<EnrollViewModel>();
@@ -66,6 +64,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<ViewCredentialListViewModel>();
 		builder.Services.AddTransient<NotificationViewModel>();
 		builder.Services.AddTransient<WalletViewModel>();
+		builder.Services.AddTransient<PinModalViewModel>();
 		builder.Services.Configure<MobileOptions>(o =>
 		{
 			o.WsServer = "wss://gotify.simpleidserver.com";

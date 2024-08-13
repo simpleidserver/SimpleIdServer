@@ -1,29 +1,28 @@
 ﻿using Microsoft.Extensions.Options;
 
-namespace SimpleIdServer.Mobile.Factories
+namespace SimpleIdServer.Mobile.Factories;
+
+public interface IHttpClientFactory
 {
-    public interface IHttpClientFactory
+    HttpClient Build();
+}
+
+public class HttpClientFactory : IHttpClientFactory
+{
+    private readonly MobileOptions _options;
+
+    public HttpClientFactory(IOptions<MobileOptions> options)
     {
-        HttpClient Build();
+        _options = options.Value;
     }
 
-    public class HttpClientFactory : IHttpClientFactory
+    public HttpClient Build()
     {
-        private readonly MobileOptions _options;
-
-        public HttpClientFactory(IOptions<MobileOptions> options)
+        var handler = new HttpClientHandler();
+        if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
         {
-            _options = options.Value;
-        }
-
-        public HttpClient Build()
-        {
-            var handler = new HttpClientHandler();
-            if (_options.IgnoreHttps) handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                return true;
-            };
-            return new HttpClient(handler);
-        }
+            return true;
+        };
+        return new HttpClient(handler);
     }
 }

@@ -9,7 +9,7 @@ namespace SimpleIdServer.WalletClient.Services;
 public interface IDeferredCredentialIssuer
 {
     string Version { get; }
-    Task<(CredentialIssuerResult credentialIssuer, string errorMessage)> Issue(ICredentialFormatter formatter, BaseCredentialIssuer credentialIssuer, string transactionId, CancellationToken cancellationToken);
+    Task<(CredentialIssuerResult credentialIssuer, string errorMessage)> Issue(ICredentialFormatter formatter, BaseCredentialIssuer credentialIssuer, BaseCredentialDefinitionResult credentialDefinition, string transactionId, CancellationToken cancellationToken);
 }
 
 public record CredentialIssuerResult
@@ -19,10 +19,12 @@ public record CredentialIssuerResult
         
     }
 
-    public CredentialStatus Status { get; private set; }
-    public W3CVerifiableCredential Credential { get; private set; }
+    public CredentialStatus Status { get; private set; } 
+    public BaseCredentialResult Credential { get; private set; }
+    public W3CVerifiableCredential W3CCredential { get; private set; }
+    public BaseCredentialDefinitionResult CredentialDef { get; private set; }
 
-    public static CredentialIssuerResult Issue(W3CVerifiableCredential credential) => new CredentialIssuerResult { Credential = credential, Status = CredentialStatus.ISSUED };
+    public static CredentialIssuerResult Issue(BaseCredentialResult credential, W3CVerifiableCredential w3cCredential, BaseCredentialDefinitionResult credDef) => new CredentialIssuerResult { Credential = credential, W3CCredential = w3cCredential, Status = CredentialStatus.ISSUED, CredentialDef = credDef };
     public static CredentialIssuerResult Pending() => new CredentialIssuerResult { Status = CredentialStatus.PENDING };
 }
 

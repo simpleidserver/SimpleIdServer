@@ -78,10 +78,12 @@
 		<PackageReference Include="SQLitePCLRaw.provider.dynamic_cdecl" Version="2.1.5" />
 		<PackageReference Include="SQLitePCLRaw.provider.sqlite3" Version="2.1.5" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
+		<PackageReference Include="PINView.MAUI" Version="1.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\json-ld.net\src\json-ld.net\json-ld.net.csproj" />
+	  <ProjectReference Include="..\..\CredentialIssuer\SimpleIdServer.WalletClient\SimpleIdServer.WalletClient.csproj" />
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj" />
 	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj" />
@@ -131,6 +133,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Common\Loader.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Components\PinModal.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Components\ViewOTPCode.xaml">

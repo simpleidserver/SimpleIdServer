@@ -25,6 +25,7 @@ namespace SimpleIdServer.WalletClient.Services;
 public interface IVerifiableCredentialsService
 {
     Task<RequestVerifiableCredentialResult> Request(string credentialOfferJson, string publicDid, IAsymmetricKey privateKey, string pin, CancellationToken cancellationToken);
+    BaseCredentialOffer DeserializeCredentialOffer(string json);
     string Version { get; }
 }
 
@@ -33,6 +34,7 @@ public record RequestVerifiableCredentialResult
     private IDeferredCredentialIssuer _issuer;
     private BaseCredentialIssuer _credentialIssuer;
     private ICredentialFormatter _formatter;
+    private BaseCredentialDefinitionResult _credDef;
 
     private RequestVerifiableCredentialResult()
     {
@@ -46,15 +48,15 @@ public record RequestVerifiableCredentialResult
 
     public static RequestVerifiableCredentialResult Ok(CredentialIssuerResult result) => new RequestVerifiableCredentialResult { VerifiableCredential = result, Status = CredentialStatus.ISSUED };
     public static RequestVerifiableCredentialResult Nok(string errorMessage) => new RequestVerifiableCredentialResult { ErrorMessage = errorMessage, Status = CredentialStatus.ERROR };
-    public static RequestVerifiableCredentialResult Pending(string transactionId, BaseCredentialIssuer credentialIssuer, IDeferredCredentialIssuer issuer, ICredentialFormatter formatter) 
-        => new RequestVerifiableCredentialResult { TransactionId = transactionId, Status = CredentialStatus.PENDING, _issuer = issuer, _credentialIssuer = credentialIssuer, _formatter = formatter };
+    public static RequestVerifiableCredentialResult Pending(string transactionId, BaseCredentialIssuer credentialIssuer, BaseCredentialDefinitionResult credDef, IDeferredCredentialIssuer issuer, ICredentialFormatter formatter) 
+        => new RequestVerifiableCredentialResult { TransactionId = transactionId, Status = CredentialStatus.PENDING, _issuer = issuer, _credentialIssuer = credentialIssuer, _formatter = formatter, _credDef = credDef };
 
     public async Task<RequestVerifiableCredentialResult> Retry(CancellationToken cancellationToken)
     {
-        var issueResult = await _issuer.Issue(_formatter, _credentialIssuer, TransactionId, cancellationToken);
+        var issueResult = await _issuer.Issue(_formatter, _credentialIssuer, _credDef, TransactionId, cancellationToken);
         if (!string.IsNullOrWhiteSpace(issueResult.errorMessage)) return RequestVerifiableCredentialResult.Nok(issueResult.errorMessage);
-        if (issueResult.credentialIssuer.Status == CredentialStatus.PENDING) return RequestVerifiableCredentialResult.Pending(TransactionId, _credentialIssuer, _issuer, _formatter);
-        return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(issueResult.credentialIssuer.Credential));
+        if (issueResult.credentialIssuer.Status == CredentialStatus.PENDING) return RequestVerifiableCredentialResult.Pending(TransactionId, _credentialIssuer, _credDef, _issuer, _formatter);
+        return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(issueResult.credentialIssuer.Credential, issueResult.credentialIssuer.W3CCredential, _credDef));
     }
 }
 
@@ -117,6 +119,7 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
 
         var didDocument = await resolver.Resolve(publicDid, cancellationToken);
         var credIssuer = extractionResult.Value.credIssuer;
+        var credDef = extractionResult.Value.credDef;
         var authorizationServers = credIssuer.GetAuthorizationServers();
         if (authorizationServers == null || authorizationServers.Count == 0) return RequestVerifiableCredentialResult.Nok(Global.AuthorizationServerCannotBeResolved);
         var authorizationServer = authorizationServers.First();
@@ -140,17 +143,20 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         if(!string.IsNullOrWhiteSpace(transaction))
         {
             var issuer = _issuers.Single(r => r.Version == Version);
-            var issueResult = await issuer.Issue(formatter, credIssuer, transaction, cancellationToken);
+            var issueResult = await issuer.Issue(formatter, credIssuer, credDef, transaction, cancellationToken);
             if (!string.IsNullOrWhiteSpace(issueResult.errorMessage)) return RequestVerifiableCredentialResult.Nok(issueResult.errorMessage);
-            if (issueResult.credentialIssuer.Status == CredentialStatus.PENDING) return RequestVerifiableCredentialResult.Pending(transaction, credIssuer, issuer, formatter);
-            return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(issueResult.credentialIssuer.Credential));
+            if (issueResult.credentialIssuer.Status == CredentialStatus.PENDING) return RequestVerifiableCredentialResult.Pending(transaction, credIssuer, credDef, issuer, formatter);
+            return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(issueResult.credentialIssuer.Credential, issueResult.credentialIssuer.W3CCredential, credDef));
         }
         else
         {
             var credential = formatter.Extract(result.Credential.ToString());
-            return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(credential));
+            return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(result, credential, credDef));
         }
     }
+
+    public BaseCredentialOffer DeserializeCredentialOffer(string json)
+        => JsonSerializer.Deserialize<T>(json);
 
     protected abstract Task<(BaseCredentialDefinitionResult credDef, DTOs.BaseCredentialIssuer credIssuer)?> Extract(T credentialOffer, CancellationToken cancellationToken);
 

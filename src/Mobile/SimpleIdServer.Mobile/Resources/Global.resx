@@ -150,10 +150,16 @@
   <data name="PreAuthorizedCodeMissing" xml:space="preserve">
     <value>the pre authorized code is missing</value>
   </data>
+  <data name="RetryGetDeferredCredential" xml:space="preserve">
+    <value>Retry to get the deferred credential</value>
+  </data>
   <data name="Success" xml:space="preserve">
     <value>Success</value>
   </data>
   <data name="VerifiableCredentialEnrolled" xml:space="preserve">
     <value>The verifiable credential has been enrolled</value>
+  </data>
+  <data name="VerifiableCredentialEnrollment" xml:space="preserve">
+    <value>VC Enrollment</value>
   </data>
 </root>

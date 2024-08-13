@@ -6,6 +6,6 @@ namespace SimpleIdServer.Mobile.Models
     {
         [PrimaryKey]
         public string Did { get; set; }
-        public byte[] PrivaterKey { get; set; }
+        public string SerializedPrivateKey { get; set; }
     }
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             x:DataType="local:PinModalViewModel"
+             x:Class="SimpleIdServer.Mobile.PinModal"
+             xmlns:pinview="clr-namespace:PINView.Maui;assembly=PINView.Maui"
+             Title="PinModal">
+    <StackLayout>
+        <pinview:PINView
+            BoxBackgroundColor="{StaticResource Gray200}"
+            BoxShape="Circle"
+            PINLength="{Binding Path=PinLength}"
+            PINValue="{Binding Path=Pin}"
+            Color="{StaticResource Primary}" />
+        <Button Text="Confirm" HorizontalOptions="Fill" Command="{Binding Path=ConfirmPinCommand}"></Button>
+    </StackLayout>
+</ContentPage>

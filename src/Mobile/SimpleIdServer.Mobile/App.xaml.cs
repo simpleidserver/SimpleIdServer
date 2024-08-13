@@ -13,6 +13,7 @@ public partial class App : Application
     private readonly MobileSettingsState _mobileSettingsState;
     private readonly DidRecordState _didRecordState;
     private readonly IServiceProvider _serviceProvider;
+    private readonly IVcService _vcService;
     public static MobileDatabase _database;
 
     public static GotifyNotificationListener Listener = GotifyNotificationListener.New();
@@ -36,7 +37,8 @@ public partial class App : Application
         VerifiableCredentialListState verifiableCredentialListState, 
         MobileSettingsState mobileSettingsState,
         DidRecordState didRecordState,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        IVcService vcService)
 	{
 		InitializeComponent();
 		_credentialListState = credentialListState;
@@ -45,6 +47,7 @@ public partial class App : Application
         _mobileSettingsState = mobileSettingsState;
         _didRecordState = didRecordState;
         _serviceProvider = serviceProvider;
+        _vcService = vcService;
         MainPage = new AppShell();
     }
 
@@ -63,9 +66,9 @@ public partial class App : Application
         {
             await HandleNotificationReceived(sender, e);
         };
-        CredentialOfferListener.CredentialOfferReceived += (sender, e) =>
+        CredentialOfferListener.CredentialOfferReceived += async (sender, e) =>
         {
-            HandleCredentialOfferReceived(sender, e);
+            await HandleCredentialOfferReceived(sender, e);
         };
     }
 
@@ -76,9 +79,9 @@ public partial class App : Application
         notificationPage.Display(e.Notification);
     }
 
-    private void HandleCredentialOfferReceived(object sender, CredentialOfferEventArgs e)
+    private async Task HandleCredentialOfferReceived(object sender, CredentialOfferEventArgs e)
     {
-
+        await _vcService.RegisterVc(e.Parameters, CancellationToken.None);
     }
 
     private async Task InitGotify()
