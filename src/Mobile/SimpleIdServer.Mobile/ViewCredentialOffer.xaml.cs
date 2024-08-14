@@ -10,18 +10,15 @@ public partial class ViewCredentialOffer : ContentPage
 {
     private readonly DidRecordState _didState;
     private readonly ViewCredentialOfferViewModel _viewModel;
-    private readonly IVcService _vcService;
     private readonly IVerifiableCredentialResolver _verifiableCredentialResolver;
 
     public ViewCredentialOffer(
         DidRecordState didState,
         ViewCredentialOfferViewModel viewModel,
-        IVcService vcService,
         IVerifiableCredentialResolver verifiableCredentialResolver)
 	{
         _didState = didState;
         _viewModel = viewModel;
-		_vcService = vcService;
         _verifiableCredentialResolver = verifiableCredentialResolver;
         BindingContext = _viewModel;
         InitializeComponent();
@@ -34,7 +31,7 @@ public partial class ViewCredentialOffer : ContentPage
         var credentialOffer = res.service.DeserializeCredentialOffer(res.credentialOffer);
         foreach (var credentialId in credentialOffer.CredentialIds)
             _viewModel.CredentialOffers.Add(new CredentialOfferRecord { Title = credentialId });
-        await _viewModel.Set(res);
         _viewModel.IsLoading = false;
+        await _viewModel.Set(res);
     }
 }

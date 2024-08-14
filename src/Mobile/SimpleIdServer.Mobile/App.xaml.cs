@@ -13,7 +13,6 @@ public partial class App : Application
     private readonly MobileSettingsState _mobileSettingsState;
     private readonly DidRecordState _didRecordState;
     private readonly IServiceProvider _serviceProvider;
-    private readonly IVcService _vcService;
     public static MobileDatabase _database;
 
     public static GotifyNotificationListener Listener = GotifyNotificationListener.New();
@@ -37,8 +36,7 @@ public partial class App : Application
         VerifiableCredentialListState verifiableCredentialListState, 
         MobileSettingsState mobileSettingsState,
         DidRecordState didRecordState,
-        IServiceProvider serviceProvider,
-        IVcService vcService)
+        IServiceProvider serviceProvider)
 	{
 		InitializeComponent();
 		_credentialListState = credentialListState;
@@ -47,7 +45,6 @@ public partial class App : Application
         _mobileSettingsState = mobileSettingsState;
         _didRecordState = didRecordState;
         _serviceProvider = serviceProvider;
-        _vcService = vcService;
         MainPage = new AppShell();
     }
 

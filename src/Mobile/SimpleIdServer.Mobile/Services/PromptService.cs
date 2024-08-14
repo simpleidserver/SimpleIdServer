@@ -3,7 +3,7 @@
     public interface IPromptService
     {
         Task ShowAlert(string title, string message) => Application.Current.MainPage.DisplayAlert(title, message, "OK");
-        Task<bool> ShowPrompt(string title, string message);
+        Task<bool> ShowYesNo(string title, string message);
     }
 
     public class PromptService : IPromptService
@@ -16,13 +16,12 @@
             });
         }
 
-        public async Task<bool> ShowPrompt(string title, string message)
+        public async Task<bool> ShowYesNo(string title, string message)
         {
             var isAccepted = false;
             await App.Current.Dispatcher.DispatchAsync(async () =>
             {
-                var prompt = await Application.Current.MainPage.DisplayPromptAsync(title, message, "Yes", "No");
-                isAccepted = prompt == "Yes";
+                isAccepted = await Application.Current.MainPage.DisplayAlert(title, message, "Yes", "No");
             });
             return isAccepted;
         }

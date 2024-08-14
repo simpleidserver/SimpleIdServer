@@ -42,7 +42,6 @@ public static class MauiProgram
         builder.Services.AddTransient<IOTPService, OTPService>();
 		builder.Services.AddTransient<INavigationService, NavigationService>();
 		builder.Services.AddTransient<IUrlService, UrlService>();
-		builder.Services.AddTransient<IVcService, VcService>();
 		builder.Services.AddTransient<Factories.IHttpClientFactory, Factories.HttpClientFactory>();
 		builder.Services.AddSingleton(new OtpListState());
 		builder.Services.AddSingleton(new CredentialListState());

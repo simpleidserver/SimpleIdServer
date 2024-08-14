@@ -38,9 +38,7 @@ public class QRCodeScannerViewModel
     private readonly IOTPService _otpService;
     private readonly INavigationService _navigationService;
     private readonly IUrlService _urlService;
-    private readonly IVerifiableCredentialResolver _verifiableCredentialResolver;
     private readonly Factories.IHttpClientFactory _httpClientFactory;
-    private readonly IVcService _vcService;
     private readonly OtpListState _otpListState;
     private readonly CredentialListState _credentialListState;
     private readonly VerifiableCredentialListState _verifiableCredentialListState;
@@ -54,9 +52,7 @@ public class QRCodeScannerViewModel
         IOTPService otpService,
         INavigationService navigationService,
         IUrlService urlService,
-        IVerifiableCredentialResolver verifiableCredentialResolver,
         Factories.IHttpClientFactory httpClientFactory,
-        IVcService vcService,
         OtpListState otpListState,
         CredentialListState credentialListState,
         VerifiableCredentialListState verifiableCredentialListState,
@@ -67,9 +63,7 @@ public class QRCodeScannerViewModel
         _promptService = promptService;
         _otpService = otpService;
         _urlService = urlService;
-        _verifiableCredentialResolver = verifiableCredentialResolver;
         _httpClientFactory = httpClientFactory;
-        _vcService = vcService;
         _options = options.Value;
         _otpListState = otpListState;
         _credentialListState = credentialListState;

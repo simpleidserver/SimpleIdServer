@@ -1,5 +1,9 @@
-﻿using SimpleIdServer.Mobile.Models;
+﻿using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.Did.Crypto;
+using SimpleIdServer.Mobile.Models;
+using SimpleIdServer.Mobile.Resources;
 using SimpleIdServer.Mobile.Services;
+using SimpleIdServer.Mobile.Stores;
 using SimpleIdServer.WalletClient.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,20 +14,34 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class ViewCredentialOfferViewModel : INotifyPropertyChanged
 {
+    private readonly IServiceProvider _serviceProvider;
+    private readonly DidRecordState _didState;
+    private readonly VerifiableCredentialListState _verifiableCredentialListState;
+    private readonly INavigationService _navigationService;
+    private readonly IPromptService _promptService;
+    private readonly ObservableCollection<CredentialOfferRecord> _credentialOffers = new ObservableCollection<CredentialOfferRecord>();
     private bool _isLoading;
     private (IVerifiableCredentialsService service, string credentialOffer)? _service = null;
-    private readonly ObservableCollection<CredentialOfferRecord> _credentialOffers = new ObservableCollection<CredentialOfferRecord>();
 
-    public ViewCredentialOfferViewModel(IVcService vcService, INavigationService navigationService)
+    public ViewCredentialOfferViewModel(
+        IServiceProvider serviceProvider,
+        DidRecordState didState,
+        VerifiableCredentialListState verifiableCredentialListState,
+        IPromptService promptService,
+        INavigationService navigationService)
     {
+        _serviceProvider = serviceProvider;
+        _didState = didState;
+        _verifiableCredentialListState = verifiableCredentialListState;
+        _promptService = promptService;
+        _navigationService = navigationService;
         ConfirmCommand = new Command(async () =>
         {
-            IsLoading = true;
-            await vcService.RegisterVc(_service.Value, CancellationToken.None);
-            IsLoading = false;
+            if (IsLoading == true) return;
+            await RegisterVc();
         }, () =>
         {
-            return _service != null;
+            return _service != null && !IsLoading;
         });
     }
 
@@ -53,14 +71,106 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
     public async Task Set((IVerifiableCredentialsService service, string credentialOffer) service)
     {
         _service = service;
+        await RefreshCommand();
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    private async Task RegisterVc()
+    {
+        IsLoading = true;
+        var credentialOffer = _service.Value.service.DeserializeCredentialOffer(_service.Value.credentialOffer);
+        if (credentialOffer.Grants.PreAuthorizedCodeGrant != null)
+        {
+            var pinLength = credentialOffer.Grants.PreAuthorizedCodeGrant.Transaction?.Length ?? 4;
+            var pinModal = _serviceProvider.GetRequiredService<PinModal>();
+            pinModal.ViewModel.PinLength = pinLength;
+            await _navigationService.DisplayModal(pinModal);
+            pinModal.ViewModel.PinEntered += async (o, e) =>
+            {
+                await RegisterVc(e.Pin, CancellationToken.None);
+                IsLoading = false;
+                await this.RefreshCommand();
+                await _navigationService.GoBack();
+            };
+            return;
+        }
+
+        await RegisterVc(null, CancellationToken.None);
+        IsLoading = false;
+        await this.RefreshCommand();
+        await _navigationService.GoBack();
+    }
+
+    private async Task RegisterVc(string pin, CancellationToken cancellationToken)
+    {
+        var didRecord = _didState.Did;
+        var privateKey = SignatureKeySerializer.Deserialize(didRecord.SerializedPrivateKey);
+        var credResult = await _service.Value.service.Request(_service.Value.credentialOffer, didRecord.Did, privateKey, pin, cancellationToken);
+        if (credResult.Status == CredentialStatus.ERROR)
+        {
+            await _promptService.ShowAlert(Global.Error, credResult.ErrorMessage);
+            return;
+        }
+
+        if (credResult.Status == CredentialStatus.PENDING)
+        {
+            credResult = await Retry(credResult, cancellationToken);
+            if (credResult == null) return;
+        }
+
+        var w3cCred = credResult.VerifiableCredential.W3CCredential;
+        var credDef = credResult.VerifiableCredential.CredentialDef;
+        var cred = credResult.VerifiableCredential.Credential;
+        var firstDisplay = credDef.Display?.FirstOrDefault();
+
+        await _verifiableCredentialListState.AddVerifiableCredentialRecord(new VerifiableCredentialRecord
+        {
+            Id = Guid.NewGuid().ToString(),
+            Format = cred.Format,
+            Name = firstDisplay.Name,
+            Description = firstDisplay.Description,
+            ValidFrom = w3cCred.ValidFrom,
+            ValidUntil = w3cCred.ValidUntil,
+            Type = w3cCred.Type.Last(),
+            BackgroundColor = firstDisplay.BackgroundColor,
+            TextColor = firstDisplay.TextColor,
+            Logo = firstDisplay.Logo?.Uri
+        });
+        await _promptService.ShowAlert(Global.Success, Global.VerifiableCredentialEnrolled);
+    }
+
+    private async Task<RequestVerifiableCredentialResult> Retry(RequestVerifiableCredentialResult credResult, CancellationToken cancellationToken)
+    {
+        var retry = await _promptService.ShowYesNo(Global.VerifiableCredentialEnrollment, Global.RetryGetDeferredCredential);
+        if (retry)
+        {
+            var res = await credResult.Retry(cancellationToken);
+            if (res.Status == CredentialStatus.ERROR)
+            {
+                await _promptService.ShowAlert(Global.Error, credResult.ErrorMessage);
+                return null;
+            }
+
+            if (res.Status == CredentialStatus.PENDING)
+            {
+                return await Retry(credResult, cancellationToken);
+            }
+
+            return res;
+        }
+
+        return null;
+    }
+
+    private async Task RefreshCommand()
+    {
         await App.Current.Dispatcher.DispatchAsync(async () =>
         {
             var cmd = (Command)ConfirmCommand;
             cmd.ChangeCanExecute();
         });
     }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }

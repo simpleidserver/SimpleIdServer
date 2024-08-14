@@ -32,8 +32,11 @@ public class NavigationService : INavigationService
 
     public async Task<T> DisplayModal<T>(T content) where T : ContentPage
     {
-        var navigation = App.Current.MainPage.Navigation;
-        await navigation.PushModalAsync(content);
+        await App.Current.Dispatcher.DispatchAsync(async () =>
+        {
+            var navigation = App.Current.MainPage.Navigation;
+            await navigation.PushModalAsync(content);
+        });
         return content;
     }
 }

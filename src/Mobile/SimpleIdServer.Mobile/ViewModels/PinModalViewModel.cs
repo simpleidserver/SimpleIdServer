@@ -14,8 +14,8 @@ public class PinModalViewModel : INotifyPropertyChanged
     {
         ConfirmPinCommand = new Command(async () =>
         {
-            if (PinEntered != null) PinEntered(this, new PinEventArgs(Pin));
             await navigationService.GoBack();
+            if (PinEntered != null) PinEntered(this, new PinEventArgs(Pin));
         }, () =>
         {
             return Pin?.Length != PinLength;
