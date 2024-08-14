@@ -362,7 +362,9 @@ public class QRCodeScannerViewModel
         {
             var uri = Uri.TryCreate(qrCodeValue, UriKind.Absolute, out Uri r);
             var parameters = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
-            await _vcService.RegisterVc(parameters, CancellationToken.None);
+            var credentialOfferPage = await _navigationService.DisplayModal<ViewCredentialOffer>();
+            await Task.Delay(1000);
+            await credentialOfferPage.Load(parameters);
         }
 
         #endregion

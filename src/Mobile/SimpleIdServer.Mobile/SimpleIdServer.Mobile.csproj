@@ -144,6 +144,9 @@
 	  <MauiXaml Update="NotificationPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="ViewCredentialOffer.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="WalletPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

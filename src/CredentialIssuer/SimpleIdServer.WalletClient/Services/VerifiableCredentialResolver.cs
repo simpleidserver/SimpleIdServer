@@ -1,5 +1,4 @@
 ﻿using SimpleIdServer.Did.Crypto;
-using SimpleIdServer.WalletClient.DTOs.Latest;
 using SimpleIdServer.WalletClient.Factories;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +6,7 @@ using System.Net.Http;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SimpleIdServer.WalletClient.Services;
 
@@ -47,7 +47,7 @@ public class VerifiableCredentialResolver : IVerifiableCredentialResolver
                 var requestMessage = new HttpRequestMessage
                 {
                     Method = HttpMethod.Get,
-                    RequestUri = new System.Uri(parameters["credential_offer_uri"])
+                    RequestUri = new System.Uri(HttpUtility.UrlDecode(parameters["credential_offer_uri"]))
                 };
                 var httpResult = await httpClient.SendAsync(requestMessage, cancellationToken);
                 credentialOffer = await httpResult.Content.ReadAsStringAsync(cancellationToken);

@@ -6,13 +6,16 @@
              x:Class="SimpleIdServer.Mobile.PinModal"
              xmlns:pinview="clr-namespace:PINView.Maui;assembly=PINView.Maui"
              Title="PinModal">
-    <StackLayout>
+    <StackLayout Margin="20" Spacing="6">
+        <Label Text="Pin code" FontSize="Title"></Label>
         <pinview:PINView
             BoxBackgroundColor="{StaticResource Gray200}"
             BoxShape="Circle"
+            IsPassword="True"
             PINLength="{Binding Path=PinLength}"
             PINValue="{Binding Path=Pin}"
-            Color="{StaticResource Primary}" />
+            Color="{StaticResource Primary}"
+            HorizontalOptions="CenterAndExpand"/>
         <Button Text="Confirm" HorizontalOptions="Fill" Command="{Binding Path=ConfirmPinCommand}"></Button>
     </StackLayout>
 </ContentPage>

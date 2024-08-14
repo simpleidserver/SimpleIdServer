@@ -14,7 +14,11 @@ public class PinModalViewModel : INotifyPropertyChanged
     {
         ConfirmPinCommand = new Command(async () =>
         {
+            if (PinEntered != null) PinEntered(this, new PinEventArgs(Pin));
             await navigationService.GoBack();
+        }, () =>
+        {
+            return Pin?.Length != PinLength;
         });
     }
 
@@ -46,6 +50,19 @@ public class PinModalViewModel : INotifyPropertyChanged
 
     public ICommand ConfirmPinCommand { get; private set; }
 
+    public event EventHandler<PinEventArgs> PinEntered;
+
     public event PropertyChangedEventHandler PropertyChanged;
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+}
+
+
+public class PinEventArgs : EventArgs
+{
+    public PinEventArgs(string pin)
+    {
+        Pin = pin;
+    }
+
+    public string Pin { get; set; }
 }

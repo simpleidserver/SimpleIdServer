@@ -81,7 +81,9 @@ public partial class App : Application
 
     private async Task HandleCredentialOfferReceived(object sender, CredentialOfferEventArgs e)
     {
-        await _vcService.RegisterVc(e.Parameters, CancellationToken.None);
+        var credentialOfferPage = await NavigationService.DisplayModal<ViewCredentialOffer>();
+        await Task.Delay(1000);
+        await credentialOfferPage.Load(e.Parameters);
     }
 
     private async Task InitGotify()

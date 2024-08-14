@@ -9,12 +9,10 @@ public interface INavigationService
 
 public class NavigationService : INavigationService
 {
-    private readonly INavigation _navigation;
     private readonly IServiceProvider _serviceProvider;
 
     public NavigationService(IServiceProvider serviceProvider)
     {
-        _navigation = App.Current.MainPage.Navigation;
         _serviceProvider = serviceProvider;
     }
 
@@ -34,7 +32,8 @@ public class NavigationService : INavigationService
 
     public async Task<T> DisplayModal<T>(T content) where T : ContentPage
     {
-        await _navigation.PushModalAsync(content);
+        var navigation = App.Current.MainPage.Navigation;
+        await navigation.PushModalAsync(content);
         return content;
     }
 }

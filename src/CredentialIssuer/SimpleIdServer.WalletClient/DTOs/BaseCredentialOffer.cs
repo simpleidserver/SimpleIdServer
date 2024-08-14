@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.WalletClient.DTOs;
 
@@ -10,6 +11,8 @@ public abstract class BaseCredentialOffer
     public CredentialOfferGrants Grants { get; set; }
     [JsonIgnore]
     public abstract string Version { get; }
+    [JsonIgnore]
+    public abstract List<string> CredentialIds { get; }
 
     public abstract bool HasOneCredential();
 }

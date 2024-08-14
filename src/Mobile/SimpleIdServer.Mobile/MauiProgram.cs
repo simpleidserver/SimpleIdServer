@@ -56,6 +56,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<QRCodeScannerPage>();
 		builder.Services.AddTransient<WalletPage>();
 		builder.Services.AddTransient<PinModal>();
+		builder.Services.AddTransient<ViewCredentialOffer>();
 		builder.Services.AddTransient<ViewCredentialListPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
         builder.Services.AddTransient<EnrollViewModel>();
@@ -65,6 +66,7 @@ public static class MauiProgram
 		builder.Services.AddTransient<NotificationViewModel>();
 		builder.Services.AddTransient<WalletViewModel>();
 		builder.Services.AddTransient<PinModalViewModel>();
+		builder.Services.AddTransient<ViewCredentialOfferViewModel>();
 		builder.Services.Configure<MobileOptions>(o =>
 		{
 			o.WsServer = "wss://gotify.simpleidserver.com";
