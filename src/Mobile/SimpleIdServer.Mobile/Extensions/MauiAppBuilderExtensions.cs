@@ -1,8 +1,10 @@
-﻿using Microsoft.Maui.LifecycleEvents;
+﻿using Microsoft.Maui.Controls.PlatformConfiguration;
+using Microsoft.Maui.LifecycleEvents;
 using Plugin.Firebase.Auth;
 using Plugin.Firebase.CloudMessaging;
 #if IOS
 using Plugin.Firebase.Core.Platforms.iOS;
+using SimpleIdServer.Mobile;
 using SimpleIdServer.Mobile.Services;
 #else
 using Plugin.Firebase.Core.Platforms.Android;
@@ -21,10 +23,14 @@ public static class MauiAppBuilderExtensions
         builder.ConfigureLifecycleEvents(evts =>
         {
 #if IOS
-            evts.AddiOS(iOS => iOS.FinishedLaunching((_,__) => {
-                CrossFirebase.Initialize();
-                return false;
-            }));
+            evts.AddiOS(iOS =>
+            {
+                iOS.FinishedLaunching((_, __) =>
+                {
+                    CrossFirebase.Initialize();
+                    return false;
+                });
+            });
 #else
             evts.AddAndroid(android => android.OnCreate((activity, _) =>
             {

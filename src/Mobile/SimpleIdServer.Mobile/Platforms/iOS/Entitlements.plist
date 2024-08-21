@@ -7,10 +7,4 @@
 			<string>$(AppIdentifierPrefix)com.simpleidserver.mobile</string>
 		</array>
 	</dict>
-	<dict>
-		<key>com.apple.developer.associated-domains</key>
-		<array>
-			<string>applinks:openid-credential-offer</string>
-		</array>
-	</dict>
 </plist>
