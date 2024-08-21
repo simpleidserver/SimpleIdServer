@@ -32,5 +32,9 @@
 	<string>Assets.xcassets/appicon.appiconset</string>
 	<key>NSCameraUsageDescription</key>
 	<string>This app uses barcode scanning to enroll the device</string>
+	<key>CFBundleURLSchemes</key>
+	<array>
+		<string>openid-credential-offer</string>
+	</array>
 </dict>
 </plist>
