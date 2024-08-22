@@ -83,11 +83,11 @@ namespace SimpleIdServer.Scim.Domains
                 }, multiValued: true)
                 .AddComplexAttribute("groups", callback: c =>
                 {
-                    c.AddStringAttribute("value");
-                    c.AddStringAttribute("$ref");
-                    c.AddStringAttribute("display");
-                    c.AddStringAttribute("type");
-                }, multiValued: true)
+                    c.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                    c.AddStringAttribute("$ref", mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                    c.AddStringAttribute("display", mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                    c.AddStringAttribute("type", mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
                 .AddComplexAttribute("entitlements", callback: c =>
                 {
                     c.AddStringAttribute("value");
@@ -109,10 +109,10 @@ namespace SimpleIdServer.Scim.Domains
                     c.AddStringAttribute("type");
                     c.AddBooleanAttribute("primary");
                 }, multiValued: true)
-                .AddComplexAttribute("groups", opt =>
-                {
-                    opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.READONLY);
-                }, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
+                //.AddComplexAttribute("groups", opt =>
+                //{
+                //    opt.AddStringAttribute("value", mutability: SCIMSchemaAttributeMutabilities.READONLY);
+                //}, multiValued: true, mutability: SCIMSchemaAttributeMutabilities.READONLY)
                 .Build();
 
         public static SCIMSchema GroupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", SCIMResourceTypes.Group, "Group", true)
