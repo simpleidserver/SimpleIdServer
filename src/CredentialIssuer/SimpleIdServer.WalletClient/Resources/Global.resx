@@ -153,4 +153,10 @@
   <data name="PreAuthorizedCodeMissing" xml:space="preserve">
     <value>The pre authorized code is missing</value>
   </data>
+  <data name="ResponseTypeIsNotSupported" xml:space="preserve">
+    <value>The response type {0} is not supported</value>
+  </data>
+  <data name="PresentationDefinitionParameterRequired" xml:space="preserve">
+    <value>the parameter presentation_definition or presentation_definition_uri must be present</value>
+  </data>
 </root>

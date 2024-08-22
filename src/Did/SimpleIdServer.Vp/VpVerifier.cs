@@ -23,9 +23,7 @@ public class VpVerifier
         _didFactoryResolver = didFactoryResolver;
     }
 
-    public async Task Verify(
-        VerifiablePresentation presentation,
-        CancellationToken cancellationToken)
+    public async Task Verify(VerifiablePresentation presentation, CancellationToken cancellationToken)
     {
         var securedDocument = SecuredDocument.New();
         var holderDid = await _didFactoryResolver.Resolve(presentation.Holder, cancellationToken);

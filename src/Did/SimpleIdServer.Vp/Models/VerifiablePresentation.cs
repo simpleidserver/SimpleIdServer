@@ -24,5 +24,5 @@ public class VerifiablePresentation : BaseVerifiableDocument
     [JsonPropertyName("type")]
     public List<string> Type { get; set; } = new List<string>();
     [JsonPropertyName("verifiableCredential")]
-    public List<W3CVerifiableCredential> VerifiableCredential { get; set; } = new List<W3CVerifiableCredential>();
+    public JsonArray VerifiableCredential { get; set; } = new JsonArray();
 }

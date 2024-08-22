@@ -15,8 +15,9 @@ public abstract class GenericDeferredCredentialIssuer<T> : IDeferredCredentialIs
         var result = await GetDeferredCredential(credentialIssuer, transactionId, cancellationToken);
         if (HasPendingState(result)) return (CredentialIssuerResult.Pending(), null);
         if (!string.IsNullOrWhiteSpace(result.ErrorMessage)) return (null, result.ErrorMessage);
-        var credential = formatter.Extract(result.VerifiableCredential.Credential.ToString());
-        return (CredentialIssuerResult.Issue(result.VerifiableCredential, credential, credentialDefinition), null);
+        var serializedVc = result.VerifiableCredential.Credential.ToString();
+        var credential = formatter.Extract(serializedVc);
+        return (CredentialIssuerResult.Issue(result.VerifiableCredential, credential, credentialDefinition, serializedVc), null);
     }
 
     protected abstract bool HasPendingState(DeferredCredentialResult<T> credential);

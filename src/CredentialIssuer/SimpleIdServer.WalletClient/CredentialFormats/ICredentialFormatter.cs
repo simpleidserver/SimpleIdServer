@@ -6,5 +6,6 @@ namespace SimpleIdServer.WalletClient.CredentialFormats
     {
         string Format { get; }
         W3CVerifiableCredential Extract(string content);
+        object DeserializeObject(string serializedVc);
     }
 }

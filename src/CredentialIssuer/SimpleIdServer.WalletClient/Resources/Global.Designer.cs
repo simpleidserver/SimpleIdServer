@@ -167,5 +167,23 @@ namespace SimpleIdServer.WalletClient.Resources {
                 return ResourceManager.GetString("PreAuthorizedCodeMissing", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the parameter presentation_definition or presentation_definition_uri must be present.
+        /// </summary>
+        internal static string PresentationDefinitionParameterRequired {
+            get {
+                return ResourceManager.GetString("PresentationDefinitionParameterRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The response type {0} is not supported.
+        /// </summary>
+        internal static string ResponseTypeIsNotSupported {
+            get {
+                return ResourceManager.GetString("ResponseTypeIsNotSupported", resourceCulture);
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using SimpleIdServer.WalletClient.DTOs;
+﻿using SimpleIdServer.Vp.Models;
+using SimpleIdServer.WalletClient.DTOs;
 using SimpleIdServer.WalletClient.DTOs.ESBI;
 using SimpleIdServer.WalletClient.DTOs.Latest;
 using System;
@@ -18,6 +19,7 @@ public interface ICredentialIssuerClient
     Task<R> GetCredential<T, R>(string url, T request, string accessToken, CancellationToken cancellationToken) where T : BaseCredentialRequest where R : BaseCredentialResult;
     Task<DeferredCredentialResult<ESBICredentialResult>> GetEsbiDeferredCredential(string url, string acceptanceToken, CancellationToken cancellationToken);
     Task<DeferredCredentialResult<CredentialResult>> GetDeferredCredential(string url, string transactionId, CancellationToken cancellationToken);
+    Task<VerifiablePresentationDefinition> GetVerifiablePresentationDefinition(string url, CancellationToken cancellationToken);
 }
 
 public class CredentialIssuerClient : ICredentialIssuerClient
@@ -120,6 +122,21 @@ public class CredentialIssuerClient : ICredentialIssuerClient
             }
 
             return new DeferredCredentialResult<CredentialResult> { VerifiableCredential = JsonSerializer.Deserialize<CredentialResult>(content) };
+        }
+    }
+
+    public async Task<VerifiablePresentationDefinition> GetVerifiablePresentationDefinition(string url, CancellationToken cancellationToken)
+    {
+        using (var httpClient = _httpClientFactory.Build())
+        {
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(url)
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage, cancellationToken);
+            var content = await httpResult.Content.ReadAsStringAsync(cancellationToken);
+            return JsonSerializer.Deserialize<VerifiablePresentationDefinition>(content);
         }
     }
 }

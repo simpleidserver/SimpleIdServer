@@ -23,8 +23,9 @@ public record CredentialIssuerResult
     public BaseCredentialResult Credential { get; private set; }
     public W3CVerifiableCredential W3CCredential { get; private set; }
     public BaseCredentialDefinitionResult CredentialDef { get; private set; }
+    public string SerializedVc { get; private set; }
 
-    public static CredentialIssuerResult Issue(BaseCredentialResult credential, W3CVerifiableCredential w3cCredential, BaseCredentialDefinitionResult credDef) => new CredentialIssuerResult { Credential = credential, W3CCredential = w3cCredential, Status = CredentialStatus.ISSUED, CredentialDef = credDef };
+    public static CredentialIssuerResult Issue(BaseCredentialResult credential, W3CVerifiableCredential w3cCredential, BaseCredentialDefinitionResult credDef, string serializedVc) => new CredentialIssuerResult { Credential = credential, W3CCredential = w3cCredential, Status = CredentialStatus.ISSUED, CredentialDef = credDef, SerializedVc = serializedVc };
     public static CredentialIssuerResult Pending() => new CredentialIssuerResult { Status = CredentialStatus.PENDING };
 }
 

@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.Did.Crypto;
+﻿using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Mobile.Models;
 using SimpleIdServer.Mobile.Resources;
 using SimpleIdServer.Mobile.Services;
@@ -137,7 +136,8 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
             Type = w3cCred.Type.Last(),
             BackgroundColor = firstDisplay.BackgroundColor,
             TextColor = firstDisplay.TextColor,
-            Logo = firstDisplay.Logo?.Uri
+            Logo = firstDisplay.Logo?.Uri,
+            SerializedVc = credResult.VerifiableCredential.SerializedVc
         });
         await _promptService.ShowAlert(Global.Success, Global.VerifiableCredentialEnrolled);
     }

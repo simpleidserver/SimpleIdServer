@@ -11,7 +11,8 @@ var publicKey = "did:key:z2dmzD81cgPx8Vki7JbuuMmFYrWPgYoytykUZ3eyqht1j9Kbrz1hh3C
 var serializedPrivateKey = System.IO.File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "privatekey.json"));
 var privateKey = SignatureKeySerializer.Deserialize(serializedPrivateKey);
 
-PreAuthorisedAndDeferredCredential();
+// PreAuthorisedAndDeferredCredential();
+VerifiablePresentationExchange();
 
 void InTimeCredential()
 {
@@ -57,6 +58,16 @@ void PreAuthorisedAndDeferredCredential()
     Thread.Sleep(6000);
     vc = vc.Retry(CancellationToken.None).Result;
     Console.WriteLine(vc.Status);
+}
+
+void VerifiablePresentationExchange()
+{
+    var intentData = "openid-credential-offer://?credential_offer_uri=https%3A%2F%2Fapi-conformance.ebsi.eu%2Fconformance%2Fv3%2Fissuer-mock%2Foffers%2F4e04dea2-0fbb-4b58-9626-783bc8920663";
+    var uri = Uri.TryCreate(intentData, UriKind.Absolute, out Uri r);
+    var q = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
+    var resolver = VerifiableCredentialOfferResolverFactory.Build();
+    var vc = resolver.Resolve(q, publicKey, privateKey, CancellationToken.None).Result;
+
 }
 
 string GenerateDidKey()

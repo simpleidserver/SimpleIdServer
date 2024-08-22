@@ -6,6 +6,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj" />
+	  <ProjectReference Include="..\..\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"></PackageReference>
