@@ -79,6 +79,7 @@ namespace SimpleIdServer.Scim.Domains
                     c.AddStringAttribute("postalCode");
                     c.AddStringAttribute("country");
                     c.AddStringAttribute("type");
+                    c.AddBooleanAttribute("primary");
                 }, multiValued: true)
                 .AddComplexAttribute("groups", callback: c =>
                 {
