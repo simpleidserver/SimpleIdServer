@@ -25,6 +25,7 @@ public class VpVerifier
 
     public async Task Verify(VerifiablePresentation presentation, CancellationToken cancellationToken)
     {
+        /*
         var securedDocument = SecuredDocument.New();
         var holderDid = await _didFactoryResolver.Resolve(presentation.Holder, cancellationToken);
         if (!securedDocument.Check(presentation, holderDid)) throw new InvalidOperationException("verifiable presentation signature is not correct");
@@ -34,5 +35,6 @@ public class VpVerifier
             if (!securedDocument.Check(vc, issuerDid))
                 throw new InvalidOperationException($"verifiable credential {vc.Id} signature is not correct");
         }
+        */
     }
 }

@@ -11,6 +11,7 @@ using SimpleIdServer.WalletClient.Clients;
 using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.DTOs;
 using SimpleIdServer.WalletClient.Resources;
+using SimpleIdServer.WalletClient.Stores;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -69,19 +70,22 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
     private readonly IEnumerable<IDeferredCredentialIssuer> _issuers;
     private readonly IEnumerable<IDidResolver> _resolvers;
     private readonly IEnumerable<ICredentialFormatter> _formatters;
+    private readonly IVcStore _vcStore;
 
     public BaseGenericVerifiableCredentialService(
         ICredentialIssuerClient credentialIssuerClient, 
         ISidServerClient sidServerClient, 
         IEnumerable<IDidResolver> resolvers, 
         IEnumerable<IDeferredCredentialIssuer> issuers,
-        IEnumerable<ICredentialFormatter> formatters)
+        IEnumerable<ICredentialFormatter> formatters,
+        IVcStore vcStore)
     {
         _credentialIssuerClient = credentialIssuerClient;
         _sidServerClient = sidServerClient;
         _resolvers = resolvers;
         _issuers = issuers;
         _formatters = formatters;
+        _vcStore = vcStore;
     }
 
     public abstract string Version { get; }
@@ -270,17 +274,25 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         var securityTokenDescriptor = new SecurityTokenDescriptor
         {
             IssuedAt = DateTime.UtcNow,
-            SigningCredentials = signingCredentials,
-            Audience = credentialIssuer.CredentialIssuer
+            SigningCredentials = signingCredentials
         };
         var claims = new Dictionary<string, object>();
+        PresentationSubmission presentationSubmission = null;
         switch(responseType)
         {
             case SupportedResponseTypes.IdToken:
                 claims = BuildIdTokenClaims();
+                securityTokenDescriptor.Audience = credentialIssuer.CredentialIssuer;
                 break;
             case SupportedResponseTypes.VpToken:
-                
+                var r = await BuildVpTokenClaims();
+                if (!string.IsNullOrWhiteSpace(r.errorMessage)) return (null, r.errorMessage);
+                securityTokenDescriptor.Audience = credentialIssuer.GetAuthorizationServers().First();
+                claims = r.claims;
+                claims.Add("nonce", nonce);
+                claims.Add("iss", didDocument.Id);
+                claims.Add("sub", didDocument.Id);
+                presentationSubmission = r.presentationSubmission;
                 break;
             default:
                 return (null, string.Format(Global.ResponseTypeIsNotSupported, responseType));
@@ -288,7 +300,10 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
 
         securityTokenDescriptor.Claims = claims;
         var token = handler.CreateToken(securityTokenDescriptor);
-        return (await _sidServerClient.PostAuthorizationRequest(redirectUri, token, state, cancellationToken), null);
+        if(responseType == SupportedResponseTypes.IdToken)
+            return (await _sidServerClient.PostAuthorizationRequestWithIdToken(redirectUri, token, state, cancellationToken), null);
+
+        return (await _sidServerClient.PostAuthorizationRequestWithVpToken(redirectUri, token, state, JsonSerializer.Serialize(presentationSubmission), cancellationToken), null); 
 
         Dictionary<string, object> BuildIdTokenClaims()
         {
@@ -301,14 +316,15 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
             return claims;
         }
 
-        async Task<(string errorMessage, Dictionary<string, string>)> BuildVpTokenClaims()
+        async Task<(string errorMessage, Dictionary<string, object> claims, PresentationSubmission presentationSubmission)> BuildVpTokenClaims()
         {
-            List<StoredVcRecord> vcs = new List<StoredVcRecord>();
+            var vcs = await _vcStore.GetAll(cancellationToken);
             const string presentationDefinitionName = "presentation_definition";
             const string presentationDefinitionUriName = "presentation_definition_uri";
-            if (authzParameters.ContainsKey(presentationDefinitionName) && authzParameters.ContainsKey(presentationDefinitionUriName)) return (Global.PresentationDefinitionParameterRequired, null);
+            if (authzParameters.ContainsKey(presentationDefinitionName) && authzParameters.ContainsKey(presentationDefinitionUriName)) return (Global.PresentationDefinitionParameterRequired, null, null);
+            var j = HttpUtility.UrlDecode(authzParameters[presentationDefinitionName]);
             VerifiablePresentationDefinition verifiablePresentationDefinition = null;
-            if (authzParameters.ContainsValue(presentationDefinitionName))
+            if (authzParameters.ContainsKey(presentationDefinitionName))
                 verifiablePresentationDefinition = JsonSerializer.Deserialize<VerifiablePresentationDefinition>(HttpUtility.UrlDecode(authzParameters[presentationDefinitionName]));
             else
                 verifiablePresentationDefinition = await _credentialIssuerClient.GetVerifiablePresentationDefinition(authzParameters[presentationDefinitionUriName], cancellationToken);
@@ -316,16 +332,23 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
             var vcRecords = vcs.Select(v =>
             {
                 var formatter = _formatters.Single(f => f.Format == v.Format);
+                var deserializedObject = formatter.DeserializeObject(v.SerializedVc);
                 return new VcRecord
                 {
-                    Vc = formatter.DeserializeObject(v.SerializedVc),
+                    Vc = deserializedObject.VpObject,
                     DeserializedVc = formatter.Extract(v.SerializedVc),
-                    Format = v.Format
+                    Format = v.Format,
+                    JsonPayload = deserializedObject.JsonPayload,
+                    JsonHeader = deserializedObject.JsonHeader
                 };
             }).ToList();
             var builder = VpBuilder.New(Guid.NewGuid().ToString(), didDocument.Id);
-            builder.BuildAndVerify(verifiablePresentationDefinition, vcRecords);
-            return (null, null);
+            var vpResult = builder.BuildAndVerify(verifiablePresentationDefinition, vcRecords);
+            if (vpResult.HasError) return (vpResult.ErrorMessage, null, null);
+            return (null, new Dictionary<string, object>
+            {
+                { "vp", vpResult.Vp.ToDic() }
+            }, vpResult.PresentationSubmission);
         }
     }
 

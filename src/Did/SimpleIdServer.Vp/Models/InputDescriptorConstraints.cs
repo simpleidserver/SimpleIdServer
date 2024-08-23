@@ -10,7 +10,7 @@ namespace SimpleIdServer.Vp.Models;
 
 public class InputDescriptorConstraints
 {
-    [JsonProperty("fields")]
+    [JsonPropertyName("fields")]
     public List<InputDescriptorConstraintsField> Fields { get; set; }
 }
 
@@ -29,7 +29,7 @@ public class InputDescriptorConstraintsField
     /// <summary>
     /// Describes the purpose for which the field is being requested.
     /// </summary>
-    [JsonProperty("purpose")]
+    [JsonPropertyName("purpose")]
     public string Purpose { get; set; }
     /// <summary>
     /// A human-friendly name that describes what the target field represents.

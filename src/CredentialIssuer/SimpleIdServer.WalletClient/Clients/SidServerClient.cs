@@ -15,7 +15,8 @@ public interface ISidServerClient
 {
     Task<OpenidConfigurationResult> GetOpenidConfiguration(string url, CancellationToken cancellationToken);
     Task<Dictionary<string, string>> GetAuthorization(string authEdp, Dictionary<string, string> parameters, CancellationToken cancellationToken);
-    Task<Dictionary<string, string>> PostAuthorizationRequest(string url, string idToken, string state, CancellationToken cancellationToken);
+    Task<Dictionary<string, string>> PostAuthorizationRequestWithIdToken(string url, string idToken, string state, CancellationToken cancellationToken);
+    Task<Dictionary<string, string>> PostAuthorizationRequestWithVpToken(string url, string vpToken, string state, string presentationSubmissionUrlEncoded, CancellationToken cancellationToken);
     Task<TokenResult> GetAccessTokenWithPreAuthorizedCode(string clientId, string tokenEndpoint, string preAuthorizedCode, string pin, CancellationToken cancellationToken);
     Task<TokenResult> GetAccessTokenWithAuthorizationCode(string url, string clientId, string code, string codeVerifier, CancellationToken cancellationToken);
 }
@@ -53,11 +54,10 @@ public class SidServerClient : ISidServerClient
         }
     }
 
-    public async Task<Dictionary<string, string>> PostAuthorizationRequest(string url, string idToken, string state, CancellationToken cancellationToken)
+    public async Task<Dictionary<string, string>> PostAuthorizationRequestWithIdToken(string url, string idToken, string state, CancellationToken cancellationToken)
     {
         using (var httpClient = _httpClientFactory.Build())
         {
-
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(HttpUtility.UrlDecode(url)),
@@ -65,6 +65,26 @@ public class SidServerClient : ISidServerClient
                 {
                     new KeyValuePair<string, string>("id_token", idToken),
                     new KeyValuePair<string, string>("state", state)
+                }),
+                Method = HttpMethod.Post
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage, cancellationToken);
+            return ExtractQueryParameters(httpResult);
+        }
+    }
+
+    public async Task<Dictionary<string, string>> PostAuthorizationRequestWithVpToken(string url, string vpToken, string state, string presentationSubmissionUrlEncoded, CancellationToken cancellationToken)
+    {
+        using (var httpClient = _httpClientFactory.Build())
+        {
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri(HttpUtility.UrlDecode(url)),
+                Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
+                {
+                    new KeyValuePair<string, string>("vp_token", vpToken),
+                    new KeyValuePair<string, string>("state", state),
+                    new KeyValuePair<string, string>("presentation_submission", presentationSubmissionUrlEncoded)
                 }),
                 Method = HttpMethod.Post
             };

@@ -7,6 +7,8 @@ namespace SimpleIdServer.Vp.Models;
 
 public class InputDescriptor
 {
+    [JsonPropertyName("id")]
+    public string Id { get; set; }
     /// <summary>
     /// Human-friendly string intended to constitute a distinctive designation of the Presentation Definition.
     /// </summary>

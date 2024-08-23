@@ -4,9 +4,10 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Schema;
 using SimpleIdServer.Vc.Models;
 using SimpleIdServer.Vp.Models;
+using SimpleIdServer.Vp.Resources;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Vp;
 
@@ -33,31 +34,56 @@ public class VpBuilder
         return new VpBuilder(record);
     }
 
-    public VerifiablePresentation BuildAndVerify(VerifiablePresentationDefinition vpDef, List<VcRecord> vcRecords)
+    public VpBuilderResult BuildAndVerify(VerifiablePresentationDefinition vpDef, List<VcRecord> vcRecords, string vpFormat = "jwt_vp")
     {
-        if(vpDef.InputDescriptors != null)
+        var descriptorMaps = new List<DescriptorMap>();
+        if (vpDef.InputDescriptors != null)
         {
+            int i = 0;
             foreach(var inputDescriptor in vpDef.InputDescriptors)
             {
                 var vc = GetVc(inputDescriptor, vcRecords);
-                if (vc == null) return; // THROW ERROR.
-                // CHECK THE FORMAT
-                if (!IsFormatValid(inputDescriptor, vc)) return; // THROW ERROR.
+                if (vc == null) return VpBuilderResult.Nok(Global.VcCannotBeResolved);
+                if (!IsFormatValid(inputDescriptor, vc)) return VpBuilderResult.Nok(Global.FormatNotSatisfied);
+                descriptorMaps.Add(new DescriptorMap
+                {
+                    Id = inputDescriptor.Id,
+                    Path = "$",
+                    Format = vpFormat,
+                    PathNested = new PathNested
+                    {
+                        Id = inputDescriptor.Id,
+                        Format = vc.Format,
+                        Path = $"$.vp.verifiableCredential[{i}]"
+                    }
+                });
+                i++;
             }
         }
 
-        return _verifiablePresentation;
+        foreach (var vc in vcRecords)
+            _verifiablePresentation.VerifiableCredential.Add(vc.Vc.ToString());
+        return VpBuilderResult.Ok(_verifiablePresentation, new PresentationSubmission
+        {
+            Id = Guid.NewGuid().ToString(),
+            DefinitionId = vpDef.Id,
+            DescriptorMap = descriptorMaps
+        });
     }
 
     private bool IsFormatValid(InputDescriptor inputDescriptor, VcRecord vcRecord)
     {
-        // check the format
         if (inputDescriptor.Format != null && inputDescriptor.Format.Any())
         {
             foreach (var kvp in inputDescriptor.Format)
             {
-                
+                if (kvp.Key != vcRecord.Format) break;
+                if (kvp.Value.Alg == null) return true;
+                var vcRecordAlg = vcRecord.JsonHeader.SelectToken("$.alg")?.ToString();
+                if (vcRecordAlg != null && kvp.Value.Alg.Contains(vcRecordAlg)) return true;
             }
+
+            return false;
         }
 
         return true;
@@ -72,11 +98,11 @@ public class VpBuilder
             {
                 foreach (var path in field.Path)
                 {
-                    var elt = vcRecord.JsonObj.SelectToken(path);
+                    var elt = vcRecord.JsonPayload.SelectToken(path);
                     if (elt == null) return false;
                     if (field.Filter != null)
                     {
-                        var schema = JsonSchema.Parse(field.Filter.ToString());
+                        var schema = JSchema.Parse(field.Filter.ToString());
                         if (!elt.IsValid(schema)) return false;
                     }
                 }
@@ -96,5 +122,6 @@ public class VcRecord
     public object Vc { get; set; }
     public W3CVerifiableCredential DeserializedVc { get; set; }
     public string Format { get; set; }
-    public JObject JsonObj { get; set; }
+    public JObject JsonHeader { get; set; }
+    public JObject JsonPayload { get; set; }
 }

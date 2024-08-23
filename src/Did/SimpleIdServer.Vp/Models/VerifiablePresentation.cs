@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.Vc.Models;
 using System.Collections.Generic;
-using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Vp.Models;
@@ -24,5 +23,18 @@ public class VerifiablePresentation : BaseVerifiableDocument
     [JsonPropertyName("type")]
     public List<string> Type { get; set; } = new List<string>();
     [JsonPropertyName("verifiableCredential")]
-    public JsonArray VerifiableCredential { get; set; } = new JsonArray();
+    public List<string> VerifiableCredential { get; set; } = new List<string>();
+
+    public Dictionary<string, object> ToDic()
+    {
+        var result = new Dictionary<string, object>
+        {
+            { "@context", Context },
+            { "id", Id },
+            { "type", Type },
+            { "holder", Holder },
+            { "verifiableCredential", VerifiableCredential }
+        };
+        return result;
+    }
 }
