@@ -11,16 +11,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Web;
 using System.Windows.Input;
 using ZXing.Net.Maui;
-using SimpleIdServer.Vc.Models;
-using SimpleIdServer.Vp;
-using SimpleIdServer.Vc;
-using SimpleIdServer.Did.Key;
-using SimpleIdServer.Did.Crypto;
-using SimpleIdServer.Did.Models;
-using Comet.Reflection;
 #if IOS
 using Firebase.CloudMessaging;
 #endif
@@ -29,10 +21,7 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class QRCodeScannerViewModel
 {
-    private const string _vpFormat = "ldp_vp";
-    private const string _vcFormat = "ldp_vc";
-    private const string openidCredentialOfferScheme = "openid-credential-offer://?credential_offer=";
-    private const string openidVpScheme = "openid4vp://authorize?";
+    private const string openidCredentialOfferScheme = "openid-credential-offer://";
     private bool _isLoading = false;
     private readonly IPromptService _promptService;
     private readonly IOTPService _otpService;
@@ -73,7 +62,7 @@ public class QRCodeScannerViewModel
         _navigationService = navigationService;
         CloseCommand = new Command(async () =>
         {
-            await _navigationService.GoBack();
+            await Close();
         });
         ScanQRCodeCommand = new Command<BarcodeDetectionEventArgs>(async (c) =>
         {
@@ -83,7 +72,7 @@ public class QRCodeScannerViewModel
         });
     }
 
-
+    public event EventHandler Closed;
     public event PropertyChangedEventHandler PropertyChanged;
     public ICommand CloseCommand { get; private set; }
 
@@ -100,6 +89,8 @@ public class QRCodeScannerViewModel
         }
     }
 
+    public ICommand ScanQRCodeCommand { get; private set; }
+
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     protected async Task ScanQRCode(string qrCodeValue)
@@ -107,6 +98,7 @@ public class QRCodeScannerViewModel
         if (IsLoading) return;
         await _lck.WaitAsync();
         IsLoading = true;
+        bool isDeferredExecution = false;
         try
         {
             if (string.IsNullOrWhiteSpace(qrCodeValue)) return;
@@ -115,11 +107,8 @@ public class QRCodeScannerViewModel
             {
                 if(qrCodeValue.StartsWith(openidCredentialOfferScheme))
                 {
-                    await RegisterVerifiableCredential();
-                }
-                else if (qrCodeValue.StartsWith(openidVpScheme))
-                {
-                    await SendVerifiablePresentation();
+                    await ProcessVerifiableCredential();
+                    isDeferredExecution = true;
                 }
                 else
                 {
@@ -136,8 +125,11 @@ public class QRCodeScannerViewModel
         }
         finally
         {
-            IsLoading = false;
-            _lck.Release();
+            if(!isDeferredExecution)
+            {
+                IsLoading = false;
+                _lck.Release();
+            }
         }
 
         #region Register
@@ -173,7 +165,7 @@ public class QRCodeScannerViewModel
             var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey, endRegisterResult.SignCount, rp, beginResult.Login);
             await _credentialListState.AddCredentialRecord(credentialRecord);
             await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
-            await _navigationService.GoBack();
+            await Close();
         }
 
         async Task<BeginU2FRegisterResult> ReadRegisterQRCode(QRCodeResult qrCodeResult)
@@ -272,7 +264,7 @@ public class QRCodeScannerViewModel
             selectedCredential.SigCount++;
             await App.Database.UpdateCredentialRecord(selectedCredential);
             await _promptService.ShowAlert("Success", "You are authenticated");
-            await _navigationService.GoBack();
+            await Close();
         }
 
         async Task<BeginU2FAuthenticateResult> ReadAuthenticateQRCode(QRCodeResult qrCodeResult)
@@ -341,7 +333,7 @@ public class QRCodeScannerViewModel
 
                 await _otpListState.AddOTPCode(otpCode);
                 await _promptService.ShowAlert("Success", "The One Time Password has been enrolled");
-                await _navigationService.GoBack();
+                await Close();
                 return true;
             }
 
@@ -352,222 +344,14 @@ public class QRCodeScannerViewModel
 
         #region Register verifiable credential
 
-        async Task RegisterVerifiableCredential()
+        async Task ProcessVerifiableCredential()
         {
-            var serializedQueryParams = qrCodeValue.Replace(openidCredentialOfferScheme, string.Empty);
-            var encodedJson = HttpUtility.UrlDecode(serializedQueryParams);
-            var credentialOffer = JsonSerializer.Deserialize<CredentialOffer>(encodedJson);
-            if (credentialOffer.CredentialConfigurationIds.Count() != 1)
+            var uri = Uri.TryCreate(qrCodeValue, UriKind.Absolute, out Uri r);
+            var parameters = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
+            CredentialOfferListener.New().Receive(parameters, async () =>
             {
-                await _promptService.ShowAlert("Error", "only one credential can be enrolled");
-                return;
-            }
-
-            using (var httpClient = _httpClientFactory.Build())
-            {
-                var credentialDefinition = await GetCredentialDefinition(httpClient, credentialOffer);
-                var serializedCredentialDef = credentialDefinition.CredentialsSupported
-                    .Single(kvp => kvp.Key == credentialOffer.CredentialConfigurationIds.Single())
-                    .Value.ToJsonString();
-                var offeredCredential = JsonSerializer.Deserialize<CredentialDefinitionResult>(serializedCredentialDef);
-                if (!offeredCredential.Display.Any())
-                {
-                    await _promptService.ShowAlert("Error", "credential cannot be enrolled because its definition doesn't contain display information");
-                    return;
-                }
-
-                var display = offeredCredential.Display.First();
-                var accessToken = await GetAccessTokenWithPreauthCode(credentialOffer, credentialDefinition, httpClient);
-                if(string.IsNullOrWhiteSpace(accessToken))
-                {
-                    await _promptService.ShowAlert("Error", "the credential offer is expired or has been processed");
-                    return;
-                }
-
-                var credentialResult = await GetCredential(httpClient, accessToken, credentialOffer, offeredCredential);
-                var serializedVc = credentialResult.Credential.ToJsonString();
-                var w3cVc = JsonSerializer.Deserialize<W3CVerifiableCredential>(serializedVc);
-                var types = w3cVc.Type;
-                types.Remove("VerifiableCredential");
-                await _verifiableCredentialListState.AddVerifiableCredentialRecord(new VerifiableCredentialRecord
-                {
-                    Id = w3cVc.Id,
-                    Format = _vcFormat,
-                    Name = display.Name,
-                    Description = display.Description,
-                    ValidFrom = w3cVc.ValidFrom,
-                    ValidUntil = w3cVc.ValidUntil,
-                    Type = types.First(),
-                    SerializedVc = serializedVc,
-                    BackgroundColor = display.BackgroundColor,
-                    TextColor = display.TextColor,
-                    Logo = display.Logo?.Uri
-                });
-                await _promptService.ShowAlert("Success", "The verifiable credential has been enrolled");
-            }
-        }
-
-        async Task<CredentialIssuerResult> GetCredentialDefinition(HttpClient httpClient, CredentialOffer credentialOffer)
-        {
-            var requestMessage = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(_urlService.GetUrl($"{credentialOffer.CredentialIssuer}/.well-known/openid-credential-issuer"))
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<CredentialIssuerResult>(json);
-        }
-
-        async Task<string> GetAccessTokenWithPreauthCode(CredentialOffer credentialOffer, CredentialIssuerResult credentialIssuer, HttpClient httpClient)
-        {
-            try
-            {
-                var dic = new Dictionary<string, string>
-                {
-                    { "grant_type", "urn:ietf:params:oauth:grant-type:pre-authorized_code" },
-                    { "client_id", _options.ClientId },
-                    { "client_secret", _options.ClientSecret },
-                    { "pre-authorized_code", credentialOffer.Grants.PreAuthorizedCodeGrant.PreAuthorizedCode }
-                };
-                var requestMessage = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Post,
-                    Content = new FormUrlEncodedContent(dic),
-                    RequestUri = new Uri(_urlService.GetUrl($"{credentialIssuer.AuthorizationServers.First()}/token"))
-                };
-                var httpResult = await httpClient.SendAsync(requestMessage);
-                httpResult.EnsureSuccessStatusCode();
-                var json = await httpResult.Content.ReadAsStringAsync();
-                var accessToken = JsonObject.Parse(json).AsObject()["access_token"];
-                return accessToken.ToString();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        async Task<CredentialResult> GetCredential(HttpClient httpClient, string accessToken, CredentialOffer credentialOffer, CredentialDefinitionResult credentialDefinition)
-        {
-            var credentialRequest = new CredentialRequest
-            {
-                Format = _vcFormat,
-                CredentialDefinitionRequest = new CredentialDefinitionRequest
-                {
-                    Type = credentialDefinition.Type
-                }
-            };
-            var requestMessage = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(_urlService.GetUrl($"{credentialOffer.CredentialIssuer}/credential")),
-                Content = new StringContent(JsonSerializer.Serialize(credentialRequest), Encoding.UTF8, "application/json")
-            };
-            requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            var credentialResult = JsonSerializer.Deserialize<CredentialResult>(json);
-            return credentialResult;
-        }
-
-        #endregion
-
-        #region Verifiable presentation
-
-        async Task SendVerifiablePresentation()
-        {
-            var didRecord = _didState.Did;
-            if(didRecord == null)
-            {
-                return;
-            }
-
-            var didDocument = await DidKeyResolver.New().Resolve(didRecord.Did, CancellationToken.None);
-            var privateKey = Ed25519SignatureKey.From(null, didRecord.PrivaterKey);
-            var vcLst = _verifiableCredentialListState.VerifiableCredentialRecords;
-            var serializedQueryParams = qrCodeValue.Replace(openidVpScheme, string.Empty);
-            var encodedJson = HttpUtility.UrlDecode(serializedQueryParams);
-            var vpAuthorizationRequest = JsonSerializer.Deserialize<VpAuthorizationRequest>(encodedJson);
-            using (var httpClient = _httpClientFactory.Build())
-            {
-                var presentationDefinition = await GetPresentationDefinition(vpAuthorizationRequest, httpClient);
-                var types = presentationDefinition.InputDescriptors.Select(d => d.Constraints).SelectMany(c => c.Fields).SelectMany(c => c.Path);
-                var filteredVc = vcLst.Where(v => types.Contains(v.Type)).Select(v => JsonSerializer.Deserialize<W3CVerifiableCredential>(v.SerializedVc));
-                var vpToken = await BuildVpToken(filteredVc, didDocument, privateKey);
-                var presentationSubmission = BuildPresentationSubmission(presentationDefinition);
-                var vpAuthorizationResponse = new VpAuthorizationResponse
-                {
-                    PresentationSubmission = JsonSerializer.Serialize(presentationSubmission),
-                    State = vpAuthorizationRequest.State,
-                    VpToken = vpToken
-                };                
-                var requestMessage = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(_urlService.GetUrl(vpAuthorizationRequest.ResponseUri)),
-                    Content = new FormUrlEncodedContent(vpAuthorizationResponse.ToQueries())
-                };
-                var httpResponse = await httpClient.SendAsync(requestMessage);
-                httpResponse.EnsureSuccessStatusCode();
-                await _promptService.ShowAlert("Success", "The verifiable presentation has been presented to the verifier");
-            }
-        }
-
-        async Task<PresentationDefinitionResult> GetPresentationDefinition(VpAuthorizationRequest request, HttpClient httpClient)
-        {
-            var requestMessage = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(_urlService.GetUrl(request.PresentationDefinitionUri))
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<PresentationDefinitionResult>(json);
-        }
-
-        async Task<string> BuildVpToken(IEnumerable<W3CVerifiableCredential> filteredVc, DidDocument didDocument, Ed25519SignatureKey privateKey)
-        {
-            var builder = VpBuilder.New(Guid.NewGuid().ToString(), didDocument.Id);
-            foreach (var vc in filteredVc)
-                builder.AddVerifiableCredential(vc);
-
-            var presentation = builder.Build();
-            var securedDocument = SecuredDocument.New();
-            securedDocument.Secure(
-                presentation,
-                didDocument,
-                didDocument.VerificationMethod.First().Id,
-                asymKey: privateKey);
-            var vpToken = JsonSerializer.Serialize(presentation);
-            return vpToken;
-        }
-
-        PresentationSubmissionRequest BuildPresentationSubmission(PresentationDefinitionResult presentationDefinition)
-        {
-            var result = new PresentationSubmissionRequest
-            {
-                Id = Guid.NewGuid().ToString(),
-                DefinitionId = presentationDefinition.Id,
-                DescriptorMap = new List<PresentationSubmissionDescriptorMapRequest>()
-            };
-            int i = 0;
-            foreach(var d in presentationDefinition.InputDescriptors)
-            {
-                result.DescriptorMap.Add(new PresentationSubmissionDescriptorMapRequest
-                {
-                    Id = d.Id,
-                    Format = _vpFormat,
-                    Path = "$",
-                    PathNested = new PresentationSubmissionDescriptorMapPathNestedRequest
-                    {
-                        Format = _vcFormat,
-                        Path = $"$.verifiableCredential[{i}]"
-                    }
-                });
-            }
-
-            return result;
+                await Close();
+            });
         }
 
         #endregion
@@ -630,5 +414,9 @@ public class QRCodeScannerViewModel
         #endregion
     }
 
-    public ICommand ScanQRCodeCommand { get; private set; }
+    private async Task Close()
+    {
+        if (Closed != null) Closed(this, new EventArgs());
+        await _navigationService.GoBack();
+    }
 }

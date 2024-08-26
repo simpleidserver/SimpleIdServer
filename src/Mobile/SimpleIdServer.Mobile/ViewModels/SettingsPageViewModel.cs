@@ -1,4 +1,5 @@
-﻿using SimpleIdServer.Did.Crypto;
+﻿using Newtonsoft.Json;
+using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.Mobile.Models;
 using SimpleIdServer.Mobile.Services;
@@ -32,7 +33,7 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         });
         GenerateDidKeyCommand = new Command<EventArgs>(async (c) =>
         {
-            await GenerateDid();
+            await GenerateDidKey();
         }, (a) =>
         {
             return _didRecordState.Did == null;
@@ -134,16 +135,14 @@ public class SettingsPageViewModel : INotifyPropertyChanged
         _isLoading = false;
     }
 
-    private async Task GenerateDid()
+    private async Task GenerateDidKey()
     {
         if (_isLoading) return;
         _isLoading = true;
-        var ed25519 = Ed25519SignatureKey.Generate();
-        var generator = DidKeyGenerator.New();
-        generator.SetSignatureKey(ed25519);
-        var did = generator.Export(false).Did;
-        await _didRecordState.Update(new DidRecord { Did = did, PrivaterKey = ed25519.GetPrivateKey() });
-        Did = did;
+        var exportResult = DidKeyGenerator.New().GenerateRandomES256Key().Export(false, true);
+        var export = SignatureKeySerializer.Serialize(exportResult.Key);
+        await _didRecordState.Update(new DidRecord { Did = exportResult.Did, SerializedPrivateKey = System.Text.Json.JsonSerializer.Serialize(export) });
+        Did = exportResult.Did;
         var cmd = (Command)GenerateDidKeyCommand;
         cmd.ChangeCanExecute();
         _isLoading = false;

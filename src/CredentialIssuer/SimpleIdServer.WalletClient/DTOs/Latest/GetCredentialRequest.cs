@@ -1,11 +1,10 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.Mobile.DTOs;
+namespace SimpleIdServer.WalletClient.DTOs.Latest;
 
-public class CredentialRequest
+public class GetCredentialRequest  : BaseCredentialRequest
 {
-    [JsonPropertyName("format")]
-    public string Format { get; set; }
     [JsonPropertyName("credential_definition")]
     public CredentialDefinitionRequest CredentialDefinitionRequest { get; set; }
 }

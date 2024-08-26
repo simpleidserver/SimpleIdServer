@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "json-ld.net", "json-ld.net\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Did.Key", "src\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj", "{43EDFEED-30D9-49B2-8605-051365D76727}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.WalletClient", "src\CredentialIssuer\SimpleIdServer.WalletClient\SimpleIdServer.WalletClient.csproj", "{8A95913B-06F9-4622-8E70-4ACE9691E5C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,10 @@ Global
 		{43EDFEED-30D9-49B2-8605-051365D76727}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43EDFEED-30D9-49B2-8605-051365D76727}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43EDFEED-30D9-49B2-8605-051365D76727}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A95913B-06F9-4622-8E70-4ACE9691E5C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A95913B-06F9-4622-8E70-4ACE9691E5C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A95913B-06F9-4622-8E70-4ACE9691E5C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A95913B-06F9-4622-8E70-4ACE9691E5C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +71,7 @@ Global
 		{89ADD8B4-38C3-4EB9-BA80-F692B7133CF5} = {2F88CE6F-3C21-4259-B47F-DEAF4006130B}
 		{19D9138C-E158-43C1-9B2F-ABD302DFFD5F} = {2F88CE6F-3C21-4259-B47F-DEAF4006130B}
 		{43EDFEED-30D9-49B2-8605-051365D76727} = {2F88CE6F-3C21-4259-B47F-DEAF4006130B}
+		{8A95913B-06F9-4622-8E70-4ACE9691E5C8} = {2F88CE6F-3C21-4259-B47F-DEAF4006130B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D6309DCA-4D0E-4F6B-9BD5-C9517B205984}

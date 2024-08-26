@@ -10,12 +10,13 @@ public partial class QRCodeScannerPage : ContentPage
     {
         On<iOS>().SetModalPresentationStyle(UIModalPresentationStyle.PageSheet);
         BindingContext = viewModel;
+        viewModel.Closed += HandleClosed;
         InitializeComponent();
-        this.Disappearing += HandleDisappearing;
     }
 
-    private void HandleDisappearing(object sender, EventArgs e)
+    private void HandleClosed(object sender, EventArgs e)
     {
-        this.cameraBarCodeReader.Handler.DisconnectHandler();
+        if (this.cameraBarCodeReader.Handler != null)
+            this.cameraBarCodeReader.Handler.DisconnectHandler();
     }
 }

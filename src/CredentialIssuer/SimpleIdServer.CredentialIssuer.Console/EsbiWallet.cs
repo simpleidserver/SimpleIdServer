@@ -18,6 +18,8 @@ public class EsbiWallet
     private const string publicKey = "z2dmzD81cgPx8Vki7JbuuMmFYrWPgYoytykUZ3eyqht1j9KbpMAoXtZtunruYnM4gCV65AKAUX2AwEReRhEaf3BRQNJArZPwQdmf9ENZcF8VT13a58WsHeVjJtvAKKPYEibaEfdUxvU7sgxEUTJpjEkq6BJKrRV1JQ1CqhYvGbmJ1WyoUQ";
     private const string did = $"did:key:{publicKey}";
     private const string refDid = $"{did}#{publicKey}";
+    // private const string credentialType = "CTWalletSameAuthorisedInTime";
+    private const string credentialType = "CTIssueQualificationCredential";
 
     public static async Task RegisterEsbiWalletForConformance()
     {
@@ -68,7 +70,7 @@ public class EsbiWallet
         {
             "VerifiableCredential",
             "VerifiableAttestation",
-            "CTIssueQualificationCredential"
+            credentialType
         } },
         { "locations", new JsonArray
         {
@@ -178,7 +180,7 @@ public class EsbiWallet
         {
             "VerifiableCredential",
             "VerifiableAttestation",
-            "CTIssueQualificationCredential"
+            credentialType
         } },
     { "format", "jwt_vc" }
 };
@@ -190,7 +192,9 @@ public class EsbiWallet
             Method = HttpMethod.Post
         };
         requestMessage.Headers.Add("Authorization", $"Bearer {accessToken}");
-        await httpClient.SendAsync(requestMessage);
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var content = await httpResult.Content.ReadAsStringAsync();
+        System.Console.WriteLine(content);
     }
 
     private static async Task<(string accessToken, string idToken, string cNonce)> GetToken(HttpClient httpClient, string url, string authorizationCode, string codeVerifier)

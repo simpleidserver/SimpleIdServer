@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Options;
+using SimpleIdServer.Mobile.Clients;
 using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
-using System.Text;
-using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Mobile;
 
@@ -15,8 +14,8 @@ public partial class App : Application
     private readonly DidRecordState _didRecordState;
     private readonly IServiceProvider _serviceProvider;
     public static MobileDatabase _database;
-
     public static GotifyNotificationListener Listener = GotifyNotificationListener.New();
+    public static CredentialOfferListener CredentialOfferListener = CredentialOfferListener.New();
 
     public static MobileDatabase Database
 	{
@@ -63,6 +62,10 @@ public partial class App : Application
         {
             await HandleNotificationReceived(sender, e);
         };
+        CredentialOfferListener.CredentialOfferReceived += async (sender, e) =>
+        {
+            await HandleCredentialOfferReceived(sender, e);
+        };
     }
 
     private async Task HandleNotificationReceived(object sender, NotificationEventArgs e)
@@ -70,6 +73,13 @@ public partial class App : Application
         var notificationPage = await NavigationService.DisplayModal<NotificationPage>();
         await Task.Delay(1000);
         notificationPage.Display(e.Notification);
+    }
+
+    private async Task HandleCredentialOfferReceived(object sender, CredentialOfferEventArgs e)
+    {
+        var credentialOfferPage = await NavigationService.DisplayModal<ViewCredentialOffer>();
+        await Task.Delay(1000);
+        await credentialOfferPage.Load(e.Parameters, e.Callback);
     }
 
     private async Task InitGotify()
@@ -80,21 +90,9 @@ public partial class App : Application
         {
             if (string.IsNullOrWhiteSpace(mobileSettings.GotifyPushToken))
             {
-                using (var httpClient = _serviceProvider.GetRequiredService<Factories.IHttpClientFactory>().Build())
-                {
-                    var msg = new HttpRequestMessage
-                    {
-                        RequestUri = new Uri($"{opts.Value.IdServerUrl}/gotifyconnections"),
-                        Content = new StringContent("{}", Encoding.UTF8, "application/json"),
-                        Method = HttpMethod.Post
-                    };
-                    var httpResult = await httpClient.SendAsync(msg);
-                    var content = await httpResult.Content.ReadAsStringAsync();
-                    var jObj = JsonObject.Parse(content);
-                    var pushToken = jObj["token"].ToString();
-                    mobileSettings.GotifyPushToken = pushToken;
-                    await _mobileSettingsState.Update(mobileSettings);
-                }
+                var sidServerClient = _serviceProvider.GetRequiredService<ISidServerClient>();
+                var pushToken = await sidServerClient.AddGotifyConnection();
+                mobileSettings.GotifyPushToken = pushToken;
             }
 
             var instance = GotifyNotificationListener.New();
