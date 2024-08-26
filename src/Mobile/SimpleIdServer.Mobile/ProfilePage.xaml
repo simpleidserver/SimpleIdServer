@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimpleIdServer.Mobile.ProfilePage"
+             Title="ProfilePage">
+    <StackLayout>
+        <StackLayout Orientation="Horizontal">
+            <StackLayout>
+                <Label>Notification mode</Label>
+            </StackLayout>
+            <StackLayout>
+                <Label>Gotify server status</Label>
+                <Label>Running</Label>
+            </StackLayout>
+        </StackLayout>
+        <BoxView Margin="0,5" Color="Black"></BoxView>
+    </StackLayout>
+</ContentPage>

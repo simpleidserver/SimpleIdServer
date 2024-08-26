@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SimpleIdServer.Mobile.DidsPage"
+             Title="DidsPage">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Active"></ToolbarItem>
+        <ToolbarItem Order="Primary" Text="Delete"></ToolbarItem>
+    </ContentPage.ToolbarItems>
+    <StackLayout Spacing="5">
+        <Grid>
+            <Frame Margin="5">
+                <StackLayout Orientation="Horizontal">
+                    <StackLayout Orientation="Vertical" HorizontalOptions="StartAndExpand">
+                        <Label>Creation date: 26-08-2024</Label>
+                        <Label>Type : did-key</Label>
+                    </StackLayout>
+                    <Button HorizontalOptions="End" Text="Copy"></Button>
+                </StackLayout>
+            </Frame>
+        </Grid>
+    </StackLayout>
+</ContentPage>

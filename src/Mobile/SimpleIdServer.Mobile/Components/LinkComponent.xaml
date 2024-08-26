@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:DataType="local:LinkComponent"             
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.Components"
+             x:Class="SimpleIdServer.Mobile.Components.LinkComponent"
+             x:Name="this">
+    <Grid BindingContext="{x:Reference this}">
+        <BoxView HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ZIndex="2">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding NavigateCommand}" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+        <Frame Margin="5">
+            <StackLayout Orientation="Horizontal">
+                <Image WidthRequest="20" Source="{Binding Path=Source}" HorizontalOptions="Start"></Image>
+                <Label Padding="5,0,0,0" HorizontalOptions="StartAndExpand" Text="{Binding Path=Title}"></Label>
+                <Image WidthRequest="20" Source="rightarrow.svg" HorizontalOptions="End">
+                </Image>
+            </StackLayout>
+        </Frame>
+    </Grid>
+</ContentView>

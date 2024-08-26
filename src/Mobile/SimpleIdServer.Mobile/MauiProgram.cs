@@ -61,11 +61,14 @@ public static class MauiProgram
 		builder.Services.AddSingleton(new MobileSettingsState());
 		builder.Services.AddSingleton(new DidRecordState());
         builder.Services.AddTransient<EnrollPage>();
+		builder.Services.AddTransient<InfoPage>();
 		builder.Services.AddTransient<NotificationPage>();
 		builder.Services.AddTransient<SettingsPage>();
 		builder.Services.AddTransient<ViewOtpListPage>();
 		builder.Services.AddTransient<QRCodeScannerPage>();
-		builder.Services.AddTransient<WalletPage>();
+        builder.Services.AddTransient<DidsPage>();
+		builder.Services.AddTransient<ProfilePage>();
+        builder.Services.AddTransient<WalletPage>();
 		builder.Services.AddTransient<PinModal>();
 		builder.Services.AddTransient<ViewCredentialOffer>();
 		builder.Services.AddTransient<ViewCredentialListPage>();
