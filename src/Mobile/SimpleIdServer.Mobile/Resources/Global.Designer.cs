@@ -194,5 +194,14 @@ namespace SimpleIdServer.Mobile.Resources {
                 return ResourceManager.GetString("VerifiableCredentialEnrollment", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Verifiable presentation has been presented.
+        /// </summary>
+        internal static string VpPresented {
+            get {
+                return ResourceManager.GetString("VpPresented", resourceCulture);
+            }
+        }
     }
 }

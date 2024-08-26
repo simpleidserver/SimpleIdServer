@@ -14,7 +14,6 @@ public partial class App : Application
     private readonly DidRecordState _didRecordState;
     private readonly IServiceProvider _serviceProvider;
     public static MobileDatabase _database;
-
     public static GotifyNotificationListener Listener = GotifyNotificationListener.New();
     public static CredentialOfferListener CredentialOfferListener = CredentialOfferListener.New();
 
@@ -80,7 +79,7 @@ public partial class App : Application
     {
         var credentialOfferPage = await NavigationService.DisplayModal<ViewCredentialOffer>();
         await Task.Delay(1000);
-        await credentialOfferPage.Load(e.Parameters);
+        await credentialOfferPage.Load(e.Parameters, e.Callback);
     }
 
     private async Task InitGotify()

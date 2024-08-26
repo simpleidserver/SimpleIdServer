@@ -1,24 +1,16 @@
 ﻿using Fido2NetLib;
 using Microsoft.Extensions.Options;
 using Plugin.Firebase.CloudMessaging;
-using SimpleIdServer.Did.Crypto;
-using SimpleIdServer.Did.Key;
-using SimpleIdServer.Did.Models;
 using SimpleIdServer.IdServer.U2FClient;
 using SimpleIdServer.Mobile.DTOs;
 using SimpleIdServer.Mobile.Models;
 using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
-using SimpleIdServer.Vc;
-using SimpleIdServer.Vc.Models;
-using SimpleIdServer.Vp;
-using SimpleIdServer.WalletClient.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Web;
 using System.Windows.Input;
 using ZXing.Net.Maui;
 #if IOS
@@ -29,10 +21,7 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class QRCodeScannerViewModel
 {
-    private const string _vpFormat = "ldp_vp";
-    private const string _vcFormat = "ldp_vc";
-    private const string openidCredentialOfferScheme = "openid-credential-offer://?credential_offer=";
-    private const string openidVpScheme = "openid4vp://authorize?";
+    private const string openidCredentialOfferScheme = "openid-credential-offer://";
     private bool _isLoading = false;
     private readonly IPromptService _promptService;
     private readonly IOTPService _otpService;
@@ -73,7 +62,7 @@ public class QRCodeScannerViewModel
         _navigationService = navigationService;
         CloseCommand = new Command(async () =>
         {
-            await _navigationService.GoBack();
+            await Close();
         });
         ScanQRCodeCommand = new Command<BarcodeDetectionEventArgs>(async (c) =>
         {
@@ -83,7 +72,7 @@ public class QRCodeScannerViewModel
         });
     }
 
-
+    public event EventHandler Closed;
     public event PropertyChangedEventHandler PropertyChanged;
     public ICommand CloseCommand { get; private set; }
 
@@ -100,6 +89,8 @@ public class QRCodeScannerViewModel
         }
     }
 
+    public ICommand ScanQRCodeCommand { get; private set; }
+
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     protected async Task ScanQRCode(string qrCodeValue)
@@ -107,6 +98,7 @@ public class QRCodeScannerViewModel
         if (IsLoading) return;
         await _lck.WaitAsync();
         IsLoading = true;
+        bool isDeferredExecution = false;
         try
         {
             if (string.IsNullOrWhiteSpace(qrCodeValue)) return;
@@ -115,11 +107,8 @@ public class QRCodeScannerViewModel
             {
                 if(qrCodeValue.StartsWith(openidCredentialOfferScheme))
                 {
-                    await RegisterVerifiableCredential();
-                }
-                else if (qrCodeValue.StartsWith(openidVpScheme))
-                {
-                    await SendVerifiablePresentation();
+                    await ProcessVerifiableCredential();
+                    isDeferredExecution = true;
                 }
                 else
                 {
@@ -136,8 +125,11 @@ public class QRCodeScannerViewModel
         }
         finally
         {
-            IsLoading = false;
-            _lck.Release();
+            if(!isDeferredExecution)
+            {
+                IsLoading = false;
+                _lck.Release();
+            }
         }
 
         #region Register
@@ -173,7 +165,7 @@ public class QRCodeScannerViewModel
             var credentialRecord = new CredentialRecord(enrollResponse.CredentialId, enrollResponse.AttestationCertificate.AttestationCertificate, enrollResponse.AttestationCertificate.PrivateKey, endRegisterResult.SignCount, rp, beginResult.Login);
             await _credentialListState.AddCredentialRecord(credentialRecord);
             await _promptService.ShowAlert("Success", "Your mobile device has been enrolled");
-            await _navigationService.GoBack();
+            await Close();
         }
 
         async Task<BeginU2FRegisterResult> ReadRegisterQRCode(QRCodeResult qrCodeResult)
@@ -272,7 +264,7 @@ public class QRCodeScannerViewModel
             selectedCredential.SigCount++;
             await App.Database.UpdateCredentialRecord(selectedCredential);
             await _promptService.ShowAlert("Success", "You are authenticated");
-            await _navigationService.GoBack();
+            await Close();
         }
 
         async Task<BeginU2FAuthenticateResult> ReadAuthenticateQRCode(QRCodeResult qrCodeResult)
@@ -341,7 +333,7 @@ public class QRCodeScannerViewModel
 
                 await _otpListState.AddOTPCode(otpCode);
                 await _promptService.ShowAlert("Success", "The One Time Password has been enrolled");
-                await _navigationService.GoBack();
+                await Close();
                 return true;
             }
 
@@ -352,112 +344,14 @@ public class QRCodeScannerViewModel
 
         #region Register verifiable credential
 
-        async Task RegisterVerifiableCredential()
+        async Task ProcessVerifiableCredential()
         {
             var uri = Uri.TryCreate(qrCodeValue, UriKind.Absolute, out Uri r);
             var parameters = r.Query.TrimStart('?').Split('&').Select(t => t.Split('=')).ToDictionary(r => r[0], r => r[1]);
-            var credentialOfferPage = await _navigationService.DisplayModal<ViewCredentialOffer>();
-            await Task.Delay(1000);
-            await credentialOfferPage.Load(parameters);
-        }
-
-        #endregion
-
-        #region Verifiable presentation
-
-        async Task SendVerifiablePresentation()
-        {
-            var didRecord = _didState.Did;
-            if(didRecord == null)
+            CredentialOfferListener.New().Receive(parameters, async () =>
             {
-                return;
-            }
-
-            var didDocument = await DidKeyResolver.New().Resolve(didRecord.Did, CancellationToken.None);
-            var privateKey = SignatureKeySerializer.Deserialize(didRecord.SerializedPrivateKey);
-            var vcLst = _verifiableCredentialListState.VerifiableCredentialRecords;
-            var serializedQueryParams = qrCodeValue.Replace(openidVpScheme, string.Empty);
-            var encodedJson = HttpUtility.UrlDecode(serializedQueryParams);
-            var vpAuthorizationRequest = JsonSerializer.Deserialize<VpAuthorizationRequest>(encodedJson);
-            using (var httpClient = _httpClientFactory.Build())
-            {
-                var presentationDefinition = await GetPresentationDefinition(vpAuthorizationRequest, httpClient);
-                var types = presentationDefinition.InputDescriptors.Select(d => d.Constraints).SelectMany(c => c.Fields).SelectMany(c => c.Path);
-                var filteredVc = vcLst.Where(v => types.Contains(v.Type)).Select(v => JsonSerializer.Deserialize<W3CVerifiableCredential>(v.SerializedVc));
-                var vpToken = await BuildVpToken(filteredVc, didDocument, privateKey);
-                var presentationSubmission = BuildPresentationSubmission(presentationDefinition);
-                var vpAuthorizationResponse = new VpAuthorizationResponse
-                {
-                    PresentationSubmission = JsonSerializer.Serialize(presentationSubmission),
-                    State = vpAuthorizationRequest.State,
-                    VpToken = vpToken
-                };                
-                var requestMessage = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(_urlService.GetUrl(vpAuthorizationRequest.ResponseUri)),
-                    Content = new FormUrlEncodedContent(vpAuthorizationResponse.ToQueries())
-                };
-                var httpResponse = await httpClient.SendAsync(requestMessage);
-                httpResponse.EnsureSuccessStatusCode();
-                await _promptService.ShowAlert("Success", "The verifiable presentation has been presented to the verifier");
-            }
-        }
-
-        async Task<PresentationDefinitionResult> GetPresentationDefinition(VpAuthorizationRequest request, HttpClient httpClient)
-        {
-            var requestMessage = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri(_urlService.GetUrl(request.PresentationDefinitionUri))
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<PresentationDefinitionResult>(json);
-        }
-
-        async Task<string> BuildVpToken(IEnumerable<W3CVerifiableCredential> filteredVc, DidDocument didDocument, IAsymmetricKey privateKey)
-        {
-            var builder = VpBuilder.New(Guid.NewGuid().ToString(), didDocument.Id);
-            foreach (var vc in filteredVc)
-                builder.AddVerifiableCredential(vc);
-
-            var presentation = builder.Build();
-            var securedDocument = SecuredDocument.New();
-            securedDocument.Secure(
-                presentation,
-                didDocument,
-                didDocument.VerificationMethod.First().Id,
-                asymKey: privateKey);
-            var vpToken = JsonSerializer.Serialize(presentation);
-            return vpToken;
-        }
-
-        PresentationSubmissionRequest BuildPresentationSubmission(PresentationDefinitionResult presentationDefinition)
-        {
-            var result = new PresentationSubmissionRequest
-            {
-                Id = Guid.NewGuid().ToString(),
-                DefinitionId = presentationDefinition.Id,
-                DescriptorMap = new List<PresentationSubmissionDescriptorMapRequest>()
-            };
-            int i = 0;
-            foreach(var d in presentationDefinition.InputDescriptors)
-            {
-                result.DescriptorMap.Add(new PresentationSubmissionDescriptorMapRequest
-                {
-                    Id = d.Id,
-                    Format = _vpFormat,
-                    Path = "$",
-                    PathNested = new PresentationSubmissionDescriptorMapPathNestedRequest
-                    {
-                        Format = _vcFormat,
-                        Path = $"$.verifiableCredential[{i}]"
-                    }
-                });
-            }
-
-            return result;
+                await Close();
+            });
         }
 
         #endregion
@@ -520,5 +414,9 @@ public class QRCodeScannerViewModel
         #endregion
     }
 
-    public ICommand ScanQRCodeCommand { get; private set; }
+    private async Task Close()
+    {
+        if (Closed != null) Closed(this, new EventArgs());
+        await _navigationService.GoBack();
+    }
 }

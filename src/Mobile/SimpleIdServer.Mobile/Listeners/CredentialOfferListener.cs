@@ -21,18 +21,21 @@ public class CredentialOfferListener
         return _instance;
     }
 
-    public void Receive(Dictionary<string, string> parameters)
+    public void Receive(Dictionary<string, string> parameters, Func<Task> callback = null)
     {
-        if (CredentialOfferReceived != null) CredentialOfferReceived(this, new CredentialOfferEventArgs(parameters));
+        if (CredentialOfferReceived != null) CredentialOfferReceived(this, new CredentialOfferEventArgs(parameters, callback));
     }
 }
 
 public class CredentialOfferEventArgs : EventArgs
 {
-    public CredentialOfferEventArgs(Dictionary<string, string> parameters)
+    public CredentialOfferEventArgs(Dictionary<string, string> parameters, Func<Task> callback = null)
     {
         Parameters = parameters;
+        Callback = callback;
     }
 
     public Dictionary<string, string> Parameters { get; private set; }
+    public Func<Task> Callback { get; private set; }
+    public Func<Task> ErrorCallback { get; private set; }
 }

@@ -50,7 +50,11 @@ public record RequestVerifiableCredentialResult
     public CredentialStatus Status { get; private set; }
 
     public static RequestVerifiableCredentialResult Ok(CredentialIssuerResult result) => new RequestVerifiableCredentialResult { VerifiableCredential = result, Status = CredentialStatus.ISSUED };
+
+    public static RequestVerifiableCredentialResult PresentVp() => new RequestVerifiableCredentialResult { Status = CredentialStatus.VP_PRESENTED };
+
     public static RequestVerifiableCredentialResult Nok(string errorMessage) => new RequestVerifiableCredentialResult { ErrorMessage = errorMessage, Status = CredentialStatus.ERROR };
+
     public static RequestVerifiableCredentialResult Pending(string transactionId, BaseCredentialIssuer credentialIssuer, BaseCredentialDefinitionResult credDef, IDeferredCredentialIssuer issuer, ICredentialFormatter formatter) 
         => new RequestVerifiableCredentialResult { TransactionId = transactionId, Status = CredentialStatus.PENDING, _issuer = issuer, _credentialIssuer = credentialIssuer, _formatter = formatter, _credDef = credDef };
 
@@ -131,16 +135,19 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         var authorizationServer = authorizationServers.First();
         var openidConfiguration = await _sidServerClient.GetOpenidConfiguration(authorizationServer, cancellationToken);
         CredentialTokenResult tokenResult;
+        bool isVpPresented = false;
         if(credentialOffer.Grants.PreAuthorizedCodeGrant != null)
         {
             tokenResult = await GetTokenWithPreAuthorizedCodeGrant(didDocument.Id, privateKey, credentialOffer, extractionResult.Value.credIssuer, openidConfiguration, extractionResult.Value.credDef, pin, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(tokenResult.ErrorMessage)) return RequestVerifiableCredentialResult.Nok(tokenResult.ErrorMessage);
         }
         else
         {
-            tokenResult = await GetTokenWithAuthorizationCodeGrant(didDocument, privateKey, credentialOffer, extractionResult.Value.credDef, extractionResult.Value.credIssuer, openidConfiguration, cancellationToken);
+            var res = await GetTokenWithAuthorizationCodeGrant(didDocument, privateKey, credentialOffer, extractionResult.Value.credDef, extractionResult.Value.credIssuer, openidConfiguration, cancellationToken);
+            tokenResult = res.credentialToken;
+            if (!string.IsNullOrWhiteSpace(tokenResult.ErrorMessage)) return RequestVerifiableCredentialResult.Nok(tokenResult.ErrorMessage);
+            isVpPresented = res.isVerifiablePresentationRequest;
         }
-
-        if (!string.IsNullOrWhiteSpace(tokenResult.ErrorMessage)) return RequestVerifiableCredentialResult.Nok(tokenResult.ErrorMessage);
 
         var proofOfPossession = BuildProofOfPossession(didDocument, privateKey, extractionResult.Value.credIssuer, tokenResult.Token.CNonce);
         var result = await GetCredential(extractionResult.Value.credIssuer, extractionResult.Value.credDef, new CredentialProofRequest { ProofType = "jwt", Jwt = proofOfPossession }, tokenResult.Token.AccessToken, cancellationToken);
@@ -156,6 +163,7 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         }
         else
         {
+            if (isVpPresented) return RequestVerifiableCredentialResult.PresentVp();
             var serializedVc = result.Credential.ToString();
             var credential = formatter.Extract(result.Credential.ToString());
             return RequestVerifiableCredentialResult.Ok(CredentialIssuerResult.Issue(result, credential, credDef, serializedVc));
@@ -209,18 +217,19 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
 
     #region Authorization code grant
 
-    private async Task<CredentialTokenResult> GetTokenWithAuthorizationCodeGrant(DidDocument didDocument, IAsymmetricKey privateKey, T credentialOffer, BaseCredentialDefinitionResult credentialDefinition, DTOs.BaseCredentialIssuer credentialIssuer, OpenidConfigurationResult openidConfigurationResult, CancellationToken cancellationToken)
+    private async Task<(CredentialTokenResult credentialToken, bool isVerifiablePresentationRequest)> GetTokenWithAuthorizationCodeGrant(DidDocument didDocument, IAsymmetricKey privateKey, T credentialOffer, BaseCredentialDefinitionResult credentialDefinition, DTOs.BaseCredentialIssuer credentialIssuer, OpenidConfigurationResult openidConfigurationResult, CancellationToken cancellationToken)
     {
         var (challenge, verifier) = GeneratePkce();
         var parameters = BuildAuthorizationRequestParameters(didDocument, credentialOffer.Grants.AuthorizedCodeGrant.IssuerState, credentialDefinition, credentialIssuer, challenge);
         var authorizationResult = await _sidServerClient.GetAuthorization(openidConfigurationResult.AuthorizationEndpoint, parameters, cancellationToken);
-        if (authorizationResult == null) return CredentialTokenResult.Nok(Global.BadAuthorizationRequest);
-        var postAuthResult = await ExecutePostAuthorizationRequest(didDocument, privateKey, credentialIssuer, authorizationResult["redirect_uri"], authorizationResult["nonce"], authorizationResult["state"], authorizationResult["response_type"], authorizationResult, cancellationToken);
-        if (!string.IsNullOrWhiteSpace(postAuthResult.errorMessage)) return CredentialTokenResult.Nok(postAuthResult.errorMessage);
-        if(postAuthResult.claims == null) return CredentialTokenResult.Nok(Global.BadPostAuthorizationRequest);
+        if (authorizationResult == null) return (CredentialTokenResult.Nok(Global.BadAuthorizationRequest), false);
+        var responseType = authorizationResult["response_type"];
+        var postAuthResult = await ExecutePostAuthorizationRequest(didDocument, privateKey, credentialIssuer, authorizationResult["redirect_uri"], authorizationResult["nonce"], authorizationResult["state"], responseType, authorizationResult, cancellationToken);
+        if (!string.IsNullOrWhiteSpace(postAuthResult.errorMessage)) return (CredentialTokenResult.Nok(postAuthResult.errorMessage), responseType == SupportedResponseTypes.VpToken);
+        if(postAuthResult.claims == null) return (CredentialTokenResult.Nok(Global.BadPostAuthorizationRequest), responseType == SupportedResponseTypes.VpToken);
         var tokenResult = await _sidServerClient.GetAccessTokenWithAuthorizationCode(openidConfigurationResult.TokenEndpoint, didDocument.Id, postAuthResult.claims["code"], verifier, cancellationToken);
-        if (tokenResult == null) return CredentialTokenResult.Nok(Global.CannotGetTokenWithAuthorizationCode);
-        return CredentialTokenResult.Ok(tokenResult);
+        if (tokenResult == null) return (CredentialTokenResult.Nok(Global.CannotGetTokenWithAuthorizationCode), responseType == SupportedResponseTypes.VpToken);
+        return (CredentialTokenResult.Ok(tokenResult, responseType), responseType == SupportedResponseTypes.VpToken);
     }
 
     private Dictionary<string, string> BuildAuthorizationRequestParameters(DidDocument didDocument,  string issuerState, BaseCredentialDefinitionResult credentialDefinition, DTOs.BaseCredentialIssuer credentialIssuer, string challenge)
@@ -300,10 +309,13 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
 
         securityTokenDescriptor.Claims = claims;
         var token = handler.CreateToken(securityTokenDescriptor);
-        if(responseType == SupportedResponseTypes.IdToken)
-            return (await _sidServerClient.PostAuthorizationRequestWithIdToken(redirectUri, token, state, cancellationToken), null);
-
-        return (await _sidServerClient.PostAuthorizationRequestWithVpToken(redirectUri, token, state, JsonSerializer.Serialize(presentationSubmission), cancellationToken), null); 
+        var res = new Dictionary<string, string>();
+        if (responseType == SupportedResponseTypes.IdToken)
+            res = await _sidServerClient.PostAuthorizationRequestWithIdToken(redirectUri, token, state, cancellationToken);
+        else
+            res = await _sidServerClient.PostAuthorizationRequestWithVpToken(redirectUri, token, state, JsonSerializer.Serialize(presentationSubmission), cancellationToken);
+        if (res.ContainsKey("error_description")) return (null, res["error_description"]);
+        return (res, null);
 
         Dictionary<string, object> BuildIdTokenClaims()
         {
@@ -399,7 +411,7 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         public string ErrorMessage { get; private set; }
         public TokenResult Token { get; private set; }
 
-        public static CredentialTokenResult Ok(TokenResult token) => new CredentialTokenResult { Token = token };
+        public static CredentialTokenResult Ok(TokenResult token, string responseType = null) => new CredentialTokenResult { Token = token };
 
         public static CredentialTokenResult Nok(string errorMessage) => new CredentialTokenResult { ErrorMessage = errorMessage };
     }

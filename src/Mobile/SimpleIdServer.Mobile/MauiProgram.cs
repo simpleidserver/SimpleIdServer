@@ -1,11 +1,17 @@
 ﻿using CommunityToolkit.Maui;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.LifecycleEvents;
 using SimpleIdServer.Mobile.Clients;
 using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
 using SimpleIdServer.Mobile.ViewModels;
+using SimpleIdServer.WalletClient.Stores;
 using ZXing.Net.Maui.Controls;
+
+#if ANDROID
+using SimpleIdServer.Mobile.Handlers;
+#endif
 
 namespace SimpleIdServer.Mobile;
 
@@ -26,6 +32,12 @@ public static class MauiProgram
 
 					});
 				});
+#endif
+			})
+			.ConfigureMauiHandlers(handlers =>
+			{
+#if ANDROID
+				handlers.AddHandler<CollectionView, SidCollectionViewHandler>();
 #endif
 			})
             .UseBarcodeReader()
@@ -66,6 +78,8 @@ public static class MauiProgram
 		builder.Services.AddTransient<WalletViewModel>();
 		builder.Services.AddTransient<PinModalViewModel>();
 		builder.Services.AddTransient<ViewCredentialOfferViewModel>();
+		builder.Services.RemoveAll<IVcStore>();
+		builder.Services.AddTransient<IVcStore, MobileVcStore>();
 		builder.Services.Configure<MobileOptions>(o =>
 		{
 			o.WsServer = "wss://gotify.simpleidserver.com";

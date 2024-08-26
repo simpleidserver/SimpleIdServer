@@ -162,4 +162,7 @@
   <data name="VerifiableCredentialEnrollment" xml:space="preserve">
     <value>VC Enrollment</value>
   </data>
+  <data name="VpPresented" xml:space="preserve">
+    <value>Verifiable presentation has been presented</value>
+  </data>
 </root>

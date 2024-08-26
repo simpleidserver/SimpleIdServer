@@ -21,6 +21,7 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
     private readonly ObservableCollection<CredentialOfferRecord> _credentialOffers = new ObservableCollection<CredentialOfferRecord>();
     private bool _isLoading;
     private (IVerifiableCredentialsService service, string credentialOffer)? _service = null;
+    private Func<Task> _callback;
 
     public ViewCredentialOfferViewModel(
         IServiceProvider serviceProvider,
@@ -67,9 +68,10 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
 
     public ICommand ConfirmCommand { get; private set; }
 
-    public async Task Set((IVerifiableCredentialsService service, string credentialOffer) service)
+    public async Task Set((IVerifiableCredentialsService service, string credentialOffer) service, Func<Task> callback)
     {
         _service = service;
+        _callback = callback;
         await RefreshCommand();
     }
 
@@ -93,6 +95,8 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
                 IsLoading = false;
                 await this.RefreshCommand();
                 await _navigationService.GoBack();
+                if (_callback != null)
+                    await _callback();
             };
             return;
         }
@@ -101,6 +105,8 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
         IsLoading = false;
         await this.RefreshCommand();
         await _navigationService.GoBack();
+        if (_callback != null)
+            await _callback();
     }
 
     private async Task RegisterVc(string pin, CancellationToken cancellationToken)
@@ -120,11 +126,16 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
             if (credResult == null) return;
         }
 
+        if (credResult.Status == CredentialStatus.VP_PRESENTED)
+        {
+            await _promptService.ShowAlert(Global.Success, Global.VpPresented);
+            return;
+        }
+        
         var w3cCred = credResult.VerifiableCredential.W3CCredential;
         var credDef = credResult.VerifiableCredential.CredentialDef;
         var cred = credResult.VerifiableCredential.Credential;
         var firstDisplay = credDef.Display?.FirstOrDefault();
-
         await _verifiableCredentialListState.AddVerifiableCredentialRecord(new VerifiableCredentialRecord
         {
             Id = Guid.NewGuid().ToString(),

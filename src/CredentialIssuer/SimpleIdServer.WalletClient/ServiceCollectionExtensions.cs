@@ -4,6 +4,7 @@ using SimpleIdServer.WalletClient.Clients;
 using SimpleIdServer.WalletClient.CredentialFormats;
 using SimpleIdServer.WalletClient.Factories;
 using SimpleIdServer.WalletClient.Services;
+using SimpleIdServer.WalletClient.Stores;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IVerifiableCredentialResolver, VerifiableCredentialResolver>();
         services.AddTransient<ICredentialFormatter, JwtVcFormatter>();
         services.AddTransient<ICredentialFormatter, LdpVcFormatter>();
+        services.AddTransient<IVcStore, VcStore>();
         services.AddDidKey();
         return services;
     }

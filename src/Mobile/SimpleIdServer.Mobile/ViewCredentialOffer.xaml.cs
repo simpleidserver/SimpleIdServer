@@ -1,5 +1,4 @@
 using SimpleIdServer.Mobile.Models;
-using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
 using SimpleIdServer.Mobile.ViewModels;
 using SimpleIdServer.WalletClient.Services;
@@ -24,7 +23,7 @@ public partial class ViewCredentialOffer : ContentPage
         InitializeComponent();
 	}
 
-	public async Task Load(Dictionary<string, string> parameters)
+	public async Task Load(Dictionary<string, string> parameters, Func<Task> callback)
 	{
         _viewModel.IsLoading = true;
         var res = await _verifiableCredentialResolver.BuildService(parameters, CancellationToken.None);
@@ -32,6 +31,6 @@ public partial class ViewCredentialOffer : ContentPage
         foreach (var credentialId in credentialOffer.CredentialIds)
             _viewModel.CredentialOffers.Add(new CredentialOfferRecord { Title = credentialId });
         _viewModel.IsLoading = false;
-        await _viewModel.Set(res);
+        await _viewModel.Set(res, callback);
     }
 }
