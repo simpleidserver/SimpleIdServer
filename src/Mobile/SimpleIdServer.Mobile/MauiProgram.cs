@@ -73,9 +73,10 @@ public static class MauiProgram
 		builder.Services.AddTransient<ViewCredentialOffer>();
 		builder.Services.AddTransient<ViewCredentialListPage>();
 		builder.Services.AddTransient<QRCodeScannerViewModel>();
+		builder.Services.AddTransient<DidsViewModel>();
         builder.Services.AddTransient<EnrollViewModel>();
-		builder.Services.AddTransient<SettingsPageViewModel>();
 		builder.Services.AddTransient<ViewOtpListViewModel>();
+		builder.Services.AddTransient<ProfileViewModel>();
 		builder.Services.AddTransient<ViewCredentialListViewModel>();
 		builder.Services.AddTransient<NotificationViewModel>();
 		builder.Services.AddTransient<WalletViewModel>();

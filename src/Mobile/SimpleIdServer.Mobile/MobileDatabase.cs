@@ -35,15 +35,25 @@ namespace SimpleIdServer.Mobile
             if (result == CreateTableResult.Created) await _database.InsertAsync(new MobileSettings { Id = Guid.NewGuid().ToString(), NotificationMode = "gotify" });
         }
 
-        public async Task<DidRecord> GetDidRecord()
+        public async Task<List<DidRecord>> GetDidRecords()
         {
-            var result = await _database.Table<DidRecord>().FirstOrDefaultAsync();
+            var result = await _database.Table<DidRecord>().ToListAsync();
             return result;
         }
 
         public async Task AddDidRecord(DidRecord didRecord)
         {
             await _database.InsertAsync(didRecord);
+        }
+
+        public async Task RemoveDidRecord(DidRecord didRecord)
+        {
+            await _database.DeleteAsync(didRecord);
+        }
+
+        public async Task UpdateDidRecords(IEnumerable<DidRecord> didRecords)
+        {
+            await _database.UpdateAllAsync(didRecords);
         }
 
         public async Task<List<VerifiableCredentialRecord>> GetVerifiableCredentials()

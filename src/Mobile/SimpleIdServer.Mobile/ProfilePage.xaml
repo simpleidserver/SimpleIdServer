@@ -1,18 +1,40 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
+             x:DataType="local:ProfileViewModel"
              x:Class="SimpleIdServer.Mobile.ProfilePage"
              Title="ProfilePage">
-    <StackLayout>
-        <StackLayout Orientation="Horizontal">
-            <StackLayout>
-                <Label>Notification mode</Label>
+    <Grid>
+        <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
+        <StackLayout Spacing="5">
+            <StackLayout Spacing="10" Padding="10">
+                <Label FontAttributes="Bold">Notification mode</Label>
+                <Picker ItemsSource="{Binding Path=NotificationModes}" ItemDisplayBinding="{Binding Path=DisplayName}" SelectedItem="{Binding Path=SelectedNotificationMode}">
+                    <Picker.Behaviors>
+                        <toolkit:EventToCommandBehavior EventName="SelectedIndexChanged" Command="{Binding SelectNotificationModeCommand}" />
+                    </Picker.Behaviors>
+                </Picker>
             </StackLayout>
-            <StackLayout>
-                <Label>Gotify server status</Label>
-                <Label>Running</Label>
+            <BoxView HeightRequest="1" Color="Black"></BoxView>
+            <StackLayout Spacing="10" Padding="10">
+                <Label FontAttributes="Bold">Gotify server status</Label>
+                <Label>
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="true">
+                            <Setter Property="Text">Running</Setter>
+                            <Setter Property="TextColor">Green</Setter>
+                        </DataTrigger>
+                        <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="false">
+                            <Setter Property="Text">Stopped</Setter>
+                            <Setter Property="TextColor">Red</Setter>
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
             </StackLayout>
+            <BoxView HeightRequest="1" Color="Black"></BoxView>
         </StackLayout>
-        <BoxView Margin="0,5" Color="Black"></BoxView>
-    </StackLayout>
+    </Grid>
 </ContentPage>

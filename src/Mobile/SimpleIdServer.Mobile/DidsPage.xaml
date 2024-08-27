@@ -1,23 +1,48 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             x:DataType="local:DidsViewModel"
              x:Class="SimpleIdServer.Mobile.DidsPage"
+             xmlns:models="clr-namespace:SimpleIdServer.Mobile.Models"
+             xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
              Title="DidsPage">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Text="Active"></ToolbarItem>
-        <ToolbarItem Order="Primary" Text="Delete"></ToolbarItem>
+        <ToolbarItem Order="Primary" Text="Add" Command="{Binding Path=AddCommand}"></ToolbarItem>
+        <ToolbarItem Order="Primary" Text="Active" Command="{Binding Path=SetActiveCommand}"></ToolbarItem>
+        <ToolbarItem Order="Primary" Text="Delete" Command="{Binding Path=DeleteCommand}"></ToolbarItem>
     </ContentPage.ToolbarItems>
-    <StackLayout Spacing="5">
-        <Grid>
-            <Frame Margin="5">
-                <StackLayout Orientation="Horizontal">
-                    <StackLayout Orientation="Vertical" HorizontalOptions="StartAndExpand">
-                        <Label>Creation date: 26-08-2024</Label>
-                        <Label>Type : did-key</Label>
-                    </StackLayout>
-                    <Button HorizontalOptions="End" Text="Copy"></Button>
-                </StackLayout>
-            </Frame>
-        </Grid>
-    </StackLayout>
+    <Grid Margin="20">
+        <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
+        <CollectionView ItemsSource="{Binding Path=Dids}">
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid x:DataType="models:DidRecord">
+                        <BoxView HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ZIndex="2" Color="Transparent">
+                            <BoxView.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:DidsViewModel}}, Path=SelectCommand}" CommandParameter="{Binding .}" />
+                            </BoxView.GestureRecognizers>
+                        </BoxView>
+                        <Frame Margin="5">
+                            <StackLayout Orientation="Horizontal">
+                                <StackLayout Orientation="Vertical" HorizontalOptions="StartAndExpand">
+                                    <Label Text="{Binding Path=DisplayName}"></Label>
+                                </StackLayout>
+                                <ImageButton HorizontalOptions="End" Source="copy.svg" WidthRequest="20" Command="{Binding Source={RelativeSource AncestorType={x:Type local:DidsViewModel}}, Path=CopyCommand}" CommandParameter="{Binding .}"></ImageButton>
+                            </StackLayout>
+                            <Frame.Style>
+                                <Style TargetType="Frame">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=IsSelected}" TargetType="Frame">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource Yellow100Accent}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Frame.Style>
+                        </Frame>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
 </ContentPage>

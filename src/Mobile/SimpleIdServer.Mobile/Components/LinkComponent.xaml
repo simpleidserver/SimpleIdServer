@@ -5,19 +5,12 @@
              xmlns:local="clr-namespace:SimpleIdServer.Mobile.Components"
              x:Class="SimpleIdServer.Mobile.Components.LinkComponent"
              x:Name="this">
-    <Grid BindingContext="{x:Reference this}">
-        <BoxView HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ZIndex="2">
-            <BoxView.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding NavigateCommand}" />
-            </BoxView.GestureRecognizers>
-        </BoxView>
-        <Frame Margin="5">
-            <StackLayout Orientation="Horizontal">
-                <Image WidthRequest="20" Source="{Binding Path=Source}" HorizontalOptions="Start"></Image>
-                <Label Padding="5,0,0,0" HorizontalOptions="StartAndExpand" Text="{Binding Path=Title}"></Label>
-                <Image WidthRequest="20" Source="rightarrow.svg" HorizontalOptions="End">
-                </Image>
-            </StackLayout>
-        </Frame>
-    </Grid>
+    <Border Margin="5" BindingContext="{x:Reference this}">
+        <StackLayout Orientation="Horizontal" Padding="10,20,10,20">
+            <Image WidthRequest="20" Source="{Binding Path=Source}" HorizontalOptions="Start"></Image>
+            <Label Padding="5,0,0,0" HorizontalOptions="StartAndExpand" Text="{Binding Path=Title}"></Label>
+            <ImageButton HeightRequest="20" WidthRequest="20" Source="rightarrow.svg" Command="{Binding NavigateCommand}" HorizontalOptions="End">
+            </ImageButton>
+        </StackLayout>
+    </Border>
 </ContentView>

@@ -32,7 +32,6 @@ public class QRCodeScannerViewModel
     private readonly CredentialListState _credentialListState;
     private readonly VerifiableCredentialListState _verifiableCredentialListState;
     private readonly MobileSettingsState _mobileSettingsState;
-    private readonly DidRecordState _didState;
     private readonly MobileOptions _options;
     private SemaphoreSlim _lck = new SemaphoreSlim(1, 1);
 
@@ -46,7 +45,6 @@ public class QRCodeScannerViewModel
         CredentialListState credentialListState,
         VerifiableCredentialListState verifiableCredentialListState,
         MobileSettingsState mobileSettingsState,
-        DidRecordState didState,
         IOptions<MobileOptions> options)
     {
         _promptService = promptService;
@@ -57,7 +55,6 @@ public class QRCodeScannerViewModel
         _otpListState = otpListState;
         _credentialListState = credentialListState;
         _verifiableCredentialListState = verifiableCredentialListState;
-        _didState = didState;
         _mobileSettingsState = mobileSettingsState;
         _navigationService = navigationService;
         CloseCommand = new Command(async () =>

@@ -1,4 +1,5 @@
 ﻿using SimpleIdServer.Mobile.Models;
+using System.Collections.ObjectModel;
 
 namespace SimpleIdServer.Mobile.Stores;
 
@@ -13,14 +14,28 @@ public class DidRecordState
 
     public async Task Load()
     {
-        Did = await _mobileDatabase.GetDidRecord();
+        var didRecords = await _mobileDatabase.GetDidRecords();
+        foreach(var didRecord in didRecords) Dids.Add(didRecord);
+        ActiveDid = didRecords.SingleOrDefault(d => d.IsActive);
     }
 
-    public async Task Update(DidRecord did)
+    public async Task Add(DidRecord did)
     {
         await _mobileDatabase.AddDidRecord(did);
-        Did = did;
+        Dids.Add(did);
     }
 
-    public DidRecord Did { get; set; }
+    public async Task Delete(DidRecord did)
+    {
+        await _mobileDatabase.RemoveDidRecord(did);
+        Dids.Remove(did);
+    }
+
+    public async Task Update(IEnumerable<DidRecord> didRecords)
+    {
+        await _mobileDatabase.UpdateDidRecords(didRecords);
+    }
+
+    public ObservableCollection<DidRecord> Dids { get; set; } = new ObservableCollection<DidRecord>();
+    public DidRecord ActiveDid { get; set; }
 }

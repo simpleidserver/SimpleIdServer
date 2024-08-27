@@ -5,60 +5,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:SimpleIdServer.Mobile.Components"
              x:Class="SimpleIdServer.Mobile.SettingsPage">
-    <!--
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <converters:ToggledEventArgsConverter x:Key="toggledEventArgsConverter" />
-            <toolkit:IsStringNullOrEmptyConverter x:Key="IsStringNullOrEmptyConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-    -->
     <StackLayout Spacing="5">
         <local:LinkComponent Title="Profile" Source="profile.svg" Url="//settings/profile" />
         <local:LinkComponent Title="Distributed Identity Keys" Source="key.svg" Url="//settings/dids" />
         <local:LinkComponent Title="Info" Source="info.svg" Url="//settings/info" />
     </StackLayout>
-    <!--
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <Label Text="Choose notification mode" VerticalOptions="Center" Grid.Column="0"></Label>
-        <Picker Grid.Column="1" ItemsSource="{Binding Path=NotificationModes}" ItemDisplayBinding="{Binding Path=DisplayName}" SelectedItem="{Binding Path=SelectedNotificationMode}">
-            <Picker.Behaviors>
-                <toolkit:EventToCommandBehavior EventName="SelectedIndexChanged" Command="{Binding SelectNotificationModeCommand}" />
-            </Picker.Behaviors>
-        </Picker>
-
-        <Label Grid.Row="1" Grid.ColumnSpan="2">
-            <Label.Triggers>
-                <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="true">
-                    <Setter Property="Text">Gotify server is up and running</Setter>
-                    <Setter Property="TextColor">Green</Setter>
-                </DataTrigger>
-                <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="false">
-                    <Setter Property="Text">Gotify server is not running</Setter>
-                    <Setter Property="TextColor">Red</Setter>
-                </DataTrigger>
-            </Label.Triggers>
-        </Label>
-
-        <Button Text="Generate Did key" HorizontalOptions="Fill" Command="{Binding Path=GenerateDidKeyCommand}" Grid.Row="2" Grid.ColumnSpan="2" />
-        <Label Grid.Row="3" Grid.ColumnSpan="2" Text="{Binding Path=Did}" TextColor="Green">
-            <Label.Triggers>
-                <DataTrigger TargetType="Label" Binding="{Binding Did, Converter={StaticResource IsStringNullOrEmptyConverter}}" Value="true">
-                    <Setter Property="Text">There is no Did</Setter>
-                    <Setter Property="TextColor">Red</Setter>
-                </DataTrigger>
-            </Label.Triggers>
-        </Label>
-    </Grid>
-    -->
 </ContentPage>

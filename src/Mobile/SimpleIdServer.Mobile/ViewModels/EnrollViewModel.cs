@@ -1,5 +1,4 @@
-﻿using SimpleIdServer.Mobile.Models;
-using SimpleIdServer.Mobile.Services;
+﻿using SimpleIdServer.Mobile.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
@@ -8,9 +7,8 @@ namespace SimpleIdServer.Mobile.ViewModels;
 
 public class EnrollViewModel : INotifyPropertyChanged
 {
-    public EnrollViewModel(SettingsPageViewModel settings, INavigationService navigationService)
+    public EnrollViewModel(INavigationService navigationService)
     {
-        Settings = settings;
         ScanQRCodeCommand = new Command(async () =>
         {
             await navigationService.DisplayModal<QRCodeScannerPage>();
@@ -26,8 +24,6 @@ public class EnrollViewModel : INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
-
-    public SettingsPageViewModel Settings { get; private set; }
 
     public ICommand ScanQRCodeCommand { get; private set; }
 

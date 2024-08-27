@@ -111,7 +111,7 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
 
     private async Task RegisterVc(string pin, CancellationToken cancellationToken)
     {
-        var didRecord = _didState.Did;
+        var didRecord = _didState.ActiveDid;
         var privateKey = SignatureKeySerializer.Deserialize(didRecord.SerializedPrivateKey);
         var credResult = await _service.Value.service.Request(_service.Value.credentialOffer, didRecord.Did, privateKey, pin, cancellationToken);
         if (credResult.Status == CredentialStatus.ERROR)

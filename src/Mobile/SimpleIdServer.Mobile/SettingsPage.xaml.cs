@@ -1,13 +1,9 @@
-﻿using SimpleIdServer.Mobile.ViewModels;
-
-namespace SimpleIdServer.Mobile;
+﻿namespace SimpleIdServer.Mobile;
 
 public partial class SettingsPage : ContentPage
 {
-	public SettingsPage(SettingsPageViewModel viewModel)
+	public SettingsPage()
 	{
-		BindingContext = viewModel;
 		InitializeComponent();
-		viewModel.Start();
 	}
 }
