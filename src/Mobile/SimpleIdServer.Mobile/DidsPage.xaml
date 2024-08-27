@@ -4,9 +4,10 @@
              xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
              x:DataType="local:DidsViewModel"
              x:Class="SimpleIdServer.Mobile.DidsPage"
+             xmlns:components="clr-namespace:SimpleIdServer.Mobile.Components"
              xmlns:models="clr-namespace:SimpleIdServer.Mobile.Models"
              xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
-             Title="DidsPage">
+             Title="DIDs">
     <ContentPage.ToolbarItems>
         <ToolbarItem Order="Primary" Text="Add" Command="{Binding Path=AddCommand}"></ToolbarItem>
         <ToolbarItem Order="Primary" Text="Active" Command="{Binding Path=SetActiveCommand}"></ToolbarItem>
@@ -17,30 +18,47 @@
         <CollectionView ItemsSource="{Binding Path=Dids}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid x:DataType="models:DidRecord">
-                        <BoxView HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand" ZIndex="2" Color="Transparent">
-                            <BoxView.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:DidsViewModel}}, Path=SelectCommand}" CommandParameter="{Binding .}" />
-                            </BoxView.GestureRecognizers>
-                        </BoxView>
-                        <Frame Margin="5">
-                            <StackLayout Orientation="Horizontal">
-                                <StackLayout Orientation="Vertical" HorizontalOptions="StartAndExpand">
-                                    <Label Text="{Binding Path=DisplayName}"></Label>
-                                </StackLayout>
-                                <ImageButton HorizontalOptions="End" Source="copy.svg" WidthRequest="20" Command="{Binding Source={RelativeSource AncestorType={x:Type local:DidsViewModel}}, Path=CopyCommand}" CommandParameter="{Binding .}"></ImageButton>
+                    <Border Margin="5" x:DataType="models:DidRecord">
+                        <StackLayout>
+                            <!-- Display is active badge -->
+                            <StackLayout Orientation="Horizontal" Padding="0,2,2,0">
+                                <components:Badge Title="Default" HorizontalOptions="EndAndExpand" />
+                                <StackLayout.Style>
+                                    <Style TargetType="StackLayout">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=IsActive}" Value="True" TargetType="StackLayout">
+                                                <Setter Property="IsVisible" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                        <Setter Property="IsVisible" Value="Hidden" />
+                                    </Style>
+                                </StackLayout.Style>
                             </StackLayout>
-                            <Frame.Style>
-                                <Style TargetType="Frame">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Path=IsSelected}" TargetType="Frame">
-                                            <Setter Property="BackgroundColor" Value="{StaticResource Yellow100Accent}" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Frame.Style>
-                        </Frame>
-                    </Grid>
+                            <!-- Display information -->
+                            <StackLayout Orientation="Horizontal" Padding="10,20,10,20">
+                                <StackLayout HorizontalOptions="StartAndExpand" Orientation="Horizontal">                                    
+                                    <Label HorizontalOptions="StartAndExpand" Text="{Binding Path=DisplayName}" />
+                                    <StackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type local:DidsViewModel}}, Path=SelectCommand}" CommandParameter="{Binding .}" />
+                                    </StackLayout.GestureRecognizers>
+                                </StackLayout>
+                                <Button Text="Copy" HorizontalOptions="End" ImageSource="copy.png" Command="{Binding Source={RelativeSource AncestorType={x:Type local:DidsViewModel}}, Path=CopyCommand}" CommandParameter="{Binding .}"></Button>
+                            </StackLayout>
+                        </StackLayout>
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=IsActive}" Value="True" TargetType="Border">
+                                        <Setter Property="Stroke" Value="{StaticResource Success}" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=IsSelected}" Value="True" TargetType="Border">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource Yellow100Accent}" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="BackgroundColor" Value="Transparent"></Setter>
+                            </Style>
+                        </Border.Style>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

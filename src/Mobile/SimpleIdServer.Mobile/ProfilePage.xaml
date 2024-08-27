@@ -6,7 +6,7 @@
              xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
              x:DataType="local:ProfileViewModel"
              x:Class="SimpleIdServer.Mobile.ProfilePage"
-             Title="ProfilePage">
+             Title="Profile">
     <Grid>
         <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
         <StackLayout Spacing="5">
@@ -18,7 +18,7 @@
                     </Picker.Behaviors>
                 </Picker>
             </StackLayout>
-            <BoxView HeightRequest="1" Color="Black"></BoxView>
+            <BoxView Style="{StaticResource separator}"></BoxView>
             <StackLayout Spacing="10" Padding="10">
                 <Label FontAttributes="Bold">Gotify server status</Label>
                 <Label>
@@ -34,7 +34,7 @@
                     </Label.Triggers>
                 </Label>
             </StackLayout>
-            <BoxView HeightRequest="1" Color="Black"></BoxView>
+            <BoxView Style="{StaticResource separator}"></BoxView>
         </StackLayout>
     </Grid>
 </ContentPage>

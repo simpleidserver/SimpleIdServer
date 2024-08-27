@@ -29,9 +29,10 @@ public class DidsViewModel : INotifyPropertyChanged
             var activeDid = Dids.Single(d => d.IsSelected);
             await _didRecordState.Delete(activeDid);
             IsLoading = false;
+            RefreshCommands();
         }, () =>
         {
-            return Dids.Any(d => d.IsSelected);
+            return Dids.Any() && Dids.Any(d => d.IsSelected);
         });
         SetActiveCommand = new Command(async () =>
         {
@@ -46,7 +47,7 @@ public class DidsViewModel : INotifyPropertyChanged
             IsLoading = false;
         }, () =>
         {
-            return Dids.Any(d => d.IsSelected);
+            return Dids.Any() && Dids.Any(d => d.IsSelected);
         });
         CopyCommand = new Command<DidRecord>(async (d) =>
         {
@@ -57,6 +58,8 @@ public class DidsViewModel : INotifyPropertyChanged
             foreach (var did in Dids)
                 did.IsSelected = false;
             d.IsSelected = true;
+            OnPropertyChanged(nameof(Dids));
+            RefreshCommands();
         });
     }
 
@@ -94,4 +97,10 @@ public class DidsViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    private void RefreshCommands()
+    {
+        ((Command)SetActiveCommand).ChangeCanExecute();
+        ((Command)DeleteCommand).ChangeCanExecute();
+    }
 }

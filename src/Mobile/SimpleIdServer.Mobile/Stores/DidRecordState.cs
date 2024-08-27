@@ -16,7 +16,7 @@ public class DidRecordState
     {
         var didRecords = await _mobileDatabase.GetDidRecords();
         foreach(var didRecord in didRecords) Dids.Add(didRecord);
-        ActiveDid = didRecords.SingleOrDefault(d => d.IsActive);
+        ActiveDid = didRecords.FirstOrDefault(d => d.IsActive);
     }
 
     public async Task Add(DidRecord did)

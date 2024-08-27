@@ -146,6 +146,9 @@
 	  <MauiXaml Update="Common\Loader.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Components\Badge.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Components\LinkComponent.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

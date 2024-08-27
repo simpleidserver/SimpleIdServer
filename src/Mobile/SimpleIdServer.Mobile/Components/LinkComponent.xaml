@@ -5,12 +5,14 @@
              xmlns:local="clr-namespace:SimpleIdServer.Mobile.Components"
              x:Class="SimpleIdServer.Mobile.Components.LinkComponent"
              x:Name="this">
-    <Border Margin="5" BindingContext="{x:Reference this}">
+    <Border Margin="5">
         <StackLayout Orientation="Horizontal" Padding="10,20,10,20">
             <Image WidthRequest="20" Source="{Binding Path=Source}" HorizontalOptions="Start"></Image>
-            <Label Padding="5,0,0,0" HorizontalOptions="StartAndExpand" Text="{Binding Path=Title}"></Label>
-            <ImageButton HeightRequest="20" WidthRequest="20" Source="rightarrow.svg" Command="{Binding NavigateCommand}" HorizontalOptions="End">
-            </ImageButton>
+            <Label Padding="5,10,0,0" HorizontalOptions="StartAndExpand" Text="{Binding Path=Title}"></Label>
+            <Image WidthRequest="20" Source="rightarrow.svg" HorizontalOptions="End" />
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding Path=NavigateCommand}" />
+            </StackLayout.GestureRecognizers>
         </StackLayout>
     </Border>
 </ContentView>

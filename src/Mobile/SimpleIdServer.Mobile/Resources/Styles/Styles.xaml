@@ -21,6 +21,11 @@
         <Setter Property="Source" Value="minimize.png"></Setter>
     </Style>
 
+    <Style x:Key="separator" TargetType="BoxView">
+        <Setter Property="HeightRequest" Value="1" />
+        <Setter Property="Color" Value="{StaticResource Gray200}" />
+    </Style>
+
     <Style x:Key="modalToolbarTitle" TargetType="Label">
         <Setter Property="TextColor" Value="{StaticResource White}"></Setter>
         <Setter Property="VerticalOptions" Value="Center"></Setter>
@@ -38,6 +43,13 @@
         <Setter Property="FontAttributes" Value="Bold"></Setter>
     </Style>
 
+    <Style x:Key="successBadge" TargetType="Border">
+        <Setter Property="BackgroundColor" Value="{StaticResource Success}"></Setter>
+        <Setter Property="Border.StrokeShape">
+            <RoundRectangle CornerRadius="5"></RoundRectangle>
+        </Setter>
+    </Style>
+    
     <Style x:Key="vcDescription" TargetType="Label">
         <Setter Property="FontAttributes" Value="Italic"></Setter>
     </Style>

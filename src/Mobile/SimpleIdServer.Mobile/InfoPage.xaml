@@ -2,27 +2,27 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SimpleIdServer.Mobile.InfoPage"
-             Title="InfoPage">
+             Title="Info">
     <StackLayout Spacing="5">
         <StackLayout Spacing="10" Padding="10">
             <Label FontAttributes="Bold">URL</Label>
             <Label>https://github.com/simpleidserver/SimpleIdServer</Label>
         </StackLayout>
-        <BoxView HeightRequest="1" Color="Black"></BoxView>
+        <BoxView Style="{StaticResource separator}"></BoxView>
         <StackLayout Padding="10" Spacing="10">
             <Label FontAttributes="Bold">LICENSE</Label>
             <Label>Apache 2.0</Label>
         </StackLayout>
-        <BoxView HeightRequest="1" Color="Black"></BoxView>
+        <BoxView Style="{StaticResource separator}"></BoxView>
         <StackLayout Padding="10" Spacing="10">
             <Label FontAttributes="Bold">COMPANY</Label>
             <Label>Lokit - 0794.185.124</Label>
         </StackLayout>
-        <BoxView HeightRequest="1" Color="Black"></BoxView>
+        <BoxView Style="{StaticResource separator}"></BoxView>
         <StackLayout Padding="10" Spacing="10">
             <Label FontAttributes="Bold">EMAIL</Label>
             <Label>agentsimpleidserver@gmail.com</Label>
         </StackLayout>
-        <BoxView HeightRequest="1" Color="Black"></BoxView>
+        <BoxView Style="{StaticResource separator}"></BoxView>
     </StackLayout>
 </ContentPage>

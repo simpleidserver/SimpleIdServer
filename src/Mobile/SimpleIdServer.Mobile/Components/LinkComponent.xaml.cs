@@ -12,14 +12,13 @@ public partial class LinkComponent : ContentView, INotifyPropertyChanged
 	public LinkComponent()
 	{
 		InitializeComponent();
-		NavigateCommand = new Command((async () =>
-		{
-			await Shell.Current.GoToAsync(_url);
-		}));
-	}
-
-	public ICommand NavigateCommand { get; private set; }
-
+		NavigateCommand = new Command(async () =>
+        {
+            await Shell.Current.GoToAsync(_url);
+        });
+        BindingContext = this;
+    }
+    public ICommand NavigateCommand { get; private set; }
 
     public string Title
 	{

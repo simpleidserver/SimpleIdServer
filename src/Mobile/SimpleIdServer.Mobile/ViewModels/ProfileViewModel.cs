@@ -24,8 +24,9 @@ public class ProfileViewModel : INotifyPropertyChanged
             await UpdateNotification(c);
         });
         _cancellationTokenSource = new CancellationTokenSource();
-        /*
         var listener = GotifyNotificationListener.New();
+        var notificationMode = _mobileSettingsState.Settings.NotificationMode;
+        SelectedNotificationMode = NotificationModes.Single(m => m.Name == notificationMode);
         Task.Run(async () =>
         {
             while (true)
@@ -35,7 +36,6 @@ public class ProfileViewModel : INotifyPropertyChanged
                 await Task.Delay(_refreshIntervalMs);
             }
         });
-        */
     }
 
     public ICommand SelectNotificationModeCommand { get; private set; }
