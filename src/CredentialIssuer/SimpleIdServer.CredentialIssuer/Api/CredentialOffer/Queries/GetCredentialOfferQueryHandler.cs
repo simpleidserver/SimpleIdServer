@@ -96,7 +96,7 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
     private async Task<EsbiCredentialOfferResult> ToEsbiOfferDtoResult(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer, CancellationToken cancellationToken)
     {
         var result = new EsbiCredentialOfferResult();
-        var credentialConfigurations = await _credentialConfigurationStore.GetByServerIds(credentialOffer.CredentialConfigurationIds, cancellationToken);
+        var credentialConfigurations = await _credentialConfigurationStore.Get(credentialOffer.CredentialConfigurationIds, cancellationToken);
         Enrich(result, credentialOffer, issuer, authorizationServer);
         result.Credentials = credentialConfigurations.Select(c =>
         {

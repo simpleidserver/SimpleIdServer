@@ -7,6 +7,7 @@ namespace SimpleIdServer.CredentialIssuer.Store;
 
 public interface ICredentialConfigurationStore
 {
+    Task<List<CredentialConfiguration>> Get(List<string> ids, CancellationToken cancellationToken);
     Task<List<CredentialConfiguration>> GetAll(CancellationToken cancellationToken);
     Task<CredentialConfiguration> GetByTypeAndFormat(string type, string format, CancellationToken cancellationToken);
     Task<CredentialConfiguration> GetByServerId(string id, CancellationToken cancellationToken);
@@ -24,6 +25,15 @@ public class CredentialConfigurationStore : ICredentialConfigurationStore
     public CredentialConfigurationStore(CredentialIssuerDbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public Task<List<CredentialConfiguration>> Get(List<string> ids, CancellationToken cancellationToken)
+    {
+        return _dbContext.CredentialConfigurations
+            .Include(c => c.Claims).ThenInclude(c => c.Translations)
+            .Include(c => c.Displays)
+            .Where(c => ids.Contains(c.Id))
+            .ToListAsync();
     }
 
     public Task<CredentialConfiguration> Get(string id, CancellationToken cancellationToken)
