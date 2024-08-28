@@ -18,9 +18,9 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer.Queries;
 
 public interface IGetCredentialOfferQueryHandler
 {
-    CredentialOfferResult Get(GetCredentialOfferQuery query, string authorizationServer);
+    Task<BaseCredentialOfferResult> Get(GetCredentialOfferQuery query, string authorizationServer, CancellationToken cancellationToken);
     Task<byte[]> GetQrCode(GetCredentialOfferQuery query, string authorizationServer, CancellationToken cancellationToken);
-    Task<BaseCredentialOfferRecordResult> ToDto(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer, CancellationToken cancellationToken);
+    Task<CredentialOfferRecordResult> ToDto(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer, CancellationToken cancellationToken);
 }
 
 public class GetCredentialOfferQuery
@@ -40,9 +40,14 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
         _credentialConfigurationStore = credentialConfigurationStore;
     }
 
-    public CredentialOfferResult Get(GetCredentialOfferQuery query, string authorizationServer)
+    public async Task<BaseCredentialOfferResult> Get(GetCredentialOfferQuery query, string authorizationServer, CancellationToken cancellationToken)
     {
-        return ToOfferDtoResult(query.CredentialOffer, query.Issuer, authorizationServer);
+        if (_options.Version == CredentialIssuerVersion.LAST)
+        {
+            return ToLastOfferDtoResult(query.CredentialOffer, query.Issuer, authorizationServer);
+        }
+        
+        return await ToEsbiOfferDtoResult(query.CredentialOffer, query.Issuer, authorizationServer, cancellationToken);
     }
 
     public async Task<byte[]> GetQrCode(GetCredentialOfferQuery query, string authorizationServer, CancellationToken cancellationToken)
@@ -54,93 +59,97 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
         return qrCode.GetGraphic(20);
     }
 
-    public async Task<BaseCredentialOfferRecordResult> ToDto(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer, CancellationToken cancellationToken)
+    public async Task<CredentialOfferRecordResult> ToDto(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer, CancellationToken cancellationToken)
     {
-        BaseCredentialOfferRecordResult result = null;
+        var result = new CredentialOfferRecordResult
+        {
+            Id = credentialOffer.Id,
+            CredentialConfigurationIds = credentialOffer.CredentialConfigurationIds,
+            GrantTypes = credentialOffer.GrantTypes,
+            Subject = credentialOffer.Subject,
+            CreateDateTime = credentialOffer.CreateDateTime,
+        };
         if (_options.Version == CredentialIssuerVersion.LAST)
         {
-            result = new LastCredentialOfferRecordResult
-            {
-                CredentialConfigurationIds = credentialOffer.CredentialConfigurationIds
-            };
+            result.Offer = ToLastOfferDtoResult(credentialOffer, issuer, authorizationServer);
         }
         else
         {
-            var credentialConfigurations = await _credentialConfigurationStore.GetByServerIds(credentialOffer.CredentialConfigurationIds, cancellationToken);
-            result = new EsbiCredentialOfferResult
-            {
-                Credentials = credentialConfigurations.Select(c =>
-                {
-                    var types = new List<string>();
-                    if (c.AdditionalTypes != null)
-                        types.AddRange(c.AdditionalTypes);
-                    types.Add(c.Type);
-                    return new EsbiCredential
-                    {
-                        Format = c.Format,
-                        Types = types
-                    };
-                }).ToList()
-            };
+            result.Offer = await ToEsbiOfferDtoResult(credentialOffer, issuer, authorizationServer, cancellationToken);
         }
 
-        Enrich(result);
+        if (_options.IsCredentialOfferReturnedByReference)
+            result.OfferUri = SerializeByReference(result, issuer);
+        else
+            result.OfferUri = SerializeByValue(result);
+
         return result;
-
-        void Enrich(BaseCredentialOfferRecordResult r)
-        {
-            r.Id = credentialOffer.Id;
-            r.GrantTypes = credentialOffer.GrantTypes;
-            r.Subject = credentialOffer.Subject;
-            r.CreateDateTime = credentialOffer.CreateDateTime;
-            r.Offer = ToOfferDtoResult(credentialOffer, issuer, authorizationServer);
-            if (_options.IsCredentialOfferReturnedByReference)
-                r.OfferUri = SerializeByReference(r, issuer);
-            else
-                r.OfferUri = SerializeByValue(r);
-        }
     }
 
-    private CredentialOfferResult ToOfferDtoResult(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer)
+    private LastCredentialOfferResult ToLastOfferDtoResult(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer)
     {
+        var result = new LastCredentialOfferResult();
+        Enrich(result, credentialOffer, issuer, authorizationServer);
+        return result;
+    }
+
+    private async Task<EsbiCredentialOfferResult> ToEsbiOfferDtoResult(CredentialOfferRecord credentialOffer, string issuer, string authorizationServer, CancellationToken cancellationToken)
+    {
+        var result = new EsbiCredentialOfferResult();
+        var credentialConfigurations = await _credentialConfigurationStore.GetByServerIds(credentialOffer.CredentialConfigurationIds, cancellationToken);
+        Enrich(result, credentialOffer, issuer, authorizationServer);
+        result.Credentials = credentialConfigurations.Select(c =>
+        {
+            var types = new List<string>();
+            if (c.AdditionalTypes != null)
+                types.AddRange(c.AdditionalTypes);
+            types.Add(c.Type);
+            return new EsbiCredential
+            {
+                Format = c.Format,
+                Types = types
+            };
+        }).ToList();
+        return result;
+    }
+
+    private void Enrich(BaseCredentialOfferResult credentialOffer, CredentialOfferRecord credentialOfferRecord, string issuer, string authorizationServer)
+    {
+        var result = new LastCredentialOfferResult();
         AuthorizedCodeGrant authorizedCodeGrant = null;
         PreAuthorizedCodeGrant preAuthorizedCodeGrant = null;
-        if (credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.AuthorizedCodeGrant))
+        if (credentialOfferRecord.GrantTypes.Contains(CredentialOfferResultNames.AuthorizedCodeGrant))
         {
             authorizedCodeGrant = new AuthorizedCodeGrant
             {
-                IssuerState = credentialOffer.IssuerState
+                IssuerState = credentialOfferRecord.IssuerState
             };
         }
 
-        if (credentialOffer.GrantTypes.Contains(CredentialOfferResultNames.PreAuthorizedCodeGrant))
+        if (credentialOfferRecord.GrantTypes.Contains(CredentialOfferResultNames.PreAuthorizedCodeGrant))
         {
             preAuthorizedCodeGrant = new PreAuthorizedCodeGrant
             {
-                PreAuthorizedCode = credentialOffer.PreAuthorizedCode,
+                PreAuthorizedCode = credentialOfferRecord.PreAuthorizedCode,
                 AuthorizationServer = authorizationServer
             };
         }
 
-        return new CredentialOfferResult
+        credentialOffer.CredentialIssuer = issuer;
+        credentialOffer.Grants = new CredentialOfferGrants
         {
-            CredentialIssuer = issuer,
-            CredentialConfigurationIds = credentialOffer.CredentialConfigurationIds,
-            Grants = new CredentialOfferGrants
-            {
-                AuthorizedCodeGrant = authorizedCodeGrant,
-                PreAuthorizedCodeGrant = preAuthorizedCodeGrant
-            }
+            AuthorizedCodeGrant = authorizedCodeGrant,
+            PreAuthorizedCodeGrant = preAuthorizedCodeGrant
         };
     }
 
-    private string SerializeByReference<T>(T offerRecord, string issuer) where T : BaseCredentialOfferRecordResult
+    private string SerializeByReference<T>(T offerRecord, string issuer) where T : CredentialOfferRecordResult
     {
         var url = $"{issuer}/{Constants.EndPoints.CredentialOffer}/{offerRecord.Id}";
         return $"openid-credential-offer://?credential_offer_uri={url}";
     }
 
-    private string SerializeByValue<T>(T offerRecord) where T : BaseCredentialOfferRecordResult
+    private string SerializeByValue<T>(T offerRecord) where T : CredentialOfferRecordResult
     {
         var json = JsonSerializer.Serialize(offerRecord.Offer);
         var encodedJson = HttpUtility.UrlEncode(json);

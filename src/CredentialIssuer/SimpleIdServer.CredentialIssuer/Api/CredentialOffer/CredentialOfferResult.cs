@@ -1,12 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.CredentialIssuer.DTOs;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
 {
-    public class CredentialOfferResult
+    public class BaseCredentialOfferResult
     {
         /// <summary>
         /// The Credential Issuer URL of the Credential Issuer, the Wallet is requested to obtain one or more Credentials from
@@ -14,16 +15,33 @@ namespace SimpleIdServer.IdServer.CredentialIssuer.Api.CredentialOffer
         [JsonPropertyName(CredentialOfferResultNames.CredentialIssuer)]
         public string CredentialIssuer { get; set; } = null!;
         /// <summary>
-        /// Array of unique strings that each identify one of the keys in the name/value pairs stored in the credential_configurations_supported Credential Issuer metadata.
-        /// </summary>
-        [JsonPropertyName(CredentialOfferResultNames.CredentialConfigurationIds)]
-        public ICollection<string> CredentialConfigurationIds { get; set; } = new List<string>();
-        /// <summary>
         /// A JSON object indicating to the Wallet the Grant Types the Credential Issuer's AS is prepared to process for this credential offer.
         /// </summary>
         [JsonPropertyName(CredentialOfferResultNames.Grants)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public CredentialOfferGrants Grants { get; set; } = null;
+    }
+
+    public class LastCredentialOfferResult : BaseCredentialOfferResult
+    {
+        /// <summary>
+        /// Array of unique strings that each identify one of the keys in the name/value pairs stored in the credential_configurations_supported Credential Issuer metadata.
+        /// </summary>
+        [JsonPropertyName(CredentialOfferResultNames.CredentialConfigurationIds)]
+        public ICollection<string> CredentialConfigurationIds { get; set; } = new List<string>();
+    }
+
+    public class EsbiCredentialOfferResult : BaseCredentialOfferResult
+    {
+        [JsonPropertyName("credentials")]
+        public List<EsbiCredential> Credentials { get; set; }
+    }
+    public class EsbiCredential
+    {
+        [JsonPropertyName(CredentialOfferRecordNames.Format)]
+        public string Format { get; set; }
+        [JsonPropertyName(CredentialOfferRecordNames.Types)]
+        public List<string> Types { get; set; }
     }
 
     public class CredentialOfferGrants

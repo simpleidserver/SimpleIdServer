@@ -65,7 +65,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
             var credentialOffer = await _credentialOfferStore.Get(id, cancellationToken);
             if (credentialOffer == null)
                 return Build(new ErrorResult(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_OFFER, id)));
-            return new OkObjectResult(_getCredentialOfferQueryHandler.Get(new GetCredentialOfferQuery { CredentialOffer = credentialOffer, Issuer = issuer }, _options.AuthorizationServer));
+            return new OkObjectResult(await _getCredentialOfferQueryHandler.Get(new GetCredentialOfferQuery { CredentialOffer = credentialOffer, Issuer = issuer }, _options.AuthorizationServer, cancellationToken));
         }
 
         [HttpGet("{id}/qr")]
