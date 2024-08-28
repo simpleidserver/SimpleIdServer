@@ -53,7 +53,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
             return new ContentResult
             {
                 StatusCode = (int)HttpStatusCode.Created,
-                Content = JsonSerializer.Serialize(_getCredentialOfferQueryHandler.ToDto(result.CredentialOffer, issuer, _options.AuthorizationServer)),
+                Content = JsonSerializer.Serialize(await _getCredentialOfferQueryHandler.ToDto(result.CredentialOffer, issuer, _options.AuthorizationServer, cancellationToken)),
                 ContentType = "application/json"
             };
         }
@@ -75,7 +75,7 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
             var credentialOffer = await _credentialOfferStore.Get(id, cancellationToken);
             if (credentialOffer == null)
                 return Build(new ErrorResult(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(ErrorMessages.UNKNOWN_CREDENTIAL_OFFER, id)));
-            return File(_getCredentialOfferQueryHandler.GetQrCode(new GetCredentialOfferQuery { CredentialOffer = credentialOffer, Issuer = issuer }, _options.AuthorizationServer), "image/png");
+            return File(await _getCredentialOfferQueryHandler.GetQrCode(new GetCredentialOfferQuery { CredentialOffer = credentialOffer, Issuer = issuer }, _options.AuthorizationServer, cancellationToken), "image/png");
         }
     }
 }

@@ -53,7 +53,7 @@ public class VerifiableCredentialResolver : IVerifiableCredentialResolver
                 credentialOffer = await httpResult.Content.ReadAsStringAsync(cancellationToken);
             }
         }
-        else credentialOffer = parameters["credential_offer"];
+        else credentialOffer = HttpUtility.UrlDecode(parameters["credential_offer"]);
         var version = SupportedVcVersions.LATEST;
         var jsonObj = JsonObject.Parse(credentialOffer).AsObject();
         if (jsonObj.ContainsKey("credentials")) version = SupportedVcVersions.ESBI;

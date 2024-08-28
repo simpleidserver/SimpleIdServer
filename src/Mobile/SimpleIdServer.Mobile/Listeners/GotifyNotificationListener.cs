@@ -11,6 +11,7 @@ namespace SimpleIdServer.Mobile.Services
         private bool _isStarted;
         private ClientWebSocket _client;
         private CancellationTokenSource _cancellationTokenSource;
+        private SemaphoreSlim _lck = new SemaphoreSlim(1);
 
         public static GotifyNotificationListener New()
         {
@@ -32,47 +33,63 @@ namespace SimpleIdServer.Mobile.Services
             }
         }
 
-        public async Task Start(string wsServer, string token, CancellationToken cancellationToken)
+        public async Task<bool> Start(string wsServer, string token, CancellationToken cancellationToken)
         {
-            if (_isStarted) return;
-            _client = new ClientWebSocket();
-            _cancellationTokenSource = new CancellationTokenSource();
-            await _client.ConnectAsync(new Uri($"{wsServer}/stream?token={token}"), cancellationToken);
-            Task.Run(async () =>
+            _lck.Wait();
+            try
             {
-                while(true)
+                if (_isStarted) return false;
+                _client = new ClientWebSocket();
+                _cancellationTokenSource = new CancellationTokenSource();
+                await _client.ConnectAsync(new Uri($"{wsServer}/stream?token={token}"), cancellationToken);
+                Task.Run(async () =>
                 {
-                    if (_cancellationTokenSource.Token.IsCancellationRequested) break;
-                    var buffer = new byte[2048];
-                    var result = await _client.ReceiveAsync(new ArraySegment<byte>(buffer), _cancellationTokenSource.Token);
-                    if(result.MessageType == WebSocketMessageType.Text)
+                    while (true)
                     {
-                        var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
-                        var jObj = JsonObject.Parse(msg);
-                        var data = (jObj["extras"] as JsonObject).ToDictionary(j => j.Key, k => k.Value.ToString());
-                        App.Current.Dispatcher.DispatchAsync(async () =>
+                        if (_cancellationTokenSource.Token.IsCancellationRequested) break;
+                        try
                         {
-                            var fcmNotification = new Plugin.Firebase.CloudMessaging.FCMNotification(jObj["message"].ToString(),
-                                jObj["title"].ToString(),
-                                data: data);
-                            if (NotificationReceived != null) NotificationReceived(this, new NotificationEventArgs(fcmNotification));
-                        });
+                            var buffer = new byte[2048];
+                            var result = await _client.ReceiveAsync(new ArraySegment<byte>(buffer), _cancellationTokenSource.Token);
+                            if (result.MessageType == WebSocketMessageType.Text)
+                            {
+                                var msg = Encoding.UTF8.GetString(buffer, 0, result.Count);
+                                var jObj = JsonObject.Parse(msg);
+                                var data = (jObj["extras"] as JsonObject).ToDictionary(j => j.Key, k => k.Value.ToString());
+                                App.Current.Dispatcher.DispatchAsync(async () =>
+                                {
+                                    var fcmNotification = new Plugin.Firebase.CloudMessaging.FCMNotification(jObj["message"].ToString(),
+                                        jObj["title"].ToString(),
+                                        data: data);
+                                    if (NotificationReceived != null) NotificationReceived(this, new NotificationEventArgs(fcmNotification));
+                                });
+                            }
+
+                            if (result.MessageType == WebSocketMessageType.Close)
+                            {
+                                await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", _cancellationTokenSource.Token);
+                                _isStarted = false;
+                                break;
+                            }
+                        }
+                        catch(TaskCanceledException)
+                        {
+                            _isStarted = false;
+                        }
                     }
-                    
-                    if(result.MessageType == WebSocketMessageType.Close)
-                    {
-                        await _client.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "", _cancellationTokenSource.Token);
-                        break;
-                    }
-                }
-            });
-            _isStarted = true;
+                });
+                _isStarted = true;
+                return true;
+            }
+            finally
+            {
+                _lck.Release();
+            }
         }
 
         public void Stop()
         {
             _cancellationTokenSource.Cancel();
-
             _client.Dispose();
             _isStarted = false;
         }

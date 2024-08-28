@@ -71,11 +71,11 @@ public class CredentialsController : BaseController
             return Build(result.Error.Value);
         var json = JsonSerializer.Serialize(result.CredentialOffer);
         Response.Headers.Add("QRCode", json);
-        return File(_getCredentialOfferQueryHandler.GetQrCode(new GetCredentialOfferQuery 
+        return File(await _getCredentialOfferQueryHandler.GetQrCode(new GetCredentialOfferQuery 
         { 
             CredentialOffer = result.CredentialOffer, 
             Issuer = issuer 
-        }, _options.AuthorizationServer), "image/png");
+        }, _options.AuthorizationServer, cancellationToken), "image/png");
     }
 }
 

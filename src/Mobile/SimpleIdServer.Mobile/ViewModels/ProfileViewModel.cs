@@ -1,8 +1,9 @@
-﻿using SimpleIdServer.Mobile.Services;
+﻿using Microsoft.Extensions.Options;
+using SimpleIdServer.Mobile.Resources;
+using SimpleIdServer.Mobile.Services;
 using SimpleIdServer.Mobile.Stores;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Windows.Input;
 
 namespace SimpleIdServer.Mobile.ViewModels;
@@ -10,21 +11,43 @@ namespace SimpleIdServer.Mobile.ViewModels;
 public class ProfileViewModel : INotifyPropertyChanged
 {
     private readonly MobileSettingsState _mobileSettingsState;
+    private readonly GotifyNotificationListener _listener;
+    private readonly IPromptService _promptService;
     private bool _isLoading = false;
     private bool _isGotifyServerRunning = false;
     private NotificationMode _selectedNotificationMode;
     private CancellationTokenSource _cancellationTokenSource;
     private int _refreshIntervalMs = 2000;
 
-    public ProfileViewModel(MobileSettingsState mobileSettingsState)
+    public ProfileViewModel(MobileSettingsState mobileSettingsState, IOptions<MobileOptions> mobileOptions, IPromptService promptService)
     {
         _mobileSettingsState = mobileSettingsState;
         SelectNotificationModeCommand = new Command<EventArgs>(async (c) =>
         {
             await UpdateNotification(c);
         });
+        ToggleGotifyServerCommand = new Command(async () =>
+        {
+            if (!IsGotifyServerRunning)
+            {
+                try
+                {
+                    if (await _listener.Start(mobileOptions.Value.WsServer, mobileSettingsState.Settings.GotifyPushToken, CancellationToken.None))
+                        IsGotifyServerRunning = true;
+                }
+                catch
+                {
+                    await promptService.ShowAlert(Global.Error, "Gotify client cannot be started");
+                }
+            }
+            else
+            {
+                _listener.Stop();
+                IsGotifyServerRunning = false;
+            }
+        });
         _cancellationTokenSource = new CancellationTokenSource();
-        var listener = GotifyNotificationListener.New();
+        _listener = GotifyNotificationListener.New();
         var notificationMode = _mobileSettingsState.Settings.NotificationMode;
         SelectedNotificationMode = NotificationModes.Single(m => m.Name == notificationMode);
         Task.Run(async () =>
@@ -32,13 +55,15 @@ public class ProfileViewModel : INotifyPropertyChanged
             while (true)
             {
                 if (_cancellationTokenSource.IsCancellationRequested) break;
-                IsGotifyServerRunning = listener.IsStarted;
+                IsGotifyServerRunning = _listener.IsStarted;
                 await Task.Delay(_refreshIntervalMs);
             }
         });
     }
 
     public ICommand SelectNotificationModeCommand { get; private set; }
+
+    public ICommand ToggleGotifyServerCommand { get; private set; }
 
     public List<NotificationMode> NotificationModes { get; set; } = new List<NotificationMode>
     {

@@ -165,4 +165,7 @@
   <data name="VpPresented" xml:space="preserve">
     <value>Verifiable presentation has been presented</value>
   </data>
+  <data name="CannotStartGotify" xml:space="preserve">
+    <value>Gotify client cannot be started</value>
+  </data>
 </root>

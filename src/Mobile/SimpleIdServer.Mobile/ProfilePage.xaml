@@ -20,19 +20,36 @@
             </StackLayout>
             <BoxView Style="{StaticResource separator}"></BoxView>
             <StackLayout Spacing="10" Padding="10">
-                <Label FontAttributes="Bold">Gotify server status</Label>
-                <Label>
-                    <Label.Triggers>
-                        <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="true">
-                            <Setter Property="Text">Running</Setter>
-                            <Setter Property="TextColor">Green</Setter>
-                        </DataTrigger>
-                        <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="false">
-                            <Setter Property="Text">Stopped</Setter>
-                            <Setter Property="TextColor">Red</Setter>
-                        </DataTrigger>
-                    </Label.Triggers>
-                </Label>
+                <StackLayout Spacing="10">
+                    <Label FontAttributes="Bold">Gotify server status</Label>
+                    <Label>
+                        <Label.Triggers>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="true">
+                                <Setter Property="Text">Running</Setter>
+                                <Setter Property="TextColor">Green</Setter>
+                            </DataTrigger>
+                            <DataTrigger TargetType="Label" Binding="{Binding IsGotifyServerRunning}" Value="false">
+                                <Setter Property="Text">Stopped</Setter>
+                                <Setter Property="TextColor">Red</Setter>
+                            </DataTrigger>
+                        </Label.Triggers>
+                    </Label>
+                </StackLayout>
+                <StackLayout Orientation="Horizontal" Spacing="10">
+                    <!-- Start or stop -->
+                    <Button IsVisible="False" Command="{Binding ToggleGotifyServerCommand}">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsGotifyServerRunning}" Value="false">
+                                <Setter Property="IsVisible" Value="True" />
+                                <Setter Property="Text" Value="Start" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsGotifyServerRunning}" Value="true">
+                                <Setter Property="IsVisible" Value="True" />
+                                <Setter Property="Text" Value="Stop" />
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </StackLayout>
             </StackLayout>
             <BoxView Style="{StaticResource separator}"></BoxView>
         </StackLayout>

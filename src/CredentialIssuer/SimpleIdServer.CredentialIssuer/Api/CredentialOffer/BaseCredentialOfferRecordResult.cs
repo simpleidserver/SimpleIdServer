@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer;
 
-public class CredentialOfferRecordResult
+public class BaseCredentialOfferRecordResult
 {
     [JsonPropertyName(CredentialOfferRecordNames.Id)]
     public string Id { get; set; }
@@ -16,8 +16,6 @@ public class CredentialOfferRecordResult
     public string Subject { get; set; } = null!;
     [JsonPropertyName(CredentialOfferRecordNames.GrantTypes)]
     public List<string> GrantTypes { get; set; } = new List<string>();
-    [JsonPropertyName(CredentialOfferRecordNames.CredentialConfigurationIds)]
-    public List<string> CredentialConfigurationIds { get; set; } = new List<string>();
     [JsonPropertyName(CredentialOfferRecordNames.CreateDateTime)]
     public DateTime CreateDateTime { get; set; }
     [JsonPropertyName(CredentialOfferRecordNames.Offer)]

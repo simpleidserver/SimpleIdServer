@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -41,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -85,6 +87,27 @@ if (identityServerConfiguration.IsForwardedEnabled)
     });
 }
 
+if(identityServerConfiguration.IsClientCertificateEnabled)
+{
+    builder.Services.AddCertificateForwarding(options =>
+    {
+        options.CertificateHeader = "ssl-client-cert";
+        options.HeaderConverter = (headerValue) =>
+        {
+            System.Console.WriteLine(headerValue);
+            X509Certificate2? clientCertificate = null;
+
+            if (!string.IsNullOrWhiteSpace(headerValue))
+            {
+                clientCertificate = X509Certificate2.CreateFromPem(
+                    WebUtility.UrlDecode(headerValue));
+            }
+
+            return clientCertificate!;
+        };
+    });
+}
+
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
@@ -121,6 +144,9 @@ if (!app.Environment.IsDevelopment())
     var errorPath = identityServerConfiguration.IsRealmEnabled ? "/master/Error/Unexpected" : "/Error/Unexpected";
     app.UseExceptionHandler(errorPath);
 }
+
+if(identityServerConfiguration.IsClientCertificateForwarded)
+    app.UseCertificateForwarding();
 
 app
     .UseSID()

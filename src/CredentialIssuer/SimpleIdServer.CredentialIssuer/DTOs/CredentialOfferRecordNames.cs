@@ -11,4 +11,6 @@ public static class CredentialOfferRecordNames
     public const string CreateDateTime = "create_datetime";
     public const string Offer = "offer";
     public const string OfferUri = "offer_uri";
+    public const string Format = "format";
+    public const string Types = "types";
 }

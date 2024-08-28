@@ -124,6 +124,15 @@ namespace SimpleIdServer.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Gotify client cannot be started.
+        /// </summary>
+        internal static string CannotStartGotify {
+            get {
+                return ResourceManager.GetString("CannotStartGotify", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à credential offer must contain only one credential.
         /// </summary>
         internal static string CredentialOfferMustContainsOneCredential {
