@@ -156,6 +156,13 @@ public class Program
                             o.SchemaBehavior(Pomelo.EntityFrameworkCore.MySql.Infrastructure.MySqlSchemaBehavior.Ignore);
                         });
                         break;
+                    case StorageTypes.SQLITE:
+                        options.UseSqlite(conf.ConnectionString, o =>
+                        {
+                            o.MigrationsAssembly("SimpleIdServer.Scim.SqliteMigrations");
+                            o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                        });
+                        break;
                 }
             }, options =>
             {
