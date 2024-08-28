@@ -100,7 +100,10 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
         Enrich(result, credentialOffer, issuer, authorizationServer);
         result.Credentials = credentialConfigurations.Select(c =>
         {
-            var types = new List<string>();
+            var types = new List<string>
+            {
+                "VerifiableCredential"
+            };
             if (c.AdditionalTypes != null)
                 types.AddRange(c.AdditionalTypes);
             types.Add(c.Type);
@@ -151,7 +154,7 @@ public class GetCredentialOfferQueryHandler : IGetCredentialOfferQueryHandler
 
     private string SerializeByValue<T>(T offerRecord) where T : CredentialOfferRecordResult
     {
-        var json = JsonSerializer.Serialize(offerRecord.Offer);
+        var json = JsonSerializer.Serialize(offerRecord.Offer, offerRecord.Offer.GetType());
         var encodedJson = HttpUtility.UrlEncode(json);
         return $"openid-credential-offer://?credential_offer={encodedJson}";
     }

@@ -9,9 +9,9 @@ using System.Text.Json;
 
 namespace SimpleIdServer.WalletClient.CredentialFormats;
 
-public class JwtVcFormatter : ICredentialFormatter
+public abstract class BaseJwtVcFormatter
 {
-    public string Format => "jwt_vc";
+    public abstract string Format { get; }
 
     public W3CVerifiableCredential Extract(string content)
     {
@@ -29,4 +29,15 @@ public class JwtVcFormatter : ICredentialFormatter
         var header = Base64UrlEncoder.Decode(jsonWebToken.EncodedHeader);
         return new DeserializedCredential(serializedVc, JObject.Parse(payload), JObject.Parse(header));
     }
+
+}
+
+public class JwtVcFormatter : BaseJwtVcFormatter, ICredentialFormatter
+{
+    public override string Format => "jwt_vc";
+}
+
+public class JwtVcJsonFormatter : BaseJwtVcFormatter, ICredentialFormatter
+{
+    public override string Format => "jwt_vc_json";
 }

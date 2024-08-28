@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDeferredCredentialIssuer, DeferredCredentialIssuer>();
         services.AddTransient<IVerifiableCredentialResolver, VerifiableCredentialResolver>();
         services.AddTransient<ICredentialFormatter, JwtVcFormatter>();
+        services.AddTransient<ICredentialFormatter, JwtVcJsonFormatter>();
         services.AddTransient<ICredentialFormatter, LdpVcFormatter>();
         services.AddTransient<IVcStore, VcStore>();
         services.AddDidKey();
