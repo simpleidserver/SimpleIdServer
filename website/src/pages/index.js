@@ -32,6 +32,10 @@ function HomepageHeader() {
             to="https://install.appcenter.ms/users/agentsimpleidserver-gmail.com/apps/simpleidserver/distribution_groups/public">
               Mobile
           </Link>
+          <div style={{textAlign:"center"}}>
+              <a href="#">ANDROID</a>
+              <a href="#" style={{paddingLeft: 10}}>IPHONE</a>
+          </div>
         </div>
       </div>
     </header>

@@ -224,7 +224,7 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
         var authorizationResult = await _sidServerClient.GetAuthorization(openidConfigurationResult.AuthorizationEndpoint, parameters, cancellationToken);
         if (authorizationResult == null) return (CredentialTokenResult.Nok(Global.BadAuthorizationRequest), false);
         var responseType = authorizationResult["response_type"];
-        var postAuthResult = await ExecutePostAuthorizationRequest(didDocument, privateKey, credentialIssuer, authorizationResult["redirect_uri"], authorizationResult["nonce"], authorizationResult["state"], responseType, authorizationResult, cancellationToken);
+        var postAuthResult = await ExecutePostAuthorizationRequest(didDocument, privateKey, credentialIssuer, authorizationResult["redirect_uri"], authorizationResult["nonce"], authorizationResult.ContainsKey("state") ? authorizationResult["state"] : null, responseType, authorizationResult, cancellationToken);
         if (!string.IsNullOrWhiteSpace(postAuthResult.errorMessage)) return (CredentialTokenResult.Nok(postAuthResult.errorMessage), responseType == SupportedResponseTypes.VpToken);
         if(postAuthResult.claims == null) return (CredentialTokenResult.Nok(Global.BadPostAuthorizationRequest), responseType == SupportedResponseTypes.VpToken);
         var tokenResult = await _sidServerClient.GetAccessTokenWithAuthorizationCode(openidConfigurationResult.TokenEndpoint, didDocument.Id, postAuthResult.claims["code"], verifier, cancellationToken);
@@ -258,7 +258,13 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
                     "vp_token", "id_token"
                 }
             },
-            {  "authorization_endpoint", "openid://"}
+            {  "authorization_endpoint", "openid://" },
+            {  "redirect_uris", 
+                new JsonArray
+                {
+                    "openid://"
+                } 
+            }
         };
         return new Dictionary<string, string>
         {

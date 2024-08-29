@@ -55,7 +55,7 @@ export default function HomepageOpenStandards() {
                         </div>
                     </div>
                 </div>
-                <div className="col col--12">
+                <div className="col col--6">
                     <div class="card pt-3">
                         <div className="text--center">
                             <img src="/img/scim.webp" className={styles.standardImg} />
@@ -63,6 +63,17 @@ export default function HomepageOpenStandards() {
                         <div className="text--center padding-horiz--md">
                             <h3>SCIM2.0</h3>
                             <p>The SCIM protocol is an application-level REST protocol for provisioning and managing identity data on the web.</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="col col--6">
+                    <div class="card pt-3">
+                        <div className="text--center">
+                            TODO
+                        </div>
+                        <div className="text--center padding-horiz--md">
+                            <h3>ESBI</h3>
+                            <p>TODO.</p>
                         </div>
                     </div>
                 </div>

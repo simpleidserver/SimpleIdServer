@@ -58,14 +58,16 @@ public class SidServerClient : ISidServerClient
     {
         using (var httpClient = _httpClientFactory.Build())
         {
+            var lst = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("id_token", idToken)
+            };
+            if (!string.IsNullOrWhiteSpace(state))
+                lst.Add(new KeyValuePair<string, string>("state", state));
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(HttpUtility.UrlDecode(url)),
-                Content = new FormUrlEncodedContent(new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("id_token", idToken),
-                    new KeyValuePair<string, string>("state", state)
-                }),
+                Content = new FormUrlEncodedContent(lst),
                 Method = HttpMethod.Post
             };
             var httpResult = await httpClient.SendAsync(requestMessage, cancellationToken);

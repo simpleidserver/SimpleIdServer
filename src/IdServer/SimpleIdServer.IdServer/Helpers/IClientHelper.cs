@@ -149,9 +149,6 @@ public class StandardClientHelper : IClientHelper
             }
         }
 
-        // TODO : %7B%22vp_formats_supported%22%3A%7B%22jwt_vp%22%3A%7B%22alg%22%3A%5B%22ES256%22%5D%7D%2C%22jwt_vc%22%3A%7B%22alg%22%3A%5B%22ES256%22%5D%7D%7D%2C%22response_types_supported%22%3A%5B%22vp_token%22%2C%22id_token%22%5D%2C%22authorization_endpoint%22%3A%22openid%3A%22%7D
-        // authorization_endpoint = openid ??? => must be equals to the redirect uri?
-
         clientMetadata.ClientId = clientId;
         clientMetadata.IsSelfIssueEnabled = true;
         return clientMetadata;

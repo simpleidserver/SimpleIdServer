@@ -88,6 +88,12 @@ export default function HomepagePhilosophy() {
                         <div class="flex-row" role="cell"><Redcheck className={styles.redCheck} /></div>
                     </div>
                     <div class="flex-table" role="rowgroup">
+                        <div class="flex-row first" role="cell">ESBI</div>
+                        <div class="flex-row" role="cell"><Greencheck className={styles.greencheck} /></div>
+                        <div class="flex-row" role="cell"><Redcheck className={styles.redCheck} /></div>
+                        <div class="flex-row" role="cell"><Redcheck className={styles.redCheck} /></div>
+                    </div>
+                    <div class="flex-table" role="rowgroup">
                         <div class="flex-group" role="group">Identity Provisioning</div>
                     </div>
                     <div class="flex-table" role="rowgroup">
