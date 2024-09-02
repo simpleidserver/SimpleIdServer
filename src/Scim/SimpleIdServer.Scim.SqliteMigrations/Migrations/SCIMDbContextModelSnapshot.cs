@@ -16,7 +16,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("dbo")
+                .HasDefaultSchema("scim")
                 .HasAnnotation("ProductVersion", "8.0.8");
 
             modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>
@@ -31,7 +31,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasIndex("SchemasId");
 
-                    b.ToTable("SCIMRepresentationSCIMSchema", "dbo");
+                    b.ToTable("SCIMRepresentationSCIMSchema", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.ProvisioningConfiguration", b =>
@@ -50,7 +50,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProvisioningConfigurations", "dbo");
+                    b.ToTable("ProvisioningConfigurations", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.ProvisioningConfigurationHistory", b =>
@@ -90,7 +90,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasIndex("ProvisioningConfigurationId");
 
-                    b.ToTable("ProvisioningConfigurationHistory", "dbo");
+                    b.ToTable("ProvisioningConfigurationHistory", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.ProvisioningConfigurationRecord", b =>
@@ -123,7 +123,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasIndex("ProvisioningConfigurationRecordId");
 
-                    b.ToTable("ProvisioningConfigurationRecord", "dbo");
+                    b.ToTable("ProvisioningConfigurationRecord", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.Realm", b =>
@@ -136,7 +136,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasKey("Name");
 
-                    b.ToTable("Realms", "dbo");
+                    b.ToTable("Realms", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMAttributeMapping", b =>
@@ -164,7 +164,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SCIMAttributeMappingLst", "dbo");
+                    b.ToTable("SCIMAttributeMappingLst", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentation", b =>
@@ -196,7 +196,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SCIMRepresentationLst", "dbo");
+                    b.ToTable("SCIMRepresentationLst", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMRepresentationAttribute", b =>
@@ -267,7 +267,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasIndex("ValueString");
 
-                    b.ToTable("SCIMRepresentationAttributeLst", "dbo");
+                    b.ToTable("SCIMRepresentationAttributeLst", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchema", b =>
@@ -289,7 +289,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SCIMSchemaLst", "dbo");
+                    b.ToTable("SCIMSchemaLst", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchemaAttribute", b =>
@@ -349,7 +349,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasIndex("SchemaId");
 
-                    b.ToTable("SCIMSchemaAttribute", "dbo");
+                    b.ToTable("SCIMSchemaAttribute", "scim");
                 });
 
             modelBuilder.Entity("SimpleIdServer.Scim.Domains.SCIMSchemaExtension", b =>
@@ -370,7 +370,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
 
                     b.HasIndex("SCIMSchemaId");
 
-                    b.ToTable("SCIMSchemaExtension", "dbo");
+                    b.ToTable("SCIMSchemaExtension", "scim");
                 });
 
             modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>
