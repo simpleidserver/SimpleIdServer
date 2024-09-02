@@ -168,4 +168,7 @@
   <data name="CannotStartGotify" xml:space="preserve">
     <value>Gotify client cannot be started</value>
   </data>
+  <data name="NoDidRegistered" xml:space="preserve">
+    <value>Register a DID before being able to accept a credential offer</value>
+  </data>
 </root>

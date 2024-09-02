@@ -160,6 +160,15 @@ namespace SimpleIdServer.Mobile.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Register a DID before being able to accept a credential offer.
+        /// </summary>
+        internal static string NoDidRegistered {
+            get {
+                return ResourceManager.GetString("NoDidRegistered", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the pre authorized code is missing.
         /// </summary>
         internal static string PreAuthorizedCodeMissing {

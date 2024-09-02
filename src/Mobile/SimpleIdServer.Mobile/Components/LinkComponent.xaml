@@ -7,9 +7,9 @@
              x:Name="this">
     <Border Margin="5">
         <StackLayout Orientation="Horizontal" Padding="10,20,10,20">
-            <Image WidthRequest="20" Source="{Binding Path=Source}" HorizontalOptions="Start"></Image>
+            <Image WidthRequest="20" HeightRequest="20" Source="{Binding Path=Source}" HorizontalOptions="Start"></Image>
             <Label Padding="5,10,0,0" HorizontalOptions="StartAndExpand" Text="{Binding Path=Title}"></Label>
-            <Image WidthRequest="20" Source="rightarrow.svg" HorizontalOptions="End" />
+            <Image WidthRequest="20" HeightRequest="20" Source="rightarrow.png" HorizontalOptions="End" />
             <StackLayout.GestureRecognizers>
                 <TapGestureRecognizer Command="{Binding Path=NavigateCommand}" />
             </StackLayout.GestureRecognizers>

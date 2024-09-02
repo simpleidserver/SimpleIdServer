@@ -3,6 +3,7 @@ using SimpleIdServer.Mobile.Stores;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Input;
 
 namespace SimpleIdServer.Mobile.ViewModels;
 
@@ -14,11 +15,30 @@ public class WalletViewModel : INotifyPropertyChanged
     public WalletViewModel(VerifiableCredentialListState vcListState)
     {
         _vcListState = vcListState;
-        DeleteVerifiableCredentialCommand = new Command<VerifiableCredentialRecord>(async (record) =>
+        DeleteCommand = new Command(async () =>
         {
-            await RemoveVerifiableCredential(record);
+            IsLoading = true;
+            var vc = VerifiableCredentials.Single(d => d.IsSelected);
+            await _vcListState.RemoveVerifiableCredentialRecord(vc);
+            IsLoading = false;
+            RefreshCommands();
+        }, () =>
+        {
+            return VerifiableCredentials.Any() && VerifiableCredentials.Any(d => d.IsSelected);
+        });
+        SelectCommand = new Command<VerifiableCredentialRecord>((d) =>
+        {
+            foreach (var vc in VerifiableCredentials)
+                vc.IsSelected = false;
+            d.IsSelected = true;
+            OnPropertyChanged(nameof(VerifiableCredentials));
+            RefreshCommands();
         });
     }
+
+    public Command<VerifiableCredentialRecord> SelectCommand { get; private set; }
+
+    public ICommand DeleteCommand { get; private set; }
 
     public ObservableCollection<VerifiableCredentialRecord> VerifiableCredentials
     {
@@ -27,8 +47,6 @@ public class WalletViewModel : INotifyPropertyChanged
             return _vcListState.VerifiableCredentialRecords;
         }
     }
-
-    public Command<VerifiableCredentialRecord> DeleteVerifiableCredentialCommand { get; private set; }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -45,13 +63,10 @@ public class WalletViewModel : INotifyPropertyChanged
         }
     }
 
-    private async Task RemoveVerifiableCredential(VerifiableCredentialRecord record)
-    {
-        if (IsLoading) return;
-        IsLoading = true;
-        await _vcListState.RemoveVerifiableCredentialRecord(record);
-        IsLoading = false;
-    }
-
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    private void RefreshCommands()
+    {
+        ((Command)DeleteCommand).ChangeCanExecute();
+    }
 }

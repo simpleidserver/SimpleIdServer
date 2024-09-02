@@ -82,6 +82,13 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
     private async Task RegisterVc()
     {
         IsLoading = true;
+        if(_didState.ActiveDid == null)
+        {
+            await _promptService.ShowAlert(Global.Error, Global.NoDidRegistered);
+            await Cancel();
+            return;
+        }
+
         var credentialOffer = _service.Value.service.DeserializeCredentialOffer(_service.Value.credentialOffer);
         if (credentialOffer.Grants.PreAuthorizedCodeGrant != null)
         {
@@ -92,16 +99,17 @@ public class ViewCredentialOfferViewModel : INotifyPropertyChanged
             pinModal.ViewModel.PinEntered += async (o, e) =>
             {
                 await RegisterVc(e.Pin, CancellationToken.None);
-                IsLoading = false;
-                await this.RefreshCommand();
-                await _navigationService.GoBack();
-                if (_callback != null)
-                    await _callback();
+                await Cancel();
             };
             return;
         }
 
         await RegisterVc(null, CancellationToken.None);
+        await Cancel();
+    }
+    
+    private async Task Cancel()
+    {
         IsLoading = false;
         await this.RefreshCommand();
         await _navigationService.GoBack();
