@@ -44,7 +44,7 @@
                                 <ColumnDefinition Width="50" />
                             </Grid.ColumnDefinitions>
                             <Label Text="{Binding Path=Name}" Grid.Column="0" Grid.Row="0" LineBreakMode="TailTruncation" Style="{StaticResource vcTitle}"></Label>
-                            <Image HorizontalOptions="EndAndExpand" Grid.Column="1" Grid.Row="0" HeightRequest="20" WidthRequest="20" Source="{Binding Path=Logo}" />
+                            <Image HorizontalOptions="EndAndExpand" Grid.Column="1" Grid.Row="0" HeightRequest="20" WidthRequest="20" Source="{Binding Path=DisplayLogo}" />
                             <Label Text="{Binding Path=Description}" Grid.ColumnSpan="2" Grid.Column="0" Grid.Row="1" Style="{StaticResource vcDescription}"></Label>
                             <Grid Grid.Row="2" Grid.ColumnSpan="2">
                                 <Grid.ColumnDefinitions>

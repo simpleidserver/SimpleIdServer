@@ -125,8 +125,8 @@ public partial class ViewOTPCode : ContentView, INotifyPropertyChanged
         {
 
             viewModelOTPCode.IsOTPCodeExists = true;
-			viewModelOTPCode.Issuer = $"Issuer : {newOTPCode.Issuer}";
-			viewModelOTPCode.User = $"User : {newOTPCode.Name}";
+			viewModelOTPCode.Issuer = newOTPCode.Issuer;
+			viewModelOTPCode.User = newOTPCode.Name;
             viewModelOTPCode.GenerateCode(newOTPCode);
         }
     }

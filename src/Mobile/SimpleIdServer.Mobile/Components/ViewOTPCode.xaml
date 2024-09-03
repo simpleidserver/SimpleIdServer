@@ -14,15 +14,35 @@
     </ContentView.Resources>
     <ContentView.Content>
         <Grid BindingContext="{x:Reference this}">
-            <StackLayout IsVisible="{Binding Path=IsOTPCodeExists}" Spacing="10" Padding="10">
-                <Label Text="{Binding Path=Issuer}" FontSize="Large"></Label>
-                <Label Text="{Binding Path=User}" FontSize="Large"></Label>
-                <Label Text="{Binding Path=Code}" FontSize="Large" FontAttributes="Bold"></Label>
-                <Label Text="{Binding Path=Description}" FontSize="Large"></Label>
+            <StackLayout IsVisible="{Binding Path=IsOTPCodeExists}" Spacing="5">
+                <!-- Issuer -->
+                <StackLayout Spacing="10" Padding="10">
+                    <Label FontAttributes="Bold">Issuer</Label>
+                    <Label Text="{Binding Path=Issuer}"></Label>
+                </StackLayout>
+                <BoxView Style="{StaticResource separator}"></BoxView>
+                <!-- User -->
+                <StackLayout Spacing="10" Padding="10">
+                    <Label FontAttributes="Bold">User</Label>
+                    <Label Text="{Binding Path=User}"></Label>
+                </StackLayout>
+                <BoxView Style="{StaticResource separator}"></BoxView>
+                <!-- Code -->
+                <StackLayout Spacing="10" Padding="10">
+                    <Label FontAttributes="Bold">Code</Label>
+                    <Label Text="{Binding Path=Code}"></Label>
+                </StackLayout>
+                <BoxView Style="{StaticResource separator}"></BoxView>
+                <!-- Description -->
+                <StackLayout Spacing="10" Padding="10">
+                    <Label FontAttributes="Bold">Description</Label>
+                    <Label Text="{Binding Path=Description}"></Label>
+                </StackLayout>
+                <BoxView Style="{StaticResource separator}"></BoxView>
                 <Button Text="Generate" Command="{Binding Path=GenerateHOTPCommand}"></Button>
             </StackLayout>
             <StackLayout IsVisible="{Binding Path=IsOTPCodeExists, Converter={StaticResource InvertedBoolConverter}}" Padding="10">
-                <Label Text="There is no OTP selected" FontSize="Large"></Label>
+                <Label Text="Select a one-time password"></Label>
             </StackLayout>
         </Grid>
     </ContentView.Content>

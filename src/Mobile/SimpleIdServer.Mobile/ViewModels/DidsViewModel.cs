@@ -44,6 +44,7 @@ public class DidsViewModel : INotifyPropertyChanged
             }
 
             await _didRecordState.Update(Dids);
+            _didRecordState.ActiveDid = Dids.Single(d => d.IsActive);
             IsLoading = false;
         }, () =>
         {
