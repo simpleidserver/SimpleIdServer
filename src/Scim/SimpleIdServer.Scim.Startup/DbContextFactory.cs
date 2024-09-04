@@ -36,7 +36,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations
 
             return new SCIMDbContext(
                 dbContextOptions: optionsBuilder.Options,
-                options: new OptionsWrapper<SCIMEFOptions>(new SCIMEFOptions()));
+                options: new OptionsWrapper<SCIMEFOptions>(new SCIMEFOptions { DefaultSchema = "scim" }));
         }
     }
 }
