@@ -10,7 +10,7 @@ export default function HomepagePhilosophy() {
             <h1>Why SimpleIdServer</h1>
                 SimpleIdServer is the first Free Open Source Identity Management solution using .NET.
                 <br />
-                <b>The comparison table was written on July 24, 2024.</b>
+                <b>The comparison table was written on Septembre 03, 2024.</b>
                 <div class="table-container" role="table" aria-label="Destinations">
                     <div class="flex-table header" role="rowgroup">
                         <div class="flex-row first" role="columnheader"></div>

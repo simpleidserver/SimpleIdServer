@@ -69,11 +69,11 @@ export default function HomepageOpenStandards() {
                 <div className="col col--6">
                     <div class="card pt-3">
                         <div className="text--center">
-                            TODO
+                            <img src="/img/logo-ebsi.png" className={styles.standardImg} />
                         </div>
                         <div className="text--center padding-horiz--md">
-                            <h3>ESBI</h3>
-                            <p>TODO.</p>
+                            <h3>EBSI</h3>
+                            <p>The first public sector blockchain infrastructure in Europe is used by public institutions from different countries to build and issue verifiable credentials, such as diplomas and driving licenses.</p>
                         </div>
                     </div>
                 </div>

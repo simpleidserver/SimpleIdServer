@@ -68,10 +68,10 @@ const FeatureList = [
   },
   {
     title: 'Electronic wallet',    
-    Svg: require('@site/static/img/credentialissuer.svg').default,
+    Svg: require('@site/static/img/electronic-wallet.svg').default,
     description: (
       <>
-        TODO.
+      The mobile application can be used as an electronic wallet that complies with the <a href="https://hub.ebsi.eu/wallet-conformance">EBSI standard</a>.
       </>
     )
   }
