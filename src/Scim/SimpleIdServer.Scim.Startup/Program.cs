@@ -167,7 +167,7 @@ public class Program
             }, options =>
             {
                 options.DefaultSchema = "scim";
-            });
+            }, supportSqlite: conf.Type == StorageTypes.SQLITE);
         }
 
         void ConfigureMongoDbStorage(StorageConfiguration conf)
