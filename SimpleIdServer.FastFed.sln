@@ -1,0 +1,51 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Core", "01. Core", "{CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed", "src\FastFed\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj", "{F3FFFDDF-FD01-4964-AC03-B26D2E9B1198}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.ApplicationProvider", "src\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj", "{66FE11AE-2462-4E86-B5CD-68E545102D8A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.IdentityProvider", "src\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj", "{C1F1EC87-D6E9-42B8-AA82-9C652C4204A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Helpers", "src\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj", "{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F3FFFDDF-FD01-4964-AC03-B26D2E9B1198}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3FFFDDF-FD01-4964-AC03-B26D2E9B1198}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3FFFDDF-FD01-4964-AC03-B26D2E9B1198}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3FFFDDF-FD01-4964-AC03-B26D2E9B1198}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66FE11AE-2462-4E86-B5CD-68E545102D8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66FE11AE-2462-4E86-B5CD-68E545102D8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66FE11AE-2462-4E86-B5CD-68E545102D8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66FE11AE-2462-4E86-B5CD-68E545102D8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1F1EC87-D6E9-42B8-AA82-9C652C4204A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1F1EC87-D6E9-42B8-AA82-9C652C4204A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1F1EC87-D6E9-42B8-AA82-9C652C4204A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1F1EC87-D6E9-42B8-AA82-9C652C4204A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F3FFFDDF-FD01-4964-AC03-B26D2E9B1198} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
+		{66FE11AE-2462-4E86-B5CD-68E545102D8A} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
+		{C1F1EC87-D6E9-42B8-AA82-9C652C4204A3} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
+		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AFEA5C5B-33EB-4AEC-BB66-20E5AD9C228D}
+	EndGlobalSection
+EndGlobal
