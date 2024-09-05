@@ -26,12 +26,14 @@ namespace SimpleIdServer.IdServer.PostgreMigrations
 
 namespace SimpleIdServer.Scim.SqliteMigrations
 {
+    // Uncomment the class below to be able to create a new database migration class for Sqlite
+    /*
     public class SCIMDbContextFactory : IDesignTimeDbContextFactory<SCIMDbContext>
     {
         public SCIMDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<SCIMDbContext>();
-            optionsBuilder.UseSqlite("Data Source=scim.db", o => 
+            optionsBuilder.UseSqlite("Data Source=scim.db", o =>
                 o.MigrationsAssembly("SimpleIdServer.Scim.SqliteMigrations"));
 
             return new SCIMDbContext(
@@ -39,4 +41,5 @@ namespace SimpleIdServer.Scim.SqliteMigrations
                 options: new OptionsWrapper<SCIMEFOptions>(new SCIMEFOptions { DefaultSchema = "scim" }));
         }
     }
+    */
 }
