@@ -13,6 +13,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.Iden
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Helpers", "src\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj", "{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00. Common", "00. Common", "{CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Webfinger", "src\Webfinger\SimpleIdServer.Webfinger\SimpleIdServer.Webfinger.csproj", "{6227C490-D218-4E4B-98A6-F17ABE1C16B3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Webfinger.Client", "src\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj", "{F76CEA86-7350-49BF-A7D1-CBC0D403758A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +41,14 @@ Global
 		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6227C490-D218-4E4B-98A6-F17ABE1C16B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6227C490-D218-4E4B-98A6-F17ABE1C16B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6227C490-D218-4E4B-98A6-F17ABE1C16B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6227C490-D218-4E4B-98A6-F17ABE1C16B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F76CEA86-7350-49BF-A7D1-CBC0D403758A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F76CEA86-7350-49BF-A7D1-CBC0D403758A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F76CEA86-7350-49BF-A7D1-CBC0D403758A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F76CEA86-7350-49BF-A7D1-CBC0D403758A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -43,7 +57,9 @@ Global
 		{F3FFFDDF-FD01-4964-AC03-B26D2E9B1198} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
 		{66FE11AE-2462-4E86-B5CD-68E545102D8A} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
 		{C1F1EC87-D6E9-42B8-AA82-9C652C4204A3} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
-		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
+		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
+		{6227C490-D218-4E4B-98A6-F17ABE1C16B3} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
+		{F76CEA86-7350-49BF-A7D1-CBC0D403758A} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFEA5C5B-33EB-4AEC-BB66-20E5AD9C228D}

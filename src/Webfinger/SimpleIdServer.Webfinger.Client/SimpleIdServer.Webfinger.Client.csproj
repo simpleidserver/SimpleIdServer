@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Description>Client used to interact with Webfinger.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj" />
+	</ItemGroup>
+</Project>

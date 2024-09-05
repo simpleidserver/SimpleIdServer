@@ -9,4 +9,24 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Stores;
 public interface IIdentityProviderFederationStore
 {
     Task<IdentityProviderFederation> Get(string entityId, CancellationToken cancellationToken);
+    void Add(IdentityProviderFederation identityProviderFederation);
+    Task<int> SaveChanges(CancellationToken cancellationToken);
+}
+
+public class IdentityProviderFederationStore : IIdentityProviderFederationStore
+{
+    public void Add(IdentityProviderFederation identityProviderFederation)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Task<IdentityProviderFederation> Get(string entityId, CancellationToken cancellationToken)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public Task<int> SaveChanges(CancellationToken cancellationToken)
+    {
+        throw new System.NotImplementedException();
+    }
 }

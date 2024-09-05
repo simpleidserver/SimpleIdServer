@@ -8,6 +8,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj" />
+	  <ProjectReference Include="..\..\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj" />
 	</ItemGroup>
 </Project>
