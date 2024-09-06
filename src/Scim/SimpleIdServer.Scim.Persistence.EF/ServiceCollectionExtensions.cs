@@ -4,14 +4,23 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Persistence.EF;
 using System;
+using SimpleIdServer.Scim.Persistence.EF.Sqlite;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddScimStoreEF(this IServiceCollection services, Action<DbContextOptionsBuilder> dbContextOptsCallback = null, Action<SCIMEFOptions> optionsCallback = null)
+        public static IServiceCollection AddScimStoreEF(this IServiceCollection services, Action<DbContextOptionsBuilder> dbContextOptsCallback = null, Action<SCIMEFOptions> optionsCallback = null, bool supportSqlite = false)
         {
-            services.AddTransient<ISCIMRepresentationCommandRepository, EFSCIMRepresentationCommandRepository>();
+            if (supportSqlite)
+            {
+                services.AddTransient<ISCIMRepresentationCommandRepository, SqliteCompatible_EFSCIMRepresentationCommandRepository>();
+            }
+            else
+            {
+                services.AddTransient<ISCIMRepresentationCommandRepository, EFSCIMRepresentationCommandRepository>();
+            }
+            
             services.AddTransient<ISCIMRepresentationQueryRepository, EFSCIMRepresentationQueryRepository>();
             services.AddTransient<ISCIMSchemaQueryRepository, EFSCIMSchemaQueryRepository>();
             services.AddTransient<ISCIMSchemaCommandRepository, EFSCIMSchemaCommandRepository>();

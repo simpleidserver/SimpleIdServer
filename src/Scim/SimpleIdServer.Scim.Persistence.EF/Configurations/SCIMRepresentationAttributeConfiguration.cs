@@ -16,6 +16,7 @@ namespace SimpleIdServer.Scim.Persistence.EF.Configurations
             builder.Ignore(a => a.CachedChildren);
             builder.Property(a => a.FullPath).HasMaxLength(512);
             builder.Property(a => a.ValueString).HasMaxLength(255);
+            builder.Property(a => a.ValueDecimal).HasPrecision(18,2);
 
             builder.HasIndex(a => a.FullPath);
             builder.HasIndex(a => a.ValueString);

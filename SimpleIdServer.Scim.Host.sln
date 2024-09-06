@@ -41,6 +41,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqlServ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.MySQLMigrations", "src\Scim\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj", "{DE956F00-9A99-403F-B58B-21D0F6764AF9}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.SqliteMigrations", "src\Scim\SimpleIdServer.Scim.SqliteMigrations\SimpleIdServer.Scim.SqliteMigrations.csproj", "{6BC472A8-7377-4030-BA6C-18569103CD5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +109,10 @@ Global
 		{DE956F00-9A99-403F-B58B-21D0F6764AF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DE956F00-9A99-403F-B58B-21D0F6764AF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DE956F00-9A99-403F-B58B-21D0F6764AF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6BC472A8-7377-4030-BA6C-18569103CD5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6BC472A8-7377-4030-BA6C-18569103CD5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6BC472A8-7377-4030-BA6C-18569103CD5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6BC472A8-7377-4030-BA6C-18569103CD5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -127,6 +133,7 @@ Global
 		{7DBBF997-362E-441C-9D36-572A635FC35B} = {EBD2D625-0911-46C2-A899-836706A82BC0}
 		{02AF94F7-ADB2-4966-8FF7-0D9AE90BE703} = {EBD2D625-0911-46C2-A899-836706A82BC0}
 		{DE956F00-9A99-403F-B58B-21D0F6764AF9} = {EBD2D625-0911-46C2-A899-836706A82BC0}
+		{6BC472A8-7377-4030-BA6C-18569103CD5A} = {EBD2D625-0911-46C2-A899-836706A82BC0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E7923ED0-C7DA-4D19-81E6-E3EEE579FE7A}

@@ -15,6 +15,7 @@
 		<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="8.0.1" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\SimpleIdServer.Scim.SqliteMigrations\SimpleIdServer.Scim.SqliteMigrations.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj" />
