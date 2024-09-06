@@ -111,6 +111,10 @@ const config = {
                 label: 'Documentation',
                 to: '/docs/installation',
               },
+              {
+                label: 'Privacy',
+                to: '/privacy',
+              },
             ],
           },
           {
@@ -134,7 +138,7 @@ const config = {
                 href: 'https://github.com/simpleidserver',
               },
             ],
-          },
+          }
         ],
         copyright: `Copyright © ${new Date().getFullYear()} Lokit - BE0794.185.124`,
       },

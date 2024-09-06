@@ -5,9 +5,9 @@ hide_table_of_contents: true
 
 # Privacy
 
-Privacy Policy for SimpleIdServer
+Privacy Policy for **SimpleIdServer**
 
-Last updated: 03-08-2024
+Last updated: **03-08-2024**
 
 Welcome to SimpleIdServer! Your privacy is important to us, and we are committed to protecting the personal information you share with us. This Privacy Policy outlines how LOKIT ("we," "our," or "us") collects, uses, discloses, and safeguards your information when you use our mobile application ("SimpleIdServer"). By using the app, you agree to the collection and use of information in accordance with this policy.
 
