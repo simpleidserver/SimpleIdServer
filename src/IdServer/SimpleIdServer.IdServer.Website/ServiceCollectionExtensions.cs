@@ -4,6 +4,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -20,7 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddSIDWebsite(this IServiceCollection services, Action<IdServerWebsiteOptions>? callbackOptions = null)
+        public static IServiceCollection AddSIDWebsite(this IServiceCollection services, Action<IdServerWebsiteOptions>? callbackOptions = null, Action<IDataProtectionBuilder>? dataProtectionBuilderCallback = null)
         {
             var opts = new IdServerWebsiteOptions();
             if (callbackOptions != null) callbackOptions(opts);
@@ -44,6 +45,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton<IWebsiteHttpClientFactory, WebsiteHttpClientFactory>();
             if (callbackOptions == null) services.Configure<IdServerWebsiteOptions>((o) => { });
             else services.Configure(callbackOptions);
+            var b = services.AddDataProtection();
+            if (dataProtectionBuilderCallback != null) dataProtectionBuilderCallback(b);
             return services;
         }
 
