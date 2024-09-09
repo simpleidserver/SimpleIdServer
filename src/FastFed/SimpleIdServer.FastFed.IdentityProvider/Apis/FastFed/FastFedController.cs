@@ -28,7 +28,6 @@ public class FastFedController : Controller
         // Check the request.
         // 7.2.2.2. Identity Provider Reads Application Provider Metadata
         // request.AppMetadataUri;
-
         return null;
     }
 }

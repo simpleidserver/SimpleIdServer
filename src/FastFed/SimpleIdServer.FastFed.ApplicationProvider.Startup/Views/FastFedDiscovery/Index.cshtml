@@ -1,0 +1,84 @@
+﻿@using SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources
+@using SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels
+@model SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels.DiscoverProvidersViewModel
+
+@{
+    ViewBag.Title = FastFedDiscoveryResource.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@FastFedDiscoveryResource.Title</h3>
+
+@if(ViewData.ModelState.IsValid)
+{
+    <ul class="list-group">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@error.ErrorMessage</li>
+            }
+        }
+    </ul>
+}
+
+<div class="card">
+    <div class="card-body">       
+        <div class="accordion" id="accordionParent">
+            <!-- Email-->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        1 - @FastFedDiscoveryResource.Email
+                    </button>
+                </h2>
+                <div id="collapseOne" class="@(Model.WebfingerResult == null ? "accordion-collapse collapse show" : "accordion-collapse collapse")" data-bs-parent="#accordionParent">
+                    <div class="accordion-body">
+                        <form asp-controller="FastFedDiscovery" asp-action="Index" asp-area="" method="post">
+                            @Html.AntiForgeryToken()
+                            <div class="mb-3">
+                                <label class="form-label">@FastFedDiscoveryResource.UserEmail</label>
+                                <input type="text" class="form-control" value="@Model.Email" name="@nameof(DiscoverProvidersViewModel.Email)" />
+                            </div>
+                            <button type="submit" class="btn btn-primary">@FastFedDiscoveryResource.Resolve</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Provider-->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        2 - @FastFedDiscoveryResource.Providers
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="@(Model.WebfingerResult != null ? "accordion-collapse collapse show" : "accordion-collapse collapse")" data-bs-parent="#accordionParent">
+                    <div class="accordion-body">
+                        @if (Model.WebfingerResult != null)
+                        {
+                            <form asp-controller="FastFedDiscovery" asp-action="Select" asp-area="" method="get">
+                                <div class="mb-3">
+                                    <label class="form-label">@FastFedDiscoveryResource.ChooseProvider</label>
+                                    <select class="form-select" name="Url">
+                                        @foreach (var link in Model.WebfingerResult.Links)
+                                        {
+                                            <option value="@link.Href">@link.Href</option>
+                                        }
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">@FastFedDiscoveryResource.Choose</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @FastFedDiscoveryResource.NoEmailDiscovered
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- Provider information -->
+        </div>
+    </div>
+</div>

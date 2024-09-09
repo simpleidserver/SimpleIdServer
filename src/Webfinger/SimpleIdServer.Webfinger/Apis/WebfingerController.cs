@@ -24,7 +24,7 @@ public class WebfingerController : Controller
     {
         var splittedResource = request.Resource.Split(':');
         var scheme = splittedResource.First();
-        var subject = splittedResource.Last();
+        var subject = string.Join(":", splittedResource.Skip(1));
         var webfingerResources = await _resourceStore.GetResources(scheme, subject, request.Rel, cancellationToken);
         var result = new GetWebfingerResult
         {

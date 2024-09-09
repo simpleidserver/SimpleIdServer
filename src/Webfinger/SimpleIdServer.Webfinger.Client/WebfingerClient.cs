@@ -16,11 +16,11 @@ public class WebfingerClient
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<GetWebfingerResult> Get(string url, CancellationToken cancellationToken)
+    public async Task<GetWebfingerResult> Get(string url, GetWebfingerRequest request, CancellationToken cancellationToken)
     {
         using (var httpClient = _httpClientFactory.GetHttpClient())
         {
-            var result = await httpClient.GetFromJsonAsync<GetWebfingerResult>($"{url}/{RouteNames.WellKnownWebFinger}", cancellationToken);
+            var result = await httpClient.GetFromJsonAsync<GetWebfingerResult>($"{url}?{request.ToQueryParameters()}", cancellationToken);
             return result;
         }
     }

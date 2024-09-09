@@ -1,38 +1,42 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels;
-using SimpleIdServer.Webfinger.Client;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.FastFed.ApplicationProvider.UIs
 {
-    [Authorize("Authenticated")]
-    public class FastFedDiscoveryUiController : Controller
+    // [Authorize("Authenticated")]
+    public class FastFedDiscoveryController : Controller
     {
-        private readonly IWebfingerClientFactory _clientFactory;
         private readonly IFastFedService _fastFedService;
 
-        public FastFedDiscoveryUiController(IWebfingerClientFactory clientFactory, IFastFedService fastFedService)
+        public FastFedDiscoveryController(IFastFedService fastFedService)
         {
-            _clientFactory = clientFactory;
             _fastFedService = fastFedService;
         }
 
-        public async Task<IActionResult> Discover(string url = null, CancellationToken cancellationToken = default(CancellationToken))
+        public IActionResult Index()
         {
-            // TODO : CHECK THE PERMISSION - Use must be an administrator.
-            var viewModel = new DiscoverIdentityProviderViewModel();
-            if(!string.IsNullOrWhiteSpace(url))
+            return View(new DiscoverProvidersViewModel());
+        }
+
+        [HttpPost]
+        [RequireAntiforgeryToken]
+        public async Task<IActionResult> Index(DiscoverProvidersViewModel viewModel, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var resolutionResult = await _fastFedService.ResolveProviders(viewModel.Email, cancellationToken);
+            if (resolutionResult.HasError)
             {
-                var client = _clientFactory.Build();
-                viewModel.WebfingerResult = await client.Get(url, cancellationToken);
+                ModelState.AddModelError(resolutionResult.ErrorCode, resolutionResult.ErrorDescription);
+                return View(viewModel);
             }
 
+            viewModel.WebfingerResult = resolutionResult.Result;
             return View(viewModel);
         }
 

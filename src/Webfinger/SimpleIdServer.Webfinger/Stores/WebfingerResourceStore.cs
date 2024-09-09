@@ -11,16 +11,3 @@ public interface IWebfingerResourceStore
 {
     Task<List<WebfingerResource>> GetResources(string scheme, string subject, List<string> rels, CancellationToken cancellationToken);
 }
-
-public class WebfingerResourceStore : IWebfingerResourceStore
-{
-    public WebfingerResourceStore()
-    {
-        
-    }
-
-    public Task<List<WebfingerResource>> GetResources(string scheme, string subject, List<string> rels, CancellationToken cancellationToken)
-    {
-        throw new System.NotImplementedException();
-    }
-}

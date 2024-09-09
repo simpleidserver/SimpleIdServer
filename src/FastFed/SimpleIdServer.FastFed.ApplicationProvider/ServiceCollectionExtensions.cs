@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.FastFed.ApplicationProvider;
 using SimpleIdServer.FastFed.ApplicationProvider.Apis.ProviderMetadata;
+using SimpleIdServer.FastFed.ApplicationProvider.Resolvers;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.FastFed.ApplicationProvider.Stores;
 using SimpleIdServer.IdServer.Helpers;
@@ -21,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IIdentityProviderFederationStore, IdentityProviderFederationStore>();
         services.AddTransient<IGetApplicationProviderMetadataQuery, GetApplicationProviderMetadataQuery>();
         services.AddTransient<IWebfingerClientFactory, WebfingerClientFactory>();
+        services.AddTransient<IWebfingerUrlResolver, WebfingerUrlResolver>();
         return services;
     }
 }

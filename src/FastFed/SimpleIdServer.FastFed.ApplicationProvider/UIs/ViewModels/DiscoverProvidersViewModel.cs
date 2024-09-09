@@ -5,7 +5,8 @@ using SimpleIdServer.Webfinger.Client;
 
 namespace SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels;
 
-public class DiscoverIdentityProviderViewModel
+public class DiscoverProvidersViewModel
 {
-    public GetWebfingerResult WebfingerResult { get; set; }
+    public string Email { get; set; }
+    public GetWebfingerResult? WebfingerResult { get; set; } = null;
 }

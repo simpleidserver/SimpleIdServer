@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Core", "01. Core", "{CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Core", "02. Core", "{CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed", "src\FastFed\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj", "{F3FFFDDF-FD01-4964-AC03-B26D2E9B1198}"
 EndProject
@@ -18,6 +18,16 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Webfinger", "src\Webfinger\SimpleIdServer.Webfinger\SimpleIdServer.Webfinger.csproj", "{6227C490-D218-4E4B-98A6-F17ABE1C16B3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Webfinger.Client", "src\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj", "{F76CEA86-7350-49BF-A7D1-CBC0D403758A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Startup", "03. Startup", "{A9DC45BC-3F36-4358-94B0-26D25CCD88A2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.IdentityProvider.Startup", "src\FastFed\SimpleIdServer.FastFed.IdentityProvider.Startup\SimpleIdServer.FastFed.IdentityProvider.Startup.csproj", "{80467DB9-DE6A-476D-991C-9FF3834655DD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Webfinger", "01. Webfinger", "{96F2A1CA-A5DA-4D64-ACD4-E4E229206312}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Webfinger.Store.EF", "src\Webfinger\SimpleIdServer.Webfinger.Store.EF\SimpleIdServer.Webfinger.Store.EF.csproj", "{134F2D4D-B802-4044-9200-AE9959E2D4F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.ApplicationProvider.Startup", "src\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Startup\SimpleIdServer.FastFed.ApplicationProvider.Startup.csproj", "{6EDA9EBD-AE83-4B73-AD4F-70567D128CCC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +59,18 @@ Global
 		{F76CEA86-7350-49BF-A7D1-CBC0D403758A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F76CEA86-7350-49BF-A7D1-CBC0D403758A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F76CEA86-7350-49BF-A7D1-CBC0D403758A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80467DB9-DE6A-476D-991C-9FF3834655DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80467DB9-DE6A-476D-991C-9FF3834655DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80467DB9-DE6A-476D-991C-9FF3834655DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80467DB9-DE6A-476D-991C-9FF3834655DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{134F2D4D-B802-4044-9200-AE9959E2D4F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{134F2D4D-B802-4044-9200-AE9959E2D4F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{134F2D4D-B802-4044-9200-AE9959E2D4F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{134F2D4D-B802-4044-9200-AE9959E2D4F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EDA9EBD-AE83-4B73-AD4F-70567D128CCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EDA9EBD-AE83-4B73-AD4F-70567D128CCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EDA9EBD-AE83-4B73-AD4F-70567D128CCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EDA9EBD-AE83-4B73-AD4F-70567D128CCC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,8 +80,11 @@ Global
 		{66FE11AE-2462-4E86-B5CD-68E545102D8A} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
 		{C1F1EC87-D6E9-42B8-AA82-9C652C4204A3} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
 		{745ED978-7FE1-4DC3-AF84-94159A5DB4BD} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
-		{6227C490-D218-4E4B-98A6-F17ABE1C16B3} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
-		{F76CEA86-7350-49BF-A7D1-CBC0D403758A} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
+		{6227C490-D218-4E4B-98A6-F17ABE1C16B3} = {96F2A1CA-A5DA-4D64-ACD4-E4E229206312}
+		{F76CEA86-7350-49BF-A7D1-CBC0D403758A} = {96F2A1CA-A5DA-4D64-ACD4-E4E229206312}
+		{80467DB9-DE6A-476D-991C-9FF3834655DD} = {A9DC45BC-3F36-4358-94B0-26D25CCD88A2}
+		{134F2D4D-B802-4044-9200-AE9959E2D4F3} = {96F2A1CA-A5DA-4D64-ACD4-E4E229206312}
+		{6EDA9EBD-AE83-4B73-AD4F-70567D128CCC} = {A9DC45BC-3F36-4358-94B0-26D25CCD88A2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFEA5C5B-33EB-4AEC-BB66-20E5AD9C228D}

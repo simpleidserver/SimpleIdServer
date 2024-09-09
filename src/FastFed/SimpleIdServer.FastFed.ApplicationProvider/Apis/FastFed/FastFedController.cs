@@ -8,13 +8,20 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.FastFed.ApplicationProvider.Apis.FastFed;
 
-public class FastFedController : Controller
+public class FastFedController : BaseController
 {
     private readonly IFastFedService _fastFedService;
 
     public FastFedController(IFastFedService fastFedService)
     {
         _fastFedService = fastFedService;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Resolve([FromBody] ResolveFastFedProvidersRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _fastFedService.ResolveProviders(request.Email, cancellationToken);
+        return BuildResult(result);   
     }
 
     [HttpPost]

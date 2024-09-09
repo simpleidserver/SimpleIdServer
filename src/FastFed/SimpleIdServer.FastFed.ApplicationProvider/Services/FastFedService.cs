@@ -3,11 +3,15 @@
 using Microsoft.Extensions.Options;
 using SimpleIdServer.FastFed.ApplicationProvider.Apis.ProviderMetadata;
 using SimpleIdServer.FastFed.ApplicationProvider.Models;
+using SimpleIdServer.FastFed.ApplicationProvider.Resolvers;
+using SimpleIdServer.FastFed.ApplicationProvider.Resources;
 using SimpleIdServer.FastFed.ApplicationProvider.Stores;
 using SimpleIdServer.FastFed.Requests;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.Webfinger.Client;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text.RegularExpressions;
@@ -18,6 +22,7 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Services;
 
 public interface IFastFedService
 {
+    Task<ValidationResult<GetWebfingerResult>> ResolveProviders(string email, CancellationToken cancellationToken);
     Task<ValidationResult<(FastFed.Models.ProviderMetadata metadata, IdentityProviderFederation federation)>> ValidateIdentityProviderMetadata(string url, CancellationToken cancellationToken);
     Task<ValidationResult<(StartHandshakeRequest request, string fastFedHandshakeStartUri)>> StartWhitelist(string issuer, string url, CancellationToken cancellationToken);
 }
@@ -27,18 +32,43 @@ public class FastFedService : IFastFedService
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IIdentityProviderFederationStore _identityProviderFederationStore;
     private readonly IGetApplicationProviderMetadataQuery _getApplicationProviderMetadataQuery;
+    private readonly IWebfingerUrlResolver _webfingerUrlResolver;
+    private readonly IWebfingerClientFactory _webfingerClientFactory;
     private readonly FastFedApplicationProviderOptions _options;
 
     public FastFedService(
         IHttpClientFactory httpClientFactory, 
         IIdentityProviderFederationStore identityProviderFederationStore, 
         IGetApplicationProviderMetadataQuery getApplicationProviderMetadataQuery,
+        IWebfingerUrlResolver webfingerUrlResolver,
+        IWebfingerClientFactory webfingerClientFactory,
         IOptions<FastFedApplicationProviderOptions> options)
     {
         _httpClientFactory = httpClientFactory;
         _identityProviderFederationStore = identityProviderFederationStore;
         _getApplicationProviderMetadataQuery = getApplicationProviderMetadataQuery;
+        _webfingerUrlResolver = webfingerUrlResolver;
+        _webfingerClientFactory = webfingerClientFactory;
         _options = options.Value;
+    }
+
+    public async Task<ValidationResult<GetWebfingerResult>> ResolveProviders(string email, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(email)) return ValidationResult<GetWebfingerResult>.Fail(ErrorCodes.InvalidRequest, string.Format(Global.MissingParameter, "email"));
+        var attr = new EmailAddressAttribute();
+        if(!attr.IsValid(email)) return ValidationResult<GetWebfingerResult>.Fail(ErrorCodes.InvalidRequest, Global.EmailIsInvalid);
+        var splittedEmail = email.Split("@");
+        var url = _webfingerUrlResolver.Resolve(splittedEmail.Last());
+        var client = _webfingerClientFactory.Build();
+        var webfingerResult = await client.Get(url, new GetWebfingerRequest
+        {
+            Rel = new List<string>
+            {
+                FastFed.Constants.FastFedRel
+            },
+            Resource = $"acct:{email}"
+        }, cancellationToken);
+        return ValidationResult<GetWebfingerResult>.Ok(webfingerResult);
     }
 
     public async Task<ValidationResult<(FastFed.Models.ProviderMetadata metadata, IdentityProviderFederation federation)>> ValidateIdentityProviderMetadata(string url, CancellationToken cancellationToken)
