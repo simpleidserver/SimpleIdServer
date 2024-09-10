@@ -4,8 +4,4 @@ namespace SimpleIdServer.FastFed.IdentityProvider;
 
 public class FastFedIdentityProviderOptions
 {
-    public string ProviderDomain { get; set; }
-    public FastFed.Models.Capabilities Capabilities { get; set; }
-    public FastFed.Models.DisplaySettings DisplaySettings { get; set; }
-    public FastFed.Models.ProviderContactInformation ContactInformation { get; set; }
 }

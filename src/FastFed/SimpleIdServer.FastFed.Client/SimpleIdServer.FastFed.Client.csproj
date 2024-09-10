@@ -5,6 +5,6 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj" />
-	  <ProjectReference Include="..\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.Domains\SimpleIdServer.FastFed.Domains.csproj" />
 	</ItemGroup>
 </Project>

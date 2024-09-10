@@ -13,7 +13,7 @@ public class SelectIdentityProviderViewModel
         ErrorDescription = errorDescription;
     }
 
-    public SelectIdentityProviderViewModel(string url, FastFed.Models.ProviderMetadata providerMetadata, IdentityProviderFederation identityProviderFederation)
+    public SelectIdentityProviderViewModel(string url, FastFed.Domains.ProviderMetadata providerMetadata, IdentityProviderFederation identityProviderFederation)
     {
         Url = url;
         ProviderMetadata = providerMetadata;
@@ -23,6 +23,6 @@ public class SelectIdentityProviderViewModel
     public string ErrorCode { get; set; }
     public string ErrorDescription { get; set; }
     public string Url { get; set; }
-    public FastFed.Models.ProviderMetadata ProviderMetadata { get; set; }
+    public FastFed.Domains.ProviderMetadata ProviderMetadata { get; set; }
     public IdentityProviderFederation IdentityProviderFederation { get; set; }
 }

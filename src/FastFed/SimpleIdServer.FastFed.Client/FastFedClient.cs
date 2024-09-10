@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.FastFed.Models;
+using SimpleIdServer.FastFed.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using System.Net.Http.Json;
 using System.Threading;

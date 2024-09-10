@@ -6,6 +6,7 @@ using SimpleIdServer.FastFed.ApplicationProvider.Resolvers;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels;
 using SimpleIdServer.FastFed.Client;
+using SimpleIdServer.FastFed.Resolvers;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -41,7 +42,9 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.UIs
                 var validationResult = await _fastFedService.StartWhitelist(issuer, viewModel.Href, cancellationToken);
                 if (validationResult.HasError)
                 {
-                    ModelState.AddModelError(validationResult.ErrorCode, validationResult.ErrorDescription);
+                    foreach (var errorDescription in validationResult.ErrorDescriptions)
+                        ModelState.AddModelError(validationResult.ErrorCode, errorDescription);
+
                     return View(viewModel);
                 }
 
@@ -55,7 +58,9 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.UIs
                 var resolutionResult = await _fastFedService.ResolveProviders(viewModel.Email, cancellationToken);
                 if (resolutionResult.HasError)
                 {
-                    ModelState.AddModelError(resolutionResult.ErrorCode, resolutionResult.ErrorDescription);
+                    foreach(var errorDescription in resolutionResult.ErrorDescriptions)
+                        ModelState.AddModelError(resolutionResult.ErrorCode, errorDescription);
+
                     return View(viewModel);
                 }
 

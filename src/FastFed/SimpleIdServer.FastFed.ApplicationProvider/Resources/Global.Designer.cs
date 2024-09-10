@@ -70,11 +70,47 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Federation with the identity provider is already configured.
+        /// </summary>
+        internal static string IdentityProviderFederationExists {
+            get {
+                return ResourceManager.GetString("IdentityProviderFederationExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity provider metadata cannot be retrieved.
+        /// </summary>
+        internal static string IdProviderMetadataCannotBeRetrieved {
+            get {
+                return ResourceManager.GetString("IdProviderMetadataCannotBeRetrieved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Parameter &apos;{0}&apos; is missing.
         /// </summary>
         internal static string MissingParameter {
             get {
                 return ResourceManager.GetString("MissingParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Provider metadata cannot be retrieved.
+        /// </summary>
+        internal static string ProviderMetadataCannotBeRetrieved {
+            get {
+                return ResourceManager.GetString("ProviderMetadataCannotBeRetrieved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The provider name suffix {0} is not satisifed.
+        /// </summary>
+        internal static string ProviderNameSuffixNotSatisfied {
+            get {
+                return ResourceManager.GetString("ProviderNameSuffixNotSatisfied", resourceCulture);
             }
         }
     }

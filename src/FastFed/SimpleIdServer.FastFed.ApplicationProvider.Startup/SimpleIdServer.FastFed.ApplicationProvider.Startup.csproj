@@ -11,6 +11,7 @@
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider.Store.EF\SimpleIdServer.FastFed.ApplicationProvider.Store.EF.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
 	</ItemGroup>
 	<ItemGroup>

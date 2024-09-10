@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.4" />
+		<PackageReference Include="SpecFlow" Version="3.9.74" />
+		<PackageReference Include="SpecFlow.Tools.MsBuild.Generation" Version="3.9.74" />
+		<PackageReference Include="SpecFlow.xUnit" Version="3.9.74" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Moq" Version="4.20.70" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Store.EF\SimpleIdServer.FastFed.ApplicationProvider.Store.EF.csproj" />
+	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
+	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Features\" />
+	  <Folder Include="Steps\" />
+	</ItemGroup>
+</Project>

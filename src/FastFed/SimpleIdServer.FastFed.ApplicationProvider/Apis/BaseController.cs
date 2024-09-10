@@ -17,7 +17,7 @@ public class BaseController : Controller
             Content = JsonSerializer.Serialize(new ErrorResult
             {
                 ErrorCode = result.ErrorCode,
-                ErrorDescription = result.ErrorDescription
+                ErrorDescriptions = result.ErrorDescriptions
             }),
             ContentType = "application/json"
         };

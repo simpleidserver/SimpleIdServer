@@ -123,4 +123,16 @@
   <data name="EmailIsInvalid" xml:space="preserve">
     <value>Email is invalid</value>
   </data>
+  <data name="ProviderMetadataCannotBeRetrieved" xml:space="preserve">
+    <value>Provider metadata cannot be retrieved</value>
+  </data>
+  <data name="IdProviderMetadataCannotBeRetrieved" xml:space="preserve">
+    <value>Identity provider metadata cannot be retrieved</value>
+  </data>
+  <data name="ProviderNameSuffixNotSatisfied" xml:space="preserve">
+    <value>The provider name suffix {0} is not satisifed</value>
+  </data>
+  <data name="IdentityProviderFederationExists" xml:space="preserve">
+    <value>Federation with the identity provider is already configured</value>
+  </data>
 </root>

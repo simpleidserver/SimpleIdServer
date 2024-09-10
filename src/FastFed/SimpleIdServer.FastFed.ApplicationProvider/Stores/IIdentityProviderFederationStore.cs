@@ -12,21 +12,3 @@ public interface IIdentityProviderFederationStore
     void Add(IdentityProviderFederation identityProviderFederation);
     Task<int> SaveChanges(CancellationToken cancellationToken);
 }
-
-public class IdentityProviderFederationStore : IIdentityProviderFederationStore
-{
-    public void Add(IdentityProviderFederation identityProviderFederation)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public Task<IdentityProviderFederation> Get(string entityId, CancellationToken cancellationToken)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public Task<int> SaveChanges(CancellationToken cancellationToken)
-    {
-        throw new System.NotImplementedException();
-    }
-}
