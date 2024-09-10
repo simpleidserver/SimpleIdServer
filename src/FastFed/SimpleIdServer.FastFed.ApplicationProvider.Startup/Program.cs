@@ -22,7 +22,5 @@ var app = builder.Build();
 app.UseRouting();
 app.UseStaticFiles();
 app.UseAntiforgery();
-app.MapControllerRoute(
-name: "defaultWithArea",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.UseApplicationProvider();
 app.Run();

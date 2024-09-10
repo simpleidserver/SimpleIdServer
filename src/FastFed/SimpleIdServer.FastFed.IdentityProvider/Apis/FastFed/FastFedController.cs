@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.FastFed.Requests;
 using SimpleIdServer.IdServer.Helpers;
@@ -9,14 +8,24 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.FastFed.IdentityProvider.Apis.FastFed;
 
-[Authorize("Authenticated")]
+// [Authorize("Authenticated")]
 public class FastFedController : Controller
 {
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IGetIdentityProviderMetadataQuery _getIdentityProviderMetadataQuery;
 
-    public FastFedController(IHttpClientFactory httpClientFactory)
+    public FastFedController(IHttpClientFactory httpClientFactory, IGetIdentityProviderMetadataQuery getIdentityProviderMetadataQuery)
     {
         _httpClientFactory = httpClientFactory;
+        _getIdentityProviderMetadataQuery = getIdentityProviderMetadataQuery;
+    }
+
+
+    [HttpGet]
+    public IActionResult GetMetadata()
+    {
+        var result = _getIdentityProviderMetadataQuery.Get();
+        return Ok(result);
     }
 
     [HttpGet]

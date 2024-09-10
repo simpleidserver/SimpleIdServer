@@ -2,8 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
+using SimpleIdServer.FastFed.ApplicationProvider.Resolvers;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels;
+using SimpleIdServer.FastFed.Client;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,10 +16,14 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.UIs
     public class FastFedDiscoveryController : Controller
     {
         private readonly IFastFedService _fastFedService;
+        private readonly IFastFedClientFactory _fastFedClientFactory;
+        private readonly IIssuerResolver _issuerResolver;
 
-        public FastFedDiscoveryController(IFastFedService fastFedService)
+        public FastFedDiscoveryController(IFastFedService fastFedService, IFastFedClientFactory fastFedClientFactory, IIssuerResolver issuerResolver)
         {
             _fastFedService = fastFedService;
+            _fastFedClientFactory = fastFedClientFactory;
+            _issuerResolver = issuerResolver;
         }
 
         public IActionResult Index()
@@ -29,40 +35,41 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.UIs
         [RequireAntiforgeryToken]
         public async Task<IActionResult> Index(DiscoverProvidersViewModel viewModel, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var resolutionResult = await _fastFedService.ResolveProviders(viewModel.Email, cancellationToken);
-            if (resolutionResult.HasError)
+            if(viewModel.Action == DiscoverProviderActions.CONFIRMPROVIDER)
             {
-                ModelState.AddModelError(resolutionResult.ErrorCode, resolutionResult.ErrorDescription);
-                return View(viewModel);
+                var issuer = _issuerResolver.Get();
+                var validationResult = await _fastFedService.StartWhitelist(issuer, viewModel.Href, cancellationToken);
+                if (validationResult.HasError)
+                {
+                    ModelState.AddModelError(validationResult.ErrorCode, validationResult.ErrorDescription);
+                    return View(viewModel);
+                }
+
+                var builder = new UriBuilder(validationResult.Result.fastFedHandshakeStartUri);
+                builder.Query = validationResult.Result.request.ToQueryParameters();
+                return Redirect(builder.Uri.ToString());
             }
 
-            viewModel.WebfingerResult = resolutionResult.Result;
+            if(viewModel.Action == DiscoverProviderActions.CONFIRMEMAIL || viewModel.Action == DiscoverProviderActions.SELECTPROVIDER)
+            {
+                var resolutionResult = await _fastFedService.ResolveProviders(viewModel.Email, cancellationToken);
+                if (resolutionResult.HasError)
+                {
+                    ModelState.AddModelError(resolutionResult.ErrorCode, resolutionResult.ErrorDescription);
+                    return View(viewModel);
+                }
+
+                viewModel.WebfingerResult = resolutionResult.Result;
+            }
+
+            if (viewModel.Action == DiscoverProviderActions.SELECTPROVIDER)
+            {
+                var client = _fastFedClientFactory.Build();
+                var providerMetadata = await client.GetProviderMetadata(viewModel.Href, cancellationToken);
+                viewModel.ProviderMetadata = providerMetadata;
+            }
+
             return View(viewModel);
-        }
-
-        public async Task<IActionResult> Select(string url, CancellationToken cancellationToken)
-        {
-            var validationResult = await _fastFedService.ValidateIdentityProviderMetadata(url, cancellationToken);
-            if(validationResult.HasError)
-            {
-                return View(new SelectIdentityProviderViewModel(validationResult.ErrorCode, validationResult.ErrorDescription));
-            }
-
-            return View(new SelectIdentityProviderViewModel(url,  validationResult.Result.metadata, validationResult.Result.federation));
-        }
-
-        public async Task<IActionResult> Confirm(string url, CancellationToken cancellationToken)
-        {
-            var issuer = this.GetAbsoluteUriWithVirtualPath();
-            var validationResult = await _fastFedService.StartWhitelist(issuer, url, cancellationToken);
-            if (validationResult.HasError)
-            {
-                return View(new ConfirmIdentityProviderViewModel(validationResult.ErrorCode, validationResult.ErrorDescription));
-            }
-
-            var builder = new UriBuilder(validationResult.Result.fastFedHandshakeStartUri);
-            builder.Query = validationResult.Result.request.ToQueryParameters();
-            return Redirect(builder.Uri.ToString());
         }
     }
 }

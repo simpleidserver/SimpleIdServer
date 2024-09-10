@@ -1,11 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using SimpleIdServer.FastFed.ApplicationProvider.Apis.ProviderMetadata;
+using SimpleIdServer.FastFed.ApplicationProvider.Apis.FastFed;
 using SimpleIdServer.FastFed.ApplicationProvider.Models;
 using SimpleIdServer.FastFed.ApplicationProvider.Resolvers;
 using SimpleIdServer.FastFed.ApplicationProvider.Resources;
 using SimpleIdServer.FastFed.ApplicationProvider.Stores;
+using SimpleIdServer.FastFed.Client;
 using SimpleIdServer.FastFed.Requests;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.Webfinger.Client;
@@ -13,7 +14,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net.Http.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,14 +34,16 @@ public class FastFedService : IFastFedService
     private readonly IGetApplicationProviderMetadataQuery _getApplicationProviderMetadataQuery;
     private readonly IWebfingerUrlResolver _webfingerUrlResolver;
     private readonly IWebfingerClientFactory _webfingerClientFactory;
+    private readonly IFastFedClientFactory _fastFedClientFactory;
     private readonly FastFedApplicationProviderOptions _options;
 
     public FastFedService(
         IHttpClientFactory httpClientFactory, 
-        IIdentityProviderFederationStore identityProviderFederationStore, 
+        IIdentityProviderFederationStore identityProviderFederationStore,
         IGetApplicationProviderMetadataQuery getApplicationProviderMetadataQuery,
         IWebfingerUrlResolver webfingerUrlResolver,
         IWebfingerClientFactory webfingerClientFactory,
+        IFastFedClientFactory fastFedClientFactory,
         IOptions<FastFedApplicationProviderOptions> options)
     {
         _httpClientFactory = httpClientFactory;
@@ -49,6 +51,7 @@ public class FastFedService : IFastFedService
         _getApplicationProviderMetadataQuery = getApplicationProviderMetadataQuery;
         _webfingerUrlResolver = webfingerUrlResolver;
         _webfingerClientFactory = webfingerClientFactory;
+        _fastFedClientFactory = fastFedClientFactory;
         _options = options.Value;
     }
 
@@ -74,31 +77,29 @@ public class FastFedService : IFastFedService
     public async Task<ValidationResult<(FastFed.Models.ProviderMetadata metadata, IdentityProviderFederation federation)>> ValidateIdentityProviderMetadata(string url, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(url)) return null; // TODO : ERROR
-        using (var httpClient = _httpClientFactory.GetHttpClient())
-        {
-            // 7.2.1.2. Application Provider Reads Identity Provider Metadata
-            var providerMetadata = await httpClient.GetFromJsonAsync<FastFed.Models.ProviderMetadata>($"{url}/provider-metadata", cancellationToken);
-            if (providerMetadata == null) return null; // TODO : ERROR
-            if (providerMetadata.IdentityProvider == null) return null; // TODO : ERROR
-            var errors = providerMetadata.IdentityProvider.Validate();
-            if (errors.Any()) return null; // TODO : ERROR
-            // Application Provider MUST validate the provider_domain
-            if (!IsProviderNameSuffixValid(url, providerMetadata.IdentityProvider)) return null; // TODO : ERROR
-            // 7.2.1.3. Application Provider Checks For Duplicates
-            var identityProviderFederation = await _identityProviderFederationStore.Get(providerMetadata.IdentityProvider.EntityId, cancellationToken);
-            if (identityProviderFederation != null && identityProviderFederation.Status == IdentityProviderStatus.CONFIRMED) return null;
-            if (identityProviderFederation != null && identityProviderFederation.IsExpired) return null;
-            // 7.2.1.4. Application Provider Verifies Compatibility with Identity Provider
-            var compatiblityCheckResult = CheckCompatibility(providerMetadata.IdentityProvider);
-            if (!compatiblityCheckResult.Any()) return null; // TODO : ERROR
+        // 7.2.1.2. Application Provider Reads Identity Provider Metadata
+        var client = _fastFedClientFactory.Build();
+        var providerMetadata = await client.GetProviderMetadata(url, cancellationToken);
+        if (providerMetadata == null) return null; // TODO : ERROR
+        if (providerMetadata.IdentityProvider == null) return null; // TODO : ERROR
+        var errors = providerMetadata.IdentityProvider.Validate();
+        if (errors.Any()) return null; // TODO : ERROR
+        // Application Provider MUST validate the provider_domain
+        if (!IsProviderNameSuffixValid(url, providerMetadata.IdentityProvider)) return null; // TODO : ERROR
+        // 7.2.1.3. Application Provider Checks For Duplicates
+        var identityProviderFederation = await _identityProviderFederationStore.Get(providerMetadata.IdentityProvider.EntityId, cancellationToken);
+        if (identityProviderFederation != null && identityProviderFederation.Status == IdentityProviderStatus.CONFIRMED) return null;
+        if (identityProviderFederation != null && identityProviderFederation.IsExpired) return null;
+        // 7.2.1.4. Application Provider Verifies Compatibility with Identity Provider
+        var compatiblityCheckResult = CheckCompatibility(providerMetadata.IdentityProvider);
+        if (!compatiblityCheckResult.Any()) return null; // TODO : ERROR
 
-            /*
-            // 7.2.1.5. Application Provider Obtains Confirmation from Administrator
-            if (identityProviderFederation == null || !identityProviderFederation.IsConfirmedByAdministrator) return null; // TODO : ERROR
-            */
+        /*
+        // 7.2.1.5. Application Provider Obtains Confirmation from Administrator
+        if (identityProviderFederation == null || !identityProviderFederation.IsConfirmedByAdministrator) return null; // TODO : ERROR
+        */
 
-            return ValidationResult<(FastFed.Models.ProviderMetadata, IdentityProviderFederation)>.Ok((providerMetadata, identityProviderFederation));
-        }
+        return ValidationResult<(FastFed.Models.ProviderMetadata, IdentityProviderFederation)>.Ok((providerMetadata, identityProviderFederation));
     }
 
     public async Task<ValidationResult<(StartHandshakeRequest request, string fastFedHandshakeStartUri)>> StartWhitelist(string issuer, string url, CancellationToken cancellationToken)
@@ -122,7 +123,7 @@ public class FastFedService : IFastFedService
 
     private bool IsProviderNameSuffixValid(string url, FastFed.Models.IdentityProviderMetadata identityProviderMetadata)
     {
-        var regex = new Regex($"^https://.*{identityProviderMetadata.ProviderName}.*$");
+        var regex = new Regex($"^https://.*{identityProviderMetadata.ProviderDomain}.*$");
         return regex.IsMatch(url);
     }
 

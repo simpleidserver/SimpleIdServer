@@ -62,6 +62,24 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication profiles.
+        /// </summary>
+        public static string AuthenticationProfiles {
+            get {
+                return ResourceManager.GetString("AuthenticationProfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Capabilities.
+        /// </summary>
+        public static string Capabilities {
+            get {
+                return ResourceManager.GetString("Capabilities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Choose.
         /// </summary>
         public static string Choose {
@@ -80,11 +98,56 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirm.
+        /// </summary>
+        public static string Confirm {
+            get {
+                return ResourceManager.GetString("Confirm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirm.
+        /// </summary>
+        public static string ConfirmProvider {
+            get {
+                return ResourceManager.GetString("ConfirmProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Email.
         /// </summary>
         public static string Email {
             get {
                 return ResourceManager.GetString("Email", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Information.
+        /// </summary>
+        public static string Information {
+            get {
+                return ResourceManager.GetString("Information", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à License.
+        /// </summary>
+        public static string License {
+            get {
+                return ResourceManager.GetString("License", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Name.
+        /// </summary>
+        public static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
             }
         }
         
@@ -98,6 +161,24 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no provider selected.
+        /// </summary>
+        public static string NoProviderIsSelected {
+            get {
+                return ResourceManager.GetString("NoProviderIsSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Not an identity provider.
+        /// </summary>
+        public static string NotAnIdentityProvider {
+            get {
+                return ResourceManager.GetString("NotAnIdentityProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Providers.
         /// </summary>
         public static string Providers {
@@ -107,11 +188,38 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Provisioning profiles.
+        /// </summary>
+        public static string ProvisioningProfiles {
+            get {
+                return ResourceManager.GetString("ProvisioningProfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Resolve.
         /// </summary>
         public static string Resolve {
             get {
                 return ResourceManager.GetString("Resolve", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Supported JWT Signing Algorithms.
+        /// </summary>
+        public static string SupportedJwtSigningAlgs {
+            get {
+                return ResourceManager.GetString("SupportedJwtSigningAlgs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Supported schema grammars.
+        /// </summary>
+        public static string SupportedSchemaGrammars {
+            get {
+                return ResourceManager.GetString("SupportedSchemaGrammars", resourceCulture);
             }
         }
         

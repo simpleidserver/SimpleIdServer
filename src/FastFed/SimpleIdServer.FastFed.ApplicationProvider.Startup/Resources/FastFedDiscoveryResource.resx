@@ -141,4 +141,40 @@
   <data name="Providers" xml:space="preserve">
     <value>Providers</value>
   </data>
+  <data name="ConfirmProvider" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
+  <data name="NoProviderIsSelected" xml:space="preserve">
+    <value>There is no provider selected</value>
+  </data>
+  <data name="NotAnIdentityProvider" xml:space="preserve">
+    <value>Not an identity provider</value>
+  </data>
+  <data name="AuthenticationProfiles" xml:space="preserve">
+    <value>Authentication profiles</value>
+  </data>
+  <data name="ProvisioningProfiles" xml:space="preserve">
+    <value>Provisioning profiles</value>
+  </data>
+  <data name="SupportedSchemaGrammars" xml:space="preserve">
+    <value>Supported schema grammars</value>
+  </data>
+  <data name="SupportedJwtSigningAlgs" xml:space="preserve">
+    <value>Supported JWT Signing Algorithms</value>
+  </data>
+  <data name="Capabilities" xml:space="preserve">
+    <value>Capabilities</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="License" xml:space="preserve">
+    <value>License</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+  </data>
 </root>

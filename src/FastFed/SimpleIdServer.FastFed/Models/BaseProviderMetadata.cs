@@ -17,8 +17,8 @@ public abstract class BaseProviderMetadata
     /// <summary>
     /// A Domain Name or the Provider. Serves as a unique key for programmatic use cases that require awareness of a distinct Provider identity. 
     /// </summary>
-    [JsonPropertyName("provider_name")]
-    public string ProviderName { get; set; } = null!;
+    [JsonPropertyName("provider_domain")]
+    public string ProviderDomain { get; set; } = null!;
     /// <summary>
     /// A structure describing the contact information for the Provider.
     /// </summary>
@@ -36,7 +36,7 @@ public abstract class BaseProviderMetadata
     {
         var result = new List<string>();
         if (string.IsNullOrWhiteSpace(EntityId)) result.Add(string.Empty);
-        if (string.IsNullOrWhiteSpace(ProviderName)) result.Add(string.Empty);
+        if (string.IsNullOrWhiteSpace(ProviderDomain)) result.Add(string.Empty);
         if (ContactInformation == null) result.Add(string.Empty);
         else result.AddRange(ContactInformation.Validate());
         if (DisplaySettings == null) result.Add(string.Empty);
