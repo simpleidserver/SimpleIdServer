@@ -70,7 +70,7 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.UIs
             if (viewModel.Action == DiscoverProviderActions.SELECTPROVIDER)
             {
                 var client = _fastFedClientFactory.Build();
-                var providerMetadata = await client.GetProviderMetadata(viewModel.Href, cancellationToken);
+                var providerMetadata = await client.GetProviderMetadata(viewModel.Href, false, cancellationToken);
                 viewModel.ProviderMetadata = providerMetadata;
             }
 

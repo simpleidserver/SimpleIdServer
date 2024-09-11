@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.FastFed.Store.EF;
 using SimpleIdServer.Webfinger;
 using SimpleIdServer.Webfinger.Builders;
 using System.Collections.Generic;
@@ -54,11 +55,14 @@ builder.Services.AddFastFed(o =>
             License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
         }
     };
-}).AddFastFedIdentityProvider();
+}).AddFastFedIdentityProvider(cbChooser: (t) => t.UseInMemoryEfStore());
 
 var app = builder.Build();
 app.UseRouting();
 app.UseWebfinger();
 app.UseFastFed()
     .UseIdentityProvider();
+app.MapControllerRoute(
+    name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();

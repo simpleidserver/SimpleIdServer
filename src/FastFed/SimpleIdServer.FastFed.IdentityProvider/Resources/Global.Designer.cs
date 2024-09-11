@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SimpleIdServer.FastFed.ApplicationProvider.Resources {
+namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.FastFed.ApplicationProvider.Resources.Global", typeof(Global).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.FastFed.IdentityProvider.Resources.Global", typeof(Global).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,56 +61,35 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Email is invalid.
+        ///   Recherche une chaîne localisée semblable à Incoming request is invalid.
         /// </summary>
-        internal static string EmailIsInvalid {
+        internal static string BadIncomingRequest {
             get {
-                return ResourceManager.GetString("EmailIsInvalid", resourceCulture);
+                return ResourceManager.GetString("BadIncomingRequest", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Federation with the identity provider is already configured.
-        /// </summary>
-        internal static string IdentityProviderFederationExists {
-            get {
-                return ResourceManager.GetString("IdentityProviderFederationExists", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Identity provider metadata cannot be retrieved.
-        /// </summary>
-        internal static string IdProviderMetadataCannotBeRetrieved {
-            get {
-                return ResourceManager.GetString("IdProviderMetadataCannotBeRetrieved", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Parameter &apos;{0}&apos; is missing.
-        /// </summary>
-        internal static string MissingParameter {
-            get {
+
+        internal static string MissingParameter
+        {
+            get
+            {
                 return ResourceManager.GetString("MissingParameter", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Provider metadata cannot be retrieved.
-        /// </summary>
-        internal static string ProviderMetadataCannotBeRetrieved {
-            get {
-                return ResourceManager.GetString("ProviderMetadataCannotBeRetrieved", resourceCulture);
+
+        internal static string ProviderMetadataCannotBeDownloaded
+        {
+            get
+            {
+                return ResourceManager.GetString("ProviderMetadataCannotBeDownloaded", resourceCulture);
             }
         }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à The provider name suffix {0} is not satisfied.
-        /// </summary>
-        internal static string ProviderNameSuffixNotSatisfied {
-            get {
-                return ResourceManager.GetString("ProviderNameSuffixNotSatisfied", resourceCulture);
+    
+        internal static string ApplicationProviderMetadataCannotBeRetrieved
+        {
+            get
+            {
+                return ResourceManager.GetString("ApplicationProviderMetadataCannotBeRetrieved", resourceCulture);
             }
         }
     }

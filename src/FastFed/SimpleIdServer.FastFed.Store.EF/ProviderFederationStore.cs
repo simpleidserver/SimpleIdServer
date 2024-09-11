@@ -2,18 +2,18 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.FastFed.ApplicationProvider.Models;
-using SimpleIdServer.FastFed.ApplicationProvider.Stores;
+using SimpleIdServer.FastFed.Models;
+using SimpleIdServer.FastFed.Stores;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.FastFed.ApplicationProvider.Store.EF;
+namespace SimpleIdServer.FastFed.Store.EF;
 
-public class IdentityProviderFederationStore : IIdentityProviderFederationStore
+public class ProviderFederationStore : IProviderFederationStore
 {
     private readonly FastFedDbContext _dbContext;
 
-    public IdentityProviderFederationStore(FastFedDbContext dbContext)
+    public ProviderFederationStore(FastFedDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -22,7 +22,7 @@ public class IdentityProviderFederationStore : IIdentityProviderFederationStore
         => _dbContext.IdentityProviderFederations.Add(identityProviderFederation);
 
     public Task<IdentityProviderFederation> Get(string entityId, CancellationToken cancellationToken)
-        => _dbContext.IdentityProviderFederations.SingleOrDefaultAsync(i => i.EntityId == entityId, cancellationToken);
+        => _dbContext.IdentityProviderFederations.Include(i => i.Capabilities).SingleOrDefaultAsync(i => i.EntityId == entityId, cancellationToken);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);

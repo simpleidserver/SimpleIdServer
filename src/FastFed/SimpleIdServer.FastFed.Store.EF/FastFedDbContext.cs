@@ -1,10 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.FastFed.ApplicationProvider.Models;
-using SimpleIdServer.FastFed.ApplicationProvider.Store.EF.Configurations;
+using SimpleIdServer.FastFed.Models;
+using SimpleIdServer.FastFed.Store.EF.Configurations;
 
-namespace SimpleIdServer.FastFed.ApplicationProvider.Store.EF;
+namespace SimpleIdServer.FastFed.Store.EF;
 
 public class FastFedDbContext : DbContext
 {
@@ -16,5 +16,6 @@ public class FastFedDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new IdentityProviderFederationConfiguration());
+        modelBuilder.ApplyConfiguration(new IdentityProviderFederationCapabilitiesConfiguration());
     }
 }

@@ -6,6 +6,9 @@
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 	</PropertyGroup>
 	<ItemGroup>
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\WhitelistErrors - Copier.feature.cs" />
+	</ItemGroup>
+	<ItemGroup>
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.4" />
@@ -23,9 +26,15 @@
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Store.EF\SimpleIdServer.FastFed.ApplicationProvider.Store.EF.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj" />
+	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Features\" />
 	  <Folder Include="Steps\" />
+	</ItemGroup>
+	<ItemGroup>
+	  <SpecFlowFeatureFiles Update="Features\Whitelist.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
 	</ItemGroup>
 </Project>

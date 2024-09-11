@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,11 @@ public class WebApiSteps
         lock(_lck)
         {
             _factory = new CustomWebApplicationFactory<Program>(scenarioContext);
+            var client = _factory.CreateClient(new WebApplicationFactoryClientOptions
+            {
+                AllowAutoRedirect = false
+            });
+            _scenarioContext.Set(client, "Client");
         }
     }
 

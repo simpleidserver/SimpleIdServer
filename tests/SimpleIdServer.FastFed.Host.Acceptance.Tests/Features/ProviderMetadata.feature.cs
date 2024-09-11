@@ -121,32 +121,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 13
  testRunner.Then("JSON \'$.application_provider.capabilities.signing_algorithms[0]\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 15
+#line 14
  testRunner.Then("JSON \'$.identity_provider.provider_domain\'=\'localhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 16
+#line 15
  testRunner.Then("JSON \'$.identity_provider.capabilities.provisioning_profiles[0]\'=\'urn:ietf:params" +
                         ":fastfed:1.0:provisioning:scim:2.0:enterprise\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 17
+#line 16
  testRunner.Then("JSON \'$.identity_provider.capabilities.schema_grammars[0]\'=\'urn:ietf:params:fastf" +
                         "ed:1.0:schemas:scim:2.0\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 18
+#line 17
  testRunner.Then("JSON \'$.identity_provider.capabilities.signing_algorithms[0]\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 19
+#line 18
  testRunner.Then("JSON \'$.identity_provider.provider_contact_information.email\'=\'support@example.co" +
                         "m\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 20
+#line 19
  testRunner.Then("JSON \'$.identity_provider.provider_contact_information.organization\'=\'Example Inc" +
                         ".\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 21
+#line 20
  testRunner.Then("JSON \'$.identity_provider.provider_contact_information.phone\'=\'+1-800-555-5555\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 22
+#line 21
  testRunner.Then("JSON \'$.identity_provider.display_settings.display_name\'=\'Example Identity Provid" +
                         "er\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

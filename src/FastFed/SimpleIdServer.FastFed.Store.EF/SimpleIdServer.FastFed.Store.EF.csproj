@@ -8,6 +8,6 @@
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.4" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj" />
 	</ItemGroup>
 </Project>

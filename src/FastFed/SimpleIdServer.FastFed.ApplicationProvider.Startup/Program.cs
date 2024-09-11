@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.FastFed.ApplicationProvider.Store.EF;
+using SimpleIdServer.FastFed.Store.EF;
 using System.Collections.Generic;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +19,7 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddAntiforgery();
 builder.Services.AddFastFed(cb =>
 {
+    cb.ProviderDomain = "localhost:5021";
     cb.AppProvider = new SimpleIdServer.FastFed.AppProviderOptions
     {
         Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
@@ -35,6 +36,18 @@ builder.Services.AddFastFed(cb =>
         {
             "RS256"
         }
+        },
+        ContactInformation = new SimpleIdServer.FastFed.Domains.ProviderContactInformation
+        {
+            Email = "support@example.com",
+            Organization = "Example Inc.",
+            Phone = "+1-800-555-5555"
+        },
+        DisplaySettings = new SimpleIdServer.FastFed.Domains.DisplaySettings
+        {
+            DisplayName = "Example Identity Provider",
+            LogoUri = "https://play-lh.googleusercontent.com/1-hPxafOxdYpYZEOKzNIkSP43HXCNftVJVttoo4ucl7rsMASXW3Xr6GlXURCubE1tA=w3840-h2160-rw",
+            License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
         }
     };
 }).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore());

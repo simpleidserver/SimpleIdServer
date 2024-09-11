@@ -3,7 +3,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Moq;
+using SimpleIdServer.IdServer.Helpers;
 using System.IO;
+using System.Net.Http;
 using TechTalk.SpecFlow;
 
 namespace SimpleIdServer.FastFed.Host.Acceptance.Tests
@@ -22,6 +27,15 @@ namespace SimpleIdServer.FastFed.Host.Acceptance.Tests
             builder.UseContentRoot(Directory.GetCurrentDirectory());
             builder.ConfigureTestServices(s =>
             {
+                s.RemoveAll<IdServer.Helpers.IHttpClientFactory>();
+                var mo = new Mock<IdServer.Helpers.IHttpClientFactory>();
+                mo.Setup(m => m.GetHttpClient())
+                    .Returns(() =>
+                    {
+                        var client = _scenarioContext.Get<HttpClient>("Client");
+                        return client;
+                    });
+                s.AddSingleton<IdServer.Helpers.IHttpClientFactory>(mo.Object);
             });
         }
     }

@@ -117,22 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="BadIncomingRequest" xml:space="preserve">
+    <value>Incoming request is invalid</value>
+  </data>
   <data name="MissingParameter" xml:space="preserve">
-    <value>Parameter '{0}' is missing</value>
+    <value>The parameter {0} is missing</value>
   </data>
-  <data name="EmailIsInvalid" xml:space="preserve">
-    <value>Email is invalid</value>
+  <data name="ProviderMetadataCannotBeDownloaded" xml:space="preserve">
+    <value>Provider metadata cannot be downloaded</value>
   </data>
-  <data name="ProviderMetadataCannotBeRetrieved" xml:space="preserve">
-    <value>Provider metadata cannot be retrieved</value>
-  </data>
-  <data name="IdProviderMetadataCannotBeRetrieved" xml:space="preserve">
-    <value>Identity provider metadata cannot be retrieved</value>
-  </data>
-  <data name="ProviderNameSuffixNotSatisfied" xml:space="preserve">
-    <value>The provider name suffix {0} is not satisfied</value>
-  </data>
-  <data name="IdentityProviderFederationExists" xml:space="preserve">
-    <value>Federation with the identity provider is already configured</value>
+  <data name="ApplicationProviderMetadataCannotBeRetrieved" xml:space="preserve">
+    <value>Application provider metadata cannot be retrieved</value>
   </data>
 </root>

@@ -2,11 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SimpleIdServer.FastFed.ApplicationProvider;
+namespace SimpleIdServer.FastFed;
 
-public class ApplicationProviderStoreChooser
+public class ProviderStoreChooser
 {
-    public ApplicationProviderStoreChooser(IServiceCollection services)
+    public ProviderStoreChooser(IServiceCollection services)
     {
         Services = services;
     }

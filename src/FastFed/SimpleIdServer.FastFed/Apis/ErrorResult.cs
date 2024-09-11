@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.FastFed.ApplicationProvider.Apis;
+namespace SimpleIdServer.FastFed.Apis;
 
 public class ErrorResult
 {

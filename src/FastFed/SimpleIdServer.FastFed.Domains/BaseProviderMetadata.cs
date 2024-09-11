@@ -51,13 +51,13 @@ public abstract class BaseProviderMetadata
     {
         var result = new List<string>();
         if(cap.AuthenticationProfiles != null && Capabilities.AuthenticationProfiles != null)
-            result.AddRange(Capabilities.AuthenticationProfiles.Except(cap.AuthenticationProfiles).Select(c => string.Format(Global.AuthenticationProfileNotCompatible, c)).ToList());
+            result.AddRange(cap.AuthenticationProfiles.Except(Capabilities.AuthenticationProfiles).Select(c => string.Format(Global.AuthenticationProfileNotCompatible, c)).ToList());
         if(cap.ProvisioningProfiles != null && Capabilities.ProvisioningProfiles != null)
-            result.AddRange(Capabilities.ProvisioningProfiles.Except(cap.ProvisioningProfiles).Select(c => string.Format(Global.ProvisioningProfileNotCompatible, c)).ToList());
+            result.AddRange(cap.ProvisioningProfiles.Except(Capabilities.ProvisioningProfiles).Select(c => string.Format(Global.ProvisioningProfileNotCompatible, c)).ToList());
         if (cap.SchemaGrammars != null && Capabilities.SchemaGrammars != null)
-            result.AddRange(Capabilities.SchemaGrammars.Except(cap.SchemaGrammars).Select(c => string.Format(Global.SchemaGrammarIsNotCompatible, c)).ToList());
+            result.AddRange(cap.SchemaGrammars.Except(Capabilities.SchemaGrammars).Select(c => string.Format(Global.SchemaGrammarIsNotCompatible, c)).ToList());
         if (cap.SigningAlgorithms != null && Capabilities.SigningAlgorithms != null)
-            result.AddRange(Capabilities.SigningAlgorithms.Except(cap.SigningAlgorithms).Select(c => string.Format(Global.SigningAlgIsNotCompatible, c)).ToList());
+            result.AddRange(cap.SigningAlgorithms.Except(Capabilities.SigningAlgorithms).Select(c => string.Format(Global.SigningAlgIsNotCompatible, c)).ToList());
         return result;
     }
 

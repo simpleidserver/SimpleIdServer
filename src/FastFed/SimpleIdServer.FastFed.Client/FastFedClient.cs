@@ -17,11 +17,11 @@ public class FastFedClient
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<ProviderMetadata> GetProviderMetadata(string baseUrl, CancellationToken cancellationToken)
+    public async Task<ProviderMetadata> GetProviderMetadata(string baseUrl, bool isFullPath, CancellationToken cancellationToken)
     {
         using (var httpClient = _httpClientFactory.GetHttpClient())
         {
-            var providerMetadata = await httpClient.GetFromJsonAsync<ProviderMetadata>($"{baseUrl}/provider-metadata", cancellationToken);
+            var providerMetadata = await httpClient.GetFromJsonAsync<ProviderMetadata>(isFullPath ? baseUrl : $"{baseUrl}/provider-metadata", cancellationToken);
             return providerMetadata;
         }
     }

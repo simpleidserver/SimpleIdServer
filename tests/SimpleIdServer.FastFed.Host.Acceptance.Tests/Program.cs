@@ -2,8 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.FastFed.ApplicationProvider.Store.EF;
+using SimpleIdServer.FastFed.Domains;
+using SimpleIdServer.FastFed.Models;
 using System.Collections.Generic;
+using System.Text.Json;
+using SimpleIdServer.FastFed.Store.EF;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAntiforgery();
@@ -58,7 +61,17 @@ builder.Services.AddFastFed(cb =>
             License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
         }
     };
-}).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore())
+}).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore(new IdentityProviderFederation
+{
+    EntityId = "duplicate",
+    Capabilities = new List<IdentityProviderFederationCapabilities>
+    {
+        new IdentityProviderFederationCapabilities
+        {
+            Status = IdentityProviderStatus.CONFIRMED
+        }
+    }
+}))
 .AddFastFedIdentityProvider();
 builder.Services.AddControllersWithViews();
 
@@ -66,6 +79,131 @@ var app = builder.Build();
 app.UseRouting();
 app.UseStaticFiles();
 app.UseAntiforgery();
+app.MapGet("/bad/provider-metadata", () =>
+{
+    var providerMetadata = new ProviderMetadata
+    {
+        IdentityProvider = new IdentityProviderMetadata { }
+    };
+    return JsonSerializer.Serialize(providerMetadata);
+});
+app.MapGet("/badsuffix/provider-metadata", () =>
+{
+    var providerMetadata = new ProviderMetadata
+    {
+        IdentityProvider = new IdentityProviderMetadata
+        {
+            EntityId = "entityid",
+            ProviderDomain = "invalid",
+            Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
+            {
+                ProvisioningProfiles = new List<string>
+                {
+                    "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise"
+                },
+                SchemaGrammars = new List<string>
+                {
+                    "urn:ietf:params:fastfed:1.0:schemas:scim:2.0"
+                },
+                SigningAlgorithms = new List<string>
+                {
+                    "RS256"
+                }
+            },
+            ContactInformation = new SimpleIdServer.FastFed.Domains.ProviderContactInformation
+            {
+                Email = "support@example.com",
+                Organization = "Example Inc.",
+                Phone = "+1-800-555-5555"
+            },
+            DisplaySettings = new SimpleIdServer.FastFed.Domains.DisplaySettings
+            {
+                DisplayName = "Example Identity Provider",
+                LogoUri = "https://play-lh.googleusercontent.com/1-hPxafOxdYpYZEOKzNIkSP43HXCNftVJVttoo4ucl7rsMASXW3Xr6GlXURCubE1tA=w3840-h2160-rw",
+                License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
+            }
+        }
+    };
+    return JsonSerializer.Serialize(providerMetadata);
+});
+app.MapGet("/duplicate/provider-metadata", () =>
+{
+    var providerMetadata = new ProviderMetadata
+    {
+        IdentityProvider = new IdentityProviderMetadata
+        {
+            EntityId = "duplicate",
+            ProviderDomain = "localhost",
+            Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
+            {
+                ProvisioningProfiles = new List<string>
+                {
+                    "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise"
+                },
+                SchemaGrammars = new List<string>
+                {
+                    "urn:ietf:params:fastfed:1.0:schemas:scim:2.0"
+                },
+                SigningAlgorithms = new List<string>
+                {
+                    "RS256"
+                }
+            },
+            ContactInformation = new SimpleIdServer.FastFed.Domains.ProviderContactInformation
+            {
+                Email = "support@example.com",
+                Organization = "Example Inc.",
+                Phone = "+1-800-555-5555"
+            },
+            DisplaySettings = new SimpleIdServer.FastFed.Domains.DisplaySettings
+            {
+                DisplayName = "Example Identity Provider",
+                LogoUri = "https://play-lh.googleusercontent.com/1-hPxafOxdYpYZEOKzNIkSP43HXCNftVJVttoo4ucl7rsMASXW3Xr6GlXURCubE1tA=w3840-h2160-rw",
+                License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
+            }
+        }
+    };
+    return JsonSerializer.Serialize(providerMetadata);
+});
+app.MapGet("/incompatible/provider-metadata", () =>
+{
+    var providerMetadata = new ProviderMetadata
+    {
+        IdentityProvider = new IdentityProviderMetadata
+        {
+            EntityId = "incompatible",
+            ProviderDomain = "localhost",
+            Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
+            {
+                ProvisioningProfiles = new List<string>
+                {
+                    "invalid:provisioning"
+                },
+                SchemaGrammars = new List<string>
+                {
+                    "invalid:schemagrammar"
+                },
+                SigningAlgorithms = new List<string>
+                {
+                    "invalid-sigalg"
+                }
+            },
+            ContactInformation = new SimpleIdServer.FastFed.Domains.ProviderContactInformation
+            {
+                Email = "support@example.com",
+                Organization = "Example Inc.",
+                Phone = "+1-800-555-5555"
+            },
+            DisplaySettings = new SimpleIdServer.FastFed.Domains.DisplaySettings
+            {
+                DisplayName = "Example Identity Provider",
+                LogoUri = "https://play-lh.googleusercontent.com/1-hPxafOxdYpYZEOKzNIkSP43HXCNftVJVttoo4ucl7rsMASXW3Xr6GlXURCubE1tA=w3840-h2160-rw",
+                License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
+            }
+        }
+    };
+    return JsonSerializer.Serialize(providerMetadata);
+});
 app.UseFastFed()
     .UseApplicationProvider()
     .UseIdentityProvider();

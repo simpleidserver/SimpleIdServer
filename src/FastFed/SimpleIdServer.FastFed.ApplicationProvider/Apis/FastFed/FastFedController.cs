@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
+using SimpleIdServer.FastFed.Apis;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.FastFed.Resolvers;
 using System;
@@ -33,7 +34,7 @@ public class FastFedController : BaseController
         // TODO - TRY TO AUTHENTICATE.
         var issuer = _issuerResolver.Get();
         var validationResult = await _fastFedService.StartWhitelist(issuer, request.IdentityProviderUrl, cancellationToken);
-        if (validationResult.HasError) return null;
+        if (validationResult.HasError) return BuildResult(validationResult);
         var builder = new UriBuilder(validationResult.Result.fastFedHandshakeStartUri);
         builder.Query = validationResult.Result.request.ToQueryParameters();
         return Redirect(builder.Uri.ToString());

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json;
 
-namespace SimpleIdServer.FastFed.ApplicationProvider.Apis;
+namespace SimpleIdServer.FastFed.Apis;
 
 public class BaseController : Controller
 {

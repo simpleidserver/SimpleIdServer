@@ -23,4 +23,8 @@
 	    <LastGenOutput>Global.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Models\" />
+	  <Folder Include="Stores\" />
+	</ItemGroup>
 </Project>
