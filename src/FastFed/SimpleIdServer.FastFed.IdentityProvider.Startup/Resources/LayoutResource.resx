@@ -117,19 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MissingParameter" xml:space="preserve">
-    <value>Parameter {0} is missing</value>
+  <data name="languages" xml:space="preserve">
+    <value>Languages</value>
   </data>
-  <data name="UnknownProviderFederation" xml:space="preserve">
-    <value>The provider {0} doesn't exist</value>
+  <data name="selected_language" xml:space="preserve">
+    <value>Language {0}</value>
   </data>
-  <data name="BadIncomingRequest" xml:space="preserve">
-    <value>The incoming request is invalid</value>
+  <data name="disconnect" xml:space="preserve">
+    <value>Disconnect</value>
   </data>
-  <data name="ProviderMetadataCannotBeDownloaded" xml:space="preserve">
-    <value>Provider metadata cannot be retrieved</value>
-  </data>
-  <data name="ApplicationProviderMetadataCannotBeRetrieved" xml:space="preserve">
-    <value>Application provider metadata cannot be retrieved</value>
+  <data name="authenticate" xml:space="preserve">
+    <value>Authenticate</value>
   </data>
 </root>

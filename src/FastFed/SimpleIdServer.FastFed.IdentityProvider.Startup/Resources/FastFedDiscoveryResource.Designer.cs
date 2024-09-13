@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
+namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
     using System;
     
     
@@ -22,24 +22,25 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Global {
+    public class FastFedDiscoveryResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Global() {
+        internal FastFedDiscoveryResource() {
         }
         
         /// <summary>
         ///   Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.FastFed.IdentityProvider.Resources.Global", typeof(Global).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.FastFed.IdentityProvider.Startup.Resources.FastFedDiscoveryResourc" +
+                            "e", typeof(FastFedDiscoveryResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +52,7 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
         ///   les recherches de ressources à l'aide de cette classe de ressource fortement typée.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,47 +62,74 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Application provider metadata cannot be retrieved.
+        ///   Recherche une chaîne localisée semblable à Authentication profiles.
         /// </summary>
-        internal static string ApplicationProviderMetadataCannotBeRetrieved {
+        public static string AuthenticationProfiles {
             get {
-                return ResourceManager.GetString("ApplicationProviderMetadataCannotBeRetrieved", resourceCulture);
+                return ResourceManager.GetString("AuthenticationProfiles", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The incoming request is invalid.
+        ///   Recherche une chaîne localisée semblable à Confirm.
         /// </summary>
-        internal static string BadIncomingRequest {
+        public static string Confirm {
             get {
-                return ResourceManager.GetString("BadIncomingRequest", resourceCulture);
+                return ResourceManager.GetString("Confirm", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Parameter {0} is missing.
+        ///   Recherche une chaîne localisée semblable à Confirm the capabilities.
         /// </summary>
-        internal static string MissingParameter {
+        public static string ConfirmCapabilities {
             get {
-                return ResourceManager.GetString("MissingParameter", resourceCulture);
+                return ResourceManager.GetString("ConfirmCapabilities", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Provider metadata cannot be retrieved.
+        ///   Recherche une chaîne localisée semblable à New authentication profiles.
         /// </summary>
-        internal static string ProviderMetadataCannotBeDownloaded {
+        public static string NewAuthenticationProfiles {
             get {
-                return ResourceManager.GetString("ProviderMetadataCannotBeDownloaded", resourceCulture);
+                return ResourceManager.GetString("NewAuthenticationProfiles", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The provider {0} doesn&apos;t exist.
+        ///   Recherche une chaîne localisée semblable à New provisioning profiles.
         /// </summary>
-        internal static string UnknownProviderFederation {
+        public static string NewProvisioningProfiles {
             get {
-                return ResourceManager.GetString("UnknownProviderFederation", resourceCulture);
+                return ResourceManager.GetString("NewProvisioningProfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Provisioning profiles.
+        /// </summary>
+        public static string ProvisioningProfiles {
+            get {
+                return ResourceManager.GetString("ProvisioningProfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Configure application provider.
+        /// </summary>
+        public static string Title {
+            get {
+                return ResourceManager.GetString("Title", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Update the capabilities.
+        /// </summary>
+        public static string UpdateCapabilities {
+            get {
+                return ResourceManager.GetString("UpdateCapabilities", resourceCulture);
             }
         }
     }

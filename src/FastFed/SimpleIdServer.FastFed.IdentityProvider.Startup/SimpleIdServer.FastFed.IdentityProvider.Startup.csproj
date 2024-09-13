@@ -10,4 +10,26 @@
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />
 	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Resources\FastFedDiscoveryResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>FastFedDiscoveryResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\LayoutResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>LayoutResource.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Resources\LayoutResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\FastFedDiscoveryResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>FastFedDiscoveryResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 </Project>

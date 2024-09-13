@@ -117,19 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MissingParameter" xml:space="preserve">
-    <value>Parameter {0} is missing</value>
+  <data name="Title" xml:space="preserve">
+    <value>Configure application provider</value>
   </data>
-  <data name="UnknownProviderFederation" xml:space="preserve">
-    <value>The provider {0} doesn't exist</value>
+  <data name="UpdateCapabilities" xml:space="preserve">
+    <value>Update the capabilities</value>
   </data>
-  <data name="BadIncomingRequest" xml:space="preserve">
-    <value>The incoming request is invalid</value>
+  <data name="ConfirmCapabilities" xml:space="preserve">
+    <value>Confirm the capabilities</value>
   </data>
-  <data name="ProviderMetadataCannotBeDownloaded" xml:space="preserve">
-    <value>Provider metadata cannot be retrieved</value>
+  <data name="NewAuthenticationProfiles" xml:space="preserve">
+    <value>New authentication profiles</value>
   </data>
-  <data name="ApplicationProviderMetadataCannotBeRetrieved" xml:space="preserve">
-    <value>Application provider metadata cannot be retrieved</value>
+  <data name="NewProvisioningProfiles" xml:space="preserve">
+    <value>New provisioning profiles</value>
+  </data>
+  <data name="AuthenticationProfiles" xml:space="preserve">
+    <value>Authentication profiles</value>
+  </data>
+  <data name="ProvisioningProfiles" xml:space="preserve">
+    <value>Provisioning profiles</value>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
   </data>
 </root>

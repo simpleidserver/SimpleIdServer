@@ -1,0 +1,87 @@
+﻿@using SimpleIdServer.FastFed.IdentityProvider.Startup.Resources
+@model SimpleIdServer.FastFed.IdentityProvider.UIs.FastFedDiscoveryConfirmViewModel
+
+@{
+    ViewBag.Title = FastFedDiscoveryResource.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@FastFedDiscoveryResource.Title</h3>
+
+@if(ViewData.ModelState.IsValid)
+{
+    <ul class="list-group">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@error.ErrorMessage</li>
+            }
+        }
+    </ul>
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-controller="FastFedDiscovery" asp-action="Confirm" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" value="@Model.IdProviderFederation.EntityId" name="@nameof(SimpleIdServer.FastFed.IdentityProvider.UIs.FastFedDiscoveryConfirmViewModel.EntityId)" />
+            @{
+                var lastCapabilities = Model.IdProviderFederation.LastCapabilities;
+                if (Model.IdProviderFederation.Capabilities.Count > 1)
+                {
+                    var previousCapabilities = Model.IdProviderFederation.Capabilities.ElementAt(Model.IdProviderFederation.Capabilities.Count() - 2);
+                    var newAuthenticationProfiles = lastCapabilities.AuthenticationProfiles.Where(p => !previousCapabilities.AuthenticationProfiles.Contains(p));
+                    var newProvisioningProfiles = lastCapabilities.ProvisioningProfiles.Where(p => !previousCapabilities.ProvisioningProfiles.Contains(p));
+                    <div class="card-body">@FastFedDiscoveryResource.UpdateCapabilities</div>
+                    <!-- New authentication profiles -->
+                    <div class="mb-3">
+                        <label class="form-label">@FastFedDiscoveryResource.NewAuthenticationProfiles</label>
+                        <ul class="list-group">
+                            @foreach(var ap in newAuthenticationProfiles)
+                            {
+                                <li class="list-group-item">@ap</li>
+                            }
+                        </ul>
+                    </div>
+                    <!-- New provisioning profiles -->
+                    <div class="mb-3">
+                        <label class="form-label">@FastFedDiscoveryResource.NewProvisioningProfiles</label>
+                        <ul class="list-group">
+                            @foreach (var pp in newProvisioningProfiles)
+                            {
+                                <li class="list-group-item">@pp</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <div class="card-title">@FastFedDiscoveryResource.ConfirmCapabilities</div>
+                    <!-- New authentication profiles -->
+                    <div class="mb-3">
+                        <label class="form-label">@FastFedDiscoveryResource.AuthenticationProfiles</label>
+                        <ul class="list-group">
+                            @foreach (var ap in lastCapabilities.AuthenticationProfiles)
+                            {
+                                <li class="list-group-item">@ap</li>
+                            }
+                        </ul>
+                    </div>
+                    <!-- New provisioning profiles -->
+                    <div class="mb-3">
+                        <label class="form-label">@FastFedDiscoveryResource.ProvisioningProfiles</label>
+                        <ul class="list-group">
+                            @foreach (var pp in lastCapabilities.ProvisioningProfiles)
+                            {
+                                <li class="list-group-item">@pp</li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <button type="submit" class="btn btn-primary">@FastFedDiscoveryResource.Confirm</button>
+            }
+        </form>
+    </div>
+</div>

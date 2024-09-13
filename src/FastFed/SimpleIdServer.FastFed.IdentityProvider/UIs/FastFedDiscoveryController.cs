@@ -16,9 +16,18 @@ public class FastFedDiscoveryController : Controller
         _providerFederationStore = providerFederationStore;
     }
 
+    [HttpGet]
     public async Task<IActionResult> Confirm(string id, CancellationToken cancellationToken)
     {
-        await _providerFederationStore.Get(id, cancellationToken);
-        return View();
+        var providerFederation = await _providerFederationStore.Get(id, cancellationToken);
+        return View(new FastFedDiscoveryConfirmViewModel { IdProviderFederation = providerFederation });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Confirm(FastFedDiscoveryConfirmViewModel viewModel, CancellationToken cancellationToken)
+    {
+
+        return null;
     }
 }
