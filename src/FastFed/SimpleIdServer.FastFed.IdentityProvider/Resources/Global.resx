@@ -132,4 +132,7 @@
   <data name="ApplicationProviderMetadataCannotBeRetrieved" xml:space="preserve">
     <value>Application provider metadata cannot be retrieved</value>
   </data>
+  <data name="MissingSigningCredential" xml:space="preserve">
+    <value>There is no signing credential configured</value>
+  </data>
 </root>

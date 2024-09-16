@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net8.0</TargetFramework>
-		<Description>Support FastFed in an application provider.</Description>
+		<Description>Add fastfed support to the application provider.</Description>
 	</PropertyGroup>
 	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
@@ -25,6 +25,5 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Folder Include="Models\" />
-	  <Folder Include="Stores\" />
 	</ItemGroup>
 </Project>

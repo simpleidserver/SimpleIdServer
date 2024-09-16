@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim;
 using SimpleIdServer.FastFed.Store.EF;
 using SimpleIdServer.Webfinger;
 using SimpleIdServer.Webfinger.Builders;
@@ -55,13 +56,18 @@ builder.Services.AddFastFed(o =>
             License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
         }
     };
-}).AddFastFedIdentityProvider(cbChooser: (t) => t.UseInMemoryEfStore());
+})
+    .AddFastFedIdentityProvider(cbChooser: (t) => t.UseInMemoryEfStore()) // configure EF
+    .AddIdProviderScimProvisioning(); // support scim provisioning
 
 var app = builder.Build();
 app.UseRouting();
 app.UseWebfinger();
 app.UseFastFed()
     .UseIdentityProvider();
+app.MapControllerRoute(
+    name: "defaultWithArea",
+        pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 app.MapControllerRoute(
     name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");

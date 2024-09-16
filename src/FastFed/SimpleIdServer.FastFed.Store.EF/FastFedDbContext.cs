@@ -17,5 +17,6 @@ public class FastFedDbContext : DbContext
         base.OnModelCreating(modelBuilder);
         modelBuilder.ApplyConfiguration(new IdentityProviderFederationConfiguration());
         modelBuilder.ApplyConfiguration(new IdentityProviderFederationCapabilitiesConfiguration());
+        modelBuilder.ApplyConfiguration(new CapabilitySettingsConfiguration());
     }
 }

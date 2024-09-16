@@ -11,5 +11,6 @@ public class IdentityProviderFederationCapabilitiesConfiguration : IEntityTypeCo
     public void Configure(EntityTypeBuilder<IdentityProviderFederationCapabilities> builder)
     {
         builder.HasKey(i => i.Id);
+        builder.HasMany(i => i.Configurations).WithOne().HasForeignKey(c => c.CapabilitiesId).OnDelete(DeleteBehavior.Cascade);
     }
 }

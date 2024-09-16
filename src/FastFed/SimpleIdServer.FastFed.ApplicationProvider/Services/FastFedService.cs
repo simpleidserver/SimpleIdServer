@@ -2,13 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.FastFed.Apis.FastFedMetadata;
 using SimpleIdServer.FastFed.ApplicationProvider.Resolvers;
 using SimpleIdServer.FastFed.ApplicationProvider.Resources;
 using SimpleIdServer.FastFed.Client;
-using SimpleIdServer.FastFed.Requests;
 using SimpleIdServer.FastFed.Domains;
 using SimpleIdServer.FastFed.Models;
+using SimpleIdServer.FastFed.Requests;
 using SimpleIdServer.FastFed.Stores;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.Webfinger.Client;
@@ -16,6 +17,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Http.Json;
+using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +31,7 @@ public interface IFastFedService
 {
     Task<ValidationResult<GetWebfingerResult>> ResolveProviders(string email, CancellationToken cancellationToken);
     Task<ValidationResult<(StartHandshakeRequest request, string fastFedHandshakeStartUri)>> StartWhitelist(string issuer, string url, CancellationToken cancellationToken);
+    Task<ValidationResult<Dictionary<string, JsonObject>>> Register(string content, CancellationToken cancellationToken);
 }
 
 public class FastFedService : IFastFedService
@@ -36,6 +42,7 @@ public class FastFedService : IFastFedService
     private readonly IWebfingerUrlResolver _webfingerUrlResolver;
     private readonly IWebfingerClientFactory _webfingerClientFactory;
     private readonly IFastFedClientFactory _fastFedClientFactory;
+    private readonly IEnumerable<IAppProviderProvisioningService> _provisioningServices;
     private readonly ILogger<FastFedService> _logger;
     private readonly FastFedApplicationProviderOptions _options;
 
@@ -46,6 +53,7 @@ public class FastFedService : IFastFedService
         IWebfingerUrlResolver webfingerUrlResolver,
         IWebfingerClientFactory webfingerClientFactory,
         IFastFedClientFactory fastFedClientFactory,
+        IEnumerable<IAppProviderProvisioningService> provisioningServices,
         ILogger<FastFedService> logger,
         IOptions<FastFedApplicationProviderOptions> options)
     {
@@ -55,6 +63,7 @@ public class FastFedService : IFastFedService
         _webfingerUrlResolver = webfingerUrlResolver;
         _webfingerClientFactory = webfingerClientFactory;
         _fastFedClientFactory = fastFedClientFactory;
+        _provisioningServices = provisioningServices;
         _logger = logger;
         _options = options.Value;
     }
@@ -95,6 +104,66 @@ public class FastFedService : IFastFedService
             Expiration = federation.LastCapabilities.ExpirationDateTime
         };
         return ValidationResult<(StartHandshakeRequest, string)>.Ok((parameter, validationResult.Result.metadata.IdentityProvider.FastFedHandshakeStartUri));
+    }
+
+    public async Task<ValidationResult<Dictionary<string, JsonObject>>> Register(string content, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(content)) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.RegisterRequestCannotBeEmpty);
+        var appProviderMetadata = _getProviderMetadataQuery.Get();
+        var handler = new JsonWebTokenHandler();
+        if (!handler.CanReadToken(content)) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.RegisterRequestMustBeJwt);
+        var jwt = handler.ReadJsonWebToken(content);
+        // 2. Verify the iss attribute matches a whitelisted entity_id for the tenant of the Application Provider, as captured in Section 7.2.1.6.
+        var idProviderFederation = await _identityProviderFederationStore.Get(jwt.Issuer, cancellationToken);
+        if (idProviderFederation == null) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, string.Format(Global.CannotCompleteRegistrationForUnknownProvider, jwt.Issuer));
+        using (var httpClient = _httpClientFactory.GetHttpClient())
+        {
+            var jwks = await httpClient.GetFromJsonAsync<JwksResult>(idProviderFederation.JwksUri, cancellationToken);
+            // 4. Verify the kid matches an entry in the key set hosted at the whitelisted jwks_uri captured in Section.
+            var jwk = jwks.Keys.SingleOrDefault(k => k.Kid == jwt.Kid);
+            if (jwk == null) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.JwkKidIsNotFound);
+            var parameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+            {
+                IssuerSigningKey = jwk,
+                ValidateAudience = false,
+                ValidateIssuer = false
+            };
+            var validationResult = await handler.ValidateTokenAsync(content, parameters);
+            // 5. Verify the JWT signature using the key from the key set. The signing algorithm for the kid in the key set MUST match the signing algorithm in the JWT.
+            if (!validationResult.IsValid)
+            {
+                _logger.LogError(validationResult.Exception.ToString());
+                return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, validationResult.Exception.ToString());
+            }
+
+            // 1. Verify the aud attribute matches the entity_id of a tenant in the Application Provider.
+            if (!jwt.Audiences.Contains(appProviderMetadata.ApplicationProvider.EntityId)) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.AudienceDoesntMatchEntityIdOfApplicationProvider);
+        }
+
+        // 6. If an expiration date exists on the whitelist (Section 7.2.1.6), verify the expiration date has not been exceeded.
+        if (idProviderFederation.LastCapabilities.IsExpired) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.WhitelistingIsExpired);
+        // 7. Verify the values of authentication_profiles and provisioning_profiles against the whitelisted capabilities captured in Section 7.2.1.6.
+        var authenticationProfiles = new List<string>();
+        var provisioningProfiles = new List<string>();
+        if(jwt.TryGetClaim("authentication_profiles", out Claim authenticationProfilesClaim))
+            authenticationProfiles = JsonSerializer.Deserialize<List<string>>(authenticationProfilesClaim.Value);
+        if (jwt.TryGetClaim("provisioning_profiles", out Claim provisioningProfilesClaim))
+            provisioningProfiles = JsonSerializer.Deserialize<List<string>>(provisioningProfilesClaim.Value);
+        var isCapabilitiesDifferent = authenticationProfiles.Count() == idProviderFederation.LastCapabilities.AuthenticationProfiles.Count() &&
+            authenticationProfiles.All(a => idProviderFederation.LastCapabilities.AuthenticationProfiles.Contains(a)) &&
+            provisioningProfiles.Count() == idProviderFederation.LastCapabilities.ProvisioningProfiles.Count() &&
+            provisioningProfiles.All(p => idProviderFederation.LastCapabilities.ProvisioningProfiles.Contains(p));
+        if (isCapabilitiesDifferent) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.CapabilitiesCannotBeDifferent);
+        // Activate the capabilities - provisioning_profile and authentication profile.
+        var dic = new Dictionary<string, JsonObject>();
+        foreach(var provisioningProfile in provisioningProfiles)
+        {
+            var service = _provisioningServices.Single(s => s.Name == provisioningProfile);
+            var enableResult = await service.EnableCapability(idProviderFederation.EntityId, jwt, cancellationToken);
+            dic.Add(service.Name, enableResult);
+        }
+
+        return ValidationResult<Dictionary<string, JsonObject>>.Ok(dic);
     }
 
     private async Task<ValidationResult<(FastFed.Domains.ProviderMetadata metadata, IdentityProviderFederation federation)>> ValidateIdentityProviderMetadata(string url, CancellationToken cancellationToken)

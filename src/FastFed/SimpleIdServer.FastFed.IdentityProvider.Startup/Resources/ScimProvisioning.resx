@@ -117,49 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="MissingParameter" xml:space="preserve">
-    <value>Parameter '{0}' is missing</value>
+  <data name="ConfigureScimProvisioning" xml:space="preserve">
+    <value>Configure SCIM provisioning</value>
   </data>
-  <data name="EmailIsInvalid" xml:space="preserve">
-    <value>Email is invalid</value>
+  <data name="ClientId" xml:space="preserve">
+    <value>Client identifier</value>
   </data>
-  <data name="ProviderMetadataCannotBeRetrieved" xml:space="preserve">
-    <value>Provider metadata cannot be retrieved</value>
+  <data name="ClientSecret" xml:space="preserve">
+    <value>Client secret</value>
   </data>
-  <data name="IdProviderMetadataCannotBeRetrieved" xml:space="preserve">
-    <value>Identity provider metadata cannot be retrieved</value>
-  </data>
-  <data name="ProviderNameSuffixNotSatisfied" xml:space="preserve">
-    <value>The provider name suffix {0} is not satisfied</value>
-  </data>
-  <data name="IdentityProviderFederationExists" xml:space="preserve">
-    <value>Federation with the identity provider is already configured</value>
-  </data>
-  <data name="RegisterRequestCannotBeEmpty" xml:space="preserve">
-    <value>The registration request cannot be empty</value>
-  </data>
-  <data name="RegisterRequestMustBeJwt" xml:space="preserve">
-    <value>Registration request must be a JSON Web token</value>
-  </data>
-  <data name="CannotCompleteRegistrationForUnknownProvider" xml:space="preserve">
-    <value>The registration process cannot be completed because the issuer {0} is not in the whitelist</value>
-  </data>
-  <data name="JwkKidIsNotFound" xml:space="preserve">
-    <value>The JWK Kid {0} doesn't exist</value>
-  </data>
-  <data name="JwtSignatureIsNotCorrect" xml:space="preserve">
-    <value>The Json Web Token signature is not correct</value>
-  </data>
-  <data name="AudienceDoesntMatchEntityIdOfApplicationProvider" xml:space="preserve">
-    <value>The aud attribute doesn't match the entity_id of the application provider</value>
-  </data>
-  <data name="WhitelistingIsExpired" xml:space="preserve">
-    <value>The whitelisting process of the identity provider is expired</value>
-  </data>
-  <data name="CapabilitiesCannotBeDifferent" xml:space="preserve">
-    <value>Capabilities cannot be different</value>
-  </data>
-  <data name="InvalidContentType" xml:space="preserve">
-    <value>Content type must be equals to '{0}'</value>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
   </data>
 </root>

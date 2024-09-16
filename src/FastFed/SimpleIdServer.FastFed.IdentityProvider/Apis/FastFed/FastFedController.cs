@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.FastFed.Apis;
 using SimpleIdServer.FastFed.Apis.FastFedMetadata;
 using SimpleIdServer.FastFed.Client;
-using SimpleIdServer.FastFed.Requests;
 using SimpleIdServer.FastFed.IdentityProvider.Resources;
 using SimpleIdServer.FastFed.Models;
+using SimpleIdServer.FastFed.Requests;
 using SimpleIdServer.FastFed.Stores;
 using System;
 using System.Linq;
@@ -50,6 +50,7 @@ public class FastFedController : BaseController
             {
                 EntityId = providerMetadata.ApplicationProvider.EntityId,
                 CreateDateTime = DateTime.UtcNow,
+                ProviderMetadataUrl = request.AppMetadataUri,
                 Capabilities = new System.Collections.Generic.List<IdentityProviderFederationCapabilities>()
             };
             _providerFederationStore.Add(providerFederation);

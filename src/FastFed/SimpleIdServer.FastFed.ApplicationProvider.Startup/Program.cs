@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
 using SimpleIdServer.FastFed.Store.EF;
 using System.Collections.Generic;
 
@@ -50,7 +51,14 @@ builder.Services.AddFastFed(cb =>
             License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
         }
     };
-}).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore());
+})
+    .AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore())
+    .AddAppProviderScimProvisioning(cb =>
+    {
+        cb.ScimServiceUri = builder.Configuration["scimEdp"];
+        cb.TokenEndpoint = builder.Configuration["tokenEdp"];
+        cb.Scope = builder.Configuration["scope"];
+    });
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

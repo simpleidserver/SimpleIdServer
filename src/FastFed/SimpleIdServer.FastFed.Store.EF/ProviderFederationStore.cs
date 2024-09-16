@@ -22,7 +22,7 @@ public class ProviderFederationStore : IProviderFederationStore
         => _dbContext.IdentityProviderFederations.Add(identityProviderFederation);
 
     public Task<IdentityProviderFederation> Get(string entityId, CancellationToken cancellationToken)
-        => _dbContext.IdentityProviderFederations.Include(i => i.Capabilities).SingleOrDefaultAsync(i => i.EntityId == entityId, cancellationToken);
+        => _dbContext.IdentityProviderFederations.Include(i => i.Capabilities).ThenInclude(c => c.Configurations).SingleOrDefaultAsync(i => i.EntityId == entityId, cancellationToken);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);

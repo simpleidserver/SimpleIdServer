@@ -5,6 +5,8 @@ using SimpleIdServer.FastFed.Apis;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.FastFed.Resolvers;
 using System;
+using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -41,8 +43,14 @@ public class FastFedController : BaseController
     }
 
     [HttpPost]
-    public IActionResult Register()
+    public async Task<IActionResult> Register(CancellationToken cancellationToken)
     {
-        return null;
+        const string applicationJws = "application/jws";
+        if (Request.Headers.ContentType.ToString().Equals(applicationJws, StringComparison.InvariantCultureIgnoreCase)) return BuildError(ErrorCodes.InvalidRequest, string.Format(Resources.Global.InvalidContentType, applicationJws), System.Net.HttpStatusCode.Unauthorized);
+        var bodyStream = new StreamReader(Request.Body);
+        bodyStream.BaseStream.Seek(0, SeekOrigin.Begin);
+        var txt = await bodyStream.ReadToEndAsync(cancellationToken);
+        var validationResult = await _fastFedService.Register(txt, cancellationToken);
+        return BuildResult(validationResult, HttpStatusCode.Unauthorized);
     }
 }

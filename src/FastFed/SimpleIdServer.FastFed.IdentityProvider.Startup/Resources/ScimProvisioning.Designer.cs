@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
+namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
     using System;
     
     
@@ -22,24 +22,24 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Global {
+    public class ScimProvisioning {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Global() {
+        internal ScimProvisioning() {
         }
         
         /// <summary>
         ///   Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager {
+        public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.FastFed.IdentityProvider.Resources.Global", typeof(Global).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.FastFed.IdentityProvider.Startup.Resources.ScimProvisioning", typeof(ScimProvisioning).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -51,7 +51,7 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
         ///   les recherches de ressources à l'aide de cette classe de ressource fortement typée.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture {
+        public static global::System.Globalization.CultureInfo Culture {
             get {
                 return resourceCulture;
             }
@@ -61,55 +61,38 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Application provider metadata cannot be retrieved.
+        ///   Recherche une chaîne localisée semblable à Client identifier.
         /// </summary>
-        internal static string ApplicationProviderMetadataCannotBeRetrieved {
+        public static string ClientId {
             get {
-                return ResourceManager.GetString("ApplicationProviderMetadataCannotBeRetrieved", resourceCulture);
+                return ResourceManager.GetString("ClientId", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à The incoming request is invalid.
+        ///   Recherche une chaîne localisée semblable à Client secret.
         /// </summary>
-        internal static string BadIncomingRequest {
+        public static string ClientSecret {
             get {
-                return ResourceManager.GetString("BadIncomingRequest", resourceCulture);
+                return ResourceManager.GetString("ClientSecret", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Parameter {0} is missing.
+        ///   Recherche une chaîne localisée semblable à Configure SCIM provisioning.
         /// </summary>
-        internal static string MissingParameter {
+        public static string ConfigureScimProvisioning {
             get {
-                return ResourceManager.GetString("MissingParameter", resourceCulture);
+                return ResourceManager.GetString("ConfigureScimProvisioning", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Provider metadata cannot be retrieved.
+        ///   Recherche une chaîne localisée semblable à Update.
         /// </summary>
-        internal static string ProviderMetadataCannotBeDownloaded {
+        public static string Update {
             get {
-                return ResourceManager.GetString("ProviderMetadataCannotBeDownloaded", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à The provider {0} doesn&apos;t exist.
-        /// </summary>
-        internal static string UnknownProviderFederation {
-            get {
-                return ResourceManager.GetString("UnknownProviderFederation", resourceCulture);
-            }
-        }
-
-        internal static string MissingSigningCredential
-        {
-            get
-            {
-                return ResourceManager.GetString("MissingSigningCredential", resourceCulture);
+                return ResourceManager.GetString("Update", resourceCulture);
             }
         }
     }

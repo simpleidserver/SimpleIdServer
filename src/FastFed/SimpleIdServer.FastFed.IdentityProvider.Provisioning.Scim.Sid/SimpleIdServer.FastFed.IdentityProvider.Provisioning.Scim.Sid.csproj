@@ -1,0 +1,9 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Description>Add scim provisioning support to SimpleIdServer.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj" />
+	</ItemGroup>
+</Project>

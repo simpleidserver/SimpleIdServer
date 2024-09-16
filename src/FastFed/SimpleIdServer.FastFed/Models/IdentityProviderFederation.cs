@@ -9,6 +9,7 @@ namespace SimpleIdServer.FastFed.Models;
 public class IdentityProviderFederation
 {
     public string EntityId { get; set; } = null!;
+    public string ProviderMetadataUrl { get; set; } = null;
     public string JwksUri { get; set; } = null!;
     public DateTime CreateDateTime { get; set; }
     public List<IdentityProviderFederationCapabilities> Capabilities { get; set; }

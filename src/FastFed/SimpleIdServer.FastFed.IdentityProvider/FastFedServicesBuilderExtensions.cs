@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.FastFed;
 using SimpleIdServer.FastFed.IdentityProvider;
+using SimpleIdServer.FastFed.IdentityProvider.Services;
 using System;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ public static class FastFedServicesBuilderExtensions
         if (callback == null) builder.Services.Configure<FastFedIdentityProviderOptions>(o => { });
         if (cbChooser != null) cbChooser(new ProviderStoreChooser(builder.Services));
         else builder.Services.Configure(callback);
+        builder.Services.AddTransient<IFastFedService, FastFedService>();
         return builder;
     }
 }

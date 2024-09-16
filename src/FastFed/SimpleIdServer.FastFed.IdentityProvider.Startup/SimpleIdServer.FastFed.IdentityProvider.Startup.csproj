@@ -7,10 +7,16 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj" />
 	  <ProjectReference Include="..\..\Webfinger\SimpleIdServer.Webfinger.Store.EF\SimpleIdServer.Webfinger.Store.EF.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<Compile Update="Resources\ScimProvisioning.Designer.cs">
+		  <DependentUpon>ScimProvisioning.resx</DependentUpon>
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		</Compile>
 		<Compile Update="Resources\FastFedDiscoveryResource.Designer.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>
@@ -23,6 +29,10 @@
 		</Compile>
 	</ItemGroup>
 	<ItemGroup>
+		<EmbeddedResource Update="Resources\ScimProvisioning.resx">
+		  <LastGenOutput>ScimProvisioning.Designer.cs</LastGenOutput>
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
 		<EmbeddedResource Update="Resources\LayoutResource.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
@@ -31,5 +41,8 @@
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>FastFedDiscoveryResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Areas\scim\Views\FastFedDiscovery\" />
 	</ItemGroup>
 </Project>

@@ -14,6 +14,7 @@ public class IdentityProviderFederationCapabilities
     public double ExpirationDateTime { get; set; }
     public IdentityProviderStatus Status { get; set; }
     public DateTime CreateDateTime { get; set; }
+    public List<CapabilitySettings> Configurations { get; set; }
 
     public bool IsExpired
     {

@@ -61,6 +61,33 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The aud attribute doesn&apos;t match the entity_id of the application provider.
+        /// </summary>
+        internal static string AudienceDoesntMatchEntityIdOfApplicationProvider {
+            get {
+                return ResourceManager.GetString("AudienceDoesntMatchEntityIdOfApplicationProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The registration process cannot be completed because the issuer {0} is not in the whitelist.
+        /// </summary>
+        internal static string CannotCompleteRegistrationForUnknownProvider {
+            get {
+                return ResourceManager.GetString("CannotCompleteRegistrationForUnknownProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Capabilities cannot be different.
+        /// </summary>
+        internal static string CapabilitiesCannotBeDifferent {
+            get {
+                return ResourceManager.GetString("CapabilitiesCannotBeDifferent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Email is invalid.
         /// </summary>
         internal static string EmailIsInvalid {
@@ -88,6 +115,33 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Content type must be equals to &apos;{0}&apos;.
+        /// </summary>
+        internal static string InvalidContentType {
+            get {
+                return ResourceManager.GetString("InvalidContentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The JWK Kid {0} doesn&apos;t exist.
+        /// </summary>
+        internal static string JwkKidIsNotFound {
+            get {
+                return ResourceManager.GetString("JwkKidIsNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The Json Web Token signature is not correct.
+        /// </summary>
+        internal static string JwtSignatureIsNotCorrect {
+            get {
+                return ResourceManager.GetString("JwtSignatureIsNotCorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Parameter &apos;{0}&apos; is missing.
         /// </summary>
         internal static string MissingParameter {
@@ -111,6 +165,33 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Resources {
         internal static string ProviderNameSuffixNotSatisfied {
             get {
                 return ResourceManager.GetString("ProviderNameSuffixNotSatisfied", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The registration request cannot be empty.
+        /// </summary>
+        internal static string RegisterRequestCannotBeEmpty {
+            get {
+                return ResourceManager.GetString("RegisterRequestCannotBeEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Registration request must be a JSON Web token.
+        /// </summary>
+        internal static string RegisterRequestMustBeJwt {
+            get {
+                return ResourceManager.GetString("RegisterRequestMustBeJwt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The whitelisting process of the identity provider is expired.
+        /// </summary>
+        internal static string WhitelistingIsExpired {
+            get {
+                return ResourceManager.GetString("WhitelistingIsExpired", resourceCulture);
             }
         }
     }
