@@ -4,6 +4,7 @@
 		<Description>Add scim provisioning support to SimpleIdServer.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj" />
+	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.csproj" />
 	</ItemGroup>
 </Project>

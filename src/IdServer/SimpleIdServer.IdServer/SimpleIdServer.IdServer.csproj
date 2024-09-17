@@ -21,6 +21,7 @@
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">

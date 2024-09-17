@@ -8,6 +8,7 @@ public class CapabilitySettings
     public string ProfileName { get; set; }
     public bool IsAuthenticationProfile { get; set; }
     public string IdProviderSerializedConfiguration { get; set; }
+    public string AppProviderSerializedMappings { get; set; }
     public string AppProviderSerializedConfiguration { get; set; }
     public string CapabilitiesId { get; set; }
 }

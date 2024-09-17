@@ -41,7 +41,7 @@ public class FastFedAppProviderController : Controller
         var providerFederation = await _providerFederationStore.Get(viewModel.EntityId, cancellationToken);
         var lastCapabilities = providerFederation.LastCapabilities;
         var configuration = lastCapabilities.Configurations.Single(c => c.ProfileName == Constants.ProvisioningProfileName);
-        configuration.AppProviderSerializedConfiguration = JsonSerializer.Serialize(viewModel.Configuration);
+        configuration.IdProviderSerializedConfiguration = JsonSerializer.Serialize(viewModel.Configuration);
         await _providerFederationStore.SaveChanges(cancellationToken);
         return null;
     }

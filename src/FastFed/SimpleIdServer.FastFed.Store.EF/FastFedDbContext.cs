@@ -11,6 +11,8 @@ public class FastFedDbContext : DbContext
     public FastFedDbContext(DbContextOptions<FastFedDbContext> options) : base(options) { }
 
     public DbSet<IdentityProviderFederation> IdentityProviderFederations { get; set; }
+    public DbSet<ExtractedRepresentation> ExtractedRepresentations {  get; set; }
+    public DbSet<ProvisioningProfileHistory> ProvisioningProfileHistories { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -18,5 +20,7 @@ public class FastFedDbContext : DbContext
         modelBuilder.ApplyConfiguration(new IdentityProviderFederationConfiguration());
         modelBuilder.ApplyConfiguration(new IdentityProviderFederationCapabilitiesConfiguration());
         modelBuilder.ApplyConfiguration(new CapabilitySettingsConfiguration());
+        modelBuilder.ApplyConfiguration(new ExtractedRepresentationConfiguration());
+        modelBuilder.ApplyConfiguration(new ProvisioningProfileHistoryConfiguration());
     }
 }

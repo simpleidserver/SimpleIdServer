@@ -4,6 +4,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.FastFed.Models;
 using SimpleIdServer.FastFed.Stores;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,6 +24,9 @@ public class ProviderFederationStore : IProviderFederationStore
 
     public Task<IdentityProviderFederation> Get(string entityId, CancellationToken cancellationToken)
         => _dbContext.IdentityProviderFederations.Include(i => i.Capabilities).ThenInclude(c => c.Configurations).SingleOrDefaultAsync(i => i.EntityId == entityId, cancellationToken);
+
+    public Task<List<IdentityProviderFederation>> GetAll(CancellationToken cancellationToken)
+        => _dbContext.IdentityProviderFederations.ToListAsync(cancellationToken);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);

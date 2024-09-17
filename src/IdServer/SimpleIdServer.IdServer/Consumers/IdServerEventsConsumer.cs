@@ -3,8 +3,7 @@
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Events;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Linq;

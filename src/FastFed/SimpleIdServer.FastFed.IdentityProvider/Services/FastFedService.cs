@@ -110,15 +110,9 @@ public class FastFedService : IFastFedService
             var jsonObj = JsonObject.Parse(json).AsObject();
             foreach (var rec in jsonObj)
             {
-                var service = _idProviderProvisioningServices.SingleOrDefault(s => s.Name == rec.Key);
-                if (service == null) continue;
-                providerFederation.LastCapabilities.Configurations.Add(new CapabilitySettings
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    AppProviderSerializedConfiguration = jsonObj[rec.Key].ToJsonString(),
-                    IsAuthenticationProfile = false,
-                    ProfileName = rec.Key
-                });
+                var conf = providerFederation.LastCapabilities.Configurations.SingleOrDefault(c => c.ProfileName == rec.Key);
+                if (conf == null) continue;
+                conf.AppProviderSerializedMappings = jsonObj[rec.Key].ToJsonString();
             }
 
             providerFederation.LastCapabilities.Status = Models.IdentityProviderStatus.CONFIRMED;

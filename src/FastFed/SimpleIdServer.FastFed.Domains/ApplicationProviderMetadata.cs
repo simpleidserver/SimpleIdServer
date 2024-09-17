@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using System.Collections.Generic;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.FastFed.Domains;
 
+[JsonConverter(typeof(ApplicationProviderMetadataJsonConverter))]
 public class ApplicationProviderMetadata : BaseProviderMetadata
 {
     /// <summary>
@@ -12,6 +14,8 @@ public class ApplicationProviderMetadata : BaseProviderMetadata
     /// </summary>
     [JsonPropertyName("fastfed_handshake_register_uri")]
     public string FastfedHandshakeRegisterUri { get; set; } = null!;
+    [JsonIgnore]
+    public JsonObject OtherParameters { get; set; } = new JsonObject();
 
     protected override List<string> InternalValidate()
     {

@@ -16,8 +16,10 @@ public static class ApplicationProviderStoreChooserExtensions
     public static void UseEfStore(this ProviderStoreChooser chooser, Action<DbContextOptionsBuilder> dbCallback = null)
     {
         if (dbCallback != null) chooser.Services.AddDbContext<FastFedDbContext>(dbCallback);
-        else chooser.Services.AddDbContext<FastFedDbContext>(o => o.UseInMemoryDatabase("webfinger"));
+        else chooser.Services.AddDbContext<FastFedDbContext>(o => o.UseInMemoryDatabase("fastFed"));
         chooser.Services.AddTransient<IProviderFederationStore, ProviderFederationStore>();
+        chooser.Services.AddTransient<IExtractedRepresentationStore, ExtractedRepresentationStore>();
+        chooser.Services.AddTransient<IProvisioningProfileHistoryStore, ProvisioningProfileHistoryStore>();
     }
 
     public static void UseInMemoryEfStore(this ProviderStoreChooser chooser, params IdentityProviderFederation[] identityProviderFederations)

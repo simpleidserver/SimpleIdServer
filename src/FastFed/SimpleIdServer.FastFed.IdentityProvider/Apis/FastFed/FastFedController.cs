@@ -90,20 +90,44 @@ public class FastFedController : BaseController
         var newProvisioningProfiles = nextProvisioningProfiles.Where(p => !previousProvisioningProfiles.Contains(p));
         if(newAuthenticationProfiles.Any() || newProvisioningProfiles.Any())
         {
-            providerFederation.Capabilities.Add(new IdentityProviderFederationCapabilities
+            var capabilities = new IdentityProviderFederationCapabilities
             {
                 Id = Guid.NewGuid().ToString(),
                 AuthenticationProfiles = nextAuthenticationProfiles,
                 ProvisioningProfiles = nextProvisioningProfiles,
                 ExpirationDateTime = request.Expiration.Value,
                 Status = IdentityProviderStatus.CREATE
-            });
+            };
+            providerFederation.Capabilities.Add(capabilities);
             await _providerFederationStore.SaveChanges(cancellationToken);
             return RedirectToAction("Confirm", "FastFedDiscovery", new { id = providerMetadata.ApplicationProvider.EntityId });
         }
 
         providerFederation.LastCapabilities.AuthenticationProfiles = nextAuthenticationProfiles;
         providerFederation.LastCapabilities.ProvisioningProfiles = nextProvisioningProfiles;
+        if (providerMetadata.ApplicationProvider.OtherParameters != null)
+        {
+            foreach(var rec in providerMetadata.ApplicationProvider.OtherParameters)
+            {
+                if(nextAuthenticationProfiles.Contains(rec.Key))
+                {
+                    var conf = providerFederation.LastCapabilities.Configurations.SingleOrDefault(c => c.ProfileName == rec.Key);
+                    if(conf == null)
+                    {
+                        conf = new CapabilitySettings
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            ProfileName = rec.Key,
+                            IsAuthenticationProfile = false
+                        };
+                        providerFederation.LastCapabilities.Configurations.Add(conf);
+                    }
+
+                    conf.AppProviderSerializedConfiguration = providerMetadata.ApplicationProvider.OtherParameters[rec.Key].ToJsonString();
+                }
+            }
+        }
+
         providerFederation.LastCapabilities.ExpirationDateTime = request.Expiration.Value;
         await _providerFederationStore.SaveChanges(cancellationToken);
         return null;

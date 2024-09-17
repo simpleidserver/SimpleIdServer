@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -25,9 +26,14 @@ namespace SimpleIdServer.Scim.Client
             _baseUrl = baseUrl;
         }
 
-        public SCIMClient(string baseUrl, HttpClientHandler handler)
+        public SCIMClient(string baseUrl, HttpClientHandler handler) : this(baseUrl)
         {
             _handler = handler;
+        }
+
+        public SCIMClient(string baseUrl, HttpClient httpClient) : this(baseUrl)
+        {
+            _httpClient = httpClient;
         }
 
         public async Task<SchemasResult> GetSchemas(CancellationToken cancellationToken)
@@ -95,6 +101,23 @@ namespace SimpleIdServer.Scim.Client
             var json = await httpResult.Content.ReadAsStringAsync(cancellationToken);
             var jsonObj = JsonObject.Parse(json).AsObject();
             return RepresentationSerializer.DeserializeRepresentation(jsonObj);
+        }
+
+        public async Task AddUser(JsonObject jsonObject, string accessToken, CancellationToken cancellationToken)
+        {
+            if (_resourceTypes == null) await GetResourceTypes(cancellationToken);
+            var userEdp = _resourceTypes.Resources.Single(r => r.Name == "User").Endpoint;
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(GetPath(userEdp)),
+                Content = new StringContent(jsonObject.ToJsonString(), Encoding.UTF8, "application/json")
+            };
+            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            var httpClient = GetHttpClient();
+            var httpResult = await httpClient.SendAsync(request, cancellationToken);
+            httpResult.EnsureSuccessStatusCode();
+            
         }
 
         private HttpClient GetHttpClient()
