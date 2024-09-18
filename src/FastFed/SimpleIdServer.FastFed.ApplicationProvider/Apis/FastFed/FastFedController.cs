@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.FastFed.Apis;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
@@ -46,10 +47,10 @@ public class FastFedController : BaseController
     public async Task<IActionResult> Register(CancellationToken cancellationToken)
     {
         const string applicationJws = "application/jws";
-        if (Request.Headers.ContentType.ToString().Equals(applicationJws, StringComparison.InvariantCultureIgnoreCase)) return BuildError(ErrorCodes.InvalidRequest, string.Format(Resources.Global.InvalidContentType, applicationJws), System.Net.HttpStatusCode.Unauthorized);
-        var bodyStream = new StreamReader(Request.Body);
-        bodyStream.BaseStream.Seek(0, SeekOrigin.Begin);
-        var txt = await bodyStream.ReadToEndAsync(cancellationToken);
+        if (!Request.Headers.ContentType.ToString().StartsWith(applicationJws, StringComparison.InvariantCultureIgnoreCase)) return BuildError(ErrorCodes.InvalidRequest, string.Format(Resources.Global.InvalidContentType, applicationJws), System.Net.HttpStatusCode.Unauthorized);
+        Request.EnableBuffering();
+        Request.Body.Position = 0;
+        var txt = await new StreamReader(Request.Body).ReadToEndAsync(cancellationToken);
         var validationResult = await _fastFedService.Register(txt, cancellationToken);
         return BuildResult(validationResult, HttpStatusCode.Unauthorized);
     }

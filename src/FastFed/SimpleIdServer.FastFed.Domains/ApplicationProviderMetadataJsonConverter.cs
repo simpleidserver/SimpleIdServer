@@ -67,32 +67,10 @@ public class ApplicationProviderMetadataJsonConverter : JsonConverter<Applicatio
                 writer.WriteString(prop.Item2, (DateTime)obj);
             else if (TryGetEnumType(propertyType, out Type resultType))
                 writer.WriteString(prop.Item2, Enum.GetName(resultType, obj));
-            else if (propertyType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+            else
             {
-                if (propertyType == typeof(JsonObject))
-                {
-                    writer.WritePropertyName(prop.Item2);
-                    writer.WriteRawValue(((JsonObject)obj).ToJsonString());
-                }
-                else
-                {
-                    writer.WriteStartArray(prop.Item2);
-                    var values = (IEnumerable<object>)obj;
-                    foreach (var v in values)
-                    {
-                        switch (v)
-                        {
-                            case string s:
-                                writer.WriteStringValue(s);
-                                break;
-                            default:
-                                writer.WriteRawValue(JsonSerializer.Serialize(v));
-                                break;
-                        }
-                    }
-
-                    writer.WriteEndArray();
-                }
+                writer.WritePropertyName(prop.Item2);
+                writer.WriteRawValue(JsonSerializer.Serialize(obj));
             }
         }
 

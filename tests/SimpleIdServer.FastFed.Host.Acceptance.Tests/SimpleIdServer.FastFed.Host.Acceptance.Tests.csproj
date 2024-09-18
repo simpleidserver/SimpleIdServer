@@ -6,6 +6,9 @@
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 	</PropertyGroup>
 	<ItemGroup>
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\AppProvider\EndRegisterErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\AppProvider\WhitelistErrors - Copier.feature.cs" />
+	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\IdentityProvider\EndRegister.feature.cs" />
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\WhitelistErrors - Copier.feature.cs" />
 	</ItemGroup>
 	<ItemGroup>
@@ -23,16 +26,37 @@
 		<PackageReference Include="Moq" Version="4.20.70" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Store.EF\SimpleIdServer.FastFed.ApplicationProvider.Store.EF.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Steps\" />
+	  <Compile Update="Features\AppProvider\EndRegister.feature.cs">
+	    <DependentUpon>EndRegister.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\AppProvider\EndRegisterErrors.feature.cs">
+	    <DependentUpon>EndRegisterErrors.feature</DependentUpon>
+	  </Compile>
+	  <Compile Update="Features\IdentityProvider\StartHandshakeErrors.feature.cs">
+	    <DependentUpon>StartHandshakeErrors.feature</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
-	  <SpecFlowFeatureFiles Update="Features\Whitelist.feature">
+	  <SpecFlowFeatureFiles Update="Features\AppProvider\EndRegister.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\AppProvider\Whitelist.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\AppProvider\EndRegisterErrors.feature">
+	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
+	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+	  </SpecFlowFeatureFiles>
+	  <SpecFlowFeatureFiles Update="Features\IdentityProvider\StartHandshakeErrors.feature">
 	    <Visible>$(UsingMicrosoftNETSdk)</Visible>
 	    <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
 	  </SpecFlowFeatureFiles>

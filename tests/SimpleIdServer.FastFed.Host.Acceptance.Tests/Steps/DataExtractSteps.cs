@@ -29,6 +29,14 @@ public class DataExtractSteps
         _scenarioContext.Set(JsonDocument.Parse(json), "jsonHttpBody");
     }
 
+    [When("extract return url")]
+    public void WhenExtractReturnUrl()
+    {
+        var httpResponseMessage = _scenarioContext["httpResponseMessage"] as HttpResponseMessage;
+        var requestUri = httpResponseMessage.RequestMessage.RequestUri;
+        _scenarioContext.Set(requestUri.ToString(), "requestUri");
+    }
+
     [When("extract query parameters into JSON")]
     public void WhenExtractQueryParametersIntoJSON()
     {

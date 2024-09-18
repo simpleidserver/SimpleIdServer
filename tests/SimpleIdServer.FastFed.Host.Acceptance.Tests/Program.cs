@@ -2,11 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
 using SimpleIdServer.FastFed.Domains;
-using SimpleIdServer.FastFed.Models;
+using SimpleIdServer.FastFed.Host.Acceptance.Tests;
+using SimpleIdServer.FastFed.Host.Acceptance.Tests.Extensions;
+using SimpleIdServer.FastFed.Store.EF;
 using System.Collections.Generic;
 using System.Text.Json;
-using SimpleIdServer.FastFed.Store.EF;
+using System.Text.Json.Nodes;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAntiforgery();
@@ -29,6 +32,18 @@ builder.Services.AddFastFed(cb =>
         {
             "RS256"
         }
+        },
+        ContactInformation = new SimpleIdServer.FastFed.Domains.ProviderContactInformation
+        {
+            Email = "support@example.com",
+            Organization = "Example Inc.",
+            Phone = "+1-800-555-5555"
+        },
+        DisplaySettings = new SimpleIdServer.FastFed.Domains.DisplaySettings
+        {
+            DisplayName = "Example Application Provider",
+            LogoUri = "https://play-lh.googleusercontent.com/1-hPxafOxdYpYZEOKzNIkSP43HXCNftVJVttoo4ucl7rsMASXW3Xr6GlXURCubE1tA=w3840-h2160-rw",
+            License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
         }
     };
     cb.IdProvider = new SimpleIdServer.FastFed.IdProviderOptions
@@ -61,18 +76,14 @@ builder.Services.AddFastFed(cb =>
             License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
         }
     };
-}).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore(new IdentityProviderFederation
+}).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore(Constants.ProviderFederations))
+.AddFastFedIdentityProvider()
+.AddAppProviderScimProvisioning(o =>
 {
-    EntityId = "duplicate",
-    Capabilities = new List<IdentityProviderFederationCapabilities>
-    {
-        new IdentityProviderFederationCapabilities
-        {
-            Status = IdentityProviderStatus.CONFIRMED
-        }
-    }
-}))
-.AddFastFedIdentityProvider();
+    o.ScimServiceUri = "http://localhost/scim";
+    o.Scope = "scim";
+    o.TokenEndpoint = "http://localhost/token";
+});
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -200,9 +211,55 @@ app.MapGet("/incompatible/provider-metadata", () =>
                 LogoUri = "https://play-lh.googleusercontent.com/1-hPxafOxdYpYZEOKzNIkSP43HXCNftVJVttoo4ucl7rsMASXW3Xr6GlXURCubE1tA=w3840-h2160-rw",
                 License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
             }
-        }
+        },
     };
     return JsonSerializer.Serialize(providerMetadata);
+});
+app.MapGet("/bad/app-provider-metadata", () =>
+{
+    var providerMetadata = new ProviderMetadata
+    {
+        ApplicationProvider = new ApplicationProviderMetadata
+        {
+            EntityId = "incompatible",
+            ProviderDomain = "localhost",
+            Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
+            {
+                ProvisioningProfiles = new List<string>
+                {
+                    "invalid:provisioning"
+                },
+                SchemaGrammars = new List<string>
+                {
+                    "invalid:schemagrammar"
+                },
+                SigningAlgorithms = new List<string>
+                {
+                    "invalid-sigalg"
+                }
+            },
+            ContactInformation = new SimpleIdServer.FastFed.Domains.ProviderContactInformation
+            {
+                Email = "support@example.com",
+                Organization = "Example Inc.",
+                Phone = "+1-800-555-5555"
+            },
+            DisplaySettings = new SimpleIdServer.FastFed.Domains.DisplaySettings
+            {
+                DisplayName = "Example Identity Provider",
+                LogoUri = "https://play-lh.googleusercontent.com/1-hPxafOxdYpYZEOKzNIkSP43HXCNftVJVttoo4ucl7rsMASXW3Xr6GlXURCubE1tA=w3840-h2160-rw",
+                License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
+            }
+        },
+    };
+    return JsonSerializer.Serialize(providerMetadata);
+});
+app.MapGet("/entityId/jwks", () =>
+{
+    var result = new JwksResult();
+    var publicJwk = Constants.SigningCredentials.SerializePublicJWK();
+    result.JsonWebKeys.Add(JsonNode.Parse(JsonSerializer.Serialize(publicJwk)).AsObject());
+    return JsonSerializer.Serialize(result);
 });
 app.UseFastFed()
     .UseApplicationProvider()

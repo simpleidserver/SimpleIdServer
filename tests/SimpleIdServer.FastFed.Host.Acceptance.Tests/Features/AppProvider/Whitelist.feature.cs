@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features
+namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features.AppProvider
 {
     using TechTalk.SpecFlow;
     using System;
@@ -40,7 +40,7 @@ namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "Whitelist", "\tCheck errors returned during whitelisting", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/AppProvider", "Whitelist", "\tCheck errors returned during whitelisting", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -101,14 +101,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table2.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "identity_provider_url",
                             "http://localhost/fastfed"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table2, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table8, "When ");
 #line hidden
 #line 9
  testRunner.And("extract parameter \'app_metadata_uri\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

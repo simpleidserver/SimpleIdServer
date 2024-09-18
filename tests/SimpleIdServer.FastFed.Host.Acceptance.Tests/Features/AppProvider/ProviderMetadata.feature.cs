@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features
+namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features.AppProvider
 {
     using TechTalk.SpecFlow;
     using System;
@@ -40,7 +40,7 @@ namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "ProviderMetadata", "\tCheck result returned by the /fastfed/provider-metadata endpoint", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/AppProvider", "ProviderMetadata", "\tCheck result returned by the /fastfed/provider-metadata endpoint", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP GET request \'http://localhost/fastfed/provider-metadata\'", ((string)(null)), table1, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/fastfed/provider-metadata\'", ((string)(null)), table7, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

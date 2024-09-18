@@ -10,7 +10,7 @@
 // ------------------------------------------------------------------------------
 #region Designer generated code
 #pragma warning disable
-namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features
+namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features.AppProvider
 {
     using TechTalk.SpecFlow;
     using System;
@@ -40,7 +40,7 @@ namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features
         public static void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
-            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features", "WhitelistErrors", "\tCheck errors returned during whitelisting", ProgrammingLanguage.CSharp, featureTags);
+            TechTalk.SpecFlow.FeatureInfo featureInfo = new TechTalk.SpecFlow.FeatureInfo(new System.Globalization.CultureInfo("en-US"), "Features/AppProvider", "WhitelistErrors", "\tCheck errors returned during whitelisting", ProgrammingLanguage.CSharp, featureTags);
             testRunner.OnFeatureStart(featureInfo);
         }
         
@@ -98,11 +98,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table3, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table9, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -138,14 +138,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table4.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "identity_provider_url",
                             "URL"});
 #line 17
- testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table4, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table10, "When ");
 #line hidden
 #line 21
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -181,14 +181,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table5.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "identity_provider_url",
                             "http://localhost/bad"});
 #line 29
- testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table5, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table11, "When ");
 #line hidden
 #line 33
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -255,14 +255,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table6.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "identity_provider_url",
                             "http://localhost/badsuffix"});
 #line 48
- testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table6, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table12, "When ");
 #line hidden
 #line 52
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -299,14 +299,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table7.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "identity_provider_url",
                             "http://localhost/duplicate"});
 #line 59
- testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table7, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table13, "When ");
 #line hidden
 #line 63
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -343,14 +343,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table8.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "identity_provider_url",
                             "http://localhost/incompatible"});
 #line 70
- testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table8, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table14, "When ");
 #line hidden
 #line 74
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

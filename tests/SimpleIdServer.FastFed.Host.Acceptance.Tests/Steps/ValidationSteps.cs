@@ -43,6 +43,14 @@ public class ValidationSteps
     }
 
 
+    [Then("redirect uri equals to '(.*)'")]
+    public void ThenRedirectUriEuals(string redirectUri)
+    {
+        var requestUri = _scenarioContext["requestUri"].ToString();
+        Assert.True(requestUri == redirectUri);
+    }
+
+
     [Then("JSON doesn't exist '(.*)'")]
     public void ThenDoesntExist(string key)
     {

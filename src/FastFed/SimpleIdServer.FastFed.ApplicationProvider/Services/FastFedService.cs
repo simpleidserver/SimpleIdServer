@@ -121,7 +121,7 @@ public class FastFedService : IFastFedService
             var jwks = await httpClient.GetFromJsonAsync<JwksResult>(idProviderFederation.JwksUri, cancellationToken);
             // 4. Verify the kid matches an entry in the key set hosted at the whitelisted jwks_uri captured in Section.
             var jwk = jwks.Keys.SingleOrDefault(k => k.Kid == jwt.Kid);
-            if (jwk == null) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.JwkKidIsNotFound);
+            if (jwk == null) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, string.Format(Global.JwkKidIsNotFound, jwt.Kid));
             var parameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
             {
                 IssuerSigningKey = jwk,
@@ -149,10 +149,10 @@ public class FastFedService : IFastFedService
             authenticationProfiles = JsonSerializer.Deserialize<List<string>>(authenticationProfilesClaim.Value);
         if (jwt.TryGetClaim("provisioning_profiles", out Claim provisioningProfilesClaim))
             provisioningProfiles = JsonSerializer.Deserialize<List<string>>(provisioningProfilesClaim.Value);
-        var isCapabilitiesDifferent = authenticationProfiles.Count() == idProviderFederation.LastCapabilities.AuthenticationProfiles.Count() &&
-            authenticationProfiles.All(a => idProviderFederation.LastCapabilities.AuthenticationProfiles.Contains(a)) &&
-            provisioningProfiles.Count() == idProviderFederation.LastCapabilities.ProvisioningProfiles.Count() &&
-            provisioningProfiles.All(p => idProviderFederation.LastCapabilities.ProvisioningProfiles.Contains(p));
+        var isCapabilitiesDifferent = authenticationProfiles.Count() != idProviderFederation.LastCapabilities.AuthenticationProfiles.Count() ||
+            authenticationProfiles.Any(a => !idProviderFederation.LastCapabilities.AuthenticationProfiles.Contains(a)) ||
+            provisioningProfiles.Count() != idProviderFederation.LastCapabilities.ProvisioningProfiles.Count() ||
+            provisioningProfiles.Any(p => !idProviderFederation.LastCapabilities.ProvisioningProfiles.Contains(p));
         if (isCapabilitiesDifferent) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.CapabilitiesCannotBeDifferent);
         // Activate the capabilities - provisioning_profile and authentication profile.
         var dic = new Dictionary<string, JsonObject>();
