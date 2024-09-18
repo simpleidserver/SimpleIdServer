@@ -25,6 +25,11 @@ body.orange {
     --bs-btn-hover-bg: #ee5f00ff;
 }
 
+#website-title {
+    color: white;
+    padding-left: 10px;
+}
+
 #container {
     padding: 10px 5px 0px 10px;
 }

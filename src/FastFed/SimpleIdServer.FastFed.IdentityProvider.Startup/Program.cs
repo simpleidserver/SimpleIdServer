@@ -3,11 +3,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim;
 using SimpleIdServer.FastFed.Store.EF;
 using SimpleIdServer.Webfinger;
 using SimpleIdServer.Webfinger.Builders;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
@@ -54,14 +56,22 @@ builder.Services.AddFastFed(o =>
             DisplayName = "Example Identity Provider",
             LogoUri = "https://play-lh.googleusercontent.com/1-hPxafOxdYpYZEOKzNIkSP43HXCNftVJVttoo4ucl7rsMASXW3Xr6GlXURCubE1tA=w3840-h2160-rw",
             License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
-        }
+        },
+        JwksUri = "https://localhost:5020/jwks"
     };
 })
-    .AddFastFedIdentityProvider(cbChooser: (t) => t.UseInMemoryEfStore()) // configure EF
+    .AddFastFedIdentityProvider(cbChooser: (t) => t.UseInMemoryEfStore(), (cb) =>
+    {
+        cb.SigningCredentials = new List<Microsoft.IdentityModel.Tokens.SigningCredentials>
+        {
+            GenerateRSASignatureKey("keyId")
+        };
+    })
     .AddIdProviderScimProvisioning(); // support scim provisioning
 
 var app = builder.Build();
 app.UseRouting();
+app.UseStaticFiles();
 app.UseWebfinger();
 app.UseFastFed()
     .UseIdentityProvider();
@@ -72,3 +82,10 @@ app.MapControllerRoute(
     name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
 app.Run();
+
+static SigningCredentials GenerateRSASignatureKey(string keyId, string alg = SecurityAlgorithms.RsaSha256)
+{
+    var rsa = RSA.Create();
+    var securityKey = new RsaSecurityKey(rsa) { KeyId = keyId };
+    return new SigningCredentials(securityKey, alg);
+}

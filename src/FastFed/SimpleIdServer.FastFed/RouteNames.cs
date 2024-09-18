@@ -9,4 +9,5 @@ public static class RouteNames
     public const string ProviderMetadata = $"{FastFed}/provider-metadata";
     public const string Register = $"{FastFed}/register";
     public const string Start = $"{FastFed}/start";
+    public const string Jwks = "/jwks";
 }

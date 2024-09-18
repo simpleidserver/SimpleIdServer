@@ -129,4 +129,7 @@
   <data name="Update" xml:space="preserve">
     <value>Update</value>
   </data>
+  <data name="ScimProvisioningIsConfigured" xml:space="preserve">
+    <value>The scim provisioning is configured</value>
+  </data>
 </root>

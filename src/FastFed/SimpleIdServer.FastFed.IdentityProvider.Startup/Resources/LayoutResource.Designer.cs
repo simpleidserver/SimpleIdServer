@@ -61,6 +61,15 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Application Providers.
+        /// </summary>
+        public static string ApplicationProviders {
+            get {
+                return ResourceManager.GetString("ApplicationProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Authenticate.
         /// </summary>
         public static string authenticate {
@@ -75,6 +84,15 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
         public static string disconnect {
             get {
                 return ResourceManager.GetString("disconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provider.
+        /// </summary>
+        public static string IdentityProvider {
+            get {
+                return ResourceManager.GetString("IdentityProvider", resourceCulture);
             }
         }
         

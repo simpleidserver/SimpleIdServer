@@ -100,7 +100,7 @@ this.ScenarioInitialize(scenarioInfo);
                 this.ScenarioStart();
 #line 5
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jwt\', content \'jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jws\', content \'jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 7
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -112,7 +112,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'$.error_code\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 12
- testRunner.Then("JSON \'$.error_descriptions[0]\'=\'Content type must be equals to \'application/jws\'\'" +
+ testRunner.Then("JSON \'$.error_descriptions[0]\'=\'Content type must be equals to \'application/jwt\'\'" +
                         "", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -139,7 +139,7 @@ this.ScenarioInitialize(scenarioInfo);
                 this.ScenarioStart();
 #line 15
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jws\', content \'\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 17
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -177,7 +177,7 @@ this.ScenarioInitialize(scenarioInfo);
                 this.ScenarioStart();
 #line 25
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jws\', content \'jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'jwt\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 27
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -224,7 +224,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 39
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jws\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 41
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -272,7 +272,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 53
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jws\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 55
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -322,7 +322,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 68
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jws\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 70
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -373,7 +373,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 83
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jws\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 85
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -427,7 +427,7 @@ this.ScenarioInitialize(scenarioInfo);
 #line hidden
 #line 99
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jws\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 101
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

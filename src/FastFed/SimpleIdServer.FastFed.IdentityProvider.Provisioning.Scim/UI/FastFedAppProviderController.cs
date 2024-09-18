@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.UI;
 
@@ -23,7 +24,7 @@ public class FastFedAppProviderController : Controller
     [HttpGet]
     public async Task<IActionResult> Configure(string entityId, CancellationToken cancellationToken)
     {
-        var providerFederation = await _providerFederationStore.Get(entityId, cancellationToken);
+        var providerFederation = await _providerFederationStore.Get(HttpUtility.UrlDecode(entityId), cancellationToken);
         var serializedConfiguration = providerFederation.LastCapabilities.Configurations.Single(c => c.ProfileName == Constants.ProvisioningProfileName && c.IsAuthenticationProfile == false).IdProviderSerializedConfiguration;
         var configuration = string.IsNullOrWhiteSpace(serializedConfiguration) ? new ScimProvisioningConfiguration() : JsonSerializer.Deserialize<ScimProvisioningConfiguration>(serializedConfiguration);
         var viewModel = new FastFedAppProviderConfigureViewModel
@@ -38,11 +39,12 @@ public class FastFedAppProviderController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Configure(FastFedAppProviderConfigureViewModel viewModel, CancellationToken cancellationToken)
     {
-        var providerFederation = await _providerFederationStore.Get(viewModel.EntityId, cancellationToken);
+        var providerFederation = await _providerFederationStore.Get(HttpUtility.UrlDecode(viewModel.EntityId), cancellationToken);
         var lastCapabilities = providerFederation.LastCapabilities;
         var configuration = lastCapabilities.Configurations.Single(c => c.ProfileName == Constants.ProvisioningProfileName);
         configuration.IdProviderSerializedConfiguration = JsonSerializer.Serialize(viewModel.Configuration);
         await _providerFederationStore.SaveChanges(cancellationToken);
-        return null;
+        viewModel.IsConfirmed = true;
+        return View(viewModel);
     }
 }

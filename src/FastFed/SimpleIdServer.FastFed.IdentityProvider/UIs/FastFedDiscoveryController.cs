@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SimpleIdServer.FastFed.IdentityProvider.UIs;
 
@@ -26,7 +27,7 @@ public class FastFedDiscoveryController : Controller
     [HttpGet]
     public async Task<IActionResult> Confirm(string id, CancellationToken cancellationToken)
     {
-        var providerFederation = await _providerFederationStore.Get(id, cancellationToken);
+        var providerFederation = await _providerFederationStore.Get(HttpUtility.UrlDecode(id), cancellationToken);
         return View(new FastFedDiscoveryConfirmViewModel { IdProviderFederation = providerFederation });
     }
 
@@ -35,13 +36,13 @@ public class FastFedDiscoveryController : Controller
     public async Task<IActionResult> Confirm(FastFedDiscoveryConfirmViewModel viewModel, CancellationToken cancellationToken)
     {
         var result = await _fastFedService.StartHandshakeRegistration(viewModel.EntityId, cancellationToken);
-        if(!result.HasError)
+        if(result.HasError)
         {
             ModelState.AddModelError(result.ErrorCode, result.ErrorDescriptions.First());
             return View(viewModel);
         }
 
         var service = _idProviderProvisioningServices.Single(i => i.Name == result.Result.LastCapabilities.ProvisioningProfiles.First());
-        return RedirectToAction("Configure", "FastFedAppProvider", new { area = service.Area });
+        return RedirectToAction("Configure", "FastFedAppProvider", new { area = service.Area, entityId = viewModel.EntityId });
     }
 }

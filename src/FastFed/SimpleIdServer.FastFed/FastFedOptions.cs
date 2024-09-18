@@ -22,4 +22,5 @@ public class IdProviderOptions
     public Domains.Capabilities Capabilities { get; set; }
     public Domains.DisplaySettings DisplaySettings { get; set; }
     public Domains.ProviderContactInformation ContactInformation { get; set; }
+    public string JwksUri { get; set; }
 }

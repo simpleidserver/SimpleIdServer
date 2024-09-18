@@ -5,11 +5,13 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.FastFed.Apis;
 using SimpleIdServer.FastFed.Apis.FastFedMetadata;
 using SimpleIdServer.FastFed.Client;
+using SimpleIdServer.FastFed.Domains;
 using SimpleIdServer.FastFed.IdentityProvider.Resources;
 using SimpleIdServer.FastFed.Models;
 using SimpleIdServer.FastFed.Requests;
 using SimpleIdServer.FastFed.Stores;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,20 +67,16 @@ public class FastFedController : BaseController
                 providerFederation.Capabilities.Add(new IdentityProviderFederationCapabilities
                 {
                     Id = Guid.NewGuid().ToString(),
-                    AuthenticationProfiles = nextAuthenticationProfiles,
-                    ProvisioningProfiles = nextProvisioningProfiles,
-                    ExpirationDateTime = request.Expiration.Value,
                     Status = IdentityProviderStatus.CREATE,
-                    CreateDateTime = DateTime.UtcNow
+                    CreateDateTime = DateTime.UtcNow,
+                    Configurations = new List<CapabilitySettings>()
                 });
             }
-            else
-            {
-                providerFederation.LastCapabilities.AuthenticationProfiles = nextAuthenticationProfiles;
-                providerFederation.LastCapabilities.ProvisioningProfiles = nextProvisioningProfiles;
-                providerFederation.LastCapabilities.ExpirationDateTime = request.Expiration.Value;
-            }
 
+            providerFederation.LastCapabilities.AuthenticationProfiles = nextAuthenticationProfiles;
+            providerFederation.LastCapabilities.ProvisioningProfiles = nextProvisioningProfiles;
+            providerFederation.LastCapabilities.ExpirationDateTime = request.Expiration.Value;
+            UpdateConfiguration(providerFederation, providerMetadata);
             await _providerFederationStore.SaveChanges(cancellationToken);
             return RedirectToAction("Confirm", "FastFedDiscovery", new { id = providerMetadata.ApplicationProvider.EntityId });
         }
@@ -105,32 +103,34 @@ public class FastFedController : BaseController
 
         providerFederation.LastCapabilities.AuthenticationProfiles = nextAuthenticationProfiles;
         providerFederation.LastCapabilities.ProvisioningProfiles = nextProvisioningProfiles;
-        if (providerMetadata.ApplicationProvider.OtherParameters != null)
-        {
-            foreach(var rec in providerMetadata.ApplicationProvider.OtherParameters)
-            {
-                if(nextAuthenticationProfiles.Contains(rec.Key))
-                {
-                    var conf = providerFederation.LastCapabilities.Configurations.SingleOrDefault(c => c.ProfileName == rec.Key);
-                    if(conf == null)
-                    {
-                        conf = new CapabilitySettings
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            ProfileName = rec.Key,
-                            IsAuthenticationProfile = false
-                        };
-                        providerFederation.LastCapabilities.Configurations.Add(conf);
-                    }
-
-                    conf.AppProviderSerializedConfiguration = providerMetadata.ApplicationProvider.OtherParameters[rec.Key].ToJsonString();
-                }
-            }
-        }
-
+        UpdateConfiguration(providerFederation, providerMetadata);
         providerFederation.LastCapabilities.ExpirationDateTime = request.Expiration.Value;
         await _providerFederationStore.SaveChanges(cancellationToken);
         return null;
+    }
+
+    private void UpdateConfiguration(IdentityProviderFederation metadata, ProviderMetadata providerMetadata)
+    {
+        if (metadata.LastCapabilities.ProvisioningProfiles == null) return;
+        foreach(var provisioningProfile in metadata.LastCapabilities.ProvisioningProfiles)
+        {
+            var conf = metadata.LastCapabilities.Configurations.SingleOrDefault(c => c.ProfileName == provisioningProfile);
+            if(conf == null)
+            {
+                conf = new CapabilitySettings
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ProfileName = provisioningProfile,
+                    IsAuthenticationProfile = false
+                };
+                metadata.LastCapabilities.Configurations.Add(conf);
+            }
+
+            if (providerMetadata.ApplicationProvider.OtherParameters != null && providerMetadata.ApplicationProvider.OtherParameters.ContainsKey(provisioningProfile))
+            {
+                conf.AppProviderSerializedConfiguration = providerMetadata.ApplicationProvider.OtherParameters[provisioningProfile].ToJsonString();
+            }
+        }
     }
 
     private async Task<ValidationResult<Domains.ProviderMetadata>> Validate(StartHandshakeRequest request, CancellationToken cancellationToken)

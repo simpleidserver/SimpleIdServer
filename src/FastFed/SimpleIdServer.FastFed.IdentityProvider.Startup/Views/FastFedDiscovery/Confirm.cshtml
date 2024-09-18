@@ -57,27 +57,49 @@
                 }
                 else
                 {
-                    <div class="card-title">@FastFedDiscoveryResource.ConfirmCapabilities</div>
+                    <div class="card-title">
+                        <h5>@FastFedDiscoveryResource.ConfirmCapabilities</h5>
+                    </div>
                     <!-- New authentication profiles -->
                     <div class="mb-3">
                         <label class="form-label">@FastFedDiscoveryResource.AuthenticationProfiles</label>
-                        <ul class="list-group">
-                            @foreach (var ap in lastCapabilities.AuthenticationProfiles)
-                            {
-                                <li class="list-group-item">@ap</li>
-                            }
-                        </ul>
+                        @if(lastCapabilities.AuthenticationProfiles == null || !lastCapabilities.AuthenticationProfiles.Any())
+                        {                            
+                            <div class="alert alert-danger" role="alert">
+                              @FastFedDiscoveryResource.NoAuthenticationProfiles
+                            </div>
+                        }
+                        else
+                        {
+                            <ul class="list-group">
+                                @foreach (var ap in lastCapabilities.AuthenticationProfiles)
+                                {
+                                    <li class="list-group-item">@ap</li>
+                                }      
+                            </ul>
+                        }
                     </div>
+                    <hr class="hr" />
                     <!-- New provisioning profiles -->
                     <div class="mb-3">
                         <label class="form-label">@FastFedDiscoveryResource.ProvisioningProfiles</label>
-                        <ul class="list-group">
-                            @foreach (var pp in lastCapabilities.ProvisioningProfiles)
-                            {
-                                <li class="list-group-item">@pp</li>
-                            }
-                        </ul>
+                        @if(lastCapabilities.ProvisioningProfiles == null || !lastCapabilities.ProvisioningProfiles.Any())
+                        {
+                            <div class="alert alert-danger" role="alert">
+                              @FastFedDiscoveryResource.NoProvisioningProfiles
+                            </div>                            
+                        }
+                        else
+                        {
+                            <ul class="list-group">
+                                @foreach (var pp in lastCapabilities.ProvisioningProfiles)
+                                {
+                                    <li class="list-group-item">@pp</li>
+                                }
+                            </ul>                            
+                        }
                     </div>
+                    <hr class="hr" />
                 }
 
                 <button type="submit" class="btn btn-primary">@FastFedDiscoveryResource.Confirm</button>

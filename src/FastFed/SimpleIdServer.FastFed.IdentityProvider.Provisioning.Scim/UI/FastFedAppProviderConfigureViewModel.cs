@@ -7,4 +7,5 @@ public class FastFedAppProviderConfigureViewModel
 {
     public string EntityId { get; set; }
     public ScimProvisioningConfiguration Configuration { get; set; }
+    public bool IsConfirmed { get; set; } = false;
 }

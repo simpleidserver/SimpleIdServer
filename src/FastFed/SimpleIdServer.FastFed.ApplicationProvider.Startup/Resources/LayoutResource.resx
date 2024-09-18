@@ -126,4 +126,10 @@
   <data name="ConfigureProvider" xml:space="preserve">
     <value>Configure provider</value>
   </data>
+  <data name="ApplicationProvider" xml:space="preserve">
+    <value>Application Provider</value>
+  </data>
+  <data name="IdentityProviders" xml:space="preserve">
+    <value>Identity Providers</value>
+  </data>
 </root>

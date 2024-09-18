@@ -5,11 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
 using SimpleIdServer.FastFed.Domains;
 using SimpleIdServer.FastFed.Host.Acceptance.Tests;
-using SimpleIdServer.FastFed.Host.Acceptance.Tests.Extensions;
 using SimpleIdServer.FastFed.Store.EF;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAntiforgery();
@@ -77,7 +75,13 @@ builder.Services.AddFastFed(cb =>
         }
     };
 }).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore(Constants.ProviderFederations))
-.AddFastFedIdentityProvider()
+.AddFastFedIdentityProvider(callback: cb =>
+{
+    cb.SigningCredentials = new List<Microsoft.IdentityModel.Tokens.SigningCredentials>
+    {
+        Constants.SigningCredentials
+    };
+})
 .AddAppProviderScimProvisioning(o =>
 {
     o.ScimServiceUri = "http://localhost/scim";
@@ -253,13 +257,6 @@ app.MapGet("/bad/app-provider-metadata", () =>
         },
     };
     return JsonSerializer.Serialize(providerMetadata);
-});
-app.MapGet("/entityId/jwks", () =>
-{
-    var result = new JwksResult();
-    var publicJwk = Constants.SigningCredentials.SerializePublicJWK();
-    result.JsonWebKeys.Add(JsonNode.Parse(JsonSerializer.Serialize(publicJwk)).AsObject());
-    return JsonSerializer.Serialize(result);
 });
 app.UseFastFed()
     .UseApplicationProvider()

@@ -107,6 +107,24 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no authentication profile.
+        /// </summary>
+        public static string NoAuthenticationProfiles {
+            get {
+                return ResourceManager.GetString("NoAuthenticationProfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no provisioning profile.
+        /// </summary>
+        public static string NoProvisioningProfiles {
+            get {
+                return ResourceManager.GetString("NoProvisioningProfiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Provisioning profiles.
         /// </summary>
         public static string ProvisioningProfiles {

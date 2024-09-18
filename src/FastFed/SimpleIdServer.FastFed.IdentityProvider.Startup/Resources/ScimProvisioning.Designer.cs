@@ -88,6 +88,15 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The scim provisioning is configured.
+        /// </summary>
+        public static string ScimProvisioningIsConfigured {
+            get {
+                return ResourceManager.GetString("ScimProvisioningIsConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Update.
         /// </summary>
         public static string Update {

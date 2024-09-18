@@ -84,9 +84,9 @@ public class FastFedService : IFastFedService
             SigningCredentials = _options.SigningCredentials.First()
         };
         var claims = new Dictionary<string, object>();
-        if(lastCapabilities.ProvisioningProfiles.Any())
+        if(lastCapabilities.ProvisioningProfiles != null && lastCapabilities.ProvisioningProfiles.Any())
             claims.Add("provisioning_profiles", lastCapabilities.ProvisioningProfiles);
-        if (lastCapabilities.AuthenticationProfiles.Any())
+        if (lastCapabilities.AuthenticationProfiles != null && lastCapabilities.AuthenticationProfiles.Any())
             claims.Add("authentication_profiles", lastCapabilities.AuthenticationProfiles);
         securityTokenDescriptor.Claims = claims;
         var handler = new JsonWebTokenHandler();

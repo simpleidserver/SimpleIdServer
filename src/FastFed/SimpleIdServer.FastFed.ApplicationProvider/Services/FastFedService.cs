@@ -143,16 +143,12 @@ public class FastFedService : IFastFedService
         // 6. If an expiration date exists on the whitelist (Section 7.2.1.6), verify the expiration date has not been exceeded.
         if (idProviderFederation.LastCapabilities.IsExpired) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.WhitelistingIsExpired);
         // 7. Verify the values of authentication_profiles and provisioning_profiles against the whitelisted capabilities captured in Section 7.2.1.6.
-        var authenticationProfiles = new List<string>();
-        var provisioningProfiles = new List<string>();
-        if(jwt.TryGetClaim("authentication_profiles", out Claim authenticationProfilesClaim))
-            authenticationProfiles = JsonSerializer.Deserialize<List<string>>(authenticationProfilesClaim.Value);
-        if (jwt.TryGetClaim("provisioning_profiles", out Claim provisioningProfilesClaim))
-            provisioningProfiles = JsonSerializer.Deserialize<List<string>>(provisioningProfilesClaim.Value);
-        var isCapabilitiesDifferent = authenticationProfiles.Count() != idProviderFederation.LastCapabilities.AuthenticationProfiles.Count() ||
-            authenticationProfiles.Any(a => !idProviderFederation.LastCapabilities.AuthenticationProfiles.Contains(a)) ||
-            provisioningProfiles.Count() != idProviderFederation.LastCapabilities.ProvisioningProfiles.Count() ||
-            provisioningProfiles.Any(p => !idProviderFederation.LastCapabilities.ProvisioningProfiles.Contains(p));
+        var authenticationProfiles = jwt.Claims.Where(c => c.Type == "authentication_profiles").Select(c => c.Value).ToList();
+        var provisioningProfiles = jwt.Claims.Where(c => c.Type == "provisioning_profiles").Select(c => c.Value).ToList();
+        var isCapabilitiesDifferent = authenticationProfiles.Count() != (idProviderFederation.LastCapabilities.AuthenticationProfiles?.Count() ?? 0) ||
+            authenticationProfiles.Any(a => !(idProviderFederation.LastCapabilities.AuthenticationProfiles?.Contains(a) ?? false)) ||
+            provisioningProfiles.Count() != (idProviderFederation.LastCapabilities.ProvisioningProfiles?.Count() ?? 0) ||
+            provisioningProfiles.Any(p => !(idProviderFederation.LastCapabilities.ProvisioningProfiles?.Contains(p) ?? false));
         if (isCapabilitiesDifferent) return ValidationResult<Dictionary<string, JsonObject>>.Fail(ErrorCodes.InvalidRequest, Global.CapabilitiesCannotBeDifferent);
         // Activate the capabilities - provisioning_profile and authentication profile.
         var dic = new Dictionary<string, JsonObject>();

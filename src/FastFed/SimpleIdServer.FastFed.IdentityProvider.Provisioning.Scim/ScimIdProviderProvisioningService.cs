@@ -55,7 +55,6 @@ public class ScimIdProviderProvisioningService : IIdProviderProvisioningService
 
                     // extract into representation.
                     // extract attributes.
-
                     // when a user is added in the IdServer.
                     // save the representation the entire representation.
                     // each 30 minutes, transform the representation into SCIM (according to the grammar from application provider).

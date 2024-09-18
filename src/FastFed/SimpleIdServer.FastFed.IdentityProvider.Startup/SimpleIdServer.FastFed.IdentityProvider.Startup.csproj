@@ -12,6 +12,9 @@
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+	</ItemGroup>
+	<ItemGroup>
 		<Compile Update="Resources\ScimProvisioning.Designer.cs">
 		  <DependentUpon>ScimProvisioning.resx</DependentUpon>
 		  <DesignTime>True</DesignTime>
@@ -41,8 +44,5 @@
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>FastFedDiscoveryResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Areas\scim\Views\FastFedDiscovery\" />
 	</ItemGroup>
 </Project>

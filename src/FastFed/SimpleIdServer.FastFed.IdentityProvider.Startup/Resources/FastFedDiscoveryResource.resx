@@ -141,4 +141,10 @@
   <data name="Confirm" xml:space="preserve">
     <value>Confirm</value>
   </data>
+  <data name="NoProvisioningProfiles" xml:space="preserve">
+    <value>There is no provisioning profile</value>
+  </data>
+  <data name="NoAuthenticationProfiles" xml:space="preserve">
+    <value>There is no authentication profile</value>
+  </data>
 </root>

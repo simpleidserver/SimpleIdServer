@@ -36,6 +36,7 @@ public class GetProviderMetadataQuery : IGetProviderMetadataQuery
                 DisplaySettings = _options.IdProvider.DisplaySettings,
                 ContactInformation = _options.IdProvider.ContactInformation,
                 FastFedHandshakeStartUri = $"{issuer}{RouteNames.Start}",
+                JwksUri = _options.IdProvider.JwksUri
             };
         }
 

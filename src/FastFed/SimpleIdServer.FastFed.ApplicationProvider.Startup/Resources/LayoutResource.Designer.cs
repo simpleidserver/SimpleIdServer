@@ -81,9 +81,29 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources {
         /// <summary>
         ///   Recherche une chaîne localisée semblable à Disconnect.
         /// </summary>
-        public static string disconnect {
-            get {
+        public static string disconnect
+        {
+            get
+            {
                 return ResourceManager.GetString("disconnect", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Disconnect.
+        /// </summary>
+        public static string ApplicationProvider
+        {
+            get
+            {
+                return ResourceManager.GetString("ApplicationProvider", resourceCulture);
+            }
+        }
+        public static string IdentityProviders
+        {
+            get
+            {
+                return ResourceManager.GetString("IdentityProviders", resourceCulture);
             }
         }
     }

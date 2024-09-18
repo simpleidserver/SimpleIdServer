@@ -129,4 +129,10 @@
   <data name="authenticate" xml:space="preserve">
     <value>Authenticate</value>
   </data>
+  <data name="IdentityProvider" xml:space="preserve">
+    <value>Identity Provider</value>
+  </data>
+  <data name="ApplicationProviders" xml:space="preserve">
+    <value>Application Providers</value>
+  </data>
 </root>

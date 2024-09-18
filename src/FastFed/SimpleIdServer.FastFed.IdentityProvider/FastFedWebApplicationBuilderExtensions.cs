@@ -11,6 +11,9 @@ public static class FastFedWebApplicationBuilderExtensions
         builder.WebApplication.MapControllerRoute(name: "StartFastFed",
             pattern: RouteNames.Start,
             defaults: new { controller = "FastFed", action = "Start" });
+        builder.WebApplication.MapControllerRoute(name: "GetJwks",
+            pattern: RouteNames.Jwks,
+            defaults: new { controller = "Jwks", action = "Get" });
         return builder;
     }
 }

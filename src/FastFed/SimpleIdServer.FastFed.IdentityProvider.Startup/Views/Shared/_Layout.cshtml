@@ -24,21 +24,21 @@
     <div class="container-fluid">
         <a class="navbar-brand" href="#">
 			<img src="~/images/SIDLogo.svg" width="40px" />
+            <label id="website-title">@LayoutResource.IdentityProvider</label>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto">
-                @if (User.Identity.IsAuthenticated)
-                {
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Profile", "Home")">
-                            Welcome @User.Identity.Name
+                        <a class="nav-link" href="@Url.Action("Index", "ApplicationProviders")">
+                            @LayoutResource.ApplicationProviders
                         </a>
                     </li>
-                }
-                @RenderSection("SubMenu", required: false)
+                    @RenderSection("SubMenu", required: false)
+                </ul>
             </ul>
             <ul class="navbar-nav">
                 @if(User.Identity.IsAuthenticated)

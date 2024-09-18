@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
-using SimpleIdServer.FastFed.ApplicationProvider.Resolvers;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels;
 using SimpleIdServer.FastFed.Client;

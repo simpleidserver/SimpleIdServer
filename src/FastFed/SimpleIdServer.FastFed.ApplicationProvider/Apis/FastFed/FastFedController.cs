@@ -46,7 +46,7 @@ public class FastFedController : BaseController
     [HttpPost]
     public async Task<IActionResult> Register(CancellationToken cancellationToken)
     {
-        const string applicationJws = "application/jws";
+        const string applicationJws = "application/jwt";
         if (!Request.Headers.ContentType.ToString().StartsWith(applicationJws, StringComparison.InvariantCultureIgnoreCase)) return BuildError(ErrorCodes.InvalidRequest, string.Format(Resources.Global.InvalidContentType, applicationJws), System.Net.HttpStatusCode.Unauthorized);
         Request.EnableBuffering();
         Request.Body.Position = 0;

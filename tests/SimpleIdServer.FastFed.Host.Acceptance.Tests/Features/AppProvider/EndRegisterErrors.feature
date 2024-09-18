@@ -2,17 +2,17 @@
 	Check errors returned during the end of the registration
 
 Scenario: Http header must be equals to 'application/jws'
-	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jwt', content 'jwt'
+	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jws', content 'jwt'
 	
 	And extract JSON from body
 
 	Then HTTP status code equals to '401'
 
 	Then JSON '$.error_code'='invalid_request'
-	Then JSON '$.error_descriptions[0]'='Content type must be equals to 'application/jws''
+	Then JSON '$.error_descriptions[0]'='Content type must be equals to 'application/jwt''
 
 Scenario: Request content must be specified
-	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jws', content ''
+	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jwt', content ''
 	
 	And extract JSON from body
 
@@ -22,7 +22,7 @@ Scenario: Request content must be specified
 	Then JSON '$.error_descriptions[0]'='The registration request cannot be empty'
 
 Scenario: Registration request must be a JWT
-	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jws', content 'jwt'
+	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jwt', content 'jwt'
 	
 	And extract JSON from body
 
@@ -36,7 +36,7 @@ Scenario: Jwt issuer must be a whitelisted identity provider
 	| Key | Value   |
 	| iss | invalid |
 		
-	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jws', content '$accessToken$'
+	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jwt', content '$accessToken$'
 	
 	And extract JSON from body
 
@@ -50,7 +50,7 @@ Scenario: Jwt signature must be correct
 	| Key | Value    |
 	| iss | entityId |
 	
-	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jws', content '$accessToken$'
+	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jwt', content '$accessToken$'
 	
 	And extract JSON from body
 
@@ -65,7 +65,7 @@ Scenario: Jwt audience must be correct
 	| iss | entityId |
 	| aud | bad      |
 
-	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jws', content '$accessToken$'
+	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jwt', content '$accessToken$'
 	
 	And extract JSON from body
 
@@ -80,7 +80,7 @@ Scenario: Federation whitelisting is expired
 	| iss | expiredEntityId    |
 	| aud | http://localhost   |
 
-	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jws', content '$accessToken$'
+	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jwt', content '$accessToken$'
 	
 	And extract JSON from body
 
@@ -96,7 +96,7 @@ Scenario: Capabilities must be adequate
 	| aud                   | http://localhost   |
 	| provisioning_profiles | ["prov"]           |
 
-	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jws', content '$accessToken$'
+	When execute HTTP POST request 'http://localhost/fastfed/register', content-type 'application/jwt', content '$accessToken$'
 	
 	And extract JSON from body
 

@@ -40,7 +40,7 @@ public static class Constants
                 new IdentityProviderFederation
                 {
                     EntityId = "entityId",
-                    JwksUri = "http://localhost/entityId/jwks",
+                    JwksUri = "http://localhost/jwks",
                     Capabilities = new List<IdentityProviderFederationCapabilities>
                     {
                         new IdentityProviderFederationCapabilities
@@ -58,7 +58,7 @@ public static class Constants
                 new IdentityProviderFederation
                 {
                     EntityId = "expiredEntityId",
-                    JwksUri = "http://localhost/entityId/jwks",
+                    JwksUri = "http://localhost/jwks",
                     Capabilities = new List<IdentityProviderFederationCapabilities>
                     {
                         new IdentityProviderFederationCapabilities
