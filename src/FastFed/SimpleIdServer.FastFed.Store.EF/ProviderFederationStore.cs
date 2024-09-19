@@ -26,7 +26,7 @@ public class ProviderFederationStore : IProviderFederationStore
         => _dbContext.IdentityProviderFederations.Include(i => i.Capabilities).ThenInclude(c => c.Configurations).SingleOrDefaultAsync(i => i.EntityId == entityId, cancellationToken);
 
     public Task<List<IdentityProviderFederation>> GetAll(CancellationToken cancellationToken)
-        => _dbContext.IdentityProviderFederations.ToListAsync(cancellationToken);
+        => _dbContext.IdentityProviderFederations.Include(i => i.Capabilities).ThenInclude(c => c.Configurations).ToListAsync(cancellationToken);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);

@@ -4,6 +4,7 @@
 		<Description>Add scim provisioning to the application provider.</Description>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.Provisioning.Scim\SimpleIdServer.FastFed.Provisioning.Scim.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj" />
 	</ItemGroup>
 </Project>

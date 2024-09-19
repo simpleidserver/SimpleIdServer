@@ -128,7 +128,7 @@ public class FastFedController : BaseController
 
             if (providerMetadata.ApplicationProvider.OtherParameters != null && providerMetadata.ApplicationProvider.OtherParameters.ContainsKey(provisioningProfile))
             {
-                conf.AppProviderSerializedConfiguration = providerMetadata.ApplicationProvider.OtherParameters[provisioningProfile].ToJsonString();
+                conf.AppProviderConfiguration = providerMetadata.ApplicationProvider.OtherParameters[provisioningProfile].ToJsonString();
             }
         }
     }

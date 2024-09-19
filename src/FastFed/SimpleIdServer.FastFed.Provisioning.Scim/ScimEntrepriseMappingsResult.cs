@@ -1,12 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim;
+namespace SimpleIdServer.FastFed.Provisioning.Scim;
 
-public class AppProviderProvisioningProfileMappingsResult
+public class ScimEntrepriseMappingsResult
 {
     /// <summary>
     ///  Boolean value indicating whether the Application Provider supports provisioning of nested Group memberships.
@@ -22,13 +21,13 @@ public class AppProviderProvisioningProfileMappingsResult
     /// A structure specifying the attributes to be provisioned.
     /// </summary>
     [JsonPropertyName("desired_attributes")]
-    public ScimDesiredAttributes DesiredAttributes { get; set; }
+    public DesiredAttributes DesiredAttributes { get; set; }
 }
 
-public class ScimDesiredAttributes
+public class DesiredAttributes
 {
     [JsonPropertyName(Constants.SchemaGrammarName)]
-    public SchemaGrammarDesiredAttributes DesiredAttributes { get; set; }
+    public SchemaGrammarDesiredAttributes Attrs { get; set; }
 }
 
 public class SchemaGrammarDesiredAttributes

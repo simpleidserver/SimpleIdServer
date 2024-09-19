@@ -38,7 +38,7 @@ public class SidIntegrationEventsConsumer : IConsumer<AddUserSuccessEvent>
             Id = Guid.NewGuid().ToString(),
             CreateDateTime = DateTime.UtcNow,
             SerializedRepresentation = scimRepresentation.ToJsonString(),
-            ProvisioningProfileName = Constants.ProvisioningProfileName
+            ProvisioningProfileName = FastFed.Provisioning.Scim.Constants.ProvisioningProfileName
         });
         await _extractedRepresentationStore.SaveChanges(context.CancellationToken);
     }

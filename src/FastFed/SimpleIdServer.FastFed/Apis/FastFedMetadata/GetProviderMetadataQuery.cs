@@ -22,7 +22,7 @@ public class GetProviderMetadataQuery : IGetProviderMetadataQuery
         _options = options.Value;
     }
 
-    public SimpleIdServer.FastFed.Domains.ProviderMetadata Get()
+    public virtual SimpleIdServer.FastFed.Domains.ProviderMetadata Get()
     {
         var result = new SimpleIdServer.FastFed.Domains.ProviderMetadata();
         var issuer = _issuerResolver.Get();

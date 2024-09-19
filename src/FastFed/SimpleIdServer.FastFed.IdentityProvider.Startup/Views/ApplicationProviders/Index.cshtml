@@ -1,3 +1,46 @@
-﻿@{
+﻿@using SimpleIdServer.FastFed.IdentityProvider.Startup.Resources
+@using SimpleIdServer.FastFed.Models
+@model IEnumerable<SimpleIdServer.FastFed.IdentityProvider.UIs.ApplicationProviderViewModel>
+
+@{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = ApplicationProviderResource.ApplicationProviders;
 }
+
+<h3>@ApplicationProviderResource.ApplicationProviders</h3>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>@ApplicationProviderResource.EntityId</th>
+                    <th>@ApplicationProviderResource.CreateDateTime</th>
+                    <th>@ApplicationProviderResource.Status</th>
+                    <th>@ApplicationProviderResource.ExpirationTime</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var identityProvider in Model)
+                {
+                    <tr>
+                        <td><a href="@Url.Action("View", "ApplicationProviders", new { entityId = identityProvider.EntityId })">@identityProvider.EntityId</a></td>
+                        <td>@identityProvider.CreateDateTime.ToString()</td>
+                        <td>
+                            @if (identityProvider.Status != null)
+                            {
+                                <span>@Enum.GetName(typeof(IdentityProviderStatus), identityProvider.Status.Value)</span>
+                            }
+                        </td>
+                        <td>
+                            @if (identityProvider.ExpirationTime != null && identityProvider.Status == IdentityProviderStatus.WHITELISTED)
+                            {
+                                <label>@DateTimeOffset.FromUnixTimeSeconds((long)identityProvider.ExpirationTime.Value).ToString()</label>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

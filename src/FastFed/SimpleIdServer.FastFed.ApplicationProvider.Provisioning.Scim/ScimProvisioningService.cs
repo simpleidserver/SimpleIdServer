@@ -4,6 +4,7 @@ using MassTransit;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.IntegrationEvents;
+using SimpleIdServer.FastFed.Provisioning.Scim;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
@@ -13,7 +14,6 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
 
 public class ScimProvisioningService : IAppProviderProvisioningService
 {
-    public const string JwtProfile = "urn:ietf:params:fastfed:1.0:provider_authentication:oauth:2.0:jwt_profile";
     private readonly ScimProvisioningOptions _options;
     private readonly IBusControl _busControl;
 
@@ -23,14 +23,14 @@ public class ScimProvisioningService : IAppProviderProvisioningService
         _busControl = busControl;
     }
 
-    public string Name => "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise";
+    public string Name => SimpleIdServer.FastFed.Provisioning.Scim.Constants.ProvisioningProfileName;
 
     public async Task<JsonObject> EnableCapability(string entityId, JsonWebToken jwt, CancellationToken cancellationToken)
     {
         var result = JsonObject.Parse(JsonSerializer.Serialize(new ScimEntrepriseRegistrationResult
         {
             ScimServiceUri = _options.ScimServiceUri,
-            ProviderAuthenticationMethods = JwtProfile,
+            ProviderAuthenticationMethods = FastFed.Provisioning.Scim.Constants.JwtProfile,
             JwtProfile = new AuthenticationProfileResult
             {
                 Scope = _options.Scope,

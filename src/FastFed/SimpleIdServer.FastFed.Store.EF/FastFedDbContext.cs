@@ -13,6 +13,7 @@ public class FastFedDbContext : DbContext
     public DbSet<IdentityProviderFederation> IdentityProviderFederations { get; set; }
     public DbSet<ExtractedRepresentation> ExtractedRepresentations {  get; set; }
     public DbSet<ProvisioningProfileHistory> ProvisioningProfileHistories { get; set; }
+    public DbSet<ProvisioningProfileImportError> ImportErrors { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,5 +23,6 @@ public class FastFedDbContext : DbContext
         modelBuilder.ApplyConfiguration(new CapabilitySettingsConfiguration());
         modelBuilder.ApplyConfiguration(new ExtractedRepresentationConfiguration());
         modelBuilder.ApplyConfiguration(new ProvisioningProfileHistoryConfiguration());
+        modelBuilder.ApplyConfiguration(new ProvisioningProfileImportErrorConfiguration());
     }
 }

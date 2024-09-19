@@ -3,7 +3,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
+namespace SimpleIdServer.FastFed.Provisioning.Scim;
 
 public class ScimEntrepriseRegistrationResult
 {
@@ -11,6 +11,6 @@ public class ScimEntrepriseRegistrationResult
     public string ScimServiceUri { get; set; }
     [JsonPropertyName("provider_authentication_methods")]
     public string ProviderAuthenticationMethods { get; set; }
-    [JsonPropertyName(ScimProvisioningService.JwtProfile)]
+    [JsonPropertyName(Constants.JwtProfile)]
     public AuthenticationProfileResult JwtProfile { get; set; }
 }

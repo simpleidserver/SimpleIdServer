@@ -15,6 +15,11 @@
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
 	</ItemGroup>
 	<ItemGroup>
+		<Compile Update="Resources\ApplicationProviderResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ApplicationProviderResource.resx</DependentUpon>
+		</Compile>
 		<Compile Update="Resources\ScimProvisioning.Designer.cs">
 		  <DependentUpon>ScimProvisioning.resx</DependentUpon>
 		  <DesignTime>True</DesignTime>
@@ -43,6 +48,10 @@
 		<EmbeddedResource Update="Resources\FastFedDiscoveryResource.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>FastFedDiscoveryResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ApplicationProviderResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>ApplicationProviderResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
 </Project>

@@ -5,12 +5,11 @@ using System;
 
 namespace SimpleIdServer.FastFed.Models;
 
-public class ExtractedRepresentation
+public class ProvisioningProfileImportError
 {
     public string Id { get; set; }
-    public string SerializedRepresentation {  get; set; }
+    public string ExtractedRepresentationId { get; set; }
+    public string ErrorMessage { get; set; }
     public DateTime CreateDateTime { get; set; }
-    public string ProvisioningProfileName { get; set; }
-    public ExtractedRepresentationOperations Operation { get; set; }
-    public ExtractedRepresentationTypes Type { get; set; }
+    public string ProvisioningProfileHistoryId { get; set; }
 }

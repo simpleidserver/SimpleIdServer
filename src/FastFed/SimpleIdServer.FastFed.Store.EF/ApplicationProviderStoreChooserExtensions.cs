@@ -20,6 +20,7 @@ public static class ApplicationProviderStoreChooserExtensions
         chooser.Services.AddTransient<IProviderFederationStore, ProviderFederationStore>();
         chooser.Services.AddTransient<IExtractedRepresentationStore, ExtractedRepresentationStore>();
         chooser.Services.AddTransient<IProvisioningProfileHistoryStore, ProvisioningProfileHistoryStore>();
+        chooser.Services.AddTransient<IProvisioningProfileImportErrorStore, ProvisioningProfileImportErrorStore>();
     }
 
     public static void UseInMemoryEfStore(this ProviderStoreChooser chooser, params IdentityProviderFederation[] identityProviderFederations)

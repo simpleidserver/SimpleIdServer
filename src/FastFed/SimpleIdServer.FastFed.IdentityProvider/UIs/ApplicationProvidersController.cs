@@ -2,21 +2,41 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.AspNetCore.Mvc;
+using SimpleIdServer.FastFed.Stores;
+using System.Threading.Tasks;
+using System.Threading;
+using System.Linq;
 
-namespace SimpleIdServer.FastFed.IdentityProvider.UIs
+namespace SimpleIdServer.FastFed.IdentityProvider.UIs;
+
+public class ApplicationProvidersController : Controller
 {
-    public class ApplicationProvidersController : Controller
-    {
-        public IActionResult Index()
-        {
-            // Display list of configured application providers.
-            return View();
-        }
+    private readonly IProviderFederationStore _providerFederationStore;
 
-        public IActionResult View(string id)
+    public ApplicationProvidersController(IProviderFederationStore providerFederationStore)
+    {
+        _providerFederationStore = providerFederationStore;
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
+    {
+        var providerFederations = await _providerFederationStore.GetAll(cancellationToken);
+        var result = providerFederations.Select(p => new ApplicationProviderViewModel
         {
-            // display only one application provider.
-            return View();
-        }
+            EntityId = p.EntityId,
+            CreateDateTime = p.CreateDateTime,
+            Status = p.LastCapabilities?.Status,
+            ExpirationTime = p.LastCapabilities?.ExpirationDateTime,
+            UpdateDateTime = p.LastCapabilities?.CreateDateTime
+        });
+        return View(result);
+    }
+
+    [HttpGet]
+    public IActionResult View(string entityId, CancellationToken cancellationToken)
+    {
+        // display only one application provider.
+        return View();
     }
 }

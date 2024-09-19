@@ -159,6 +159,8 @@ public class FastFedService : IFastFedService
             dic.Add(service.Name, enableResult);
         }
 
+        idProviderFederation.LastCapabilities.Status = IdentityProviderStatus.CONFIRMED;
+        await _identityProviderFederationStore.SaveChanges(cancellationToken);
         return ValidationResult<Dictionary<string, JsonObject>>.Ok(dic);
     }
 

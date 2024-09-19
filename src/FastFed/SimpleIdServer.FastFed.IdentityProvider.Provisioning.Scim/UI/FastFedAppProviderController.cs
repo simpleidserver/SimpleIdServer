@@ -25,7 +25,7 @@ public class FastFedAppProviderController : Controller
     public async Task<IActionResult> Configure(string entityId, CancellationToken cancellationToken)
     {
         var providerFederation = await _providerFederationStore.Get(HttpUtility.UrlDecode(entityId), cancellationToken);
-        var serializedConfiguration = providerFederation.LastCapabilities.Configurations.Single(c => c.ProfileName == Constants.ProvisioningProfileName && c.IsAuthenticationProfile == false).IdProviderSerializedConfiguration;
+        var serializedConfiguration = providerFederation.LastCapabilities.Configurations.Single(c => c.ProfileName == FastFed.Provisioning.Scim.Constants.ProvisioningProfileName && c.IsAuthenticationProfile == false).IdProviderConfiguration;
         var configuration = string.IsNullOrWhiteSpace(serializedConfiguration) ? new ScimProvisioningConfiguration() : JsonSerializer.Deserialize<ScimProvisioningConfiguration>(serializedConfiguration);
         var viewModel = new FastFedAppProviderConfigureViewModel
         {
@@ -41,8 +41,8 @@ public class FastFedAppProviderController : Controller
     {
         var providerFederation = await _providerFederationStore.Get(HttpUtility.UrlDecode(viewModel.EntityId), cancellationToken);
         var lastCapabilities = providerFederation.LastCapabilities;
-        var configuration = lastCapabilities.Configurations.Single(c => c.ProfileName == Constants.ProvisioningProfileName);
-        configuration.IdProviderSerializedConfiguration = JsonSerializer.Serialize(viewModel.Configuration);
+        var configuration = lastCapabilities.Configurations.Single(c => c.ProfileName == FastFed.Provisioning.Scim.Constants.ProvisioningProfileName);
+        configuration.IdProviderConfiguration = JsonSerializer.Serialize(viewModel.Configuration);
         await _providerFederationStore.SaveChanges(cancellationToken);
         viewModel.IsConfirmed = true;
         return View(viewModel);

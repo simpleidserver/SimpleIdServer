@@ -4,7 +4,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
+namespace SimpleIdServer.FastFed.Provisioning.Scim;
 
 public class AuthenticationProfileResult
 {

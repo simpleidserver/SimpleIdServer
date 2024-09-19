@@ -11,5 +11,5 @@ public interface IIdProviderProvisioningService
 {
     string Name { get; }
     string Area { get; }
-    Task Migrate(ProvisioningProfileHistory provisioningProfileHistory, CapabilitySettings settings, CancellationToken cancellationToken);
+    Task<MigrationResult> Migrate(ProvisioningProfileHistory provisioningProfileHistory, CapabilitySettings settings, CancellationToken cancellationToken);
 }

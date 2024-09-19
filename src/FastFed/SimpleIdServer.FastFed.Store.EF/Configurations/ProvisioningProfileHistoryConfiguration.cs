@@ -11,5 +11,6 @@ public class ProvisioningProfileHistoryConfiguration : IEntityTypeConfiguration<
     public void Configure(EntityTypeBuilder<ProvisioningProfileHistory> builder)
     {
         builder.HasKey(p => p.Id);
+        builder.HasMany(p => p.ImportErrors).WithOne().HasForeignKey(p => p.ProvisioningProfileHistoryId).OnDelete(DeleteBehavior.Cascade);
     }
 }

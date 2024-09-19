@@ -112,7 +112,7 @@ public class FastFedService : IFastFedService
             {
                 var conf = providerFederation.LastCapabilities.Configurations.SingleOrDefault(c => c.ProfileName == rec.Key);
                 if (conf == null) continue;
-                conf.AppProviderSerializedMappings = jsonObj[rec.Key].ToJsonString();
+                conf.AppProviderHandshakeRegisterConfiguration = jsonObj[rec.Key].ToJsonString();
             }
 
             providerFederation.LastCapabilities.Status = Models.IdentityProviderStatus.CONFIRMED;
