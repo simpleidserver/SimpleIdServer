@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels;
 using SimpleIdServer.FastFed.Stores;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.FastFed.ApplicationProvider.UIs;
 
+[Authorize(DefaultPolicyNames.IsAdminUser)]
 public class IdentityProvidersController : Controller
 {
     private readonly IProviderFederationStore _providerFederationStore;
@@ -36,6 +38,13 @@ public class IdentityProvidersController : Controller
     [HttpGet]
     public async Task<IActionResult> View(string entityId, CancellationToken cancellationToken)
     {
+        var providerFederation = await _providerFederationStore.Get(entityId, cancellationToken);
+        var viewModel = new ViewIdentityProviderViewModel
+        {
+            EntityId = entityId,
+            Status = providerFederation.LastCapabilities.Status,
+            ProvisioningProfiles = providerFederation.LastCapabilities.ProvisioningProfiles
+        };
         return View();
     }
 }

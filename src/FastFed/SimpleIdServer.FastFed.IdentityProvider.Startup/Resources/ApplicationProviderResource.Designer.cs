@@ -62,6 +62,15 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Application provider.
+        /// </summary>
+        public static string ApplicationProvider {
+            get {
+                return ResourceManager.GetString("ApplicationProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Application Providers.
         /// </summary>
         public static string ApplicationProviders {
@@ -89,11 +98,65 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Error.
+        /// </summary>
+        public static string ErrorMessage {
+            get {
+                return ResourceManager.GetString("ErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Expiration.
         /// </summary>
         public static string ExpirationTime {
             get {
                 return ResourceManager.GetString("ExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Representation identifier.
+        /// </summary>
+        public static string ExtractedRepresentationId {
+            get {
+                return ResourceManager.GetString("ExtractedRepresentationId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Last 10 import errors.
+        /// </summary>
+        public static string Last10ImportErrors {
+            get {
+                return ResourceManager.GetString("Last10ImportErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Name.
+        /// </summary>
+        public static string Name {
+            get {
+                return ResourceManager.GetString("Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Number of imported records.
+        /// </summary>
+        public static string NbRecords {
+            get {
+                return ResourceManager.GetString("NbRecords", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Provisioning profiles.
+        /// </summary>
+        public static string ProvisioningProfiles {
+            get {
+                return ResourceManager.GetString("ProvisioningProfiles", resourceCulture);
             }
         }
         

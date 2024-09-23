@@ -12,4 +12,6 @@ public class ProvisioningProfileImportError
     public string ErrorMessage { get; set; }
     public DateTime CreateDateTime { get; set; }
     public string ProvisioningProfileHistoryId { get; set; }
+    public string EntityId { get; set; }
+    public string ProfileName { get; set; }
 }

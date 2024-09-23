@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.FastFed.ApplicationProvider.UIs
 {
-    // [Authorize("Authenticated")]
+    [Authorize(DefaultPolicyNames.IsAdminUser)]
     public class FastFedDiscoveryController : Controller
     {
         private readonly IFastFedService _fastFedService;

@@ -11,6 +11,17 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAntiforgery();
+builder.Services.AddAuthorization(b =>
+{
+    b.AddPolicy("IsAdminUser", b =>
+    {
+        b.RequireAssertion(_ => true);
+    });
+    b.AddPolicy("IsAdminScope", b =>
+    {
+        b.RequireAssertion(_ => true);
+    });
+});
 builder.Services.AddFastFed(cb =>
 {
     cb.ProviderDomain = "localhost";
@@ -74,12 +85,22 @@ builder.Services.AddFastFed(cb =>
             License = "https://openid.net/intellectual-property/licenses/fastfed/1.0/",
         }
     };
-}).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore(Constants.ProviderFederations))
+}).AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore(Constants.ProviderFederations), callback: cb =>
+{
+    cb.AuthScheme = new SimpleIdServer.FastFed.ApplicationProvider.AuthSchemeOptions
+    {
+        Cookie = "Cookie1"
+    };
+})
 .AddFastFedIdentityProvider(callback: cb =>
 {
     cb.SigningCredentials = new List<Microsoft.IdentityModel.Tokens.SigningCredentials>
     {
         Constants.SigningCredentials
+    };
+    cb.AuthScheme = new SimpleIdServer.FastFed.IdentityProvider.AuthSchemeOptions
+    {
+        Cookie = "Cookie2"
     };
 })
 .AddAppProviderScimProvisioning(o =>
@@ -92,6 +113,7 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 app.UseRouting();
+app.UseAuthorization();
 app.UseStaticFiles();
 app.UseAntiforgery();
 app.MapGet("/bad/provider-metadata", () =>

@@ -8,6 +8,8 @@ using SimpleIdServer.FastFed.Models;
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.FastFed.Stores;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,8 +27,11 @@ public class ProvisioningProfileHistoryStore : IProvisioningProfileHistoryStore
     public void Add(ProvisioningProfileHistory record)
         => _dbContext.ProvisioningProfileHistories.Add(record);
 
-    public Task<ProvisioningProfileHistory> Get(string profileName, CancellationToken cancellationToken)
-        => _dbContext.ProvisioningProfileHistories.SingleOrDefaultAsync(p => p.ProfileName == profileName, cancellationToken);
+    public Task<List<ProvisioningProfileHistory>> Get(string entityId, CancellationToken cancellationToken)
+        => _dbContext.ProvisioningProfileHistories.Where(h => h.EntityId == entityId).ToListAsync(cancellationToken);
+
+    public Task<ProvisioningProfileHistory> Get(string entityId, string profileName, CancellationToken cancellationToken)
+        => _dbContext.ProvisioningProfileHistories.SingleOrDefaultAsync(p => p.ProfileName == profileName && p.EntityId == entityId, cancellationToken);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);

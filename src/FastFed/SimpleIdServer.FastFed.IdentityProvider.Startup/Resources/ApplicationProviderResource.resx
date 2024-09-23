@@ -132,4 +132,25 @@
   <data name="ExpirationTime" xml:space="preserve">
     <value>Expiration</value>
   </data>
+  <data name="ApplicationProvider" xml:space="preserve">
+    <value>Application provider</value>
+  </data>
+  <data name="ProvisioningProfiles" xml:space="preserve">
+    <value>Provisioning profiles</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="NbRecords" xml:space="preserve">
+    <value>Number of imported records</value>
+  </data>
+  <data name="Last10ImportErrors" xml:space="preserve">
+    <value>Last 10 import errors</value>
+  </data>
+  <data name="ErrorMessage" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ExtractedRepresentationId" xml:space="preserve">
+    <value>Representation identifier</value>
+  </data>
 </root>

@@ -89,11 +89,29 @@ namespace SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Identity Provider.
+        /// </summary>
+        public static string IdentityProvider {
+            get {
+                return ResourceManager.GetString("IdentityProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Identity Providers.
         /// </summary>
         public static string IdentityProviders {
             get {
                 return ResourceManager.GetString("IdentityProviders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Provisioning profiles.
+        /// </summary>
+        public static string ProvisioningProfiles {
+            get {
+                return ResourceManager.GetString("ProvisioningProfiles", resourceCulture);
             }
         }
         

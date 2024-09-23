@@ -25,7 +25,7 @@ public class ScimGetProviderMetadataQuery : GetProviderMetadataQuery
     {
         var result = base.Get();
         if (_scimProvisioningOptions.Mappings != null)
-            result.ApplicationProvider.OtherParameters.Add(SimpleIdServer.FastFed.Provisioning.Scim.Constants.ProvisioningProfileName, JsonObject.Parse(JsonSerializer.Serialize(_scimProvisioningOptions.Mappings)));
+            result.ApplicationProvider.OtherParameters.Add(SimpleIdServer.FastFed.Provisioning.Scim.Constants.ProvisioningProfileName, JsonObject.Parse(JsonSerializer.Serialize(_scimProvisioningOptions.Mappings)).AsObject());
 
         return result;
     }

@@ -64,7 +64,9 @@ public class ScimIdProviderProvisioningService : IIdProviderProvisioningService
                                     Id = Guid.NewGuid().ToString(),
                                     CreateDateTime = DateTime.UtcNow,
                                     ErrorMessage = Global.OnlyNewOperationIsSupported,
-                                    ExtractedRepresentationId = extractedRepresentation.Id
+                                    ExtractedRepresentationId = extractedRepresentation.Id,
+                                    EntityId = provisioningProfileHistory.EntityId,
+                                    ProfileName = Name
                                 });
                                 return result;
                             }
@@ -77,7 +79,9 @@ public class ScimIdProviderProvisioningService : IIdProviderProvisioningService
                                     Id = Guid.NewGuid().ToString(),
                                     CreateDateTime = DateTime.UtcNow,
                                     ErrorMessage = e,
-                                    ExtractedRepresentationId = extractedRepresentation.Id
+                                    ExtractedRepresentationId = extractedRepresentation.Id,
+                                    EntityId = provisioningProfileHistory.EntityId,
+                                    ProfileName = Name
                                 }));
                                 return result;
                             }

@@ -16,8 +16,8 @@ public class SCIMRequestExtractor
     public static SCIMRequestExtractorResult ExtractAdd(JsonObject jsonObject, SchemaGrammarDesiredAttributes attributes)
     {
         var errorMessages = new List<string>();
-        var requiredUserAttributes = attributes.RequiredUserAttributes.Select(u => (SCIMFilterParser.Parse(u), u));
-        var optionalUserAttributes = attributes.OptionalUserAttributes.Select(u => (SCIMFilterParser.Parse(u), u));
+        var requiredUserAttributes = attributes.RequiredUserAttributes?.Select(u => (SCIMFilterParser.Parse(u), u)) ?? new List<(SCIMExpression, string)>();
+        var optionalUserAttributes = attributes.OptionalUserAttributes?.Select(u => (SCIMFilterParser.Parse(u), u)) ?? new List<(SCIMExpression, string)>();
         var result = new JsonObject();
         Extract(result, jsonObject, requiredUserAttributes, errorMessages, true);
         Extract(result, jsonObject, optionalUserAttributes, errorMessages, false);

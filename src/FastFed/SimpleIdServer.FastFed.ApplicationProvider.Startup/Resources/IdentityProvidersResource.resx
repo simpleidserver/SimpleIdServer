@@ -132,4 +132,10 @@
   <data name="ExpirationTime" xml:space="preserve">
     <value>Expiration</value>
   </data>
+  <data name="IdentityProvider" xml:space="preserve">
+    <value>Identity Provider</value>
+  </data>
+  <data name="ProvisioningProfiles" xml:space="preserve">
+    <value>Provisioning profiles</value>
+  </data>
 </root>

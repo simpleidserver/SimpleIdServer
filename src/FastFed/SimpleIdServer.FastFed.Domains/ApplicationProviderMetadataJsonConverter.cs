@@ -77,7 +77,10 @@ public class ApplicationProviderMetadataJsonConverter : JsonConverter<Applicatio
         if (value.OtherParameters != null)
         {
             foreach (var record in value.OtherParameters)
-                writer.WriteString(record.Key, record.Value.ToString());
+            {
+                writer.WritePropertyName(record.Key);
+                writer.WriteRawValue(JsonSerializer.Serialize(record.Value));
+            }
         }
 
         writer.WriteEndObject();

@@ -21,7 +21,6 @@ using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Notification.Gotify;
@@ -183,7 +182,6 @@ void ConfigureIdServer(IServiceCollection services)
         })
         .AddConsoleNotification()
         .AddVpAuthentication()
-        .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddPwdAuthentication()
         .AddEmailAuthentication()
@@ -219,6 +217,37 @@ void ConfigureIdServer(IServiceCollection services)
     if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDidKey();
     ConfigureDistributedCache();
+    ConfigureMessageBroker(idServerBuilder);
+}
+
+void ConfigureMessageBroker(IdServerBuilder idServerBuilder)
+{
+    var section = builder.Configuration.GetSection(nameof(MessageBrokerOptions));
+    var conf = section.Get<MessageBrokerOptions>();
+    switch(conf.Transport)
+    {
+        case TransportTypes.SQLSERVER:
+
+            builder.Services.AddSqlServerMigrationHostedService(create: true, delete: false);
+            builder.Services.AddOptions<SqlTransportOptions>()
+                .Configure(options =>
+            {
+                options.ConnectionString = conf.ConnectionString;
+                options.Username = conf.Username;
+                options.Password = conf.Password;
+            });
+            idServerBuilder.UseMassTransit(o =>
+            {                o.UsingSqlServer((ctx, cfg) =>
+                {
+                    cfg.UsePublishMessageScheduler();
+                    cfg.ConfigureEndpoints(ctx);
+                });
+            });
+            break;
+        default:
+            idServerBuilder.UseInMemoryMassTransit();
+            break;
+    }
 }
 
 void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)

@@ -7,12 +7,14 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj" />
 	  <ProjectReference Include="..\..\Webfinger\SimpleIdServer.Webfinger.Store.EF\SimpleIdServer.Webfinger.Store.EF.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+		<PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.2.5" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Resources\ApplicationProviderResource.Designer.cs">

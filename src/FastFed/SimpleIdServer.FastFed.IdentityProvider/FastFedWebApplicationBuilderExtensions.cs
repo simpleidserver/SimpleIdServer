@@ -3,8 +3,6 @@
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.FastFed;
-using SimpleIdServer.FastFed.IdentityProvider.Jobs;
-using System.Threading;
 
 namespace Microsoft.AspNetCore.Builder;
 
@@ -13,7 +11,7 @@ public static class FastFedWebApplicationBuilderExtensions
     public static FastFedWebApplicationBuilder UseIdentityProvider(this FastFedWebApplicationBuilder builder)
     {
         var reccuringJobManager = builder.WebApplication.Services.GetRequiredService<IRecurringJobManager>();
-        reccuringJobManager.AddOrUpdate<ProvisionRepresentationsJob>(nameof(ProvisionRepresentationsJob), j => builder.WebApplication.Services.GetRequiredService<ProvisionRepresentationsJob>().Execute(CancellationToken.None), "*/10 * * * * *");
+        // reccuringJobManager.AddOrUpdate<ProvisionRepresentationsJob>(nameof(ProvisionRepresentationsJob), j => builder.WebApplication.Services.GetRequiredService<ProvisionRepresentationsJob>().Execute(CancellationToken.None), "*/10 * * * * *");
         builder.WebApplication.MapControllerRoute(name: "StartFastFed",
             pattern: RouteNames.Start,
             defaults: new { controller = "FastFed", action = "Start" });

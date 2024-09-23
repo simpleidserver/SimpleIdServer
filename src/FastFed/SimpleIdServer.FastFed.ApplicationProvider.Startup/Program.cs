@@ -3,7 +3,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.FastFed.ApplicationProvider.Options;
 using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
+using SimpleIdServer.FastFed.ApplicationProvider.Startup.Configurations;
+using SimpleIdServer.FastFed.Provisioning.Scim;
 using SimpleIdServer.FastFed.Store.EF;
 using System.Collections.Generic;
 
@@ -17,10 +20,15 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
     .AllowAnyMethod()
     .AllowAnyHeader()));
 
+var authSection = builder.Configuration.GetSection(nameof(AuthOptions));
+var scimSection = builder.Configuration.GetSection(nameof(ScimOptions));
+var authOptions = authSection.Get<AuthOptions>();
+var scimOptions = scimSection.Get<ScimOptions>();
+
 builder.Services.AddAntiforgery();
 builder.Services.AddFastFed(cb =>
 {
-    cb.ProviderDomain = "localhost:5021";
+    cb.ProviderDomain = builder.Configuration["ProviderDomain"];
     cb.AppProvider = new SimpleIdServer.FastFed.AppProviderOptions
     {
         Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
@@ -55,14 +63,31 @@ builder.Services.AddFastFed(cb =>
     .AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore())
     .AddAppProviderScimProvisioning(cb =>
     {
-        cb.ScimServiceUri = builder.Configuration["scimEdp"];
-        cb.TokenEndpoint = builder.Configuration["tokenEdp"];
-        cb.Scope = builder.Configuration["scope"];
-    });
+        cb.ScimServiceUri = scimOptions.Url;
+        cb.TokenEndpoint = $"{authOptions.Authority}/token";
+        cb.Scope = scimOptions.Scope;
+        cb.Mappings = new ScimEntrepriseMappingsResult
+        {
+            DesiredAttributes = new DesiredAttributes
+            {
+                Attrs = new SchemaGrammarDesiredAttributes
+                {
+                    RequiredUserAttributes = new List<string>
+                    {
+                        "externalId",
+                        "userName",
+                        "name.familyName"
+                    }
+                }
+            }
+        };
+    })
+    .UseDefaultAppProviderSecurity(authOptions: authOptions);
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 app.UseRouting();
+app.UseAuthorization();
 app.UseStaticFiles();
 app.UseAntiforgery();
 app.UseFastFed()

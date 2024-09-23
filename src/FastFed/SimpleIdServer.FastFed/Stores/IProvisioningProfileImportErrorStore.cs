@@ -12,5 +12,6 @@ public interface IProvisioningProfileImportErrorStore
 {
     void Add(ProvisioningProfileImportError error);
     void Add(List<ProvisioningProfileImportError> errors);
+    Task<List<ProvisioningProfileImportError>> GetTop(string entityId, int nb, CancellationToken cancellationToken);
     Task<int> SaveChanges(CancellationToken cancellationToken);
 }

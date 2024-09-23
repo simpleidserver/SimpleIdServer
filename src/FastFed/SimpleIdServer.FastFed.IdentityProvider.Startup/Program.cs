@@ -1,10 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.FastFed;
+using SimpleIdServer.FastFed.IdentityProvider.Options;
 using SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim;
+using SimpleIdServer.FastFed.IdentityProvider.Startup.Configurations;
 using SimpleIdServer.FastFed.Store.EF;
 using SimpleIdServer.Webfinger;
 using SimpleIdServer.Webfinger.Builders;
@@ -17,6 +21,9 @@ builder.Configuration
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
 
+var authSection = builder.Configuration.GetSection(nameof(AuthOptions));
+var authOptions = authSection.Get<AuthOptions>();
+
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
@@ -24,10 +31,10 @@ builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAn
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddWebfinger()
-    .UseInMemoryEfStore(WebfingerResourceBuilder.New("acct", "jane@localhost:5020").AddLinkRelation("https://openid.net/specs/fastfed/1.0/provider", "https://localhost:5020/fastfed").Build());
-builder.Services.AddFastFed(o =>
+    .UseInMemoryEfStore(WebfingerResourceBuilder.New("acct", $"jane@{builder.Configuration["ProviderDomain"]}").AddLinkRelation("https://openid.net/specs/fastfed/1.0/provider", "https://localhost:5020/fastfed").Build());
+var fastFedBuilder = builder.Services.AddFastFed(o =>
 {
-    o.ProviderDomain = "localhost:5020";
+    o.ProviderDomain = builder.Configuration["ProviderDomain"];
     o.IdProvider = new SimpleIdServer.FastFed.IdProviderOptions
     {
         Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
@@ -66,11 +73,43 @@ builder.Services.AddFastFed(o =>
         {
             GenerateRSASignatureKey("keyId")
         };
-    })
-    .AddIdProviderScimProvisioning(); // support scim provisioning
+    }) // support scim provisioning
+    .AddIdProviderScimProvisioning()
+    .UseDefaultIdProviderSecurity(authOptions);
+ConfigureMessageBroker(fastFedBuilder);
+
+void ConfigureMessageBroker(FastFedServicesBuilder fastFedBuilder)
+{
+    var section = builder.Configuration.GetSection(nameof(MessageBrokerOptions));
+    var conf = section.Get<MessageBrokerOptions>();
+    switch(conf.Transport)
+    {
+        case TransportTypes.SQLSERVER:
+            builder.Services.AddOptions<SqlTransportOptions>()
+                .Configure(options =>
+                {
+                    options.ConnectionString = conf.ConnectionString;
+                    options.Username = conf.Username;
+                    options.Password = conf.Password;
+                });
+            fastFedBuilder.AddSidScimProvisioning(o =>
+            {
+                o.UsingSqlServer((ctx, cfg) =>
+                {
+                    cfg.UsePublishMessageScheduler();
+                    cfg.ConfigureEndpoints(ctx);
+                });
+            });
+            break;
+        default:
+            fastFedBuilder.AddSidScimProvisioning();
+            break;
+    }
+}
 
 var app = builder.Build();
 app.UseRouting();
+app.UseAuthorization();
 app.UseStaticFiles();
 app.UseWebfinger();
 app.UseFastFed()

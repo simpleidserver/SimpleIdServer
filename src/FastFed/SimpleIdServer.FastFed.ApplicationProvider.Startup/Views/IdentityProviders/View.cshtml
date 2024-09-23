@@ -1,0 +1,46 @@
+﻿@using SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources
+@using SimpleIdServer.FastFed.Models
+@model SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels.ViewIdentityProviderViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = IdentityProvidersResource.IdentityProvider;
+}
+
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "IdentityProviders")">@IdentityProvidersResource.IdentityProviders</a></li>
+        <li class="breadcrumb-item active">@IdentityProvidersResource.IdentityProvider</li>
+    </ol>
+</nav>
+
+<h3>@IdentityProvidersResource.IdentityProvider</h3>
+
+<div class="card">
+    <div class="card-body">
+        
+        <!-- Entity identifier -->
+        <div class="mb-3">
+            <label class="form-label">@IdentityProvidersResource.EntityId</label>
+            <input type="text" class="form-control" value="@Model.EntityId" disabled="disabled"/>
+        </div>
+        <!-- Status -->
+        <div class="mb-3">
+            <label class="form-label">@IdentityProvidersResource.Status</label>
+            <input type="text" class="form-control" value="@Enum.GetName(typeof(IdentityProviderStatus), Model.Status)" disabled="disabled" />
+        </div>
+        @if(Model.Status != IdentityProviderStatus.CREATE)
+        {
+            <!-- Provisioning profiles -->
+            <div class="mb-3">
+                <label class="form-label">@IdentityProvidersResource.ProvisioningProfiles</label>
+                <ul class="list-group">
+                    @foreach(var provisioningProfile in Model.ProvisioningProfiles)
+                    {
+                        <li class="list-group-item">@provisioningProfile</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+</div>

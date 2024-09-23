@@ -41,13 +41,14 @@ public class ProvisionRepresentationsJob
             {
                 foreach (var provisioningProfile in providerFederation.LastCapabilities.ProvisioningProfiles)
                 {
-                    var history = await _provisioningProfileHistoryStore.Get(provisioningProfile, cancellationToken);
+                    var history = await _provisioningProfileHistoryStore.Get(providerFederation.EntityId, provisioningProfile, cancellationToken);
                     if(history == null)
                     {
                         history = new Models.ProvisioningProfileHistory
                         {
                             Id = Guid.NewGuid().ToString(),
                             NbMigratedRecords = 0,
+                            EntityId = providerFederation.EntityId,
                             ProfileName = provisioningProfile
                         };
                         _provisioningProfileHistoryStore.Add(history);

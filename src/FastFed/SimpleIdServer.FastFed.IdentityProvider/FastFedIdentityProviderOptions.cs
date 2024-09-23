@@ -10,4 +10,11 @@ public class FastFedIdentityProviderOptions
 {
     public List<CultureInfo> SupportedCultures { get; set; } = new List<CultureInfo>();
     public List<SigningCredentials> SigningCredentials { get; set; } = new List<SigningCredentials>();
+    public AuthSchemeOptions AuthScheme { get; set; } = new AuthSchemeOptions();
+}
+
+public class AuthSchemeOptions
+{
+    public string Cookie { get; set; } = DefaultSchemes.Cookies;
+    public string Openid { get; set; } = DefaultSchemes.Openid;
 }
