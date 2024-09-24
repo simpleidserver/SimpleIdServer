@@ -99,11 +99,13 @@ public class ScimIdProviderProvisioningService : IIdProviderProvisioningService
 
     private async Task<string> GetScimAccessToken(HttpClient httpClient, ScimEntrepriseRegistrationResult configuration, ScimProvisioningConfiguration scimProvisioningConfiguration, CancellationToken cancellationToken)
     {
+        if (scimProvisioningConfiguration.AuthenticationType == AuthenticationTypes.APIKEY) return scimProvisioningConfiguration.ApiSecret;
         var dic = new Dictionary<string, string>
         {
             { "client_id", scimProvisioningConfiguration.ClientId },
             { "client_secret", scimProvisioningConfiguration.ClientSecret },
-            { "scope", configuration.JwtProfile.Scope }
+            { "scope", configuration.JwtProfile.Scope },
+            { "grant_type", "client_credentials" }
         };
         var requestMessage = new HttpRequestMessage
         {

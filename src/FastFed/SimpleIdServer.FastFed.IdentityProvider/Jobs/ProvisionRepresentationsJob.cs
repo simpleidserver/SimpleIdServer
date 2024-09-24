@@ -34,10 +34,8 @@ public class ProvisionRepresentationsJob
     [DisableConcurrentExecution(timeoutInSeconds: 10 * 60)]
     public async Task Execute(CancellationToken cancellationToken)
     {
-        using (var transactionScope = new TransactionScope(TransactionScopeOption.Required))
-        {
-            var providerFederations = await _providerFederationStore.GetAll(cancellationToken);
-            foreach (var providerFederation in providerFederations.Where(f => f.LastCapabilities != null && f.LastCapabilities.Status == Models.IdentityProviderStatus.CONFIRMED))
+        var providerFederations = await _providerFederationStore.GetAll(cancellationToken);
+        foreach (var providerFederation in providerFederations.Where(f => f.LastCapabilities != null && f.LastCapabilities.Status == Models.IdentityProviderStatus.CONFIRMED))
             {
                 foreach (var provisioningProfile in providerFederation.LastCapabilities.ProvisioningProfiles)
                 {
@@ -61,9 +59,7 @@ public class ProvisionRepresentationsJob
                 }
             }
 
-            await _provisioningProfileImportErrorStore.SaveChanges(cancellationToken);
-            await _providerFederationStore.SaveChanges(cancellationToken);
-            transactionScope.Complete();
-        }
+        await _provisioningProfileImportErrorStore.SaveChanges(cancellationToken);
+        await _providerFederationStore.SaveChanges(cancellationToken);
     }
 }

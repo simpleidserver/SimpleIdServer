@@ -63,6 +63,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.Iden
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.Provisioning.Scim", "src\FastFed\SimpleIdServer.FastFed.Provisioning.Scim\SimpleIdServer.FastFed.Provisioning.Scim.csproj", "{2B8866B4-2180-47F8-B7FD-273AA1B3EA8B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OpenIdConnect", "src\IdServer\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj", "{CEB19494-415B-41D5-8602-68FACF09584A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -161,6 +163,10 @@ Global
 		{2B8866B4-2180-47F8-B7FD-273AA1B3EA8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B8866B4-2180-47F8-B7FD-273AA1B3EA8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B8866B4-2180-47F8-B7FD-273AA1B3EA8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEB19494-415B-41D5-8602-68FACF09584A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEB19494-415B-41D5-8602-68FACF09584A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEB19494-415B-41D5-8602-68FACF09584A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEB19494-415B-41D5-8602-68FACF09584A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -191,6 +197,7 @@ Global
 		{95379F2D-8892-4AC8-A46C-797AAA7D6ED9} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
 		{2901CE30-D083-467C-BF98-2420BBDDCC83} = {8F53AA7D-1C00-47B7-8D30-3288FE4991E3}
 		{2B8866B4-2180-47F8-B7FD-273AA1B3EA8B} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
+		{CEB19494-415B-41D5-8602-68FACF09584A} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFEA5C5B-33EB-4AEC-BB66-20E5AD9C228D}

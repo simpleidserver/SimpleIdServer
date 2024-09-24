@@ -76,7 +76,8 @@ builder.Services.AddFastFed(cb =>
                     {
                         "externalId",
                         "userName",
-                        "name.familyName"
+                        "name.familyName",
+                        "name.givenName"
                     }
                 }
             }

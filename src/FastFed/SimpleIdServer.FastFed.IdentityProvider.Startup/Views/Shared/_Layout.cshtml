@@ -35,7 +35,7 @@
                     @if(User.Identity.IsAuthenticated)
                     {
                         <li class="nav-item">
-                            <a class="nav-link" href="@Url.Action("Index", "ApplicationProviders")">
+                            <a class="nav-link" href="@Url.Action("Index", "ApplicationProviders", new { area = "" })">
                                 @LayoutResource.ApplicationProviders
                             </a>
                         </li>

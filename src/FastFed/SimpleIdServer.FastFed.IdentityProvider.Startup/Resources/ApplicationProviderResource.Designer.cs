@@ -168,5 +168,14 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
                 return ResourceManager.GetString("Status", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Update.
+        /// </summary>
+        public static string Update {
+            get {
+                return ResourceManager.GetString("Update", resourceCulture);
+            }
+        }
     }
 }

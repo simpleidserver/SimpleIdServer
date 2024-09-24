@@ -22,6 +22,10 @@ public class SCIMRequestExtractor
         Extract(result, jsonObject, requiredUserAttributes, errorMessages, true);
         Extract(result, jsonObject, optionalUserAttributes, errorMessages, false);
         if (errorMessages.Any()) return SCIMRequestExtractorResult.Error(errorMessages);
+        var schemas = new JsonArray();
+        foreach (var schema in jsonObject["schemas"].AsArray().Select(s => s.ToString()).ToList())
+            schemas.Add(schema);
+        result.Add("schemas", schemas);
         return SCIMRequestExtractorResult.Ok(result);
     }
 

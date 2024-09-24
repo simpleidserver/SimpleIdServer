@@ -61,6 +61,33 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Api key.
+        /// </summary>
+        public static string ApiKey {
+            get {
+                return ResourceManager.GetString("ApiKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Api secret.
+        /// </summary>
+        public static string ApiSecret {
+            get {
+                return ResourceManager.GetString("ApiSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication type.
+        /// </summary>
+        public static string AuthenticationType {
+            get {
+                return ResourceManager.GetString("AuthenticationType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client identifier.
         /// </summary>
         public static string ClientId {
@@ -84,6 +111,15 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Startup.Resources {
         public static string ConfigureScimProvisioning {
             get {
                 return ResourceManager.GetString("ConfigureScimProvisioning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à OAUTH.
+        /// </summary>
+        public static string OAUTH {
+            get {
+                return ResourceManager.GetString("OAUTH", resourceCulture);
             }
         }
         

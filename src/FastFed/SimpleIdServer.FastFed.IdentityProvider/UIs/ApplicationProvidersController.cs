@@ -17,15 +17,18 @@ public class ApplicationProvidersController : Controller
     private readonly IProviderFederationStore _providerFederationStore;
     private readonly IProvisioningProfileImportErrorStore _provisioningProfileImportErrorStore;
     private readonly IProvisioningProfileHistoryStore _provisioningProfileHistoryStore;
+    private readonly IEnumerable<IIdProviderProvisioningService> _idProviderProvisioningServices;
 
     public ApplicationProvidersController
         (IProviderFederationStore providerFederationStore,
         IProvisioningProfileImportErrorStore provisioningProfileImportErrorStore,
-        IProvisioningProfileHistoryStore provisioningProfileHistoryStore)
+        IProvisioningProfileHistoryStore provisioningProfileHistoryStore,
+        IEnumerable<IIdProviderProvisioningService> idProviderProvisioningServices)
     {
         _providerFederationStore = providerFederationStore;
         _provisioningProfileImportErrorStore = provisioningProfileImportErrorStore;
         _provisioningProfileHistoryStore = provisioningProfileHistoryStore;
+        _idProviderProvisioningServices = idProviderProvisioningServices;
     }
 
     [HttpGet]
@@ -63,7 +66,8 @@ public class ApplicationProvidersController : Controller
             ProvisioningProfiles = provisioningProfiles?.Select(p => new ProvisioningProfileViewModel
             {
                 ProfileName = p,
-                NbRecords = histories.SingleOrDefault(h => h.ProfileName == p)?.NbMigratedRecords ?? 0
+                NbRecords = histories.SingleOrDefault(h => h.ProfileName == p)?.NbMigratedRecords ?? 0, 
+                Area = _idProviderProvisioningServices.Single(s => s.Name == p).Area
             }).ToList() ?? new List<ProvisioningProfileViewModel>()
         };
         return View(viewModel);

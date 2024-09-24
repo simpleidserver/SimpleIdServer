@@ -7,5 +7,6 @@ public class AuthOptions
     public string Authority { get; set; }
     public string ClientId { get; set; }
     public string ClientSecret { get; set; }
-    public string AdministratorRole { get; set; } = "administrator";
+    public bool IgnoreCertificateError { get; set; } = false;
+    public string AdministratorRole { get; set; } = "identityProvider/administrator";
 }

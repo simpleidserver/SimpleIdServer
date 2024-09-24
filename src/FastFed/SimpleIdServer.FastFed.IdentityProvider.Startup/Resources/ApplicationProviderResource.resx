@@ -153,4 +153,7 @@
   <data name="ExtractedRepresentationId" xml:space="preserve">
     <value>Representation identifier</value>
   </data>
+  <data name="Update" xml:space="preserve">
+    <value>Update</value>
+  </data>
 </root>

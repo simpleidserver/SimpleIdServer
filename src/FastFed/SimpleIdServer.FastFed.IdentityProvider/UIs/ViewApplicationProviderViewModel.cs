@@ -16,6 +16,7 @@ namespace SimpleIdServer.FastFed.IdentityProvider.UIs
     {
         public string ProfileName { get; set; }
         public int NbRecords { get; set; }
+        public string Area { get; set; }
     }
 
     public class ImportErrorViewModel

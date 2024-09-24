@@ -22,6 +22,19 @@ else
             <form asp-controller="FastFedAppProvider" asp-action="Configure" asp-area="scim" method="post">
                 @Html.AntiForgeryToken()
                 <input type="hidden" value="@Model.EntityId" name="EntityId" />
+                <!-- Authentication type -->
+                <div class="mb-3">
+                    <label class="form-label">@ScimProvisioning.AuthenticationType</label>
+                    <select class="form-control" name="Configuration.AuthenticationType">
+                        <option value="0">@ScimProvisioning.OAUTH</option>
+                        <option value="1">@ScimProvisioning.ApiKey</option>
+                    </select>
+                </div>
+                <!-- Api secret -->
+                <div class="mb-3">
+                    <label class="form-label">@ScimProvisioning.ApiSecret</label>
+                    <input type="text" class="form-control" name="Configuration.ApiSecret" />
+                </div>
                 <!-- ClientId -->
                 <div class="mb-3">
                     <label class="form-label">@ScimProvisioning.ClientId</label>

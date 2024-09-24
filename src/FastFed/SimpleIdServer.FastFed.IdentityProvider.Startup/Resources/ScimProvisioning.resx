@@ -132,4 +132,16 @@
   <data name="ScimProvisioningIsConfigured" xml:space="preserve">
     <value>The scim provisioning is configured</value>
   </data>
+  <data name="AuthenticationType" xml:space="preserve">
+    <value>Authentication type</value>
+  </data>
+  <data name="OAUTH" xml:space="preserve">
+    <value>OAUTH</value>
+  </data>
+  <data name="ApiKey" xml:space="preserve">
+    <value>Api key</value>
+  </data>
+  <data name="ApiSecret" xml:space="preserve">
+    <value>Api secret</value>
+  </data>
 </root>

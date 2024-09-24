@@ -38,6 +38,7 @@
                         <tr>
                             <th>@ApplicationProviderResource.Name</th>
                             <th>@ApplicationProviderResource.NbRecords</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,6 +47,7 @@
                             <tr>
                                 <td>@provisioningProfile.ProfileName</td>
                                 <td>@provisioningProfile.NbRecords</td>
+                                <td><a href="@Url.Action("Configure", "FastFedAppProvider", new { entityId = Model.EntityId, area = provisioningProfile.Area })">@ApplicationProviderResource.Update</a></td>
                             </tr>
                         }
                     </tbody>

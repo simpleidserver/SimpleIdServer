@@ -17,7 +17,7 @@ public class SCIMRequestExtractorFixture
         var userObject = JsonObject.Parse(userJson).AsObject();
         var desiredAttributes = new SchemaGrammarDesiredAttributes
         {
-            RequiredUserAttributes = new List<string> { "externalId", "name.formatted", "emails[primary eq true]" },
+            RequiredUserAttributes = new List<string> { "externalId", "name.formatted", "emails[primary eq true]", "name.givenName" },
             OptionalUserAttributes = new List<string>()
         };
 

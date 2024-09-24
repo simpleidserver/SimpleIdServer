@@ -42,7 +42,18 @@ public static class JsonNodeExtensions
                 var children = childJsonObject.Filter(parameterExpression.Child, sub);
                 if (children == null) return null;
                 if (result != null)
-                    result.Add(parameterExpression.Name, sub);
+                {
+                    if(!result.ContainsKey(parameterExpression.Name))
+                    {
+                        result.Add(parameterExpression.Name, sub);
+                    }
+                    else
+                    {
+                        var obj = result[parameterExpression.Name].AsObject();
+                        foreach (var rec in sub)
+                            obj.Add(rec.Key, rec.Value.ToString());
+                    }
+                }
                 return children;
             }
 

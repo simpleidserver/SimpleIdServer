@@ -11,6 +11,9 @@ using SimpleIdServer.FastFed.ApplicationProvider.Services;
 using SimpleIdServer.Webfinger.Client;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Security.Claims;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -50,12 +53,15 @@ public static class FastFedServicesBuilderExtensions
         {
             b.AddPolicy(DefaultPolicyNames.IsAdminUser, b =>
             {
-                b.AuthenticationSchemes = new List<string> { opts.AuthScheme.Openid };
-                b.RequireRole(authOptions.AdministratorRole);
+                b.RequireAuthenticatedUser();
+                b.RequireAssertion(c =>
+                {
+                    return c.User.Claims.Any(c => c.Type == "role" && c.Value == authOptions.AdministratorRole);
+                });
             });
             b.AddPolicy(DefaultPolicyNames.IsAdminScope, b =>
             {
-                b.AuthenticationSchemes = new List<string> { opts.AuthScheme.Jwt };
+                b.AuthenticationSchemes.Add(opts.AuthScheme.Jwt);
                 b.RequireClaim("scope", authOptions.AdministratorScope);
             });
         });
@@ -65,8 +71,20 @@ public static class FastFedServicesBuilderExtensions
             options.DefaultChallengeScheme = opts.AuthScheme.Openid;
         })
             .AddCookie(opts.AuthScheme.Cookie)
-            .AddOpenIdConnect(opts.AuthScheme.Openid, options =>
+            .AddCustomOpenIdConnect(opts.AuthScheme.Openid, options =>
             {
+                if (authOptions.IgnoreCertificateError)
+                {
+                    var handler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>
+                        {
+                            return true;
+                        }
+                    };
+                    options.BackchannelHttpHandler = handler;
+                }
+
                 options.SignInScheme = opts.AuthScheme.Cookie;
                 options.ResponseType = "code";
                 options.Authority = authOptions.Authority;

@@ -45,6 +45,6 @@ public class IdentityProvidersController : Controller
             Status = providerFederation.LastCapabilities.Status,
             ProvisioningProfiles = providerFederation.LastCapabilities.ProvisioningProfiles
         };
-        return View();
+        return View(viewModel);
     }
 }

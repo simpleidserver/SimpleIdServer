@@ -9,7 +9,7 @@ public static class WebApplicationExtensions
 {
     public static FastFedWebApplicationBuilder UseFastFed(this WebApplication webApplication)
     {
-        webApplication.MapControllerRoute(name: "",
+        webApplication.MapControllerRoute(name: "getFastFedMetadata",
             pattern: RouteNames.ProviderMetadata,
             defaults: new { controller = "FastFedMetadata", action = "Get" });
         return new FastFedWebApplicationBuilder(webApplication);

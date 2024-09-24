@@ -8,6 +8,7 @@ using SimpleIdServer.FastFed.IdentityProvider.Jobs;
 using SimpleIdServer.FastFed.IdentityProvider.Options;
 using SimpleIdServer.FastFed.IdentityProvider.Services;
 using System;
+using System.Linq;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -43,7 +44,11 @@ public static class FastFedServicesBuilderExtensions
         {
             b.AddPolicy(DefaultPolicyNames.IsAdminUser, b =>
             {
-                b.RequireRole(authOptions.AdministratorRole);
+                b.RequireAuthenticatedUser();
+                b.RequireAssertion(c =>
+                {
+                    return c.User.Claims.Any(c => c.Type == "role" && c.Value == authOptions.AdministratorRole);
+                });
             });
         });
         builder.Services.AddAuthentication(options =>
