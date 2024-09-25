@@ -3,9 +3,8 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Auditing;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Events;
-using SimpleIdServer.IdServer.ExternalEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
 

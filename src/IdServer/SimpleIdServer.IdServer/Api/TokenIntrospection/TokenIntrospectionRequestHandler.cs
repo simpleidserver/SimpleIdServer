@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Resources;
 using System;

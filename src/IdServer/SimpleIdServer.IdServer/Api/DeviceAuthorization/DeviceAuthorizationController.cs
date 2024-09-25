@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;

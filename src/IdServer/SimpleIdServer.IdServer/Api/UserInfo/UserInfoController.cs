@@ -13,7 +13,7 @@ using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;

@@ -14,5 +14,6 @@ public class IdentityServerConfiguration
     public string Authority { get; set; }
     public string SCIMBaseUrl { get; set; }
     public bool IsForwardedEnabled { get; set; }
+    public bool IsClientCertificateForwarded { get; set; }
     public bool ForceHttps { get; set; }
 }

@@ -15,6 +15,8 @@ This will add the following templates
 | dotnet new scim              | Create SCIM Server.                                                                              |
 | dotnet new credissuer        | Create credential issuer API.                                                                    |
 | dotnet new credissueradminui | Create credential issuer administration UI.                                                      |
+| dotnet new fastfedappprov    | Create FastFed application provider                                                              |
+| dotnet new fastfedidprov     | Create FastFed identity provider                                                                 |
 
 ## Create Visual Studio Solution
 
@@ -224,3 +226,21 @@ The website can be used to manage the credential configurations.
 The CredentialIssuer website UI uses Radzen.
 
 ![CredentialIssuerAdminUi](../images/CredentialIssuer-2.png)
+
+## Create FastFed Application Provider
+
+Create a web project named `FastFedApplicationProvider` with the `SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim` package installed. To do this, run the following command:
+
+```
+cd src
+dotnet new fastfedappprov -n FastFedApplicationProvider
+```
+
+## Create FastFed Identity Provider
+
+Create a web project named `FastFedIdProvider` with the `SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim` package installed and configured to use SQL Server as the message broker. Execute the following command:
+
+```
+cd src
+dotnet new fastfedidprov -n FastFedIdProvider --messageBrokerConnectionString "Data Source=.;Initial Catalog=MessageBroker;Integrated Security=True;TrustServerCertificate=True" --messageBrokerTransport "SQLSERVER"
+```

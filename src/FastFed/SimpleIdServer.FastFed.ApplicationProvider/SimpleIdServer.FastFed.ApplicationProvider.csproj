@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Description>Add fastfed support to the application provider.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.8" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj" />
+	  <ProjectReference Include="..\..\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Resources\Global.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Global.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Resources\Global.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Global.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+</Project>

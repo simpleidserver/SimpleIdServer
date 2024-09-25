@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;

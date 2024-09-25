@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<Description>Client to interact with FastFederation endpoints.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.Domains\SimpleIdServer.FastFed.Domains.csproj" />
+	</ItemGroup>
+</Project>

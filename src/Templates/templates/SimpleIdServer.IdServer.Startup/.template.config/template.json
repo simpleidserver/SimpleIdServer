@@ -15,6 +15,30 @@
     "type": "project"
   },
   "symbols": {
+	  "messageBrokerConnectionString": {
+		"type": "parameter",
+		"defaultValue": "Data Source=.;Initial Catalog=MessageBroker;Integrated Security=True;TrustServerCertificate=True",
+		"replaces": "MESSAGEBROKER-CONNECTIONSTRING",
+		"isRequired": false,
+		"description": "Connection string for the message broker."
+	  },
+	  "messageBrokerTransport": {
+		"type": "parameter",
+		"defaultValue": "INMEMORY",
+		"replaces": "MESSAGEBROKER-TRANSPORT",
+		"isRequired": false,
+		"description": "Message broker transport",
+		"choices": [
+			{
+			  "choice": "INMEMORY",
+			  "description": "INMEMORY"
+			},
+			{
+			  "choice": "SQLSERVER",
+			  "description": "SQLSERVER"
+			}
+		]
+	  },
 	  "storageConnectionString": {
 		  "type": "parameter",
 		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",

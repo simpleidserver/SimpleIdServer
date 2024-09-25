@@ -166,6 +166,7 @@ task compile -depends clean {
 	exec { dotnet build .\SimpleIdServer.Did.sln -c $config --version-suffix=$buildSuffix }
 	exec { dotnet build .\SimpleIdServer.CredentialIssuer.Host.sln -c $config --version-suffix=$buildSuffix }
 	exec { dotnet build .\SimpleIdServer.Federation.sln -c $config --version-suffix=$buildSuffix }
+	exec { dotnet build .\SimpleIdServer.FastFed.sln -c $config --version-suffix=$buildSuffix }
 	exec { dotnet build "$source_dir/Templates/SimpleIdServer.Templates.csproj" -c $config --version-suffix=$buildSuffix }
 }
 
@@ -180,13 +181,18 @@ task buildTemplate {
 	$CredentialIssuerPathTarget = "$source_dir/Templates/templates/SimpleIdServer.CredentialIssuer.Startup"
 	$CredentialIssuerWebsitePathSource = "$source_dir/CredentialIssuer/SimpleIdServer.CredentialIssuer.Website.Startup"
 	$CredentialIssuerWebsitePathTarget = "$source_dir/Templates/templates/SimpleIdServer.CredentialIssuer.Website.Startup"
-	
-	
+	$FastFedApplicationProviderPathSource = "$source_dir/FastFed/SimpleIdServer.FastFed.ApplicationProvider.Startup"
+	$FastFedApplicationProviderPathTarget = "$source_dir/Templates/templates/SimpleIdServer.FastFed.ApplicationProvider.Startup"
+	$FastFedIdentityProviderPathSource = "$source_dir/FastFed/SimpleIdServer.FastFed.IdentityProvider.Startup"
+	$FastFedIdentityProviderPathTarget = "$source_dir/Templates/templates/SimpleIdServer.FastFed.IdentityProvider.Startup"
+		
 	CopyFolder $IdServerPathSource $IdServerPathTarget
 	CopyFolder $IdServerWebsitePathSource $IdServerWebsitePathTarget
 	CopyFolder $ScimPathSource $ScimPathTarget
 	CopyFolder $CredentialIssuerPathSource $CredentialIssuerPathTarget
 	CopyFolder $CredentialIssuerWebsitePathSource $CredentialIssuerWebsitePathTarget
+	CopyFolder $FastFedApplicationProviderPathSource $FastFedApplicationProviderPathTarget
+	CopyFolder $FastFedIdentityProviderPathSource $FastFedIdentityProviderPathTarget
 }
  
 task pack -depends release, compile, buildTemplate {
@@ -225,6 +231,8 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Authority.Federation\SimpleIdServer.Authority.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Rp.Federation\SimpleIdServer.Rp.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Domains\SimpleIdServer.Scim.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -236,15 +244,33 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj -c $config $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj -c $config $versionSuffix --output $result_dir }
+	
 	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer\SimpleIdServer.CredentialIssuer.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Domains\SimpleIdServer.CredentialIssuer.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Store\SimpleIdServer.CredentialIssuer.Store.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website\SimpleIdServer.CredentialIssuer.Website.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website\SimpleIdServer.CredentialIssuer.Website.csproj -c $config --no-build $versionSuffix --output $result_dir }	
+	
+	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger\SimpleIdServer.Webfinger.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger.Store.EF\SimpleIdServer.Webfinger.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
+		
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Client\SimpleIdServer.FastFed.Client.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Domains\SimpleIdServer.FastFed.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Provisioning.Scim\SimpleIdServer.FastFed.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	
 	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
 
@@ -329,6 +355,22 @@ task test {
     }
 
     Push-Location -Path $base_dir\tests\SimpleIdServer.OpenidFederation.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
+
+    Push-Location -Path $base_dir\tests\SimpleIdServer.FastFed.Host.Acceptance.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
+
+    Push-Location -Path $base_dir\tests\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }

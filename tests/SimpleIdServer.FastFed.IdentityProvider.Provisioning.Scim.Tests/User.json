@@ -1,0 +1,24 @@
+{
+  "schemas": [
+    "urn:ietf:params:scim:schemas:core:2.0:User",
+    "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User"
+  ],
+  "externalId": "98d78581-dd0d-4361-ab61-9511c6e5f035",
+  "userName": "bjensen",
+  "name": {
+    "formatted": "Ms. Barbara J Jensen III",
+    "familyName": "Jensen",
+    "givenName": "Barbara"
+  },
+  "emails": [
+    {
+      "value": "dschrute@example.com",
+      "type": "work",
+      "primary": true
+    }
+  ],
+  "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User": {
+    "costCenter": "12345",
+    "manager": { "value": "0cca76a8-090a-4944-8e61-e7791e619d48" }
+  }
+}

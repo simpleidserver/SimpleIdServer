@@ -8,7 +8,7 @@ using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Domains.Extensions;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.TokenTypes;
 using System.Collections.Generic;

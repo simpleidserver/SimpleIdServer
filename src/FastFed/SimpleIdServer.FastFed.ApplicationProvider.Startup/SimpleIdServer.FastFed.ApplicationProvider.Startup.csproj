@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.8" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Resources\FastFedDiscoveryResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>FastFedDiscoveryResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\HomeResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>HomeResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\LayoutResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>LayoutResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\IdentityProvidersResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>IdentityProvidersResource.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Resources\FastFedDiscoveryResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>FastFedDiscoveryResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\HomeResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>HomeResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\LayoutResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\IdentityProvidersResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>IdentityProvidersResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+</Project>

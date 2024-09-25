@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;

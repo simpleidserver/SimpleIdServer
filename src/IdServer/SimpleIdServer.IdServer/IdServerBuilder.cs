@@ -100,11 +100,23 @@ namespace Microsoft.Extensions.DependencyInjection
             return this;
         }
 
+        public IdServerBuilder UseInMemoryMassTransit()
+        {
+            return this.UseMassTransit(o =>
+            {
+                o.UsingInMemory((ctx, cfg) =>
+                {
+                    cfg.UsePublishMessageScheduler();
+                    cfg.ConfigureEndpoints(ctx);
+                });
+            });
+        }
+
         /// <summary>
         /// Use in memory implementation of mass transit.
         /// </summary>
         /// <returns></returns>
-        public IdServerBuilder UseInMemoryMassTransit()
+        public IdServerBuilder UseMassTransit(Action<IBusRegistrationConfigurator> cb)
         {
             _serviceCollection.AddMassTransitTestHarness((o) =>
             {
@@ -115,25 +127,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 o.AddConsumer<IdServerEventsConsumer>();
                 o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
                 o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();
-                o.UsingInMemory((ctx, cfg) =>
-                {
-                    cfg.UsePublishMessageScheduler();
-                    cfg.ConfigureEndpoints(ctx);
-                });
-            });
-            return this;
-        }
-
-        /// <summary>
-        /// Configure and use mass transit.
-        /// </summary>
-        /// <param name="massTransitOptions"></param>
-        /// <returns></returns>
-        public IdServerBuilder UseMassTransit(Action<IBusRegistrationConfigurator> massTransitOptions)
-        {
-            _serviceCollection.AddMassTransit(massTransitOptions != null ? massTransitOptions : (o) =>
-            {
-                o.UsingInMemory();
+                cb(o);
             });
             return this;
         }

@@ -572,6 +572,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         #region Extract
 
+
         public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas)
         {
             CheckRequiredAttributes(mainSchema, extensionSchemas, json);

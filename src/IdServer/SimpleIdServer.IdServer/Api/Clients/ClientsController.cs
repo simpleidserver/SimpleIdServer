@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Register;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.ExternalEvents;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
@@ -203,7 +203,7 @@ public class ClientsController : BaseController
                     await _busControl.Publish(new ClientUpdatedSuccessEvent
                     {
                         Realm = prefix,
-                        Request = request,
+                        SerializedRequest = JsonSerializer.Serialize(request),
                         Id = id
                     });
                     return new NoContentResult();
@@ -216,7 +216,7 @@ public class ClientsController : BaseController
                 await _busControl.Publish(new ClientUpdatedFailureEvent
                 {
                     Realm = prefix,
-                    Request = request,
+                    SerializedRequest = JsonSerializer.Serialize(request),
                     Id = id
                 });
                 return BuildError(ex);
@@ -277,7 +277,7 @@ public class ClientsController : BaseController
                     await _busControl.Publish(new ClientAdvancedSettingsUpdatedSuccessEvent
                     {
                         Realm = prefix,
-                        Request = request,
+                        SerializedRequest = JsonSerializer.Serialize(request),
                         Id = id
                     });
                     return new NoContentResult();
@@ -290,7 +290,7 @@ public class ClientsController : BaseController
                 await _busControl.Publish(new ClientAdvancedSettingsUpdatedFailureEvent
                 {
                     Realm = prefix,
-                    Request = request,
+                    SerializedRequest = JsonSerializer.Serialize(request),
                     Id = id
                 });
                 return BuildError(ex);

@@ -1,0 +1,57 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+		<PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.2.5" />
+		<PackageReference Include="SimpleIdServer.Webfinger.Client" Version="5.0.*-*" />
+		<PackageReference Include="SimpleIdServer.Webfinger.Store.EF" Version="5.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid" Version="5.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim" Version="5.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider" Version="5.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.Store.EF" Version="5.0.*-*" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Update="Resources\ApplicationProviderResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>ApplicationProviderResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\ScimProvisioning.Designer.cs">
+		  <DependentUpon>ScimProvisioning.resx</DependentUpon>
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		</Compile>
+		<Compile Update="Resources\FastFedDiscoveryResource.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>FastFedDiscoveryResource.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\LayoutResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>LayoutResource.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Update="Resources\ScimProvisioning.resx">
+		  <LastGenOutput>ScimProvisioning.Designer.cs</LastGenOutput>
+		  <Generator>PublicResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\LayoutResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\FastFedDiscoveryResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>FastFedDiscoveryResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\ApplicationProviderResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>ApplicationProviderResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+</Project>

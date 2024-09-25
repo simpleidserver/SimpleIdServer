@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
@@ -20,7 +21,6 @@ using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Notification.Gotify;
@@ -41,6 +41,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -85,6 +86,27 @@ if (identityServerConfiguration.IsForwardedEnabled)
     });
 }
 
+if(identityServerConfiguration.IsClientCertificateEnabled)
+{
+    builder.Services.AddCertificateForwarding(options =>
+    {
+        options.CertificateHeader = "ssl-client-cert";
+        options.HeaderConverter = (headerValue) =>
+        {
+            System.Console.WriteLine(headerValue);
+            X509Certificate2? clientCertificate = null;
+
+            if (!string.IsNullOrWhiteSpace(headerValue))
+            {
+                clientCertificate = X509Certificate2.CreateFromPem(
+                    WebUtility.UrlDecode(headerValue));
+            }
+
+            return clientCertificate!;
+        };
+    });
+}
+
 builder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
     .AllowAnyMethod()
     .AllowAnyHeader()));
@@ -122,6 +144,9 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler(errorPath);
 }
 
+if(identityServerConfiguration.IsClientCertificateForwarded)
+    app.UseCertificateForwarding();
+
 app
     .UseSID()
     .UseVerifiablePresentation()
@@ -157,7 +182,6 @@ void ConfigureIdServer(IServiceCollection services)
         })
         .AddConsoleNotification()
         .AddVpAuthentication()
-        .UseInMemoryMassTransit()
         .AddBackChannelAuthentication()
         .AddPwdAuthentication()
         .AddEmailAuthentication()
@@ -193,6 +217,37 @@ void ConfigureIdServer(IServiceCollection services)
     if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDidKey();
     ConfigureDistributedCache();
+    ConfigureMessageBroker(idServerBuilder);
+}
+
+void ConfigureMessageBroker(IdServerBuilder idServerBuilder)
+{
+    var section = builder.Configuration.GetSection(nameof(MessageBrokerOptions));
+    var conf = section.Get<MessageBrokerOptions>();
+    switch(conf.Transport)
+    {
+        case TransportTypes.SQLSERVER:
+
+            builder.Services.AddSqlServerMigrationHostedService(create: true, delete: false);
+            builder.Services.AddOptions<SqlTransportOptions>()
+                .Configure(options =>
+            {
+                options.ConnectionString = conf.ConnectionString;
+                options.Username = conf.Username;
+                options.Password = conf.Password;
+            });
+            idServerBuilder.UseMassTransit(o =>
+            {                o.UsingSqlServer((ctx, cfg) =>
+                {
+                    cfg.UsePublishMessageScheduler();
+                    cfg.ConfigureEndpoints(ctx);
+                });
+            });
+            break;
+        default:
+            idServerBuilder.UseInMemoryMassTransit();
+            break;
+    }
 }
 
 void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
@@ -326,7 +381,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
             var unsupportedScopes = MigrateScopes(dbContext, masterRealm);
-            MigrateClients(dbContext, unsupportedScopes);
+            MigrateClients(dbContext, unsupportedScopes, masterRealm);
             if (!dbContext.UmaPendingRequest.Any())
                 dbContext.UmaPendingRequest.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PendingRequests);
 
@@ -358,7 +413,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
 
             var groups = MigrateGroups(dbContext, masterRealm);
-            MigrateUsers(dbContext, groups.adminGroup, groups.adminRoGroup);
+            MigrateUsers(dbContext, groups.adminGroup, groups.adminRoGroup, groups.fastFedGroup);
             if (!dbContext.SerializedFileKeys.Any())
             {
                 dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"));
@@ -527,7 +582,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             return unsupportedScopes.ToList();
         }
 
-        void MigrateClients(StoreDbContext dbContext, List<Scope> unsupportedScopes)
+        void MigrateClients(StoreDbContext dbContext, List<Scope> unsupportedScopes, Realm masterRealm)
         {
             var confClientIds = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Select(c => c.ClientId);
             var allClientIds = dbContext.Clients.Select(s => s.ClientId);
@@ -536,7 +591,22 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 .Include(c => c.Scopes)
                 .Where(c => confClientIds.Contains(c.ClientId));
             foreach (var unknownClient in unknownClients)
+            {
+                unknownClient.Realms = new List<Realm>
+                {
+                    masterRealm
+                };
+                var scopeNames = unknownClient.Scopes.Select(s => s.Name).ToList();
+                unknownClient.Scopes.Clear();
+                foreach (var name in scopeNames)
+                {
+                    var existingScope = dbContext.Scopes.SingleOrDefault(s => s.Name == name) ?? unsupportedScopes.Single(s => s.Name == name);
+                    unknownClient.Scopes.Add(existingScope);
+                }
+
                 dbContext.Clients.Add(unknownClient);
+            }
+
             foreach (var knownClient in knownClients)
             {
                 var cl = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Single(c => c.ClientId == knownClient.ClientId);
@@ -551,7 +621,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             }
         }
 
-        (Group adminGroup, Group adminRoGroup) MigrateGroups(StoreDbContext dbContext, Realm masterRealm)
+        (Group adminGroup, Group adminRoGroup, Group fastFedGroup) MigrateGroups(StoreDbContext dbContext, Realm masterRealm)
         {
             var admGroup = dbContext.Groups.Include(g => g.Realms)
                 .Include(g => g.Roles)
@@ -559,6 +629,10 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             var admRoGroup = dbContext.Groups.Include(g => g.Realms)
                 .Include(g => g.Roles)
                 .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name);
+            var fastFedAdmGroup = dbContext.Groups.Include(g => g.Realms)
+                .Include(g => g.Roles)
+                .FirstOrDefault(g => g.Name == IdServerConfiguration.FastFedAdministratorGroup.Name);
+
             if (admGroup == null)
             {
                 admGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup;
@@ -607,10 +681,25 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole.Name))
                 admGroup.Roles.Add(existingAdministratorRole);
 
-            return (admGroup, admRoGroup);
+            if(fastFedAdmGroup == null)
+            {
+                var grp = IdServerConfiguration.FastFedAdministratorGroup;
+                foreach(var role in grp.Roles)
+                {
+                    role.Realms = new List<Realm>
+                    {
+                        masterRealm
+                    };
+                }
+
+                dbContext.Groups.Add(grp);
+                fastFedAdmGroup = grp;
+            }
+
+            return (admGroup, admRoGroup, fastFedAdmGroup);
         }
 
-        void MigrateUsers(StoreDbContext dbContext, Group adminGroup, Group adminRoGroup)
+        void MigrateUsers(StoreDbContext dbContext, Group adminGroup, Group adminRoGroup, Group fastFedGroup)
         {
             var isUserExists = dbContext.Users
                 .Any(c => c.Name == "user");
@@ -634,12 +723,23 @@ async void SeedData(WebApplication application, string scimBaseUrl)
 
             if (existingAdministratorUser == null)
                 dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser);
-            else if(!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))
+            else
             {
-                existingAdministratorUser.Groups.Add(new GroupUser
+                if (!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))
                 {
-                    Group = adminGroup
-                });
+                    existingAdministratorUser.Groups.Add(new GroupUser
+                    {
+                        Group = adminGroup
+                    });
+                }
+
+                if (!existingAdministratorUser.Groups.Any(g => g.Group.Name == IdServerConfiguration.FastFedAdministratorGroup.Name))
+                {
+                    existingAdministratorUser.Groups.Add(new GroupUser
+                    {
+                        Group = fastFedGroup
+                    });
+                }
             }
         }
     }

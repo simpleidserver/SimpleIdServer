@@ -1,0 +1,217 @@
+﻿@using SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources
+@using SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels
+@model SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels.DiscoverProvidersViewModel
+
+@{
+    ViewBag.Title = FastFedDiscoveryResource.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3>@FastFedDiscoveryResource.Title</h3>
+
+@if(ViewData.ModelState.IsValid)
+{
+    <ul class="list-group">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@error.ErrorMessage</li>
+            }
+        }
+    </ul>
+}
+
+<div class="card">
+    <div class="card-body">       
+        <div class="accordion" id="accordionParent">
+            <!-- Email-->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        1 - @FastFedDiscoveryResource.Email
+                    </button>
+                </h2>
+                <div id="collapseOne" class="@(Model.WebfingerResult == null ? "accordion-collapse collapse show" : "accordion-collapse collapse")" data-bs-parent="#accordionParent">
+                    <div class="accordion-body">
+                        <form asp-controller="FastFedDiscovery" asp-action="Index" asp-area="" method="post">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="@nameof(DiscoverProvidersViewModel.Action)" value="@DiscoverProviderActions.CONFIRMEMAIL" />
+                            <div class="mb-3">
+                                <label class="form-label">@FastFedDiscoveryResource.UserEmail</label>
+                                <input type="text" class="form-control" value="@Model.Email" name="@nameof(DiscoverProvidersViewModel.Email)" />
+                            </div>
+                            <button type="submit" class="btn btn-primary">@FastFedDiscoveryResource.Resolve</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Provider-->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                        2 - @FastFedDiscoveryResource.Providers
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="@(Model.WebfingerResult != null && Model.ProviderMetadata == null ? "accordion-collapse collapse show" : "accordion-collapse collapse")" data-bs-parent="#accordionParent">
+                    <div class="accordion-body">
+                        @if (Model.WebfingerResult != null)
+                        {
+                            <form asp-controller="FastFedDiscovery" asp-action="Index" asp-area="" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="@nameof(DiscoverProvidersViewModel.Action)" value="@DiscoverProviderActions.SELECTPROVIDER" />
+                                <input type="hidden" name="@nameof(DiscoverProvidersViewModel.Email)" value="@Model.Email" />
+                                <div class="mb-3">
+                                    <label class="form-label">@FastFedDiscoveryResource.ChooseProvider</label>
+                                    <select class="form-select" name="@nameof(DiscoverProvidersViewModel.Href)" value="@Model.Href">
+                                        @foreach (var link in Model.WebfingerResult.Links)
+                                        {
+                                            <option value="@link.Href">@link.Href</option>
+                                        }
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">@FastFedDiscoveryResource.Choose</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @FastFedDiscoveryResource.NoEmailDiscovered
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <!-- Confirm -->
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                        3 - @FastFedDiscoveryResource.ConfirmProvider
+                    </button>
+                </h2>
+                <div id="collapseThree" class="@(Model.WebfingerResult != null && Model.ProviderMetadata != null ? "accordion-collapse collapse show" : "accordion-collapse collapse")" data-bs-parent="#accordionParent">
+                    <div class="accordion-body">
+                        @if (Model.ProviderMetadata != null)
+                        {
+                            if(Model.ProviderMetadata.IdentityProvider == null)
+                            {
+                                <div class="alert alert-danger" role="alert">
+                                    @FastFedDiscoveryResource.NotAnIdentityProvider
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="accordion" id="accordionParentProvider">
+                                    <form asp-controller="FastFedDiscovery" asp-action="Index" asp-area="" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="@nameof(DiscoverProvidersViewModel.Action)" value="@DiscoverProviderActions.CONFIRMPROVIDER" />
+                                        <input type="hidden" name="@nameof(DiscoverProvidersViewModel.Email)" value="@Model.Email" />
+                                        <input type="hidden" name="@nameof(DiscoverProvidersViewModel.Href)" value="@Model.Href" />
+                                        <!-- Information -->
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInformation" aria-expanded="true" aria-controls="collapseInformation">
+                                                    @FastFedDiscoveryResource.Information
+                                                </button>
+                                            </h2>
+                                            <div id="collapseInformation" class="accordion-collapse collapse show" data-bs-parent="#accordionParentProvider">
+                                                <div class="accordion-body">
+                                                    @if (!string.IsNullOrWhiteSpace(Model.ProviderMetadata.IdentityProvider.DisplaySettings.LogoUri))
+                                                    {
+                                                        <div style="text-align:center">
+                                                            <img src="@Model.ProviderMetadata.IdentityProvider.DisplaySettings.LogoUri" style="max-width:200px" class="img-thumbnail" />
+                                                        </div>
+                                                    }
+                                                    <div>
+                                                        <label><b>@FastFedDiscoveryResource.Name</b></label>
+                                                        <label>@Model.ProviderMetadata.IdentityProvider.DisplaySettings.DisplayName</label>
+                                                    </div>
+                                                    @if (!string.IsNullOrWhiteSpace(Model.ProviderMetadata.IdentityProvider.DisplaySettings.License))
+                                                    {
+                                                        <div>
+                                                            <a href="@Model.ProviderMetadata.IdentityProvider.DisplaySettings.License"><b>@FastFedDiscoveryResource.License</b></a>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Capabilities -->
+                                        <div class="accordion-item mb-1">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCapabilities" aria-expanded="true" aria-controls="collapseCapabilities">
+                                                    @FastFedDiscoveryResource.Capabilities
+                                                </button>
+                                            </h2>
+                                            <div id="collapseCapabilities" class="accordion-collapse collapse" data-bs-parent="#accordionParentProvider">
+                                                <div class="accordion-body">
+                                                    @if (Model.ProviderMetadata.IdentityProvider.Capabilities.AuthenticationProfiles != null)
+                                                    {
+                                                        <div>
+                                                            <label><b>@FastFedDiscoveryResource.AuthenticationProfiles</b></label>
+                                                            <ul class="list-group">
+                                                                @foreach (var authProfile in Model.ProviderMetadata.IdentityProvider.Capabilities.AuthenticationProfiles)
+                                                                {
+                                                                    <li class="list-group-item">@authProfile</li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+
+                                                    @if (Model.ProviderMetadata.IdentityProvider.Capabilities.ProvisioningProfiles != null)
+                                                    {
+                                                        <div>
+                                                            <label><b>@FastFedDiscoveryResource.ProvisioningProfiles</b></label>
+                                                            <ul class="list-group">
+                                                                @foreach (var provProfile in Model.ProviderMetadata.IdentityProvider.Capabilities.ProvisioningProfiles)
+                                                                {
+                                                                    <li class="list-group-item">@provProfile</li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+
+                                                    @if (Model.ProviderMetadata.IdentityProvider.Capabilities.SchemaGrammars != null)
+                                                    {
+                                                        <div>
+                                                            <label><b>@FastFedDiscoveryResource.SupportedSchemaGrammars</b></label>
+                                                            <ul class="list-group">
+                                                                @foreach (var grammar in Model.ProviderMetadata.IdentityProvider.Capabilities.SchemaGrammars)
+                                                                {
+                                                                    <li class="list-group-item">@grammar</li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+
+                                                    @if (Model.ProviderMetadata.IdentityProvider.Capabilities.SigningAlgorithms != null)
+                                                    {
+                                                        <div>
+                                                            <label><b>@FastFedDiscoveryResource.SupportedJwtSigningAlgs</b></label>
+                                                            <ul class="list-group">
+                                                                @foreach (var alg in Model.ProviderMetadata.IdentityProvider.Capabilities.SigningAlgorithms)
+                                                                {
+                                                                    <li class="list-group-item">@alg</li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">@FastFedDiscoveryResource.Confirm</button>
+                                    </form>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="alert alert-danger" role="alert">
+                                @FastFedDiscoveryResource.NoProviderIsSelected
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
