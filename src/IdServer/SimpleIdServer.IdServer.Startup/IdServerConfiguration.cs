@@ -162,7 +162,10 @@ namespace SimpleIdServer.IdServer.Startup
             CtWalletScope,
             SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities,
             SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole,
-            ScimScope
+            ScimScope,
+            IdProviderAdministratorScope,
+            AppProviderAdministratorScope,
+            SimpleIdServer.IdServer.Constants.StandardScopes.Acrs
         };
 
         public static ICollection<User> Users => new List<User>

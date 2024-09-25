@@ -1,0 +1,84 @@
+﻿@using SimpleIdServer.FastFed.IdentityProvider.Startup.Resources
+@using SimpleIdServer.FastFed.Models
+@model SimpleIdServer.FastFed.IdentityProvider.UIs.ViewApplicationProviderViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = ApplicationProviderResource.ApplicationProviders;
+}
+
+<nav>
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="@Url.Action("Index", "ApplicationProviders")">@ApplicationProviderResource.ApplicationProviders</a></li>
+        <li class="breadcrumb-item active">@ApplicationProviderResource.ApplicationProvider</li>
+    </ol>
+</nav>
+
+<h3>@ApplicationProviderResource.ApplicationProvider</h3>
+
+<div class="card">
+    <div class="card-body">
+        <!-- Entity identifier -->
+        <div class="mb-3">
+            <label class="form-label">@ApplicationProviderResource.EntityId</label>
+            <input type="text" class="form-control" value="@Model.EntityId" disabled="disabled"/>
+        </div>
+        <!-- Status -->
+        <div class="mb-3">
+            <label class="form-label">@ApplicationProviderResource.Status</label>
+            <input type="text" class="form-control" value="@Enum.GetName(typeof(IdentityProviderStatus), Model.Status)" disabled="disabled" />
+        </div>
+        @if(Model.Status != IdentityProviderStatus.CREATE)
+        {
+            <!-- Provisioning profiles -->
+            <div class="mb-3">
+                <label class="form-label">@ApplicationProviderResource.ProvisioningProfiles</label>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>@ApplicationProviderResource.Name</th>
+                            <th>@ApplicationProviderResource.NbRecords</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var provisioningProfile in Model.ProvisioningProfiles)
+                        {
+                            <tr>
+                                <td>@provisioningProfile.ProfileName</td>
+                                <td>@provisioningProfile.NbRecords</td>
+                                <td><a href="@Url.Action("Configure", "FastFedAppProvider", new { entityId = Model.EntityId, area = provisioningProfile.Area })">@ApplicationProviderResource.Update</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if(Model.Status == IdentityProviderStatus.CONFIRMED)
+            {
+                <!-- Last import errors -->
+                <div class="mb-3">
+                    <label class="form-label">@ApplicationProviderResource.Last10ImportErrors</label>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>@ApplicationProviderResource.ErrorMessage</th>
+                                <th>@ApplicationProviderResource.CreateDateTime</th>
+                                <th>@ApplicationProviderResource.ExtractedRepresentationId</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var importError in Model.ImportErrors)
+                            {
+                                <tr>
+                                    <td>@importError.ErrorMessage</td>
+                                    <td>@importError.CreateDateTime</td>
+                                    <td>@importError.ExtractedRepresentationId</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</div>

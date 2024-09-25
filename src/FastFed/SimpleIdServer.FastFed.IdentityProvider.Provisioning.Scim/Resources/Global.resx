@@ -123,4 +123,7 @@
   <data name="OnlyNewOperationIsSupported" xml:space="preserve">
     <value>Only add operation is supported</value>
   </data>
+  <data name="ScimEdpIsNotReachable" xml:space="preserve">
+    <value>SCIM endpoint is not reachable</value>
+  </data>
 </root>

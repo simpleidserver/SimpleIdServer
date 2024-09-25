@@ -1,0 +1,44 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "OpenId",
+    "Fastfed"
+  ],
+  "name": "FastFed identity provider",
+  "identity": "SimpleIdServer.FastFed.IdentityProvider.Startup",
+  "groupIdentity": "SimpleIdServer.FastFed.IdentityProvider.Startup",
+  "shortName": "fastfedidprov",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+	  "messageBrokerConnectionString": {
+		  "type": "parameter",
+		  "defaultValue": "Data Source=.;Initial Catalog=MessageBroker;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "MessageBrokerOptions-ConnectionString",
+		  "isRequired": false,
+		  "description": "Connection string of the message broker"
+	  },
+	  "messageBrokerTransport": {
+		  "type": "parameter",
+		  "defaultValue": "INMEMORY",
+		  "replaces": "MessageBrokerOptions-Transport",
+		  "isRequired": false,
+		  "description": "Message broker transport",
+		  "choices": [
+			  {
+				"choice": "INMEMORY",
+				"description": "INMEMORY"
+			  },
+			  {
+				"choice": "SQLSERVER",
+				"description": "SQLSERVER"
+			  }
+		  ]
+	  }
+  },
+  "sourceName": "SimpleIdServer.FastFed.IdentityProvider.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.FastFed.IdentityProvider.Startup.csproj" } ]
+}

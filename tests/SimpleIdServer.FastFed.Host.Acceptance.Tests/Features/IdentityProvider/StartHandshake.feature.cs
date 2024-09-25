@@ -80,47 +80,6 @@ namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features.IdentityProvider
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="start handshake and check confirmation view is returned")]
-        [Xunit.TraitAttribute("FeatureTitle", "StartHandshake")]
-        [Xunit.TraitAttribute("Description", "start handshake and check confirmation view is returned")]
-        public void StartHandshakeAndCheckConfirmationViewIsReturned()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("start handshake and check confirmation view is returned", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 4
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table15.AddRow(new string[] {
-                            "expiration",
-                            "2"});
-                table15.AddRow(new string[] {
-                            "app_metadata_uri",
-                            "http://localhost/fastfed/provider-metadata"});
-#line 5
- testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table15, "When ");
-#line hidden
-#line 10
- testRunner.And("extract return url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 12
- testRunner.Then("redirect uri equals to \'http://localhost/FastFedDiscovery/Confirm/http%3A%2F%2Flo" +
-                        "calhost\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

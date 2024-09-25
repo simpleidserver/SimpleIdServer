@@ -98,14 +98,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table16.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "expiration",
                             "2"});
 #line 5
- testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table16, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table13, "When ");
 #line hidden
 #line 9
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -141,17 +141,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table17.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "expiration",
                             "2"});
-                table17.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "app_metadata_uri",
                             "url"});
 #line 16
- testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table17, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table14, "When ");
 #line hidden
 #line 21
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -187,17 +187,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table18.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "expiration",
                             "2"});
-                table18.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "app_metadata_uri",
                             "http://localhost/bad/provider-metadata"});
 #line 28
- testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table18, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table15, "When ");
 #line hidden
 #line 33
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -234,17 +234,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table19.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "expiration",
                             "2"});
-                table19.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "app_metadata_uri",
                             "http://localhost/bad/app-provider-metadata"});
 #line 41
- testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table19, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/fastfed/start\'", ((string)(null)), table16, "When ");
 #line hidden
 #line 46
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

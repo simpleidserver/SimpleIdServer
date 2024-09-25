@@ -213,18 +213,18 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table2.AddRow(new string[] {
+                table1.AddRow(new string[] {
                             "iss",
                             "invalid"});
 #line 35
- testRunner.Given("build jwt and store the result into \'accessToken\'", ((string)(null)), table2, "Given ");
+ testRunner.Given("build jwt and store the result into \'accessToken1\'", ((string)(null)), table1, "Given ");
 #line hidden
 #line 39
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'$accessToken1$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 41
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -261,18 +261,18 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table3.AddRow(new string[] {
+                table2.AddRow(new string[] {
                             "iss",
                             "entityId"});
 #line 49
- testRunner.Given("build jwt and store the result into \'accessToken\'", ((string)(null)), table3, "Given ");
+ testRunner.Given("build jwt and store the result into \'accessToken2\'", ((string)(null)), table2, "Given ");
 #line hidden
 #line 53
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'$accessToken2$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
 #line 55
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -290,15 +290,66 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Jwt audience must be correct")]
+        [Xunit.SkippableFactAttribute(DisplayName="Federation whitelisting is expired")]
         [Xunit.TraitAttribute("FeatureTitle", "EndRegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Jwt audience must be correct")]
-        public void JwtAudienceMustBeCorrect()
+        [Xunit.TraitAttribute("Description", "Federation whitelisting is expired")]
+        public void FederationWhitelistingIsExpired()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Jwt audience must be correct", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Federation whitelisting is expired", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 62
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table3.AddRow(new string[] {
+                            "iss",
+                            "expiredEntityId"});
+                table3.AddRow(new string[] {
+                            "aud",
+                            "http://localhost"});
+#line 63
+ testRunner.Given("build jwt signed with certificate and store the result into \'accessToken4\'", ((string)(null)), table3, "Given ");
+#line hidden
+#line 68
+ testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
+                        "ication/jwt\', content \'$accessToken4$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+#line hidden
+#line 70
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 72
+ testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 74
+ testRunner.Then("JSON \'$.error_code\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 75
+ testRunner.Then("JSON \'$.error_descriptions[0]\'=\'The whitelisting process of the identity provider" +
+                        " is expired\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Capabilities must be adequate")]
+        [Xunit.TraitAttribute("FeatureTitle", "EndRegisterErrors")]
+        [Xunit.TraitAttribute("Description", "Capabilities must be adequate")]
+        public void CapabilitiesMustBeAdequate()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Capabilities must be adequate", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 77
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -316,129 +367,27 @@ this.ScenarioInitialize(scenarioInfo);
                             "entityId"});
                 table4.AddRow(new string[] {
                             "aud",
-                            "bad"});
-#line 63
- testRunner.Given("build jwt signed with certificate and store the result into \'accessToken\'", ((string)(null)), table4, "Given ");
-#line hidden
-#line 68
- testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 70
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 72
- testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 74
- testRunner.Then("JSON \'$.error_code\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 75
- testRunner.Then("JSON \'$.error_descriptions[0]\'=\'The aud attribute doesn\'t match the entity_id of " +
-                        "the application provider\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Federation whitelisting is expired")]
-        [Xunit.TraitAttribute("FeatureTitle", "EndRegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Federation whitelisting is expired")]
-        public void FederationWhitelistingIsExpired()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Federation whitelisting is expired", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 77
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table5.AddRow(new string[] {
-                            "iss",
-                            "expiredEntityId"});
-                table5.AddRow(new string[] {
-                            "aud",
                             "http://localhost"});
-#line 78
- testRunner.Given("build jwt signed with certificate and store the result into \'accessToken\'", ((string)(null)), table5, "Given ");
-#line hidden
-#line 83
- testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 85
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 87
- testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 89
- testRunner.Then("JSON \'$.error_code\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 90
- testRunner.Then("JSON \'$.error_descriptions[0]\'=\'The whitelisting process of the identity provider" +
-                        " is expired\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Capabilities must be adequate")]
-        [Xunit.TraitAttribute("FeatureTitle", "EndRegisterErrors")]
-        [Xunit.TraitAttribute("Description", "Capabilities must be adequate")]
-        public void CapabilitiesMustBeAdequate()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Capabilities must be adequate", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 92
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table6.AddRow(new string[] {
-                            "iss",
-                            "entityId"});
-                table6.AddRow(new string[] {
-                            "aud",
-                            "http://localhost"});
-                table6.AddRow(new string[] {
+                table4.AddRow(new string[] {
                             "provisioning_profiles",
                             "[\"prov\"]"});
-#line 93
- testRunner.Given("build jwt signed with certificate and store the result into \'accessToken\'", ((string)(null)), table6, "Given ");
+#line 78
+ testRunner.Given("build jwt signed with certificate and store the result into \'accessToken5\'", ((string)(null)), table4, "Given ");
 #line hidden
-#line 99
+#line 84
  testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
+                        "ication/jwt\', content \'$accessToken5$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-#line 101
+#line 86
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 103
+#line 88
  testRunner.Then("HTTP status code equals to \'401\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 105
+#line 90
  testRunner.Then("JSON \'$.error_code\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 106
+#line 91
  testRunner.Then("JSON \'$.error_descriptions[0]\'=\'Capabilities cannot be different\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

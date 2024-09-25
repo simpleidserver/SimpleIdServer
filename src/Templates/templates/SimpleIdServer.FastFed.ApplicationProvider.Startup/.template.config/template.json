@@ -1,0 +1,18 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "OpenId",
+    "Fastfed"
+  ],
+  "name": "FastFed application provider",
+  "identity": "SimpleIdServer.FastFed.ApplicationProvider.Startup",
+  "groupIdentity": "SimpleIdServer.FastFed.ApplicationProvider.Startup",
+  "shortName": "fastfedappprov",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "SimpleIdServer.FastFed.ApplicationProvider.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.FastFed.ApplicationProvider.Startup.csproj" } ]
+}

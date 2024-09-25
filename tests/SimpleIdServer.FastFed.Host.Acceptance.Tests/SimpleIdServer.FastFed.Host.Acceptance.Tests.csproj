@@ -27,7 +27,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj" />
-	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Store.EF\SimpleIdServer.FastFed.ApplicationProvider.Store.EF.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj" />
 	  <ProjectReference Include="..\..\src\FastFed\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />

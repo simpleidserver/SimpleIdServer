@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.Extensions.Logging;
 using SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Resources;
 using SimpleIdServer.FastFed.Models;
 using SimpleIdServer.FastFed.Provisioning.Scim;
@@ -14,6 +15,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim;
 
@@ -22,15 +24,18 @@ public class ScimIdProviderProvisioningService : IIdProviderProvisioningService
     private readonly IExtractedRepresentationStore _extractedRepresentationStore;
     private readonly IProviderFederationStore _providerFederationStore;
     private readonly IdServer.Helpers.IHttpClientFactory _httpClientFactory;
+    private readonly ILogger<ScimIdProviderProvisioningService> _logger;
 
     public ScimIdProviderProvisioningService(
         IExtractedRepresentationStore extractedRepresentationStore, 
         IProviderFederationStore providerFederationStore,
-        IdServer.Helpers.IHttpClientFactory httpClientFactory)
+        IdServer.Helpers.IHttpClientFactory httpClientFactory,
+        ILogger<ScimIdProviderProvisioningService> logger)
     {
         _extractedRepresentationStore = extractedRepresentationStore;
         _providerFederationStore = providerFederationStore;
         _httpClientFactory = httpClientFactory;
+        _logger = logger;
     }
 
     public string Name => SimpleIdServer.FastFed.Provisioning.Scim.Constants.ProvisioningProfileName;
@@ -86,8 +91,39 @@ public class ScimIdProviderProvisioningService : IIdProviderProvisioningService
                                 return result;
                             }
 
-                            await scimClient.AddUser(extractionResult.Result, accessToken, cancellationToken);
-                            result.NbMigratedRepresentation++;
+                            try
+                            {
+                                var error = await scimClient.AddUser(extractionResult.Result, accessToken, cancellationToken);
+                                if (error != null)
+                                {
+                                    result.Errors.Add(new ProvisioningProfileImportError
+                                    {
+                                        Id = Guid.NewGuid().ToString(),
+                                        CreateDateTime = DateTime.UtcNow,
+                                        ErrorMessage = error.Detail,
+                                        ExtractedRepresentationId = extractedRepresentation.Id,
+                                        EntityId = provisioningProfileHistory.EntityId,
+                                        ProfileName = Name
+                                    });
+                                    return result;
+                                }
+
+                                result.NbMigratedRepresentation++;
+                            }
+                            catch(Exception ex)
+                            {
+                                _logger.LogError(ex.ToString());
+                                result.Errors.Add(new ProvisioningProfileImportError
+                                {
+                                    Id = Guid.NewGuid().ToString(),
+                                    CreateDateTime = DateTime.UtcNow,
+                                    ErrorMessage = Global.ScimEdpIsNotReachable,
+                                    ExtractedRepresentationId = extractedRepresentation.Id,
+                                    EntityId = provisioningProfileHistory.EntityId,
+                                    ProfileName = Name
+                                });
+                                return result;
+                            }
                             break;
                     }
                 }

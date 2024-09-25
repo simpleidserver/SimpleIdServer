@@ -80,57 +80,6 @@ namespace SimpleIdServer.FastFed.Host.Acceptance.Tests.Features.AppProvider
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="Send end registration request")]
-        [Xunit.TraitAttribute("FeatureTitle", "EndRegister")]
-        [Xunit.TraitAttribute("Description", "Send end registration request")]
-        public void SendEndRegistrationRequest()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Send end registration request", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 4
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table1.AddRow(new string[] {
-                            "iss",
-                            "entityId"});
-                table1.AddRow(new string[] {
-                            "aud",
-                            "http://localhost"});
-                table1.AddRow(new string[] {
-                            "provisioning_profiles",
-                            "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise"});
-#line 5
- testRunner.Given("build jwt signed with certificate and store the result into \'accessToken\'", ((string)(null)), table1, "Given ");
-#line hidden
-#line 11
- testRunner.When("execute HTTP POST request \'http://localhost/fastfed/register\', content-type \'appl" +
-                        "ication/jwt\', content \'$accessToken$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
-#line hidden
-#line 13
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 15
- testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 16
- testRunner.Then("JSON \'$[\'urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise\'].scim_serv" +
-                        "ice_uri\'=\'http://localhost/scim\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

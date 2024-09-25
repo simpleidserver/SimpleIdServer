@@ -722,7 +722,14 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             }
 
             if (existingAdministratorUser == null)
-                dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser);
+            {
+                var user = SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser;
+                user.Groups.Add(new GroupUser
+                {
+                    Group = fastFedGroup
+                });
+                dbContext.Users.Add(user);
+            }
             else
             {
                 if (!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))

@@ -77,5 +77,14 @@ namespace SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Resources {
                 return ResourceManager.GetString("OnlyNewOperationIsSupported", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à SCIM endpoint is not reachable.
+        /// </summary>
+        internal static string ScimEdpIsNotReachable {
+            get {
+                return ResourceManager.GetString("ScimEdpIsNotReachable", resourceCulture);
+            }
+        }
     }
 }

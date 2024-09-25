@@ -101,14 +101,14 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table8.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "identity_provider_url",
                             "http://localhost/fastfed"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table8, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/fastfed/whitelist\'", ((string)(null)), table6, "When ");
 #line hidden
 #line 9
  testRunner.And("extract parameter \'app_metadata_uri\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

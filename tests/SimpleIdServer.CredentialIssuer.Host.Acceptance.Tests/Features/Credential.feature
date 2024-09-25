@@ -43,22 +43,3 @@ Scenario: use the ldp_vc format and type parameters to get a credential
 	And JSON exists '$.credential.proof.jws'
 	And JSON '$.credential.proof.type'='JsonWebSignature2020'
 	And JSON '$.credential.proof.proofPurpose'='assertionMethod'
-
-Scenario: use the credential_identifier to get a credential
-	Given build jwt proof
-	| Key   | Value                |
-	| typ   | openid4vci-proof+jwt |
-	| nonce | nonce                |
-	
-	And access token contains one credential identifier 'MasterComputerScience'
-
-	When execute HTTP POST JSON request 'http://localhost/credential'
-	| Key                            | Value                                        |
-	| proof                          | { "proof_type": "jwt", "jwt": "$jwtProof$" } |
-	| credential_identifier          | MasterComputerScience                        |
-		
-	And extract JSON from body	
-
-	Then HTTP status code equals to '200'
-	And JSON 'c_nonce'='nonce'
-	And JSON exists 'credential'

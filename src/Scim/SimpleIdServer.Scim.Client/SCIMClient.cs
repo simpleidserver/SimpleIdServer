@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -103,7 +104,7 @@ namespace SimpleIdServer.Scim.Client
             return RepresentationSerializer.DeserializeRepresentation(jsonObj);
         }
 
-        public async Task AddUser(JsonObject jsonObject, string accessToken, CancellationToken cancellationToken)
+        public async Task<SCIMErrorRepresentation> AddUser(JsonObject jsonObject, string accessToken, CancellationToken cancellationToken)
         {
             if (_resourceTypes == null) await GetResourceTypes(cancellationToken);
             var userEdp = _resourceTypes.Resources.Single(r => r.Name == "User").Endpoint;
@@ -116,8 +117,9 @@ namespace SimpleIdServer.Scim.Client
             if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", $"Bearer {accessToken}");
             var httpClient = GetHttpClient();
             var httpResult = await httpClient.SendAsync(request, cancellationToken);
-            httpResult.EnsureSuccessStatusCode();
-            
+            if (httpResult.IsSuccessStatusCode) return null;
+            var content = await httpResult.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<SCIMErrorRepresentation>(content);
         }
 
         private HttpClient GetHttpClient()
