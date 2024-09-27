@@ -11,15 +11,15 @@ public class EnrollViewModel : INotifyPropertyChanged
     {
         ScanQRCodeCommand = new Command(async () =>
         {
-            await navigationService.DisplayModal<QRCodeScannerPage>();
+            await navigationService.Navigate<QRCodeScannerPage>();
         });
         ViewOTPCommand = new Command((async () =>
         {
-            await navigationService.DisplayModal<ViewOtpListPage>();
+            await navigationService.Navigate<ViewOtpListPage>();
         }));
         ViewCredentialListCommand = new Command((async () =>
         {
-            await navigationService.DisplayModal<ViewCredentialListPage>();
+            await navigationService.Navigate<ViewCredentialListPage>();
         }));
     }
 

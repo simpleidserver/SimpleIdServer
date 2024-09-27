@@ -20,13 +20,8 @@
         <Grid ZIndex="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
-                <RowDefinition Height="9*" />
             </Grid.RowDefinitions>
-            <StackLayout Grid.Row="0" Style="{StaticResource modalToolbar}">
-                <ImageButton Command="{Binding Path=CloseCommand}" Style="{StaticResource modalToolbarClose}" />
-                <Label Style="{StaticResource modalToolbarTitle}">Scan QR Code</Label>
-            </StackLayout>
-            <zxing:CameraBarcodeReaderView x:Name="cameraBarCodeReader" Grid.Row="1">
+            <zxing:CameraBarcodeReaderView x:Name="cameraBarCodeReader" Grid.Row="0">
                 <zxing:CameraBarcodeReaderView.Behaviors>
                     <toolkit:EventToCommandBehavior EventName="BarcodesDetected" Command="{Binding ScanQRCodeCommand}" EventArgsConverter="{StaticResource barcodeDetectionEventArgsConverter}" />
                 </zxing:CameraBarcodeReaderView.Behaviors>
