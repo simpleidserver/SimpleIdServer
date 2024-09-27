@@ -107,6 +107,7 @@ public class ClientsController : BaseController
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.ClientIdentifierAlreadyExists, request.ClientId));
                     request.Scopes = await GetScopes(prefix, request.Scope, CancellationToken.None);
                     var realm = await _realmRepository.Get(prefix, cancellationToken);
+                    request.Realms.Clear();
                     request.Realms.Add(realm);
                     await _registerClientRequestValidator.Validate(prefix, request, CancellationToken.None);
                     _clientRepository.Add(request);
@@ -160,6 +161,25 @@ public class ClientsController : BaseController
             return new OkObjectResult(result);
         }
         catch(OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetByTechnicalId([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        try
+        {
+            id = System.Web.HttpUtility.UrlDecode(id);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Clients.Name);
+            var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+            if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+            return new OkObjectResult(result);
+        }
+        catch (OAuthException ex)
         {
             _logger.LogError(ex.ToString());
             return BuildError(ex);

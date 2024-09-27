@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MySqlConnector;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Did.Key;
@@ -39,6 +40,7 @@ using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
@@ -62,6 +64,20 @@ const string MYSQLCreateTableFormat =
                 "PRIMARY KEY(`Id`)," +
                 "KEY `Index_ExpiresAtTime` (`ExpiresAtTime`)" +
 ")";
+
+const string PostgreCreateSchemaAndTableSql =
+    $"""
+        CREATE SCHEMA IF NOT EXISTS "public";
+        CREATE TABLE IF NOT EXISTS "public"."DistributedCache"
+        (
+            "Id" text COLLATE pg_catalog."default" NOT NULL,
+            "Value" bytea,
+            "ExpiresAtTime" timestamp with time zone,
+            "SlidingExpirationInSeconds" double precision,
+            "AbsoluteExpiration" timestamp with time zone,
+            CONSTRAINT "DistCache_pkey" PRIMARY KEY ("Id")
+        )
+        """;
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
@@ -498,6 +514,13 @@ async void SeedData(WebApplication application, string scimBaseUrl)
         void EnableIsolationLevel(StoreDbContext dbContext)
         {
             if (dbContext.Database.IsInMemory()) return;
+            EnableSqlServer(dbContext);
+            EnableMysql(dbContext);
+            EnablePostgre(dbContext);
+        }
+
+        void EnableSqlServer(StoreDbContext dbContext)
+        {
             var dbConnection = dbContext.Database.GetDbConnection();
             var sqlConnection = dbConnection as SqlConnection;
             if (sqlConnection != null)
@@ -509,9 +532,12 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 cmd = sqlConnection.CreateCommand();
                 cmd.CommandText = SQLServerCreateTableFormat;
                 cmd.ExecuteNonQuery();
-                return;
             }
+        }
 
+        void EnableMysql(StoreDbContext dbContext)
+        {
+            var dbConnection = dbContext.Database.GetDbConnection();
             var mysqlConnection = dbConnection as MySqlConnector.MySqlConnection;
             if (mysqlConnection != null)
             {
@@ -519,7 +545,19 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 var cmd = mysqlConnection.CreateCommand();
                 cmd.CommandText = MYSQLCreateTableFormat;
                 cmd.ExecuteNonQuery();
-                return;
+            }
+        }
+
+        void EnablePostgre(StoreDbContext dbContext)
+        {
+            var dbConnection = dbContext.Database.GetDbConnection();
+            var postgreconnection = dbConnection as Npgsql.NpgsqlConnection;
+            if(postgreconnection != null)
+            {
+                if (postgreconnection.State != System.Data.ConnectionState.Open) postgreconnection.Open();
+                var cmd = postgreconnection.CreateCommand();
+                cmd.CommandText = PostgreCreateSchemaAndTableSql;
+                cmd.ExecuteNonQuery();
             }
         }
 

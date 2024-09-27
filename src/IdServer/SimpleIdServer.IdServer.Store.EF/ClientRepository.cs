@@ -17,6 +17,16 @@ public class ClientRepository : IClientRepository
         _dbContext = dbContext;
     }
 
+    public Task<Client> GetById(string realm, string id, CancellationToken cancellationToken)
+    {
+        return _dbContext.Clients
+                .Include(c => c.Scopes).ThenInclude(s => s.ClaimMappers)
+                .Include(c => c.SerializedJsonWebKeys)
+                .Include(c => c.Translations)
+                .Include(c => c.Realms)
+                .SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == realm), cancellationToken);
+    }
+
     public Task<Client> GetByClientId(string realm, string clientId, CancellationToken cancellationToken)
     {
         return _dbContext.Clients

@@ -476,6 +476,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addClient",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients,
                 defaults: new { controller = "Clients", action = "Add" });
+            webApplication.SidMapControllerRoute("getClientByTechnicalId",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/bytechnicalid/{id}",
+                defaults: new { controller = "Clients", action = "GetByTechnicalId" });
             webApplication.SidMapControllerRoute("getClient",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}",
                 defaults: new { controller = "Clients", action = "Get" });

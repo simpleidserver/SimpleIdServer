@@ -71,6 +71,17 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             return result.Select(r => r.ToDomain()).ToList();
         }
 
+        public async Task<Client> GetById(string realm, string id, CancellationToken cancellationToken)
+        {
+            var result = await _dbContext.Client.Queryable<SugarClient>()
+                .Includes(c => c.ClientScopes, c => c.Scope, s => s.ClaimMappers)
+                .Includes(c => c.SerializedJsonWebKeys)
+                .Includes(c => c.Translations)
+                .Includes(c => c.Realms)
+                .FirstAsync(c => c.Id == id && c.Realms.Any(r => r.RealmsName == realm), cancellationToken);
+            return result?.ToDomain();
+        }
+
         public async Task<Client> GetByClientId(string realm, string clientId, CancellationToken cancellationToken)
         {
             var result = await _dbContext.Client.Queryable<SugarClient>()

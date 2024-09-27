@@ -272,7 +272,7 @@ public class ClientEffects
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(action.ClientId)}"),
+            RequestUri = new Uri($"{baseUrl}/bytechnicalid/{action.Id}"),
             Method = HttpMethod.Get
         };
         var httpResult = await httpClient.SendAsync(requestMessage);
@@ -758,7 +758,8 @@ public class ClientEffects
         try
         {
             httpResult.EnsureSuccessStatusCode();
-            dispatcher.Dispatch(new AddClientSuccessAction { ClientId = client.ClientId, ClientName = client.ClientName, Language = client.Translations.FirstOrDefault()?.Language, ClientType = clientType, Pem = pemResult, JsonWebKeyStr = jsonWebKey });
+            var newClient = JsonSerializer.Deserialize<Client>(json);
+            dispatcher.Dispatch(new AddClientSuccessAction { Id = newClient.Id, ClientId = client.ClientId, ClientName = client.ClientName, Language = client.Translations.FirstOrDefault()?.Language, ClientType = clientType, Pem = pemResult, JsonWebKeyStr = jsonWebKey });
         }
         catch
         {
@@ -901,6 +902,7 @@ public class AddClientFailureAction
 
 public class AddClientSuccessAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public string? ClientName { get; set; } = null;
     public string? Language { get; set; } = null;
@@ -932,7 +934,7 @@ public class ToggleAllClientSelectionAction
 
 public class GetClientAction
 {
-    public string ClientId { get; set; } = null!;
+    public string Id { get; set; } = null!;
 }
 
 public class GetClientFailureAction
