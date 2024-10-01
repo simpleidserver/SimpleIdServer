@@ -113,7 +113,7 @@
                 dialogService.Close();
             });
             if (!userState.Value.IsLoading)
-                gridUsers.Reload();
+                gridUsers?.Reload();
         }
     }
 

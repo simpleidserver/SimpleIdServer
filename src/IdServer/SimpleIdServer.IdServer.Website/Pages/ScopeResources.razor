@@ -140,7 +140,7 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ScopeResourcesRemoved });
                 StateHasChanged();
             });
-            grid.Reload();
+            grid?.Reload();
         }
     }
 

@@ -76,7 +76,7 @@
                 StateHasChanged();
             });
             if (!searchIdProvidersState.Value.IsLoading)
-                idProvidersGrid.Reload();
+                idProvidersGrid?.Reload();
         }
     }
 

@@ -55,8 +55,6 @@
             </div>
         </div>
     </RadzenHeader>
-    @if(!isLoading)
-    {
         <RadzenSidebar @bind-Expanded="@sidebarExpanded">
             <RadzenPanelMenu>
                 <RadzenPanelMenuItem Text=@(string.Format(Global.ActiveRealm, activeRealm)) Path="@(urlHelper.GetUrl("/realm/overview"))" />
@@ -83,14 +81,16 @@
         </RadzenSidebar>
         <RadzenBody>
             <div class="p-2">
-                @Body
+                @if (isLoading)
+                {
+                    <h3>@Global.Loading</h3>
+                }
+                else
+                {
+                    @Body                    
+                }
             </div>
         </RadzenBody>
-    }
-    else
-    {
-        <h3>@Global.Loading</h3>
-    }
 </RadzenLayout>
 
 @code {
@@ -132,18 +132,13 @@
             });
             var authState = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
             userName = authState.User.Identity.Name;
+            this.isLoading = true;
+            dispatcher.Dispatch(new GetAllRealmAction());
+            dispatcher.Dispatch(new GetAllAuthMethodAction());
+            dispatcher.Dispatch(new GetLanguagesAction());
+            dispatcher.Dispatch(new GetAllRegistrationWorkflowsAction());
+            dispatcher.Dispatch(new GetAllAcrsAction());
+            dispatcher.Dispatch(new GetAllConfigurationDefinitionsAction());
         }
-    }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        this.isLoading = true;
-        dispatcher.Dispatch(new GetAllRealmAction());
-        dispatcher.Dispatch(new GetAllAuthMethodAction());
-        dispatcher.Dispatch(new GetLanguagesAction());
-        dispatcher.Dispatch(new GetAllRegistrationWorkflowsAction());
-        dispatcher.Dispatch(new GetAllAcrsAction());
-        dispatcher.Dispatch(new GetAllConfigurationDefinitionsAction());
     }
 }

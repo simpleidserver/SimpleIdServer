@@ -65,7 +65,7 @@
         if(firstRender)
         {
             if (!searchAuditingRecordsState.Value.IsLoading)
-                auditEvtsGrid.Reload();
+                auditEvtsGrid?.Reload();
         }
     }
 
@@ -92,6 +92,6 @@
     void DisplayErrors(bool a)
     {
         displayErrors = a;
-        auditEvtsGrid.Reload();
+        auditEvtsGrid?.Reload();
     }
 }

@@ -114,7 +114,7 @@
                 StateHasChanged();
             });
             if (!registrationWorkflowsState.Value.IsLoading && registrationWorkflowsGrid != null)
-                registrationWorkflowsGrid.Reload();
+                registrationWorkflowsGrid?.Reload();
         }
     }
 

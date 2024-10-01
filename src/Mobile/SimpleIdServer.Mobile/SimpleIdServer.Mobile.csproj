@@ -16,7 +16,8 @@
 		<!-- App Identifier -->
 		<ApplicationId>com.simpleidserver.mobile</ApplicationId>
 		<ApplicationIdGuid>0836bc02-cb16-4a23-9911-8d74c04e41e9</ApplicationIdGuid>
-		<ApplicationDisplayVersion>1.1</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>5.0.2</ApplicationDisplayVersion>
+		<ApplicationVersion>2</ApplicationVersion>
 		
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>

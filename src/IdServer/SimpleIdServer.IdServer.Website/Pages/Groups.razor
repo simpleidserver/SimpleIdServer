@@ -98,7 +98,7 @@
                 dialogService.Close();
             });
             if (!searchGroupsState.Value.IsLoading)
-                groupsGrid.Reload();
+                groupsGrid?.Reload();
         }
     }
 

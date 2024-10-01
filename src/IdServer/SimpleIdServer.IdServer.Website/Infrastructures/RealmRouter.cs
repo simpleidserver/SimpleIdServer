@@ -7,32 +7,57 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
 
 namespace SimpleIdServer.IdServer.Website.Infrastructures;
 
 public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
 {
+    string _baseUri;
+    string _locationAbsolute;
+    bool _navigationInterceptionEnabled;
     private RenderHandle _renderHandle;
     private Dictionary<Type, Dictionary<string, string>> _routeableComponents;
     internal static IServiceProvider _serviceProvider;
+    private CancellationTokenSource _onNavigateCts;
+    private Task _previousOnNavigateTask = Task.CompletedTask;
+    private IRoutingStateProvider? RoutingStateProvider { get; set; }
+
     [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] IServiceProvider ServiceProvider { get; set; }
+    [Inject] private IScrollToLocationHash ScrollToLocationHash { get; set; }
+    [Inject] private INavigationInterception NavigationInterception { get; set; }
     [Parameter] public Assembly AppAssembly { get; set; }
     [Parameter] public RenderFragment<RouteData> Found { get; set; }
     [Parameter] public RenderFragment NotFound { get; set; }
+    [Parameter] public RenderFragment? Navigating { get; set; }
+    [Parameter] public EventCallback<CustomNavigationContext> OnNavigateAsync { get; set; }
+    private bool _onNavigateCalled;
 
     public void Attach(RenderHandle renderHandle)
     {
         _renderHandle = renderHandle;
-        NavigationManager.LocationChanged += OnLocationChanged;
         _routeableComponents = GetRouteableComponents();
+        _baseUri = NavigationManager.BaseUri;
+        _locationAbsolute = NavigationManager.Uri;
+        NavigationManager.LocationChanged += OnLocationChanged;
+        RoutingStateProvider = ServiceProvider.GetService<IRoutingStateProvider>();
     }
 
     public async Task SetParametersAsync(ParameterView parameters)
     {
         parameters.SetParameterProperties(this);
         var locationPath = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        await Navigate(locationPath);
+        if (!_onNavigateCalled)
+        {
+            _onNavigateCalled = true;
+            await RunOnNavigateAsync(locationPath, false);
+        }
+        else
+        {
+            await Refresh(locationPath, false);
+        }
     }
 
     public void Dispose()
@@ -40,16 +65,61 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
 
-    public Task OnAfterRenderAsync()
+    public async Task OnAfterRenderAsync()
     {
-        return Task.CompletedTask;
+        if (!_navigationInterceptionEnabled)
+        {
+            _navigationInterceptionEnabled = true;
+            await NavigationInterception.EnableNavigationInterceptionAsync();
+        }
     }
 
-    private async Task Navigate(string locationPath)
+    private async Task RunOnNavigateAsync(string locationPath, bool isNavigationIntercepted)
     {
+        _onNavigateCts?.Cancel();
+        await _previousOnNavigateTask;
+        var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        _previousOnNavigateTask = tcs.Task;
+        if (!OnNavigateAsync.HasDelegate)
+        {
+            await Refresh(locationPath, isNavigationIntercepted);
+        }
+
+        _onNavigateCts = new CancellationTokenSource();
+        var navigateContext = new CustomNavigationContext(locationPath,  _onNavigateCts.Token);
+        var cancellationTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        navigateContext.CancellationToken.Register(state =>
+            ((TaskCompletionSource)state).SetResult(), cancellationTcs);
+
+        try
+        {
+            var task = await Task.WhenAny(OnNavigateAsync.InvokeAsync(navigateContext), cancellationTcs.Task);
+            await task;
+            tcs.SetResult();
+            await Refresh(locationPath, isNavigationIntercepted);
+        }
+        catch (Exception e)
+        {
+            _renderHandle.Render(builder => ExceptionDispatchInfo.Throw(e));
+        }
+    }
+
+    private async Task Refresh(string locationPath, bool isNavigationIntercepted)
+    {
+        if (_previousOnNavigateTask.Status != TaskStatus.RanToCompletion)
+        {
+            if (Navigating != null)
+            {
+                _renderHandle.Render(Navigating);
+            }
+            return;
+        }
+
+
         var options = _serviceProvider.GetRequiredService<IOptions<IdServerWebsiteOptions>>();
         var routeParameters = new Dictionary<string, object>();
         Type handlerContext = null;
+        var relativePath = NavigationManager.ToBaseRelativePath(_locationAbsolute);
         if (!options.Value.IsReamEnabled)
         {
             if (!locationPath.StartsWith("/"))
@@ -61,7 +131,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
             }
 
             var routeData = new RouteData(handlerContext, routeParameters);
-            _renderHandle.Render(Found(routeData));
+            _renderHandle.Render(Found(routeData)); 
             return;
         }
         else
@@ -85,7 +155,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         if(_renderHandle.IsInitialized && _routeableComponents != null)
         {
             var locationPath = NavigationManager.ToBaseRelativePath(args.Location);
-            _ = Navigate(locationPath);
+            _ = RunOnNavigateAsync((locationPath), args.IsNavigationIntercepted);
         }
     }
 
@@ -143,4 +213,24 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
 
         return dic;
     }
+}
+
+public class CustomNavigationContext
+{
+    public CustomNavigationContext(string path, CancellationToken cancellationToken)
+    {
+        Path = path;
+        CancellationToken = cancellationToken;
+    }
+
+    /// <summary>
+    /// The target path for the navigation.
+    /// </summary>
+    public string Path { get; }
+
+    /// <summary>
+    /// The <see cref="CancellationToken"/> to use to cancel navigation.
+    /// </summary>
+    public CancellationToken CancellationToken { get; }
+
 }

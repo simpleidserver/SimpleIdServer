@@ -108,7 +108,7 @@
                 await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
             });
             if (!searchCertificateAuthoritiesState.Value.IsLoading)
-                caGrid.Reload();
+                caGrid?.Reload();
         }
     }
 

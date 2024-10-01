@@ -98,7 +98,7 @@
                 StateHasChanged();
             });
             if (!clientState.Value.IsLoading)
-                clientsGrid.Reload();
+                clientsGrid?.Reload();
         }
     }
 

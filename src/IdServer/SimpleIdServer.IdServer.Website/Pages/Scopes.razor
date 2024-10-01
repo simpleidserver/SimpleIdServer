@@ -120,7 +120,7 @@
                 StateHasChanged();
             });
             if (!scopesState.Value.IsLoading)
-                scopesGrid.Reload();
+                scopesGrid?.Reload();
         }
     }
 
