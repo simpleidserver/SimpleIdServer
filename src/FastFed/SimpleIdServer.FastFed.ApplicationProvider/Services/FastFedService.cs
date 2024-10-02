@@ -18,8 +18,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -155,7 +153,17 @@ public class FastFedService : IFastFedService
         foreach(var provisioningProfile in provisioningProfiles)
         {
             var service = _provisioningServices.Single(s => s.Name == provisioningProfile);
-            var enableResult = await service.EnableCapability(idProviderFederation.EntityId, jwt, cancellationToken);
+            var enableResult = await service.EnableCapability(idProviderFederation, jwt, cancellationToken);
+            var claim = jwt.Claims.SingleOrDefault(c => c.Type == service.RegisterConfigurationName);
+            if(claim != null)
+            {
+                idProviderFederation.LastCapabilities.Configurations.Add(new CapabilitySettings
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    ProfileName = provisioningProfile,
+                    IdProviderConfiguration = claim.Value
+                });
+            }
             dic.Add(service.Name, enableResult);
         }
 
@@ -215,6 +223,10 @@ public class FastFedService : IFastFedService
             federation = new IdentityProviderFederation
             {
                 EntityId = metadata.IdentityProvider.EntityId,
+                DisplayName = metadata.IdentityProvider.DisplaySettings?.DisplayName,
+                IconUri = metadata.IdentityProvider.DisplaySettings?.IconUri,
+                LogoUri = metadata.IdentityProvider.DisplaySettings?.LogoUri,
+                License = metadata.IdentityProvider.DisplaySettings?.License,
                 Capabilities = new List<IdentityProviderFederationCapabilities>
                 {
                     new IdentityProviderFederationCapabilities

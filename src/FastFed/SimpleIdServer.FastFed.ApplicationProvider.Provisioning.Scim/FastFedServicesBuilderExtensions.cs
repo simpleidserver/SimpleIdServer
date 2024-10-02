@@ -13,9 +13,8 @@ public static class FastFedServicesBuilderExtensions
     public static FastFedServicesBuilder AddAppProviderScimProvisioning(this FastFedServicesBuilder builder, Action<ScimProvisioningOptions> cb)
     {
         builder.Services.Configure(cb);
-        builder.Services.RemoveAll<IGetProviderMetadataQuery>();
         builder.Services.AddTransient<IAppProviderProvisioningService, ScimProvisioningService>();
-        builder.Services.AddTransient<IGetProviderMetadataQuery, ScimGetProviderMetadataQuery>();
+        builder.Services.AddTransient<IProviderMetadataEnricher, ScimProviderMetadataEnricher>();
         return builder;
     }
 }

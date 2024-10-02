@@ -35,6 +35,7 @@ public class FastFedService : IFastFedService
     private readonly IFastFedClientFactory _fastFedClientFactory;
     private readonly IdServer.Helpers.IHttpClientFactory _httpClientFactory;
     private readonly IEnumerable<IIdProviderProvisioningService> _idProviderProvisioningServices;
+    private readonly IEnumerable<IFastFedEnricher> _enrichers;
     private readonly FastFedIdentityProviderOptions _options;
     private readonly ILogger<FastFedService> _logger;
 
@@ -44,6 +45,7 @@ public class FastFedService : IFastFedService
         IFastFedClientFactory fastFedClientFactory,
         IdServer.Helpers.IHttpClientFactory httpClientFactory,
         IEnumerable<IIdProviderProvisioningService> idProviderProvisioningServices,
+        IEnumerable<IFastFedEnricher> enrichers,
         IOptions<FastFedIdentityProviderOptions> options,
         ILogger<FastFedService> logger)
     {
@@ -52,6 +54,7 @@ public class FastFedService : IFastFedService
         _fastFedClientFactory = fastFedClientFactory;
         _httpClientFactory = httpClientFactory;
         _idProviderProvisioningServices = idProviderProvisioningServices;
+        _enrichers = enrichers;
         _options = options.Value;
         _logger = logger;
     }
@@ -88,6 +91,9 @@ public class FastFedService : IFastFedService
             claims.Add("provisioning_profiles", lastCapabilities.ProvisioningProfiles);
         if (lastCapabilities.AuthenticationProfiles != null && lastCapabilities.AuthenticationProfiles.Any())
             claims.Add("authentication_profiles", lastCapabilities.AuthenticationProfiles);
+        foreach(var enricher in _enrichers)
+            enricher.EnrichFastFedRequest(claims);
+
         securityTokenDescriptor.Claims = claims;
         var handler = new JsonWebTokenHandler();
         var token = handler.CreateToken(securityTokenDescriptor);

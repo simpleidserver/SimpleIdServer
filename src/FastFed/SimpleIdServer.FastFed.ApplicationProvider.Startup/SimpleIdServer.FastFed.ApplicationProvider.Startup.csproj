@@ -9,6 +9,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.8" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj" />

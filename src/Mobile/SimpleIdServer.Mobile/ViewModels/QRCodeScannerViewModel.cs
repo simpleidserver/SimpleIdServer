@@ -117,7 +117,7 @@ public class QRCodeScannerViewModel
         }
         catch(Exception ex)
         {
-            await _promptService.ShowAlert("Error", ex.ToString());
+            // await _promptService.ShowAlert("Error", ex.ToString());
             await _promptService.ShowAlert("Error", "An error occured while trying to parse the QR Code");
         }
         finally

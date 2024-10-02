@@ -3,6 +3,9 @@
 
 using Microsoft.Extensions.Options;
 using SimpleIdServer.FastFed.Resolvers;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
 
 namespace SimpleIdServer.FastFed.Apis.FastFedMetadata;
 
@@ -14,15 +17,19 @@ public interface IGetProviderMetadataQuery
 public class GetProviderMetadataQuery : IGetProviderMetadataQuery
 {
     private readonly IIssuerResolver _issuerResolver;
+    private readonly IEnumerable<IProviderMetadataEnricher> _providerMetadataEnrichers;
     private readonly FastFedOptions _options;
 
-    public GetProviderMetadataQuery(IIssuerResolver issuerResolver, IOptions<FastFedOptions> options)
+    public GetProviderMetadataQuery(IIssuerResolver issuerResolver,
+        IEnumerable<IProviderMetadataEnricher> providerMetadataEnrichers,
+        IOptions<FastFedOptions> options)
     {
         _issuerResolver = issuerResolver;
+        _providerMetadataEnrichers = providerMetadataEnrichers;
         _options = options.Value;
     }
 
-    public virtual SimpleIdServer.FastFed.Domains.ProviderMetadata Get()
+    public SimpleIdServer.FastFed.Domains.ProviderMetadata Get()
     {
         var result = new SimpleIdServer.FastFed.Domains.ProviderMetadata();
         var issuer = _issuerResolver.Get();
@@ -51,6 +58,8 @@ public class GetProviderMetadataQuery : IGetProviderMetadataQuery
                 DisplaySettings = _options.AppProvider.DisplaySettings,
                 ContactInformation = _options.AppProvider.ContactInformation
             };
+            foreach (var enricher in _providerMetadataEnrichers)
+                enricher.EnrichApplicationProvider(result.ApplicationProvider.OtherParameters);
         }
         return result;
     }

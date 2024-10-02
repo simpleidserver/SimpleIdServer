@@ -11,6 +11,10 @@ public class IdentityProviderFederation
     public string EntityId { get; set; } = null!;
     public string ProviderMetadataUrl { get; set; } = null;
     public string JwksUri { get; set; } = null!;
+    public string DisplayName { get; set; }
+    public string IconUri { get; set; }
+    public string LogoUri { get; set; }
+    public string License { get; set; }
     public DateTime CreateDateTime { get; set; }
     public List<IdentityProviderFederationCapabilities> Capabilities { get; set; }
     public IdentityProviderFederationCapabilities LastCapabilities

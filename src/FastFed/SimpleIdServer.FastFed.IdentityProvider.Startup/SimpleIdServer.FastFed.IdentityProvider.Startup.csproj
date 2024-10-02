@@ -7,6 +7,7 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj" />
 	  <ProjectReference Include="..\..\Webfinger\SimpleIdServer.Webfinger.Store.EF\SimpleIdServer.Webfinger.Store.EF.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj" />

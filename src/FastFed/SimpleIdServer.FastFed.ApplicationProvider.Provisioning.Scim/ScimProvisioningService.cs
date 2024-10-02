@@ -4,6 +4,7 @@ using MassTransit;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.IntegrationEvents;
+using SimpleIdServer.FastFed.Models;
 using SimpleIdServer.FastFed.Provisioning.Scim;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -25,7 +26,9 @@ public class ScimProvisioningService : IAppProviderProvisioningService
 
     public string Name => SimpleIdServer.FastFed.Provisioning.Scim.Constants.ProvisioningProfileName;
 
-    public async Task<JsonObject> EnableCapability(string entityId, JsonWebToken jwt, CancellationToken cancellationToken)
+    public string RegisterConfigurationName => SimpleIdServer.FastFed.Provisioning.Scim.Constants.ProvisioningProfileName;
+
+    public async Task<JsonObject> EnableCapability(IdentityProviderFederation identityProviderFederation, JsonWebToken jwt, CancellationToken cancellationToken)
     {
         var result = JsonObject.Parse(JsonSerializer.Serialize(new ScimEntrepriseRegistrationResult
         {
@@ -39,7 +42,7 @@ public class ScimProvisioningService : IAppProviderProvisioningService
         })).AsObject();
         await _busControl.Publish(new ScimClientCreatedIntegrationEvent
         {
-            EntityId = entityId,
+            EntityId = identityProviderFederation.EntityId,
             Scope = _options.Scope
         }, cancellationToken);
         return result;

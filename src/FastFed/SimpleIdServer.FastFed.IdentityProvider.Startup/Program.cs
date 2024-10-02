@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.FastFed;
 using SimpleIdServer.FastFed.IdentityProvider.Options;
 using SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim;
+using SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml;
 using SimpleIdServer.FastFed.IdentityProvider.Startup.Configurations;
 using SimpleIdServer.FastFed.Store.EF;
 using SimpleIdServer.Webfinger;
@@ -40,17 +41,17 @@ var fastFedBuilder = builder.Services.AddFastFed(o =>
         Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
         {
             ProvisioningProfiles = new List<string>
-        {
-            "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise"
-        },
+            {
+                "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise"
+            },
             SchemaGrammars = new List<string>
-        {
-            "urn:ietf:params:fastfed:1.0:schemas:scim:2.0"
-        },
+            {
+                "urn:ietf:params:fastfed:1.0:schemas:scim:2.0"
+            },
             SigningAlgorithms = new List<string>
-        {
-            "RS256"
-        }
+            {
+                "RS256"
+            }
         },
         ContactInformation = new SimpleIdServer.FastFed.Domains.ProviderContactInformation
         {
@@ -75,6 +76,10 @@ var fastFedBuilder = builder.Services.AddFastFed(o =>
         };
     }) // support scim provisioning
     .AddIdProviderScimProvisioning()
+    .AddIdProviderSamlAuthentication(o =>
+    {
+        o.SamlMetadataUri = "https://localhost:5020/saml-metadata.xml";
+    })
     .UseDefaultIdProviderSecurity(authOptions);
 ConfigureMessageBroker(fastFedBuilder);
 
