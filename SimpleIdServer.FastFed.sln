@@ -65,6 +65,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.Prov
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OpenIdConnect", "src\IdServer\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj", "{CEB19494-415B-41D5-8602-68FACF09584A}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml", "src\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml.csproj", "{D32DC695-25A0-4B76-A70D-585F516E052E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.Authentication.Saml", "src\FastFed\SimpleIdServer.FastFed.Authentication.Saml\SimpleIdServer.FastFed.Authentication.Saml.csproj", "{419C42B1-6A41-4A43-AA46-379C336B3097}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml", "src\FastFed\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.csproj", "{72BAA8FC-8418-41EA-9F12-F1ABC8C7F7A5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Saml.Sp", "src\IdServer\SimpleIdServer.IdServer.Saml.Sp\SimpleIdServer.IdServer.Saml.Sp.csproj", "{4104E18C-467E-4BA0-B8AE-925E37AEBF22}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -167,6 +175,22 @@ Global
 		{CEB19494-415B-41D5-8602-68FACF09584A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEB19494-415B-41D5-8602-68FACF09584A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEB19494-415B-41D5-8602-68FACF09584A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D32DC695-25A0-4B76-A70D-585F516E052E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D32DC695-25A0-4B76-A70D-585F516E052E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D32DC695-25A0-4B76-A70D-585F516E052E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D32DC695-25A0-4B76-A70D-585F516E052E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{419C42B1-6A41-4A43-AA46-379C336B3097}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{419C42B1-6A41-4A43-AA46-379C336B3097}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{419C42B1-6A41-4A43-AA46-379C336B3097}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{419C42B1-6A41-4A43-AA46-379C336B3097}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72BAA8FC-8418-41EA-9F12-F1ABC8C7F7A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72BAA8FC-8418-41EA-9F12-F1ABC8C7F7A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72BAA8FC-8418-41EA-9F12-F1ABC8C7F7A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72BAA8FC-8418-41EA-9F12-F1ABC8C7F7A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4104E18C-467E-4BA0-B8AE-925E37AEBF22}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4104E18C-467E-4BA0-B8AE-925E37AEBF22}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4104E18C-467E-4BA0-B8AE-925E37AEBF22}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4104E18C-467E-4BA0-B8AE-925E37AEBF22}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -198,6 +222,10 @@ Global
 		{2901CE30-D083-467C-BF98-2420BBDDCC83} = {8F53AA7D-1C00-47B7-8D30-3288FE4991E3}
 		{2B8866B4-2180-47F8-B7FD-273AA1B3EA8B} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
 		{CEB19494-415B-41D5-8602-68FACF09584A} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
+		{D32DC695-25A0-4B76-A70D-585F516E052E} = {F627344E-4F16-4556-B987-82B37B5CB7B0}
+		{419C42B1-6A41-4A43-AA46-379C336B3097} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
+		{72BAA8FC-8418-41EA-9F12-F1ABC8C7F7A5} = {E7858D10-1FFB-4682-98E1-DA5DBD40BC17}
+		{4104E18C-467E-4BA0-B8AE-925E37AEBF22} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFEA5C5B-33EB-4AEC-BB66-20E5AD9C228D}
