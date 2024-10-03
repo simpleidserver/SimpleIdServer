@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SimpleIdServer.Mobile.InfoPage"
              Title="Info">
-    <StackLayout Spacing="5">
+    <StackLayout Spacing="5" BackgroundColor="{StaticResource BackgroundColor}">
         <StackLayout Spacing="10" Padding="10">
             <Label FontAttributes="Bold">URL</Label>
             <Label>https://github.com/simpleidserver/SimpleIdServer</Label>

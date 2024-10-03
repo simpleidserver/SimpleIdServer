@@ -2,20 +2,32 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:SimpleIdServer.Mobile.ViewModels"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:DataType="local:DidsViewModel"
              x:Class="SimpleIdServer.Mobile.DidsPage"
              xmlns:components="clr-namespace:SimpleIdServer.Mobile.Components"
              xmlns:models="clr-namespace:SimpleIdServer.Mobile.Models"
              xmlns:common="clr-namespace:SimpleIdServer.Mobile.Common"
              Title="DIDs">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter"></toolkit:InvertedBoolConverter>
+        </ResourceDictionary>
+    </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem Order="Primary" Text="Add" Command="{Binding Path=AddCommand}"></ToolbarItem>
         <ToolbarItem Order="Primary" Text="Active" Command="{Binding Path=SetActiveCommand}"></ToolbarItem>
         <ToolbarItem Order="Primary" Text="Delete" Command="{Binding Path=DeleteCommand}"></ToolbarItem>
     </ContentPage.ToolbarItems>
-    <Grid Margin="20">
+    <Grid Padding="20" BackgroundColor="{StaticResource BackgroundColor}">
         <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
-        <CollectionView ItemsSource="{Binding Path=Dids}">
+        <StackLayout IsVisible="{Binding Path=AtLeastOneDid, Converter={StaticResource InvertedBoolConverter}}" Padding="10">
+            <ContentView Style="{StaticResource noRecord}">
+                <Image Source="did.png" HorizontalOptions="Center" Aspect="AspectFit" />
+            </ContentView>
+            <Label Text="There is no distributed identity. Click 'Add' to generate a new one." HorizontalOptions="Center"/>
+        </StackLayout>
+        <CollectionView IsVisible="{Binding Path=AtLeastOneDid}" ItemsSource="{Binding Path=Dids}">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
                     <Border Margin="5" x:DataType="models:DidRecord">

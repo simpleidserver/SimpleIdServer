@@ -7,7 +7,7 @@
              x:DataType="local:ProfileViewModel"
              x:Class="SimpleIdServer.Mobile.ProfilePage"
              Title="Profile">
-    <Grid>
+    <Grid BackgroundColor="{StaticResource BackgroundColor}">
         <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
         <StackLayout Spacing="5">
             <StackLayout Spacing="10" Padding="10">

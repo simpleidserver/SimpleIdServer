@@ -20,12 +20,14 @@
         <Grid ZIndex="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
+                <RowDefinition Height="auto" />
             </Grid.RowDefinitions>
             <zxing:CameraBarcodeReaderView x:Name="cameraBarCodeReader" Grid.Row="0">
                 <zxing:CameraBarcodeReaderView.Behaviors>
                     <toolkit:EventToCommandBehavior EventName="BarcodesDetected" Command="{Binding ScanQRCodeCommand}" EventArgsConverter="{StaticResource barcodeDetectionEventArgsConverter}" />
                 </zxing:CameraBarcodeReaderView.Behaviors>
             </zxing:CameraBarcodeReaderView>
+            <Button Text="Close" Grid.Row="1" Command="{Binding Path=CloseCommand}"></Button>
         </Grid>
     </Grid>
 </ContentPage>

@@ -40,7 +40,7 @@
                                     <OrientationStateTrigger Orientation="Portrait"></OrientationStateTrigger>
                                 </VisualState.StateTriggers>
                                 <VisualState.Setters>
-                                    <Setter Property="BackgroundColor" Value="#E1E1E1" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource BackgroundColor}" />
                                 </VisualState.Setters>
                             </VisualState>
                             <VisualState x:Name="Landscape">

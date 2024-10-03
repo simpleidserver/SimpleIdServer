@@ -11,14 +11,21 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <converters:StringToColorConverter x:Key="StringToColor" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
     <ContentPage.ToolbarItems>
         <ToolbarItem Order="Primary" Text="Delete" Command="{Binding Path=DeleteCommand}"></ToolbarItem>
     </ContentPage.ToolbarItems>
-    <Grid Margin="10">
+    <Grid Padding="10" BackgroundColor="{StaticResource BackgroundColor}">
         <common:Loader IsVisible="{Binding Path=IsLoading}" ZIndex="2" />
-        <CollectionView x:Name="collectionView" ItemsSource="{Binding Path=VerifiableCredentials}" SelectionMode="None">
+        <StackLayout IsVisible="{Binding Path=AtLeastOneVerifiableCredential, Converter={StaticResource InvertedBoolConverter}}" VerticalOptions="Center" Spacing="10">
+            <ContentView Style="{StaticResource noRecord}">
+                <Image Source="nowallet.png" HorizontalOptions="Center" Aspect="AspectFit" />
+            </ContentView>
+            <Label Text="Your electronic wallet doesn't contain a verifiable credential. Scan a QR code from a trusted issuer to enroll the credential" HorizontalOptions="Center"/>
+        </StackLayout>
+        <CollectionView IsVisible="{Binding Path=AtLeastOneVerifiableCredential}" x:Name="collectionView" ItemsSource="{Binding Path=VerifiableCredentials}" SelectionMode="None">
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="5" />
             </CollectionView.ItemsLayout>
