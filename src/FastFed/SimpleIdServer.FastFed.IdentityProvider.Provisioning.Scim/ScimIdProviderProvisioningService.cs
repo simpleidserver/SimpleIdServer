@@ -39,9 +39,11 @@ public class ScimIdProviderProvisioningService : IIdProviderProvisioningService
     }
 
     public string Name => SimpleIdServer.FastFed.Provisioning.Scim.Constants.ProvisioningProfileName;
-    
+
+    public string RegisterConfigurationName => SimpleIdServer.FastFed.Provisioning.Scim.Constants.ProvisioningProfileName;
+
     public string Area => Constants.Areas.Scim;
-    
+
     public async Task<MigrationResult> Migrate(ProvisioningProfileHistory provisioningProfileHistory, CapabilitySettings settings, CancellationToken cancellationToken)
     {
         var result = new MigrationResult(); ;
@@ -131,6 +133,11 @@ public class ScimIdProviderProvisioningService : IIdProviderProvisioningService
         }
 
         return result;
+    }
+
+    public Task EnableCapability(IdentityProviderFederation identityProviderFederation, CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 
     private async Task<string> GetScimAccessToken(HttpClient httpClient, ScimEntrepriseRegistrationResult configuration, ScimProvisioningConfiguration scimProvisioningConfiguration, CancellationToken cancellationToken)

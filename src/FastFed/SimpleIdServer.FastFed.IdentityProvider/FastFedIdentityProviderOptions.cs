@@ -3,6 +3,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
 
 namespace SimpleIdServer.FastFed.IdentityProvider;
 

@@ -26,7 +26,6 @@ public class DynamicSamlAuthenticationSchemeProvider : AuthenticationSchemeProvi
     private readonly IBusControl _busControl;
     private readonly IServiceProvider _serviceProvider;
     private readonly SamlAuthenticationOptions _samlAuthOptions;
-    private readonly SamlSpOptions _samlSpOptions;
     private DateTime? _nextExpirationTime;
     private IEnumerable<AuthSchemeProvider> _cachedAuthSchemeProviders;
     private object _lck = new object();
@@ -35,13 +34,11 @@ public class DynamicSamlAuthenticationSchemeProvider : AuthenticationSchemeProvi
         IBusControl busControl,
         IServiceProvider serviceProvider,
         IOptions<SamlAuthenticationOptions> samlAuthOptions,
-        IOptions<SamlSpOptions> samlSpOptions,
         IOptions<AuthenticationOptions> options) : base(options)
     {
         _busControl = busControl;
         _serviceProvider = serviceProvider;
         _samlAuthOptions = samlAuthOptions.Value;
-        _samlSpOptions = samlSpOptions.Value;
     }
 
     public async override Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
@@ -80,12 +77,12 @@ public class DynamicSamlAuthenticationSchemeProvider : AuthenticationSchemeProvi
             var handlerType = typeof(SamlSpHandler);
             var options = new SamlSpOptions
             {
-                SPId = _samlSpOptions.SPId,
+                SPId = _samlAuthOptions.SpId,
                 IdpMetadataUrl = provider.SamlMetadataUri,
-                SigningCertificate = _samlSpOptions.SigningCertificate
+                SigningCertificate = _samlAuthOptions.SigningCertificate
             };
             if (options.Backchannel == null)
-                options.Backchannel = new HttpClient(_samlSpOptions.BackchannelHttpHandler ?? new HttpClientHandler());
+                options.Backchannel = new HttpClient(_samlAuthOptions.BackchannelHttpHandler ?? new HttpClientHandler());
             return new SamlAuthenticationScheme(new AuthenticationScheme(provider.Name, provider.DisplayName, handlerType), options);
         }
     }

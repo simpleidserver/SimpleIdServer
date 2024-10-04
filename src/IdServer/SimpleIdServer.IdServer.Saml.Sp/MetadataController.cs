@@ -45,8 +45,7 @@ public class MetadataController : Controller
             {
             }
         };
-        entityDescriptor.ContactPersons = _options.ContactPersons;
-        
+        entityDescriptor.ContactPersons = _options.ContactPersons;        
         return new Saml2Metadata(entityDescriptor).CreateMetadata().ToActionResult();
     }
 

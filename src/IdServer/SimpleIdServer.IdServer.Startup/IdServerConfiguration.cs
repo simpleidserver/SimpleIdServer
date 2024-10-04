@@ -287,6 +287,7 @@ namespace SimpleIdServer.IdServer.Startup
                 .Build(),
             ClientBuilder.BuildApiClient("scimClient", "password").AddScope(ScimScope)
                 .Build(),
+            ClientBuilder.BuildApiClient("fastFed", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Clients).Build(),
             ClientBuilder.BuildApiClient("managementClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Users).AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.Register).Build(),
             ClientBuilder.BuildDeviceClient("deviceClient", "password").AddScope(SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.StandardScopes.Profile).Build(),
             SamlSpClientBuilder.BuildSamlSpClient("samlSp", "http://localhost:5125/Metadata").Build()

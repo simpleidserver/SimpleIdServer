@@ -10,6 +10,8 @@ namespace SimpleIdServer.FastFed;
 public interface IIdProviderProvisioningService
 {
     string Name { get; }
+    string RegisterConfigurationName { get; }
     string Area { get; }
     Task<MigrationResult> Migrate(ProvisioningProfileHistory provisioningProfileHistory, CapabilitySettings settings, CancellationToken cancellationToken);
+    Task EnableCapability(IdentityProviderFederation identityProviderFederation, CancellationToken cancellationToken);
 }

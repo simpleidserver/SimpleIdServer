@@ -164,7 +164,7 @@ public class FastFedService : IFastFedService
                     IdProviderConfiguration = claim.Value
                 });
             }
-            dic.Add(service.Name, enableResult);
+            dic.Add(service.RegisterConfigurationName, enableResult);
         }
 
         idProviderFederation.LastCapabilities.Status = IdentityProviderStatus.CONFIRMED;

@@ -73,6 +73,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.Iden
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Saml.Sp", "src\IdServer\SimpleIdServer.IdServer.Saml.Sp\SimpleIdServer.IdServer.Saml.Sp.csproj", "{4104E18C-467E-4BA0-B8AE-925E37AEBF22}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid", "src\FastFed\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid.csproj", "{A744CC8C-0C91-4826-85C4-20877185FF30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +193,10 @@ Global
 		{4104E18C-467E-4BA0-B8AE-925E37AEBF22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4104E18C-467E-4BA0-B8AE-925E37AEBF22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4104E18C-467E-4BA0-B8AE-925E37AEBF22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A744CC8C-0C91-4826-85C4-20877185FF30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A744CC8C-0C91-4826-85C4-20877185FF30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A744CC8C-0C91-4826-85C4-20877185FF30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A744CC8C-0C91-4826-85C4-20877185FF30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -226,6 +232,7 @@ Global
 		{419C42B1-6A41-4A43-AA46-379C336B3097} = {CDB564B6-1FB0-4F6C-87FE-FF79A6FDFF64}
 		{72BAA8FC-8418-41EA-9F12-F1ABC8C7F7A5} = {E7858D10-1FFB-4682-98E1-DA5DBD40BC17}
 		{4104E18C-467E-4BA0-B8AE-925E37AEBF22} = {CC647F05-F14B-4D2C-84ED-E8E76EA6EFE1}
+		{A744CC8C-0C91-4826-85C4-20877185FF30} = {E7858D10-1FFB-4682-98E1-DA5DBD40BC17}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {AFEA5C5B-33EB-4AEC-BB66-20E5AD9C228D}

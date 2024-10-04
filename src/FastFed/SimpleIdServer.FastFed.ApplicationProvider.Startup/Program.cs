@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.FastFed;
 using SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml;
 using SimpleIdServer.FastFed.ApplicationProvider.Options;
 using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
@@ -64,6 +65,7 @@ builder.Services.AddFastFed(cb =>
     };
 })
     .AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore())
+    .UseDefaultAppProviderSecurity(authOptions: authOptions)
     .AddAppProviderScimProvisioning(cb =>
     {
         cb.ScimServiceUri = scimOptions.Url;
@@ -89,6 +91,7 @@ builder.Services.AddFastFed(cb =>
     .AddSamlAppProviderAuthenticationProfile(cb =>
     {
         cb.SamlMetadataUri = "https://localhost:5021/saml-metadata.xml";
+        cb.SigningCertificate = KeyGenerator.GenerateSelfSignedCertificate();
         cb.Mappings = new SamlEntrepriseMappingsResult
         {
             SamlSubject = new SamlSubject
@@ -110,8 +113,7 @@ builder.Services.AddFastFed(cb =>
                 }
             }
         };
-    })
-    .UseDefaultAppProviderSecurity(authOptions: authOptions);
+    });
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

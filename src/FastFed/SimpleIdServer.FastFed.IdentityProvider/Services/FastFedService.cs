@@ -116,9 +116,11 @@ public class FastFedService : IFastFedService
             var jsonObj = JsonObject.Parse(json).AsObject();
             foreach (var rec in jsonObj)
             {
-                var conf = providerFederation.LastCapabilities.Configurations.SingleOrDefault(c => c.ProfileName == rec.Key);
-                if (conf == null) continue;
+                var service = _idProviderProvisioningServices.SingleOrDefault(p => p.RegisterConfigurationName == rec.Key);
+                if (service == null) continue;
+                var conf = providerFederation.LastCapabilities.Configurations.Single(c => c.ProfileName == service.Name);
                 conf.AppProviderHandshakeRegisterConfiguration = jsonObj[rec.Key].ToJsonString();
+                await service.EnableCapability(providerFederation, cancellationToken);
             }
 
             providerFederation.LastCapabilities.Status = Models.IdentityProviderStatus.CONFIRMED;

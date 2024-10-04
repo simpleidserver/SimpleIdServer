@@ -12,6 +12,7 @@ public static class FastFedServicesBuilderExtensions
     {
         builder.Services.Configure(cb);
         builder.Services.AddTransient<IFastFedEnricher, SamlAuthenticationFastFedEnricher>();
+        builder.Services.AddTransient<IIdProviderProvisioningService, SamlIdProviderProvisioningService>();
         return builder;
     }
 }

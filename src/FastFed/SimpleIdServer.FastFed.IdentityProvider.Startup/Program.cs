@@ -15,6 +15,7 @@ using SimpleIdServer.Webfinger;
 using SimpleIdServer.Webfinger.Builders;
 using System.Collections.Generic;
 using System.Security.Cryptography;
+using SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
@@ -42,7 +43,8 @@ var fastFedBuilder = builder.Services.AddFastFed(o =>
         {
             ProvisioningProfiles = new List<string>
             {
-                "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise"
+                "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise",
+                "urn:ietf:params:fastfed:1.0:provisioning:saml:2.0:enterprise"
             },
             SchemaGrammars = new List<string>
             {
@@ -78,7 +80,13 @@ var fastFedBuilder = builder.Services.AddFastFed(o =>
     .AddIdProviderScimProvisioning()
     .AddIdProviderSamlAuthentication(o =>
     {
-        o.SamlMetadataUri = "https://localhost:5020/saml-metadata.xml";
+        o.SamlMetadataUri = "https://openid.simpleidserver.com/master/saml/metadata";
+    })
+    .AddSidSamlAuthentication(o =>
+    {
+        o.ClientId = "fastFed";
+        o.ClientSecret = "password";
+        o.SidBaseUrl = "https://localhost:5001/master";
     })
     .UseDefaultIdProviderSecurity(authOptions);
 ConfigureMessageBroker(fastFedBuilder);
