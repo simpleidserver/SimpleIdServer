@@ -360,22 +360,22 @@
     void GenerateSigKey(SigKeyGenerationForm form)
     {
         keyIsGenerated = false;
-        dispatcher.Dispatch(new GenerateSigKeyAction { Alg = form.Alg, ClientId = Client.ClientId, KeyId = form.KeyId, KeyType = form.KeyType });
+        dispatcher.Dispatch(new GenerateSigKeyAction { Id = Client.Id, Alg = form.Alg, ClientId = Client.ClientId, KeyId = form.KeyId, KeyType = form.KeyType });
     }
 
     void GenerateEncKey(EncKeyGenerationForm form)
     {
         keyIsGenerated = false;
-        dispatcher.Dispatch(new GenerateEncKeyAction { Alg = form.Alg, ClientId = Client.ClientId, KeyId = form.KeyId, KeyType = form.KeyType, Enc = form.Enc });
+        dispatcher.Dispatch(new GenerateEncKeyAction { Id = Client.Id, Alg = form.Alg, ClientId = Client.ClientId, KeyId = form.KeyId, KeyType = form.KeyType, Enc = form.Enc });
     }
 
     void SaveSigKey()
     {
-        dispatcher.Dispatch(new AddSigKeyAction { Alg = generatedSigKey.Alg, ClientId = Client.ClientId, Credentials = generatedSigKey.Credentials, KeyId = generatedSigKey.KeyId, KeyType = generatedSigKey.KeyType });
+        dispatcher.Dispatch(new AddSigKeyAction { Id = Client.Id, Alg = generatedSigKey.Alg, ClientId = Client.ClientId, Credentials = generatedSigKey.Credentials, KeyId = generatedSigKey.KeyId, KeyType = generatedSigKey.KeyType });
     }
 
     void SaveEncKey()
     {
-        dispatcher.Dispatch(new AddEncKeyAction { Alg = generatedEncKey.Alg, ClientId = Client.ClientId, Credentials = generatedEncKey.Credentials, KeyId = generatedEncKey.KeyId, KeyType = generatedEncKey.KeyType, Enc = generatedEncKey.Enc });
+        dispatcher.Dispatch(new AddEncKeyAction { Id = Client.Id, Alg = generatedEncKey.Alg, ClientId = Client.ClientId, Credentials = generatedEncKey.Credentials, KeyId = generatedEncKey.KeyId, KeyType = generatedEncKey.KeyType, Enc = generatedEncKey.Enc });
     }
 }

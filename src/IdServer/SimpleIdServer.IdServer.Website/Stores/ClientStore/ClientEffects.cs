@@ -252,17 +252,17 @@ public class ClientEffects
     {
         var baseUrl = await GetClientsUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
-        foreach(var clientId in action.ClientIds)
+        foreach(var clientId in action.Ids)
         {
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(clientId)}"),
+                RequestUri = new Uri($"{baseUrl}/{clientId}"),
                 Method = HttpMethod.Delete
             };
             await httpClient.SendAsync(requestMessage);
         }
 
-        dispatcher.Dispatch(new RemoveSelectedClientsSuccessAction { ClientIds = action.ClientIds });
+        dispatcher.Dispatch(new RemoveSelectedClientsSuccessAction { Ids = action.Ids });
     }
 
     [EffectMethod]
@@ -344,7 +344,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -397,7 +397,7 @@ public class ClientEffects
         {
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/scopes/{scopeName}"),
+                RequestUri = new Uri($"{baseUrl}/{act.Id}/scopes/{scopeName}"),
                 Method = HttpMethod.Delete
             };
             await httpClient.SendAsync(requestMessage);
@@ -415,7 +415,7 @@ public class ClientEffects
         {
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/scopes"),
+                RequestUri = new Uri($"{baseUrl}/{act.Id}/scopes"),
                 Method = HttpMethod.Post,
                 Content = new StringContent(JsonSerializer.Serialize(new AddClientScopeRequest
                 {
@@ -435,7 +435,7 @@ public class ClientEffects
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/sigkey/generate"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/sigkey/generate"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(new GenerateSigKeyRequest
             {
@@ -480,7 +480,7 @@ public class ClientEffects
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/enckey/generate"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/enckey/generate"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(new GenerateEncKeyRequest
             {
@@ -524,7 +524,7 @@ public class ClientEffects
         var jsonWebKey = act.Credentials.SerializePublicJWK();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/sigkey"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/sigkey"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(new AddSigKeyRequest
             {
@@ -546,7 +546,7 @@ public class ClientEffects
         var jsonWebKey = act.Credentials.SerializePublicJWK();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/enckey"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/enckey"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(new AddSigKeyRequest
             {
@@ -569,7 +569,7 @@ public class ClientEffects
         {
             var requestMessage = new HttpRequestMessage
             {
-                RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/keys/{keyId}"),
+                RequestUri = new Uri($"{baseUrl}/{act.Id}/keys/{keyId}"),
                 Method = HttpMethod.Delete
             };
             await httpClient.SendAsync(requestMessage);
@@ -601,7 +601,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -625,7 +625,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/credentials"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/credentials"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -654,7 +654,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/roles"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/roles"),
             Method = HttpMethod.Post,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -695,7 +695,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/advanced"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/advanced"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -735,7 +735,7 @@ public class ClientEffects
         };
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{baseUrl}/{System.Web.HttpUtility.UrlEncode(act.ClientId)}/realms"),
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/realms"),
             Method = HttpMethod.Put,
             Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
         };
@@ -913,12 +913,12 @@ public class AddClientSuccessAction
 
 public class RemoveSelectedClientsAction 
 {
-    public IEnumerable<string> ClientIds { get; set; } = new List<string>();
+    public IEnumerable<string> Ids { get; set; } = new List<string>();
 }
 
 public class RemoveSelectedClientsSuccessAction
 {
-    public IEnumerable<string> ClientIds { get; set; } = new List<string>();
+    public IEnumerable<string> Ids { get; set; } = new List<string>();
 }
 
 public class ToggleClientSelectionAction
@@ -949,6 +949,7 @@ public class GetClientSuccessAction
 
 public class UpdateClientDetailsAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public string? ClientName { get; set; } = null;
     public string? RedirectionUrls { get; set; } = null;
@@ -1024,6 +1025,7 @@ public class ToggleClientScopeSelectionAction
 
 public class RemoveSelectedClientScopesAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public IEnumerable<string> ScopeNames { get; set; } = new List<string>();
 }
@@ -1048,6 +1050,7 @@ public class ToggleAllEditableClientScopeSelectionAction
 
 public class AddClientScopesAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public IEnumerable<SimpleIdServer.IdServer.Domains.Scope> Scopes { get; set; } = new List<SimpleIdServer.IdServer.Domains.Scope>();
 }
@@ -1060,6 +1063,7 @@ public class AddClientScopesSuccessAction
 
 public class GenerateSigKeyAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public string KeyId { get; set; } = null!;
     public SecurityKeyTypes KeyType { get; set; }
@@ -1089,6 +1093,7 @@ public class GenerateEncKeySuccessAction
 
 public class GenerateEncKeyAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public string KeyId { get; set; } = null!;
     public SecurityKeyTypes KeyType { get; set; }
@@ -1103,6 +1108,7 @@ public class GenerateKeyFailureAction
 
 public class AddSigKeyAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public string KeyId { get; set; } = null!;
     public string Alg { get; set; } = null!;
@@ -1112,6 +1118,7 @@ public class AddSigKeyAction
 
 public class AddEncKeyAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public string KeyId { get; set; } = null!;
     public string Alg { get; set; } = null!;
@@ -1152,6 +1159,7 @@ public class ToggleClientKeySelectionAction
 
 public class RemoveSelectedClientKeysAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public IEnumerable<string> KeyIds { get; set; } = new List<string>();
 }
@@ -1164,6 +1172,7 @@ public class RemoveSelectedClientKeysSuccessAction
 
 public class UpdateJWKSUrlAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public string JWKSUrl { get; set; } = null!;
     public SimpleIdServer.IdServer.Domains.Client Client { get; set; } = null!;
@@ -1177,6 +1186,7 @@ public class UpdateJWKSUrlSuccessAction
 
 public class UpdateClientCredentialsAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; }
     public string AuthMethod { get; set; } = null!;
     public string? ClientSecret { get; set; } = null;
@@ -1199,6 +1209,7 @@ public class UpdateClientCredentialsSuccessAction
 
 public class AddClientRoleAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
@@ -1227,6 +1238,7 @@ public class ToggleAllClientRolesAction
 
 public class UpdateAdvancedClientSettingsAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; } = null!;
     public string? TokenSignedResponseAlg { get; set; }
     public string? IdTokenSignedResponseAlg { get; set; }
@@ -1271,6 +1283,7 @@ public class StartGenerateClientKeyAction { }
 
 public class UpdateClientRealmsAction
 {
+    public string Id { get; set; }
     public string ClientId { get; set; }
     public List<string> Realms { get; set; }
 }

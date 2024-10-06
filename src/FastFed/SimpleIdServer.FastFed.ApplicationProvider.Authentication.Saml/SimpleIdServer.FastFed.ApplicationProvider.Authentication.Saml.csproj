@@ -5,6 +5,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\IdServer\SimpleIdServer.IdServer.Saml.Sp\SimpleIdServer.IdServer.Saml.Sp.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.Authentication.Saml\SimpleIdServer.FastFed.Authentication.Saml.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj" />
 	</ItemGroup>

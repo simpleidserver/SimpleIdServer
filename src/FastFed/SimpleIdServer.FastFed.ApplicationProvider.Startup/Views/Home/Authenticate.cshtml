@@ -1,0 +1,30 @@
+﻿@model SimpleIdServer.FastFed.ApplicationProvider.UIs.ViewModels.AuthenticateViewModel
+@using SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources
+
+@{
+    ViewBag.Title = AuthenticateResource.Title;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div>
+    <div class="card">
+        <div class="card-body">
+            <div>
+                <a class="btn btn-secondary" href="@Url.Action("Login", "Home")">@AuthenticateResource.Authenticate</a>
+            </div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <div>
+                <ul class="extauth">
+                    @foreach(var provider in Model.ExternalIdProviders)
+                    {
+                        <li>
+                            <a class="btn btn-secondary" href="@Url.Action("ExternalLogin", "Home", new { scheme = provider.AuthenticationScheme })">@provider.DisplayName</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

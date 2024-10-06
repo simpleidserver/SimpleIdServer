@@ -138,7 +138,7 @@
         if (a.Value.Equals(1))
         {
             var scopeNames = clientScopesState.Value.Scopes.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
-            var act = new RemoveSelectedClientScopesAction { ScopeNames = scopeNames, ClientId = Client.ClientId };
+            var act = new RemoveSelectedClientScopesAction { Id = Client.Id, ScopeNames = scopeNames, ClientId = Client.ClientId };
             dispatcher.Dispatch(act);
             contextMenuService.Close();
         }

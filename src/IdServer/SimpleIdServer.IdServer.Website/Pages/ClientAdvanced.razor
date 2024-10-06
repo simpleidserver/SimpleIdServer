@@ -196,6 +196,7 @@
     {
         dispatcher.Dispatch(new UpdateAdvancedClientSettingsAction
         {
+            Id = Client.Id,
             AuthorizationDataTypes = client.AuthorizationDataTypes,
             AuthorizationSignedResponseAlg = client.AuthorizationSignedResponseAlg,
             TokenSignedResponseAlg = client.TokenSignedResponseAlg,

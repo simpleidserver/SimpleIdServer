@@ -68,7 +68,7 @@
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableClientKey" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
-                <Template Context="data">µ
+                <Template Context="data">
                     <SidAuthorizeView Roles=@("/clients/manage")>
                         <Authorized>
                             <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />                        
@@ -131,7 +131,7 @@
     if (a.Value.Equals(1))
     {
         var keyIds = clientKeysState.Value.Keys.Where(s => s.IsSelected).Select(s => s.Value.Kid).ToList();
-        var act = new RemoveSelectedClientKeysAction { KeyIds = keyIds, ClientId = Client.ClientId };
+        var act = new RemoveSelectedClientKeysAction { Id = Client.Id, KeyIds = keyIds, ClientId = Client.ClientId };
         dispatcher.Dispatch(act);
         contextMenuService.Close();
     }
@@ -178,7 +178,7 @@
 
     void UpdateJWKSUrl(UpdateJWKSUrlForm form)
     {
-        dispatcher.Dispatch(new UpdateJWKSUrlAction { ClientId = Client.ClientId, JWKSUrl = form.Url, Client = this.Client });
+        dispatcher.Dispatch(new UpdateJWKSUrlAction { Id = Client.Id, ClientId = Client.ClientId, JWKSUrl = form.Url, Client = this.Client });
     }
 
     void HandleUseJWKSUrl(bool isEnabled)

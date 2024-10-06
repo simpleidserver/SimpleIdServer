@@ -522,6 +522,7 @@
     {
         dispatcher.Dispatch(new UpdateClientDetailsAction 
         { 
+            Id = this.Client.Id,
             ClientId = client.ClientId,
             ClientName = client.ClientName,
             RedirectionUrls = client.RedirectionUrls,

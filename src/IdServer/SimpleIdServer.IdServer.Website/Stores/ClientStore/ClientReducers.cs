@@ -61,7 +61,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var clients = state.Clients?.ToList();
             if (clients == null) return state;
-            clients = clients.Where(c => !act.ClientIds.Contains(c.Value.ClientId)).ToList();
+            clients = clients.Where(c => !act.Ids.Contains(c.Value.Id)).ToList();
             return state with
             {
                 Clients = clients,

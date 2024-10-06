@@ -31,6 +31,8 @@
 @code {
     [Parameter]
     public string ClientId { get; set; }
+    [Parameter]
+    public string Id { get; set; }
 
     AddClientRole addClientRole = new AddClientRole();
 
@@ -58,6 +60,6 @@
 
     void SubmitAddClientRole(AddClientRole addClientRole)
     {
-        dispatcher.Dispatch(new AddClientRoleAction { Name = addClientRole.Name, Description = addClientRole.Description, ClientId = ClientId });
+        dispatcher.Dispatch(new AddClientRoleAction { Id = Id, Name = addClientRole.Name, Description = addClientRole.Description, ClientId = ClientId });
     }
 }

@@ -121,7 +121,8 @@
     {
         await dialogService.OpenAsync<AddClientRoleDialog>(Global.AddRole, new Dictionary<string, object>
         {
-            { "ClientId", Client.ClientId }
+            { "ClientId", Client.ClientId },
+            { "Id", Client.Id }
         }, new DialogOptions
             {
                 Width = "700px",

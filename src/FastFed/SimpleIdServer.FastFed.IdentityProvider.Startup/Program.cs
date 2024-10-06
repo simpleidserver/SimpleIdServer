@@ -80,7 +80,7 @@ var fastFedBuilder = builder.Services.AddFastFed(o =>
     .AddIdProviderScimProvisioning()
     .AddIdProviderSamlAuthentication(o =>
     {
-        o.SamlMetadataUri = "https://openid.simpleidserver.com/master/saml/metadata";
+        o.SamlMetadataUri = "https://localhost:5001/master/saml/metadata";
     })
     .AddSidSamlAuthentication(o =>
     {

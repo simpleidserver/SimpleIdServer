@@ -26,6 +26,7 @@ public class DynamicSamlAuthenticationSchemeProvider : AuthenticationSchemeProvi
     private readonly IBusControl _busControl;
     private readonly IServiceProvider _serviceProvider;
     private readonly SamlAuthenticationOptions _samlAuthOptions;
+    private readonly FastFedApplicationProviderOptions _fastFedApplicationProviderOptions;
     private DateTime? _nextExpirationTime;
     private IEnumerable<AuthSchemeProvider> _cachedAuthSchemeProviders;
     private object _lck = new object();
@@ -34,11 +35,13 @@ public class DynamicSamlAuthenticationSchemeProvider : AuthenticationSchemeProvi
         IBusControl busControl,
         IServiceProvider serviceProvider,
         IOptions<SamlAuthenticationOptions> samlAuthOptions,
+        IOptions<FastFedApplicationProviderOptions> fastFedApplicationProviderOptions,
         IOptions<AuthenticationOptions> options) : base(options)
     {
         _busControl = busControl;
         _serviceProvider = serviceProvider;
         _samlAuthOptions = samlAuthOptions.Value;
+        _fastFedApplicationProviderOptions = fastFedApplicationProviderOptions.Value;
     }
 
     public async override Task<IEnumerable<AuthenticationScheme>> GetAllSchemesAsync()
@@ -56,6 +59,8 @@ public class DynamicSamlAuthenticationSchemeProvider : AuthenticationSchemeProvi
 
         return rules;
     }
+
+    public override Task<IEnumerable<AuthenticationScheme>> GetRequestHandlerSchemesAsync() => GetAllSchemesAsync();
 
     public override async Task<AuthenticationScheme> GetSchemeAsync(string name) => (await GetSamlSchemeAsync(name)).AuthScheme;
 
@@ -79,11 +84,13 @@ public class DynamicSamlAuthenticationSchemeProvider : AuthenticationSchemeProvi
             {
                 SPId = _samlAuthOptions.SpId,
                 IdpMetadataUrl = provider.SamlMetadataUri,
-                SigningCertificate = _samlAuthOptions.SigningCertificate
+                SigningCertificate = _samlAuthOptions.SigningCertificate,
+                SignInScheme = _fastFedApplicationProviderOptions.AuthScheme.Cookie
             };
+            var monitoredOpts = new ConcreteOptionsMonitor<SamlSpOptions>(options);
             if (options.Backchannel == null)
                 options.Backchannel = new HttpClient(_samlAuthOptions.BackchannelHttpHandler ?? new HttpClientHandler());
-            return new SamlAuthenticationScheme(new AuthenticationScheme(provider.Name, provider.DisplayName, handlerType), options);
+            return new SamlAuthenticationScheme(new AuthenticationScheme(provider.Name, provider.DisplayName, handlerType), monitoredOpts);
         }
     }
 
@@ -126,6 +133,26 @@ public class DynamicSamlAuthenticationSchemeProvider : AuthenticationSchemeProvi
             }
 
             return authenticationSchemeProviders;
+        }
+    }
+
+    private class ConcreteOptionsMonitor<T> : IOptionsMonitor<T> where T : class
+    {
+        public ConcreteOptionsMonitor(T value)
+        {
+            CurrentValue = value;
+        }
+
+        public T CurrentValue { get; private set; }
+
+        public T Get(string name)
+        {
+            return CurrentValue;
+        }
+
+        public IDisposable OnChange(Action<T, string> listener)
+        {
+            return null;
         }
     }
 }

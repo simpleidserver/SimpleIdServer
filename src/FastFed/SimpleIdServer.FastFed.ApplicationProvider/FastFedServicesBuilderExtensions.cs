@@ -49,6 +49,7 @@ public static class FastFedServicesBuilderExtensions
         authOptions = authOptions ?? new AuthOptions();
         var opts = new FastFedApplicationProviderOptions();
         if (callback != null) callback(opts);
+        builder.Services.AddSingleton(authOptions);
         builder.Services.AddAuthorization(b =>
         {
             b.AddPolicy(DefaultPolicyNames.IsAdminUser, b =>

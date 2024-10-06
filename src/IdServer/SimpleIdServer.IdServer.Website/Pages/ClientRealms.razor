@@ -142,7 +142,7 @@
         NbAssigned = AssignedRealms.Count();
         NbAvailable = AvailableRealms.Count();
         selectAllAvailable = false;
-        dispatcher.Dispatch(new UpdateClientRealmsAction { ClientId = _client.ClientId, Realms = AssignedRealms.Select(r => r.Name).ToList() });
+        dispatcher.Dispatch(new UpdateClientRealmsAction { Id = _client.Id, ClientId = _client.ClientId, Realms = AssignedRealms.Select(r => r.Name).ToList() });
     }
 
     void Unassign()
@@ -154,7 +154,7 @@
         NbAssigned = AssignedRealms.Count();
         NbAvailable = availableRealms.Count();
         selectAllAssigned = false;
-        dispatcher.Dispatch(new UpdateClientRealmsAction { ClientId = _client.ClientId, Realms = AssignedRealms.Select(r => r.Name).ToList() });
+        dispatcher.Dispatch(new UpdateClientRealmsAction { Id = _client.Id, ClientId = _client.ClientId, Realms = AssignedRealms.Select(r => r.Name).ToList() });
     }
 
     void ToggleAssignedAll(bool isSelected)

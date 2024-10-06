@@ -25,6 +25,11 @@
 		  <AutoGen>True</AutoGen>
 		  <DependentUpon>HomeResource.resx</DependentUpon>
 		</Compile>
+		<Compile Update="Resources\AuthenticateResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>AuthenticateResource.resx</DependentUpon>
+		</Compile>
 		<Compile Update="Resources\LayoutResource.Designer.cs">
 			<DesignTime>True</DesignTime>
 			<AutoGen>True</AutoGen>
@@ -52,6 +57,10 @@
 		<EmbeddedResource Update="Resources\IdentityProvidersResource.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>IdentityProvidersResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\AuthenticateResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>AuthenticateResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
 </Project>

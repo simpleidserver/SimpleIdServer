@@ -113,6 +113,7 @@
         var selectedScopes = clientScopesState.Value.EditableScopes.Where(s => !s.IsPresent && s.IsSelected).Select(s => s.Value);
         var act = new AddClientScopesAction 
         { 
+            Id = Client.Id,
             ClientId = Client.ClientId,
             Scopes = selectedScopes
         };

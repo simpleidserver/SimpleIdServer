@@ -116,8 +116,8 @@
         }, (a) => {
             if (a.Value.Equals(1))
             {
-                var clientIds = clientState.Value.Clients?.Where(c => c.IsSelected).Select(c => c.Value.ClientId)?.ToList();
-                var act = new RemoveSelectedClientsAction { ClientIds = clientIds };
+                var ids = clientState.Value.Clients?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                var act = new RemoveSelectedClientsAction { Ids = ids };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();
             }

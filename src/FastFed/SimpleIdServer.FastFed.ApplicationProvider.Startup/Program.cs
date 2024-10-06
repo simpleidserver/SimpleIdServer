@@ -90,7 +90,8 @@ builder.Services.AddFastFed(cb =>
     })
     .AddSamlAppProviderAuthenticationProfile(cb =>
     {
-        cb.SamlMetadataUri = "https://localhost:5021/saml-metadata.xml";
+        cb.SpId = "https://localhost:5021";
+        cb.SamlMetadataUri = "https://localhost:5021/Metadata";
         cb.SigningCertificate = KeyGenerator.GenerateSelfSignedCertificate();
         cb.Mappings = new SamlEntrepriseMappingsResult
         {
