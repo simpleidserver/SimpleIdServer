@@ -1868,6 +1868,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("SourceScimPath")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "source_scim_path");
+
                     b.Property<string>("SourceUserAttribute")
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source_user_attribute");

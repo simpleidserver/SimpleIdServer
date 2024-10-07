@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 
 namespace SimpleIdServer.IdServer.Extractors
@@ -20,7 +21,7 @@ namespace SimpleIdServer.IdServer.Extractors
 
         public MappingRuleTypes MappingRuleType => MappingRuleTypes.SUBJECT;
 
-        public object Extract(HandlerContext context, IClaimMappingRule mappingRule)
+        public object Extract(HandlerContext context, JsonObject scimObject, IClaimMappingRule mappingRule)
         {
             var client = context.Client;
             var subjectTypeBuilder = _subjectTypeBuilders.First(f => f.SubjectType == (string.IsNullOrWhiteSpace(client?.SubjectType) ? PublicSubjectTypeBuilder.SUBJECT_TYPE : client.SubjectType));

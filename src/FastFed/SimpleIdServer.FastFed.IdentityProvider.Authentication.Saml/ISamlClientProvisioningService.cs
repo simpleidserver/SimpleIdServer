@@ -3,10 +3,11 @@
 
 using System.Threading.Tasks;
 using System.Threading;
+using SimpleIdServer.FastFed.Authentication.Saml;
 
 namespace SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml;
 
 public interface ISamlClientProvisioningService
 {
-    Task Provision(string clientId, string metadataUrl, CancellationToken cancellationToken);
+    Task Provision(string clientId, string metadataUrl, SamlEntrepriseMappingsResult mappings, CancellationToken cancellationToken);
 }

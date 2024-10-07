@@ -1,9 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.FastFed.Authentication.Saml;
 using SimpleIdServer.FastFed.Models;
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -34,7 +36,8 @@ public class SamlIdProviderProvisioningService : IIdProviderProvisioningService
     {
         var configuration = identityProviderFederation.LastCapabilities.Configurations.Single(c => c.ProfileName == FastFed.Authentication.Saml.Constants.ProvisioningProfileName);
         var jObj = JsonObject.Parse(configuration.AppProviderHandshakeRegisterConfiguration).AsObject();
+        var mappings = JsonSerializer.Deserialize<SamlEntrepriseMappingsResult>(configuration.AppProviderConfiguration);
         var samlMetadataUri = jObj[SimpleIdServer.FastFed.Authentication.Saml.Constants.SamlMetadataUri].ToString();
-        await _samlClientProvisioningService.Provision(identityProviderFederation.EntityId, samlMetadataUri, cancellationToken);
+        await _samlClientProvisioningService.Provision(identityProviderFederation.EntityId, samlMetadataUri, mappings, cancellationToken);
     }
 }

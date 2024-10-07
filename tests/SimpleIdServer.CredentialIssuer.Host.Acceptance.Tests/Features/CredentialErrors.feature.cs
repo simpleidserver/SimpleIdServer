@@ -101,11 +101,11 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table7, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table5, "When ");
 #line hidden
 #line 8
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -141,17 +141,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table8.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "proof",
                             "{ }"});
-                table8.AddRow(new string[] {
+                table6.AddRow(new string[] {
                             "format",
                             "format"});
 #line 15
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table8, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table6, "When ");
 #line hidden
 #line 20
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -187,17 +187,17 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table9.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"invalid\" }"});
-                table9.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "format",
                             "format"});
 #line 27
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table9, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table7, "When ");
 #line hidden
 #line 32
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -233,26 +233,26 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table10.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "typ",
                             "invalid"});
 #line 39
- testRunner.Given("build jwt proof", ((string)(null)), table10, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table8, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table11.AddRow(new string[] {
+                table9.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table11.AddRow(new string[] {
+                table9.AddRow(new string[] {
                             "format",
                             "format"});
 #line 43
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table11, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table9, "When ");
 #line hidden
 #line 48
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -288,29 +288,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table12.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
-                table12.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "kid",
                             "did"});
 #line 55
- testRunner.Given("build jwt proof", ((string)(null)), table12, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table10, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table13.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table13.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "format",
                             "format"});
 #line 60
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table13, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table11, "When ");
 #line hidden
 #line 65
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -349,29 +349,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table14.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 72
- testRunner.Given("build jwt proof", ((string)(null)), table14, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table12, "Given ");
 #line hidden
 #line 76
  testRunner.And("access token contains one credential identifier \'ItMaster\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table15.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table15.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "format",
                             "format"});
 #line 78
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table15, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table13, "When ");
 #line hidden
 #line 83
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -410,32 +410,32 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table16.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 90
- testRunner.Given("build jwt proof", ((string)(null)), table16, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table14, "Given ");
 #line hidden
 #line 94
  testRunner.And("access token contains one credential identifier \'ItMaster\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table17.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table17.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "format",
                             "format"});
-                table17.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "credential_identifier",
                             "ItMaster"});
 #line 96
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table17, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table15, "When ");
 #line hidden
 #line 102
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -472,29 +472,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table18.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 109
- testRunner.Given("build jwt proof", ((string)(null)), table18, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table16, "Given ");
 #line hidden
 #line 113
  testRunner.And("access token contains one credential identifier \'ItMaster\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table19.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table19.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "credential_identifier",
                             "Invalid"});
 #line 115
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table19, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table17, "When ");
 #line hidden
 #line 120
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -530,26 +530,26 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table20.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 127
- testRunner.Given("build jwt proof", ((string)(null)), table20, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table18, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table21.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table21.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "format",
                             "format"});
 #line 131
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table21, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table19, "When ");
 #line hidden
 #line 136
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -588,26 +588,26 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table22.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 143
- testRunner.Given("build jwt proof", ((string)(null)), table22, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table20, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table23.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table23.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
 #line 147
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table23, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table21, "When ");
 #line hidden
 #line 152
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -643,29 +643,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table24.AddRow(new string[] {
+                table22.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 159
- testRunner.Given("build jwt proof", ((string)(null)), table24, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table22, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table25.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table25.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table25.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "credential_definition",
                             "{ }"});
 #line 163
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table25, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table23, "When ");
 #line hidden
 #line 169
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -701,29 +701,29 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table26.AddRow(new string[] {
+                table24.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 176
- testRunner.Given("build jwt proof", ((string)(null)), table26, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table24, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table27.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table27.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table27.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "credential_definition",
                             "{ \"type\" : [\"VerifiableCredential\",\"Type\"] }"});
 #line 180
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table27, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table25, "When ");
 #line hidden
 #line 186
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -759,32 +759,32 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table28.AddRow(new string[] {
+                table26.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 193
- testRunner.Given("build jwt proof", ((string)(null)), table28, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table26, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table29.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table29.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table29.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "credential_definition",
                             "{ \"type\" : [\"VerifiableCredential\",\"UniversityDegree\"] }"});
-                table29.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "credential_response_encryption",
                             "{ }"});
 #line 197
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table29, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table27, "When ");
 #line hidden
 #line 204
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -820,32 +820,32 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table30.AddRow(new string[] {
+                table28.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 211
- testRunner.Given("build jwt proof", ((string)(null)), table30, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table28, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table31.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table31.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table31.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "credential_definition",
                             "{ \"type\" : [\"VerifiableCredential\",\"UniversityDegree\"] }"});
-                table31.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "credential_response_encryption",
                             "{ \"alg\": \"alg\" }"});
 #line 215
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table31, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table29, "When ");
 #line hidden
 #line 222
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -881,32 +881,32 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table32.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "typ",
                             "openid4vci-proof+jwt"});
 #line 229
- testRunner.Given("build jwt proof", ((string)(null)), table32, "Given ");
+ testRunner.Given("build jwt proof", ((string)(null)), table30, "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table33.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "proof",
                             "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table33.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "format",
                             "jwt_vc_json"});
-                table33.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "credential_definition",
                             "{ \"type\" : [\"VerifiableCredential\",\"UniversityDegree\"] }"});
-                table33.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "credential_response_encryption",
                             "{ \"alg\": \"alg\", \"enc\": \"enc\" }"});
 #line 233
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table33, "When ");
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table31, "When ");
 #line hidden
 #line 240
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");

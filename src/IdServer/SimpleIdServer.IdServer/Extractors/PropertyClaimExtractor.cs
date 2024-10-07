@@ -4,6 +4,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Extractors
 {
@@ -11,7 +12,7 @@ namespace SimpleIdServer.IdServer.Extractors
     {
         public MappingRuleTypes MappingRuleType => MappingRuleTypes.USERPROPERTY;
 
-        public object Extract(HandlerContext context, IClaimMappingRule mappingRule)
+        public object Extract(HandlerContext context, JsonObject scimObject, IClaimMappingRule mappingRule)
         {
             var property = mappingRule.SourceUserProperty;
             var visibleAttributes = typeof(User).GetProperties(BindingFlags.Instance | BindingFlags.Public)

@@ -213,6 +213,8 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public bool IsPasswordEncodeInBase64 { get; set; } = false;
 
+        public ScimClientOptions ScimClientOptions { get; set; }
+
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 
         public string GetStringParameter(string name) => Parameters[name];

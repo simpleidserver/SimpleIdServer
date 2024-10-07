@@ -33,8 +33,8 @@ function HomepageHeader() {
               Mobile
           </Link>
           <div style={{textAlign:"center", paddingTop: 10}}>
-              <a href="#"><img src="/img/play-store.png" style={{width: 250}} /></a>
-              <a href="#"><img src="/img/app-store.png"  style={{width: 250, paddingLeft: 5}} /></a>
+              <a href="https://play.google.com/store/apps/details?id=com.simpleidserver.mobile&pcampaignid=web_share"><img src="/img/play-store.png" style={{width: 250}} /></a>
+              <a href="https://apps.apple.com/be/app/simpleidserver/id6647993628?l=fr-FR"><img src="/img/app-store.png"  style={{width: 250, paddingLeft: 5}} /></a>
           </div>
         </div>
       </div>

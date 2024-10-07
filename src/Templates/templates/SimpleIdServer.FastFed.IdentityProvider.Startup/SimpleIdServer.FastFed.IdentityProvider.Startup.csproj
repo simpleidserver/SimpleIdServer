@@ -9,6 +9,8 @@
 		<PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.2.5" />
 		<PackageReference Include="SimpleIdServer.Webfinger.Client" Version="5.0.*-*" />
 		<PackageReference Include="SimpleIdServer.Webfinger.Store.EF" Version="5.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid" Version="5.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml" Version="5.0.*-*" />
 		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid" Version="5.0.*-*" />
 		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim" Version="5.0.*-*" />
 		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider" Version="5.0.*-*" />

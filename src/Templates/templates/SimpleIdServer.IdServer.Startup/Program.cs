@@ -24,6 +24,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Notification.Gotify;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
@@ -62,6 +63,20 @@ const string MYSQLCreateTableFormat =
                 "PRIMARY KEY(`Id`)," +
                 "KEY `Index_ExpiresAtTime` (`ExpiresAtTime`)" +
 ")";
+
+const string PostgreCreateSchemaAndTableSql =
+    $"""
+        CREATE SCHEMA IF NOT EXISTS "public";
+        CREATE TABLE IF NOT EXISTS "public"."DistributedCache"
+        (
+            "Id" text COLLATE pg_catalog."default" NOT NULL,
+            "Value" bytea,
+            "ExpiresAtTime" timestamp with time zone,
+            "SlidingExpirationInSeconds" double precision,
+            "AbsoluteExpiration" timestamp with time zone,
+            CONSTRAINT "DistCache_pkey" PRIMARY KEY ("Id")
+        )
+        """;
 
 ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
 var builder = WebApplication.CreateBuilder(args);
@@ -121,7 +136,7 @@ ConfigureCentralizedConfiguration(builder);
 // builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 
 var app = builder.Build();
-SeedData(app, identityServerConfiguration.SCIMBaseUrl);
+SeedData(app, builder.Configuration["SCIM:SCIMRepresentationsExtractionJobOptions:SCIMEdp"]);
 app.UseCors("AllowAll");
 if (identityServerConfiguration.IsForwardedEnabled)
 {
@@ -164,11 +179,14 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
+    var section = builder.Configuration.GetSection(nameof(ScimClientOptions));
+    var conf = section.Get<ScimClientOptions>();
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
+            cb.ScimClientOptions = conf;
         }, cookie: c =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix))
@@ -498,6 +516,13 @@ async void SeedData(WebApplication application, string scimBaseUrl)
         void EnableIsolationLevel(StoreDbContext dbContext)
         {
             if (dbContext.Database.IsInMemory()) return;
+            EnableSqlServer(dbContext);
+            EnableMysql(dbContext);
+            EnablePostgre(dbContext);
+        }
+
+        void EnableSqlServer(StoreDbContext dbContext)
+        {
             var dbConnection = dbContext.Database.GetDbConnection();
             var sqlConnection = dbConnection as SqlConnection;
             if (sqlConnection != null)
@@ -509,9 +534,12 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 cmd = sqlConnection.CreateCommand();
                 cmd.CommandText = SQLServerCreateTableFormat;
                 cmd.ExecuteNonQuery();
-                return;
             }
+        }
 
+        void EnableMysql(StoreDbContext dbContext)
+        {
+            var dbConnection = dbContext.Database.GetDbConnection();
             var mysqlConnection = dbConnection as MySqlConnector.MySqlConnection;
             if (mysqlConnection != null)
             {
@@ -519,7 +547,19 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 var cmd = mysqlConnection.CreateCommand();
                 cmd.CommandText = MYSQLCreateTableFormat;
                 cmd.ExecuteNonQuery();
-                return;
+            }
+        }
+
+        void EnablePostgre(StoreDbContext dbContext)
+        {
+            var dbConnection = dbContext.Database.GetDbConnection();
+            var postgreconnection = dbConnection as Npgsql.NpgsqlConnection;
+            if(postgreconnection != null)
+            {
+                if (postgreconnection.State != System.Data.ConnectionState.Open) postgreconnection.Open();
+                var cmd = postgreconnection.CreateCommand();
+                cmd.CommandText = PostgreCreateSchemaAndTableSql;
+                cmd.ExecuteNonQuery();
             }
         }
 
@@ -722,7 +762,14 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             }
 
             if (existingAdministratorUser == null)
-                dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser);
+            {
+                var user = SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser;
+                user.Groups.Add(new GroupUser
+                {
+                    Group = fastFedGroup
+                });
+                dbContext.Users.Add(user);
+            }
             else
             {
                 if (!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))

@@ -224,67 +224,6 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="use the credential_identifier to get a credential")]
-        [Xunit.TraitAttribute("FeatureTitle", "Credential")]
-        [Xunit.TraitAttribute("Description", "use the credential_identifier to get a credential")]
-        public void UseTheCredential_IdentifierToGetACredential()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("use the credential_identifier to get a credential", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 47
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table5 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table5.AddRow(new string[] {
-                            "typ",
-                            "openid4vci-proof+jwt"});
-                table5.AddRow(new string[] {
-                            "nonce",
-                            "nonce"});
-#line 48
- testRunner.Given("build jwt proof", ((string)(null)), table5, "Given ");
-#line hidden
-#line 53
- testRunner.And("access token contains one credential identifier \'MasterComputerScience\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table6.AddRow(new string[] {
-                            "proof",
-                            "{ \"proof_type\": \"jwt\", \"jwt\": \"$jwtProof$\" }"});
-                table6.AddRow(new string[] {
-                            "credential_identifier",
-                            "MasterComputerScience"});
-#line 55
- testRunner.When("execute HTTP POST JSON request \'http://localhost/credential\'", ((string)(null)), table6, "When ");
-#line hidden
-#line 60
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 62
- testRunner.Then("HTTP status code equals to \'200\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 63
- testRunner.And("JSON \'c_nonce\'=\'nonce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 64
- testRunner.And("JSON exists \'credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

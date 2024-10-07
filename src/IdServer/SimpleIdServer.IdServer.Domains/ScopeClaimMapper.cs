@@ -3,7 +3,6 @@
 using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
-using System.Xml.Linq;
 
 namespace SimpleIdServer.IdServer.Domains
 {
@@ -28,6 +27,8 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(ScopeClaimMapperNames.SourceUserProperty)]
         public string? SourceUserProperty { get; set; } = null;
+        [JsonPropertyName(ScopeClaimMapperNames.SourceScimPath)]
+        public string? SourceScimPath { get; set; } = null;
         /// <summary>
         /// Name of the claim to insert in the token.
         /// </summary>
@@ -191,6 +192,19 @@ namespace SimpleIdServer.IdServer.Domains
                 MapperType = MappingRuleTypes.USERPROPERTY,
                 SourceUserProperty = userPropertyName,
                 SAMLAttributeName = samlClaimName,
+                TokenClaimJsonType = claimJsonType
+            };
+        }
+
+        public static ScopeClaimMapper CreateSamlPropertyClaimFromScim(string name, string samlClaimName, string sourceScimPath, TokenClaimJsonTypes claimJsonType = TokenClaimJsonTypes.STRING)
+        {
+            return new ScopeClaimMapper
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = name,
+                MapperType = MappingRuleTypes.SCIM,
+                SAMLAttributeName = samlClaimName,
+                SourceScimPath = sourceScimPath,
                 TokenClaimJsonType = claimJsonType
             };
         }

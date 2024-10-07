@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MySqlConnector;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Did.Key;
@@ -25,6 +24,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Notification.Gotify;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
@@ -40,7 +40,6 @@ using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
@@ -137,7 +136,7 @@ ConfigureCentralizedConfiguration(builder);
 // builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 
 var app = builder.Build();
-SeedData(app, identityServerConfiguration.SCIMBaseUrl);
+SeedData(app, builder.Configuration["SCIM:SCIMRepresentationsExtractionJobOptions:SCIMEdp"]);
 app.UseCors("AllowAll");
 if (identityServerConfiguration.IsForwardedEnabled)
 {
@@ -180,11 +179,14 @@ app.Run();
 
 void ConfigureIdServer(IServiceCollection services)
 {
+    var section = builder.Configuration.GetSection(nameof(ScimClientOptions));
+    var conf = section.Get<ScimClientOptions>();
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
+            cb.ScimClientOptions = conf;
         }, cookie: c =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix))

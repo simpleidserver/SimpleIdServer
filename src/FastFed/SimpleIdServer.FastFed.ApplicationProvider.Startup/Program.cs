@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.FastFed;
 using SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml;
 using SimpleIdServer.FastFed.ApplicationProvider.Options;
 using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
@@ -12,6 +11,9 @@ using SimpleIdServer.FastFed.Authentication.Saml;
 using SimpleIdServer.FastFed.Provisioning.Scim;
 using SimpleIdServer.FastFed.Store.EF;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
@@ -90,9 +92,10 @@ builder.Services.AddFastFed(cb =>
     })
     .AddSamlAppProviderAuthenticationProfile(cb =>
     {
+        var currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         cb.SpId = "https://localhost:5021";
         cb.SamlMetadataUri = "https://localhost:5021/Metadata";
-        cb.SigningCertificate = KeyGenerator.GenerateSelfSignedCertificate();
+        cb.SigningCertificate = X509Certificate2.CreateFromPemFile(Path.Combine(currentPath, "sidClient.crt"), Path.Combine(currentPath, "sidClient.key"));
         cb.Mappings = new SamlEntrepriseMappingsResult
         {
             SamlSubject = new SamlSubject
@@ -105,7 +108,7 @@ builder.Services.AddFastFed(cb =>
                 {
                     RequiredUserAttributes = new List<string>
                     {
-                        "displayName"
+                        "name.givenName"
                     },
                     OptionalUserAttributes = new List<string>
                     {

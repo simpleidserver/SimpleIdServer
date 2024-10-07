@@ -310,6 +310,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IClaimsExtractor, ClaimsExtractor>();
             services.AddTransient<IClaimExtractor, AttributeClaimExtractor>();
             services.AddTransient<IClaimExtractor, PropertyClaimExtractor>();
+            services.AddTransient<IClaimExtractor, ScimClaimExtractor>();
             services.AddTransient<IClaimExtractor, SubClaimExtractor>();
             services.AddTransient<IUserHelper, UserHelper>();
             services.AddTransient<IPreAuthorizedCodeValidator, PreAuthorizedCodeValidator>();

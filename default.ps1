@@ -262,10 +262,14 @@ task pack -depends release, compile, buildTemplate {
 		
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Authentication.Saml\SimpleIdServer.FastFed.Authentication.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }	
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Client\SimpleIdServer.FastFed.Client.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Domains\SimpleIdServer.FastFed.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Provisioning.Scim\SimpleIdServer.FastFed.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }

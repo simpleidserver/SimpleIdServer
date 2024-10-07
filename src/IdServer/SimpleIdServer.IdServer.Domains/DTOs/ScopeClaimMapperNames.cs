@@ -14,5 +14,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string TokenClaimJsonType = "token_claim_json_type";
         public const string IsMultivalued = "is_multivalued";
         public const string IncludeInAccessToken = "include_in_accesstoken";
+        public const string SourceScimPath = "source_scim_path";
     }
 }

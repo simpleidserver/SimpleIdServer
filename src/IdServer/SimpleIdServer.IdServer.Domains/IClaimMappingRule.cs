@@ -8,6 +8,7 @@ namespace SimpleIdServer.IdServer.Domains
         string? SourceUserAttribute { get; set; }
         string? SourceUserProperty { get; set; }
         string TargetClaimPath { get; set; }
+        string? SourceScimPath { get; set; }
         bool IsMultiValued { get; set; }
         TokenClaimJsonTypes? TokenClaimJsonType { get; set; }
     }

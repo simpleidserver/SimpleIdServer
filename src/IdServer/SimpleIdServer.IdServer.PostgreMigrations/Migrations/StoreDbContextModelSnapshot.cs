@@ -1885,6 +1885,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("SourceScimPath")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "source_scim_path");
+
                     b.Property<string>("SourceUserAttribute")
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "source_user_attribute");

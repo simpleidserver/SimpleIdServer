@@ -7,6 +7,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.8" />
+		<PackageReference Include="SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml" Version="5.0.*-*" />
 		<PackageReference Include="SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim" Version="5.0.*-*" />
 		<PackageReference Include="SimpleIdServer.FastFed.ApplicationProvider" Version="5.0.*-*" />
 		<PackageReference Include="SimpleIdServer.FastFed.Store.EF" Version="5.0.*-*" />

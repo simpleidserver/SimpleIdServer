@@ -1,0 +1,52 @@
+﻿.loginContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 80px;
+}
+
+.login {
+    width: 400px;
+}
+
+@media (max-width: 600px) {
+    .loginContainer {
+        padding-top: 0px;
+        display: block;
+    }
+
+    .login {
+        width: auto;
+    }
+}
+
+.login .divider:before,
+.login .divider:after {
+    content: "";
+    height: 1px;
+    background: var(--sid-separator-bg);
+    flex: 1;
+}
+
+.login .divider .text {
+    margin-right: 1rem;
+    margin-left: 1rem;
+    margin-bottom: 0px;
+    color: var(--bs-gray);
+}
+
+.login .divider {
+    display: flex;
+    align-items: center;
+    margin-top: 1.5rem;
+}
+
+.login .extauth {
+    list-style: none;
+    padding-left: 0px;
+}
+
+.login .extauth > li {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

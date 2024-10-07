@@ -61,6 +61,6 @@ public class HomeController : Controller
 
     public IActionResult Disconnect()
     {
-        return SignOut(new[] { _options.AuthScheme.Openid, _options.AuthScheme.Cookie });
+        return SignOut(new AuthenticationProperties { RedirectUri = "/" }, _options.AuthScheme.Cookie);
     }
 }

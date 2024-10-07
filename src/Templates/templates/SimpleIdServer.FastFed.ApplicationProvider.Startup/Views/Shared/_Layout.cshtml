@@ -1,7 +1,9 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using SimpleIdServer.FastFed.ApplicationProvider.Options
 @using SimpleIdServer.FastFed.ApplicationProvider.Startup.Resources
 @using Microsoft.Extensions.Options
 @using System.Globalization
+@inject AuthOptions authOptions
 
 @inject IOptions<SimpleIdServer.FastFed.ApplicationProvider.FastFedApplicationProviderOptions> Options
 
@@ -31,20 +33,31 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto">
-                @if(User.Identity.IsAuthenticated)
+                @if (User.Identity.IsAuthenticated)
                 {
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "IdentityProviders")">
-                            @LayoutResource.IdentityProviders
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="@Url.Action("Index", "FastFedDiscovery")">
-                            @LayoutResource.ConfigureProvider
-                        </a>
-                    </li>
-                    @RenderSection("SubMenu", required: false)
+                    if(User.Claims.Any(c => c.Type == "role" && c.Value == authOptions.AdministratorRole))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "IdentityProviders")">
+                                @LayoutResource.IdentityProviders
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "FastFedDiscovery")">
+                                @LayoutResource.ConfigureProvider
+                            </a>
+                        </li>
+                    }
+                    else
+                    {                        
+                        <li class="nav-item">
+                            <a class="nav-link" href="@Url.Action("Index", "ProtectedResources")">
+                                Protected resources
+                            </a>
+                        </li>
+                    }
                 }
+                @RenderSection("SubMenu", required: false)
             </ul>
             <ul class="navbar-nav">
                 @if(User.Identity.IsAuthenticated)

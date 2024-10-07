@@ -22,6 +22,7 @@ namespace SimpleIdServer.IdServer.Domains
         USERPROPERTY = 1,
         SUBJECT = 2,
         IDENTIFIER = 3,
-        GROUPNAME = 4
+        GROUPNAME = 4,
+        SCIM = 5
     }
 }

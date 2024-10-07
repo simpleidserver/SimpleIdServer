@@ -1885,6 +1885,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("SourceScimPath")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "source_scim_path");
+
                     b.Property<string>("SourceUserAttribute")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "source_user_attribute");

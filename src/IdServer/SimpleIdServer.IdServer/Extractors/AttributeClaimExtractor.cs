@@ -3,6 +3,7 @@
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using System.Linq;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.IdServer.Extractors
 {
@@ -10,7 +11,7 @@ namespace SimpleIdServer.IdServer.Extractors
     {
         public MappingRuleTypes MappingRuleType => MappingRuleTypes.USERATTRIBUTE;
 
-        public object Extract(HandlerContext context, IClaimMappingRule mappingRule)
+        public object Extract(HandlerContext context, JsonObject scimObject, IClaimMappingRule mappingRule)
         {
             if (!mappingRule.IsMultiValued)
             {

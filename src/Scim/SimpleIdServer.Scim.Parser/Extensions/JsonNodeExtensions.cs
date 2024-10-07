@@ -8,7 +8,7 @@ using System.Data;
 using System.Linq;
 using System.Text.Json.Nodes;
 
-namespace SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Extensions;
+namespace SimpleIdServer.Scim.Parser.Extensions;
 
 public static class JsonNodeExtensions
 {

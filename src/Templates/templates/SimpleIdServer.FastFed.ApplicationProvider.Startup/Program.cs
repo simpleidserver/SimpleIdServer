@@ -3,12 +3,17 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml;
 using SimpleIdServer.FastFed.ApplicationProvider.Options;
 using SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim;
 using SimpleIdServer.FastFed.ApplicationProvider.Startup.Configurations;
+using SimpleIdServer.FastFed.Authentication.Saml;
 using SimpleIdServer.FastFed.Provisioning.Scim;
 using SimpleIdServer.FastFed.Store.EF;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
@@ -34,17 +39,18 @@ builder.Services.AddFastFed(cb =>
         Capabilities = new SimpleIdServer.FastFed.Domains.Capabilities
         {
             ProvisioningProfiles = new List<string>
-        {
-            "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise"
-        },
+            {
+                "urn:ietf:params:fastfed:1.0:provisioning:scim:2.0:enterprise",
+                "urn:ietf:params:fastfed:1.0:provisioning:saml:2.0:enterprise"
+            },
             SchemaGrammars = new List<string>
-        {
-            "urn:ietf:params:fastfed:1.0:schemas:scim:2.0"
-        },
+            {
+                "urn:ietf:params:fastfed:1.0:schemas:scim:2.0"
+            },
             SigningAlgorithms = new List<string>
-        {
-            "RS256"
-        }
+            {
+                "RS256"
+            }
         },
         ContactInformation = new SimpleIdServer.FastFed.Domains.ProviderContactInformation
         {
@@ -61,6 +67,7 @@ builder.Services.AddFastFed(cb =>
     };
 })
     .AddFastFedApplicationProvider(cbChooser: (t) => t.UseInMemoryEfStore())
+    .UseDefaultAppProviderSecurity(authOptions: authOptions)
     .AddAppProviderScimProvisioning(cb =>
     {
         cb.ScimServiceUri = scimOptions.Url;
@@ -83,7 +90,34 @@ builder.Services.AddFastFed(cb =>
             }
         };
     })
-    .UseDefaultAppProviderSecurity(authOptions: authOptions);
+    .AddSamlAppProviderAuthenticationProfile(cb =>
+    {
+        var currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+        cb.SpId = "https://localhost:5021";
+        cb.SamlMetadataUri = "https://localhost:5021/Metadata";
+        cb.SigningCertificate = X509Certificate2.CreateFromPemFile(Path.Combine(currentPath, "sidClient.crt"), Path.Combine(currentPath, "sidClient.key"));
+        cb.Mappings = new SamlEntrepriseMappingsResult
+        {
+            SamlSubject = new SamlSubject
+            {
+                Username = "userName"
+            },
+            DesiredAttributes = new DesiredAttributes
+            {
+                Attrs = new SchemaGrammarDesiredAttributes
+                {
+                    RequiredUserAttributes = new List<string>
+                    {
+                        "name.givenName"
+                    },
+                    OptionalUserAttributes = new List<string>
+                    {
+                        "phoneNumbers[primary eq true].value"
+                    }
+                }
+            }
+        };
+    });
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

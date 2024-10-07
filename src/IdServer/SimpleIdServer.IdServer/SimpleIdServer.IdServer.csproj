@@ -19,6 +19,8 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
+	  <ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj" />
+	  <ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj" />

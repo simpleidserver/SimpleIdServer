@@ -13,7 +13,7 @@ The OpenID FastFed standard simplifies this process, making it easier to establi
 
 :::warning
 
-Currently, the SimpleIdServer project only supports identity provisioning via SCIM. Authentication protocols such as SAML and OpenID will be supported in a future release.
+Currently, the SimpleIdServer project only supports identity provisioning via SCIM. Authentication protocols such as SAML are supported but not yet documented
 
 :::
 
