@@ -71,6 +71,9 @@ According to the [specification](https://openid.bitbucket.io/fapi/fapi-2_0-secur
     <DocsCard header="SCIM Provisioning" href="scim">
         <p>Configure automatic provisioning with SCIM</p>
     </DocsCard>
+    <DocsCard header="Openid FastFed" href="fastfed">
+        <p>Configure Openid FastFed</p>
+    </DocsCard>
 </DocsCards>
 
 ## Delegation

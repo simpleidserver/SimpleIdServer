@@ -179,6 +179,10 @@ server {
 
 For more information about NGINX, you can refer to the official website: https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/
 
+### Load balancer
+
+If the NGINX server is configured as a load balancer, there is a chance that a user's session may be recognized by one Identity Server instance but not by another. Therefore, you can edit the NGINX configuration to enable sticky sessions. For more information, please refer to the chapter 'Enabling Session Persistence' on the official website: [https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/).
+
 ## IIS
 
 The zip file downloaded from [here](./quickstart.md#copy-and-paste), contains all of SimpleIdServer's services. 

@@ -86,6 +86,7 @@
         "tutorial/saml",
         "tutorial/ldap",
         "tutorial/scim",
+        "tutorial/fastfed",
         "tutorial/delegation"
       ]
     }
