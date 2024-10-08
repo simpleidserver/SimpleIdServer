@@ -42,7 +42,10 @@
                 <Button Text="Generate" Command="{Binding Path=GenerateHOTPCommand}"></Button>
             </StackLayout>
             <StackLayout IsVisible="{Binding Path=IsOTPCodeExists, Converter={StaticResource InvertedBoolConverter}}" Padding="10">
-                <Label Text="Select a one-time password"></Label>
+                <ContentView Style="{StaticResource noRecord}">
+                    <Image Source="nootp.png" HorizontalOptions="Center" Aspect="AspectFit" />
+                </ContentView>
+                <Label Text="Select a one-time password from below to view the result." HorizontalOptions="Center"/>
             </StackLayout>
         </Grid>
     </ContentView.Content>

@@ -12,6 +12,7 @@ namespace SimpleIdServer.Mobile.ViewModels;
 public class DidsViewModel : INotifyPropertyChanged
 {
     private bool _isLoading;
+    private bool _atLeastOneDid;
     private readonly DidRecordState _didRecordState;
 
     public DidsViewModel(DidRecordState didRecordState)
@@ -22,6 +23,7 @@ public class DidsViewModel : INotifyPropertyChanged
             var exportResult = DidKeyGenerator.New().GenerateRandomES256Key().Export(false, true);
             var export = SignatureKeySerializer.Serialize(exportResult.Key);
             await _didRecordState.Add(new DidRecord { Did = exportResult.Did, SerializedPrivateKey = System.Text.Json.JsonSerializer.Serialize(export), CreateDateTime = DateTime.Now, IsActive = false });
+            RefreshAtLeastOneDid();
         });
         DeleteCommand = new Command(async () =>
         {
@@ -30,6 +32,7 @@ public class DidsViewModel : INotifyPropertyChanged
             await _didRecordState.Delete(activeDid);
             IsLoading = false;
             RefreshCommands();
+            RefreshAtLeastOneDid();
         }, () =>
         {
             return Dids.Any() && Dids.Any(d => d.IsSelected);
@@ -62,6 +65,7 @@ public class DidsViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(Dids));
             RefreshCommands();
         });
+        RefreshAtLeastOneDid();
     }
 
     public bool IsLoading
@@ -74,6 +78,22 @@ public class DidsViewModel : INotifyPropertyChanged
         {
             _isLoading = value;
             OnPropertyChanged();
+        }
+    }
+
+    public bool AtLeastOneDid
+    {
+        get
+        {
+            return _atLeastOneDid;
+        }
+        set
+        {
+            if(_atLeastOneDid != value)
+            {
+                _atLeastOneDid = value;
+                OnPropertyChanged();
+            }
         }
     }
 
@@ -98,6 +118,9 @@ public class DidsViewModel : INotifyPropertyChanged
     public event PropertyChangedEventHandler PropertyChanged;
 
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    private void RefreshAtLeastOneDid()
+        => AtLeastOneDid = Dids?.Any() ?? false;
 
     private void RefreshCommands()
     {

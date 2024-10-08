@@ -14,6 +14,7 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
     private readonly INavigationService _navigationService;
     private OTPCode _selectedOTPCode;
     private bool _isLoading;
+    private bool _atLeastOneOtp;
     public event PropertyChangedEventHandler PropertyChanged;
 
     public ViewOtpListViewModel(OtpListState otpListState,  INavigationService navigationService)
@@ -27,10 +28,13 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
         RemoveSelectedOtpCommand = new Command(async () =>
         {
             await RemoveSelectedOtp();
+            RefreshDeleteCommand();
+            RefreshAtLeastOneOtp();
         }, () =>
         {
             return SelectedOTPCode != null;
         });
+        RefreshAtLeastOneOtp();
     }
 
     public ICommand RemoveSelectedOtpCommand { get; private set; }
@@ -56,8 +60,23 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
             {
                 _selectedOTPCode = value;
                 OnPropertyChanged();
-                var cmd = (Command)RemoveSelectedOtpCommand;
-                cmd.ChangeCanExecute();
+                RefreshDeleteCommand();
+            }
+        }
+    }
+
+    public bool AtLeastOneOtp
+    {
+        get
+        {
+            return _atLeastOneOtp;
+        }
+        set
+        {
+            if (_atLeastOneOtp != value)
+            {
+                _atLeastOneOtp = value;
+                OnPropertyChanged();
             }
         }
     }
@@ -86,6 +105,15 @@ public class ViewOtpListViewModel : INotifyPropertyChanged
         await _otpListState.RemoveOTPCode(SelectedOTPCode);
         SelectedOTPCode = null;
     }
+
+    private void RefreshDeleteCommand()
+    {
+        var cmd = (Command)RemoveSelectedOtpCommand;
+        cmd.ChangeCanExecute();
+    }
+
+    private void RefreshAtLeastOneOtp()
+        => AtLeastOneOtp = OTPCodes?.Any() ?? false;
 
     public void Load()
     {

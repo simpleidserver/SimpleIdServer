@@ -21,8 +21,21 @@
         <Setter Property="Source" Value="minimize.png"></Setter>
     </Style>
 
+    <Style x:Key="linkComponent" TargetType="StackLayout">
+        <Setter Property="BackgroundColor" Value="{StaticResource White}"></Setter>
+    </Style>
+
+    <Style x:Key="noRecord" TargetType="ContentView">
+        <Setter Property="MaximumHeightRequest" Value="100"></Setter>
+    </Style>
+    
     <Style x:Key="separator" TargetType="BoxView">
         <Setter Property="HeightRequest" Value="1" />
+        <Setter Property="Color" Value="{StaticResource Gray200}" />
+    </Style>
+
+    <Style x:Key="verticalSeparator" TargetType="BoxView">
+        <Setter Property="WidthRequest" Value="1" />
         <Setter Property="Color" Value="{StaticResource Gray200}" />
     </Style>
 

@@ -10,6 +10,7 @@ namespace SimpleIdServer.Mobile.ViewModels;
 public class ViewCredentialListViewModel : INotifyPropertyChanged
 {
     private bool _isLoading;
+    private bool _atLeastOneCredential;
     private readonly CredentialListState _credentialListState;
     private readonly INavigationService _navigationService;
 
@@ -24,7 +25,9 @@ public class ViewCredentialListViewModel : INotifyPropertyChanged
         RemoveSelectedCredentialsCommand = new Command(async () =>
         {
             await credentialListState.Remove();
+            RefreshAtLeastOneCredential();
         });
+        RefreshAtLeastOneCredential();
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
@@ -53,7 +56,23 @@ public class ViewCredentialListViewModel : INotifyPropertyChanged
         }
     }
 
+    public bool AtLeastOneCredential
+    {
+        get { return _atLeastOneCredential; }
+        set
+        {
+            if (_atLeastOneCredential != value)
+            {
+                _atLeastOneCredential = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+    private void RefreshAtLeastOneCredential()
+        => AtLeastOneCredential = Credentials?.Any() ?? false;
 
     public void Load()
     {

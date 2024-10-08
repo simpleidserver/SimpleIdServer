@@ -5,7 +5,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:SimpleIdServer.Mobile.Components"
              x:Class="SimpleIdServer.Mobile.SettingsPage">
-    <StackLayout Spacing="5">
+    <StackLayout BackgroundColor="{StaticResource BackgroundColor}"> 
         <local:LinkComponent Title="Profile" Source="profile.png" Url="//settings/profile" />
         <local:LinkComponent Title="Distributed Identity Keys" Source="key.png" Url="//settings/dids" />
         <local:LinkComponent Title="Info" Source="info.png" Url="//settings/info" />

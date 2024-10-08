@@ -10,6 +10,7 @@ namespace SimpleIdServer.Mobile.ViewModels;
 public class WalletViewModel : INotifyPropertyChanged
 {
     private bool _isLoading = false;
+    private bool _atLeastOneVerifiableCredential = false;
     private readonly VerifiableCredentialListState _vcListState;
 
     public WalletViewModel(VerifiableCredentialListState vcListState)
@@ -21,6 +22,7 @@ public class WalletViewModel : INotifyPropertyChanged
             var vc = VerifiableCredentials.Single(d => d.IsSelected);
             await _vcListState.RemoveVerifiableCredentialRecord(vc);
             IsLoading = false;
+            RefreshAtLeastOneVerifiableCredential();
             RefreshCommands();
         }, () =>
         {
@@ -34,6 +36,7 @@ public class WalletViewModel : INotifyPropertyChanged
             OnPropertyChanged(nameof(VerifiableCredentials));
             RefreshCommands();
         });
+        RefreshAtLeastOneVerifiableCredential();
     }
 
     public Command<VerifiableCredentialRecord> SelectCommand { get; private set; }
@@ -63,10 +66,26 @@ public class WalletViewModel : INotifyPropertyChanged
         }
     }
 
+    public bool AtLeastOneVerifiableCredential
+    {
+        get { return _atLeastOneVerifiableCredential; }
+        set
+        {
+            if (_atLeastOneVerifiableCredential != value)
+            {
+                _atLeastOneVerifiableCredential = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public void OnPropertyChanged([CallerMemberName] string name = "") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 
     private void RefreshCommands()
     {
         ((Command)DeleteCommand).ChangeCanExecute();
     }
+
+    private void RefreshAtLeastOneVerifiableCredential()
+        => AtLeastOneVerifiableCredential = VerifiableCredentials?.Any() ?? false;
 }

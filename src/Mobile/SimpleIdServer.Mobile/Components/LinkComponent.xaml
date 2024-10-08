@@ -5,7 +5,7 @@
              xmlns:local="clr-namespace:SimpleIdServer.Mobile.Components"
              x:Class="SimpleIdServer.Mobile.Components.LinkComponent"
              x:Name="this">
-    <Border Margin="5">
+    <StackLayout Style="{StaticResource linkComponent}">
         <StackLayout Orientation="Horizontal" Padding="10,20,10,20">
             <Image WidthRequest="20" HeightRequest="20" Source="{Binding Path=Source}" HorizontalOptions="Start"></Image>
             <Label Padding="5,0,0,0" HorizontalOptions="StartAndExpand" Text="{Binding Path=Title}"></Label>
@@ -14,5 +14,6 @@
                 <TapGestureRecognizer Command="{Binding Path=NavigateCommand}" />
             </StackLayout.GestureRecognizers>
         </StackLayout>
-    </Border>
+        <BoxView Style="{StaticResource separator}"></BoxView>
+    </StackLayout>
 </ContentView>
