@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.CredentialIssuer.Middlewares;
 using SimpleIdServer.CredentialIssuer.Startup;
 using SimpleIdServer.Did.Crypto;
 using SimpleIdServer.Did.Key;
@@ -121,6 +122,7 @@ app.UseAuthentication();
 
 app.UseRouting();
 app.UseAuthorization();
+app.UseMiddleware<MissingContentTypeMiddleware>();
 app.UseEndpoints(endpoints =>
 {
     endpoints.MapControllers();
