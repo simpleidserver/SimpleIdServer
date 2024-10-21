@@ -120,39 +120,41 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         var routeParameters = new Dictionary<string, object>();
         Type handlerContext = null;
         var relativePath = NavigationManager.ToBaseRelativePath(_locationAbsolute);
+        string pathWithoutRealm = locationPath;
         if (!options.Value.IsReamEnabled)
         {
-            if (!locationPath.StartsWith("/"))
-                locationPath = $"/{locationPath}";
-            if (!IsMatch(locationPath, _routeableComponents, out routeParameters, out handlerContext))
-            {
-                _renderHandle.Render(NotFound);
-                return;
-            }
-
-            var routeData = new RouteData(handlerContext, routeParameters);
-            _renderHandle.Render(Found(routeData)); 
-            return;
+            if (!pathWithoutRealm.StartsWith("/"))
+                pathWithoutRealm = $"/{locationPath}";
         }
         else
         {
             var realms = await GetRealms(options);
             var realm = string.IsNullOrWhiteSpace(locationPath) ? Constants.DefaultRealm : locationPath.Split("/").First();
-            var pathWithoutRealm = locationPath.Replace(realm, string.Empty);
-            if (!IsMatch(pathWithoutRealm, _routeableComponents, out routeParameters, out handlerContext))
+            if (realms.Any(r => r.Name == realm))
+                pathWithoutRealm = locationPath.Replace(realm, string.Empty);
+        }
+
+        if (!IsMatch(pathWithoutRealm, _routeableComponents, out routeParameters, out handlerContext))
+        {
+            if(!isNavigationIntercepted)
             {
                 _renderHandle.Render(NotFound);
                 return;
             }
 
-            var routeData = new RouteData(handlerContext, routeParameters);
-            _renderHandle.Render(Found(routeData));
+            NavigationManager.NavigateTo(_locationAbsolute, forceLoad: true);
+            return;
         }
+
+        var routeData = new RouteData(handlerContext, routeParameters);
+        _renderHandle.Render(Found(routeData));
+        return;
     }
 
     private async void OnLocationChanged(object sender, LocationChangedEventArgs args)
     {
-        if(_renderHandle.IsInitialized && _routeableComponents != null)
+        _locationAbsolute = args.Location;
+        if (_renderHandle.IsInitialized && _routeableComponents != null)
         {
             var locationPath = NavigationManager.ToBaseRelativePath(args.Location);
             _ = RunOnNavigateAsync((locationPath), args.IsNavigationIntercepted);
