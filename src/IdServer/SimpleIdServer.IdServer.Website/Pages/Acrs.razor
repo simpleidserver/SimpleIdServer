@@ -76,13 +76,20 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="@Global.DisplayName" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.RegistrationWorkflow" Width="80px">
-                    <Template Context="data">
-                        <RadzenDropDown Data=@registrationWorkflowsState.Value.RegistrationWorkflows.Select(r => r.RegistrationWorkflow)
-                                        TextProperty="Name"
-                                        ValueProperty="Id"
-                                        TValue="string"
-                                        @bind-Value=@data.Value.RegistrationWorkflowId
-                                        Change=@((obj) => UpdateRegistrationWorkflow(obj, data)) />
+                    <Template Context="data">                        
+                        <SidAuthorizeView Roles="/acrs/manage">
+                            <Authorized>
+                                <RadzenDropDown Data=@registrationWorkflowsState.Value.RegistrationWorkflows.Select(r => r.RegistrationWorkflow)
+                                                TextProperty="Name"
+                                                ValueProperty="Id"
+                                                TValue="string"
+                                                @bind-Value=@data.Value.RegistrationWorkflowId
+                                                Change=@((obj) => UpdateRegistrationWorkflow(obj, data)) />
+                            </Authorized>
+                            <NotAuthorized>
+                                <label>@(registrationWorkflowsState.Value.RegistrationWorkflows.Select(r => r.RegistrationWorkflow).FirstOrDefault(r => r.Id == data.Value.RegistrationWorkflowId)?.Name ?? string.Empty)</label>
+                            </NotAuthorized>
+                        </SidAuthorizeView>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">

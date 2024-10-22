@@ -26,8 +26,12 @@
                         @bind-Value=@userPropertyIdProviderMapperForm.TargetUserProperty />
         <p class="text-muted">@Global.PropertyName</p>
         <RadzenRequiredValidator Component="UserPropertyName" Text="@Global.UserPropertyRequired"></RadzenRequiredValidator>
-    </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+    </div>    
+    <SidAuthorizeView Roles=@Permissions>
+        <Authorized>
+            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+        </Authorized>
+    </SidAuthorizeView>
 </RadzenTemplateForm>
 
 @code {
@@ -35,6 +39,8 @@
     public EventCallback<AuthenticationSchemeProviderMapperResult> AuthProviderMapperUpdated { get; set; }
     [Parameter]
     public AuthenticationSchemeProviderMapperResult Mapper { get; set; }
+    [Parameter]
+    public string Permissions{ get; set; }
     IEnumerable<string> userProperties = new List<string>();
 
     record UserPropertyIdProviderMapperForm

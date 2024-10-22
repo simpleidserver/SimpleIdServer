@@ -789,6 +789,7 @@ namespace SimpleIdServer.IdServer
             {
                 Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
                 CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
                 FullPath = "administrator",
                 Realms = new List<GroupRealm>
                 {

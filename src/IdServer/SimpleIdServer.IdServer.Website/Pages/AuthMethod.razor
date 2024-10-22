@@ -17,7 +17,14 @@
 <RadzenText class="mt-3 mb-3" Text="@authMethodState.Value.AuthenticationMethod?.Name" TextStyle="TextStyle.DisplayH3" />
 
 <RadzenCardLoader Variant="Variant.Filled" IsLoading=@authMethodState.Value.IsLoading>
-    <EditConfiguration PropertiesSaved=@SaveProperties Name=@authMethodState.Value.AuthenticationMethod?.OptionsName Values="@authMethodState.Value.AuthenticationMethod?.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+    <SidAuthorizeView Roles=@($"/authentication/manage")>
+        <Authorized>
+            <EditConfiguration PropertiesSaved=@SaveProperties Name=@authMethodState.Value.AuthenticationMethod?.OptionsName Values="@authMethodState.Value.AuthenticationMethod?.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+        </Authorized>
+        <NotAuthorized>
+            <EditConfiguration Name=@authMethodState.Value.AuthenticationMethod?.OptionsName Values="@authMethodState.Value.AuthenticationMethod?.Values" IsUpdating=@IsUpdating IsEnabled="false" IsAddForm=false></EditConfiguration>
+        </NotAuthorized>
+    </SidAuthorizeView>
 </RadzenCardLoader>
 
 @code {

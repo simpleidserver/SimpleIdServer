@@ -11,7 +11,11 @@
 
 @if(IdProvider != null)
 {
-    <RadzenButton class="mb-1" Click="@(args => AddIdProviderMapper())" Icon="add" Text="@Global.AddMapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    <SidAuthorizeView Roles=@("/authentication/manage")>
+        <Authorized>
+            <RadzenButton class="mb-1" Click="@(args => AddIdProviderMapper())" Icon="add" Text="@Global.AddMapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+        </Authorized>
+    </SidAuthorizeView>
 
     <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -48,7 +52,11 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                 <Template Context="data">
-                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    <SidAuthorizeView Roles=@("/authentication/manage")>
+                        <Authorized>
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                        </Authorized>
+                    </SidAuthorizeView>
                 </Template>
             </RadzenDataGridColumn>
         </Columns>

@@ -21,9 +21,9 @@
         <RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH3" />
 
         <div>
-            <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="@Global.Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
             <SidAuthorizeView Roles=@("/automaticidprovisioning/manage")>
                 <Authorized>
+                    <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="@Global.Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
                     <RadzenButton class="mb-1" Click="@(args => TestIdentityProvisioning())" Icon="launch" Text="@Global.TryExtractUsers" ButtonStyle="ButtonStyle.Secondary" Disabled=@isTesting Size="ButtonSize.Medium"></RadzenButton>
                 </Authorized>
             </SidAuthorizeView>

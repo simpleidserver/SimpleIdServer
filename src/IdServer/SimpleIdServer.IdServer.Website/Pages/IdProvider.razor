@@ -71,6 +71,6 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/authentications/idproviders/{id}/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/authentications/idproviders/{id}/{rec.Key}"));
     }
 }

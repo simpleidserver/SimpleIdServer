@@ -34,10 +34,10 @@
         switch (mapper.MapperType)
         {
             case MappingRuleTypes.USERATTRIBUTE:
-                <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserAttributeScopeMapper>
+                <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true" Permissions="/scopes/manage"></UserAttributeScopeMapper>
                 break;
             case MappingRuleTypes.USERPROPERTY:
-                <UserPropertyScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true"></UserPropertyScopeMapper>
+                <UserPropertyScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true" Permissions="/scopes/manage"></UserPropertyScopeMapper>
                 break;
             case MappingRuleTypes.SUBJECT:
                 <!-- Name -->

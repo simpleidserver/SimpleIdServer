@@ -54,7 +54,11 @@
     </Columns>
 </RadzenDataGrid>
 
-<RadzenButton class="mt-1" Click="@(args => SaveClaims())" Icon="save" Text="@Global.Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<SidAuthorizeView Roles=@($"/users/manage")>
+    <Authorized>
+        <RadzenButton class="mt-1" Click="@(args => SaveClaims())" Icon="save" Text="@Global.Save" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
 
 @code {
     [Parameter]

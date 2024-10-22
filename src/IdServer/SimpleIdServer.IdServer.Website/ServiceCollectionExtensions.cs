@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Website.Helpers;
 using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 using System.Security.Claims;
+using System.Xml.Linq;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -79,6 +80,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.HttpOnly = true;
+                options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + Uri.EscapeDataString("AdminWebsite");
             })
             .AddCustomOpenIdConnect("oidc", config =>
             {

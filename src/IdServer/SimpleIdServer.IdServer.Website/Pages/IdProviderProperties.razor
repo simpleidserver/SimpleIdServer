@@ -8,7 +8,14 @@
 
 @if(IdProvider != null)
 {
-    <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvider.Definition.OptionsName Values="@IdProvider.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+    <SidAuthorizeView Roles=@($"/authentication/manage")>
+        <Authorized>
+            <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvider.Definition.OptionsName Values="@IdProvider.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+        </Authorized>
+        <NotAuthorized>
+            <EditConfiguration IsEnabled="false" Name=@IdProvider.Definition.OptionsName Values="@IdProvider.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
+        </NotAuthorized>
+    </SidAuthorizeView>
 }
 
 @code {

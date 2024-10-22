@@ -71,7 +71,14 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.IsDefault">
                     <Template Context="data">
-                        <RadzenCheckBox @bind-Value="@data.RegistrationWorkflow.IsDefault" Change="@(args => ToggleIsDefault(args, data))" TValue="bool"></RadzenCheckBox>
+                        <SidAuthorizeView Roles=@($"/manualidprovisioning/manage")>
+                            <Authorized>
+                                <RadzenCheckBox @bind-Value="@data.RegistrationWorkflow.IsDefault" Change="@(args => ToggleIsDefault(args, data))" TValue="bool"></RadzenCheckBox>
+                            </Authorized>
+                            <NotAuthorized>
+                                <RadzenCheckBox Value="@data.RegistrationWorkflow.IsDefault" Disabled=true TValue="bool"></RadzenCheckBox>
+                            </NotAuthorized>
+                        </SidAuthorizeView>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Property="RegistrationWorkflow.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.UpdateDateTime" Width="80px" />

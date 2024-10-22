@@ -24,8 +24,12 @@
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Description</RadzenText>
         <RadzenTextArea Name="Description" @bind-Value="@updateIdProviderDetails.Description" Class="w-100"></RadzenTextArea>
-    </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProvider.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateIdProvider.Value.IsUpdating />
+    </div>    
+    <SidAuthorizeView Roles=@("/authentication/manage")>
+        <Authorized>
+            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProvider.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateIdProvider.Value.IsUpdating />
+        </Authorized>
+    </SidAuthorizeView>
 </RadzenTemplateForm>
 @code {
     [Parameter]

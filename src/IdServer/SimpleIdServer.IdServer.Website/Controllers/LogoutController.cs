@@ -33,10 +33,12 @@ namespace SimpleIdServer.IdServer.Website.Controllers
 
         [Route("oidccallback")]
         public IActionResult OidcSignoutCallback()
-        {            
+        {
+            var redirectUri = "~/";
+            if (_options.IsReamEnabled) redirectUri = $"~/{IdServer.Helpers.RealmContext.Instance().Realm}/clients";
             return SignOut(new AuthenticationProperties
             {
-                RedirectUri = Url.Content(_options.IsReamEnabled ? "~/master/clients" : "~/")
+                RedirectUri = Url.Content(redirectUri)
             }, CookieAuthenticationDefaults.AuthenticationScheme);
         }
 
