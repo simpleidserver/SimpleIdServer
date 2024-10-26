@@ -22,14 +22,35 @@
     @switch (mapper?.MapperType)
     {
         case MappingRuleTypes.USERATTRIBUTE:
-            <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserAttributeIdProviderMapper>
+            <SidAuthorizeView Roles="/authentication/manage">
+                <Authorized>                    
+                    <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper IsEnabled=true></UserAttributeIdProviderMapper>
+                </Authorized>
+                <NotAuthorized>
+                    <UserAttributeIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper IsEnabled=false></UserAttributeIdProviderMapper>
+                </NotAuthorized>
+            </SidAuthorizeView>
             break;
         case MappingRuleTypes.USERPROPERTY:
-            <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserPropertyIdProviderMapper>
+            <SidAuthorizeView Roles="/authentication/manage">
+                <Authorized>                    
+                    <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper IsEnabled="true"></UserPropertyIdProviderMapper>
+                </Authorized>
+                <NotAuthorized>
+                    <UserPropertyIdProviderMapper Mapper=mapper AuthProviderMapperUpdated=@UpdateAuthProviderMapper IsEnabled="false"></UserPropertyIdProviderMapper>
+                </NotAuthorized>
+            </SidAuthorizeView>
             break;
         case MappingRuleTypes.SUBJECT:
         case MappingRuleTypes.IDENTIFIER:
-            <UserUniqueIdProviderMapper Mapper=mapper Type=mapper.MapperType AuthProviderMapperUpdated=@UpdateAuthProviderMapper></UserUniqueIdProviderMapper>
+            <SidAuthorizeView Roles="/authentication/manage">
+                <Authorized>
+                    <UserUniqueIdProviderMapper Mapper=mapper Type=mapper.MapperType AuthProviderMapperUpdated=@UpdateAuthProviderMapper IsEnabled=true></UserUniqueIdProviderMapper>
+                </Authorized>
+                <NotAuthorized>
+                    <UserUniqueIdProviderMapper Mapper=mapper Type=mapper.MapperType AuthProviderMapperUpdated=@UpdateAuthProviderMapper IsEnabled=false></UserUniqueIdProviderMapper>
+                </NotAuthorized>
+            </SidAuthorizeView>
             break;
     }
 </RadzenCardLoader>

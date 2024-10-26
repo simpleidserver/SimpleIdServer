@@ -42,10 +42,10 @@
             @switch(SelectedMapperType.Type)
             {
                 case MappingRuleTypes.USERATTRIBUTE:
-                    <UserAttributeScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false" Permissions="/scopes/manage"></UserAttributeScopeMapper>
+                    <UserAttributeScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false"></UserAttributeScopeMapper>
                     break;
                 case MappingRuleTypes.USERPROPERTY:
-                    <UserPropertyScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false" Permissions="/scopes/manage"></UserPropertyScopeMapper>
+                    <UserPropertyScopeMapper ScopeMapperSaved="AddScopeMapper" Scope="@Scope" IsEditModeEnabled="false"></UserPropertyScopeMapper>
                     break;
             }
         </RadzenStepsItem>

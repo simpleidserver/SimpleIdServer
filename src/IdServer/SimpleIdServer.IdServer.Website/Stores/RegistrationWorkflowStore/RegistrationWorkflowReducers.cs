@@ -107,6 +107,8 @@ public class RegistrationWorkflowReducers
     public static RegistrationWorkflowsState ReduceAddRegistrationWorkflowSuccessAction(RegistrationWorkflowsState state, AddRegistrationWorkflowSuccessAction action)
     {
         var registrationWorkflows = state.RegistrationWorkflows.ToList();
+        if(action.IsDefault)
+            registrationWorkflows.ForEach(r => r.RegistrationWorkflow.IsDefault = false);
         registrationWorkflows.Add(new SelectableRegistrationWorkflow(new RegistrationWorkflowResult { CreateDateTime = DateTime.Now, Id = action.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps, UpdateDateTime = DateTime.Now }, false)
         {
             IsNew = true

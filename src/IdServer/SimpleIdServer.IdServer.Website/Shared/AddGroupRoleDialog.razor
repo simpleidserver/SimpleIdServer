@@ -3,9 +3,9 @@
 @using SimpleIdServer.IdServer.Website.Stores.GroupStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @inherits FluxorComponent
-@inject IState<GroupRolesState> groupRolesState
 @inject Radzen.DialogService dialogService
 @inject NotificationService notificationService
+@inject IState<GroupRolesState> groupRolesState
 @inject IState<UpdateGroupState> updateGroupState
 @inject IDispatcher dispatcher
 
@@ -68,13 +68,13 @@
 
     void LoadData(LoadDataArgs args)
     {
-        var act = new SearchScopesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top, IsRole = true };
+        var act = new SearchRoleScopesAction { Filter = args.Filter, OrderBy = args.OrderBy, Skip = args.Skip, Take = args.Top };
         dispatcher.Dispatch(act);
     }
 
     void ToggleChanged(bool isSelected, EditableGroupScope scope)
     {
-        var act = new ToggleScopeSelectionAction { IsSelected = isSelected, ScopeName = scope.Value.Name };
+        var act = new ToggleRoleScopeSelectionAction { IsSelected = isSelected, ScopeName = scope.Value.Name };
         dispatcher.Dispatch(act);
     }
 

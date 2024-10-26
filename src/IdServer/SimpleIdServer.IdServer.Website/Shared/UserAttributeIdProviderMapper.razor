@@ -22,7 +22,10 @@
         <RadzenTextBox Name="TargetUserAttribute" @bind-Value="@userAttributeIdProviderMapperForm.TargetUserAttribute" Class="w-100"></RadzenTextBox>
         <RadzenRequiredValidator Component="TargetUserAttribute" Text="@Global.UserAttributeRequired"></RadzenRequiredValidator>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+    @if(IsEnabled)
+    {        
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+    }
 </RadzenTemplateForm>
 
 @code {
@@ -30,6 +33,8 @@
     public EventCallback<AuthenticationSchemeProviderMapperResult> AuthProviderMapperUpdated { get; set; }
     [Parameter]
     public AuthenticationSchemeProviderMapperResult Mapper { get; set; }
+    [Parameter]
+    public bool IsEnabled { get; set; } = true;
 
     record UserAttributeIdProviderMapperForm
     {

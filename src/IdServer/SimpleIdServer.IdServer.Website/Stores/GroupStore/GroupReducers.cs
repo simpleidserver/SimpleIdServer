@@ -298,6 +298,19 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         #region GroupRolesState
 
         [ReducerMethod]
+        public static GroupRolesState ReduceToggleRoleScopeSelectionAction(GroupRolesState state, ToggleRoleScopeSelectionAction act)
+        {
+            var scopes = state.EditableGroupRoles?.ToList();
+            if (scopes == null) return state;
+            var selectedScope = scopes.Single(c => c.Value.Name == act.ScopeName);
+            selectedScope.IsSelected = act.IsSelected;
+            return state with
+            {
+                EditableGroupRoles = scopes
+            };
+        }
+
+        [ReducerMethod]
         public static GroupRolesState ReduceGetGroupAction(GroupRolesState state, GetGroupAction act) => new(new List<Scope>(), true);
 
         [ReducerMethod]
@@ -351,13 +364,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
         }
 
         [ReducerMethod]
-        public static GroupRolesState ReduceSearchScopesAction(GroupRolesState state, SearchScopesAction act) => state with
+        public static GroupRolesState ReduceSearchRoleScopesAction(GroupRolesState state, SearchRoleScopesAction act) => state with
         {
             IsEditableRolesLoading = true
         };
 
         [ReducerMethod]
-        public static GroupRolesState ReduceSearchScopesSuccessAction(GroupRolesState state, SearchScopesSuccessAction act)
+        public static GroupRolesState ReduceSearchRoleScopesSuccessAction(GroupRolesState state, SearchRoleScopesSuccessAction act)
         {
             if (state.GroupRoles == null) return state;
             var result = act.Scopes.OrderBy(s => s.Name).Select(s => new EditableGroupScope(s)

@@ -32,7 +32,10 @@
         <RadzenSwitch @bind-Value=@scopeMapperFom.IncludeInAccessToken Name="IncludeInAccessToken" TValue="bool" />
         <RadzenLabel Text="@Global.IncludeInAccessToken" Component="IncludeInAccessToken" Style="margin-left: 8px; vertical-align: middle;" />
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
+    @if(IsEnabled)
+    {
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
+    }
 </RadzenTemplateForm>
 @code {
     [Parameter]
@@ -43,6 +46,8 @@
     public Scope Scope { get; set; } = null!;
     [Parameter]
     public bool IsEditModeEnabled { get; set; } = false;
+    [Parameter]
+    public bool IsEnabled { get; set; } = true;
 
     IEnumerable<string> userProperties = new List<string>();
 

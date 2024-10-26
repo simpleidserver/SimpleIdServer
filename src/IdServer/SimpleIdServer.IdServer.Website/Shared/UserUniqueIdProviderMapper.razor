@@ -17,7 +17,10 @@
         <RadzenTextBox Name="SourceClaimName" @bind-Value="@userUniqueIdentiferMapperForm.SourceClaimName" Class="w-100"></RadzenTextBox>
         <RadzenRequiredValidator Component="SourceClaimName" Text="@Global.SourceClaimNameRequired"></RadzenRequiredValidator>
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+    @if(IsEnabled)
+    {
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateIdProviderState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateIdProviderState.Value.IsUpdating)" />
+    }    
 </RadzenTemplateForm>
 
 @code {
@@ -27,6 +30,8 @@
     public AuthenticationSchemeProviderMapperResult Mapper { get; set; }
     [Parameter]
     public MappingRuleTypes Type { get; set; }
+    [Parameter]
+    public bool IsEnabled { get; set; } = true;
     IEnumerable<string> userProperties = new List<string>();
 
     record UserUniqueIdentifierIdProviderMapperForm

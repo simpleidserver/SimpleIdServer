@@ -33,12 +33,12 @@
         <RadzenSwitch @bind-Value=@scopeMapperFom.IncludeInAccessToken Name="IncludeInAccessToken" TValue="bool" />
         <RadzenLabel Text="@Global.IncludeInAccessToken" Component="IncludeInAccessToken" Style="margin-left: 8px; vertical-align: middle;" />
     </div>
-    <SidAuthorizeView Roles=@Permissions>
-        <Authorized>
-            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
-        </Authorized>
-    </SidAuthorizeView>
+    @if(IsEnabled)
+    {
+        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeMapperState.Value.IsUpdating ? Global.Saving : Global.Save)" Disabled="@(updateScopeMapperState.Value.IsUpdating)" />
+    }
 </RadzenTemplateForm>
+
 @code {
     [Parameter]
     public EventCallback<ScopeClaimMapper> ScopeMapperSaved { get; set; }
@@ -49,7 +49,7 @@
     [Parameter]
     public bool IsEditModeEnabled { get; set; } = false;
     [Parameter]
-    public string Permissions { get; set; }
+    public bool IsEnabled { get; set; } = true;
 
     record UserAttributeScopeMapperForm : BaseUserScopeMapperForm
     {

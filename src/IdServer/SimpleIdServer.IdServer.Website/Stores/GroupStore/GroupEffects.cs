@@ -343,3 +343,9 @@ public class GetHierarchicalGroupSuccessAction
     public string GroupId { get; set; }
     public List<GetHierarchicalGroupResult> Result { get; set; }
 }
+
+public class ToggleRoleScopeSelectionAction
+{
+    public bool IsSelected { get; set; }
+    public string ScopeName { get; set; } = null!;
+}

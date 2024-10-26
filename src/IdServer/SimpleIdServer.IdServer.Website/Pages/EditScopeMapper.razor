@@ -34,10 +34,24 @@
         switch (mapper.MapperType)
         {
             case MappingRuleTypes.USERATTRIBUTE:
-                <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true" Permissions="/scopes/manage"></UserAttributeScopeMapper>
+                <SidAuthorizeView Roles="/scopes/manage">
+                    <Authorized>
+                        <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true" IsEnabled="true"></UserAttributeScopeMapper>
+                    </Authorized>
+                    <NotAuthorized>                        
+                        <UserAttributeScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true" IsEnabled="false"></UserAttributeScopeMapper>
+                    </NotAuthorized>
+                </SidAuthorizeView>
                 break;
             case MappingRuleTypes.USERPROPERTY:
-                <UserPropertyScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true" Permissions="/scopes/manage"></UserPropertyScopeMapper>
+                <SidAuthorizeView Roles="/scopes/manage">
+                    <Authorized>
+                        <UserPropertyScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true" IsEnabled="true"></UserPropertyScopeMapper>
+                    </Authorized>
+                    <NotAuthorized>
+                        <UserPropertyScopeMapper ScopeMapperSaved="UpdateScopeMapper" Scope="@scopeState.Value.Scope" ClaimMapper="@mapper" IsEditModeEnabled="true" IsEnabled="false"></UserPropertyScopeMapper>
+                    </NotAuthorized>
+                </SidAuthorizeView>
                 break;
             case MappingRuleTypes.SUBJECT:
                 <!-- Name -->

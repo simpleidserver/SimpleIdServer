@@ -8,7 +8,7 @@
 
 @if(IdProvider != null)
 {
-    <SidAuthorizeView Roles=@($"/authentication/manage")>
+    <SidAuthorizeView Roles="/authentication/manage">
         <Authorized>
             <EditConfiguration PropertiesSaved=@SaveProperties Name=@IdProvider.Definition.OptionsName Values="@IdProvider.Values" IsUpdating=@IsUpdating IsAddForm=false></EditConfiguration>
         </Authorized>

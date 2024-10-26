@@ -28,38 +28,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         [EffectMethod]
         public async Task Handle(SearchScopesAction action, IDispatcher dispatcher)
         {
-            var baseUrl = await GetScopesUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            var types = new List<ScopeProtocols>();
-            if (!string.IsNullOrWhiteSpace(action.ClientType))
-            {
-                if (action.ClientType == SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE)
-                    types = new List<ScopeProtocols> { ScopeProtocols.SAML };
-                else
-                    types = new List<ScopeProtocols> { ScopeProtocols.OAUTH, ScopeProtocols.OPENID };
-            }
+            var searchResult = await SearchScopes(action, false);
+            dispatcher.Dispatch(new SearchScopesSuccessAction { Scopes = searchResult.Content, Count = searchResult.Count });
+        }
 
-            var requestMessage = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"{baseUrl}/.search"),
-                Method = HttpMethod.Post,
-                Content = new StringContent(JsonSerializer.Serialize(new SearchScopeRequest
-                {
-                    Filter = SanitizeExpression(action.Filter),
-                    OrderBy = SanitizeExpression(action.OrderBy),
-                    Skip = action.Skip,
-                    Take = action.Take,
-                    Protocols = types,
-                    IsRole = action.IsRole
-                    
-                }), Encoding.UTF8, "application/json")
-            };
-            var httpResult = await httpClient.SendAsync(requestMessage);
-            var json = await httpResult.Content.ReadAsStringAsync();
-            var searchResult = SidJsonSerializer.Deserialize<SearchResult<Domains.Scope>>(json);
-            dispatcher.Dispatch(new SearchScopesSuccessAction { Scopes = searchResult.Content, Count = searchResult.Count});
-
-            string SanitizeExpression(string expression) => expression.Replace("Value.", "");
+        [EffectMethod]
+        public async Task Handle(SearchRoleScopesAction action, IDispatcher dispatcher)
+        {
+            var searchResult = await SearchScopes(action, true);
+            dispatcher.Dispatch(new SearchRoleScopesSuccessAction { Scopes = searchResult.Content, Count = searchResult.Count });
         }
 
         [EffectMethod]
@@ -303,19 +280,69 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
 
             return $"{_options.IdServerBaseUrl}/scopes";
         }
+
+        private async Task<SearchResult<Domains.Scope>> SearchScopes(BaseSearchScopesAction action, bool isRole)
+        {
+            var baseUrl = await GetScopesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var types = new List<ScopeProtocols>();
+            if (!string.IsNullOrWhiteSpace(action.ClientType))
+            {
+                if (action.ClientType == SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE)
+                    types = new List<ScopeProtocols> { ScopeProtocols.SAML };
+                else
+                    types = new List<ScopeProtocols> { ScopeProtocols.OAUTH, ScopeProtocols.OPENID };
+            }
+
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/.search"),
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(new SearchScopeRequest
+                {
+                    Filter = SanitizeExpression(action.Filter),
+                    OrderBy = SanitizeExpression(action.OrderBy),
+                    Skip = action.Skip,
+                    Take = action.Take,
+                    Protocols = types,
+                    IsRole = isRole
+
+                }), Encoding.UTF8, "application/json")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var searchResult = SidJsonSerializer.Deserialize<SearchResult<Domains.Scope>>(json);
+            return searchResult;
+
+            string SanitizeExpression(string expression) => expression.Replace("Value.", "");
+        }
     }
 
-    public class SearchScopesAction
+    public class BaseSearchScopesAction
     {
         public string? Filter { get; set; } = null;
         public string? OrderBy { get; set; } = null;
         public int? Skip { get; set; } = null;
         public int? Take { get; set; } = null;
         public string? ClientType { get; set; } = null;
-        public bool IsRole { get; set; }
+    }
+
+    public class SearchScopesAction : BaseSearchScopesAction
+    {
+    }
+
+    public class SearchRoleScopesAction : BaseSearchScopesAction
+    {
+
     }
 
     public class SearchScopesSuccessAction
+    {
+        public IEnumerable<Domains.Scope> Scopes { get; set; } = new List<Domains.Scope>();
+        public int Count { get; set; }
+    }
+
+    public class SearchRoleScopesSuccessAction
     {
         public IEnumerable<Domains.Scope> Scopes { get; set; } = new List<Domains.Scope>();
         public int Count { get; set; }
