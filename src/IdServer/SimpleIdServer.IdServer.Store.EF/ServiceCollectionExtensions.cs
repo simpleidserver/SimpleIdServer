@@ -60,6 +60,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IMessageBusErrorStore, MessageBusErrorStore>();
             services.AddTransient<ITransactionBuilder, EFTransactionBuilder>();
             services.AddTransient<IFederationEntityStore, FederationEntityStore>();
+            services.AddTransient<ICasbinPolicyRepository, CasbinPolicyRepository>();
         }
     }
 }

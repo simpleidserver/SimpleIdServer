@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
+using FirebaseAdmin.Messaging;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
@@ -43,6 +44,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -231,6 +233,13 @@ void ConfigureIdServer(IServiceCollection services)
         {
             o.IsFederationEnabled = true;
         });
+    services.AddDbContext<CustomDataContext>(a =>
+    {
+        a.UseSqlServer("Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True", o =>
+        {
+            o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+        });
+    }, ServiceLifetime.Scoped);
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
     services.AddDidKey();
@@ -392,6 +401,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
     {
         using (var dbContext = scope.ServiceProvider.GetService<StoreDbContext>())
         {
+            Test(scope.ServiceProvider.GetRequiredService<ICasbinPolicyRepository>());
             var isInMemory = dbContext.Database.IsInMemory();
             if (!isInMemory) dbContext.Database.Migrate();
 
@@ -790,4 +800,12 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             }
         }
     }
+}
+
+void Test(ICasbinPolicyRepository repository)
+{
+    var r = repository.GetAll("casbin", CancellationToken.None).Result;
+    r.First().PolicyName = "coucou";
+    repository.SaveChanges("casbin", CancellationToken.None).Wait();
+    string ss = "";
 }
