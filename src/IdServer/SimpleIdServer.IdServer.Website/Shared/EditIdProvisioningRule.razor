@@ -51,7 +51,10 @@
                     <RadzenTextBox Name="TargetUserAttribute" @bind-Value="@MappingRule.TargetUserAttribute" Class="w-100"></RadzenTextBox>
                     <RadzenRequiredValidator Component="TargetUserAttribute" Text="@Global.UserAttributeRequired"></RadzenRequiredValidator>
                 </div>
-                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? Global.Saving : Global.Save)" Disabled="@(IsUpdating)" />
+                @if(IsEnabled)
+                {
+                    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? Global.Saving : Global.Save)" Disabled="@(IsUpdating)" />
+                }
             </RadzenTemplateForm>
             break;
         case MappingRuleTypes.USERPROPERTY:
@@ -72,7 +75,10 @@
                     <p class="text-muted">@Global.PropertyName</p>
                     <RadzenRequiredValidator Component="UserPropertyName" Text="@Global.UserPropertyRequired"></RadzenRequiredValidator>
                 </div>
-                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? Global.Saving : Global.Save)" Disabled="@(IsUpdating)" />
+                @if(IsEnabled)
+                {
+                    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? Global.Saving : Global.Save)" Disabled="@(IsUpdating)" />
+                }
             </RadzenTemplateForm>
             break;
         case MappingRuleTypes.SUBJECT:
@@ -85,7 +91,10 @@
                     <RadzenTextBox Name="Form" @bind-Value=@MappingRule.From Class="w-100"></RadzenTextBox>
                     <RadzenRequiredValidator Component="Form" Text="@Global.LdapOrJsonPathRequired"></RadzenRequiredValidator>
                 </div>
-                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? Global.Saving : Global.Save)" Disabled="@(IsUpdating)" />
+                @if(IsEnabled)
+                {
+                    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(IsUpdating ? Global.Saving : Global.Save)" Disabled="@(IsUpdating)" />
+                }
             </RadzenTemplateForm>
             break;
     }
@@ -104,6 +113,8 @@
     public bool IsUpdating { get; set; }
     [Parameter]
     public bool IsAdding { get; set; }
+    [Parameter]
+    public bool IsEnabled { get; set; } = true;
     [Parameter]
     public EventCallback<IdentityProvisioningMappingRuleResult> Saved { get; set; }
 

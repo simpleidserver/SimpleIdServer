@@ -34,7 +34,14 @@
 }
 
 <RadzenCardLoader class="m-3" Variant=Variant.Filled IsLoading=@identityProvisioningMappingRuleState.Value.IsLoading>
-    <EditIdProvisioningRule Id="@id" IsUpdating="@updateIdentityProvisioningState.Value.IsUpdating" MappingRule="@identityProvisioningMappingRuleState.Value.Mapping" Saved="@SubmitUpdateIdentityProvisioningMappingRule"></EditIdProvisioningRule>
+    <SidAuthorizeView Roles=@($"/automaticidprovisioning/manage")>
+        <Authorized>
+            <EditIdProvisioningRule Id="@id" IsUpdating="@updateIdentityProvisioningState.Value.IsUpdating" MappingRule="@identityProvisioningMappingRuleState.Value.Mapping" Saved="@SubmitUpdateIdentityProvisioningMappingRule"></EditIdProvisioningRule>
+        </Authorized>
+        <NotAuthorized>
+            <EditIdProvisioningRule Id="@id" IsUpdating="@updateIdentityProvisioningState.Value.IsUpdating" MappingRule="@identityProvisioningMappingRuleState.Value.Mapping" Saved="@SubmitUpdateIdentityProvisioningMappingRule" IsEnabled=false></EditIdProvisioningRule>
+        </NotAuthorized>
+    </SidAuthorizeView>
 </RadzenCardLoader>
 
 
