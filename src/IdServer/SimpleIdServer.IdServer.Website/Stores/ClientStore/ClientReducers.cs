@@ -30,6 +30,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         }
 
         [ReducerMethod]
+        public static SearchClientsState ReduceUpdateClientDetailsAction(SearchClientsState state, UpdateClientDetailsAction act)
+        {
+            var clients = state.Clients;
+            var client = clients.SingleOrDefault(c => c.Value.Id == act.Id);
+            if (client != null) client.Value.UpdateClientName(act.ClientName);
+            return state with
+            {
+                Clients = clients
+            };
+        }
+
+        [ReducerMethod]
         public static SearchClientsState ReduceAddClientSuccessAction(SearchClientsState state, AddClientSuccessAction act)
         {
             var clients = state.Clients?.ToList();
