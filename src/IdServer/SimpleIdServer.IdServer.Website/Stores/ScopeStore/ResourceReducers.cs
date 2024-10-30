@@ -96,6 +96,23 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             };
         }
 
+        [ReducerMethod]
+        public static SearchScopesState ReduceUpdateScopeSuccessAction(SearchScopesState state, UpdateScopeSuccessAction act)
+        {
+            var scopes = state.Scopes;
+            var resource = scopes.SingleOrDefault(s => s.Value.Id == act.ScopeId);
+            if(resource != null)
+            {
+                resource.Value.Description = act.Description;
+                resource.Value.UpdateDateTime = DateTime.Now;
+            }
+
+            return state with
+            {
+                Scopes = scopes
+            };
+        }
+
         #endregion
 
         #region AddScopeState
