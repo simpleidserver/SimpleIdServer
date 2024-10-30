@@ -37,8 +37,8 @@ public class JwtVerifiableCredentialFixture
         var isSignatureValid = handler.CheckJwt(securedJson, identityDocument);
 
         // ASSERT
-        Assert.IsNotNull(securedJson);
-        Assert.IsTrue(isSignatureValid);
+        Assert.That(securedJson != null);
+        Assert.That(isSignatureValid);
     }
 
     #endregion
@@ -66,8 +66,8 @@ public class JwtVerifiableCredentialFixture
         var isSignatureValid = handler.CheckJwt(securedJson, identityDocument);
 
         // ASSERT
-        Assert.IsNotNull(securedJson);
-        Assert.IsTrue(isSignatureValid);
+        Assert.That(securedJson != null);
+        Assert.That(isSignatureValid);
     }
 
     #endregion

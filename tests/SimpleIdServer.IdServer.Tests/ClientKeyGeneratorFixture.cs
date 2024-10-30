@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Tests
             var rsaSigPem = PemConverter.ConvertFromSecurityKey(rsaSig.Key);
             var importedRsa = PemImporter.Import<RsaSecurityKey>(rsaSigPem, "keyId");
             var sigResult = CheckSignature(jwt, importedRsa);
-            Assert.True(sigResult.IsValid);
+            Assert.That(sigResult.IsValid);
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Tests
             var certificateSigPem = PemConverter.ConvertFromSecurityKey(certificateSig.Key);
             var importedCertificate = PemImporter.Import<X509SecurityKey>(certificateSigPem, "keyId");
             var sigResult = CheckSignature(jwt, importedCertificate);
-            Assert.True(sigResult.IsValid);
+            Assert.That(sigResult.IsValid);
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace SimpleIdServer.IdServer.Tests
             var ecdsaSigPem = PemConverter.ConvertFromSecurityKey(ecdsaSig.Key);
             var importedECDsa = PemImporter.Import<ECDsaSecurityKey>(ecdsaSigPem, "keyId");
             var sigResult = CheckSignature(jwt, importedECDsa);
-            Assert.True(sigResult.IsValid);
+            Assert.That(sigResult.IsValid);
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.Tests
             var rsaEncPem = PemConverter.ConvertFromSecurityKey(rsaEnc.Key);
             var importedRsa = PemImporter.Import<RsaSecurityKey>(rsaEncPem, "keyId");
             var decrypted = Decrypt(encJwt, importedRsa);
-            Assert.True(decrypted == "JWT");
+            Assert.That(decrypted == "JWT");
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace SimpleIdServer.IdServer.Tests
             var rsaEncPem = PemConverter.ConvertFromSecurityKey(rsaEnc.Key);
             var importedRsa = PemImporter.Import<X509SecurityKey>(rsaEncPem, "keyId");
             var decrypted = Decrypt(encJwt, importedRsa);
-            Assert.True(decrypted == "JWT");
+            Assert.That(decrypted == "JWT");
         }
 
         private static string Sign(SigningCredentials signingCredentials)

@@ -9,7 +9,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="System.DirectoryServices" Version="7.0.*" />
-		<PackageReference Include="System.DirectoryServices.Protocols" Version="7.0.0" />
+		<PackageReference Include="System.DirectoryServices" Version="8.0.0" />
+		<PackageReference Include="System.DirectoryServices.Protocols" Version="8.0.0" />
 	</ItemGroup>
 </Project>

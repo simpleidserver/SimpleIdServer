@@ -10,7 +10,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.FastFed.Client\SimpleIdServer.FastFed.Client.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.5.1" />
-		<PackageReference Include="MassTransit" Version="8.2.5" />
+		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.1.2" />
+		<PackageReference Include="MassTransit" Version="8.3.0" />
 	</ItemGroup>
 </Project>

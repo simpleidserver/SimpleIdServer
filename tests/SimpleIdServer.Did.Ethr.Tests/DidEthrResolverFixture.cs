@@ -47,8 +47,8 @@ public class DidEthrResolverFixture
 
         // ASSERT
         var contextLst = didDocument.Context.AsArray().Select(c => c.ToString());
-        Assert.True(contextLst.Contains("https://www.w3.org/ns/did/v1"));
-        Assert.True(contextLst.Contains("https://w3id.org/security/suites/secp256k1recovery-2020/v2"));
+        Assert.That(contextLst.Contains("https://www.w3.org/ns/did/v1"));
+        Assert.That(contextLst.Contains("https://w3id.org/security/suites/secp256k1recovery-2020/v2"));
         Assert.That(didDocument.Id, Is.EqualTo("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a"));
         Assert.That(didDocument.VerificationMethod.Count(), Is.EqualTo(1));
         Assert.That(didDocument.VerificationMethod.First().Id, Is.EqualTo("did:ethr:0xb9c5714089478a327f09197987f16f9e5d936e8a#controller"));
@@ -80,9 +80,9 @@ public class DidEthrResolverFixture
 
         // ASSERT
         var contextLst = didDocument.Context.AsArray().Select(c => c.ToString());
-        Assert.True(contextLst.Contains("https://www.w3.org/ns/did/v1"));
-        Assert.True(contextLst.Contains("https://w3id.org/security/suites/secp256k1recovery-2020/v2"));
-        Assert.True(contextLst.Contains("https://w3id.org/security/suites/secp256k1-2019/v1"));
+        Assert.That(contextLst.Contains("https://www.w3.org/ns/did/v1"));
+        Assert.That(contextLst.Contains("https://w3id.org/security/suites/secp256k1recovery-2020/v2"));
+        Assert.That(contextLst.Contains("https://w3id.org/security/suites/secp256k1-2019/v1"));
         Assert.That(didDocument.Id, Is.EqualTo("did:ethr:0x0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"));
         Assert.That(didDocument.VerificationMethod.Count(), Is.EqualTo(2));
         Assert.That(didDocument.VerificationMethod.First().Id, Is.EqualTo("did:ethr:0x0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798#controller"));

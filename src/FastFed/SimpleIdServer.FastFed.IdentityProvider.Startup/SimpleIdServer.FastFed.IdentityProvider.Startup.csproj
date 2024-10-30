@@ -16,7 +16,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-		<PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.2.5" />
+		<PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.3.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Resources\ApplicationProviderResource.Designer.cs">

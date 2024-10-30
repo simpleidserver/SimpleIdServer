@@ -17,13 +17,12 @@ public class DidKeyResolverFixture
         {
             PublicKeyFormat = Ed25519VerificationKey2020Standard.TYPE
         });
-
+        
         // ACT
         var didDocument = await resolver.Resolve(key, CancellationToken.None);
 
-
         // ASSERT
-        Assert.IsNotNull(didDocument);
+        Assert.That(didDocument != null);
         Assert.That(didDocument.VerificationMethod.First().Id, Is.EqualTo("did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK#z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"));
         Assert.That(didDocument.VerificationMethod.First().Type, Is.EqualTo("Ed25519VerificationKey2020"));
         Assert.That(didDocument.VerificationMethod.First().Controller, Is.EqualTo("did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"));
@@ -48,7 +47,7 @@ public class DidKeyResolverFixture
         var didDocument = await resolver.Resolve(key, CancellationToken.None);
 
         // ASSERT
-        Assert.IsNotNull(didDocument);
+        Assert.That(didDocument != null);
         Assert.That(didDocument.VerificationMethod.First().Id, Is.EqualTo("did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp#z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp"));
         Assert.That(didDocument.VerificationMethod.First().Type, Is.EqualTo("JsonWebKey2020"));
         Assert.That(didDocument.VerificationMethod.First().Controller, Is.EqualTo("did:key:z6MkiTBz1ymuepAQ4HEHYSF1H8quG5GLVVQR3djdX3mDooWp"));

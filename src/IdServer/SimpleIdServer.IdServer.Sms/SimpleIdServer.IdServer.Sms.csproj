@@ -10,6 +10,6 @@
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Twilio" Version="6.2.1" />
+		<PackageReference Include="Twilio" Version="7.6.0" />
 	</ItemGroup>
 </Project>

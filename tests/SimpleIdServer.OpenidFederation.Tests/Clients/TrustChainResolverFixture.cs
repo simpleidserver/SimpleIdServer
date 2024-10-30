@@ -21,9 +21,9 @@ public class TrustChainResolverFixture
         var validationResult = trustChain.Select(v => v.Validate());
 
         // ACT
-        Assert.IsNotNull(trustChain);
-        Assert.IsNotNull(validationResult);
-        Assert.IsFalse(validationResult.SelectMany(v => v.ErrorMessages).Any());
+        Assert.That(trustChain != null);
+        Assert.That(validationResult != null);
+        Assert.That(!validationResult.SelectMany(v => v.ErrorMessages).Any());
     }
 
     [Test]
@@ -42,11 +42,11 @@ public class TrustChainResolverFixture
         var trustChains = TrustChainResolver.Transform(dic);
 
         // ASSERT
-        Assert.IsNotNull(trustChains);
-        Assert.IsTrue(trustChains.Any(c => c.Path == "key1;key2;key4"));
-        Assert.IsTrue(trustChains.Any(c => c.Path == "key1;key3;key5"));
-        Assert.IsTrue(trustChains.Any(c => c.Path == "key1;key3;key6"));
-        Assert.AreEqual(3, trustChains.Count());
-        Assert.IsTrue(trustChains.All(c => c.EntityStatements.Count() == 3));
+        Assert.That(trustChains != null);
+        Assert.That(trustChains.Any(c => c.Path == "key1;key2;key4"));
+        Assert.That(trustChains.Any(c => c.Path == "key1;key3;key5"));
+        Assert.That(trustChains.Any(c => c.Path == "key1;key3;key6"));
+        Assert.That(3 == trustChains.Count());
+        Assert.That(trustChains.All(c => c.EntityStatements.Count() == 3));
     }
 }

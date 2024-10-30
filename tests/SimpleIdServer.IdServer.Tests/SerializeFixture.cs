@@ -25,10 +25,10 @@ public class SerializeFixture
         var deserializedClient = JsonSerializer.Deserialize<Client>(json);
 
         // ASSERT
-        Assert.AreEqual(client.ClientId, deserializedClient.ClientId);
-        Assert.AreEqual(client.ClientName, deserializedClient.ClientName);
-        Assert.IsTrue(deserializedClient.Scopes.Any(s => s.Name == "openid"));
-        Assert.IsTrue(deserializedClient.Scopes.Any(s => s.Name == "profile"));
+        Assert.That(client.ClientId == deserializedClient.ClientId);
+        Assert.That(client.ClientName == deserializedClient.ClientName);
+        Assert.That(deserializedClient.Scopes.Any(s => s.Name == "openid"));
+        Assert.That(deserializedClient.Scopes.Any(s => s.Name == "profile"));
     }
 
     [Test]
@@ -52,14 +52,14 @@ public class SerializeFixture
         var deserializedClient = JsonSerializer.Deserialize<Client>(json);
 
         // ASSERT
-        Assert.AreEqual(newClient.ClientId, deserializedClient.ClientId);
-        Assert.AreEqual(newClient.AuthorizationSignedResponseAlg, deserializedClient.AuthorizationSignedResponseAlg);
-        Assert.AreEqual(newClient.IdTokenSignedResponseAlg, deserializedClient.IdTokenSignedResponseAlg);
-        Assert.AreEqual(newClient.RequestObjectSigningAlg, deserializedClient.RequestObjectSigningAlg);
-        Assert.AreEqual(newClient.SerializedJsonWebKeys.Count(), deserializedClient.SerializedJsonWebKeys.Count());
-        Assert.AreEqual(newClient.TokenEndPointAuthMethod, deserializedClient.TokenEndPointAuthMethod);
-        Assert.AreEqual(newClient.DPOPBoundAccessTokens, deserializedClient.DPOPBoundAccessTokens);
-        Assert.AreEqual(newClient.IsDPOPNonceRequired, deserializedClient.IsDPOPNonceRequired);
+        Assert.That(newClient.ClientId == deserializedClient.ClientId);
+        Assert.That(newClient.AuthorizationSignedResponseAlg == deserializedClient.AuthorizationSignedResponseAlg);
+        Assert.That(newClient.IdTokenSignedResponseAlg == deserializedClient.IdTokenSignedResponseAlg);
+        Assert.That(newClient.RequestObjectSigningAlg == deserializedClient.RequestObjectSigningAlg);
+        Assert.That(newClient.SerializedJsonWebKeys.Count() == deserializedClient.SerializedJsonWebKeys.Count());
+        Assert.That(newClient.TokenEndPointAuthMethod == deserializedClient.TokenEndPointAuthMethod);
+        Assert.That(newClient.DPOPBoundAccessTokens == deserializedClient.DPOPBoundAccessTokens);
+        Assert.That(newClient.IsDPOPNonceRequired == deserializedClient.IsDPOPNonceRequired);
     }
 
     [Test]
@@ -77,8 +77,8 @@ public class SerializeFixture
         var deserializedClient = JsonSerializer.Deserialize<Client>(json);
 
         // ASSERT
-        Assert.AreEqual(newClient.ClientId, deserializedClient.ClientId);
-        Assert.AreEqual(TokenExchangeTypes.IMPERSONATION, deserializedClient.TokenExchangeType);
+        Assert.That(newClient.ClientId == deserializedClient.ClientId);
+        Assert.That(TokenExchangeTypes.IMPERSONATION == deserializedClient.TokenExchangeType);
     }
 
     [Test]
@@ -96,8 +96,8 @@ public class SerializeFixture
         var deserializedClient = JsonSerializer.Deserialize<Client>(json);
 
         // ASSERT
-        Assert.AreEqual(newClient.ClientId, deserializedClient.ClientId);
-        Assert.AreEqual(newClient.SerializedJsonWebKeys.Count(), deserializedClient.SerializedJsonWebKeys.Count());
-        Assert.AreEqual(newClient.Parameters.Count(), deserializedClient.Parameters.Count());
+        Assert.That(newClient.ClientId == deserializedClient.ClientId);
+        Assert.That(newClient.SerializedJsonWebKeys.Count() == deserializedClient.SerializedJsonWebKeys.Count());
+        Assert.That(newClient.Parameters.Count() == deserializedClient.Parameters.Count());
     }
 }

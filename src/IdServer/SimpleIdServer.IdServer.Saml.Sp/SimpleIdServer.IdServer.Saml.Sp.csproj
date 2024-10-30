@@ -6,6 +6,6 @@
 		<Description>Support SAML2.0.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.8.8" />
+		<PackageReference Include="ITfoxtec.Identity.Saml2.MvcCore" Version="4.13.2" />
 	</ItemGroup>
 </Project>
