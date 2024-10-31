@@ -165,7 +165,7 @@
 
     string GetGroupLink(RadzenTreeItem data)
     {
-        return urlHelper.GetUrl(urlHelper.GetUrl($"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children"));
+        return urlHelper.GetUrl($"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children");
     }
 
     bool HasChildren(object data)

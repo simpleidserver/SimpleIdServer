@@ -71,11 +71,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
         [ReducerMethod]
         public static SearchIdProvidersState ReduceUpdateIdProviderDetailsAction(SearchIdProvidersState state, UpdateIdProviderDetailsAction act)
         {
-            var idProviders = state.IdProviders.ToList();
-            var idProvider = idProviders.First(i => i.Value.Name == act.Name);
-            idProvider.Value.Description = act.Description;
-            idProvider.Value.DisplayName = act.DisplayName;
-            idProvider.Value.UpdateDateTime = DateTime.Now;
+            var idProviders = state.IdProviders?.ToList();
+            var idProvider = idProviders?.FirstOrDefault(i => i.Value.Name == act.Name);
+            if(idProvider != null)
+            {
+                idProvider.Value.Description = act.Description;
+                idProvider.Value.DisplayName = act.DisplayName;
+                idProvider.Value.UpdateDateTime = DateTime.Now;
+            }
             return state with
             {
                 IdProviders = idProviders
