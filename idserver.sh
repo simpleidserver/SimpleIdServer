@@ -15,45 +15,6 @@ source_dir="$base_dir/src"
 build_dir="$base_dir/build"
 result_dir="$build_dir/results"
 
-# Calling options
-case $1 in
-"clean")
-    clean
-    echo "All cleaned"
-    ;;
-"compile")
-    compile
-    echo "All compiled"
-    ;;
-"dockerBuild")
-    dockerBuild
-    echo "Docker images builded"
-    ;;
-"dockerUp")
-    dockerUp
-    echo "Docker containers running"
-    ;;
-"dockerDown")
-    dockerDown
-    echo "Docker containers deleted"
-    ;;
-"dockerStart")
-    dockerStart
-    echo "Docker containers started"
-    ;;
-"dockerStop")
-    dockerStop
-    echo "Docker containers stopped"
-    ;;
-"fetchSubComponent")
-    fetchSubComponent
-    echo "Submodules updated"
-    ;;
-*)
-    help
-    ;;
-esac
-
 # Config profile
 if [[ -n $2 ]]; then
     config=$2
@@ -137,7 +98,7 @@ function dockerStop() {
     docker compose -f "$base_dir/local-docker-compose.yml" stop
 }
 
-help() {
+function help() {
     echo "Use:
 . idserver.sh OPTION CONFIG
 
@@ -158,3 +119,42 @@ OPTIONs:
 CONFIGs:
     Possible values are: debug and release"
 }
+
+# Calling options
+case $1 in
+"clean")
+    clean
+    echo "All cleaned"
+    ;;
+"compile")
+    compile
+    echo "All compiled"
+    ;;
+"dockerBuild")
+    dockerBuild
+    echo "Docker images builded"
+    ;;
+"dockerUp")
+    dockerUp
+    echo "Docker containers running"
+    ;;
+"dockerDown")
+    dockerDown
+    echo "Docker containers deleted"
+    ;;
+"dockerStart")
+    dockerStart
+    echo "Docker containers started"
+    ;;
+"dockerStop")
+    dockerStop
+    echo "Docker containers stopped"
+    ;;
+"fetchSubComponent")
+    fetchSubComponent
+    echo "Submodules updated"
+    ;;
+*)
+    help
+    ;;
+esac
