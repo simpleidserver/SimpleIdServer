@@ -1,4 +1,5 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+
 config="debug"
 
 # Getting the bash script executing path. See: https://stackoverflow.com/a/630387
