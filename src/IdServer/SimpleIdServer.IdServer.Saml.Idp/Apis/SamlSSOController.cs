@@ -18,6 +18,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Saml.Idp.Apis;
 using SimpleIdServer.IdServer.Saml.Idp.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Saml.Idp.Factories;
@@ -38,6 +39,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
         private readonly IScopeClaimsExtractor _scopeClaimsExtractor;
         private readonly IDistributedCache _distributedCache;
         private readonly IUserRepository _userRepository;
+        private readonly ISaml2AuthResponseEnricher _saml2AuthResponseEnricher;
         private readonly IdServerHostOptions _options;
         private readonly ILogger<SamlSSOController> _logger;
 
@@ -48,6 +50,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             IScopeClaimsExtractor scopeClaimsExtractor, 
             IDistributedCache distributedCache,
             IUserRepository userRepository,
+            ISaml2AuthResponseEnricher saml2AuthResponseEnricher,
             IOptions<IdServerHostOptions> options,
             ILogger<SamlSSOController> logger)
         {
@@ -57,6 +60,7 @@ namespace SimpleIdServer.IdServer.Saml2.Api
             _scopeClaimsExtractor = scopeClaimsExtractor;
             _distributedCache = distributedCache;
             _userRepository = userRepository;
+            _saml2AuthResponseEnricher = saml2AuthResponseEnricher;
             _options = options.Value;
             _logger = logger;
         }
@@ -226,7 +230,8 @@ namespace SimpleIdServer.IdServer.Saml2.Api
                 response.SessionIndex = Guid.NewGuid().ToString();
                 response.NameId = new Saml2NameIdentifier(claimsIdentity.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).Single(), NameIdentifierFormats.Persistent);
                 response.ClaimsIdentity = claimsIdentity;
-                response.CreateSecurityToken(clientResult.Client.ClientId, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
+                var securityToken = response.CreateSecurityToken(clientResult.Client.ClientId, subjectConfirmationLifetime: 5, issuedTokenLifetime: 60);
+                _saml2AuthResponseEnricher.Enrich(securityToken);
             }
 
             return response;
