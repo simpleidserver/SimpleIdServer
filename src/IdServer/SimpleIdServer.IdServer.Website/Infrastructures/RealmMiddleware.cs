@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -73,12 +74,23 @@ public class RealmMiddleware
         var existingRealms = await GetRealms(currentRealm);
         if(!existingRealms.Any(r => r.Name == currentRealm))
         {
+            EnsureCookiesAreRemoved(context, currentRealm);
             ReturnNotFound(context);
             return;
         }
 
         RealmContext.Instance().Realm = currentRealm;
         await _next.Invoke(context);
+    }
+
+    private void EnsureCookiesAreRemoved(HttpContext context, string currentRealm)
+    {
+        var cookieName = $"{CookieAuthenticationDefaults.CookiePrefix + Uri.EscapeDataString("AdminWebsite")}.{currentRealm}";
+        var filteredCookieNames = context.Request.Cookies.Where(c => c.Key.StartsWith(cookieName)).Select(c => c.Key);
+        foreach (var cookie in filteredCookieNames)
+        {
+            context.Response.Cookies.Delete(cookie);
+        }
     }
 
     private void ReturnNotFound(HttpContext context)
