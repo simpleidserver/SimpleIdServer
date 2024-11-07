@@ -12,8 +12,9 @@ namespace SimpleIdServer.IdServer.Stores
     {
         Task<Client> GetById(string realm, string id, CancellationToken cancellationToken);
         Task<Client> GetByClientId(string realm, string clientId, CancellationToken cancellationToken);
+        Task<List<Client>> GetByClientIds(List<string> clientIds, CancellationToken cancellationToken);
         Task<List<Client>> GetByClientIds(string realm, List<string> clientIds, CancellationToken cancellationToken);
-        Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken);
+        Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(List<string> clientIds, CancellationToken cancellationToken);
         Task<List<Client>> GetByClientIdsAndExistingFrontchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken);
         Task<List<Client>> GetAll(string realm, CancellationToken cancellationToken);
         Task<List<Client>> GetAll(string realm, List<string> clientIds, CancellationToken cancellationToken);

@@ -4,6 +4,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.Scim.Domains;
 
 namespace SimpleIdServer.IdServer.Store.EF;
 
@@ -15,6 +16,15 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
     {
         _dbContext = dbContext;
     }
+
+    public Task<List<SerializedFileKey>> GetByKeyIds(List<string> keyIds, CancellationToken cancellationToken)
+    {
+        return _dbContext.SerializedFileKeys
+            .Include(s => s.Realms)
+            .Where(s => keyIds.Contains(s.KeyId))
+            .ToListAsync(cancellationToken);
+    }
+
     public IQueryable<SerializedFileKey> Query() => _dbContext.SerializedFileKeys;
 
     public Task<List<SerializedFileKey>> GetAll(string realm, CancellationToken cancellationToken)

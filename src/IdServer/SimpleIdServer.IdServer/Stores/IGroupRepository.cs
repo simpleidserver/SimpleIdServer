@@ -15,6 +15,7 @@ public interface IGroupRepository
     Task<Group> Get(string realm, string id, CancellationToken cancellationToken);
     Task<Group> GetByStrictFullPath(string realm, string fullPath, CancellationToken cancellationToken);
     Task<List<Group>> GetAllByFullPath(string realm, string fullPath, CancellationToken cancellationToken);
+    Task<List<Group>> GetAllByStrictFullPath(List<string> fullPathLst, CancellationToken cancellationToken);
     Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken);
     Task<List<Group>> GetAllByFullPath(string realm, string id, string fullPath, CancellationToken cancellationToken);
     void Add(Group group);

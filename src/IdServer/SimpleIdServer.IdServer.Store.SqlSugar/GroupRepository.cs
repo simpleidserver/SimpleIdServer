@@ -78,6 +78,16 @@ public class GroupRepository : IGroupRepository
         return result.Select(r => r.ToDomain()).ToList();
     }
 
+    public async Task<List<Group>> GetAllByStrictFullPath(List<string> fullPathLst, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.Client.Queryable<SugarGroup>()
+            .Includes(g => g.Roles, r => r.Realms)
+            .Includes(c => c.Realms)
+            .Where(g => fullPathLst.Contains(g.FullPath))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
+    }
+
     public async Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarGroup>()

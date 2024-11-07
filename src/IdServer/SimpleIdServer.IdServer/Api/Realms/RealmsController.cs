@@ -1,7 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using MassTransit.Initializers;
+using Hangfire;
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Builders;
@@ -12,7 +13,6 @@ using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -23,6 +23,7 @@ namespace SimpleIdServer.IdServer.Api.Realms;
 
 public class RealmsController : BaseController
 {
+    private readonly IBusControl _busControl;
     private readonly IRealmRepository _realmRepository;
     private readonly IUserRepository _userRepository;
     private readonly IClientRepository _clientRepository;
@@ -31,9 +32,12 @@ public class RealmsController : BaseController
     private readonly IGroupRepository _groupRepository;
     private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
     private readonly ITransactionBuilder _transactionBuilder;
+    private readonly IUserSessionResitory _userSessionRepository;
+    private readonly IRecurringJobManager _recurringJobManager;
     private readonly ILogger<RealmsController> _logger;
 
     public RealmsController(
+        IBusControl busControl,
         IRealmRepository realmRepository, 
         IUserRepository userRepository,
         IClientRepository clientRepository,
@@ -42,10 +46,13 @@ public class RealmsController : BaseController
         IGroupRepository groupRepository,
         IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
         ITransactionBuilder transactionBuilder,
+        IUserSessionResitory userSessionRepository,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
+        IRecurringJobManager recurringJobManager,
         ILogger<RealmsController> logger) : base(tokenRepository, jwtBuilder)
     {
+        _busControl = busControl;
         _realmRepository = realmRepository;
         _userRepository = userRepository;
         _clientRepository = clientRepository;
@@ -53,16 +60,19 @@ public class RealmsController : BaseController
         _fileSerializedKeyStore = fileSerializedKeyStore;
         _groupRepository = groupRepository;
         _transactionBuilder = transactionBuilder;
+        _userSessionRepository = userSessionRepository;
+        _recurringJobManager = recurringJobManager;
         _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
         _logger = logger;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll([FromRoute] string prefix, CancellationToken cancellationToken)
     {
+        prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
+            await CheckAccessToken(prefix, Constants.StandardScopes.Realms.Name);
             var realms = await _realmRepository.GetAll(cancellationToken);
             return new OkObjectResult(realms);
         }
@@ -74,25 +84,26 @@ public class RealmsController : BaseController
     }
 
     [HttpPost]
-    public async Task<IActionResult> Add([FromBody] AddRealmRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddRealmRequest request, CancellationToken cancellationToken)
     {
+        prefix = prefix ?? Constants.DefaultRealm;
         using (var activity = Tracing.IdServerActivitySource.StartActivity("Add realm"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(Constants.DefaultRealm, Constants.StandardScopes.Realms.Name);
+                    await CheckAccessToken(prefix, Constants.StandardScopes.Realms.Name);
                     var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
                     if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
                     var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                     var administratorRole = RealmRoleBuilder.BuildAdministrativeRole(realm);
                     var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
-                    var groups = await _groupRepository.GetAllByStrictFullPath(Constants.DefaultRealm, Constants.RealmStandardGroupsFullPath, cancellationToken);
-                    var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
-                    var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
-                    var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
-                    var acrs = await _authenticationContextClassReferenceRepository.GetAll(cancellationToken);
+                    var groups = await _groupRepository.GetAllByStrictFullPath(Constants.RealmStandardGroupsFullPath, cancellationToken);
+                    var clients = await _clientRepository.GetByClientIds(Constants.RealmStandardClients, cancellationToken);
+                    var scopes = await _scopeRepository.GetByNames(Constants.RealmStandardScopes, cancellationToken);
+                    var keys = await _fileSerializedKeyStore.GetByKeyIds(Constants.StandardKeyIds, cancellationToken);
+                    var acrs = await _authenticationContextClassReferenceRepository.GetByNames(Constants.StandardAcrNames, cancellationToken);
                     _realmRepository.Add(realm);
                     foreach (var user in users)
                     {
@@ -144,6 +155,38 @@ public class RealmsController : BaseController
                         Content = JsonSerializer.Serialize(realm).ToString(),
                         ContentType = "application/json"
                     };
+                }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
+                return BuildError(ex);
+            }
+        }
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove realm"))
+        {
+            try
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.Realms.Name);
+                if (id == Constants.DefaultRealm) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CannotRemoveMasterRealm);
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    var existingRealm = await _realmRepository.Get(id, cancellationToken);
+                    if (existingRealm == null) throw new OAuthException(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRealm, id));
+                    var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{RemoveRealmCommandConsumer.Queuename}"));
+                    await sendEndpoint.Send(new RemoveRealmCommand
+                    {
+                        Realm = id
+                    });
+                    activity?.SetStatus(ActivityStatusCode.Ok, $"Realm {id} is removed");
+                    return new NoContentResult();
                 }
             }
             catch (OAuthException ex)

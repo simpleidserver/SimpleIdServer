@@ -394,7 +394,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
         {
             var isInMemory = dbContext.Database.IsInMemory();
             if (!isInMemory) dbContext.Database.Migrate();
-
+            if (dbContext.Translations.Any()) return;
             var masterRealm = dbContext.Realms.FirstOrDefault(r => r.Name == SimpleIdServer.IdServer.Constants.StandardRealms.Master.Name) ?? SimpleIdServer.IdServer.Constants.StandardRealms.Master;
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
@@ -434,8 +434,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             MigrateUsers(dbContext, groups.adminGroup, groups.adminRoGroup, groups.fastFedGroup);
             if (!dbContext.SerializedFileKeys.Any())
             {
-                dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"));
-                dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateECDSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "ecdsa-1"));
+                dbContext.SerializedFileKeys.AddRange(SimpleIdServer.IdServer.Constants.StandardKeys);
                 dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
             }
 

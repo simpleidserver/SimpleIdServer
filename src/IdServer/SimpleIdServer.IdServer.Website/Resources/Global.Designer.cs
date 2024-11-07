@@ -1600,6 +1600,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Do-you want to delete the current realm?.
+        /// </summary>
+        public static string DoYouWantToDeleteRealm {
+            get {
+                return ResourceManager.GetString("DoYouWantToDeleteRealm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Lifetime of DPoP Nonce.
         /// </summary>
         public static string DpopNonceLifetime {
@@ -3375,6 +3384,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The realm is removed.
+        /// </summary>
+        public static string RealmRemoved {
+            get {
+                return ResourceManager.GetString("RealmRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Roles have been updated.
         /// </summary>
         public static string RealmRoleScopesUpdated {
@@ -3443,6 +3461,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Reference {
             get {
                 return ResourceManager.GetString("Reference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Do-you want to refresh the page ?.
+        /// </summary>
+        public static string RefreshPage {
+            get {
+                return ResourceManager.GetString("RefreshPage", resourceCulture);
             }
         }
         
@@ -3542,6 +3569,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Remove {
             get {
                 return ResourceManager.GetString("Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Remove current realm.
+        /// </summary>
+        public static string RemoveRealm {
+            get {
+                return ResourceManager.GetString("RemoveRealm", resourceCulture);
             }
         }
         

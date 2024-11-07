@@ -4,6 +4,7 @@
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.Scim.Domains;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar;
 
@@ -14,6 +15,15 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
     public SerializedFileKeyStore(DbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public async Task<List<SerializedFileKey>> GetByKeyIds(List<string> keyIds, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.Client.Queryable<SugarSerializedFileKey>()
+        .Includes(s => s.Realms)
+            .Where(s => keyIds.Contains(s.KeyId))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
     }
 
     public void Add(SerializedFileKey key)

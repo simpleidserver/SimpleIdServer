@@ -5,6 +5,7 @@ using Fluxor;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Website.Resources;
 using System.Text;
 using System.Text.Json;
@@ -27,7 +28,7 @@ public class RealmEffects
     [EffectMethod]
     public async Task Handle(GetAllRealmAction action, IDispatcher dispatcher)
     {
-        var url = GetRealmsUrl();
+        var url = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
@@ -49,7 +50,7 @@ public class RealmEffects
             return;
         }
 
-        var url = GetRealmsUrl();
+        var url = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var req = new AddRealmRequest
         {
@@ -80,7 +81,34 @@ public class RealmEffects
         }
     }
 
-    private string GetRealmsUrl() => $"{_options.IdServerBaseUrl}/realms";
+    [EffectMethod]
+    public async Task Handle(DeleteCurrentRealmAction action, IDispatcher dispatcher)
+    {
+        var url = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var realm = RealmContext.Instance()?.Realm;
+        var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{url}/{realmStr}"),
+            Method = HttpMethod.Delete
+        };
+        await httpClient.SendAsync(requestMessage);
+        _websiteHttpClientFactory.RemoveAccessToken(realmStr);
+        dispatcher.Dispatch(new DeleteCurrentRealmSuccessAction());
+    }
+
+    private async Task<string> GetBaseUrl()
+    {
+        if (_options.IsReamEnabled)
+        {
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return $"{_options.IdServerBaseUrl}/{realmStr}/realms";
+        }
+
+        return $"{_options.IdServerBaseUrl}/realms";
+    }
 }
 
 public class GetAllRealmAction
@@ -108,4 +136,12 @@ public class AddRealmSuccessAction
 {
     public string Name { get; set; }
     public string Description { get; set; }
+}
+
+public class DeleteCurrentRealmAction
+{
+}
+
+public class DeleteCurrentRealmSuccessAction
+{
 }

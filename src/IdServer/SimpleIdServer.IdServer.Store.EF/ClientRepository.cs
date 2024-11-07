@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.Scim.Domains;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Store.EF;
@@ -37,6 +38,17 @@ public class ClientRepository : IClientRepository
                 .SingleOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
     }
 
+    public Task<List<Client>> GetByClientIds(List<string> clientIds, CancellationToken cancellationToken)
+    {
+        return _dbContext.Clients
+                .Include(c => c.SerializedJsonWebKeys)
+                .Include(c => c.Realms)
+                .Include(c => c.Scopes)
+                .Include(c => c.Translations)
+                .Where(c => clientIds.Contains(c.ClientId))
+                .ToListAsync(cancellationToken);
+    }
+
     public Task<List<Client>> GetByClientIds(string realm, List<string> clientIds, CancellationToken cancellationToken)
     {
         return _dbContext.Clients
@@ -48,10 +60,10 @@ public class ClientRepository : IClientRepository
                 .ToListAsync(cancellationToken);
     }
 
-    public Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
+    public Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(List<string> clientIds, CancellationToken cancellationToken)
     {
         return _dbContext.Clients
-            .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
+            .Where(c => clientIds.Contains(c.ClientId) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
             .ToListAsync();
     }
 

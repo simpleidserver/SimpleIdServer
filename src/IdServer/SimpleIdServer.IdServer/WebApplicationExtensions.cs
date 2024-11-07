@@ -549,23 +549,14 @@ namespace Microsoft.AspNetCore.Builder
                 defaults: new { controller = "Statistics", action = "Get" });
 
             webApplication.SidMapControllerRoute("getAllRealms",
-                pattern: Constants.EndPoints.Realms,
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "GetAll" });
             webApplication.SidMapControllerRoute("addRealm",
-                pattern: Constants.EndPoints.Realms,
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "Add" });
-            webApplication.SidMapControllerRoute("searchRealmRoles",
-                pattern: Constants.EndPoints.Realms + "/{id}/roles/.search",
-                defaults: new { controller = "Realms", action = "SearchRoles" });
-            webApplication.SidMapControllerRoute("getRealmRole",
-                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
-                defaults: new { controller = "Realms", action = "GetRole" });
-            webApplication.SidMapControllerRoute("removeRealmRole",
-                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
-                defaults: new { controller = "Realms", action = "RemoveRole" });
-            webApplication.SidMapControllerRoute("updateRealmRoles",
-                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
-                defaults: new { controller = "Realms", action = "UpdateRoleScopes" });
+            webApplication.SidMapControllerRoute("deleteRealm",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Realms + "/{id}",
+                defaults: new { controller = "Realms", action = "Delete" });
 
             webApplication.SidMapControllerRoute("getAllLanguages",
                 pattern: Constants.EndPoints.Languages,

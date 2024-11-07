@@ -54,6 +54,24 @@ public class UserSessionRepository : IUserSessionResitory
         return session.Select(s => s.ToDomain());
     }
 
+    public Task<int> NbActiveSessions(string realm, CancellationToken cancellationToken)
+        => _dbContext.Client.Queryable<SugarUserSession>().CountAsync(s => s.Realm == realm && s.State == UserSessionStates.Active, cancellationToken);
+
+    public async Task<SearchResult<UserSession>> SearchActiveSessions(string realm, SearchRequest request, CancellationToken cancellationToken)
+    {
+        var query = _dbContext.Client.Queryable<SugarUserSession>()
+            .Includes(s => s.User)
+            .Where(u => u.Realm == realm && u.State == UserSessionStates.Active)
+            .OrderBy(u => u.SessionId);
+        var count = query.Count();
+        var users = await query.Skip(request.Skip.Value).Take(request.Take.Value).ToListAsync(CancellationToken.None);
+        return new SearchResult<UserSession>
+        {
+            Content = users.Select(u => u.ToDomain()).ToList(),
+            Count = count
+        };
+    }
+
     public async Task<SearchResult<UserSession>> Search(string userId, string realm, SearchRequest request, CancellationToken cancellationToken)
     {
         var query = _dbContext.Client.Queryable<SugarUserSession>()

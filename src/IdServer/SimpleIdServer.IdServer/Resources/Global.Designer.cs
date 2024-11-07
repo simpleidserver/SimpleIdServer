@@ -322,6 +322,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the access token issuer is not valid.
+        /// </summary>
+        public static string BadAccessTokenIssuer {
+            get {
+                return ResourceManager.GetString("BadAccessTokenIssuer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à bad authorization code.
         /// </summary>
         public static string BadAuthorizationCode {
@@ -705,6 +714,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string CannotReadCertificateStore {
             get {
                 return ResourceManager.GetString("CannotReadCertificateStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Master realm cannot be removed.
+        /// </summary>
+        public static string CannotRemoveMasterRealm {
+            get {
+                return ResourceManager.GetString("CannotRemoveMasterRealm", resourceCulture);
             }
         }
         

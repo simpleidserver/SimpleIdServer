@@ -1,11 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using MassTransit.Configuration;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Text.RegularExpressions;
@@ -24,6 +26,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
     private Task _previousOnNavigateTask = Task.CompletedTask;
     private IRoutingStateProvider? RoutingStateProvider { get; set; }
 
+    [Inject] private IOptions<IdServerWebsiteOptions> Options { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
     [Inject] IServiceProvider ServiceProvider { get; set; }
     [Inject] private IScrollToLocationHash ScrollToLocationHash { get; set; }
@@ -161,10 +164,22 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         }
     }
 
+    private async Task<string> GetBaseUrl()
+    {
+        if (Options.Value.IsReamEnabled)
+        {
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            return $"{Options.Value.IdServerBaseUrl}/{realmStr}/realms";
+        }
+
+        return $"{Options.Value.IdServerBaseUrl}/realms";
+    }
+
     private async Task<IEnumerable<Realm>> GetRealms(IOptions<IdServerWebsiteOptions> options)
     {
         var httpClientFactory = _serviceProvider.GetRequiredService<IWebsiteHttpClientFactory>();
-        var url = $"{options.Value.IdServerBaseUrl}/realms";
+        var url = await GetBaseUrl();
         var httpClient = await httpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {

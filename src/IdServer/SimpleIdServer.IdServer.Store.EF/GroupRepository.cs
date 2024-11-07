@@ -61,6 +61,13 @@ public class GroupRepository : IGroupRepository
                 .Where(g => g.Realms.Any(r => r.RealmsName == realm) && g.FullPath.StartsWith(fullPath))
                 .ToListAsync(cancellationToken);
 
+    public Task<List<Group>> GetAllByStrictFullPath(List<string> fullPathLst, CancellationToken cancellationToken)
+        => _dbContext.Groups
+            .Include(g => g.Roles).ThenInclude(r => r.Realms)
+            .Include(c => c.Realms)
+            .Where(g => fullPathLst.Contains(g.FullPath))
+            .ToListAsync(cancellationToken);
+
     public Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken)
         => _dbContext.Groups
             .Include(g => g.Roles).ThenInclude(r => r.Realms)

@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer
@@ -34,6 +35,20 @@ namespace SimpleIdServer.IdServer
             "website",
             "urn:website",
             "SIDS-manager"
+        };
+
+        public static List<string> StandardAcrNames => new List<string>
+        {
+            StandardAcrs.FirstLevelAssurance.Name,
+            StandardAcrs.IapSilver.Name
+        };
+
+        public static List<string> StandardKeyIds => StandardKeys.Select(s => s.KeyId).ToList();
+
+        public static List<SerializedFileKey> StandardKeys => new List<SerializedFileKey>
+        {
+            KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"),
+            KeyGenerator.GenerateECDSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "ecdsa-1")
         };
 
         public static List<string> RealmStandardScopes = new List<string>

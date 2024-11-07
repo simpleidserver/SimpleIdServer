@@ -104,6 +104,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddDeviceAuthorizationApi()
                 .AddTokenTypes();
             services.AddAuthorization();
+            services.AddHttpContextAccessor();
             services.Configure<AuthorizationOptions>(o =>
             {
                 o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());

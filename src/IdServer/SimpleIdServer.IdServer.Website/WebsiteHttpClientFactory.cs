@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Helpers;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json.Nodes;
 
@@ -9,18 +11,18 @@ namespace SimpleIdServer.IdServer.Website
 {
     public interface IWebsiteHttpClientFactory
     {
-        Task<HttpClient> Build(string realm = null);
+        Task<HttpClient> Build(string currentRealm = null);
         HttpClient Get();
+        void RemoveAccessToken(string realm);
     }
 
     public class WebsiteHttpClientFactory : IWebsiteHttpClientFactory
     {
         private readonly DefaultSecurityOptions _securityOptions;
         private readonly IdServerWebsiteOptions _idServerWebsiteOptions;
-        private static SemaphoreSlim _lck = new SemaphoreSlim(1);
         private readonly HttpClient _httpClient;
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
-        private GetAccessTokenResult _accessToken;
+        private ConcurrentDictionary<string, GetAccessTokenResult> _accessTokens = new ConcurrentDictionary<string, GetAccessTokenResult>();
 
         public WebsiteHttpClientFactory(DefaultSecurityOptions securityOptions, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
         {
@@ -37,9 +39,9 @@ namespace SimpleIdServer.IdServer.Website
             _jsonWebTokenHandler = new JsonWebTokenHandler();
         }
 
-        public async Task<HttpClient> Build(string realm = null)
+        public async Task<HttpClient> Build(string currentRealm = null)
         {
-            var token = await GetAccessToken(realm);
+            var token = await GetAccessToken(currentRealm);
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
             var acceptLanguage = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
             if (_httpClient.DefaultRequestHeaders.Contains("Language"))
@@ -53,51 +55,48 @@ namespace SimpleIdServer.IdServer.Website
 
         public HttpClient Get() => _httpClient;
 
-        private async Task<GetAccessTokenResult> GetAccessToken(string realm = null)
+        public void RemoveAccessToken(string realm)
         {
-            await _lck.WaitAsync();
-            if (_accessToken != null && _accessToken.IsValid)
-            {
-                _lck.Release();
-                return _accessToken;
-            }
+            _accessTokens.TryRemove(realm, out GetAccessTokenResult r);
+        }
 
-            try
-            {
-                var content = new List<KeyValuePair<string, string>>
-                {
-                    new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
-                    new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
-                    new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities"),
-                    new KeyValuePair<string, string>("grant_type", "client_credentials")
-                };
-                var url = _securityOptions.Issuer;
-                if (!string.IsNullOrWhiteSpace(realm))
-                    url += $"/{realm}";
-                url += "/token";
-                var httpRequest = new HttpRequestMessage
-                {
-                    Method = HttpMethod.Post,
-                    RequestUri = new Uri(url),
-                    Content = new FormUrlEncodedContent(content)
-                };
-                _httpClient.DefaultRequestHeaders.Clear();
-                var httpResult = await _httpClient.SendAsync(httpRequest);
-                var json = await httpResult.Content.ReadAsStringAsync();
-                var accessToken = JsonObject.Parse(json)["access_token"].GetValue<string>();
-                JsonWebToken jwt = null;
-                if (_jsonWebTokenHandler.CanReadToken(accessToken))
-                {
-                    jwt = _jsonWebTokenHandler.ReadJsonWebToken(accessToken);
-                }
+        private async Task<GetAccessTokenResult> GetAccessToken(string currentRealm = null)
+        {
+            var realm = currentRealm;
+            if(string.IsNullOrWhiteSpace(realm))
+                realm = _idServerWebsiteOptions.IsReamEnabled ? RealmContext.Instance()?.Realm : Constants.DefaultRealm;
 
-                _accessToken = new GetAccessTokenResult(accessToken, jwt);
-                return _accessToken;
-            }
-            finally
+            GetAccessTokenResult accessToken = null;
+            if(_accessTokens.ContainsKey(realm))
+                accessToken = _accessTokens[realm];
+            if (accessToken != null && accessToken.IsValid) return accessToken;
+            if (accessToken != null && !accessToken.IsValid) _accessTokens.TryRemove(realm, out GetAccessTokenResult r); 
+            var content = new List<KeyValuePair<string, string>>
             {
-                _lck.Release();
-            }
+                new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
+                new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
+                new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities"),
+                new KeyValuePair<string, string>("grant_type", "client_credentials")
+            };
+            var url = _securityOptions.Issuer;
+            if (!string.IsNullOrWhiteSpace(realm))
+                url += $"/{realm}";
+            url += "/token";
+            var httpRequest = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(url),
+                Content = new FormUrlEncodedContent(content)
+            };
+            _httpClient.DefaultRequestHeaders.Clear();
+            var httpResult = await _httpClient.SendAsync(httpRequest);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var at = JsonObject.Parse(json)["access_token"].GetValue<string>();
+            JsonWebToken jwt = null;
+            if (_jsonWebTokenHandler.CanReadToken(at)) jwt = _jsonWebTokenHandler.ReadJsonWebToken(at);            
+            accessToken = new GetAccessTokenResult(at, jwt);
+            _accessTokens.TryAdd(realm, accessToken);
+            return accessToken;
         }
 
         private record GetAccessTokenResult

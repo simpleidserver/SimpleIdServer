@@ -47,7 +47,17 @@ public class UserSessionRepository : IUserSessionResitory
         throw new NotImplementedException();
     }
 
+    public Task<int> NbActiveSessions(string realm, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<SearchResult<UserSession>> Search(string userId, string realm, SearchRequest request, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<SearchResult<UserSession>> SearchActiveSessions(string realm, SearchRequest request, CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

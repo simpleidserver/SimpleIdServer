@@ -69,6 +69,16 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             return result?.ToDomain();
         }
 
+        public async Task<List<AuthenticationContextClassReference>> GetByNames(List<string> names, CancellationToken cancellationToken)
+        {
+            var result = await _dbContext.Client.Queryable<SugarAuthenticationContextClassReference>()
+                .Includes(a => a.Realms)
+                .Includes(a => a.RegistrationWorkflow)
+                .Where(a => names.Contains(a.Name))
+                .ToListAsync(cancellationToken);
+            return result.Select(r => r.ToDomain()).ToList();
+        }
+
         public async Task<List<AuthenticationContextClassReference>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken)
         {
             var result = await _dbContext.Client.Queryable<SugarAuthenticationContextClassReference>()
