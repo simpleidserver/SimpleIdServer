@@ -37,7 +37,7 @@ function fetchSubComponent() {
 function clean() {
     fetchSubComponent
 
-    rm "$build_dir" -r -f
+    rm -rf "$build_dir"
 }
 
 function compile() {
