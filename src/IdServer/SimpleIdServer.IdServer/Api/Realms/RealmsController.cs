@@ -99,11 +99,11 @@ public class RealmsController : BaseController
                     var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                     var administratorRole = RealmRoleBuilder.BuildAdministrativeRole(realm);
                     var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
-                    var groups = await _groupRepository.GetAllByStrictFullPath(Constants.RealmStandardGroupsFullPath, cancellationToken);
-                    var clients = await _clientRepository.GetByClientIds(Constants.RealmStandardClients, cancellationToken);
-                    var scopes = await _scopeRepository.GetByNames(Constants.RealmStandardScopes, cancellationToken);
-                    var keys = await _fileSerializedKeyStore.GetByKeyIds(Constants.StandardKeyIds, cancellationToken);
-                    var acrs = await _authenticationContextClassReferenceRepository.GetByNames(Constants.StandardAcrNames, cancellationToken);
+                    var groups = await _groupRepository.GetAllByStrictFullPath(Constants.DefaultRealm, Constants.RealmStandardGroupsFullPath, cancellationToken);
+                    var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
+                    var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
+                    var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
+                    var acrs = await _authenticationContextClassReferenceRepository.GetAll(cancellationToken);
                     _realmRepository.Add(realm);
                     foreach (var user in users)
                     {

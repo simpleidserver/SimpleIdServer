@@ -56,7 +56,7 @@ namespace SimpleIdServer.IdServer.Jobs
                             .Where(s => !string.IsNullOrWhiteSpace(s))
                             .Distinct();
 
-                        var targetedClients = await _clientRepository.GetByClientIdsAndExistingBackchannelLogoutUri(clientIds.ToList(), CancellationToken.None);
+                        var targetedClients = await _clientRepository.GetByClientIdsAndExistingBackchannelLogoutUri(group.Key, clientIds.ToList(), CancellationToken.None);
                         var sigCredentials = _keyStore.GetAllSigningKeys(group.Key);
                         await Parallel.ForEachAsync(group.Select(_ => _), async (inactiveSession, c) =>
                         {

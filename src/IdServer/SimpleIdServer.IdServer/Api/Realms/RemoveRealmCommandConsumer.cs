@@ -77,7 +77,7 @@ public class RemoveRealmCommandConsumer :
                     .Where(s => !string.IsNullOrWhiteSpace(s))
                     .Distinct();
                 var sub = _authenticationHelper.GetLogin(activeSession.User);
-                var targetedClients = await _clientRepository.GetByClientIdsAndExistingBackchannelLogoutUri(clientIds.ToList(), CancellationToken.None);
+                var targetedClients = await _clientRepository.GetByClientIdsAndExistingBackchannelLogoutUri(realm, clientIds.ToList(), CancellationToken.None);
                 var sessionClients = targetedClients.Where(c => activeSession.ClientIds.Contains(c.ClientId));
                 activeSession.State = UserSessionStates.Rejected;
                 _userSessionRepository.Update(activeSession);

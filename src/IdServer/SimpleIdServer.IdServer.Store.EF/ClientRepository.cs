@@ -60,12 +60,14 @@ public class ClientRepository : IClientRepository
                 .ToListAsync(cancellationToken);
     }
 
-    public Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(List<string> clientIds, CancellationToken cancellationToken)
+    public Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
     {
         return _dbContext.Clients
-            .Where(c => clientIds.Contains(c.ClientId) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
+            .Include(c => c.Realms)
+            .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
             .ToListAsync();
     }
+
 
     public Task<List<Client>> GetByClientIdsAndExistingFrontchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
     {

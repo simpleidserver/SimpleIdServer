@@ -117,10 +117,11 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             return result.Select(r => r.ToDomain()).ToList(); 
         }
 
-        public async Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(List<string> clientIds, CancellationToken cancellationToken)
+        public async Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
         {
             var result = await _dbContext.Client.Queryable<SugarClient>()
-                .Where(c => clientIds.Contains(c.ClientId) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
+                .Includes(c => c.Realms)
+                .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.RealmsName == realm) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
                 .ToListAsync();
             return result.Select(r => r.ToDomain()).ToList();
         }

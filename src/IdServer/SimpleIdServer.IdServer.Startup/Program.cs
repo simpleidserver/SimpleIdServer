@@ -394,7 +394,6 @@ async void SeedData(WebApplication application, string scimBaseUrl)
         {
             var isInMemory = dbContext.Database.IsInMemory();
             if (!isInMemory) dbContext.Database.Migrate();
-            if (dbContext.Translations.Any()) return;
             var masterRealm = dbContext.Realms.FirstOrDefault(r => r.Name == SimpleIdServer.IdServer.Constants.StandardRealms.Master.Name) ?? SimpleIdServer.IdServer.Constants.StandardRealms.Master;
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
