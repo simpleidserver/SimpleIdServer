@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Stores;
 
 public interface IRegistrationWorkflowRepository
 {
+    Task<List<RegistrationWorkflow>> GetByIds(string realm, List<string> ids, CancellationToken cancellationToken);
     Task<RegistrationWorkflow> Get(string realm, string id, CancellationToken cancellationToken);
     Task<RegistrationWorkflow> GetByName(string realm, string name, CancellationToken cancellationToken);
     Task<RegistrationWorkflow> GetDefault(string realm, CancellationToken cancellationToken);

@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
@@ -180,6 +180,12 @@ namespace SimpleIdServer.IdServer.UI
                 var res = await ResolveAmrInfo(query, prefix, client, token);
                 amrInfo = res?.Item1;
                 viewModel.AmrAuthInfo = amrInfo;
+                if (res != null && res.Value.Item1.CurrentAmr == res.Value.Item1.AllAmr.First())
+                {
+                    viewModel.IsFirstAmr = true;
+                    viewModel.RememberLogin = false;
+                    viewModel.RegistrationWorkflow = res.Value.Item2.RegistrationWorkflow;
+                }
             }
 
             EnrichViewModel(viewModel);

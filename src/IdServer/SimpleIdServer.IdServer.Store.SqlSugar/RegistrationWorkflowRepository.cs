@@ -60,6 +60,15 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
         return result?.ToDomain();
     }
 
+    public async Task<List<RegistrationWorkflow>> GetByIds(string realm, List<string> ids, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.Client.Queryable<SugarRegistrationWorkflow>()
+            .Where(r => r.RealmName == realm && ids.Contains(r.Id))
+            .OrderByDescending(r => r.UpdateDateTime)
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
+    }
+
     public async Task<RegistrationWorkflow> GetDefault(string realm, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarRegistrationWorkflow>()
