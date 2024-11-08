@@ -86,5 +86,6 @@ namespace SimpleIdServer.Scim
         /// </summary>
         public bool EnableRealm { get; set; } = false;
         public bool IsFullRepresentationReturned { get; set; }
+        public bool IsBigMessagePublished { get; set; }
     }
 }

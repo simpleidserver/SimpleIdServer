@@ -44,7 +44,7 @@ namespace SimpleIdServer.Scim.Api
         private readonly IAttributeReferenceEnricher _attributeReferenceEnricher;
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
-        private readonly IBusControl _busControl;
+        private readonly IBusHelper _busControl;
         private readonly IResourceTypeResolver _resourceTypeResolver;
         private readonly IUriProvider _uriProvider;
         private readonly IRealmRepository _realmRepository;
@@ -58,8 +58,8 @@ namespace SimpleIdServer.Scim.Api
             IGetRepresentationQueryHandler getRepresentationQueryHandler, 
             IAttributeReferenceEnricher attributeReferenceEnricher, 
             IOptionsMonitor<SCIMHostOptions> options, 
-            ILogger logger, 
-            IBusControl busControl, 
+            ILogger logger,
+            IBusHelper busControl, 
             IResourceTypeResolver resourceTypeResolver, 
             IUriProvider uriProvider,
             IRealmRepository realmRepository)
@@ -357,7 +357,15 @@ namespace SimpleIdServer.Scim.Api
                 representation.ApplyEmptyArray();
                 var location = GetLocation(representation);
                 var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                if (IsPublishEvtsEnabled)
+                {
+                    var message = new BigMessage
+                    {
+
+                    };
+                    await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                }
+
                 return BuildHTTPResult(HttpStatusCode.Created, location, representation.Version, content);
             }
             catch (SCIMSchemaViolatedException ex)

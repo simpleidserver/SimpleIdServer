@@ -1,7 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using AspNetCore.Authentication.ApiKey;
+using Azure.Storage.Blobs;
 using MassTransit;
+using MassTransit.AzureStorage.MessageData;
+using MassTransit.MessageData;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
@@ -12,6 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
+using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;
@@ -110,15 +114,25 @@ public class Program
 
     private static void ConfigureScim(WebApplicationBuilder builder)
     {
+        var massTransitSection = builder.Configuration.GetSection(nameof(MassTransitStorageConfiguration));
+        var massTransitConf = massTransitSection.Get<MassTransitStorageConfiguration>();
+        var repository = ConfigureMassTransitConfiguration(builder.Services, massTransitConf);
         builder.Services.AddSIDScim(_ =>
         {
             _.IgnoreUnsupportedCanonicalValues = false;
             _.EnableRealm = bool.Parse(builder.Configuration["IsRealmEnabled"]);
+            _.IsBigMessagePublished = massTransitConf.IsEnabled;
         }, massTransitOptions: _ =>
         {
-            _.AddConsumer<IntegrationEventConsumer>();
+            if(repository == null) _.AddConsumer<IntegrationEventConsumer>();
+            else _.AddConsumer<BigMessageConsumer>();
             _.UsingInMemory((context, cfg) =>
             {
+                if (repository != null)
+                {
+                    cfg.UseMessageData(repository);
+                }
+
                 cfg.ConfigureEndpoints(context);
             });
         });
@@ -168,6 +182,28 @@ public class Program
             {
                 options.DefaultSchema = "scim";
             }, supportSqlite: conf.Type == StorageTypes.SQLITE);
+        }
+
+        IMessageDataRepository ConfigureMassTransitConfiguration(IServiceCollection services, MassTransitStorageConfiguration conf)
+        {
+            if (!conf.IsEnabled) return null;
+            IMessageDataRepository repository = null;
+            switch (conf.Type)
+            {
+                case MassTransitStorageTypes.INMEMORY:
+                    repository = new InMemoryMessageDataRepository();
+                    break;
+                case MassTransitStorageTypes.DIRECTORY:
+                    repository = new FileSystemMessageDataRepository(new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory));
+                    break;
+                case MassTransitStorageTypes.AZURESTORAGE:
+                    var client = new BlobServiceClient(conf.ConnectionString);
+                    repository = client.CreateMessageDataRepository("message-data");
+                    break;
+            }
+
+            services.AddSingleton(repository);
+            return repository;
         }
 
         void ConfigureMongoDbStorage(StorageConfiguration conf)

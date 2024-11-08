@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         public DeleteRepresentationCommandHandler(ISCIMSchemaCommandRepository scimSchemaCommandRepository,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
-            IBusControl busControl) : base(busControl)
+            IBusHelper busControl) : base(busControl)
         {
             _scimSchemaCommandRepository = scimSchemaCommandRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;

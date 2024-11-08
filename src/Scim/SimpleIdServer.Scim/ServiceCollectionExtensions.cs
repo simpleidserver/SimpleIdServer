@@ -99,6 +99,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IRepresentationHelper, RepresentationHelper>();
             services.AddHttpContextAccessor();
             services.AddTransient<IUriProvider, UriProvider>();
+            services.AddTransient<IBusHelper, BusHelper>();
             return services;
         }
 

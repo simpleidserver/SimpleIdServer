@@ -34,7 +34,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             IRepresentationReferenceSync representationReferenceSync,
             IRepresentationHelper representationHelper,
             IOptions<SCIMHostOptions> options,
-            IBusControl busControl) : base(busControl)
+            IBusHelper busControl) : base(busControl)
         {
             _scimSchemaCommandRepository = scimSchemaCommandRepository;
             _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;

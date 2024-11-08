@@ -28,7 +28,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
             IRepresentationHelper representationHelper,
-            IBusControl busControl) : base(busControl)
+            IBusHelper busControl) : base(busControl)
         {
             _scimSchemaCommandRepository = scimSchemaCommandRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
