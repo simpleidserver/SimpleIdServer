@@ -31,6 +31,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             var result = new SCIMRepresentationAttribute
             {
                 SchemaAttribute = SchemaAttribute,
+                SchemaAttributeId = SchemaAttribute?.Id,
                 FullPath = SchemaAttribute.FullPath,
                 Namespace = SchemaAttribute.SchemaId,
                 Id = Guid.NewGuid().ToString(),

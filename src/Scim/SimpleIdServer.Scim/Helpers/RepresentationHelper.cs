@@ -17,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -105,7 +106,16 @@ namespace SimpleIdServer.Scim.Helpers
                 if (scimFilter != null)
                 {
                     filteredAttributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, scimExpr, cancellationToken);
-                    hierarchicalFilteredAttributes = SCIMRepresentation.BuildHierarchicalAttributes(filteredAttributes);
+                    if(hierarchicalNewAttributes != null && !filteredAttributes.Any())
+                    {
+                        hierarchicalFilteredAttributes = scimFilter.EvaluateAttributes(SCIMRepresentation.BuildHierarchicalAttributes(result.Patches.Select(p => p.Attr)).AsQueryable(), false).ToList();
+                        filteredAttributes = SCIMRepresentation.BuildFlatAttributes(hierarchicalNewAttributes);
+                    }
+                    else
+                    {
+                        hierarchicalFilteredAttributes = SCIMRepresentation.BuildHierarchicalAttributes(filteredAttributes);
+                    }
+
                     var complexAttr = scimFilter as SCIMComplexAttributeExpression;
                     if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null && patch.Operation == SCIMPatchOperations.REPLACE) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                 }

@@ -1,6 +1,31 @@
 ﻿Feature: Users
 	Check the /Users endpoint
 
+Scenario: Pass multiple add operation for multiple fields to emails and check there is no duplicate
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key                                                        | Value                                                                                                          |
+	| schemas                                                    | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName                                                   | bjen                                                                                                           |
+	| externalId                                                 | externalid                                                                                                     |
+	| name                                                       | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| urn:ietf:params:scim:schemas:extension:enterprise:2.0:User | { "employeeNumber" : "number" }                                                                                |
+	| eidCertificate                                             | aGVsbG8=                                                                                                       |
+	| immutable                                                  | immutable																									  |
+	
+	And extract JSON from body
+	And extract 'id' from JSON body
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                                                                                                                                       |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]						                                                                                                   |
+	| Operations | [ { "op": "add", "path": "emails[type eq work].display", "value" : "display" }, { "op": "add", "path": "emails[type eq work].value", "value" : "value" } ]                  |
+
+	And execute HTTP GET request 'http://localhost/Users/$id$'
+	And extract JSON from body
+
+	Then HTTP status code equals to '200'
+	Then JSON 'emails[0].display'='display'
+	Then JSON 'emails[0].value'='value'
+
 Scenario: Check immutable property can be updated twice with the same value
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key                                                        | Value                                                                                                          |

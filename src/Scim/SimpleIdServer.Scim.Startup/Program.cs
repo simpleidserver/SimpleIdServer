@@ -186,7 +186,12 @@ public class Program
 
         IMessageDataRepository ConfigureMassTransitConfiguration(IServiceCollection services, MassTransitStorageConfiguration conf)
         {
-            if (!conf.IsEnabled) return null;
+            if (!conf.IsEnabled)
+            {
+                services.AddSingleton<IMessageDataRepository>(new InMemoryMessageDataRepository());
+                return null;
+            }
+
             IMessageDataRepository repository = null;
             switch (conf.Type)
             {

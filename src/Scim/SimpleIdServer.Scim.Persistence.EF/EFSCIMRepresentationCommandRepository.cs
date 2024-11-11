@@ -206,7 +206,11 @@ public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandR
     {
         scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId)).ToList();
         foreach (var attr in scimRepresentationAttributes)
+        {
             attr.SchemaAttributeId = attr.SchemaAttribute?.Id;
+            attr.SchemaAttribute = null;
+        }
+
         await _scimDbContext.AddRangeAsync(scimRepresentationAttributes);
     }
 
