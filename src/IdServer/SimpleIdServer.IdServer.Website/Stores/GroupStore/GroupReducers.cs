@@ -380,7 +380,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
             return state with
             {
                 EditableGroupRoles = result,
-                EditableGroupCount = result.Count,
+                EditableGroupCount = act.Count,
                 IsEditableRolesLoading = false
             };
         }
