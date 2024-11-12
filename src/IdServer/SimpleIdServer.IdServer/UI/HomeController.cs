@@ -31,6 +31,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using SimpleIdServer.IdServer.UI.Infrastructures;
 
 namespace SimpleIdServer.IdServer.UI
 {
@@ -50,6 +51,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IDistributedCache _distributedCache;
         private readonly ISessionHelper _sessionHelper;
         private readonly ITransactionBuilder _transactionBuilder;
+        private readonly ISessionManager _sessionManager;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -66,6 +68,7 @@ namespace SimpleIdServer.IdServer.UI
             IDistributedCache distributedCache,
             ISessionHelper sessionHelper,
             ITransactionBuilder transactionBuilder,
+            ISessionManager sessionManager,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -82,6 +85,7 @@ namespace SimpleIdServer.IdServer.UI
             _distributedCache = distributedCache;
             _sessionHelper = sessionHelper;
             _transactionBuilder = transactionBuilder;
+            _sessionManager = sessionManager;
             _logger = logger;
         }
 
@@ -340,29 +344,9 @@ namespace SimpleIdServer.IdServer.UI
         public virtual async Task<IActionResult> Disconnect([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             if (User.Identity == null || !User.Identity.IsAuthenticated) return RedirectToAction("Index");
-            var sessionCookieName = _options.GetSessionCookieName();
-            var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var kvp = Request.Cookies.SingleOrDefault(c => c.Key == sessionCookieName);
-            IEnumerable<string> frontChannelLogouts = new List<string>();
-            if (!string.IsNullOrWhiteSpace(kvp.Key))
-            {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    var activeSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
-                    var targetedClients = await _clientRepository.GetByClientIdsAndExistingFrontchannelLogoutUri(prefix, activeSession.ClientIds, cancellationToken);
-                    frontChannelLogouts = targetedClients.Select(c => BuildFrontChannelLogoutUrl(c, kvp.Value));
-                    if (activeSession != null && !activeSession.IsClientsNotified)
-                    {
-                        activeSession.State = UserSessionStates.Rejected;
-                        _userSessionRepository.Update(activeSession);
-                        await transaction.Commit(cancellationToken);
-                        _recurringJobManager.Trigger(nameof(UserSessionJob));
-                    }
-                }
-            }
-
-            Response.Cookies.Delete(sessionCookieName);
+            var session = await _sessionManager.Revoke(HttpContext.Request, nameIdentifier, prefix, cancellationToken);
+            Response.Cookies.Delete(session.SessionCookieName);
             await HttpContext.SignOutAsync();
             await _busControl.Publish(new UserLogoutSuccessEvent
             {
@@ -371,7 +355,7 @@ namespace SimpleIdServer.IdServer.UI
             });
             return View(new DisconnectViewModel
             {
-                FrontChannelLogoutUrls = frontChannelLogouts
+                FrontChannelLogoutUrls = session.FrontChannelLogouts
             });
         }
 

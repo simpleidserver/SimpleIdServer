@@ -67,7 +67,8 @@ namespace SimpleIdServer.IdServer.UI
         public IActionResult Index([FromRoute] string prefix)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
-            var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName());
+            var userId = User.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
+            var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName(userId));
             newHtml = newHtml.Replace("{activeSessionUrl}", $"{issuer}/{prefix}/{Constants.EndPoints.ActiveSession}");
             return new ContentResult
             {
@@ -82,9 +83,9 @@ namespace SimpleIdServer.IdServer.UI
         {
             prefix = prefix ?? Constants.DefaultRealm;
             if (!User.Identity.IsAuthenticated) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, Global.UserNotAuthenticated);
-            var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
-            if (string.IsNullOrWhiteSpace(kvp.Value)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.MissingSessionId);
             var userId = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(userId));
+            if (string.IsNullOrWhiteSpace(kvp.Value)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.MissingSessionId);
             var user = await _userRepository.GetBySubject(userId, prefix, cancellationToken);
             if (user == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNKNOWN_USER, Global.UserNotAuthenticated);
             var session = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
@@ -103,9 +104,10 @@ namespace SimpleIdServer.IdServer.UI
             var state = jObjBody.GetStateFromRpInitiatedLogoutRequest();
             try
             {
+                var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
                 {
-                    Response.Cookies.Delete(_options.GetSessionCookieName());
+                    Response.Cookies.Delete(_options.GetSessionCookieName(subject));
                     await HttpContext.SignOutAsync();
                     return new ContentResult
                     {
@@ -131,8 +133,7 @@ namespace SimpleIdServer.IdServer.UI
                     url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
                 }
 
-                var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
+                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(subject));
                 var userSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
                 IEnumerable<string> frontChannelLogouts = new List<string>();
                 if (userSession != null && userSession.State == UserSessionStates.Active)
@@ -178,7 +179,7 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
+                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(subject));
                 if(string.IsNullOrWhiteSpace(kvp.Value))
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoSessionId);
@@ -201,7 +202,7 @@ namespace SimpleIdServer.IdServer.UI
                     }
                 }
 
-                Response.Cookies.Delete(_options.GetSessionCookieName());
+                Response.Cookies.Delete(_options.GetSessionCookieName(subject));
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))
                 {

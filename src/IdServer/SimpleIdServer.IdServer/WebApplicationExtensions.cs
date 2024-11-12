@@ -569,6 +569,14 @@ namespace Microsoft.AspNetCore.Builder
                 name: "default",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{controller=Home}/{action=Index}/{id?}");
 
+            if(usePrefix)
+            {
+                webApplication.MapControllerRoute(
+                   name: "getSessions",
+                   pattern: "{controller=Sessions}/{action=Index}"
+                );
+            }
+
             return webApplication;
         }
     }

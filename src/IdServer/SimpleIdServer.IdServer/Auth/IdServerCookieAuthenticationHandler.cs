@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Diagnostics;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
@@ -192,8 +193,6 @@ namespace SimpleIdServer.IdServer.Auth
 
             var currentUtc = Clock.UtcNow;
             var expiresUtc = ticket.Properties.ExpiresUtc;
-
-
             if (expiresUtc != null && expiresUtc.Value < currentUtc)
             {
                 if (Options.SessionStore != null)
@@ -207,7 +206,7 @@ namespace SimpleIdServer.IdServer.Auth
                 return AuthenticateResults.ExpiredTicket;
             }
 
-            var sessionId = Options.CookieManager.GetRequestCookie(Context, _options.GetSessionCookieName());
+            var sessionId = ticket.Principal.Claims.SingleOrDefault(c => c.Type == JwtRegisteredClaimNames.Sid)?.Value;
             if(!string.IsNullOrWhiteSpace(sessionId))
             {
                 var realm = RealmContext.Instance().Realm;

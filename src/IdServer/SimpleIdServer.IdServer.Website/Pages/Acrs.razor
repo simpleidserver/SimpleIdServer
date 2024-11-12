@@ -202,7 +202,9 @@
 
     string GetDemoUrl(SelectableAcr selectableAcr)
     {
-        return $"/login?acrValues={selectableAcr.Value.Name}";
+        var realm = string.Empty;
+        if (!string.IsNullOrWhiteSpace(RealmContext.Instance()?.Realm)) realm = $"&realm={RealmContext.Instance()?.Realm}";
+        return $"/login?acrValues={selectableAcr.Value.Name}{realm}";
     }
 
     async Task<string> GetRealm()

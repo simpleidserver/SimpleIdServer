@@ -90,7 +90,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             catch (OAuthLoginRequiredException ex)
             {
                 context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { _options.GetSessionCookieName(), Constants.DefaultCurrentAmrCookieName });
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { Constants.DefaultCurrentAmrCookieName });
             }
             catch (OAuthSelectAccountRequiredException)
             {
@@ -101,7 +101,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             {
                 var login = _authenticationHelper.GetLogin(context.User);
                 var amrAuthInfo = new AmrAuthInfo(context.User.Id, login, context.User.Email, new List<KeyValuePair<string, string>>(), ex.AllAmrs, ex.Acr, ex.Amr);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(), Constants.DefaultCurrentAmrCookieName }, amrAuthInfo);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(context.Request.UserSubject), Constants.DefaultCurrentAmrCookieName }, amrAuthInfo);
             }
         }
 
@@ -200,7 +200,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
         protected async Task<UserSession> GetActiveSession(HandlerContext context, CancellationToken cancellationToken)
         {
-            var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName());
+            var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(context.Request.UserSubject));
             if (string.IsNullOrWhiteSpace(kvp.Value)) return null;
             var userSession = await _userSessionRepository.GetById(kvp.Value, context.Realm, cancellationToken);
             if (userSession == null) return null;

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
@@ -51,8 +52,9 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddDefaultSecurity(this IServiceCollection services, IConfiguration configuration, bool isRealmEnabled)
+        public static IServiceCollection AddDefaultSecurity(this IServiceCollection services, IConfiguration configuration, bool isRealmEnabled, string cookieName = null)
         {
+            cookieName = cookieName ?? CookieAuthenticationDefaults.CookiePrefix + Uri.EscapeDataString("AdminWebsite");
             string authoritySectionName = nameof(IdServerWebsiteOptions.IdServerBaseUrl);
             string defaultSecurityOptionsSectionName = nameof(DefaultSecurityOptions);
             string? authority = configuration.GetValue<string>(authoritySectionName);
@@ -80,7 +82,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 options.Cookie.SameSite = SameSiteMode.None;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.HttpOnly = true;
-                options.Cookie.Name = CookieAuthenticationDefaults.CookiePrefix + Uri.EscapeDataString("AdminWebsite");
+                options.Cookie.Name = cookieName;
             })
             .AddCustomOpenIdConnect("oidc", config =>
             {
