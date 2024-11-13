@@ -69,7 +69,9 @@ namespace SimpleIdServer.IdServer.UI
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var userId = User.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
             var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName(userId));
-            newHtml = newHtml.Replace("{activeSessionUrl}", $"{issuer}/{prefix}/{Constants.EndPoints.ActiveSession}");
+            var activeSessionUrl = $"{issuer}/{Constants.EndPoints.ActiveSession}";
+            if (!string.IsNullOrWhiteSpace(prefix)) activeSessionUrl = $"{issuer}/{prefix}/{Constants.EndPoints.ActiveSession}";
+            newHtml = newHtml.Replace("{activeSessionUrl}", activeSessionUrl);
             return new ContentResult
             {
                 ContentType = "text/html",

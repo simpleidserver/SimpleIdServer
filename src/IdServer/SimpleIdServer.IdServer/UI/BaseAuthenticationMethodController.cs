@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.AuthProviders;
+using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -36,6 +37,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IUserAuthenticationService _authenticationService;
         private readonly IAntiforgery _antiforgery;
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
+        private readonly ISessionManager _sessionManager;
 
         public BaseAuthenticationMethodController(
             IConfiguration configuration,
@@ -54,13 +56,15 @@ namespace SimpleIdServer.IdServer.UI
             IUserTransformer userTransformer,
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
+            ISessionManager sessionManager) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
         {
             _configuration = configuration;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;
             _antiforgery = antiforgery;
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
+            _sessionManager = sessionManager;
         }
 
         protected abstract string Amr { get; }
@@ -76,6 +80,14 @@ namespace SimpleIdServer.IdServer.UI
 
             try
             {
+                var viewModel = Activator.CreateInstance<T>();
+                var allTickets = _sessionManager.FetchTicketsFromAllRealm(HttpContext);
+                if(allTickets.Count()  >= Options.MaxNbActiveSessions)
+                {
+                    ViewBag.MaximumNumberOfActiveSessions = "true";
+                    return View(viewModel);
+                }
+
                 IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalIdProviders = new List<Microsoft.AspNetCore.Authentication.AuthenticationScheme>();
                 if (IsExternalIdProvidersDisplayed)
                 {
@@ -83,7 +95,6 @@ namespace SimpleIdServer.IdServer.UI
                     externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
                 }
 
-                var viewModel = Activator.CreateInstance<T>();
                 viewModel.ReturnUrl = returnUrl;
                 viewModel.Realm = prefix;
                 viewModel.IsFirstAmr = false;

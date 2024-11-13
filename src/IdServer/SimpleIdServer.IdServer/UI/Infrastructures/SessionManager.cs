@@ -10,6 +10,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
@@ -89,7 +90,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
 
         public IEnumerable<(AuthenticationTicket ticket, string realm)> FetchTicketsFromAllRealm(HttpContext context)
         {
-            var regex = new Regex($"{COOKIE_NAME}\\.\\w*\\-\\w*");
+            var regex = new Regex(_options.UseRealm ? $"{COOKIE_NAME}\\.\\w*\\-\\w*" : $"{COOKIE_NAME}\\-\\w*");
             var filteredCookies = context.Request.Cookies.Where(c => regex.IsMatch(c.Key));
             var result = new List<(AuthenticationTicket ticket, string realm)>();
             foreach (var filterCookie in filteredCookies)
@@ -109,6 +110,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
 
         public async Task<RevokeSessionResult> Revoke(HttpRequest request, string user, string realm, CancellationToken cancellationToken)
         {
+            realm = realm ?? Constants.DefaultRealm;
             var sessionCookieName = _options.GetSessionCookieName(user);
             var kvp = request.Cookies.SingleOrDefault(c => c.Key == sessionCookieName);
             IEnumerable<string> frontChannelLogouts = new List<string>();

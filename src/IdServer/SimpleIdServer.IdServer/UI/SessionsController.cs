@@ -41,7 +41,7 @@ public class SessionsController : Controller
         Response.Cookies.Delete(sessionResult.SessionCookieName);
         var items = new Dictionary<string, string>
         {
-            { "otherUser", request.User }
+            { Constants.LogoutUserKey, request.User }
         };
         await HttpContext.SignOutAsync(new AuthenticationProperties(items));
         await _busControl.Publish(new UserLogoutSuccessEvent

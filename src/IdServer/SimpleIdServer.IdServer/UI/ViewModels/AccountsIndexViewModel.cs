@@ -13,6 +13,6 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         }
 
         public string ReturnUrl { get; }
-        public IEnumerable<AccountViewModel> Accounts { get; }
+        public IEnumerable<AccountViewModel> Accounts { get; set; }
     }
 }

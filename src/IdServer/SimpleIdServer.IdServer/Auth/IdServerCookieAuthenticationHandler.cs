@@ -11,6 +11,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -99,6 +100,7 @@ namespace SimpleIdServer.IdServer.Auth
             {
                 _readCookieTask = ReadCookieTicket();
             }
+
             return _readCookieTask;
         }
 
@@ -207,12 +209,40 @@ namespace SimpleIdServer.IdServer.Auth
             }
 
             var sessionId = ticket.Principal.Claims.SingleOrDefault(c => c.Type == JwtRegisteredClaimNames.Sid)?.Value;
+            var nameIdentifier = ticket.Principal.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            string sessionCookieName = null;
+            if (string.IsNullOrWhiteSpace(sessionId))
+            {
+                sessionCookieName = _options.GetSessionCookieName(nameIdentifier);
+                sessionId = Options.CookieManager.GetRequestCookie(Context, sessionCookieName);
+            }
+
             if(!string.IsNullOrWhiteSpace(sessionId))
             {
                 var realm = RealmContext.Instance().Realm;
                 realm = realm ?? Constants.DefaultRealm;
                 var userSession = await _userSessionResitory.GetById(sessionId, realm, CancellationToken.None);
-                if(userSession == null || !userSession.IsActive()) return AuthenticateResults.ExpiredTicket;
+                if (userSession == null || !userSession.IsActive())
+                {
+                    var cookieOptions = BuildCookieOptions();
+                    var properties = new AuthenticationProperties(new Dictionary<string, string>
+                    {
+                        { Constants.LogoutUserKey, nameIdentifier }
+                    });
+                    var context = new CookieSigningOutContext(
+                        Context,
+                        Scheme,
+                        Options,
+                        properties,
+                        cookieOptions);
+                    await Events.SigningOut(context);
+                    Options.CookieManager.DeleteCookie(
+                        Context,
+                        GetCookieName()!,
+                        context.CookieOptions);
+                    if(!string.IsNullOrWhiteSpace(sessionCookieName)) Options.CookieManager.DeleteCookie(Context, sessionCookieName, context.CookieOptions);
+                    return AuthenticateResults.ExpiredTicket;
+                }
             }
 
             // Finally we have a valid ticket

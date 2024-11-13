@@ -135,16 +135,17 @@ namespace Microsoft.Extensions.DependencyInjection
                     opts.Events.OnSigningOut += (CookieSigningOutContext ctx) =>
                     {
                         string nameIdentifier = null;
-                        if(ctx.Properties != null && ctx.Properties.Items.ContainsKey("otherUser")) nameIdentifier = ctx.Properties.Items["otherUser"];
+                        if(ctx.Properties != null && ctx.Properties.Items.ContainsKey(Constants.LogoutUserKey)) nameIdentifier = ctx.Properties.Items[Constants.LogoutUserKey];
                         if (string.IsNullOrWhiteSpace(nameIdentifier) && ctx.HttpContext.User != null && ctx.HttpContext.User.Identity != null && ctx.HttpContext.User.Identity.IsAuthenticated)
                         {
                             nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                         }
 
-                        ctx.Options.CookieManager.DeleteCookie(
-                                ctx.HttpContext,
-                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
-                                ctx.CookieOptions);
+                        if(!string.IsNullOrWhiteSpace(nameIdentifier))
+                            ctx.Options.CookieManager.DeleteCookie(
+                                    ctx.HttpContext,
+                                    $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
+                                    ctx.CookieOptions);
                         return Task.CompletedTask;
                     };
                 });

@@ -212,7 +212,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Set if the password is encoded in base64.
         /// </summary>
         public bool IsPasswordEncodeInBase64 { get; set; } = false;
-
+        /// <summary>
+        /// Maximum number of active sessions.
+        /// </summary>
+        public int MaxNbActiveSessions { get; set; } = 4;
         public ScimClientOptions ScimClientOptions { get; set; }
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);

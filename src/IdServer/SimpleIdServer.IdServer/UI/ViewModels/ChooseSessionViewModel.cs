@@ -6,5 +6,6 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
     {
         public string ReturnUrl { get; set; }
         public string AccountName { get; set; }
+        public string Action { get; set; }
     }
 }

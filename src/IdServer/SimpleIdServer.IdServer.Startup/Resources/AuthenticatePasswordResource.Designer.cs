@@ -97,6 +97,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The maximum number of active sessions has been reached..
+        /// </summary>
+        public static string maximum_number_active_sessions {
+            get {
+                return ResourceManager.GetString("maximum_number_active_sessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login is missing.
         /// </summary>
         public static string missing_login {
@@ -151,6 +160,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Click the following link to reject sessions.
+        /// </summary>
+        public static string reject_sessions {
+            get {
+                return ResourceManager.GetString("reject_sessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Remember me.
         /// </summary>
         public static string remember_login {
@@ -165,6 +183,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string reset_pwd {
             get {
                 return ResourceManager.GetString("reset_pwd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Sessions.
+        /// </summary>
+        public static string sessions {
+            get {
+                return ResourceManager.GetString("sessions", resourceCulture);
             }
         }
         

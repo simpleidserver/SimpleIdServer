@@ -14,6 +14,8 @@ namespace SimpleIdServer.IdServer
 {
     public static class Constants
     {
+        public const string LogoutUserKey = "otherUser";
+
         public static class JWKUsages
         {
             public const string Enc = "enc";

@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.Website
         {
             var realm = currentRealm;
             if(string.IsNullOrWhiteSpace(realm))
-                realm = _idServerWebsiteOptions.IsReamEnabled ? RealmContext.Instance()?.Realm : Constants.DefaultRealm;
+                realm = _idServerWebsiteOptions.IsReamEnabled ? (RealmContext.Instance()?.Realm ?? Constants.DefaultRealm) : string.Empty;
 
             GetAccessTokenResult accessToken = null;
             if(_accessTokens.ContainsKey(realm))
