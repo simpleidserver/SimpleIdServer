@@ -101,7 +101,7 @@ if (identityServerConfiguration.IsForwardedEnabled)
     });
 }
 
-if(identityServerConfiguration.IsClientCertificateEnabled)
+if(identityServerConfiguration.IsClientCertificateForwarded)
 {
     builder.Services.AddCertificateForwarding(options =>
     {
