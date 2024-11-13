@@ -1,0 +1,20 @@
+﻿@page "/test"
+@using FormBuilder.Components.Form
+@using global::FormBuilder.Components.FormElements.Input
+@using global::FormBuilder.Models
+
+<FormViewer Form="@Record"></FormViewer>
+
+@code {
+    FormRecord Record = new FormRecord
+    {
+        Elements = new List<IFormElementRecord>
+        {
+            new FormInputFieldRecord
+            {
+                Name = "coucou",
+                Value = "value"
+            }
+        }
+    };
+}
