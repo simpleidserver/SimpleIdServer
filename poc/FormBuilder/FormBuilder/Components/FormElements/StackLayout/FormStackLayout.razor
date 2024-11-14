@@ -1,1 +1,21 @@
-﻿
+﻿@using FormBuilder.Components.Form
+@using FormBuilder.Helpers
+@inject IRenderFormElementsHelper renderFormsElementsHelper
+
+@if (Value.Elements != null)
+{
+    if(Value.IsFormEnabled)
+    {
+        <EditForm Model="Value" OnSubmit="Submit" FormName="main">
+            <RadzenStack Orientation="Orientation.Vertical">
+                @CustomRender
+            </RadzenStack>
+        </EditForm>
+    }
+    else
+    {
+        <RadzenStack Orientation="Orientation.Vertical">
+            @CustomRender
+        </RadzenStack>
+    }
+}

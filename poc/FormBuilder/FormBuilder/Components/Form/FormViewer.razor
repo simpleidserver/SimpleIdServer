@@ -1,5 +1,6 @@
-﻿@using global::FormBuilder.Models
-@inject IEnumerable<IFormElementDefinition> definitions
+﻿@using FormBuilder.Helpers
+@using global::FormBuilder.Models
+@inject IRenderFormElementsHelper renderFormsElementsHelper
 
 @if(Form.Elements != null)
 {
@@ -21,14 +22,6 @@
 
     private RenderFragment CreateComponent() => builder =>
     {
-        foreach (var record in Form.Elements)
-        {
-            var expectedType = record.GetType();
-            var definition = definitions.Single(d => d.RecordType == expectedType);
-            var uiElt = definition.UiElt;
-            builder.OpenComponent(0, uiElt);
-            builder.AddAttribute(1, "Value", record);
-            builder.CloseComponent();
-        }
+        renderFormsElementsHelper.Render(builder, Form.Elements);
     };
 }

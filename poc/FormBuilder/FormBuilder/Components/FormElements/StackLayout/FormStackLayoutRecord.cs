@@ -1,5 +1,8 @@
-﻿namespace FormBuilder.Components.FormElements.StackLayout;
+﻿using FormBuilder.Models;
 
-public class FormStackLayoutRecord
+namespace FormBuilder.Components.FormElements.StackLayout;
+
+public class FormStackLayoutRecord : BaseFormLayoutRecord
 {
+    public bool IsFormEnabled { get; set; } = false;
 }

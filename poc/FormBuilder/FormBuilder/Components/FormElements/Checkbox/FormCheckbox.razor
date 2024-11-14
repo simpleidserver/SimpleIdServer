@@ -1,0 +1,7 @@
+﻿@using FormBuilder.Helpers
+@inject ITranslationHelper translationHelper
+
+<div>
+    <RadzenCheckBox @bind-Value="@Value.Value"></RadzenCheckBox>
+    <RadzenLabel>@translationHelper.Translate(Value)</RadzenLabel>
+</div>

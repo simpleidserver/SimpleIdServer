@@ -1,18 +1,31 @@
 using FormBuilder;
-using FormBuilder.Components;
-using FormBuilder.Components.FormElements;
+using FormBuilder.Components.FormElements.Anchor;
+using FormBuilder.Components.FormElements.Button;
+using FormBuilder.Components.FormElements.Checkbox;
+using FormBuilder.Components.FormElements.Divider;
 using FormBuilder.Components.FormElements.Input;
-using Radzen;
+using FormBuilder.Components.FormElements.Password;
+using FormBuilder.Components.FormElements.StackLayout;
+using FormBuilder.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 
 builder.Services.AddTransient<IApplicationBuilder, ApplicationBuilder>();
-builder.Services.AddRadzenComponents();
+
 builder.Services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
+builder.Services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();
+builder.Services.AddTransient<IFormElementDefinition, FormButtonDefinition>();
+builder.Services.AddTransient<IFormElementDefinition, FormStackLayoutDefinition>();
+builder.Services.AddTransient<IFormElementDefinition, FormCheckboxDefinition>();
+builder.Services.AddTransient<IFormElementDefinition, DividerLayoutDefinition>();
+builder.Services.AddTransient<IFormElementDefinition, FormAnchorDefinition>();
+
+builder.Services.AddTransient<ITranslationHelper, TranslationHelper>();
+builder.Services.AddTransient<IRenderFormElementsHelper, RenderFormElementsHelper>();
 
 var app = builder.Build();
 
@@ -28,8 +41,13 @@ app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
+app.UseRouting();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+app.UseEndpoints(edps =>
+{
+    edps.MapBlazorHub();
+    edps.MapFallbackToPage("/_Host");
+    edps.MapControllers();
+});
 
 app.Run();

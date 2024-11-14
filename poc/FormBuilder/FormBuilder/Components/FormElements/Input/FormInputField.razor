@@ -1,3 +1,6 @@
-﻿<RadzenFormField Variant="Variant.Filled">
-    <RadzenTextBox @bind-Value="@Value.Value" Name="@Value.Name"></RadzenTextBox>
+﻿@using FormBuilder.Helpers
+@inject ITranslationHelper translationHelper
+
+<RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value)">
+    <RadzenTextBox @bind-Value="@Value.Value"></RadzenTextBox>
 </RadzenFormField>
