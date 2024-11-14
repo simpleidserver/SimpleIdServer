@@ -162,6 +162,7 @@ if (!app.Environment.IsDevelopment())
 if(identityServerConfiguration.IsClientCertificateForwarded)
     app.UseCertificateForwarding();
 
+app.MapBlazorHub();
 app
     .UseSID()
     .UseVerifiablePresentation()
@@ -181,6 +182,7 @@ void ConfigureIdServer(IServiceCollection services)
 {
     var section = builder.Configuration.GetSection(nameof(ScimClientOptions));
     var conf = section.Get<ScimClientOptions>();
+    services.AddServerSideBlazor();
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))

@@ -1,19 +1,29 @@
-﻿@page "/test"
+﻿@page "/"
 @using FormBuilder.Builders
 @using FormBuilder.Components.Form
 @using FormBuilder.Components.FormElements.Anchor
 @using FormBuilder.Components.FormElements.Button
 @using FormBuilder.Components.FormElements.Checkbox
 @using FormBuilder.Components.FormElements.Divider
+@using FormBuilder.Components.FormElements.Input
 @using FormBuilder.Components.FormElements.Password
 @using FormBuilder.Components.FormElements.StackLayout
-@using global::FormBuilder.Components.FormElements.Input
-@using global::FormBuilder.Models
+@using FormBuilder.Models
+@using System.Text.Json
 
 <FormViewer Form="@Record"></FormViewer>
 
 @code {
-    // Login & password authentication page.
+    FormRecord Record { get; set; }
+    [Parameter] public string SerializedRecord { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        Record = JsonSerializer.Deserialize<FormRecord>(SerializedRecord);
+    }
+
+
     FormRecord Record = new FormRecord
     {
         Elements = new List<IFormElementRecord>
