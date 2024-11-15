@@ -38,13 +38,20 @@ public class UserEntitySeeder : IEntitySeeder<UserSeedDto>
         {
             var usersToCreate = new List<User>();
 
-            foreach (var user in usersNotInDb)
+            foreach (UserSeedDto user in usersNotInDb)
             {
-                var builder = UserBuilder.Create(user.Login, user.Password, user.FirstName)
+                Realm? realm = null;
+
+                if (!string.IsNullOrEmpty(user.Realm))
+                {
+                    realm = await _storeDbContext.Realms.FirstOrDefaultAsync(r => r.Name.ToUpper() == user.Realm.ToUpper());
+                }
+
+                UserBuilder builder = UserBuilder.Create(user.Login, user.Password, user.FirstName, realm)
                     .SetLastname(user.LastName)
                     .SetEmail(user.Email);
 
-                foreach (var role in user.Roles) { builder.AddRole(role); }
+                foreach (string role in user.Roles) { builder.AddRole(role); }
 
                 usersToCreate.Add(builder.Build());
             }

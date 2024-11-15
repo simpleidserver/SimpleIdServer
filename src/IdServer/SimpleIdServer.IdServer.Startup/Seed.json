@@ -1,4 +1,9 @@
 {
+  "Realms": [
+    {
+      "Name": "tools"
+    }
+  ],
   "Users": [
     {
       "Login": "user2",
@@ -6,11 +11,13 @@
       "FirstName": "User",
       "LastName": "2",
       "Email": "user2@email.com",
-      "Roles": ["user", "local"]
+      "Roles": [ "user", "local" ],
+      "Realm":  "tools"
     },
     {
       "Login": "user3",
-      "Password": "password"
+      "Password": "password",
+      "Realm": "tools"
     }
   ]
 }
