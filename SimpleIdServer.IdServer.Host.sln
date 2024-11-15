@@ -133,6 +133,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Scim", "01. Scim", "{0C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Parser", "src\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj", "{F5753099-E7C0-406F-B48E-87DAF80F88D5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Domains", "src\Scim\SimpleIdServer.Scim.Domains\SimpleIdServer.Scim.Domains.csproj", "{78FA92C7-C140-4A77-9777-528ED390332D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -351,6 +353,10 @@ Global
 		{F5753099-E7C0-406F-B48E-87DAF80F88D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5753099-E7C0-406F-B48E-87DAF80F88D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5753099-E7C0-406F-B48E-87DAF80F88D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78FA92C7-C140-4A77-9777-528ED390332D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78FA92C7-C140-4A77-9777-528ED390332D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78FA92C7-C140-4A77-9777-528ED390332D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78FA92C7-C140-4A77-9777-528ED390332D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -417,6 +423,7 @@ Global
 		{7098E926-13C8-4085-9CAA-A27EF72F7520} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{0CF45705-7CD6-48B6-B032-D9031BB67F18} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{F5753099-E7C0-406F-B48E-87DAF80F88D5} = {0CF45705-7CD6-48B6-B032-D9031BB67F18}
+		{78FA92C7-C140-4A77-9777-528ED390332D} = {0CF45705-7CD6-48B6-B032-D9031BB67F18}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}
