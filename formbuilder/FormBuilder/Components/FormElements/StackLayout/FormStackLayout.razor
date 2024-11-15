@@ -1,12 +1,11 @@
 ﻿@using FormBuilder.Components.Form
 @using FormBuilder.Helpers
-@inject IRenderFormElementsHelper renderFormsElementsHelper
 
 @if (Value.Elements != null)
 {
     if(Value.IsFormEnabled)
     {
-        <EditForm Model="Value" OnSubmit="Submit" FormName="main">
+        <EditForm Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
             <RadzenStack Orientation="Orientation.Vertical">
                 @CustomRender
             </RadzenStack>

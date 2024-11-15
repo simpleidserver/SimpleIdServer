@@ -6,6 +6,7 @@ using FormBuilder.Components.FormElements.Divider;
 using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
+using FormBuilder.Factories;
 using FormBuilder.Helpers;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,12 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFormElementDefinition, FormAnchorDefinition>();
         services.AddTransient<ITranslationHelper, TranslationHelper>();
         services.AddTransient<IRenderFormElementsHelper, RenderFormElementsHelper>();
+        services.AddTransient<ITargetUrlHelper, DirectTargetUrlHelper>();
+        services.AddTransient<ITargetUrlHelper, ControllerActionTargetUrlHelper>();
+        services.AddTransient<ITargetUrlHelperFactory, TargetUrlHelperFactory>();
+        services.AddTransient<IUriProvider, UriProvider>();
+        services.AddHttpContextAccessor();
+        services.AddHttpClient();
         return services;
     }
 }

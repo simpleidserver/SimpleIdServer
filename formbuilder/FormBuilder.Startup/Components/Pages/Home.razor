@@ -14,19 +14,9 @@
 <FormViewer Form="@Record"></FormViewer>
 
 @code {
-    FormRecord Record { get; set; }
-    [Parameter] public string SerializedRecord { get; set; }
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        Record = JsonSerializer.Deserialize<FormRecord>(SerializedRecord);
-    }
-
-
     FormRecord Record = new FormRecord
     {
-        Elements = new List<IFormElementRecord>
+            Elements = new List<IFormElementRecord>
         {
             new FormStackLayoutRecord
             {
@@ -36,6 +26,11 @@
                     new FormStackLayoutRecord
                     {
                         IsFormEnabled = true,
+                        Url = new ControllerActionTargetUrl
+                        {
+                            Action = "Confirm",
+                            Controller = "Auth"
+                        },
                         Elements = new List<IFormElementRecord>
                         {
                             new FormInputFieldRecord
@@ -52,7 +47,7 @@
                             },
                             new FormCheckboxRecord
                             {
-                              Name = "IsRememberMe",
+                              Name = "RememberLogin",
                               Value = true,
                               Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").Build()
                             },
