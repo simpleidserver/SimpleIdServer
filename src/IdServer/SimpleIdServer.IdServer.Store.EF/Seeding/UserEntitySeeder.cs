@@ -44,7 +44,8 @@ public class UserEntitySeeder : IEntitySeeder<UserSeedDto>
 
                 if (!string.IsNullOrEmpty(user.Realm))
                 {
-                    realm = await _storeDbContext.Realms.FirstOrDefaultAsync(r => r.Name.ToUpper() == user.Realm.ToUpper());
+                    realm = await _storeDbContext.Realms
+                        .FirstOrDefaultAsync(r => r.Name.ToUpper() == user.Realm.ToUpper(), cancellationToken);
                 }
 
                 UserBuilder builder = UserBuilder.Create(user.Login, user.Password, user.FirstName, realm)

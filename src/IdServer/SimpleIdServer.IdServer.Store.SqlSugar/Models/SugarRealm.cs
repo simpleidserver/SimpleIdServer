@@ -19,6 +19,14 @@ public class SugarRealm
     [Navigate(NavigateType.OneToMany, nameof(SugarPresentationDefinition.RealmName))]
     public List<SugarPresentationDefinition> PresentationDefinitions { get; set; }
 
+    public static SugarRealm Transform(Realm realm) => new()
+    {
+        CreateDateTime = realm.CreateDateTime,
+        UpdateDateTime = realm.UpdateDateTime,
+        Description = realm.Description ?? realm.Name,
+        RealmsName = realm.Name
+    };
+
     public Realm ToDomain()
     {
         return new Realm

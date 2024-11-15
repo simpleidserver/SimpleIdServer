@@ -22,11 +22,13 @@ using SimpleIdServer.IdServer.Notification.Gotify;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
+using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.SqlSugar.Startup;
 using SimpleIdServer.IdServer.SqlSugar.Startup.Configurations;
 using SimpleIdServer.IdServer.SqlSugar.Startup.Converters;
 using SimpleIdServer.IdServer.Store.SqlSugar;
+using SimpleIdServer.IdServer.Store.SqlSugar.Seeding;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
@@ -38,6 +40,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -100,9 +103,9 @@ builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
 
-// Uncomment these two lines to enable seed data from JSON file.
-// builder.Services.AddJsonSeeding(builder.Configuration);
-// builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
+// Delete these two lines or remove the JSON_SEEDS_FILE_PATH key/content from the configuration to disable seed data from JSON file.
+builder.Services.AddJsonSeeding(builder.Configuration);
+builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 
 var app = builder.Build();
 app.UseCors("AllowAll");
@@ -275,7 +278,7 @@ void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
     dataProtectionBuilder.Services.PersistKeysToSqlSugar();
 }
 
-void SeedData(WebApplication webApplication)
+async Task SeedData(WebApplication webApplication)
 {
     var dbContext = webApplication.Services.GetRequiredService<DbContext>();
     dbContext.Migrate();
@@ -301,37 +304,37 @@ void SeedData(WebApplication webApplication)
     {
         foreach (var realm in IdServerConfiguration.Realms)
             realmRepository.Add(realm);
-        
-        foreach(var scope in IdServerConfiguration.Scopes)
+
+        foreach (var scope in IdServerConfiguration.Scopes)
             scopeRepository.Add(scope);
-        
+
         foreach (var user in IdServerConfiguration.Users)
             userRepository.Add(user);
-        
+
         foreach (var client in IdServerConfiguration.Clients)
             clientRepository.Add(client);
-        
+
         foreach (var umaPendingRequest in IdServerConfiguration.PendingRequests)
             umaPendingRequestRepository.Add(umaPendingRequest);
-        
+
         foreach (var umaResource in IdServerConfiguration.Resources)
             umaResourceRepository.Add(umaResource);
-        
+
         foreach (var gotifySession in IdServerConfiguration.Sessions)
             gotifySessionRepository.Add(gotifySession);
-        
+
         foreach (var language in IdServerConfiguration.Languages)
             languageRepository.Add(language);
-        
+
         foreach (var definition in IdServerConfiguration.ProviderDefinitions)
             providerDefinitionRepository.Add(definition);
-        
+
         foreach (var authProvider in IdServerConfiguration.Providers)
             authSchemeProviderRepository.Add(authProvider);
-        
+
         foreach (var idProvisioningDef in IdServerConfiguration.IdentityProvisioningDefLst)
             idProvisioningDefRepository.Add(idProvisioningDef);
-        
+
         foreach (var registrationWorkflow in IdServerConfiguration.RegistrationWorkflows)
             registrationWorkflowRepository.Add(registrationWorkflow);
 
@@ -400,8 +403,12 @@ void SeedData(WebApplication webApplication)
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<NegotiateOptionsLite>());
         configurationDefinitionRepository.Add(ConfigurationDefinitionExtractor.Extract<UserLockingOptions>());
 
-        transaction.Commit(CancellationToken.None).Wait();
+        await transaction.Commit(CancellationToken.None);
     }
+
+    // Delete these two lines to disable seed data from an external resource like JSON file.
+    ISeedStrategy seedingService = webApplication.Services.GetRequiredService<ISeedStrategy>();
+    await seedingService.SeedDataAsync();
 
     EnsureIsolationLevel();
 
@@ -415,7 +422,7 @@ void SeedData(WebApplication webApplication)
             return;
         }
 
-        if(ado is MySqlConnection)
+        if (ado is MySqlConnection)
         {
             dbContext.SqlSugarClient.Ado.ExecuteCommand(MYSQLCreateTableFormat);
             return;
