@@ -1,5 +1,5 @@
 ﻿using FormBuilder.Helpers;
-using FormBuilder.Models;
+using FormBuilder.Models.Url;
 
 namespace FormBuilder.Factories;
 

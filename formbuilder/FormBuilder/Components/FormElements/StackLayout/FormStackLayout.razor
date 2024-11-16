@@ -6,6 +6,11 @@
     if(Value.IsFormEnabled)
     {
         <EditForm Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
+            @if(Value.IsAntiforgeryEnabled)
+            {
+                <AntiforgeryToken />
+            }
+
             <RadzenStack Orientation="Orientation.Vertical">
                 @CustomRender
             </RadzenStack>

@@ -8,6 +8,9 @@ using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
+using FormBuilder.Rules;
+using FormBuilder.Transformers;
+using FormBuilder.Url;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -27,6 +30,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITargetUrlHelper, DirectTargetUrlHelper>();
         services.AddTransient<ITargetUrlHelper, ControllerActionTargetUrlHelper>();
         services.AddTransient<ITargetUrlHelperFactory, TargetUrlHelperFactory>();
+        services.AddTransient<ITransformer, ControllerActionTransformer>();
+
+        services.AddTransient<ITransformationRuleEngine, IncomingTokensTransformationRuleEngine>();
+        services.AddTransient<IRuleEngine, RuleEngine>();
+
         services.AddTransient<IUriProvider, UriProvider>();
         services.AddHttpContextAccessor();
         services.AddHttpClient();

@@ -1,2 +1,7 @@
-* Ajouter antiforgery : TODO
+* Ajouter antiforgery : OK
 * Afficher une liste de btn venant de la DB : TODO
+Il devrait être possible de spécifier dans l'élément StackLayout, le JSON PATH du view model serialize, spécifier le type d'élément et indiquer les règles de mapping.
+
+Architecture globale :
+
+View model serialize => FORMBUILDER => VIEWMODEL SUBMIT.

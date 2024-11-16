@@ -1,6 +1,13 @@
 ﻿@using FormBuilder.Helpers
 @inject ITranslationHelper translationHelper
 
-<RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value)">
-    <RadzenTextBox @bind-Value="@Value.Value"></RadzenTextBox>
-</RadzenFormField>
+@if(Value.Type != FormInputTypes.HIDDEN)
+{
+    <RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value)">
+        <RadzenTextBox @bind-Value="@Value.Value"></RadzenTextBox>
+    </RadzenFormField>
+}
+else
+{
+    <input type="hidden" value="@Value.Value" name="@Value.Name" />
+}

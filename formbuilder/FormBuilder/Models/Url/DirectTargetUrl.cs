@@ -1,4 +1,4 @@
-﻿namespace FormBuilder.Models;
+﻿namespace FormBuilder.Models.Url;
 
 public class DirectTargetUrl : ITargetUrl
 {

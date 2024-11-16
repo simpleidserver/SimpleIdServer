@@ -26,6 +26,7 @@
                     new FormStackLayoutRecord
                     {
                         IsFormEnabled = true,
+                        IsAntiforgeryEnabled = true,
                         Url = new ControllerActionTargetUrl
                         {
                             Action = "Confirm",
@@ -33,6 +34,12 @@
                         },
                         Elements = new List<IFormElementRecord>
                         {
+                            new FormInputFieldRecord
+                            {
+                                Name = "ReturnUrl",
+                                Value = string.Empty,
+                                Type = FormInputTypes.HIDDEN
+                            },
                             new FormInputFieldRecord
                             {
                                 Name = "Login",

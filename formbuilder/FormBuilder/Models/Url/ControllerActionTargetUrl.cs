@@ -1,4 +1,4 @@
-﻿namespace FormBuilder.Models;
+﻿namespace FormBuilder.Models.Url;
 
 public class ControllerActionTargetUrl : ITargetUrl
 {
@@ -6,4 +6,5 @@ public class ControllerActionTargetUrl : ITargetUrl
     public string Type => TYPE;
     public string Controller { get; set; }
     public string Action { get; set; }
+    public Dictionary<string, string> Parameters { get; set; }
 }
