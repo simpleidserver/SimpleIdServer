@@ -1,23 +1,22 @@
 {
   "Realms": [
     {
-      "Name": "tools"
+      "Name": "testing"
     }
   ],
   "Users": [
     {
-      "Login": "user2",
+      "Login": "user-seeded-testing",
       "Password": "password",
       "FirstName": "User",
-      "LastName": "2",
-      "Email": "user2@email.com",
+      "LastName": "Seeded Testing",
+      "Email": "user-seeded-testing@email.com",
       "Roles": [ "user", "local" ],
-      "Realm": "tools"
+      "Realm": "testing"
     },
     {
-      "Login": "user3",
-      "Password": "password",
-      "Realm": "tools"
+      "Login": "user-seeded-master",
+      "Password": "password"
     }
   ]
 }
