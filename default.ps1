@@ -68,7 +68,22 @@ task dockerPublish -depends dockerBuild {
 
 task dockerUp {
 	$Env:TAG = GetDockerVersion
-	exec { docker-compose up }
+	exec { docker-compose -f local-docker-compose.yml up -d }
+}
+
+task dockerDown {
+	echo "Deleting Docker containers"
+	exec { docker-compose -f local-docker-compose.yml down }
+}
+
+task dockerStart {
+	echo "Starting Docker containers"
+	exec { docker-compose -f local-docker-compose.yml start }
+}
+
+task dockerStop {
+	echo "Stopping Docker containers"
+	exec { docker-compose -f local-docker-compose.yml stop }
 }
 
 task buildInstaller {
