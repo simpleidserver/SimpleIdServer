@@ -15,5 +15,5 @@ public class ControllerActionTargetUrlHelper : GenericTargetUrlHelper<Controller
     public override string Type => ControllerActionTargetUrl.TYPE;
 
     protected override string InternalBuild(ControllerActionTargetUrl target)
-        => _linkGenerator.GetPathByAction(target.Action, target.Controller);
+        => target == null ? null : _linkGenerator.GetPathByAction(target.Action, target.Controller);
 }

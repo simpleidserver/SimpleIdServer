@@ -1,5 +1,6 @@
 ﻿@using FormBuilder.Helpers
 @using System.Text.Json.Nodes
+@using FormBuilder.Rules
 @using global::FormBuilder.Models
 @inject IRenderFormElementsHelper renderFormsElementsHelper
 
@@ -10,22 +11,20 @@
 
 @code {
     private RenderFragment? CustomRender { get; set; }
+    [Inject] public IRuleEngine RuleEngine { get; set; }
     [Parameter] public FormRecord Form { get; set; }
     [Parameter] public JsonObject Input { get; set; }
+    [Parameter] public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
+        RuleEngine.Apply(Form, Input);
         CustomRender = CreateComponent();
-    }
-
-    private void Init()
-    {
-        Form.Elements
     }
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Form.Elements);
+        renderFormsElementsHelper.Render(builder, Form.Elements, AntiforgeryToken);
     };
 }

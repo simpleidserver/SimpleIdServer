@@ -1,7 +1,7 @@
 ﻿using FormBuilder.Factories;
 using FormBuilder.Helpers;
 using Microsoft.AspNetCore.Components;
-using System.Text;
+using System.Net;
 using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components.FormElements.StackLayout;
@@ -13,7 +13,9 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Inject] private IHttpClientFactory httpClientFactory { get; set; }
     [Inject] private ITargetUrlHelperFactory targetUrlHelperFactory { get; set; }
     [Inject] private IUriProvider uriProvider {  get; set; }
+    [Inject] private IServiceProvider serviceProvider { get; set; }
     [Parameter] public FormStackLayoutRecord Value { get; set; }
+    [Parameter] public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -29,25 +31,48 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
         if (Value.Url == null) return;
         var json = new JsonObject();
         Value.ExtractJson(json);
+        var dic = ConvertToDic(json);
+        if(Value.IsAntiforgeryEnabled)
+            dic.Add(AntiforgeryToken.FormField, AntiforgeryToken.FormValue);
+
         var targetUrl = targetUrlHelperFactory.Build(Value.Url);
-        using (var httpClient = httpClientFactory.CreateClient())
+        var cookieContainer = new CookieContainer();
+        using(var handler = new HttpClientHandler { CookieContainer = cookieContainer })
         {
-            var url = new Uri($"{uriProvider.GetAbsoluteUriWithVirtualPath()}{targetUrl}");
-            var requestMessage = new HttpRequestMessage
+            using (var httpClient = new HttpClient(handler))
             {
-                Content = new FormUrlEncodedContent(new Dictionary<string, string>
+                var baseUrl = uriProvider.GetAbsoluteUriWithVirtualPath();
+                var url = new Uri($"{baseUrl}{targetUrl}");
+                var requestMessage = new HttpRequestMessage
                 {
-                    { "Login", "Login" }
-                }),
-                Method = HttpMethod.Post,
-                RequestUri = url
-            };
-            var httpResult  = await httpClient.SendAsync(requestMessage);
+                    Content = new FormUrlEncodedContent(dic),
+                    Method = HttpMethod.Post,
+                    RequestUri = url
+                };
+                if (Value.IsAntiforgeryEnabled)
+                {
+                    cookieContainer.Add(new Uri(baseUrl), new Cookie(AntiforgeryToken.CookieName, AntiforgeryToken.CookieValue));
+                }
+
+                var httpResult = await httpClient.SendAsync(requestMessage);
+                string sss = "";
+            }
         }
     }
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Value.Elements);
+        renderFormsElementsHelper.Render(builder, Value.Elements, AntiforgeryToken);
     };
+
+    private Dictionary<string, string> ConvertToDic(JsonObject json)
+    {
+        var result = new Dictionary<string, string>();
+        foreach (var kvp in json)
+        {
+            result.Add(kvp.Key, json[kvp.Key].ToString());
+        }
+
+        return result;
+    }
 }

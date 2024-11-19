@@ -4,6 +4,7 @@ using FormBuilder.Components.FormElements.Button;
 using FormBuilder.Components.FormElements.Checkbox;
 using FormBuilder.Components.FormElements.Divider;
 using FormBuilder.Components.FormElements.Input;
+using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Factories;
@@ -25,14 +26,22 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFormElementDefinition, FormCheckboxDefinition>();
         services.AddTransient<IFormElementDefinition, DividerLayoutDefinition>();
         services.AddTransient<IFormElementDefinition, FormAnchorDefinition>();
+        services.AddTransient<IFormElementDefinition, ListDataDefinition>();
+
         services.AddTransient<ITranslationHelper, TranslationHelper>();
         services.AddTransient<IRenderFormElementsHelper, RenderFormElementsHelper>();
+        services.AddTransient<ITransformerFactory, TransformerFactory>();
+        services.AddTransient<ITransformationRuleEngineFactory, TransformationRuleEngineFactory>();
+        services.AddTransient<IRepetitionRuleEngineFactory, RepetitionRuleEngineFactory>();
+
         services.AddTransient<ITargetUrlHelper, DirectTargetUrlHelper>();
         services.AddTransient<ITargetUrlHelper, ControllerActionTargetUrlHelper>();
         services.AddTransient<ITargetUrlHelperFactory, TargetUrlHelperFactory>();
+
         services.AddTransient<ITransformer, ControllerActionTransformer>();
 
         services.AddTransient<ITransformationRuleEngine, IncomingTokensTransformationRuleEngine>();
+        services.AddTransient<IRepetitionRuleEngine, IncomingTokensRepetitionRuleEngine>();
         services.AddTransient<IRuleEngine, RuleEngine>();
 
         services.AddTransient<IUriProvider, UriProvider>();

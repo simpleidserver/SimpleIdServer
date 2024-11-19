@@ -9,7 +9,7 @@ public interface ITransformerFactory
     object Transform<T>(string value, T parameters) where T : ITransformerParameters;
 }
 
-internal class TransformerFactory : ITransformerFactory
+public class TransformerFactory : ITransformerFactory
 {
     private readonly IEnumerable<ITransformer> _transformers;
 

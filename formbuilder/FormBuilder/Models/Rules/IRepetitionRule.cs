@@ -7,6 +7,5 @@ public interface IRepetitionRule
 {
     string Path { get; }
     string Type { get; }
-    string FieldType { get; set; }
     List<MappingRule> MappingRules { get; set; }
 }

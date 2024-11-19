@@ -6,4 +6,5 @@ namespace FormBuilder.Components.FormElements.Password;
 public partial class FormPasswordField : IGenericFormElement<FormPasswordFieldRecord>
 {
     [Parameter] public FormPasswordFieldRecord Value { get; set; }
+    [Parameter] public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
 }

@@ -3,6 +3,7 @@ using FormBuilder.Components.FormElements.Button;
 using FormBuilder.Components.FormElements.Checkbox;
 using FormBuilder.Components.FormElements.Divider;
 using FormBuilder.Components.FormElements.Input;
+using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
 using System.Text.Json.Nodes;
@@ -17,6 +18,7 @@ namespace FormBuilder.Models;
 [JsonDerivedType(typeof(FormInputFieldRecord), typeDiscriminator: "Input")]
 [JsonDerivedType(typeof(FormPasswordFieldRecord), typeDiscriminator: "Password")]
 [JsonDerivedType(typeof(FormStackLayoutRecord), typeDiscriminator: "StackLayout")]
+[JsonDerivedType(typeof(ListDataRecord), typeDiscriminator: "ListData")]
 public interface IFormElementRecord
 {
     List<LabelTranslation> Labels { get; set; }

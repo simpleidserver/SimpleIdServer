@@ -9,4 +9,7 @@ public class FormPasswordFieldRecord : BaseFormFieldRecord
 
     public override void ExtractJson(JsonObject json)
         => json.Add(Name, Value);
+
+    public override void Apply(JsonNode node)
+        => Value = node?.ToString();
 }

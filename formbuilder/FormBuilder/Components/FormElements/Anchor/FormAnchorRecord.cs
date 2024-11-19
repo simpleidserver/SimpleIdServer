@@ -1,5 +1,7 @@
 ﻿using FormBuilder.Models;
 using FormBuilder.Models.Url;
+using FormBuilder.Url;
+using Microsoft.AspNetCore.Components;
 using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components.FormElements.Anchor
@@ -8,6 +10,10 @@ namespace FormBuilder.Components.FormElements.Anchor
     {
         public ITargetUrl Url { get; set; }
         public bool ActAsButton { get; set; } = false;
+
+        public override void Apply(JsonNode node)
+        {
+        }
 
         public override void ExtractJson(JsonObject json)
         {

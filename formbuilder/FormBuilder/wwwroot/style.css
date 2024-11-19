@@ -13,6 +13,7 @@
 .divider .text {
     margin-right: 1rem;
     margin-left: 1rem;
+    margin-top: 0px;
     margin-bottom: 0px;
     color: var(--divider-text);
 }

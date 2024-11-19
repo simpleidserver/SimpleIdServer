@@ -1,11 +1,12 @@
 ﻿using FormBuilder.Models;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Rendering;
 
 namespace FormBuilder.Helpers;
 
 public interface IRenderFormElementsHelper
 {
-    void Render(RenderTreeBuilder builder, IEnumerable<IFormElementRecord> elements);
+    void Render(RenderTreeBuilder builder, IEnumerable<IFormElementRecord> elements, AntiforgeryTokenRecord antiforgeryToken);
 }
 
 public class RenderFormElementsHelper : IRenderFormElementsHelper
@@ -17,7 +18,7 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
         _definitions = definitions;
     }
 
-    public void Render(RenderTreeBuilder builder, IEnumerable<IFormElementRecord> elements)
+    public void Render(RenderTreeBuilder builder, IEnumerable<IFormElementRecord> elements, AntiforgeryTokenRecord antiforgeryToken)
     {
         foreach (var record in elements)
         {
@@ -26,6 +27,7 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
             var uiElt = definition.UiElt;
             builder.OpenComponent(0, uiElt);
             builder.AddAttribute(1, "Value", record);
+            builder.AddAttribute(2, "AntiforgeryToken", antiforgeryToken);
             builder.CloseComponent();
         }
     }

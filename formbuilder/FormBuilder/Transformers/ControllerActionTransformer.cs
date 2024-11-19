@@ -22,7 +22,7 @@ public class ControllerActionTransformer : GenericTransformer<ControllerActionTr
         _targetUrlHelperFactory = targetUrlHelperFactory;
     }
 
-    public string Type => ControllerActionTransformerParameters.TYPE;
+    public override string Type => ControllerActionTransformerParameters.TYPE;
 
     public override object InternalTransform(string value, ControllerActionTransformerParameters parameters)
     {

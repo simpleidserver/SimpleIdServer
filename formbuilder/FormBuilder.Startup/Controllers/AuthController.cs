@@ -10,17 +10,20 @@ using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
 using FormBuilder.Models.Url;
-using FormBuilder.Startup.Components;
 using FormBuilder.Startup.Controllers.ViewModels;
 using FormBuilder.Transformers;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Startup.Controllers;
 
 public class AuthController : Controller
 {
+    private readonly IAntiforgery _antiforgery;
+    private readonly FormBuilderOptions _options;
     private static FormRecord LoginPwdAuthForm = new FormRecord
     {
         Elements = new List<IFormElementRecord>
@@ -103,17 +106,21 @@ public class AuthController : Controller
                     // List all external identity providers.
                     new ListDataRecord
                     {
-                        FieldType = "FormAnchorRecord",
-                        Parameters = new Dictionary<string, string>
+                        FieldType = FormAnchorDefinition.TYPE,
+                        Parameters = new Dictionary<string, object>
                         {
-                            { nameof(FormAnchorRecord.ActAsButton), "true" }
+                            { nameof(FormAnchorRecord.ActAsButton), true }
                         },
                         RepetitionRule = new IncomingTokensRepetitionRule
                         {
-                            Path = "$.ExternalIdsProviders",
+                            Path = "$.ExternalIdProviders[*]",
+                            LabelMappingRules = new List<Rules.LabelMappingRule>
+                            {
+                                new Rules.LabelMappingRule { Language = "en", Source = "$.DisplayName" }
+                            },
                             MappingRules = new List<MappingRule>
                             {
-                                new MappingRule { Source = "AuthenticationScheme", Target = nameof(FormAnchorRecord.Url), Transformer = new ControllerActionTransformerParameters { Action = "Callback", Controller = "Auth", QueryParameterName = "scheme" } } // Transformer !!!
+                                new MappingRule { Source = "$.AuthenticationScheme", Target = nameof(FormAnchorRecord.Url), Transformer = new ControllerActionTransformerParameters { Action = "Callback", Controller = "Auth", QueryParameterName = "scheme" } } // Transformer !!!
                             }
                         }
                     }
@@ -122,22 +129,37 @@ public class AuthController : Controller
         }
     };
 
-    [Route("authenticate")]
-    public IResult Index()
+    public AuthController(IAntiforgery antiforgery, IOptions<FormBuilderOptions> options)
     {
+        _antiforgery = antiforgery;
+        _options = options.Value;
+    }
+
+    public IActionResult Index()
+    {
+        var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         var viewModel = new AuthViewModel
         {
             ReturnUrl = "http://localhost:5000",
             ExternalIdProviders = new List<ExternalIdProviderViewModel>
             {
-                new ExternalIdProviderViewModel { AuthenticationScheme = "facebook" }
+                new ExternalIdProviderViewModel { AuthenticationScheme = "facebook", DisplayName = "Facebook" }
             }
-        }; 
-        var obj = new { Form = JsonSerializer.Serialize(LoginPwdAuthForm), Input = JsonSerializer.Serialize(viewModel) };
-        return new RazorComponentResult<AuthenticateComponent>(obj);
+        };
+        return View(new IndexAuthViewModel
+        {
+            Form = LoginPwdAuthForm,
+            Input = JsonObject.Parse(JsonSerializer.Serialize(viewModel)).AsObject(),
+            AntiforgeryToken = new AntiforgeryTokenRecord
+            {
+                FormValue = tokenSet.RequestToken,
+                FormField = tokenSet.FormFieldName,
+                CookieName = _options.AntiforgeryCookieName,
+                CookieValue = tokenSet.CookieToken
+            }
+        });
     }
 
-    [Route("authenticate")]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public IActionResult Confirm(AuthViewModel viewModel)
@@ -146,7 +168,6 @@ public class AuthController : Controller
     }
 
     [HttpGet]
-    [Route("extauth")]
     public IActionResult Callback(string scheme)
     {
         return NoContent();
