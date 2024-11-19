@@ -1,0 +1,49 @@
+﻿@using FormBuilder.Models
+@using System.Text.Json.Nodes
+@inject IEnumerable<IFormElementDefinition> definitions
+
+<RadzenRow>
+    <RadzenColumn Size="4">
+        <RadzenStack class="formEditor">
+            <h5 class="title">Elements</h5>
+            <ul class="elements">
+                @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.ELEMENT))
+                {
+                    <li draggable="true" @ondragstart="@(() => HandleDragStart(def))" @ondragend="HandleDragEnd">@def.Type</li>
+                }
+            </ul>
+            <h5 class="title">Layout</h5>
+            <ul class="elements">
+                @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.LAYOUT))
+                {
+                    <li>@def.Type</li>
+                }
+            </ul>
+            <h5 class="title">Data</h5>
+            <ul class="elements">
+                @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.DATA))
+                {
+                    <li>@def.Type</li>
+                }
+            </ul>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="8">
+        <FormViewer Form="@Form" Input="@(new JsonObject())" IsEditModeEnabled="true" Context="@Context" />
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter] public FormRecord Form { get; set; }
+    FormViewerContext Context { get; set; } = new FormViewerContext();
+
+    private void HandleDragStart(IFormElementDefinition def)
+    {
+        Context.SelectedDefinition = def;
+    }
+
+    private void HandleDragEnd()
+    {
+        
+    }
+}

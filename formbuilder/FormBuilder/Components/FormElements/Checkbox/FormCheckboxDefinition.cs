@@ -7,4 +7,5 @@ public class FormCheckboxDefinition : IFormElementDefinition
     public Type RecordType => typeof(FormCheckboxRecord);
     public string Type => TYPE;
     public static string TYPE = "Checkbox";
+    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
 }

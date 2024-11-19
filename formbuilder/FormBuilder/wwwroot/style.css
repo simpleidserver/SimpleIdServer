@@ -1,4 +1,5 @@
-﻿.divider {
+﻿/* Divider */
+.divider {
     display: flex;
     align-items: center;
 }
@@ -16,4 +17,43 @@
     margin-top: 0px;
     margin-bottom: 0px;
     color: var(--divider-text);
+}
+
+/* Form editor */
+.formEditor .title {
+    background-color: #00000008;
+    border: 1px solid rgba(0,0,0,.125);
+    padding: 10px;
+    margin-bottom: 0px;
+}
+
+.formEditor ul.elements {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.formEditor ul.elements > li {
+    padding: 5px 5px 5px 8px;
+    border-radius: .3em;
+    border: 1px solid gray;
+    background-color: #f3f3f3;
+    margin-bottom: 2px;
+}
+
+/* Drop zone */
+.dropZone {
+    height: 2px;
+}
+
+.dropZone.active {
+    border: 1px dashed green;
+    background-color: #e2ffe2;
+    padding: 10px;
+    text-align: center;
+    height: 42px;
+}
+
+.dropZone.active:after {
+    content: "DROP";
 }

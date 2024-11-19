@@ -5,4 +5,5 @@ public interface IFormElementDefinition
     string Type { get; }
     Type UiElt { get; }
     Type RecordType {  get; }
+    ElementDefinitionCategories Category { get; }
 }

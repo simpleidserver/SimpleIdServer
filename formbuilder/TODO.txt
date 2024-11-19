@@ -1,3 +1,9 @@
 * Faire fonctionner le formulaire blazor			:	OK
 * Pouvoir naviguer									:	OK
-* 
+
+* Ajouter un éditeur graphique								:	OK
+* Pouvoir bouger les éléments du formulaire					:	TODO
+* Afficher une image										:	TODO
+* Afficher target _blank									:	TODO
+* Désactiver le boutton quand l'auth est en progression		:	TODO
+* Afficher la liste des étapes								:	TODO

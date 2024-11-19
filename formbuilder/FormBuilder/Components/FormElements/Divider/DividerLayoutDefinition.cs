@@ -7,4 +7,5 @@ public class DividerLayoutDefinition : IFormElementDefinition
     public Type RecordType => typeof(DividerLayoutRecord);
     public string Type => TYPE;
     public static string TYPE = "Divider";
+    public ElementDefinitionCategories Category => ElementDefinitionCategories.LAYOUT;
 }

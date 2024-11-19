@@ -14,7 +14,8 @@
     [Inject] public IRuleEngine RuleEngine { get; set; }
     [Parameter] public FormRecord Form { get; set; }
     [Parameter] public JsonObject Input { get; set; }
-    [Parameter] public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
+    [Parameter] public bool IsEditModeEnabled { get; set; }
+    [Parameter] public FormViewerContext Context { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -25,6 +26,6 @@
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Form.Elements, AntiforgeryToken);
+        renderFormsElementsHelper.Render(builder, Form.Elements, Context, IsEditModeEnabled);
     };
 }

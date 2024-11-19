@@ -45,6 +45,7 @@ public class RuleEngine : IRuleEngine
     {
         if (record.Transformation == null) return;
         var transformationResult = _transformationRuleEngineFactory.Transform(input, record.Transformation);
+        if (!transformationResult.Any()) return;
         record.Apply(transformationResult.First());
     }
 

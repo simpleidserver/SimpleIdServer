@@ -6,4 +6,5 @@ public class FormInputFieldDefinition : IFormElementDefinition
     public Type RecordType => typeof(FormInputFieldRecord);
     public string Type => TYPE;
     public static string TYPE = "Input";
+    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
 }

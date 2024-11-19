@@ -15,7 +15,8 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Inject] private IUriProvider uriProvider {  get; set; }
     [Inject] private IServiceProvider serviceProvider { get; set; }
     [Parameter] public FormStackLayoutRecord Value { get; set; }
-    [Parameter] public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
+    [Parameter] public FormViewerContext Context { get; set; }
+    [Parameter] public bool IsEditModeEnabled { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -32,8 +33,8 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
         var json = new JsonObject();
         Value.ExtractJson(json);
         var dic = ConvertToDic(json);
-        if(Value.IsAntiforgeryEnabled)
-            dic.Add(AntiforgeryToken.FormField, AntiforgeryToken.FormValue);
+        if(Value.IsAntiforgeryEnabled && Context.AntiforgeryToken != null)
+            dic.Add(Context.AntiforgeryToken.FormField, Context.AntiforgeryToken.FormValue);
 
         var targetUrl = targetUrlHelperFactory.Build(Value.Url);
         var cookieContainer = new CookieContainer();
@@ -49,10 +50,8 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
                     Method = HttpMethod.Post,
                     RequestUri = url
                 };
-                if (Value.IsAntiforgeryEnabled)
-                {
-                    cookieContainer.Add(new Uri(baseUrl), new Cookie(AntiforgeryToken.CookieName, AntiforgeryToken.CookieValue));
-                }
+                if (Value.IsAntiforgeryEnabled && Context.AntiforgeryToken != null)
+                    cookieContainer.Add(new Uri(baseUrl), new Cookie(Context.AntiforgeryToken.CookieName, Context.AntiforgeryToken.CookieValue));
 
                 var httpResult = await httpClient.SendAsync(requestMessage);
                 string sss = "";
@@ -62,7 +61,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Value.Elements, AntiforgeryToken);
+        renderFormsElementsHelper.RenderWithZone(builder, Value.Elements, Context, IsEditModeEnabled);
     };
 
     private Dictionary<string, string> ConvertToDic(JsonObject json)

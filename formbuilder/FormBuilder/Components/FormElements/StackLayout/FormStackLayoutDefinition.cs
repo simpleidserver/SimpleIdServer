@@ -8,4 +8,5 @@ public class FormStackLayoutDefinition : IFormElementDefinition
     public Type RecordType => typeof(FormStackLayoutRecord);
     public string Type => TYPE;
     public static string TYPE = "Stacklayout";
+    public ElementDefinitionCategories Category => ElementDefinitionCategories.LAYOUT;
 }

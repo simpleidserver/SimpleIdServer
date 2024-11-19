@@ -7,8 +7,9 @@ namespace FormBuilder.Components.FormElements.ListData
     {
         private RenderFragment? CustomRender { get; set; }
         [Inject] private IRenderFormElementsHelper renderFormsElementsHelper { get; set; }
-        [Parameter] public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
+        [Parameter] public FormViewerContext Context { get; set; }
         [Parameter] public ListDataRecord Value { get; set; }
+        [Parameter] public bool IsEditModeEnabled { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -21,7 +22,7 @@ namespace FormBuilder.Components.FormElements.ListData
 
         private RenderFragment CreateComponent() => builder =>
         {
-            renderFormsElementsHelper.Render(builder, Value.Elements, AntiforgeryToken);
+            renderFormsElementsHelper.RenderWithZone(builder, Value.Elements, Context, IsEditModeEnabled);
         };
     }
 }

@@ -1,4 +1,5 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using FormBuilder.Components
 @using FormBuilder.Components.Form
 @model FormBuilder.Startup.Controllers.ViewModels.IndexAuthViewModel
 
@@ -6,4 +7,4 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<component type="typeof(FormViewer)" render-mode="ServerPrerendered" param-Form="@Model.Form" param-Input="@Model.Input" param-AntiforgeryToken="@Model.AntiforgeryToken" />
+<component type="typeof(FormViewer)" render-mode="ServerPrerendered" param-Form="@Model.Form" param-Input="@Model.Input" param-Context="@(new FormViewerContext { AntiforgeryToken = Model.AntiforgeryToken })" />
