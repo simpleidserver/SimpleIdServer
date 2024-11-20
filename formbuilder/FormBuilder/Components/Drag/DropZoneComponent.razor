@@ -1,0 +1,29 @@
+﻿@using FormBuilder.Models
+
+<div class="@($"dropZone {ClassName}" + (IsActive ? " active" : string.Empty))" 
+    ondragover="event.preventDefault()" 
+    @ondrop="@(async(e) => await HandleDrop())"
+    @ondragenter="HandleDragEnter"
+    @ondragleave="HandleDragLeave"></div>
+
+@code {
+    bool IsActive { get; set; }
+    [Parameter] public string ClassName { get; set; }
+    [Parameter] public EventCallback Dropped { get; set; }
+
+    private async Task HandleDrop()
+    {
+        IsActive = false;
+        await Dropped.InvokeAsync();
+    }
+
+    private void HandleDragEnter()
+    {
+        IsActive = true;
+    }
+
+    private void HandleDragLeave()
+    {
+        IsActive = false;
+    }
+}

@@ -1,13 +1,19 @@
-﻿@using FormBuilder.Helpers
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
 @inject ITranslationHelper translationHelper
 
-@if(Value.Type != FormInputTypes.HIDDEN)
-{
-    <RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value)">
-        <RadzenTextBox @bind-Value="@Value.Value"></RadzenTextBox>
-    </RadzenFormField>
-}
-else
-{
-    <input type="hidden" value="@Value.Value" name="@Value.Name" />
-}
+
+ <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context">
+     <Children>
+        @if(Value.Type != FormInputTypes.HIDDEN)
+        {
+            <RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value)" class="fullWidth">
+                <RadzenTextBox @bind-Value="@Value.Value"></RadzenTextBox>
+            </RadzenFormField>
+        }
+        else
+        {
+            <input type="hidden" value="@Value.Value" name="@Value.Name" />
+        }
+    </Children>
+</DraggableFormElement>

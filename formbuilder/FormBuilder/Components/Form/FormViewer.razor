@@ -1,6 +1,9 @@
 ﻿@using FormBuilder.Helpers
 @using System.Text.Json.Nodes
 @using FormBuilder.Rules
+@using System.Collections.ObjectModel
+@using System.ComponentModel
+@using System.Collections.Specialized
 @using global::FormBuilder.Models
 @inject IRenderFormElementsHelper renderFormsElementsHelper
 
@@ -22,10 +25,17 @@
         base.OnParametersSet();
         RuleEngine.Apply(Form, Input);
         CustomRender = CreateComponent();
+        Form.Elements.CollectionChanged += HandleChanged;
     }
 
     private RenderFragment CreateComponent() => builder =>
     {
         renderFormsElementsHelper.Render(builder, Form.Elements, Context, IsEditModeEnabled);
     };
+
+    private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)
+    {
+        CustomRender = CreateComponent();
+        StateHasChanged();
+    }
 }

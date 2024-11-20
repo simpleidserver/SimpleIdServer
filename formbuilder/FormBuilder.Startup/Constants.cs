@@ -11,6 +11,7 @@ using FormBuilder.Models.Rules;
 using FormBuilder.Models.Url;
 using FormBuilder.Models;
 using FormBuilder.Transformers;
+using System.Collections.ObjectModel;
 
 namespace FormBuilder.Startup;
 
@@ -18,11 +19,11 @@ public class Constants
 {
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
-        Elements = new List<IFormElementRecord>
+        Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord
             {
-                Elements = new List<IFormElementRecord>
+                Elements = new ObservableCollection<IFormElementRecord>
                 {
                     // Authentication form
                     new FormStackLayoutRecord
@@ -34,7 +35,7 @@ public class Constants
                             Action = "Confirm",
                             Controller = "Auth"
                         },
-                        Elements = new List<IFormElementRecord>
+                        Elements = new ObservableCollection<IFormElementRecord>
                         {
                             new FormInputFieldRecord
                             {

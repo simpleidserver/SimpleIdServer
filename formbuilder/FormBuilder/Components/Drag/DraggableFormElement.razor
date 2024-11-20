@@ -1,0 +1,53 @@
+﻿@using FormBuilder.Models
+@if(IsEditModeEnabled)
+{
+    <div class="draggableElement">
+        <div class="toolbox">
+            <ul>
+                <li>
+                    <RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleViewSettings" />
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" />
+                </li>
+            </ul>
+        </div>
+        <DropZoneComponent ClassName="top" Dropped="@HandleEltDroppedTop"></DropZoneComponent>
+        @Children
+        <DropZoneComponent ClassName="bottom" Dropped="@HandleEltDroppedBottom"></DropZoneComponent>
+    </div>
+}
+else 
+{
+    @Children
+}
+
+@code {
+    [Parameter] public RenderFragment Children { get; set; }
+    [Parameter] public bool IsEditModeEnabled { get; set; }
+    [Parameter] public ParentEltContext ParentContext { get; set; }
+    [Parameter] public FormViewerContext Context { get; set; }
+
+    private void HandleEltDroppedTop()
+    {
+        var def = Context.SelectedDefinition;
+        var record = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
+        ParentContext.Elements.Insert(ParentContext.Index, record);
+    }
+
+    private void HandleEltDroppedBottom()
+    {
+        var def = Context.SelectedDefinition;
+        var record = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
+        ParentContext.Elements.Insert(ParentContext.Index + 1, record);
+    }
+
+    private void HandleRemove()
+    {
+        var elt = ParentContext.Elements[ParentContext.Index];
+        ParentContext.Elements.Remove(elt);
+    }
+
+    private void HandleViewSettings()
+    {
+        
+    }
+}

@@ -8,6 +8,7 @@ using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Models;
 using NUnit.Framework;
+using System.Collections.ObjectModel;
 using System.Text.Json;
 
 namespace FormBuilder.Tests;
@@ -19,17 +20,17 @@ public class FormRecordSerializerFixture
     {
         var formRecord = new FormRecord
         {
-            Elements = new List<IFormElementRecord>
+            Elements = new ObservableCollection<IFormElementRecord>
             {
                 new FormStackLayoutRecord
                 {
-                    Elements = new List<IFormElementRecord>
+                    Elements = new ObservableCollection<IFormElementRecord>
                     {
                         // Authentication form
                         new FormStackLayoutRecord
                         {
                             IsFormEnabled = true,
-                            Elements = new List<IFormElementRecord>
+                            Elements = new ObservableCollection<IFormElementRecord>
                             {
                                 new FormInputFieldRecord
                                 {

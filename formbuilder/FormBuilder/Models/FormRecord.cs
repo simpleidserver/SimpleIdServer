@@ -1,6 +1,8 @@
-﻿namespace FormBuilder.Models;
+﻿using System.Collections.ObjectModel;
+
+namespace FormBuilder.Models;
 
 public class FormRecord
 {
-    public List<IFormElementRecord> Elements { get; set; } = new List<IFormElementRecord>();
+    public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();
 }

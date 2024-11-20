@@ -1,7 +1,13 @@
-﻿@using FormBuilder.Helpers
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
 @inject ITranslationHelper translationHelper
 
-<div>
-    <RadzenCheckBox @bind-Value="@Value.Value"></RadzenCheckBox>
-    <RadzenLabel>@translationHelper.Translate(Value)</RadzenLabel>
-</div>
+
+ <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context">
+     <Children>
+        <div>
+            <RadzenCheckBox @bind-Value="@Value.Value"></RadzenCheckBox>
+            <RadzenLabel>@translationHelper.Translate(Value)</RadzenLabel>
+        </div>
+     </Children>
+</DraggableFormElement>

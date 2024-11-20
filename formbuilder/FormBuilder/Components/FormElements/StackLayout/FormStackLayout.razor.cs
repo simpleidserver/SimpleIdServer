@@ -1,6 +1,9 @@
-﻿using FormBuilder.Factories;
+﻿using FormBuilder.Components.Drag;
+using FormBuilder.Factories;
 using FormBuilder.Helpers;
+using FormBuilder.Models;
 using Microsoft.AspNetCore.Components;
+using System.Collections.ObjectModel;
 using System.Net;
 using System.Text.Json.Nodes;
 
@@ -17,12 +20,14 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Parameter] public FormStackLayoutRecord Value { get; set; }
     [Parameter] public FormViewerContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
+    [Parameter] public ParentEltContext ParentContext { get; set; }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (Value != null)
         {
+            Value.Elements.CollectionChanged += HandleCollectionChanged;
             CustomRender = CreateComponent();
         }
     }
@@ -61,8 +66,14 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.RenderWithZone(builder, Value.Elements, Context, IsEditModeEnabled);
+        renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled);
     };
+
+    private void HandleCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        CustomRender = CreateComponent();
+        StateHasChanged();
+    }
 
     private Dictionary<string, string> ConvertToDic(JsonObject json)
     {

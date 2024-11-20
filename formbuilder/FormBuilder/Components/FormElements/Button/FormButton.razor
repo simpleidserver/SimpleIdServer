@@ -1,4 +1,9 @@
-﻿@using FormBuilder.Helpers
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
 @inject ITranslationHelper translationHelper
 
-<RadzenButton Text="@translationHelper.Translate(Value)" ButtonType="ButtonType.Submit"></RadzenButton>
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context">
+    <Children>
+        <RadzenButton Text="@translationHelper.Translate(Value)" ButtonType="ButtonType.Submit" class="fullWidth"></RadzenButton>
+    </Children>
+</DraggableFormElement>

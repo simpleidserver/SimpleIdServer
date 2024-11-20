@@ -1,12 +1,17 @@
-﻿@using FormBuilder.Helpers
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
 @inject ITranslationHelper translationHelper
 
-@if(Value.ActAsButton)
-{
-    <RadzenButton Text="@translationHelper.Translate(Value)" Click="@(async (e) => await Navigate())"></RadzenButton>
-    <a href="@targetUrlHelper.Build(Value.Url)" style="display: none" @ref=LinkElt></a>
-}
-else
-{
-    <RadzenLink Path="@targetUrlHelper.Build(Value.Url)" Text="@translationHelper.Translate(Value)" />
-}
+ <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context">
+    <Children>
+        @if(Value.ActAsButton)
+        {
+            <RadzenButton Text="@translationHelper.Translate(Value)" Click="@(async (e) => await Navigate())"></RadzenButton>
+            <a href="@targetUrlHelper.Build(Value.Url)" style="display: none" @ref=LinkElt></a>
+        }
+        else
+        {
+            <RadzenLink Path="@targetUrlHelper.Build(Value.Url)" Text="@translationHelper.Translate(Value)" />
+        }
+    </Children>
+</DraggableFormElement>

@@ -42,18 +42,58 @@
 }
 
 /* Drop zone */
+.draggableElement {
+    position: relative;
+    border: 1px solid transparent;
+}
+
+.draggableElement:hover {
+    border-color: gray;
+}
+
+.draggableElement:hover > .toolbox {
+    display: block;
+    z-index: 2;
+}
+
+.draggableElement > .toolbox {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    display: none;
+}
+
+.toolbox > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.toolbox > ul > li {
+    padding-left: 2px;
+}
+
 .dropZone {
-    height: 2px;
+    position: absolute;
+    height: 10px;
+    width: 100%;
+}
+
+.dropZone.top {
+    top: 0px;
+}
+
+.dropZone.bottom {
+    bottom: 0px;
 }
 
 .dropZone.active {
     border: 1px dashed green;
     background-color: #e2ffe2;
-    padding: 10px;
     text-align: center;
-    height: 42px;
+    height: 10px;
 }
 
-.dropZone.active:after {
-    content: "DROP";
+.fullWidth {
+    width: 100%;
 }

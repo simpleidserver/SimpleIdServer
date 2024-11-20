@@ -2,6 +2,7 @@
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Factories;
 using FormBuilder.Models;
+using System.Collections.ObjectModel;
 using System.Text.Json.Nodes;
 
 namespace FormBuilder.Rules;
@@ -53,7 +54,7 @@ public class RuleEngine : IRuleEngine
     {
         if (record.RepetitionRule == null) return;
         var elts = _repetitionRuleEngineFactory.Transform(record.FieldType, input, record.RepetitionRule, record.Parameters);
-        record.Elements = elts;
+        record.Elements = new ObservableCollection<IFormElementRecord>(elts);
     }
 
     public void Apply(BaseFormDataRecord record, JsonObject input)

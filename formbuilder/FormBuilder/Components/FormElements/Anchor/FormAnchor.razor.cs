@@ -1,4 +1,5 @@
-﻿using FormBuilder.Url;
+﻿using FormBuilder.Components.Drag;
+using FormBuilder.Url;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -10,6 +11,7 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     [Parameter] public FormAnchorRecord Value { get; set; }
     [Parameter] public FormViewerContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
+    [Parameter] public ParentEltContext ParentContext {  get; set; }
     [Inject] private ITargetUrlHelper targetUrlHelper { get; set; }
     [Inject] private IJSRuntime JSRuntime { get; set; }
 
