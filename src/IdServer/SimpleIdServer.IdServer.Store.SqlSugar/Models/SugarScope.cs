@@ -18,7 +18,11 @@ public class SugarScope
     public bool IsExposedInConfigurationEdp { get; set; }
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    
+    [SugarColumn(IsNullable = true)]
     public ComponentActions? Action { get; set; }
+
+    [SugarColumn(IsNullable = true)]
     public string? Component { set; get; } = null;
 
     [Navigate(NavigateType.OneToMany, nameof(SugarScopeClaimMapper.ScopeId))]
