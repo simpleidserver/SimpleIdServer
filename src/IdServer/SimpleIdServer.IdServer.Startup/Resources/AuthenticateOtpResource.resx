@@ -171,4 +171,7 @@
   <data name="unknown_user" xml:space="preserve">
     <value>The given login does not correspond to any user</value>
   </data>
+  <data name="user_blocked" xml:space="preserve">
+    <value>User account is blocked</value>
+  </data>
 </root>

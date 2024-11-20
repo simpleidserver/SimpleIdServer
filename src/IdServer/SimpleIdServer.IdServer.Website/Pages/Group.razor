@@ -14,51 +14,59 @@
 @inject IGroupService groupService
 @inject IState<GroupState> groupState
 @inject IState<GroupHierarchyState> groupHierarchyState
+@inject IUrlHelper urlHelper
 
-<RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/groups" Text="@Global.Groups" />
-    <RadzenBreadCrumbItem Text="@Global.GroupDetails" />
-</RadzenBreadCrumb>
+<SidAuthorizeView Roles=@("/groups/manage,/groups/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/groups")" Text="@Global.Groups" />
+            <RadzenBreadCrumbItem Text="@Global.GroupDetails" />
+        </RadzenBreadCrumb>
 
-<RadzenText class="mt-3 mb-3 no-margin" Text="@groupState.Value.Group?.Name" TextStyle="TextStyle.DisplayH3" />
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@groupState.Value.Group?.Name" TextStyle="TextStyle.DisplayH3" />
 
-<RadzenBreadCrumb>
-    @foreach (var groupName in groupNames)
-    {
-        <RadzenBreadCrumbItem Text="@groupName" />
-    }
-</RadzenBreadCrumb>
-
-<RadzenCardLoader Variant="Variant.Filled" IsLoading=@groupState.Value.IsLoading>
-    <RadzenSplitter>
-        <RadzenSplitterPane Size="10%">
-            @if (!isLoading)
+        <RadzenBreadCrumb>
+            @foreach (var groupName in groupNames)
             {
-                <RadzenTree Data=@groups>
-                    <RadzenTreeLevel Selected="@(o => IsSelected(o))" Expanded="@(o => IsExpanded(o))" HasChildren="@(o => HasChildren(o))" TextProperty="Name" ChildrenProperty="Children">
-                        <Template>
-                            <RadzenLink Text="@GetGroupName(context)" Path="@GetGroupLink(context)" />
-                        </Template>
-                    </RadzenTreeLevel>
-                </RadzenTree>
+                <RadzenBreadCrumbItem Text="@groupName" />
             }
-        </RadzenSplitterPane>
-        <RadzenSplitterPane>
-            <div class="ml-3">
-                <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
-                    <Tabs>
-                        <RadzenTabsItem Text="@Global.Children">
-                            <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
-                        </RadzenTabsItem>
-                        <RadzenTabsItem Text="@Global.Roles">
-                            <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
-                        </RadzenTabsItem>
-                    </Tabs>
-                </RadzenTabs>
-            </div>
-        </RadzenSplitterPane>
-    </RadzenSplitter>
-</RadzenCardLoader>
+        </RadzenBreadCrumb>
+
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@groupState.Value.IsLoading>
+            <RadzenSplitter>
+                <RadzenSplitterPane Size="10%">
+                    @if (!isLoading)
+                    {
+                        <RadzenTree Data=@groups>
+                            <RadzenTreeLevel Selected="@(o => IsSelected(o))" Expanded="@(o => IsExpanded(o))" HasChildren="@(o => HasChildren(o))" TextProperty="Name" ChildrenProperty="Children">
+                                <Template>
+                                    <RadzenLink Text="@GetGroupName(context)" Path="@GetGroupLink(context)" />
+                                </Template>
+                            </RadzenTreeLevel>
+                        </RadzenTree>
+                    }
+                </RadzenSplitterPane>
+                <RadzenSplitterPane>
+                    <div class="ml-3">
+                        <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                            <Tabs>
+                                <RadzenTabsItem Text="@Global.Children">
+                                    <GroupChildren Group="@groupState.Value.Group"></GroupChildren>
+                                </RadzenTabsItem>
+                                <RadzenTabsItem Text="@Global.Roles">
+                                    <GroupRoles Group="@groupState.Value.Group"></GroupRoles>
+                                </RadzenTabsItem>
+                            </Tabs>
+                        </RadzenTabs>
+                    </div>
+                </RadzenSplitterPane>
+            </RadzenSplitter>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     bool isLoading = true;
@@ -85,10 +93,6 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                navigationManager.NavigateTo("/groups");
-            });
             SubscribeToAction<GetGroupSuccessAction>((act) =>
             {
                 currentGroup = act.Group;
@@ -151,7 +155,7 @@
     void OnChange(int index)
     {
         var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
-        navigationManager.NavigateTo($"/groups/{id}/{rec.Key}");
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/groups/{id}/{rec.Key}"));
     }
 
     string GetGroupName(RadzenTreeItem data)
@@ -161,7 +165,7 @@
 
     string GetGroupLink(RadzenTreeItem data)
     {
-        return $"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children";
+        return urlHelper.GetUrl(urlHelper.GetUrl($"/groups/{(data.Value as GetHierarchicalGroupResult).Root.Id}/children"));
     }
 
     bool HasChildren(object data)

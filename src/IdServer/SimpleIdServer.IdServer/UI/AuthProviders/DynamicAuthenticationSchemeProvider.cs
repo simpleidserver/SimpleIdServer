@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
@@ -42,7 +43,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
     public class DynamicAuthenticationSchemeProvider : AuthenticationSchemeProvider, ISIDAuthenticationSchemeProvider
     {
-        private readonly IdServer.Infrastructures.IHttpClientFactory _httpClientFactory;
+        private readonly Helpers.IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
         private readonly IdServerHostOptions _options;
@@ -53,7 +54,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
         private DateTime? _nextExpirationTime;
 
         public DynamicAuthenticationSchemeProvider(
-            IdServer.Infrastructures.IHttpClientFactory httpClientFactory,
+            Helpers.IHttpClientFactory httpClientFactory,
             IConfiguration configuration, 
             IServiceProvider serviceProvider, 
             IOptions<IdServerHostOptions> opts, 
@@ -95,7 +96,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
 
             var providers = await GetAuthenticationSchemeProviders();
             var provider = providers.FirstOrDefault(p => p.Name == name);
-            return providers == null ? null : Convert(provider);
+            return provider == null ? null : Convert(provider);
         }
 
         private async Task<IEnumerable<Domains.AuthenticationSchemeProvider>> GetAuthenticationSchemeProviders()

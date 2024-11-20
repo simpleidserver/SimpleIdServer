@@ -110,6 +110,8 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 o.AddPublishMessageScheduler();
                 o.AddHangfireConsumers();
+                o.AddConsumer<ExtractUsersFaultConsumer>();
+                o.AddConsumer<ImportUsersFaultConsumer>();
                 o.AddConsumer<IdServerEventsConsumer>();
                 o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
                 o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();

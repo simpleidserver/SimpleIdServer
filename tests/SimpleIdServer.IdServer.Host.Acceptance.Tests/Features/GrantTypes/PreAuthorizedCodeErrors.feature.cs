@@ -81,14 +81,14 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Features.GrantTypes
             this.TestTearDown();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="client_id is required")]
+        [Xunit.SkippableFactAttribute(DisplayName="client must exists")]
         [Xunit.TraitAttribute("FeatureTitle", "PreAuthorizedCodeErrors")]
-        [Xunit.TraitAttribute("Description", "client_id is required")]
-        public void Client_IdIsRequired()
+        [Xunit.TraitAttribute("Description", "client must exists")]
+        public void ClientMustExists()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("client_id is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("client must exists", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 4
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -99,71 +99,28 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table316 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table336 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table316.AddRow(new string[] {
+                table336.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-#line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table316, "When ");
-#line hidden
-#line 9
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 10
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 11
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 12
- testRunner.And("JSON \'$.error_description\'=\'missing client_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="client must exists")]
-        [Xunit.TraitAttribute("FeatureTitle", "PreAuthorizedCodeErrors")]
-        [Xunit.TraitAttribute("Description", "client must exists")]
-        public void ClientMustExists()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("client must exists", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 14
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table317 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table317.AddRow(new string[] {
-                            "grant_type",
-                            "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table317.AddRow(new string[] {
+                table336.AddRow(new string[] {
                             "client_id",
                             "invalid"});
-#line 15
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table317, "When ");
+#line 5
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table336, "When ");
 #line hidden
-#line 20
+#line 10
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 21
+#line 11
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 22
+#line 12
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 23
+#line 13
  testRunner.And("JSON \'$.error_description\'=\'unknown client invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -178,7 +135,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("client must supports the grant-type", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 25
+#line 15
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -188,31 +145,31 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table318 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table337 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table318.AddRow(new string[] {
+                table337.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table318.AddRow(new string[] {
+                table337.AddRow(new string[] {
                             "client_id",
                             "fiftySevenClient"});
-                table318.AddRow(new string[] {
+                table337.AddRow(new string[] {
                             "client_secret",
                             "password"});
-#line 26
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table318, "When ");
+#line 16
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table337, "When ");
 #line hidden
-#line 32
+#line 22
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 33
+#line 23
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 34
+#line 24
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 35
+#line 25
  testRunner.And("JSON \'$.error_description\'=\'grant type urn:ietf:params:oauth:grant-type:pre-autho" +
                         "rized_code is not supported by the client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -228,7 +185,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("pre-authorized code is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 37
+#line 27
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -238,31 +195,31 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table319 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table338 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table319.AddRow(new string[] {
+                table338.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table319.AddRow(new string[] {
+                table338.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table319.AddRow(new string[] {
+                table338.AddRow(new string[] {
                             "client_secret",
                             "password"});
-#line 38
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table319, "When ");
+#line 28
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table338, "When ");
 #line hidden
-#line 44
+#line 34
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 45
+#line 35
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 46
+#line 36
  testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 47
+#line 37
  testRunner.And("JSON \'$.error_description\'=\'missing parameter pre-authorized_code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -277,7 +234,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("transaction code is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 49
+#line 39
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -287,34 +244,34 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table320 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table339 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table320.AddRow(new string[] {
+                table339.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table320.AddRow(new string[] {
+                table339.AddRow(new string[] {
                             "client_id",
                             "sixtyClient"});
-                table320.AddRow(new string[] {
+                table339.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table320.AddRow(new string[] {
+                table339.AddRow(new string[] {
                             "pre-authorized_code",
                             "code"});
-#line 50
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table320, "When ");
+#line 40
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table339, "When ");
 #line hidden
-#line 57
+#line 47
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 58
+#line 48
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 59
+#line 49
  testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 60
+#line 50
  testRunner.And("JSON \'$.error_description\'=\'missing parameter tx_code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -329,7 +286,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("pre-authorized must exists", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 62
+#line 52
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -339,34 +296,34 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table321 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table340 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table321.AddRow(new string[] {
+                table340.AddRow(new string[] {
                             "grant_type",
                             "urn:ietf:params:oauth:grant-type:pre-authorized_code"});
-                table321.AddRow(new string[] {
+                table340.AddRow(new string[] {
                             "client_id",
                             "fiftyNineClient"});
-                table321.AddRow(new string[] {
+                table340.AddRow(new string[] {
                             "client_secret",
                             "password"});
-                table321.AddRow(new string[] {
+                table340.AddRow(new string[] {
                             "pre-authorized_code",
                             "code"});
-#line 63
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table321, "When ");
+#line 53
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table340, "When ");
 #line hidden
-#line 70
+#line 60
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 71
+#line 61
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 72
+#line 62
  testRunner.And("JSON \'$.error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 73
+#line 63
  testRunner.And("JSON \'$.error_description\'=\'either the pre-authorized code has expired or is inva" +
                         "lid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden

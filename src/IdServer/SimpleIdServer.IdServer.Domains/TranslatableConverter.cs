@@ -68,6 +68,8 @@ public class TranslatableConverter<T> : JsonConverter<T> where T : class
                 writer.WriteNumber(prop.Item2, (double)obj);
             else if (propertyType == typeof(DateTime))
                 writer.WriteString(prop.Item2, (DateTime)obj);
+            else if (propertyType == typeof(DateTime?) && obj != null)
+                writer.WriteString(prop.Item2, (DateTime)obj);
             else if (TryGetEnumType(propertyType, out Type resultType))
                 writer.WriteString(prop.Item2, Enum.GetName(resultType, obj));
             else if (propertyType.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>)))

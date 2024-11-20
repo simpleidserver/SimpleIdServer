@@ -1,0 +1,26 @@
+﻿@using SimpleIdServer.IdServer.Api.Provisioning
+@using SimpleIdServer.IdServer.Website.Resources
+
+@if (IdentityProvisioningProcess != null)
+{
+    <RadzenDataGrid AllowFiltering="false"
+                    AllowColumnResize="true"
+                    AllowAlternatingRows="true"
+                    AllowSorting="false"
+                    PageSize="30"
+                    AllowPaging="false"
+                    PagerHorizontalAlign="HorizontalAlign.Left"
+                    ShowPagingSummary="false"
+                    Data="@IdentityProvisioningProcess.Errors"
+                    TItem="IdentityProvisioningProcessMessageErrorResult"
+                    ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="IdentityProvisioningProcessMessageErrorResult" Property="Exception" Filterable="false" Sortable="true" Title="@Global.Exception" Width="80px" />
+        </Columns>
+    </RadzenDataGrid>
+}
+
+@code {
+    [Parameter]
+    public IdentityProvisioningProcessResult IdentityProvisioningProcess { get; set; }
+}

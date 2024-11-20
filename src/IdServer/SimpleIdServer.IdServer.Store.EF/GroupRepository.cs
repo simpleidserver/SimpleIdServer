@@ -4,6 +4,7 @@ using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
 
@@ -45,7 +46,7 @@ public class GroupRepository : IGroupRepository
         => _dbContext.Groups
                     .Include(c => c.Realms)
                     .Include(c => c.Children)
-                    .Include(c => c.Roles)
+                    .Include(c => c.Roles).ThenInclude(c => c.Realms)
                     .SingleOrDefaultAsync(g => g.Realms.Any(r => r.RealmsName == realm) && g.Id == id, cancellationToken);
 
     public Task<Group> GetByStrictFullPath(string realm, string fullPath, CancellationToken cancellationToken)
@@ -62,7 +63,7 @@ public class GroupRepository : IGroupRepository
 
     public Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken)
         => _dbContext.Groups
-            .Include(g => g.Roles)
+            .Include(g => g.Roles).ThenInclude(r => r.Realms)
             .Include(c => c.Realms)
             .Where(g => fullPathLst.Contains(g.FullPath) && g.Realms.Any(r => r.RealmsName == realm))
             .ToListAsync(cancellationToken);

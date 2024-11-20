@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Middlewares;
 using System;
 using System.Collections.Generic;

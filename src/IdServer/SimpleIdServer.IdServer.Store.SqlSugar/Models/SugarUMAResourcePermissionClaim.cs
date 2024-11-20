@@ -11,7 +11,9 @@ public class SugarUMAResourcePermissionClaim
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? ClaimType { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? FriendlyName { get; set; } = null;
     public string Name { get; set; } = null!;
     public string Value { get; set; } = null!;

@@ -121,7 +121,11 @@
         </Items>
     </RadzenAccordion>
 
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateClientState.Value.IsUpdating />
+    <SidAuthorizeView Roles=@("/clients/manage")>
+        <Authorized>
+            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateClientState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateClientState.Value.IsUpdating />
+        </Authorized>
+    </SidAuthorizeView>
 </RadzenTemplateForm>
 
 @code {

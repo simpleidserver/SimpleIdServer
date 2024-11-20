@@ -14,13 +14,16 @@ public class SugarSerializedFileKey
     public string KeyId { get; set; } = null!;
     public string Usage { get; set; } = null!;
     public string Alg { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Enc { get; set; }
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? PublicKeyPem { get; set; } = null;
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? PrivateKeyPem { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
     public bool IsSymmetric { get; set; } = false;
-    public byte[]? Key { get; set; } = null;
+    public byte[] Key { get; set; } = new byte[0];
     [Navigate(typeof(SugarRealmSerializedFileKey), nameof(SugarRealmSerializedFileKey.SerializedFileKeysId), nameof(SugarRealmSerializedFileKey.RealmsName))]
     public List<SugarRealm> Realms { get; set; }
 

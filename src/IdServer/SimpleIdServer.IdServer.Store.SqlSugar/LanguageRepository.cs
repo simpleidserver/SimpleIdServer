@@ -16,6 +16,11 @@ public class LanguageRepository : ILanguageRepository
         _dbContext = dbContext;
     }
 
+    public void Add(Language language)
+    {
+        _dbContext.Client.Insertable(SugarLanguage.Transform(language)).ExecuteCommand();
+    }
+
     public async Task<List<Language>> GetAll(CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarLanguage>().ToListAsync(cancellationToken);

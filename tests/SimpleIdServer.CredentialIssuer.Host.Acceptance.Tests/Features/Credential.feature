@@ -40,8 +40,8 @@ Scenario: use the ldp_vc format and type parameters to get a credential
 	And JSON '$.credential.@context[1]'='https://www.w3.org/2018/credentials/examples/v1'
 	And JSON exists '$.credential.credentialSubject.id'
 	And JSON exists '$.credential.proof.verificationMethod'
-	And JSON exists '$.credential.proof.proofValue'
-	And JSON '$.credential.proof.type'='Ed25519Signature2020'
+	And JSON exists '$.credential.proof.jws'
+	And JSON '$.credential.proof.type'='JsonWebSignature2020'
 	And JSON '$.credential.proof.proofPurpose'='assertionMethod'
 
 Scenario: use the credential_identifier to get a credential

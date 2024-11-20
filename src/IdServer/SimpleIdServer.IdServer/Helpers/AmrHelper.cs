@@ -53,7 +53,8 @@ namespace SimpleIdServer.IdServer.Helpers
                 if (defaultAcr == null)
                 {
                     var acrs = new List<string>();
-                    acrs.AddRange(client.DefaultAcrValues);
+                    if(client != null && client.DefaultAcrValues != null)
+                        acrs.AddRange(client.DefaultAcrValues);
                     acrs.Add(_options.DefaultAcrValue);
                     defaultAcr = await GetSupportedAcr(realm, acrs, cancellationToken);
                 }

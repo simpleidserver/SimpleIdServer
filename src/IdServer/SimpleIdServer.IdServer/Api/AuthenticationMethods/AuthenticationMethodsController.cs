@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.UI;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -96,6 +97,57 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
                     Capabilities = authMethod.Capabilities
                 };
                 return new OkObjectResult(result);
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserLockingOptions([FromRoute] string prefix)
+        {
+            try
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationMethods.Name);
+                var userLockingOptions = typeof(UserLockingOptions);
+                var section = _configuration.GetSection(userLockingOptions.Name);
+                var configuration = section.Get(userLockingOptions);
+                var values = new Dictionary<string, string>();
+                if (configuration != null)
+                {
+                    var type = configuration.GetType();
+                    var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+                    foreach (var property in properties)
+                    {
+                        var value = property.GetValue(configuration)?.ToString();
+                        if (!string.IsNullOrWhiteSpace(value)) values.Add(property.Name, value);
+                    }
+                }
+
+                var result = new UserLockingResult
+                {
+                    OptionsName = userLockingOptions.Name,
+                    Values = values
+                };
+                return new OkObjectResult(result);
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateUserLockingOptions([FromRoute] string prefix, [FromBody] UpdateUserLockingRequest request)
+        {
+            try
+            {
+                var type = typeof(UserLockingOptions);
+                await CheckAccessToken(prefix, Constants.StandardScopes.AuthenticationMethods.Name);
+                foreach (var kvp in request.Values)
+                    _configuration[$"{type.Name}:{kvp.Key}"] = kvp.Value;
+                return NoContent();
             }
             catch (OAuthException ex)
             {

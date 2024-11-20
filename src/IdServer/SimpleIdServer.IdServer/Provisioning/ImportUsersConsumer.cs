@@ -215,7 +215,8 @@ public class ImportUsersConsumer :
             Id = extractedUser.RepresentationId,
             Source = idProvisioning.Definition.Name,
             IdentityProvisioningId = idProvisioning.Id,
-            UpdateDateTime = DateTime.UtcNow
+            UpdateDateTime = DateTime.UtcNow,
+            CreateDateTime = DateTime.UtcNow
         };
         if (!string.IsNullOrWhiteSpace(extractedUser.Values))
         {

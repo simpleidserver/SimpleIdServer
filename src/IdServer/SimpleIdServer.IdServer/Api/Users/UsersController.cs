@@ -132,7 +132,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 if (user == null) return new NotFoundResult();
                 var grpPathLst = user.Groups.SelectMany(g => g.Group.ResolveAllPath()).Distinct().ToList();
                 var allGroups = await _groupRepository.GetAllByStrictFullPath(prefix, grpPathLst, cancellationToken);
-                var roles = allGroups.SelectMany(g => g.Roles).Select(r => r.Name).Distinct();
+                var roles = allGroups.SelectMany(g => g.Roles).Where(r => r.Realms.Any(re => re.Name == prefix)).Select(r => r.Name).Distinct();
                 return new OkObjectResult(roles);
             }
             catch (OAuthException ex)
@@ -229,6 +229,12 @@ namespace SimpleIdServer.IdServer.Api.Users
                         if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                        if (!string.IsNullOrWhiteSpace(request.Email))
+                        {
+                            var existingUser = await _userRepository.GetByEmail(request.Email, prefix, cancellationToken);
+                            if (existingUser != null && existingUser.Id != id) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.EmailIsTaken);
+                        }
+
                         user.UpdateEmail(request.Email);
                         user.UpdateName(request.Name);
                         user.UpdateLastname(request.Lastname);
@@ -347,6 +353,11 @@ namespace SimpleIdServer.IdServer.Api.Users
                             request.Credential.IsActive = true;
                         }
 
+                        if(request.Credential.CredentialType == Constants.Areas.Password)
+                        {
+                            request.Credential.Value = PasswordHelper.ComputeHash(request.Credential.Value, _options.IsPasswordEncodeInBase64);
+                        }
+
                         request.Credential.Id = Guid.NewGuid().ToString();
                         user.Credentials.Add(request.Credential);
                         user.UpdateDateTime = DateTime.UtcNow;
@@ -386,7 +397,11 @@ namespace SimpleIdServer.IdServer.Api.Users
                         if (user == null) return new NotFoundResult();
                         var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
                         if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
-                        existingCredential.Value = request.Value;
+                        if(existingCredential.CredentialType == Constants.Areas.Password)
+                            existingCredential.Value = PasswordHelper.ComputeHash(request.Value, _options.IsPasswordEncodeInBase64);
+                        else
+                            existingCredential.Value = request.Value;
+
                         existingCredential.OTPAlg = request.OTPAlg;
                         user.UpdateDateTime = DateTime.UtcNow;
                         _userRepository.Update(user);

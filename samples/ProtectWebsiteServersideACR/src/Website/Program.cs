@@ -16,7 +16,7 @@ builder.Services.AddAuthentication(options =>
             if(context.Properties.Items.ContainsKey("acr"))
             {
                 context.ProtocolMessage.AcrValues = context.Properties.Items["acr"];
-                context.ProtocolMessage.Prompt = "login";
+                // context.ProtocolMessage.Prompt = "login";
             }
 
             return Task.CompletedTask;

@@ -17,29 +17,33 @@ using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Notification.Gotify;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
+using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store.EF;
+using SimpleIdServer.IdServer.Store.EF.Seeding;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
+using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using SimpleIdServer.IdServer.Seeding;
-using SimpleIdServer.IdServer.Store.EF.Seeding;
+using System.Threading.Tasks;
 
 const string SQLServerCreateTableFormat = "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='DistributedCache' and xtype='U') " +
     "CREATE TABLE [dbo].[DistributedCache] (" +
@@ -93,12 +97,12 @@ builder.Services.AddLocalization();
 ConfigureIdServer(builder.Services);
 ConfigureCentralizedConfiguration(builder);
 
-// Uncomment these two lines to enable seed data from JSON file.
-// builder.Services.AddJsonSeeding(builder.Configuration);
-// builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
+// Delete these two lines or remove the JSON_SEEDS_FILE_PATH key/content from the configuration to disable seed data from JSON file.
+builder.Services.AddJsonSeeding(builder.Configuration);
+builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 
 var app = builder.Build();
-SeedData(app, identityServerConfiguration.SCIMBaseUrl);
+await SeedData(app, identityServerConfiguration.SCIMBaseUrl);
 app.UseCors("AllowAll");
 if (identityServerConfiguration.IsForwardedEnabled)
 {
@@ -131,7 +135,8 @@ app
     .UseFIDO()
     .UseSamlIdp()
     .UseGotifyNotification()
-    .UseAutomaticConfiguration();
+    .UseAutomaticConfiguration()
+    .UseOpenidFederation();
 
 app.Run();
 
@@ -182,6 +187,10 @@ void ConfigureIdServer(IServiceCollection services)
                 m.AllowedCertificateTypes = CertificateTypes.All;
                 m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
             });
+        })
+        .AddOpenidFederation(o =>
+        {
+            o.IsFederationEnabled = true;
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
@@ -202,10 +211,12 @@ void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
         o.Add<IdServerEmailOptions>();
         o.Add<IdServerSmsOptions>();
         o.Add<IdServerPasswordOptions>();
-        o.Add<FidoOptions>();
+        o.Add<WebauthnOptions>();
+        o.Add<MobileOptions>();
         o.Add<IdServerConsoleOptions>();
         o.Add<GotifyOptions>();
         o.Add<IdServerVpOptions>();
+        o.Add<UserLockingOptions>();
         o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
         o.UseEFConnector();
     });
@@ -305,7 +316,7 @@ void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
     dataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();
 }
 
-void SeedData(WebApplication application, string scimBaseUrl)
+async Task SeedData(WebApplication application, string scimBaseUrl)
 {
     using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
     {
@@ -313,18 +324,12 @@ void SeedData(WebApplication application, string scimBaseUrl)
         {
             var isInMemory = dbContext.Database.IsInMemory();
             if (!isInMemory) dbContext.Database.Migrate();
+
+            var masterRealm = dbContext.Realms.FirstOrDefault(r => r.Name == SimpleIdServer.IdServer.Constants.StandardRealms.Master.Name) ?? SimpleIdServer.IdServer.Constants.StandardRealms.Master;
             if (!dbContext.Realms.Any())
                 dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
-
-            if (!dbContext.Scopes.Any())
-                dbContext.Scopes.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Scopes);
-
-            if (!dbContext.Users.Any())
-                dbContext.Users.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Users);
-
-            if (!dbContext.Clients.Any())
-                dbContext.Clients.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients);
-
+            var unsupportedScopes = MigrateScopes(dbContext, masterRealm);
+            MigrateClients(dbContext, unsupportedScopes);
             if (!dbContext.UmaPendingRequest.Any())
                 dbContext.UmaPendingRequest.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PendingRequests);
 
@@ -355,6 +360,8 @@ void SeedData(WebApplication application, string scimBaseUrl)
             if (!dbContext.RegistrationWorkflows.Any())
                 dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
 
+            var groups = MigrateGroups(dbContext, masterRealm);
+            MigrateUsers(dbContext, groups.adminGroup, groups.adminRoGroup);
             if (!dbContext.SerializedFileKeys.Any())
             {
                 dbContext.SerializedFileKeys.Add(KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"));
@@ -367,6 +374,9 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.PresentationDefinitions.Any())
                 dbContext.PresentationDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions);
+
+            if (!dbContext.FederationEntities.Any())
+                dbContext.FederationEntities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.FederationEntities);
 
             if (!dbContext.Acrs.Any())
             {
@@ -417,18 +427,20 @@ void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<IdServerSmsOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerPasswordOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerVpOptions>(dbContext);
-            AddMissingConfigurationDefinition<FidoOptions>(dbContext);
+            AddMissingConfigurationDefinition<WebauthnOptions>(dbContext);
+            AddMissingConfigurationDefinition<MobileOptions>(dbContext);
             AddMissingConfigurationDefinition<IdServerConsoleOptions>(dbContext);
             AddMissingConfigurationDefinition<GotifyOptions>(dbContext);
             AddMissingConfigurationDefinition<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>(dbContext);
             AddMissingConfigurationDefinition<GoogleOptionsLite>(dbContext);
             AddMissingConfigurationDefinition<NegotiateOptionsLite>(dbContext);
+            AddMissingConfigurationDefinition<UserLockingOptions>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
 
-            // Uncomment these two lines to enable seed data from an external resource like JSON file.
-            // ISeedStrategy seedingService = scope.ServiceProvider.GetService<ISeedStrategy>();
-            // seedingService.SeedDataAsync().Wait();
+            // Delete these two lines to disable seed data from an external resource like JSON file.
+            ISeedStrategy seedingService = scope.ServiceProvider.GetService<ISeedStrategy>();
+            await seedingService.SeedDataAsync();
         }
 
         void EnableIsolationLevel(StoreDbContext dbContext)
@@ -502,6 +514,135 @@ void SeedData(WebApplication application, string scimBaseUrl)
 
                     dbContext.AuthenticationSchemeProviders.Add(provider);
                 }
+            }
+        }
+
+        List<Scope> MigrateScopes(StoreDbContext dbContext, Realm masterRealm)
+        {
+            var allScopeNames = dbContext.Scopes.Select(s => s.Name);
+            var unsupportedScopes = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Scopes.Where(s => !allScopeNames.Contains(s.Name));
+            foreach (var scope in unsupportedScopes)
+                scope.Realms = new List<Realm>
+                {
+                    masterRealm
+                };
+            dbContext.Scopes.AddRange(unsupportedScopes);
+            return unsupportedScopes.ToList();
+        }
+
+        void MigrateClients(StoreDbContext dbContext, List<Scope> unsupportedScopes)
+        {
+            var confClientIds = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Select(c => c.ClientId);
+            var allClientIds = dbContext.Clients.Select(s => s.ClientId);
+            var unknownClients = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Where(c => !allClientIds.Contains(c.ClientId));
+            var knownClients = dbContext.Clients
+                .Include(c => c.Scopes)
+                .Where(c => confClientIds.Contains(c.ClientId));
+            foreach (var unknownClient in unknownClients)
+                dbContext.Clients.Add(unknownClient);
+            foreach (var knownClient in knownClients)
+            {
+                var cl = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Single(c => c.ClientId == knownClient.ClientId);
+                foreach (var scope in cl.Scopes)
+                {
+                    if (!knownClient.Scopes.Any(s => s.Name == scope.Name))
+                    {
+                        var existingScope = dbContext.Scopes.SingleOrDefault(s => s.Name == scope.Name) ?? unsupportedScopes.Single(s => s.Name == scope.Name);
+                        knownClient.Scopes.Add(existingScope);
+                    }
+                }
+            }
+        }
+
+        (Group adminGroup, Group adminRoGroup) MigrateGroups(StoreDbContext dbContext, Realm masterRealm)
+        {
+            var admGroup = dbContext.Groups.Include(g => g.Realms)
+                .Include(g => g.Roles)
+                .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name);
+            var admRoGroup = dbContext.Groups.Include(g => g.Realms)
+                .Include(g => g.Roles)
+                .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name);
+            if (admGroup == null)
+            {
+                admGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup;
+                admGroup.Realms = new List<GroupRealm>();
+                masterRealm.Groups.Add(new GroupRealm
+                {
+                    Group = admGroup
+                });
+            }
+
+            if (admRoGroup == null)
+            {
+                admRoGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup;
+                admRoGroup.Realms = new List<GroupRealm>();
+                masterRealm.Groups.Add(new GroupRealm
+                {
+                    Group = admRoGroup
+                });
+            }
+
+            var scopes = RealmRoleBuilder.BuildAdministrativeRole(masterRealm);
+            var allScopeNames = dbContext.Scopes.Select(s => s.Name);
+            var unknownScopes = scopes.Where(s => !allScopeNames.Contains(s.Name));
+            dbContext.Scopes.AddRange(unknownScopes);
+            foreach (var scope in unknownScopes)
+            {
+                if (!admGroup.Roles.Any(r => r.Name == scope.Name))
+                    admGroup.Roles.Add(scope);
+            }
+
+            foreach (var scope in unknownScopes.Where(s => s.Action == ComponentActions.View))
+            {
+                if (!admRoGroup.Roles.Any(r => r.Name == scope.Name))
+                    admRoGroup.Roles.Add(scope);
+            }
+
+            var existingAdministratorRole = dbContext.Scopes.FirstOrDefault(s => s.Name == SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole.Name);
+            if (existingAdministratorRole == null)
+            {
+                existingAdministratorRole = SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole;
+                existingAdministratorRole.Realms.Clear();
+                existingAdministratorRole.Realms.Add(masterRealm);
+                dbContext.Scopes.Add(existingAdministratorRole);
+            }
+
+            if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole.Name))
+                admGroup.Roles.Add(existingAdministratorRole);
+
+            return (admGroup, admRoGroup);
+        }
+
+        void MigrateUsers(StoreDbContext dbContext, Group adminGroup, Group adminRoGroup)
+        {
+            var isUserExists = dbContext.Users
+                .Any(c => c.Name == "user");
+            var existingAdministratorUser = dbContext.Users
+                .Include(u => u.Groups).ThenInclude(u => u.Group)
+                .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser.Name);
+            var existingAdministratorRoUser = dbContext.Users
+                .Include(u => u.Groups).ThenInclude(u => u.Group)
+                .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser.Name);
+            if (!isUserExists)
+                dbContext.Users.Add(UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build());
+            if (existingAdministratorRoUser == null)
+                dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser);
+            else if (!existingAdministratorRoUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name))
+            {
+                existingAdministratorRoUser.Groups.Add(new GroupUser
+                {
+                    Group = adminRoGroup
+                });
+            }
+
+            if (existingAdministratorUser == null)
+                dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser);
+            else if(!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))
+            {
+                existingAdministratorUser.Groups.Add(new GroupUser
+                {
+                    Group = adminGroup
+                });
             }
         }
     }

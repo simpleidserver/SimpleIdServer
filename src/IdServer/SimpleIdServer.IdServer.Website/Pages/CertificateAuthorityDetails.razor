@@ -73,7 +73,11 @@
             break;
     }
 
-    <RadzenButton class="mt-1" Click=@(a => Download()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.Download" />
+    <SidAuthorizeView Roles=@("/certificateauthorities/manage")>
+        <Authorized>
+            <RadzenButton class="mt-1" Click=@(a => Download()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.Download" />
+        </Authorized>
+    </SidAuthorizeView>
 }
 
 @code {

@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.CredentialIssuer;
 using SimpleIdServer.IdServer.CredentialIssuer.DTOs;
 using System.Collections.Generic;
 using System.Security.Claims;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -44,7 +45,8 @@ public class CredentialsController : BaseController
         var credentialConfigurations = await _credentialConfigurationStore.GetAll(cancellationToken);
         return View(new CredentialsViewModel
         {
-            CredentialConfigurations = credentialConfigurations
+            CredentialConfigurations = credentialConfigurations,
+            IsDeveloperModeEnabled = _options.IsDeveloperModeEnabled
         });
     }
 
@@ -53,18 +55,22 @@ public class CredentialsController : BaseController
     {
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var subject = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var grants = new List<string>();
+        if (request.PreAuthorized)
+            grants.Add(CredentialOfferResultNames.PreAuthorizedCodeGrant);
+        else
+            grants.Add(CredentialOfferResultNames.AuthorizedCodeGrant);
         var result = await _createCredentialOfferCommandHandler.Handle(new CreateCredentialOfferCommand
         {
             AccessToken = await GetAccessToken(),
             CredentialConfigurationIds = new List<string> { request.ConfigurationId },
-            Grants = new List<string>
-            {
-                CredentialOfferResultNames.PreAuthorizedCodeGrant
-            },
+            Grants = grants,
             Subject = subject
         }, cancellationToken);
         if (result.Error != null)
             return Build(result.Error.Value);
+        var json = JsonSerializer.Serialize(result.CredentialOffer);
+        Response.Headers.Add("QRCode", json);
         return File(_getCredentialOfferQueryHandler.GetQrCode(new GetCredentialOfferQuery 
         { 
             CredentialOffer = result.CredentialOffer, 
@@ -77,4 +83,5 @@ public class CredentialsController : BaseController
 public class ShareCredentialRequest
 {
     public string ConfigurationId { get; set; }
+    public bool PreAuthorized { get; set; }
 }

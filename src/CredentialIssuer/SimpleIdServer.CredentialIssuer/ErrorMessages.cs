@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Org.BouncyCastle.Asn1.Cms;
+
 namespace SimpleIdServer.IdServer.CredentialIssuer
 {
     public static class ErrorMessages
@@ -11,7 +13,10 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string EXISTING_CREDENTIAL_CONFIGURATION = "credential configuration {0} already exists";
         public const string EXISTING_CREDENTIAL_CLAIM = "the credential configuration claim {0} already exists";
         public const string EXISTING_CREDENTIAL = "the credential {0} already exists";
+        public const string ISSUANCE_PENDING = "The Credential issuance is still pending";
+        public const string INVALID_TRANSACTION_ID = "The Deferred Credential Request contains an invalid transaction_id";
         public const string INVALID_INCOMING_REQUEST = "the incoming request is not valid";
+        public const string INVALID_ISSUER_STATE = "the issuer_state is not valid";
         public const string INVALID_PROOF_FORMAT = "the proof format {0} is not supported";
         public const string INVALID_ACCESS_TOKEN_SCOPE = "access token has an invalid scope";
         public const string INVALID_PROOF_SIG = "the proof signature is not correct";
@@ -36,6 +41,7 @@ namespace SimpleIdServer.IdServer.CredentialIssuer
         public const string UNKNOWN_CREDENTIAL_CLAIM_TRANSLATION = "the translation {0} doesn't exist";
         public const string UNKNOWN_CREDENTIAL_CONFIGURATION_DISPLAY = "the credential configuration display {0} doesn't exist";
         public const string UNKNOWN_PROOF_TYPE = "the proof type {0} is unknown";
+        public const string UNKNOWN_DEFERRED_CREDENTIAL = "the deferred credential {0} doesn't exist";
         public const string UNKNOWN_USER = "the user {0} doesn't exist";
         public const string UNSUPPORTED_CREDENTIALS_FORMAT = "credential formats {0} are not supported";
         public const string MALFROMED_INCOMING_REQUEST = "the incoming request is malformed";

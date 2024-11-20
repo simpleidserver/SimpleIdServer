@@ -10,5 +10,6 @@ namespace SimpleIdServer.IdServer.Stores;
 
 public interface ILanguageRepository
 {
+    void Add(Language language);
     Task<List<Language>> GetAll(CancellationToken cancellationToken);
 }

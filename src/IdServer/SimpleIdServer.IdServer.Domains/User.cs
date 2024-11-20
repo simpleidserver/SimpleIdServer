@@ -57,6 +57,10 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime UpdateDateTime { get; set; }
         [JsonPropertyName(UserNames.Source)]
         public string? Source { get; set; } = null;
+        [JsonPropertyName(UserNames.UnblockDateTime)]
+        public DateTime? UnblockDateTime { get; set; }
+        [JsonPropertyName(UserNames.NbLoginAttempt)]
+        public int NbLoginAttempt { get; set; }
         [JsonIgnore]
         public string? IdentityProvisioningId { get; set; } = null;
         [JsonIgnore]
@@ -115,6 +119,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public IdentityProvisioning? IdentityProvisioning { get; set; } = null;
 
+
         #region User claims
 
         public bool TryGetUserClaim(string key, out object result)
@@ -131,6 +136,34 @@ namespace SimpleIdServer.IdServer.Domains
         }
 
         #endregion
+
+        public bool IsBlocked()
+        {
+            if (Status == UserStatus.BLOCKED && UnblockDateTime >= DateTime.UtcNow) return true;
+            if (Status == UserStatus.BLOCKED && UnblockDateTime < DateTime.UtcNow)
+            {
+                ResetLoginAttempt();
+            }
+
+            return false;
+        }
+
+        public void LoginAttempt(int maxAttempt, int lockTimeInSeconds)
+        {
+            NbLoginAttempt++;
+            if (NbLoginAttempt >= maxAttempt)
+            {
+                UnblockDateTime = DateTime.UtcNow.AddSeconds(lockTimeInSeconds);
+                Status = UserStatus.BLOCKED;
+            }
+        }
+
+        public void ResetLoginAttempt()
+        {
+            NbLoginAttempt = 0;
+            UnblockDateTime = null;
+            Status = UserStatus.ACTIVATED;
+        }
 
         public Consent AddConsent(string realm, string clientId, ICollection<string> claims, ICollection<AuthorizedScope> scopes, ICollection<AuthorizationData> authorizationDetails)
         {

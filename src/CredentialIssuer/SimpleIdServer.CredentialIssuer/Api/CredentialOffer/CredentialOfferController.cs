@@ -39,8 +39,6 @@ namespace SimpleIdServer.CredentialIssuer.Api.CredentialOffer
         [Authorize("ApiAuthenticated")]
         public async Task<IActionResult> Create([FromBody] CreateCredentialOfferRequest request, CancellationToken cancellationToken)
         {
-            // https://openid.github.io/OpenID4VCI/openid-4-verifiable-credential-issuance-wg-draft.html#name-authorization-code-flow
-            // https://curity.io/resources/learn/pre-authorized-code/ - exchange the access token for a pre-authorized code and PIN.
             var accessToken = await GetAccessToken();
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var result = await _createCredentialOfferCommandHandler.Handle(new CreateCredentialOfferCommand

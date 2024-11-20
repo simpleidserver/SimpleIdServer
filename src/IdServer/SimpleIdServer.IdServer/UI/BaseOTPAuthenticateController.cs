@@ -4,6 +4,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Helpers;
@@ -25,6 +26,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
 
         protected BaseOTPAuthenticateController(
+            IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
             IUserAuthenticationService userAuthenticationService,
@@ -42,7 +44,7 @@ namespace SimpleIdServer.IdServer.UI
             IJwtBuilder jwtBuilder,
             IBusControl busControl,
             IAntiforgery antiforgery,
-            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
+            IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
         {
             _notificationServices = notificationServices;
             _otpAuthenticators = otpAuthenticators;

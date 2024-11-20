@@ -30,7 +30,7 @@ Scenario: authorization request must exists
 	| Key                  | Value                             |
 	| grant_type           | urn:openid:params:grant-type:ciba |
 	| client_id            | fortyTwoClient                    |
-	| X-Testing-ClientCert | sidClient.crt                    |
+	| X-Testing-ClientCert | sidClient.crt                     |
 	| auth_req_id          | id                                |
 
 	And extract JSON from body

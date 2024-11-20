@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Stores;
 
 public interface IPresentationDefinitionStore
 {
+    void Add(PresentationDefinition presentationDefinition);
     Task<List<PresentationDefinition>> GetAll(string realm, CancellationToken cancellationToken);
     Task<PresentationDefinition> GetByPublicId(string id, string realm, CancellationToken cancellationToken);
 }

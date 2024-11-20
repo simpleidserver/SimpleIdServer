@@ -7,9 +7,9 @@ namespace SimpleIdServer.IdServer.SqlSugar.Startup.Converters
 {
     public class OpenIdConnectLiteOptions : IDynamicAuthenticationOptions<OpenIdConnectOptions>
     {
-        [SimpleIdServer.Configuration.ConfigurationRecord("ClientId", "Client Identifier", order: 0, IsRequired = true)]
+        [SimpleIdServer.IdServer.ConfigurationRecord("ClientId", "Client Identifier", order: 0, IsRequired = true)]
         public string ClientId { get; set; }
-        [SimpleIdServer.Configuration.ConfigurationRecord("ClientSecret", "Client Secret", order: 1, IsRequired = true)]
+        [SimpleIdServer.IdServer.ConfigurationRecord("ClientSecret", "Client Secret", order: 1, IsRequired = true)]
         public string ClientSecret { get; set; }
 
         public OpenIdConnectOptions Convert()

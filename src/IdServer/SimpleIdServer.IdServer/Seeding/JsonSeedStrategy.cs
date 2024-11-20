@@ -17,18 +17,25 @@ public class JsonSeedStrategy : ISeedStrategy
 {
     private readonly JsonSeedingOptions _jsonSeedingOptions;
     private readonly ILogger<JsonSeedStrategy> _logger;
-    private readonly IEntitySeeder<UserSeedDto> _userSeederService;
+    private readonly IEntitySeeder<RealmSeedDto> _realmsSeeder;
+    private readonly IEntitySeeder<ScopeSeedDto> _scopesSeeder;
+    private readonly IEntitySeeder<UserSeedDto> _usersSeeder;
 
     public JsonSeedStrategy(
         IOptions<JsonSeedingOptions> jsonSeedingOptions,
         ILogger<JsonSeedStrategy> logger,
-        IEntitySeeder<UserSeedDto> userSeederService)
+        IEntitySeeder<RealmSeedDto> realmsSeeder,
+        IEntitySeeder<ScopeSeedDto> scopesSeeder,
+        IEntitySeeder<UserSeedDto> usersSeeder)
     {
         _jsonSeedingOptions = jsonSeedingOptions.Value;
         _logger = logger;
-        _userSeederService = userSeederService;
+        _realmsSeeder = realmsSeeder;
+        _scopesSeeder = scopesSeeder;
+        _usersSeeder = usersSeeder;
     }
 
+    /// <inheritdoc/>
     public async Task<SeedsDto?> GetDataFromResourceAsync(CancellationToken cancellationToken = default)
     {
         string jsonText = await File.ReadAllTextAsync(_jsonSeedingOptions.JsonFilePath, cancellationToken);
@@ -37,6 +44,7 @@ public class JsonSeedStrategy : ISeedStrategy
         return seedsDto;
     }
 
+    /// <inheritdoc/>
     public async Task SeedDataAsync(CancellationToken cancellationToken = default)
     {
         if (_jsonSeedingOptions.SeedFromJson)
@@ -48,11 +56,22 @@ public class JsonSeedStrategy : ISeedStrategy
         }
     }
 
+    /// <inheritdoc/>
     public async Task SeedDataAsync(SeedsDto seeds, CancellationToken cancellationToken = default)
     {
+        if (seeds.Realms.Count > 0)
+        {
+            await _realmsSeeder?.SeedAsync(seeds.Realms , cancellationToken);
+        }
+
+        if (seeds.Scopes.Count > 0)
+        {
+            await _scopesSeeder?.SeedAsync(seeds.Scopes, cancellationToken);
+        }
+
         if (seeds.Users.Count > 0)
         {
-            await _userSeederService.SeedAsync(seeds.Users, cancellationToken);
+            await _usersSeeder?.SeedAsync(seeds.Users, cancellationToken);
         }
     }
 }

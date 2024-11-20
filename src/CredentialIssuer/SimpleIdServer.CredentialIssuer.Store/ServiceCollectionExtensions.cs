@@ -19,9 +19,10 @@ public static class ServiceCollectionExtensions
 
     private static void RegisterDependencies(IServiceCollection services)
     {
-        services.AddTransient<ICredentialOfferStore, CredentialOfferStore>();
         services.AddTransient<ICredentialConfigurationStore, CredentialConfigurationStore>();
         services.AddTransient<ICredentialStore, CredentialStore>();
         services.AddTransient<IUserCredentialClaimStore, UserCredentialClaimStore>();
+        services.AddTransient<IDeferredCredentialStore, DeferredCredentialStore>();
+        services.AddTransient<ICredentialOfferStore, CredentialOfferStore>();
     }
 }

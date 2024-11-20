@@ -2,13 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Certificate;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Options;
 using System;
-using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer
 {

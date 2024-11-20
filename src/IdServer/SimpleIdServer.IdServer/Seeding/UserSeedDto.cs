@@ -36,4 +36,9 @@ public class UserSeedDto
     /// (Optional) Array of user roles.
     /// </summary>
     public string[] Roles { get; set; } = [];
+
+    /// <summary>
+    /// Realm to relate.
+    /// </summary>
+    public string Realm { get; set; }
 }

@@ -88,6 +88,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Incoming request is invalid.
+        /// </summary>
+        public static string invalid_request {
+            get {
+                return ResourceManager.GetString("invalid_request", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Manage consents.
         /// </summary>
         public static string manage_consents {

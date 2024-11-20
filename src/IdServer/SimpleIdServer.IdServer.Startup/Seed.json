@@ -1,15 +1,31 @@
 {
+  "Realms": [
+    {
+      "Name": "testing"
+    }
+  ],
+  "Scopes": [
+    {
+      "Name": "testing_scope",
+      "Type": "APIRESOURCE",
+      "Protocol": "OAUTH",
+      "Description": "Access to view the home page",
+      "IsExposedInConfigurationEdp": true,
+      "Realm": "testing"
+    }
+  ],
   "Users": [
     {
-      "Login": "user2",
+      "Login": "user-seeded-testing",
       "Password": "password",
       "FirstName": "User",
-      "LastName": "2",
-      "Email": "user2@email.com",
-      "Roles": ["user", "local"]
+      "LastName": "Seeded Testing",
+      "Email": "user-seeded-testing@email.com",
+      "Roles": [ "user", "local" ],
+      "Realm": "testing"
     },
     {
-      "Login": "user3",
+      "Login": "user-seeded-master",
       "Password": "password"
     }
   ]

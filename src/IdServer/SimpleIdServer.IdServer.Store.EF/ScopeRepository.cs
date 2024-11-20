@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Scopes;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
 
@@ -15,6 +16,15 @@ public class ScopeRepository : IScopeRepository
     public ScopeRepository(StoreDbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public Task<List<Scope>> Get(List<string> ids, CancellationToken cancellationToken)
+    {
+        return _dbContext.Scopes
+                .Include(s => s.Realms)
+                .Include(s => s.ClaimMappers)
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync(cancellationToken);
     }
 
     public Task<Scope> Get(string realm, string id, CancellationToken cancellationToken)
@@ -56,6 +66,14 @@ public class ScopeRepository : IScopeRepository
         return _dbContext.Scopes
                 .Include(s => s.Realms)
                 .Where(s => scopeNames.Contains(s.Name) && s.Realms.Any(r => r.Name == realm))
+                .ToListAsync(cancellationToken);
+    }
+
+    public Task<List<Scope>> GetAllRealmScopes(string realm, CancellationToken cancellationToken)
+    {
+        return _dbContext.Scopes
+                .Include(s => s.Realms)
+                .Where(s => s.Component != null && s.Realms.Any(r => r.Name == realm))
                 .ToListAsync(cancellationToken);
     }
 

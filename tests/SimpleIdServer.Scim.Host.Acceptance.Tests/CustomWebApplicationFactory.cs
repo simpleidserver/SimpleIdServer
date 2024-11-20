@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.IO;
 
 namespace SimpleIdServer.Scim.Host.Acceptance.Tests
 {
@@ -17,16 +18,9 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests
             _configureTestServices = configureTestServices;
         }
 
-        protected override IWebHostBuilder CreateWebHostBuilder()
-        {
-            return WebHost.CreateDefaultBuilder()
-                .UseStartup(typeof(T));
-        }
-
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            base.ConfigureWebHost(builder);
-            builder.UseContentRoot(".");
+            builder.UseContentRoot(Directory.GetCurrentDirectory());
             builder.ConfigureServices(collection =>
             {
                 _configureTestServices?.Invoke(collection);

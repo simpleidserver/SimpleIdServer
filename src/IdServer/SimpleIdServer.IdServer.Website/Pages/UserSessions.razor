@@ -4,12 +4,18 @@
 @inject IDispatcher dispatcher
 @inject IState<SearchUserSessionsState> userSessionsState
 @inject IState<UpdateUserState> updateUserState
+@inject IUrlHelper urlHelper
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 
 <p class="text-muted">@Global.UserSessionsDescription</p>
 
-<RadzenButton class="mb-1" Click="@(args => RevokeSessions())" Icon="delete" Text="@Global.RevokeSessions" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<SidAuthorizeView Roles=@($"/users/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => RevokeSessions())" Icon="delete" Text="@Global.RevokeSessions" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
+
 <RadzenDataGrid @ref="sessionsGrid"
             AllowFiltering="true"
             AllowColumnResize="true"
@@ -33,7 +39,7 @@
             <Template Context="data">
                 @foreach(var clientId in data.ClientIds)
                 {
-                    <RadzenLink Text="@clientId" Path="@($"/clients/{clientId}/settings")" />
+                    <RadzenLink Text="@clientId" Path="@(urlHelper.GetUrl($"/clients/{clientId}/settings"))" />
                 }
             </Template>
         </RadzenDataGridColumn>
@@ -58,7 +64,11 @@
             <Template Context="data">
                 @if (data.State == UserSessionStates.Active && data.ExpirationDateTime > DateTime.Now)
                 {
-                    <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    <SidAuthorizeView Roles=@($"/users/manage")>
+                        <Authorized>
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                        </Authorized>
+                    </SidAuthorizeView>
                 }
             </Template>
         </RadzenDataGridColumn>

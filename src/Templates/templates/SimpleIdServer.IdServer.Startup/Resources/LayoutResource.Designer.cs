@@ -124,6 +124,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Disconnected.
+        /// </summary>
+        public static string Disconnected {
+            get {
+                return ResourceManager.GetString("Disconnected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à English.
         /// </summary>
         public static string en {
@@ -183,6 +192,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string user_is_created {
             get {
                 return ResourceManager.GetString("user_is_created", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à You are disconnected.
+        /// </summary>
+        public static string YouAreDisconnected {
+            get {
+                return ResourceManager.GetString("YouAreDisconnected", resourceCulture);
             }
         }
     }

@@ -165,6 +165,7 @@ task compile -depends clean {
     exec { dotnet build .\SimpleIdServer.Scim.Host.sln -c $config --version-suffix=$buildSuffix }
 	exec { dotnet build .\SimpleIdServer.Did.sln -c $config --version-suffix=$buildSuffix }
 	exec { dotnet build .\SimpleIdServer.CredentialIssuer.Host.sln -c $config --version-suffix=$buildSuffix }
+	exec { dotnet build .\SimpleIdServer.Federation.sln -c $config --version-suffix=$buildSuffix }
 	exec { dotnet build "$source_dir/Templates/SimpleIdServer.Templates.csproj" -c $config --version-suffix=$buildSuffix }
 }
 
@@ -204,7 +205,6 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Store\SimpleIdServer.IdServer.Store.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Store.SqlSugar\SimpleIdServer.IdServer.Store.SqlSugar.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -220,6 +220,11 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Notification.Fcm\SimpleIdServer.IdServer.Notification.Fcm.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Notification.Gotify\SimpleIdServer.IdServer.Notification.Gotify.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenidFederation\SimpleIdServer.OpenidFederation.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenidFederation.Store.EF\SimpleIdServer.OpenidFederation.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Authority.Federation\SimpleIdServer.Authority.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Rp.Federation\SimpleIdServer.Rp.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Domains\SimpleIdServer.Scim.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj -c $config --no-build $versionSuffix --output $result_dir }
@@ -244,46 +249,46 @@ task pack -depends release, compile, buildTemplate {
 }
 
 task test {
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Configuration.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
+	Push-Location -Path $base_dir\tests\SimpleIdServer.Configuration.Tests
 	
-    Push-Location -Path $base_dir\tests\SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
+	try {
+	    exec { & dotnet test -c $config --no-build --no-restore }
+	} finally {
+	    Pop-Location
+	}
 	
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Did.Ethr.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
+	Push-Location -Path $base_dir\tests\SimpleIdServer.CredentialIssuer.Host.Acceptance.Tests
 	
-    Push-Location -Path $base_dir\tests\SimpleIdServer.Did.Key.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
-
-    Push-Location -Path $base_dir\tests\SimpleIdServer.DID.Tests
-
-    try {
-        exec { & dotnet test -c $config --no-build --no-restore }
-    } finally {
-        Pop-Location
-    }
+	try {
+	    exec { & dotnet test -c $config --no-build --no-restore }
+	} finally {
+	    Pop-Location
+	}
 	
+	Push-Location -Path $base_dir\tests\SimpleIdServer.Did.Ethr.Tests
+	
+	try {
+	    exec { & dotnet test -c $config --no-build --no-restore }
+	} finally {
+	    Pop-Location
+	}
+	
+	Push-Location -Path $base_dir\tests\SimpleIdServer.Did.Key.Tests
+	
+	try {
+	    exec { & dotnet test -c $config --no-build --no-restore }
+	} finally {
+	    Pop-Location
+	}
+	
+	Push-Location -Path $base_dir\tests\SimpleIdServer.DID.Tests
+	
+	try {
+	    exec { & dotnet test -c $config --no-build --no-restore }
+	} finally {
+	    Pop-Location
+	}
+
     Push-Location -Path $base_dir\tests\SimpleIdServer.IdServer.Host.Acceptance.Tests
 
     try {
@@ -291,7 +296,6 @@ task test {
     } finally {
         Pop-Location
     }
-
     Push-Location -Path $base_dir\tests\SimpleIdServer.IdServer.Tests
 
     try {
@@ -317,6 +321,14 @@ task test {
     }
 
     Push-Location -Path $base_dir\tests\SimpleIdServer.Vc.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
+
+    Push-Location -Path $base_dir\tests\SimpleIdServer.OpenidFederation.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }

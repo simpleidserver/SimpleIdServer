@@ -2,7 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license informa
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Builders;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Seeding;
+using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar.Seeding;
 
@@ -22,7 +24,7 @@ public class UserEntitySeeder : IEntitySeeder<UserSeedDto>
 
     public async Task SeedAsync(IReadOnlyCollection<UserSeedDto> records, CancellationToken cancellationToken = default)
     {
-        string[] dbLoginNames = await _dbContext.Client.Queryable<Models.SugarUser>()
+        string[] dbLoginNames = await _dbContext.Client.Queryable<SugarUser>()
             .Select(u => u.Name.ToUpper())
             .ToArrayAsync();
 
@@ -35,22 +37,32 @@ public class UserEntitySeeder : IEntitySeeder<UserSeedDto>
 
         if (usersNotInDb.Length > 0)
         {
-            var usersToCreate = new List<Models.SugarUser>();
+            var usersToCreate = new List<SugarUser>();
 
-            foreach (var user in usersNotInDb)
+            foreach (UserSeedDto user in usersNotInDb)
             {
-                var builder = UserBuilder.Create(user.Login, user.Password, user.FirstName)
+                Realm? realm = null;
+
+                if (!string.IsNullOrEmpty(user.Realm))
+                {
+                    SugarRealm sugarRealm = await _dbContext.Client.Queryable<SugarRealm>()
+                        .FirstAsync(r => r.RealmsName.ToUpper() == user.Realm.ToUpper(), cancellationToken);
+
+                    realm = sugarRealm?.ToDomain();
+                }
+
+                UserBuilder builder = UserBuilder.Create(user.Login, user.Password, user.FirstName, realm)
                     .SetLastname(user.LastName)
                     .SetEmail(user.Email);
 
-                foreach (var role in user.Roles) { builder.AddRole(role); }
+                foreach (string role in user.Roles) { builder.AddRole(role); }
 
-                Models.SugarUser sugarUser = Models.SugarUser.Transform(builder.Build());
+                SugarUser sugarUser = SugarUser.Transform(builder.Build());
 
                 usersToCreate.Add(sugarUser);
             }
 
-            await _dbContext.Client.Insertable<Models.SugarUser>(usersToCreate).ExecuteCommandAsync(cancellationToken);
+            await _dbContext.Client.Insertable<SugarUser>(usersToCreate).ExecuteCommandAsync(cancellationToken);
         }
 
         _logger.LogInformation("{count} users seeded.", usersNotInDb.Length);

@@ -10,6 +10,7 @@ using Moq;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
+using SimpleIdServer.OpenidFederation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -47,7 +48,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                     AllowAutoRedirect = false
                 });
                 _scenarioContext.Set(_factory, "Factory");
-                var mock = new Mock<Infrastructures.IHttpClientFactory>();
+                var mock = new Mock<Helpers.IHttpClientFactory>();
                 mock.Setup(m => m.GetHttpClient()).Returns(client);
                 _scenarioContext.Set(new X509Certificate2(Path.Combine(Directory.GetCurrentDirectory(), "sidClient.crt")), "sidClient.crt");
             }
@@ -72,6 +73,193 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                 };
                 var request = handler.CreateToken(descritor);
                 _scenarioContext.Set(request, "request");
+            }
+        }
+
+        [Given("build JWS request object for Relying Party")]
+        public void GivenBuildJWSRequestObjectForRp(Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var handler = new JsonWebTokenHandler();
+                var signingCredentials = IdServerConfiguration.RpSigningCredential;
+                var claims = new Dictionary<string, object>();
+                foreach (var row in table.Rows)
+                    claims.Add(row["Key"].ToString(), ParseValue(_scenarioContext, row["Value"].ToString()));
+
+                var descritor = new SecurityTokenDescriptor
+                {
+                    Claims = claims,
+                    SigningCredentials = signingCredentials
+                };
+                var request = handler.CreateToken(descritor);
+                _scenarioContext.Set(request, "request");
+            }
+        }
+
+        [Given("build random entity statement")]
+        public void GivenBuildRandomEntityStatement(Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var signingCredentials = new SigningCredentials(new RsaSecurityKey(RSA.Create()) { KeyId = Guid.NewGuid().ToString() }, SecurityAlgorithms.RsaSha256);
+                var claims = new JsonObject();
+                foreach (var row in table.Rows)
+                {
+                    var key = row["Key"].ToString();
+                    JsonNode value = row["Value"].ToString();
+                    try
+                    {
+                        value = JsonNode.Parse(value.ToString());
+                    }
+                    catch { }
+                    claims.Add(key, value);
+                }
+
+                var handler = new JsonWebTokenHandler();
+                var request = handler.CreateToken(claims.ToJsonString(), signingCredentials);
+                _scenarioContext.Set(request, "entityStatement");
+            }
+        }
+
+        [Given("build entity statement for RP")]
+        public void GivenBuildEntityStatementForRp()
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var client = new Domains.Client
+                {
+                    ClientId = "http://rp.com",
+                    ClientRegistrationTypesSupported = new List<string>
+                    {
+                        ClientRegistrationMethods.Explicit
+                    },
+                    ApplicationType = "web",
+                    RedirectionUrls = new List<string>
+                    {
+                        "https://openid.sunet.se/rp/callback"
+                    },
+                    RequestObjectSigningAlg = SecurityAlgorithms.RsaSha256,
+                    Scopes = new List<Domains.Scope>
+                    {
+                        new Domains.Scope
+                        {
+                            Name = "openid"
+                        },
+                        new Domains.Scope
+                        {
+                            Name = "profile"
+                        }
+                    },
+                    ResponseTypes = new List<string>
+                    {
+                        "code"
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code"
+                    },
+                    IsConsentDisabled = true,
+                    TokenEndPointAuthMethod = "private_key_jwt"
+                };
+                var rpOpts = new RpFederationOptions
+                {
+                    Client = client,
+                    IsFederationEnabled = false,
+                    OrganizationName = null,
+                    SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
+                };
+                var rpFederationEntityBuilder = new RpFederationEntityBuilder(Microsoft.Extensions.Options.Options.Create(rpOpts), new FakeRPFederationEntityStore());
+                var result = rpFederationEntityBuilder.BuildSelfIssued(new OpenidFederation.Builders.BuildFederationEntityRequest
+                {
+                    Credential = rpOpts.SigningCredentials,
+                    Issuer = "http://rp.com",
+                    Realm = null
+                }, CancellationToken.None).Result;
+                var handler = new JsonWebTokenHandler();
+                var jws = handler.CreateToken(JsonSerializer.Serialize(result), new SigningCredentials(rpOpts.SigningCredentials.Key, rpOpts.SigningCredentials.Algorithm));
+                _scenarioContext.Set(jws, "entityStatement");
+            }
+        }
+
+        [Given("build entity statement for RP with automatic registration")]
+        public void GivenBuildEntityStatementForRpWithAutomaticRegistration()
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var client = new Domains.Client
+                {
+                    ClientId = "http://rp.com",
+                    ClientRegistrationTypesSupported = new List<string>
+                    {
+                        ClientRegistrationMethods.Automatic
+                    },
+                    ApplicationType = "web",
+                    RedirectionUrls = new List<string>
+                    {
+                        "https://openid.sunet.se/rp/callback"
+                    },
+                    RequestObjectSigningAlg = SecurityAlgorithms.RsaSha256,
+                    Scopes = new List<Domains.Scope>
+                    {
+                        new Domains.Scope
+                        {
+                            Name = "openid"
+                        },
+                        new Domains.Scope
+                        {
+                            Name = "profile"
+                        }
+                    },
+                    ResponseTypes = new List<string>
+                    {
+                        "code"
+                    },
+                    GrantTypes = new List<string>
+                    {
+                        "authorization_code"
+                    },
+                    IsConsentDisabled = true,
+                    TokenEndPointAuthMethod = "private_key_jwt"
+                };
+                var rpOpts = new RpFederationOptions
+                {
+                    Client = client,
+                    IsFederationEnabled = false,
+                    OrganizationName = null,
+                    SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
+                };
+                var rpFederationEntityBuilder = new RpFederationEntityBuilder(Microsoft.Extensions.Options.Options.Create(rpOpts), new FakeRPFederationEntityStore());
+                var result = rpFederationEntityBuilder.BuildSelfIssued(new OpenidFederation.Builders.BuildFederationEntityRequest
+                {
+                    Credential = rpOpts.SigningCredentials,
+                    Issuer = "http://rp.com",
+                    Realm = null
+                }, CancellationToken.None).Result;
+                var handler = new JsonWebTokenHandler();
+                var jws = handler.CreateToken(JsonSerializer.Serialize(result), new SigningCredentials(rpOpts.SigningCredentials.Key, rpOpts.SigningCredentials.Algorithm));
+                _scenarioContext.Set(jws, "entityStatement");
+            }
+        }
+
+        [Given("build client assertion for Relying Party")]
+        public void GivenClientAssertionForRp(Table table)
+        {
+            using (var scope = _factory.Services.CreateScope())
+            {
+                var handler = new JsonWebTokenHandler();
+                var signingCredentials = IdServerConfiguration.RpJwtSigningCredential;
+                var claims = new Dictionary<string, object>();
+                foreach (var row in table.Rows)
+                    claims.Add(row["Key"].ToString(), ParseValue(_scenarioContext, row["Value"].ToString()));
+
+                var descritor = new SecurityTokenDescriptor
+                {
+                    Claims = claims,
+                    SigningCredentials = signingCredentials
+                };
+                var request = handler.CreateToken(descritor);
+                _scenarioContext.Set(request, "clientAssertion");
             }
         }
 
@@ -273,6 +461,21 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             {
                 httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
             }
+
+            var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
+            _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
+        }
+
+        [When("execute HTTP POST request '(.*)', content-type '(.*)', content '(.*)'")]
+        public async Task WhenExecuteHttpPostWithContentType(string url, string contentType, string content)
+        {
+            content = ParseValue(_scenarioContext, content).ToString(); ;
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(url),
+                Content = new StringContent(content, Encoding.UTF8, contentType)
+            };
 
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");

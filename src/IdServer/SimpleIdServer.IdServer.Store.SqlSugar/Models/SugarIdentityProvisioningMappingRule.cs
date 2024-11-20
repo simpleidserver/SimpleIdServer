@@ -13,7 +13,9 @@ public class SugarIdentityProvisioningMappingRule
     public string Id { get; set; } = null!;
     public string From { get; set; } = null!;
     public MappingRuleTypes MapperType { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? TargetUserAttribute { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? TargetUserProperty { get; set; } = null;
     public bool HasMultipleAttribute { get; set; } = false;
     public string IdentityProvisioningDefinitionName { get; set; } = null!;

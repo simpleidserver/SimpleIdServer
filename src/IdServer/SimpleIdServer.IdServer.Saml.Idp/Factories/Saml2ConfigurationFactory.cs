@@ -20,12 +20,12 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories
     public class Saml2ConfigurationFactory : ISaml2ConfigurationFactory
     {
         private readonly IKeyStore _keyStore;
-        private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
+        private readonly Helpers.IHttpClientFactory _httpClientFactory;
         private readonly SamlIdpOptions _options;
 
         public Saml2ConfigurationFactory(
             IKeyStore keyStore,
-            Infrastructures.IHttpClientFactory httpClientFactory,
+            Helpers.IHttpClientFactory httpClientFactory,
             IOptions<SamlIdpOptions> options)
         {
             _keyStore = keyStore;

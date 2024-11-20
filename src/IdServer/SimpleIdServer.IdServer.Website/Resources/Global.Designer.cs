@@ -232,6 +232,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add federation entity.
+        /// </summary>
+        public static string AddFederationEntity {
+            get {
+                return ResourceManager.GetString("AddFederationEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Add group.
         /// </summary>
         public static string AddGroup {
@@ -286,6 +295,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add permission.
+        /// </summary>
+        public static string AddPermission {
+            get {
+                return ResourceManager.GetString("AddPermission", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Add realm.
         /// </summary>
         public static string AddRealm {
@@ -318,6 +336,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string AddScope {
             get {
                 return ResourceManager.GetString("AddScope", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add trust anchor.
+        /// </summary>
+        public static string AddTrustAnchor {
+            get {
+                return ResourceManager.GetString("AddTrustAnchor", resourceCulture);
             }
         }
         
@@ -430,6 +457,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Assigned realms.
+        /// </summary>
+        public static string AssignedRealms {
+            get {
+                return ResourceManager.GetString("AssignedRealms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Assigned resources.
         /// </summary>
         public static string AssignedResources {
@@ -444,6 +480,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string AssignGroups {
             get {
                 return ResourceManager.GetString("AssignGroups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Assign realms.
+        /// </summary>
+        public static string AssignRealms {
+            get {
+                return ResourceManager.GetString("AssignRealms", resourceCulture);
             }
         }
         
@@ -673,6 +718,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Available realms.
+        /// </summary>
+        public static string AvailableRealms {
+            get {
+                return ResourceManager.GetString("AvailableRealms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Available resources.
         /// </summary>
         public static string AvailableResources {
@@ -714,6 +768,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string BackChannelLogoutUriTooltip {
             get {
                 return ResourceManager.GetString("BackChannelLogoutUriTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Blocked.
+        /// </summary>
+        public static string Blocked {
+            get {
+                return ResourceManager.GetString("Blocked", resourceCulture);
             }
         }
         
@@ -1006,11 +1069,38 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Expiration time.
+        /// </summary>
+        public static string ClientExpirationTime {
+            get {
+                return ResourceManager.GetString("ClientExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Client identifier.
         /// </summary>
         public static string ClientIdentifier {
             get {
                 return ResourceManager.GetString("ClientIdentifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select one or more realms.
+        /// </summary>
+        public static string ClientRealmsDescription {
+            get {
+                return ResourceManager.GetString("ClientRealmsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client registration types.
+        /// </summary>
+        public static string ClientRegistrationTypes {
+            get {
+                return ResourceManager.GetString("ClientRegistrationTypes", resourceCulture);
             }
         }
         
@@ -1141,11 +1231,29 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The client realms have been updated.
+        /// </summary>
+        public static string ClientsRealmsUpdated {
+            get {
+                return ResourceManager.GetString("ClientsRealmsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Clients.
         /// </summary>
         public static string ClientsTitle {
             get {
                 return ResourceManager.GetString("ClientsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Component.
+        /// </summary>
+        public static string Component {
+            get {
+                return ResourceManager.GetString("Component", resourceCulture);
             }
         }
         
@@ -1600,6 +1708,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Errors.
+        /// </summary>
+        public static string Errors {
+            get {
+                return ResourceManager.GetString("Errors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Ethereum contract has been deployed.
         /// </summary>
         public static string EthrContractDeployed {
@@ -1623,6 +1740,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string EthrNetworkExists {
             get {
                 return ResourceManager.GetString("EthrNetworkExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Exception.
+        /// </summary>
+        public static string Exception {
+            get {
+                return ResourceManager.GetString("Exception", resourceCulture);
             }
         }
         
@@ -1722,6 +1848,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ExtractionResult {
             get {
                 return ResourceManager.GetString("ExtractionResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Manage the trust anchors used by the identity server..
+        /// </summary>
+        public static string FederationEntitiesDescription {
+            get {
+                return ResourceManager.GetString("FederationEntitiesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Federation entities.
+        /// </summary>
+        public static string FederationEntitiesTitle {
+            get {
+                return ResourceManager.GetString("FederationEntitiesTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Entity type.
+        /// </summary>
+        public static string FederationEntityType {
+            get {
+                return ResourceManager.GetString("FederationEntityType", resourceCulture);
             }
         }
         
@@ -2581,6 +2734,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Lock account.
+        /// </summary>
+        public static string LockAccount {
+            get {
+                return ResourceManager.GetString("LockAccount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Login.
         /// </summary>
         public static string Login {
@@ -2835,6 +2997,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Number of login attempts.
+        /// </summary>
+        public static string NbLoginAttempt {
+            get {
+                return ResourceManager.GetString("NbLoginAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à No.
         /// </summary>
         public static string No {
@@ -2849,6 +3020,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string NoProperties {
             get {
                 return ResourceManager.GetString("NoProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à You are not authorized.
+        /// </summary>
+        public static string NotAuthorized {
+            get {
+                return ResourceManager.GetString("NotAuthorized", resourceCulture);
             }
         }
         
@@ -3002,6 +3182,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Pending {
             get {
                 return ResourceManager.GetString("Pending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Permissions.
+        /// </summary>
+        public static string Permissions {
+            get {
+                return ResourceManager.GetString("Permissions", resourceCulture);
             }
         }
         
@@ -3168,6 +3357,42 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Realm permissions.
+        /// </summary>
+        public static string RealmPermissions {
+            get {
+                return ResourceManager.GetString("RealmPermissions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select one or more permissions assigned to the realm. You must reconnect to the administration website for the changes to take effect..
+        /// </summary>
+        public static string RealmPermissionsDescription {
+            get {
+                return ResourceManager.GetString("RealmPermissionsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Roles have been updated.
+        /// </summary>
+        public static string RealmRoleScopesUpdated {
+            get {
+                return ResourceManager.GetString("RealmRoleScopesUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Realms.
+        /// </summary>
+        public static string Realms {
+            get {
+                return ResourceManager.GetString("Realms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Redirection URLs.
         /// </summary>
         public static string RedirectionUrls {
@@ -3303,6 +3528,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à {0} errors.
+        /// </summary>
+        public static string RelaunchErrors {
+            get {
+                return ResourceManager.GetString("RelaunchErrors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Remove.
         /// </summary>
         public static string Remove {
@@ -3362,6 +3596,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Resource {
             get {
                 return ResourceManager.GetString("Resource", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Resources.
+        /// </summary>
+        public static string Resources {
+            get {
+                return ResourceManager.GetString("Resources", resourceCulture);
             }
         }
         
@@ -3836,6 +4079,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The selected federation entities have been removed.
+        /// </summary>
+        public static string SelectedFederationEntitiesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedFederationEntitiesRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Selected grants have been rejected.
         /// </summary>
         public static string SelectedGrantsRemoved {
@@ -3886,6 +4138,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelectedIdProvidersRemoved {
             get {
                 return ResourceManager.GetString("SelectedIdProvidersRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the selected realm roles are removed.
+        /// </summary>
+        public static string SelectedRealmRolesRemoved {
+            get {
+                return ResourceManager.GetString("SelectedRealmRolesRemoved", resourceCulture);
             }
         }
         
@@ -4423,6 +4684,69 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Trust anchor.
+        /// </summary>
+        public static string TrustAnchor {
+            get {
+                return ResourceManager.GetString("TrustAnchor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Trust anchor has been added.
+        /// </summary>
+        public static string TrustAnchorAdded {
+            get {
+                return ResourceManager.GetString("TrustAnchorAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A Trust Anchor is an Entity whose main purpose is to issue statements about Entities.
+        /// </summary>
+        public static string TrustAnchorDescription {
+            get {
+                return ResourceManager.GetString("TrustAnchorDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à TODO.
+        /// </summary>
+        public static string TrustAnchorsDescription {
+            get {
+                return ResourceManager.GetString("TrustAnchorsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Entity that represents a trusted third party.
+        /// </summary>
+        public static string TrustAnchorShortDescription {
+            get {
+                return ResourceManager.GetString("TrustAnchorShortDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Trust anchors.
+        /// </summary>
+        public static string TrustAnchorsTitle {
+            get {
+                return ResourceManager.GetString("TrustAnchorsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Trust entity.
+        /// </summary>
+        public static string TrustEntity {
+            get {
+                return ResourceManager.GetString("TrustEntity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Try to extract the users.
         /// </summary>
         public static string TryExtractUsers {
@@ -4459,11 +4783,29 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Unassign realms.
+        /// </summary>
+        public static string UnassignRealms {
+            get {
+                return ResourceManager.GetString("UnassignRealms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Unassign.
         /// </summary>
         public static string UnassignResources {
             get {
                 return ResourceManager.GetString("UnassignResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Unblock datetime.
+        /// </summary>
+        public static string UnblockDateTime {
+            get {
+                return ResourceManager.GetString("UnblockDateTime", resourceCulture);
             }
         }
         
@@ -4581,6 +4923,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Url {
             get {
                 return ResourceManager.GetString("Url", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Url is required.
+        /// </summary>
+        public static string UrlIsRequired {
+            get {
+                return ResourceManager.GetString("UrlIsRequired", resourceCulture);
             }
         }
         
@@ -4824,6 +5175,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string UserIdentifierDescription {
             get {
                 return ResourceManager.GetString("UserIdentifierDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Options have been updated.
+        /// </summary>
+        public static string UserLockingOptionsUpdated {
+            get {
+                return ResourceManager.GetString("UserLockingOptionsUpdated", resourceCulture);
             }
         }
         
@@ -5094,6 +5454,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string WebAuthn {
             get {
                 return ResourceManager.GetString("WebAuthn", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Welcome {0}.
+        /// </summary>
+        public static string Welcome {
+            get {
+                return ResourceManager.GetString("Welcome", resourceCulture);
             }
         }
         

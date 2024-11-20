@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store.Configurations;
+using SimpleIdServer.IdServer.Store.EF.Configurations;
+using SimpleIdServer.OpenidFederation.Domains;
 
 namespace SimpleIdServer.IdServer.Store.EF
 {
@@ -48,6 +50,8 @@ namespace SimpleIdServer.IdServer.Store.EF
         public DbSet<GroupUser> GroupUser { get; set; }
         public DbSet<GotifySession> GotifySessions { get; set; }
         public DbSet<PresentationDefinition> PresentationDefinitions { get; set; }
+        public DbSet<MessageBusErrorMessage> MessageBusErrorMessages { get; set; }
+        public DbSet<FederationEntity> FederationEntities { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -108,6 +112,8 @@ namespace SimpleIdServer.IdServer.Store.EF
             builder.ApplyConfiguration(new PresentationDefinitionFormatConfiguration());
             builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConfiguration());
             builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConstraintConfiguration());
+            builder.ApplyConfiguration(new MessageBusErrorMessageConfiguration());
+            builder.ApplyConfiguration(new FederationEntityConfiguration());
         }
     }
 }

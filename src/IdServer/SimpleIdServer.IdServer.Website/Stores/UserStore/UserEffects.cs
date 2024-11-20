@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using Radzen;
 using SimpleIdServer.IdServer.Api.Users;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.Website.Stores.Base;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -20,12 +19,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
 
-        public UserEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, ProtectedSessionStorage sessionStorage, IOptions<IdServerWebsiteOptions> websiteOptions)
+        public UserEffects(
+            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            IOptions<IdServerWebsiteOptions> websiteOptions)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
-            _sessionStorage = sessionStorage;
             _options = websiteOptions.Value;
         }
 
@@ -113,8 +112,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 Method = HttpMethod.Put,
                 Content = new StringContent(JsonSerializer.Serialize(req), Encoding.UTF8, "application/json")
             };
-            await httpClient.SendAsync(requestMessage);
-            dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            try
+            {
+                httpResult.EnsureSuccessStatusCode();
+                dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
+            }
+            catch
+            {
+                var json = await httpResult.Content.ReadAsStringAsync();
+                var jObj = JsonObject.Parse(json);
+                dispatcher.Dispatch(new UpdateUserDetailsFailureAction { ErrorMessage = jObj["error_description"].GetValue<string>() });
+            }
         }
 
         [EffectMethod]
@@ -406,8 +415,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         private async Task<string> GetRealm()
         {
             if (!_options.IsReamEnabled) return SimpleIdServer.IdServer.Constants.DefaultRealm;
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return realmStr;
         }
     }
@@ -484,6 +493,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string? Firstname { get; set; } = null;
         public string? Lastname { get; set; } = null;
         public string? NotificationMode { get; set; } = null;
+    }
+
+    public class UpdateUserDetailsFailureAction
+    {
+        public string ErrorMessage { get; set; }
     }
 
     public class RevokeUserConsentAction

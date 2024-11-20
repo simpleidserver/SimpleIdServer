@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.CredentialIssuer;
+using SimpleIdServer.CredentialIssuer.Api.Credential.Services;
 using SimpleIdServer.CredentialIssuer.Api.Credential.Validators;
 using SimpleIdServer.CredentialIssuer.Api.CredentialOffer.Commands;
 using SimpleIdServer.CredentialIssuer.Api.CredentialOffer.Queries;
@@ -28,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IHttpClientFactory, HttpClientFactory>();
         services.AddTransient<ICreateCredentialOfferCommandHandler, CreateCredentialOfferCommandHandler>();
         services.AddTransient<IGetCredentialOfferQueryHandler, GetCredentialOfferQueryHandler>();
+        services.AddTransient<ICredentialService, CredentialService>();
         return new CredentialIssuerServer(services);
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Helpers;
@@ -23,6 +24,7 @@ namespace SimpleIdServer.IdServer.Otp.UI;
 public class AuthenticateController : BaseOTPAuthenticateController<AuthenticateOtpViewModel>
 {
     public AuthenticateController(
+        IConfiguration configuration,
         IEnumerable<IUserNotificationService> notificationServices, 
         IEnumerable<IOTPAuthenticator> otpAuthenticators,
         IOtpAuthenticationService userAuthenticationService, 
@@ -40,7 +42,7 @@ public class AuthenticateController : BaseOTPAuthenticateController<Authenticate
         IJwtBuilder jwtBuilder, 
         IBusControl busControl,
         IAntiforgery antiforgery,
-        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
+        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configuration, notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository)
     {
     }
 

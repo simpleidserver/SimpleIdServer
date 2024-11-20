@@ -269,6 +269,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public static UpdateUserState ReduceUpdateUserDetailsAction(UpdateUserState state, UpdateUserDetailsSuccessAction act) => new(false);
 
         [ReducerMethod]
+        public static UpdateUserState ReduceUpdateUserDetailsAction(UpdateUserState state, UpdateUserDetailsFailureAction act) => new(false);
+
+        [ReducerMethod]
         public static UpdateUserState ReduceRevokeUserConsentAction(UpdateUserState state, RevokeUserConsentAction act) => new(true);
 
         [ReducerMethod]
@@ -591,6 +594,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             {
                 IsLoading = false,
                 Groups = groups,
+                Count = groups.Count()
             };
         }
 

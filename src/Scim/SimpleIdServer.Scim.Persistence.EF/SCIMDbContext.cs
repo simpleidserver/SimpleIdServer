@@ -11,7 +11,13 @@ namespace SimpleIdServer.Scim.Persistence.EF
     {
         private readonly SCIMEFOptions _options;
 
-        public SCIMDbContext(DbContextOptions<SCIMDbContext> dbContextOptions, IOptions<SCIMEFOptions> options) : base(dbContextOptions)
+        public SCIMDbContext(DbContextOptions<SCIMDbContext> dbContextOptions, IOptions<SCIMEFOptions> options): this((DbContextOptions)dbContextOptions, options)
+        {
+           
+        }
+
+        // protected constructor with generic options simplifies inheritance of the DbContext
+        protected SCIMDbContext(DbContextOptions dbContextOptions, IOptions<SCIMEFOptions> options): base(dbContextOptions)
         {
             _options = options.Value;
         }

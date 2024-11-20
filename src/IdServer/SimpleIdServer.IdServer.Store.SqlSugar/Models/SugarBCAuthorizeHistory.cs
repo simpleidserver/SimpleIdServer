@@ -12,7 +12,9 @@ public class SugarBCAuthorizeHistory
     [SugarColumn(IsPrimaryKey = true)]
     public int Id { get; set; }
     public DateTime StartDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public DateTime? EndDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? Message { get; set; } = null;
     public BCAuthorizeStatus Status { get; set; }
     public string BCAuthorizeId { get; set; }

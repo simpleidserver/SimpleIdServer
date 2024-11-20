@@ -10,22 +10,19 @@
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
     var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
-    var realm = SimpleIdServer.IdServer.Middlewares.RealmContext.Instance()?.Realm;
+    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
     var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <ul class="list-group mb-3" id="errors">
-        @foreach (var modelState in ViewData.ModelState.Values)
+<ul class="list-group mb-3" id="errors">
+    @foreach (var modelState in ViewData.ModelState.Values)
+    {
+        foreach (var error in modelState.Errors)
         {
-            foreach (var error in modelState.Errors)
-            {
-                <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
-            }
+            <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
         }
-    </ul>
-}
+    }
+</ul>
 
 @if (Model.IsLoginMissing)
 {    

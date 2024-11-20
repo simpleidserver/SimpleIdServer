@@ -233,7 +233,7 @@ public class Program
 
     private static void ConfigureApp(WebApplicationBuilder builder, WebApplication app)
     {
-        var opts = app.Services.GetRequiredService<IOptions<SCIMHostOptions>>().Value;
+        var opts = app.Services.GetRequiredService<IOptions<SimpleIdServer.Scim.SCIMHostOptions>>().Value;
         app.UseSwagger();
         app.UseSwaggerUI(c =>
         {
@@ -241,9 +241,9 @@ public class Program
         });
         InitializeDatabase(builder, app);
         app.UseAuthentication();
-        app.UseMvc(e =>
+        app.UseMvc(o =>
         {
-            e.UseScim(opts.EnableRealm);
+            o.UseScim(opts.EnableRealm);
         });
     }
 
@@ -323,7 +323,7 @@ public class Program
                 }
 
                 if (!context.Realms.Any())
-                    context.Realms.AddRange(Scim.SCIMConstants.StandardRealms);
+                    context.Realms.AddRange(SimpleIdServer.Scim.SCIMConstants.StandardRealms);
 
                 context.SaveChanges();
             }

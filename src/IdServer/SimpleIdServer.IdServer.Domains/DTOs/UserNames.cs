@@ -26,5 +26,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Source = "source";
         public const string DID = "did";
         public const string DIDPrivateHex = "did_private_key";
+        public const string UnblockDateTime = "unblock_datetime";
+        public const string NbLoginAttempt = "nb_login_attempt";
     }
 }

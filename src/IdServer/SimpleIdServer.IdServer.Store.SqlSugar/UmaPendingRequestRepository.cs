@@ -54,7 +54,8 @@ public class UmaPendingRequestRepository : IUmaPendingRequestRepository
             Realm = request.Realm,
             Requester = request.Requester,
             Scopes = request.Scopes == null ? string.Empty : string.Join(",", request.Scopes),
-            Status = request.Status
+            Status = request.Status,
+            ResourceId = request.Resource?.Id
         };
     }
 }

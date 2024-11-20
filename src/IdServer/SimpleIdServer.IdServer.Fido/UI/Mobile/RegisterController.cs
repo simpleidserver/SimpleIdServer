@@ -67,10 +67,10 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         {
         }
 
-        private FidoOptions GetOptions()
+        private MobileOptions GetOptions()
         {
-            var section = _configuration.GetSection(typeof(FidoOptions).Name);
-            return section.Get<FidoOptions>();
+            var section = _configuration.GetSection(typeof(MobileOptions).Name);
+            return section.Get<MobileOptions>();
         }
     }
 }

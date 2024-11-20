@@ -9,5 +9,6 @@ namespace SimpleIdServer.IdServer.Stores;
 
 public interface IConfigurationDefinitionStore
 {
+    void Add(ConfigurationDefinition configurationDefinition);
     Task<List<ConfigurationDefinition>> GetAll(CancellationToken cancellationToken);
 }

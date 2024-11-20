@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 using SqlSugar;
@@ -44,6 +45,13 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             _dbContext.Client.UpdateNav(SugarIdentityProvisioning.Transform(identityProvisioning))
                 .Include(c => c.Histories)
                 .Include(c => c.Realms)
+                .ExecuteCommand();
+        }
+
+        public void Add(IdentityProvisioningDefinition identityProvisioningDefinition)
+        {
+            _dbContext.Client.InsertNav(SugarIdentityProvisioningDefinition.Transform(identityProvisioningDefinition))
+                .Include(c => c.MappingRules)
                 .ExecuteCommand();
         }
 

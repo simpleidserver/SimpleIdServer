@@ -12,7 +12,9 @@ public class SugarApiResource
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; }
     public string Name { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Audience { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Description { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }

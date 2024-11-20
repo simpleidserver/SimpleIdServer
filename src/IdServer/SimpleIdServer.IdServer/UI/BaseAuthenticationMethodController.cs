@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.ExternalEvents;
@@ -30,12 +31,14 @@ namespace SimpleIdServer.IdServer.UI
 {
     public abstract class BaseAuthenticationMethodController<T> : BaseAuthenticateController where T : BaseAuthenticateViewModel
     {
+        private readonly IConfiguration _configuration;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IUserAuthenticationService _authenticationService;
         private readonly IAntiforgery _antiforgery;
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
 
         public BaseAuthenticationMethodController(
+            IConfiguration configuration,
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
             IUserAuthenticationService userAuthenticationService,
@@ -53,6 +56,7 @@ namespace SimpleIdServer.IdServer.UI
             IAntiforgery antiforgery,
             IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
         {
+            _configuration = configuration;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;
             _antiforgery = antiforgery;
@@ -154,7 +158,7 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var returnUrl = viewModel.ReturnUrl;
-                if(!IsProtected(returnUrl))
+                if (!IsProtected(returnUrl))
                 {
                     return Redirect(returnUrl);
                 }
@@ -165,10 +169,10 @@ namespace SimpleIdServer.IdServer.UI
 
             viewModel.Realm = prefix;
             prefix = prefix ?? Constants.DefaultRealm;
-            if (viewModel == null) 
+            if (viewModel == null)
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
             AmrAuthInfo amrInfo = null;
-            if(IsProtected(viewModel.ReturnUrl))
+            if (IsProtected(viewModel.ReturnUrl))
             {
                 var query = ExtractQuery(viewModel.ReturnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
@@ -189,7 +193,7 @@ namespace SimpleIdServer.IdServer.UI
             else authenticationResult = await _authenticationService.Validate(prefix, amrInfo?.UserId, viewModel, token);
             if (authenticationResult.Status != ValidationStatus.AUTHENTICATE)
             {
-                switch(authenticationResult.Status)
+                switch (authenticationResult.Status)
                 {
                     case ValidationStatus.UNKNOWN_USER:
                         ModelState.AddModelError("unknown_user", "unknown_user");
@@ -201,26 +205,38 @@ namespace SimpleIdServer.IdServer.UI
                         });
                         return View(viewModel);
                     case ValidationStatus.NOCONTENT:
-                        if(!string.IsNullOrWhiteSpace(authenticationResult.ErrorCode) && !string.IsNullOrWhiteSpace(authenticationResult.ErrorMessage)) ModelState.AddModelError(authenticationResult.ErrorCode, authenticationResult.ErrorMessage);
+                        if (!string.IsNullOrWhiteSpace(authenticationResult.ErrorCode) && !string.IsNullOrWhiteSpace(authenticationResult.ErrorMessage)) ModelState.AddModelError(authenticationResult.ErrorCode, authenticationResult.ErrorMessage);
                         return View(viewModel);
                     case ValidationStatus.INVALIDCREDENTIALS:
-                        ModelState.AddModelError("invalid_credential", "invalid_credential");
-                        await Bus.Publish(new UserLoginFailureEvent
+                        using (var transaction = TransactionBuilder.Build())
                         {
-                            Realm = prefix,
-                            Amr = Amr,
-                            Login = viewModel.Login
-                        });
-                        return View(viewModel);
+                            var options = GetOptions();
+                            ModelState.AddModelError("invalid_credential", "invalid_credential");
+                            await Bus.Publish(new UserLoginFailureEvent
+                            {
+                                Realm = prefix,
+                                Amr = Amr,
+                                Login = viewModel.Login
+                            });
+                            if(authenticationResult.AuthenticatedUser != null)
+                            {
+                                authenticationResult.AuthenticatedUser.LoginAttempt(options.MaxLoginAttempts, options.LockTimeInSeconds);
+                                UserRepository.Update(authenticationResult.AuthenticatedUser);
+                            }
+
+                            await transaction.Commit(token);
+                            return View(viewModel);
+                        }
                 }
             }
 
-            return await Authenticate(prefix, 
-                viewModel.ReturnUrl, 
-                Amr, 
-                authenticationResult.AuthenticatedUser, 
-                token, 
-                !viewModel.IsFirstAmr ? null : viewModel.RememberLogin);
+            authenticationResult.AuthenticatedUser.ResetLoginAttempt();
+            return await Authenticate(prefix,
+               viewModel.ReturnUrl,
+               Amr,
+               authenticationResult.AuthenticatedUser,
+               token,
+               !viewModel.IsFirstAmr ? null : viewModel.RememberLogin);
         }
 
         protected abstract Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken);
@@ -270,6 +286,12 @@ namespace SimpleIdServer.IdServer.UI
             if (!HttpContext.Request.Cookies.ContainsKey(Constants.DefaultCurrentAmrCookieName)) return null;
             var amr = JsonSerializer.Deserialize<AmrAuthInfo>(HttpContext.Request.Cookies[Constants.DefaultCurrentAmrCookieName]);
             return amr;
+        }
+
+        protected UserLockingOptions GetOptions()
+        {
+            var section = _configuration.GetSection(typeof(UserLockingOptions).Name);
+            return section.Get<UserLockingOptions>();
         }
     }
 

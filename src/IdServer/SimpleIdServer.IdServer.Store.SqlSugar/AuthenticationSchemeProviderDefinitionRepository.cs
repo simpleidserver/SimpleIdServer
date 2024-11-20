@@ -16,6 +16,14 @@ public class AuthenticationSchemeProviderDefinitionRepository : IAuthenticationS
         _dbContext = dbContext;    
     }
 
+    public void Add(AuthenticationSchemeProviderDefinition definition)
+    {
+        _dbContext.Client.InsertNav(SugarAuthenticationSchemeProviderDefinition.Transform(definition))
+            .Include(d => d.AuthSchemeProviders).ThenInclude(d => d.Mappers)
+            .Include(d => d.AuthSchemeProviders).ThenInclude(d => d.Realms)
+            .ExecuteCommand();
+    }
+
     public async Task<AuthenticationSchemeProviderDefinition> Get(string name, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarAuthenticationSchemeProviderDefinition>()

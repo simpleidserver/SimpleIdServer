@@ -13,9 +13,11 @@ public class SugarGroup
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string FullPath { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Description { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? ParentGroupId { get; set; } = null;
     [Navigate(NavigateType.ManyToOne, nameof(ParentGroupId))]
     public SugarGroup? ParentGroup { get; set; } = null;

@@ -9,6 +9,7 @@ public interface ICredentialOfferStore
 {
     void Add(CredentialOfferRecord credentialOffer);
     Task<CredentialOfferRecord> Get(string id, CancellationToken cancellationToken);
+    Task<CredentialOfferRecord> GetByIssuerState(string issuerState, CancellationToken cancellationToken);
     Task<int> SaveChanges(CancellationToken cancellationToken);
 }
 
@@ -29,6 +30,11 @@ public class CredentialOfferStore : ICredentialOfferStore
     public Task<CredentialOfferRecord> Get(string id, CancellationToken cancellationToken)
     {
         return _dbContext.CredentialOfferRecords.SingleOrDefaultAsync(c => c.Id == id, cancellationToken);
+    }
+
+    public Task<CredentialOfferRecord> GetByIssuerState(string issuerState, CancellationToken cancellationToken)
+    {
+        return _dbContext.CredentialOfferRecords.SingleOrDefaultAsync(c => c.IssuerState == issuerState, cancellationToken);
     }
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)

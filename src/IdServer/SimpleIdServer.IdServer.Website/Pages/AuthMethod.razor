@@ -3,13 +3,14 @@
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService
 @inject ContextMenuService contextMenuService
+@inject IUrlHelper urlHelper
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Api.AuthenticationMethods
 @using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
 
 <RadzenBreadCrumb>
-    <RadzenBreadCrumbItem Path="/authentications/authmethods" Text="@Global.AuthenticationMethods" />
+    <RadzenBreadCrumbItem Path="@(urlHelper.GetUrl("/authentications/authmethods"))" Text="@Global.AuthenticationMethods" />
     <RadzenBreadCrumbItem Text="@Global.Options" />
 </RadzenBreadCrumb>
 

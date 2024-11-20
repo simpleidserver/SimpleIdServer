@@ -13,11 +13,17 @@ public class SugarCertificateAuthority
     public string Id { get; set; } = null!;
     public string SubjectName { get; set; } = null!;
     public CertificateAuthoritySources Source { get; set; }
+    [SugarColumn(IsNullable = true)]
     public StoreLocation? StoreLocation { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public StoreName? StoreName { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public X509FindType? FindType { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? FindValue { get; set; } = null;
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? PublicKey { get; set; } = null;
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? PrivateKey { get; set; } = null;
     public DateTime StartDateTime { get; set; }
     public DateTime EndDateTime { get; set; }

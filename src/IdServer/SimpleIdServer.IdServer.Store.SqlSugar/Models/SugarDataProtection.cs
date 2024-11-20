@@ -10,6 +10,8 @@ public class SugarDataProtection
 {
     [SugarColumn(IsPrimaryKey = true, IsIdentity = true)]
     public int Id { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? FriendlyName { get; set; }
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? Xml { get; set; }
 }

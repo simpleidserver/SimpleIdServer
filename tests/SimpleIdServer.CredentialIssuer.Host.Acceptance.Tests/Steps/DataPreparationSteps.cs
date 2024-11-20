@@ -5,7 +5,6 @@ using SimpleIdServer.Did.Jwt;
 using SimpleIdServer.Did.Key;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using TechTalk.SpecFlow;
 
@@ -28,10 +27,9 @@ public class DataPreparationSteps
         var generator = DidKeyGenerator.New();
         var resolver = DidKeyResolver.New();
         var securedVc = DidJsonWebTokenHandler.New();
-        var did = generator.Generate(ed25519);
-        var didDocument = await resolver.Resolve(did, CancellationToken.None);
+        var exportResult = generator.SetSignatureKey(ed25519).Export(false, false);
         var claims = new Dictionary<string, object>();
-        string tokenType = null, kid = didDocument.VerificationMethod.First().Id;
+        string tokenType = null, kid = exportResult.Document.VerificationMethod.First().Id;
         foreach(var row in table.Rows)
         {
             var key = row["Key"];

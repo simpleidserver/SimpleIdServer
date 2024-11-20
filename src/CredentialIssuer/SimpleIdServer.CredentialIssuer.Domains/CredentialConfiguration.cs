@@ -26,10 +26,20 @@ public class CredentialConfiguration
     public DateTime CreateDateTime { get; set; }
     [JsonPropertyName("update_datetime")]
     public DateTime UpdateDateTime { get; set; }
+    [JsonIgnore]
+    public string? CredentialSchemaId { get; set; } = null;
+    [JsonIgnore]
+    public string? CredentialSchemaType { get; set; } = null;
+    [JsonIgnore]
+    public bool IsDeferred { get; set; } = false;
     [JsonPropertyName("claims")]
     public virtual List<CredentialConfigurationClaim> Claims { get; set; } = new List<CredentialConfigurationClaim>();
     [JsonPropertyName("displays")]
     public virtual List<CredentialConfigurationTranslation> Displays { get; set; } = new List<CredentialConfigurationTranslation>();
+    [JsonIgnore]
+    public virtual List<DeferredCredential> DeferredCredentials { get; set; }
+    [JsonIgnore]
+    public List<string> AdditionalTypes { get; set; } = new List<string>();
     [JsonIgnore]
     public virtual List<Credential> Credentials { get; set; }
 }

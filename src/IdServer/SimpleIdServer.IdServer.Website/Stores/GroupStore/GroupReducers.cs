@@ -362,7 +362,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
             if (state.GroupRoles == null) return state;
             var result = act.Scopes.OrderBy(s => s.Name).Select(s => new EditableGroupScope(s)
             {
-                IsPresent = state.GroupRoles.Any(sc => sc.Value.Name == s.Name)
+                IsPresent = state.GroupRoles.Any(sc => sc.Value.Id == s.Id)
             }).ToList();
             return state with
             {

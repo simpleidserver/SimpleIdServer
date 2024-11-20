@@ -412,7 +412,8 @@ namespace SimpleIdServer.IdServer.UI
                 var oauthClients = await _clientRepository.GetByClientIds(prefix, clientIds, cancellationToken);
                 foreach (var consent in filteredConsents)
                 {
-                    var oauthClient = oauthClients.Single(c => c.ClientId == consent.ClientId);
+                    var oauthClient = oauthClients.SingleOrDefault(c => c.ClientId == consent.ClientId);
+                    if (oauthClient == null) continue;
                     consents.Add(new ConsentViewModel(
                         consent.Id,
                         string.IsNullOrWhiteSpace(oauthClient.ClientName) ? oauthClient.ClientId : oauthClient.ClientName,

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SimpleIdServer.IdServer.Store;
 using SimpleIdServer.IdServer.Store.EF;
 
 #nullable disable
@@ -758,6 +757,11 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "client_id");
 
+                    b.Property<string>("ClientRegistrationTypesSupported")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "client_registration_types_supported");
+
                     b.Property<string>("ClientSecret")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -800,6 +804,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<double?>("DefaultMaxAge")
                         .HasColumnType("float")
                         .HasAnnotation("Relational:JsonPropertyName", "default_max_age");
+
+                    b.Property<DateTime?>("ExpirationDateTime")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "expiration_datetime");
 
                     b.Property<bool>("FrontChannelLogoutSessionRequired")
                         .HasColumnType("bit")
@@ -845,6 +853,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<bool>("IsResourceParameterRequired")
                         .HasColumnType("bit")
                         .HasAnnotation("Relational:JsonPropertyName", "is_resource_parameter_required");
+
+                    b.Property<bool>("IsSelfIssueEnabled")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_self_issue_enabled");
 
                     b.Property<bool>("IsTokenExchangeEnabled")
                         .HasColumnType("bit")
@@ -925,6 +937,11 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("SoftwareVersion")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "software_version");
+
+                    b.Property<string>("SubjectSyntaxTypesSupported")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "subject_syntax_types_supported");
 
                     b.Property<string>("SubjectType")
                         .HasColumnType("nvarchar(max)")
@@ -1573,6 +1590,42 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.ToTable("Languages");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MessageBusErrorMessage", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Exceptions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QueueName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ReceivedDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MessageBusErrorMessages");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
                 {
                     b.Property<string>("Id")
@@ -1759,6 +1812,14 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
+                    b.Property<int?>("Action")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "action");
+
+                    b.Property<string>("Component")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "component");
+
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
@@ -1907,7 +1968,6 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ClientId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreateDateTime")
@@ -2190,6 +2250,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
+                    b.Property<int>("NbLoginAttempt")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "nb_login_attempt");
+
                     b.Property<string>("NotificationMode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -2202,6 +2266,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "status");
+
+                    b.Property<DateTime?>("UnblockDateTime")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "unblock_datetime");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2")
@@ -2414,6 +2482,34 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.ToTable("UserSession");
 
                     b.HasAnnotation("Relational:JsonPropertyName", "sessions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.OpenidFederation.Domains.FederationEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime2")
+                        .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
+
+                    b.Property<bool>("IsSubordinate")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_subordinate");
+
+                    b.Property<string>("Realm")
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "realm");
+
+                    b.Property<string>("Sub")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasAnnotation("Relational:JsonPropertyName", "sub");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FederationEntities");
                 });
 
             modelBuilder.Entity("TranslationUMAResource", b =>

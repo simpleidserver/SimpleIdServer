@@ -16,6 +16,10 @@ public class OpenIdCredentialValidator
         var openidCredentials = authDetails.Where(t => t.Type == Constants.StandardAuthorizationDetails.OpenIdCredential);
         if (!openidCredentials.Any()) return;
         foreach (var openidCredential in openidCredentials)
-            if (!openidCredential.AdditionalData.ContainsKey(Constants.StandardAuthorizationDetails.CredentialConfigurationId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, Constants.StandardAuthorizationDetails.CredentialConfigurationId));
+        {
+            if (!openidCredential.AdditionalData.ContainsKey(Constants.StandardAuthorizationDetails.CredentialConfigurationId) && 
+                !openidCredential.AdditionalData.ContainsKey(Constants.StandardAuthorizationDetails.Format))
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, Constants.StandardAuthorizationDetails.CredentialConfigurationId));
+        }
     }
 }

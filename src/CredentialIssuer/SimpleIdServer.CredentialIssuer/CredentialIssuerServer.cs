@@ -103,4 +103,19 @@ public class CredentialIssuerInMemoryStoreBuilder
             return this;
         }
     }
+
+    public CredentialIssuerInMemoryStoreBuilder AddDeferredCredentials(List<DeferredCredential> deferredCredentials)
+    {
+        lock(_lck)
+        {
+            var dbContext = _serviceProvider.GetService<CredentialIssuerDbContext>();
+            if(!dbContext.DeferredCredentials.Any())
+            {
+                dbContext.DeferredCredentials.AddRange(deferredCredentials);
+                dbContext.SaveChanges();
+            }
+
+            return this;
+        }
+    }
 }

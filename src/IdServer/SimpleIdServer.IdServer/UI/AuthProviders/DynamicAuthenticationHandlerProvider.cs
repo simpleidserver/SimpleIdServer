@@ -26,6 +26,7 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
                 return value;
 
             var scheme = await _authenticationSchemeProvider.GetSIDSchemeAsync(authenticationScheme);
+            if (scheme == null) return null;
             var handlerType = scheme.AuthScheme.HandlerType;
             var handler = context.RequestServices.GetService(handlerType) as IAuthenticationHandler;
             if (handler == null)

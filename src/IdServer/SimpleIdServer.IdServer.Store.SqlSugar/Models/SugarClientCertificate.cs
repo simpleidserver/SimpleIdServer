@@ -15,7 +15,9 @@ public class SugarClientCertificate
     public DateTime StartDateTime { get; set; }
     public DateTime EndDateTime { get; set; }
     public DateTime CreateDateTime { get; set; }
+    [SugarColumn(Length = 5000)]
     public string PublicKey { get; set; } = null!;
+    [SugarColumn(Length = 5000)]
     public string PrivateKey { get; set; } = null!;
     public string CertificateAuthorityId { get; set; }
     [Navigate(NavigateType.ManyToOne, nameof(CertificateAuthorityId))]

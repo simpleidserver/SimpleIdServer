@@ -15,6 +15,11 @@ public class ConfigurationDefinitionStore : IConfigurationDefinitionStore
         _dbContext = dbContext;
     }
 
+    public void Add(ConfigurationDefinition configurationDefinition)
+    {
+        _dbContext.Definitions.Add(configurationDefinition);
+    }
+
     public Task<List<ConfigurationDefinition>> GetAll(CancellationToken cancellationToken)
         => _dbContext.Definitions.Include(c => c.Records).ThenInclude(r => r.Values).ThenInclude(r => r.Translations)
             .Include(c => c.Records).ThenInclude(r => r.Translations)

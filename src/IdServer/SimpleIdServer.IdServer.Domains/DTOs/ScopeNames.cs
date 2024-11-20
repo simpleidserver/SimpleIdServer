@@ -16,4 +16,6 @@ public static class ScopeNames
     public const string UpdateDatetime = "update_datetime";
     public const string Mappers = "mappers";
     public const string IsRole = "is_role";
+    public const string Component = "component";
+    public const string Action = "action";
 }

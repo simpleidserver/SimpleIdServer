@@ -5,8 +5,13 @@
 @inject IDispatcher dispatcher
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
+@inject IUrlHelper urlHelper
 
-<RadzenButton class="mb-1" Click="@(args => AddMember())" Icon="add" Text="@Global.AddMember" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<SidAuthorizeView Roles=@("/groups/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddMember())" Icon="add" Text="@Global.AddMember" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
 
 <RadzenDataGrid AllowFiltering="true"
                 AllowColumnResize="true"
@@ -33,14 +38,18 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableGroupMember" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.Name" Path="@($"/groups/{data.Value.Id}/children")" />
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/groups/{data.Value.Id}/children"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableGroupMember" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableGroupMember" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableGroupMember" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                <SidAuthorizeView Roles=@("/groups/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
             </Template>
         </RadzenDataGridColumn>
     </Columns>

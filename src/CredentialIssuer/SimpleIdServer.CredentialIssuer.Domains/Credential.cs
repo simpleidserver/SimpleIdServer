@@ -25,4 +25,5 @@ public class Credential
     public virtual CredentialConfiguration Configuration { get; set; }
     [JsonPropertyName("claims")]
     public virtual List<CredentialClaim> Claims { get; set; }
+    public bool IsDeferred { get; set; } = false;
 }

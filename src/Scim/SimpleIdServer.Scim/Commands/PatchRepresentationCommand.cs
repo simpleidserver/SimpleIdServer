@@ -3,6 +3,7 @@
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Infrastructure;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.Scim.Commands
 {
@@ -28,15 +29,16 @@ namespace SimpleIdServer.Scim.Commands
     {
         public bool IsPatched { get; private set; }
         public SCIMRepresentation Representation { get; private set; }
+        public List<SCIMPatchResult> PatchOperations { get; private set; } = new List<SCIMPatchResult>();
 
         public static PatchRepresentationResult NoPatch()
         {
             return new PatchRepresentationResult { IsPatched = false };
         }
 
-        public static PatchRepresentationResult Ok(SCIMRepresentation representation)
+        public static PatchRepresentationResult Ok(SCIMRepresentation representation, List<SCIMPatchResult> patchOperations)
         {
-            return new PatchRepresentationResult { IsPatched = true, Representation = representation };
+            return new PatchRepresentationResult { IsPatched = true, Representation = representation, PatchOperations = patchOperations };
         }
     }
 }

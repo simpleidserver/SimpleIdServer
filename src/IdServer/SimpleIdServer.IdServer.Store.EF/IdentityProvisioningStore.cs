@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
 using System.Linq.Dynamic.Core;
 
@@ -53,6 +54,11 @@ public class IdentityProvisioningStore : IIdentityProvisioningStore
     public void Update(IdentityProvisioning identityProvisioning)
     {
 
+    }
+
+    public void Add(IdentityProvisioningDefinition identityProvisioningDefinition)
+    {
+        _dbContext.IdentityProvisioningDefinitions.Add(identityProvisioningDefinition);
     }
 
     public void Update(IdentityProvisioningDefinition identityProvisioningDefinition)

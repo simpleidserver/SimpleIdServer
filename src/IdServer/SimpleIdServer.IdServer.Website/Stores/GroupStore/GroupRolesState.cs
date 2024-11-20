@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.GroupStore
 {

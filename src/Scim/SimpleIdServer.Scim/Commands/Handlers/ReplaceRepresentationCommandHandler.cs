@@ -81,7 +81,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             }
 
             existingRepresentation.Apply(references, patchOperations);
-            return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.Ok(existingRepresentation));
+            return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.Ok(existingRepresentation, patchOperations));
         }
 
         private async Task<(SCIMRepresentation, SCIMSchema)> Validate(ReplaceRepresentationCommand replaceRepresentationCommand)

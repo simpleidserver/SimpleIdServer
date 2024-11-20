@@ -44,10 +44,9 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
         public async Task Enrich(EnrichParameter parameter, HandlerContext context, CancellationToken cancellationToken)
         {
             var activeSession = context.Session;
-            var dic = new JsonObject
-            {
-                [JwtRegisteredClaimNames.Sub] = context.User.Name
-            };
+            var dic = new JsonObject();
+            if (context.User != null)
+                dic.Add(JwtRegisteredClaimNames.Sub, context.User.Name);
             if (activeSession != null)
                 dic.Add(JwtRegisteredClaimNames.AuthTime, activeSession.AuthenticationDateTime.ConvertToUnixTimestamp());
 

@@ -13,6 +13,18 @@ public class SugarLanguage
     public string Code { get; set; } = null!;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    [Navigate(NavigateType.OneToMany, nameof(SugarTranslation.Language))]
+    public List<SugarTranslation> Translations { get; set; }
+
+    public static SugarLanguage Transform(Language language)
+    {
+        return new SugarLanguage
+        {
+            Code = language.Code,
+            CreateDateTime = language.CreateDateTime,
+            UpdateDateTime = language.UpdateDateTime
+        };
+    }
 
     public Language ToDomain()
     {

@@ -20,11 +20,15 @@ builder.Services.AddAuthorization(b =>
     b.AddPolicy("credconfs", p => p.RequireAssertion(_ => true));
     b.AddPolicy("credinstances", p => p.RequireAssertion(_ => true));
 });
-builder.Services.AddCredentialIssuer()
+builder.Services.AddCredentialIssuer(o =>
+{
+    o.GenerateRandomDidKey();
+})
     .UseInMemoryStore(o =>
     {
         o.AddCredentialConfigurations(CredentialIssuerConfiguration.CredentialConfigurations);
         o.AddCredentials(CredentialIssuerConfiguration.Credentials);
+        o.AddDeferredCredentials(CredentialIssuerConfiguration.DeferredCredentials);
     });
 builder.Services.AddDidKey();
 builder.Services.RemoveAll<IPreAuthorizedCodeService>();

@@ -66,7 +66,7 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
             Enc = fileKey.Enc,
             Id = fileKey.Id,
             IsSymmetric = fileKey.IsSymmetric,
-            Key = fileKey.Key,
+            Key = fileKey.Key ?? new byte[0],
             KeyId = fileKey.KeyId,
             PrivateKeyPem = fileKey.PrivateKeyPem,
             PublicKeyPem = fileKey.PublicKeyPem,

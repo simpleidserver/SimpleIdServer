@@ -13,6 +13,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Serialization;
 using System.Web;
 
 namespace System.Text.Json.Nodes
@@ -136,6 +137,15 @@ namespace System.Text.Json.Nodes
 
         public static string GetNonceFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.Nonce);
 
+        public static string GetClientMetadataUri(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ClientMetadataUri);
+
+        public static Client GetClientMetadata(this JsonObject jObj)
+        {
+            var clientMetadata = jObj.GetStr(AuthorizationRequestParameters.ClientMetadata);
+            if (clientMetadata == null) return null;
+            return JsonSerializer.Deserialize<Client>(clientMetadata);
+        }
+
         /// <summary>
         /// This parameter can be used to bind the issued authorization code to a specific key.
         /// </summary>
@@ -187,6 +197,8 @@ namespace System.Text.Json.Nodes
         public static string GetClientIdFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ClientId);
 
         public static string GetResponseModeFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ResponseMode);
+
+        public static string GetResponseUriFromAuthorizationRequest(this JsonObject jObj) => jObj.GetStr(AuthorizationRequestParameters.ResponseUri);
 
         public static string GetRedirectUriFromAuthorizationRequest(this JsonObject jObj)
         {
@@ -280,6 +292,17 @@ namespace System.Text.Json.Nodes
 
             return result;
         }
+
+        #endregion
+
+        #region Authorization request callback
+
+        /// <summary>
+        /// Get the id_token from the authorization request callback request.
+        /// </summary>
+        /// <param name="jObj"></param>
+        /// <returns></returns>
+        public static string GetIdTokenFromAuthorizationRequestCallback(this JsonObject jObj) => jObj.GetStr(AuthorizationResponseParameters.IdToken);
 
         #endregion
 

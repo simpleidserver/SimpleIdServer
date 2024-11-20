@@ -11,18 +11,27 @@ public class SugarBCAuthorize
 {
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? ClientId { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? UserId { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? NotificationToken { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? NotificationMode { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? NotificationEdp { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public int? Interval { get; set; } = null;
     public BCAuthorizeStatus LastStatus { get; set; }
     public DateTime ExpirationDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public DateTime? RejectionSentDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public DateTime? NextFetchTime { get; set; }
     public string Realm { get; set; } = null!;
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? SerializedAuthorizationDetails { get; set; } = null;
     public string Scopes { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarBCAuthorizeHistory.BCAuthorizeId))]

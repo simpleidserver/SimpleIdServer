@@ -2,9 +2,11 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationMethods;
+using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Website.Infrastructures;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -14,13 +16,13 @@ public class AuthMethodEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
-    private readonly ProtectedSessionStorage _sessionStorage;
 
-    public AuthMethodEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+    public AuthMethodEffects(
+        IWebsiteHttpClientFactory websiteHttpClientFactory, 
+        IOptions<IdServerWebsiteOptions> options)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
-        _sessionStorage = sessionStorage;
     }
 
     [EffectMethod]
@@ -93,12 +95,46 @@ public class AuthMethodEffects
         }
     }
 
+    [EffectMethod]
+    public async Task Handle(GetUserLockingOptionsAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri($"{baseUrl}/userlockingoptions")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<UserLockingResult>(json);
+        dispatcher.Dispatch(new GetUserLockingOptionsSuccessAction { UserLocking = result });
+    }
+
+    [EffectMethod]
+    public async Task Handle(UpdateUserLockingOptionsAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Put,
+            RequestUri = new Uri($"{baseUrl}/userlockingoptions"),
+            Content = new StringContent(JsonSerializer.Serialize(new UpdateUserLockingRequest
+            {
+                Values = action.Values
+            }), Encoding.UTF8, "application/json")
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new UpdateUserLockingOptionsSuccessAction());
+    }
+
     private async Task<string> GetBaseUrl()
     {
         if(_options.IsReamEnabled)
         {
-            var realm = await _sessionStorage.GetAsync<string>("realm");
-            var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realm = RealmContext.Instance()?.Realm;
+            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/authmethods";
         }
 
@@ -149,6 +185,26 @@ public class UpdateAuthMethodFailureAction
 }
 
 public class StartAddAcrMethodAction
+{
+
+}
+
+public class GetUserLockingOptionsAction
+{
+
+}
+
+public class GetUserLockingOptionsSuccessAction
+{
+    public UserLockingResult UserLocking { get; set; }
+}
+
+public class UpdateUserLockingOptionsAction
+{
+    public Dictionary<string, string> Values { get; set; }
+}
+
+public class UpdateUserLockingOptionsSuccessAction
 {
 
 }

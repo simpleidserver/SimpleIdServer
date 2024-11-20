@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SimpleIdServer.SelfIdServer.Host.Acceptance.Tests": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:53836;http://localhost:53837"
+    }
+  }
+}

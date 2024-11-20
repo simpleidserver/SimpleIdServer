@@ -9,9 +9,9 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@if (!string.IsNullOrWhiteSpace(Model.FrontChannelLogout))
+@foreach (var frontChannelLogout in Model.FrontChannelLogouts)
 {
-    <iframe src="@Model.FrontChannelLogout" style="display: none"></iframe>
+    <iframe src="@frontChannelLogout" style="display: none"></iframe>
 }
 
 @if(Model.RedirectToRevokeSessionUI)

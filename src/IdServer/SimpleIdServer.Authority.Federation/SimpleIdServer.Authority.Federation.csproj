@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Support OPENID federation - authority (intermediate authority or trust anchor).</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.OpenidFederation\SimpleIdServer.OpenidFederation.csproj" />
+	</ItemGroup>
+</Project>

@@ -130,24 +130,27 @@ public class SecuredDocument
         if (vcCredential == null) throw new ArgumentNullException(nameof(vcCredential));
         var verificationMethod = didDocument.VerificationMethod.SingleOrDefault(m => m.Id == verificationMethodId);
         if (verificationMethod == null) throw new ArgumentException($"The verification method {verificationMethodId} doesn't exist");
-        if(asymKey == null)
-            asymKey = _verificationMethodEncoding.Decode(verificationMethod);
-        var signingCredentials = asymKey.BuildSigningCredentials();
+        if (asymKey == null)
+            if (verificationMethod.PrivateKeyJwk != null)
+                asymKey = new JsonWebKeySecurityKey(verificationMethod.PrivateKeyJwk);
+            else
+                asymKey = _verificationMethodEncoding.Decode(verificationMethod);
+        var signingCredentials = asymKey.BuildSigningCredentials(verificationMethod.Id);
         var claims = new Dictionary<string, object>
         {
             { "sub", subject },
+            { "jti", vcCredential.Id },
             { "vc", new W3CVerifiableCredentialJsonSerializer().SerializeToDic(vcCredential) }
         };
         var securityTokenDescriptor = new SecurityTokenDescriptor
         {
             Issuer = didDocument.Id,
-            IssuedAt = DateTime.UtcNow,
+            IssuedAt = DateTime.UtcNow.Date,
             SigningCredentials = signingCredentials,
-            Claims = claims
+            Claims = claims,
+            NotBefore = DateTime.UtcNow.Date
         };
         var handler = new JsonWebTokenHandler();
-        CryptoProviderFactory cryptoProviderFactory = signingCredentials.CryptoProviderFactory ?? signingCredentials.Key.CryptoProviderFactory;
-        var signatureProvider = cryptoProviderFactory.CreateForSigning(signingCredentials.Key, signingCredentials.Algorithm);
         var result = handler.CreateToken(securityTokenDescriptor);
         return result;
     }
@@ -170,7 +173,7 @@ public class SecuredDocument
             json = j.ToJsonString();
         }
 
-        return Hash(json, proof);
+         return Hash(json, proof);
     }
 
     private byte[] Hash(string json, ISignatureProof proof)

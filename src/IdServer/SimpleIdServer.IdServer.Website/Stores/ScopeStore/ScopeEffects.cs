@@ -1,11 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Scopes;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Helpers;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -16,13 +15,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ScopeEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public ScopeEffects(
+            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            IOptions<IdServerWebsiteOptions> options)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _sessionStorage = sessionStorage;
         }
 
 
@@ -277,12 +276,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(GetAllRealmScopesAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetScopesUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{baseUrl}/realmscopes")
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var content = await httpResult.Content.ReadAsStringAsync();
+            var scopes = JsonSerializer.Deserialize<List<Scope>>(content);
+            dispatcher.Dispatch(new GetAllRealmScopesSuccessAction { Scopes = scopes });
+        }
+
         private async Task<string> GetScopesUrl()
         {
             if (_options.IsReamEnabled)
             {
-                var realm = await _sessionStorage.GetAsync<string>("realm");
-                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/scopes";
             }
 
@@ -452,4 +467,14 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
     public class StartAddScopeAction { }
 
     public class StartUpdateScopeMapperAction { }
+
+    public class GetAllRealmScopesAction
+    {
+
+    }
+
+    public class GetAllRealmScopesSuccessAction
+    {
+        public List<Domains.Scope> Scopes { get; set; }
+    }
 }

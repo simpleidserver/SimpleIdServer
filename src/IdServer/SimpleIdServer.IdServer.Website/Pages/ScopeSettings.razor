@@ -35,7 +35,11 @@
             </p>
         </div>
     }
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateScopeState.Value.IsUpdating />
+    <SidAuthorizeView Roles=@($"/scopes/manage")>
+        <Authorized>
+            <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateScopeState.Value.IsUpdating ? Global.Updating : Global.Update)" Disabled=@updateScopeState.Value.IsUpdating />
+        </Authorized>
+    </SidAuthorizeView>
 </RadzenTemplateForm>
 
 @code {

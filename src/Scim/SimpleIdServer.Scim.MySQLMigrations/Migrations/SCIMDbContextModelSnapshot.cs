@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SimpleIdServer.Scim.Persistence.EF;
 
@@ -17,7 +18,7 @@ namespace SimpleIdServer.Scim.MySQLMigrations.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("dbo")
-                .HasAnnotation("ProductVersion", "7.0.18")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>
@@ -212,7 +213,8 @@ namespace SimpleIdServer.Scim.MySQLMigrations.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("FullPath")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(512)
+                        .HasColumnType("varchar(512)");
 
                     b.Property<bool>("IsComputed")
                         .HasColumnType("tinyint(1)");
@@ -256,11 +258,15 @@ namespace SimpleIdServer.Scim.MySQLMigrations.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FullPath");
+
                     b.HasIndex("ParentAttributeId");
 
                     b.HasIndex("RepresentationId");
 
                     b.HasIndex("SchemaAttributeId");
+
+                    b.HasIndex("ValueString");
 
                     b.ToTable("SCIMRepresentationAttributeLst", "dbo");
                 });

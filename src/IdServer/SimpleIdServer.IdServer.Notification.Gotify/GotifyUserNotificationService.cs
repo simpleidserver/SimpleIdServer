@@ -14,12 +14,12 @@ namespace SimpleIdServer.IdServer.Notification.Gotify;
 public class GotifyUserNotificationService : IUserNotificationService
 {
     private readonly IConfiguration _configuration;
-    private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
+    private readonly Helpers.IHttpClientFactory _httpClientFactory;
     private readonly IGotiySessionStore _gotifySessionStore;
 
     public GotifyUserNotificationService(
-        IConfiguration configuration, 
-        Infrastructures.IHttpClientFactory httpClientFactory,
+        IConfiguration configuration,
+        Helpers.IHttpClientFactory httpClientFactory,
         IGotiySessionStore gotifySessionStore)
     {
         _configuration = configuration;

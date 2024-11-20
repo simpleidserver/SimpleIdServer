@@ -1,12 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.ErrorMessages;
 using SimpleIdServer.IdServer.Api.Provisioning;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Provisioning;
-using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -17,13 +18,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
 
-        public IdentityProvisioningEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public IdentityProvisioningEffects(
+            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            IOptions<IdServerWebsiteOptions> options)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _sessionStorage = sessionStorage;
         }
 
         [EffectMethod]
@@ -295,12 +296,38 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(RelaunchIdentityProvisioningErrorsAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = $"{_options.IdServerBaseUrl}/errormessages";
+            if (_options.IsReamEnabled)
+            {
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                baseUrl = $"{_options.IdServerBaseUrl}/{realmStr}/errormessages";
+            }
+
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var request = new RelaunchAllErrorMessagesByExternalIdRequest
+            {
+                ExternalId = action.ExternalId
+            };
+            var requestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json"),
+                RequestUri = new Uri($"{baseUrl}/relaunch")
+            };
+            await httpClient.SendAsync(requestMessage);
+            dispatcher.Dispatch(new RelaunchIdentityProvisioningErrorsSuccessAction { ExternalId = action.ExternalId });
+        }
+
         private async Task<string> GetBaseUrl()
         {
             if(_options.IsReamEnabled)
             {
-                var realm = await _sessionStorage.GetAsync<string>("realm");
-                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/provisioning";
             }
 
@@ -512,5 +539,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     public class LaunchIdentityProvisioningImportFailureAction
     {
         public string ErrorMessage { get; set; }
+    }
+
+    public class RelaunchIdentityProvisioningErrorsAction
+    {
+        public string ExternalId { get; set; }
+    }
+
+    public class RelaunchIdentityProvisioningErrorsSuccessAction
+    {
+        public string ExternalId { get; set; }
     }
 }

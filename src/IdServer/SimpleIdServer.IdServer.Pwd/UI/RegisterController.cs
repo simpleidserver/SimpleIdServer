@@ -96,11 +96,11 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
             {
                 var user = await UserRepository.GetBySubject(viewModel.Login, prefix, cancellationToken);
                 var passwordCredential = user.Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD);
-                if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputeHash(viewModel.Password);
+                if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputeHash(viewModel.Password, Options.IsPasswordEncodeInBase64);
                 else user.Credentials.Add(new UserCredential
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Value = PasswordHelper.ComputeHash(viewModel.Password),
+                    Value = PasswordHelper.ComputeHash(viewModel.Password, Options.IsPasswordEncodeInBase64),
                     CredentialType = UserCredential.PWD,
                     IsActive = true
                 });
@@ -118,7 +118,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
             Id = Guid.NewGuid().ToString(),
             CredentialType = "pwd",
             IsActive = true,
-            Value = PasswordHelper.ComputeHash(viewModel.Password)
+            Value = PasswordHelper.ComputeHash(viewModel.Password, Options.IsPasswordEncodeInBase64)
         });
         user.Name = viewModel.Login;
         if (Options.IsEmailUsedDuringAuthentication) user.Email = viewModel.Login;

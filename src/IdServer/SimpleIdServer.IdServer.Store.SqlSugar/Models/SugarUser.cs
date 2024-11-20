@@ -11,16 +11,25 @@ public class SugarUser
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Firstname { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Lastname { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Email { get; set; } = null;
     public bool EmailVerified { get; set; } = false;
+    [SugarColumn(IsNullable = true)]
     public string? DeviceRegistrationToken { get; set; }
     public UserStatus Status { get; set; }
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? Source { get; set; } = null;
+    public DateTime? UnblockDateTime { get; set; }
+    public int NbLoginAttempt { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? IdentityProvisioningId { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? EncodedPicture { get; set; } = null;
     public string NotificationMode { get; set; }
     [Navigate(NavigateType.ManyToOne, nameof(IdentityProvisioningId))]
@@ -58,6 +67,8 @@ public class SugarUser
             Name = user.Name,
             Source = user.Source,
             Status = user.Status,
+            UnblockDateTime = user.UnblockDateTime,
+            NbLoginAttempt = user.NbLoginAttempt,
             IdentityProvisioningId = user.IdentityProvisioningId,
             EncodedPicture = user.EncodedPicture,
             UpdateDateTime = user.UpdateDateTime,
@@ -89,6 +100,8 @@ public class SugarUser
             IdentityProvisioningId = IdentityProvisioningId,
             Source = Source,
             Email = Email,
+            UnblockDateTime = UnblockDateTime,
+            NbLoginAttempt = NbLoginAttempt,
             EmailVerified = EmailVerified,
             Firstname = Firstname,
             Status = Status,

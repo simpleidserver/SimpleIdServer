@@ -244,6 +244,13 @@ namespace SimpleIdServer.IdServer.Domains
                 return SerializedJsonWebKeys.Select(j=> new JsonWebKey(j.SerializedJsonWebKey));
             }
         }
+
+        /// <summary>
+        /// Array of strings representing URI scheme identifiers and optionally method names of supported Subject Syntax Types.
+        /// For example : did:key, did:example, urn:ietf:params:oauth:jwk-thumbprint
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.SubjectSyntaxTypesSupported)]
+        public List<string> SubjectSyntaxTypesSupported { get; set; } = new List<string>();
         /// <summary>
         /// Cryptographic algorithm used to secure the JWS access token.
         /// </summary>
@@ -356,6 +363,8 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.UserInfoSignedResponseAlg)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? UserInfoSignedResponseAlg { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.ClientRegistrationTypesSupported)]
+        public List<string> ClientRegistrationTypesSupported { get; set; } = new List<string>();
         [JsonPropertyName(OAuthClientParameters.UserInfoEncryptedResponseAlg)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         /// <summary>
@@ -496,6 +505,8 @@ namespace SimpleIdServer.IdServer.Domains
         public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
         [JsonPropertyName(OAuthClientParameters.ClientType)]
         public string? ClientType { get; set; } = null;
+        [JsonPropertyName(OAuthClientParameters.ExpirationDateTime)]
+        public DateTime? ExpirationDateTime { get; set; } = null;
         /// <summary>
         /// Nonce is required in the DPoP proof.
         /// </summary>
@@ -508,6 +519,11 @@ namespace SimpleIdServer.IdServer.Domains
         public double DPOPNonceLifetimeInSeconds { get; set; } = 5 * 60;
         [JsonPropertyName(OAuthClientParameters.IsRedirectUrlCaseSensitive)]
         public bool IsRedirectUrlCaseSensitive { get; set; } = false;
+        /// <summary>
+        /// Enable or disable self-issued.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.IsSelfIssueEnabled)]
+        public bool IsSelfIssueEnabled { get; set; }
         [JsonPropertyName(OAuthClientParameters.Parameters)]
         public JsonObject Parameters
         {
@@ -537,7 +553,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.AccessTokenType)]
         public AccessTokenTypes AccessTokenType { get; set; } = AccessTokenTypes.Jwt;
-        [JsonIgnore]
+        [JsonPropertyName(OAuthClientParameters.Realms)]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         [JsonIgnore]
         public ICollection<DeviceAuthCode> DeviceAuthCodes { get; set; } = new List<DeviceAuthCode>();
@@ -628,5 +644,6 @@ namespace SimpleIdServer.IdServer.Domains
         public const string GRANTMANAGEMENT = "GRANTMANAGEMENT";
         public const string SAML = "SAML";
         public const string CREDENTIAL_ISSUER = "CREDENTIALISSUER";
+        public const string FEDERATION = "FEDERATION";
     }
 }

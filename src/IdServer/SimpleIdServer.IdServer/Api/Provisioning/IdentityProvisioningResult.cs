@@ -66,4 +66,22 @@ public class IdentityProvisioningProcessResult
     public int TotalPageToExtract { get; set; }
     [JsonPropertyName(IdentityProvisioningNames.TotalPageToImport)]
     public int TotalPageToImport { get; set; }
+    [JsonPropertyName(IdentityProvisioningNames.Errors)]
+    public List<IdentityProvisioningProcessMessageErrorResult> Errors { get; set; }
+}
+
+public class IdentityProvisioningProcessMessageErrorResult
+{
+    [JsonPropertyName(IdentityProvisioningNames.Id)]
+    public string Id { get; set; }
+
+    [JsonPropertyName(IdentityProvisioningNames.Exceptions)]
+    public List<string> Exceptions { get; set; }
+    public string Exception
+    {
+        get
+        {
+            return string.Join(",", Exceptions);
+        }
+    }
 }

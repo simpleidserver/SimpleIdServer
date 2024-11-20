@@ -9,5 +9,18 @@ namespace SimpleIdServer.IdServer.Seeding;
 /// </summary>
 public class SeedsDto
 {
+    /// <summary>
+    /// Realms to seed.
+    /// </summary>
+    public IReadOnlyCollection<RealmSeedDto> Realms { get; set; } = [];
+
+    /// <summary>
+    /// Scopes to seed.
+    /// </summary>
+    public IReadOnlyCollection<ScopeSeedDto> Scopes { get; set; } = [];
+
+    /// <summary>
+    /// Users to seed.
+    /// </summary>
     public IReadOnlyCollection<UserSeedDto> Users { get; set; } = [];
 }

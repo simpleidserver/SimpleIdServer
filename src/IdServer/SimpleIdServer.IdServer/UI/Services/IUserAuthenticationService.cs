@@ -19,7 +19,8 @@ public enum ValidationStatus
     AUTHENTICATE = 0,
     INVALIDCREDENTIALS = 1,
     NOCONTENT = 2,
-    UNKNOWN_USER = 3
+    UNKNOWN_USER = 3,
+    BLOCKED = 4
 }
 
 public record CredentialsValidationResult
@@ -43,6 +44,11 @@ public record CredentialsValidationResult
     public static CredentialsValidationResult Ok(User user) => new CredentialsValidationResult(user);
 
     public static CredentialsValidationResult Error(ValidationStatus status) => new CredentialsValidationResult(status);
+
+    public static CredentialsValidationResult InvalidCredentials(User authenticatedUser) => new CredentialsValidationResult(ValidationStatus.INVALIDCREDENTIALS)
+    {
+        AuthenticatedUser = authenticatedUser
+    };
 
     public static CredentialsValidationResult Error(string errorCode, string errorMessage) => new CredentialsValidationResult(ValidationStatus.NOCONTENT)
     {

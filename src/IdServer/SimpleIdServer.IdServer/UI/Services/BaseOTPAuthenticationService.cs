@@ -32,10 +32,11 @@ public abstract class BaseOTPAuthenticationService : GenericAuthenticationServic
 
     protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, BaseOTPAuthenticateViewModel viewModel, CancellationToken cancellationToken)
     {
+        if (authenticatedUser.IsBlocked()) return Task.FromResult(CredentialsValidationResult.Error("user_blocked", "user_blocked"));
         if (authenticatedUser.ActiveOTP == null) return Task.FromResult(CredentialsValidationResult.Error("no_active_otp", "no_active_otp"));
         var activeOtp = authenticatedUser.ActiveOTP;
         var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
-        if (!otpAuthenticator.Verify(viewModel.OTPCode, activeOtp)) return Task.FromResult(CredentialsValidationResult.Error(ValidationStatus.INVALIDCREDENTIALS));
+        if (!otpAuthenticator.Verify(viewModel.OTPCode, activeOtp)) return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
         return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser));
     }
 }

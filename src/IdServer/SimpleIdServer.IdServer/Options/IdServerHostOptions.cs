@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Api.Token.PKCECodeChallengeMethods;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System.Collections.Generic;
@@ -64,6 +65,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Default Refresh Token Expiration Time in seconds.
         /// </summary>
         public double DefaultRefreshTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
+        /// <summary>
+        /// Default expiration time of the authorization request callback.
+        /// </summary>
+        public double DefaultAuthorizationRequestCallbackExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
         /// Default OTP issuer.
         /// </summary>
@@ -202,6 +207,11 @@ namespace SimpleIdServer.IdServer.Options
         /// Defint the time in MS to end the user's session.
         /// </summary>
         public int EndSessionRedirectionTimeInMS { get; set; } = 3 * 1000;
+
+        /// <summary>
+        /// Set if the password is encoded in base64.
+        /// </summary>
+        public bool IsPasswordEncodeInBase64 { get; set; } = false;
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
 

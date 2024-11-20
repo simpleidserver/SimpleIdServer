@@ -493,6 +493,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the identity token is invalid.
+        /// </summary>
+        public static string BadIdToken {
+            get {
+                return ResourceManager.GetString("BadIdToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à signature of the id_token_hint is not correct.
         /// </summary>
         public static string BadIdTokenHintSig {
@@ -696,6 +705,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string CannotReadCertificateStore {
             get {
                 return ResourceManager.GetString("CannotReadCertificateStore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the parameters client_metadata and client_metadata_uri cannot be used the same time.
+        /// </summary>
+        public static string CannotUseClientMetadataAndClientMetadataUri {
+            get {
+                return ResourceManager.GetString("CannotUseClientMetadataAndClientMetadataUri", resourceCulture);
             }
         }
         
@@ -907,6 +925,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the client_metadata or client_metadata_uri parameter cannot be used with a pre-registered client.
+        /// </summary>
+        public static string ClientMetadataCannotBeUsedWithRegisteredClient {
+            get {
+                return ResourceManager.GetString("ClientMetadataCannotBeUsedWithRegisteredClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à client_notification_token must not exceed 1024 characters.
         /// </summary>
         public static string ClientNotificationTokenCannotExceed1024 {
@@ -979,6 +1006,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The email is taken.
+        /// </summary>
+        public static string EmailIsTaken {
+            get {
+                return ResourceManager.GetString("EmailIsTaken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the authorization request is expired.
         /// </summary>
         public static string ExpiredBcAuthorize {
@@ -1038,6 +1074,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string IdProvisioningTypeUnique {
             get {
                 return ResourceManager.GetString("IdProvisioningTypeUnique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the nonce claim is missing in the id_token.
+        /// </summary>
+        public static string IdTokenNonceMissing {
+            get {
+                return ResourceManager.GetString("IdTokenNonceMissing", resourceCulture);
             }
         }
         
@@ -1182,6 +1227,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string InvalidClientIdTokenHint {
             get {
                 return ResourceManager.GetString("InvalidClientIdTokenHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the client_metadata_uri in the Authorization Request returns an error or contains invalid data.
+        /// </summary>
+        public static string InvalidClientMetadataUri {
+            get {
+                return ResourceManager.GetString("InvalidClientMetadataUri", resourceCulture);
             }
         }
         
@@ -1335,6 +1389,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string InvalidLocahostRedirectUri {
             get {
                 return ResourceManager.GetString("InvalidLocahostRedirectUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the nonce is invalid and doesn&apos;t match the nonce present in the authorization request.
+        /// </summary>
+        public static string InvalidNonce {
+            get {
+                return ResourceManager.GetString("InvalidNonce", resourceCulture);
             }
         }
         
@@ -1614,6 +1677,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string MissingIdTokenHint {
             get {
                 return ResourceManager.GetString("MissingIdTokenHint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the openid_relying_party doesn&apos;t exist in the entity statement.
+        /// </summary>
+        public static string MissingOpenidRpInEntityStatement {
+            get {
+                return ResourceManager.GetString("MissingOpenidRpInEntityStatement", resourceCulture);
             }
         }
         
@@ -1969,6 +2041,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à the parameter client_metadata or client_metadata_uri is required.
+        /// </summary>
+        public static string RequiredClientMetadataOrClientMetadataUri {
+            get {
+                return ResourceManager.GetString("RequiredClientMetadataOrClientMetadataUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à scope &apos;{0}&apos; already exists.
         /// </summary>
         public static string ScopeAlreadyExists {
@@ -2001,6 +2082,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string ScopeClaimMapperTokenClaimNameMustBeUnique {
             get {
                 return ResourceManager.GetString("ScopeClaimMapperTokenClaimNameMustBeUnique", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à self-issued request cannot request access to scope different to OPENID.
+        /// </summary>
+        public static string ScopeDifferentToOpenidCannotBeSelfIssued {
+            get {
+                return ResourceManager.GetString("ScopeDifferentToOpenidCannotBeSelfIssued", resourceCulture);
             }
         }
         
@@ -2248,6 +2338,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The error message {0} is unknown.
+        /// </summary>
+        public static string UnknownErrorMessage {
+            get {
+                return ResourceManager.GetString("UnknownErrorMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the grant {0} doesn&apos;t exist.
         /// </summary>
         public static string UnknownGrant {
@@ -2343,6 +2442,24 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string UnknownPresentationDefinition {
             get {
                 return ResourceManager.GetString("UnknownPresentationDefinition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the realm {0} doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownRealm {
+            get {
+                return ResourceManager.GetString("UnknownRealm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the realm role {0} doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownRealmRole {
+            get {
+                return ResourceManager.GetString("UnknownRealmRole", resourceCulture);
             }
         }
         

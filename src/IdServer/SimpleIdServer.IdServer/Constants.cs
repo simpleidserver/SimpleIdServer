@@ -3,6 +3,7 @@
 
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -20,27 +21,41 @@ namespace SimpleIdServer.IdServer
 
         public static List<string> RealmStandardUsers = new List<string>
         {
-            "administrator"
+            StandardUsers.AdministratorUser.Name
+        };
+
+        public static List<string> RealmStandardGroupsFullPath = new List<string>
+        {
+            StandardGroups.AdministratorGroup.FullPath
         };
 
         public static List<string> RealmStandardClients = new List<string>
         {
             "website",
-            "urn:website"
+            "urn:website",
+            "SIDS-manager"
         };
 
         public static List<string> RealmStandardScopes = new List<string>
         {
             StandardScopes.OpenIdScope.Name,
             StandardScopes.Profile.Name,
-            StandardScopes.SAMLProfile.Name
+            StandardScopes.SAMLProfile.Name,
+            StandardScopes.WebsiteAdministratorRole.Name,
+            StandardScopes.Role.Name
         };
 
         public static class StandardAuthorizationDetails
         {
             public const string OpenIdCredential = "openid_credential";
             public const string CredentialConfigurationId = "credential_configuration_id";
+            public const string Format = "format";
         }
+
+        public static class StandardResponseModes
+        {
+            public const string DirectPost = "direct_post";
+        }    
 
         public static class EndPoints
         {
@@ -49,6 +64,7 @@ namespace SimpleIdServer.IdServer
             public const string TokenInfo = "token_info";
             public const string Jwks = "jwks";
             public const string Authorization = "authorization";
+            public const string AuthorizationCallback = "authorization/callback";
             public const string Registration = "register";
             public const string OAuthConfiguration = ".well-known/oauth-authorization-server";
             public const string OpenIDConfiguration = ".well-known/openid-configuration";
@@ -91,6 +107,7 @@ namespace SimpleIdServer.IdServer
             public const string Realms = "realms";
             public const string Groups = "groups";
             public const string Languages = "languages";
+            public const string ErrorMessages = "errormessages";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -194,6 +211,7 @@ namespace SimpleIdServer.IdServer
             public static string ScimId = "scim_id";
             public static string ScimLocation = "scim_location";
             public static string Events = "events";
+            public static string Amrs = "amrs";
         }
 
         public static class StandardClaims
@@ -623,6 +641,20 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            public static Scope DeferredCreds = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "deferredcreds",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
             public static Scope Acrs = new Scope
             {
                 Id = Guid.NewGuid().ToString(),
@@ -735,6 +767,64 @@ namespace SimpleIdServer.IdServer
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
+            public static Scope WebsiteAdministratorRole = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "SIDS-manager/administrator",
+                Type = ScopeTypes.ROLE,
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                Description = "Administrator",
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+            };
+        }
+
+        public static class StandardGroups
+        {
+            public static Domains.Group AdministratorGroup = new Domains.Group
+            {
+                Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
+                CreateDateTime = DateTime.UtcNow,
+                FullPath = "administrator",
+                Realms = new List<GroupRealm>
+                {
+                    new GroupRealm
+                    {
+                        RealmsName = StandardRealms.Master.Name
+                    }
+                },
+                Name = "administrator",
+                Description = "Administration role",
+                Roles = new List<SimpleIdServer.IdServer.Domains.Scope>
+                {
+                    StandardScopes.WebsiteAdministratorRole
+                }
+            };
+            public static Domains.Group AdministratorReadonlyGroup = new Domains.Group
+            {
+                Id = "7a3014a3-5985-4986-bfcc-8e574fb6da27",
+                CreateDateTime = DateTime.UtcNow,
+                FullPath = "administrator-ro",
+                Realms = new List<GroupRealm>
+                {
+                    new GroupRealm
+                    {
+                        RealmsName = StandardRealms.Master.Name
+                    }
+                },
+                Name = "administrator-ro",
+                Description = "Administration role readonly"
+            };
+        }
+
+        public static class StandardUsers
+        {
+            public static User AdministratorUser = UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorGroup).GenerateRandomTOTPKey().Build();
+            public static User AdministratorReadonlyUser = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
         }
 
         public static class StandardAcrs
@@ -762,7 +852,7 @@ namespace SimpleIdServer.IdServer
                 {
                     StandardRealms.Master
                 }
-            };            
+            };
         }
 
         public static class StandardRealms

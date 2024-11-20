@@ -16,6 +16,11 @@ public class PresentationDefinitionStore : IPresentationDefinitionStore
         _dbContext = dbContext;
     }
 
+    public void Add(PresentationDefinition presentationDefinition)
+    {
+        _dbContext.PresentationDefinitions.Add(presentationDefinition);
+    }
+
     public Task<List<PresentationDefinition>> GetAll(string realm, CancellationToken cancellationToken)
     {
         var result = _dbContext.PresentationDefinitions

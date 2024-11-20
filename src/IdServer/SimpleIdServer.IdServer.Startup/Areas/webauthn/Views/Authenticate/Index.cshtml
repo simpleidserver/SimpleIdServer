@@ -10,7 +10,7 @@
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
     var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
-    var realm = SimpleIdServer.IdServer.Middlewares.RealmContext.Instance()?.Realm;
+    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
     var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 

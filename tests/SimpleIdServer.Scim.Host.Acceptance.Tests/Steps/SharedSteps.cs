@@ -18,12 +18,12 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
     public class SharedSteps
     {
         private readonly ScenarioContext _scenarioContext;
-        private CustomWebApplicationFactory<FakeStartup> _factory;
+        private CustomWebApplicationFactory<Program> _factory;
 
         public SharedSteps(ScenarioContext scenarioContext)
         {
             _scenarioContext = scenarioContext;
-            _factory = new CustomWebApplicationFactory<FakeStartup>((o) =>
+            _factory = new CustomWebApplicationFactory<Program>((o) =>
             {
                 o.AddSingleton(scenarioContext);
             });

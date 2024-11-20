@@ -15,12 +15,18 @@ public class SugarAuditEvent
     public string Realm { get; set; } = null!;
     public bool IsError { get; set; }
     public string Description { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? ErrorMessage { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? ClientId { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? UserName { get; set; } = null;
+    [SugarColumn(IsNullable = true, Length = 5000)]
     public string? RequestJSON { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? RedirectUrl { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? AuthMethod { get; set; } = null;
     public string Scopes { get; set; } = null!;
     public string Claims { get; set; } = null!;

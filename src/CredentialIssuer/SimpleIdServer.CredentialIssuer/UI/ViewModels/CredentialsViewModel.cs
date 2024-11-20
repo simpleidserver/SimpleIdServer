@@ -8,4 +8,5 @@ namespace SimpleIdServer.CredentialIssuer.UI.ViewModels;
 public class CredentialsViewModel
 {
     public List<CredentialConfiguration> CredentialConfigurations { get; set; }
+    public bool IsDeveloperModeEnabled { get; set; }
 }

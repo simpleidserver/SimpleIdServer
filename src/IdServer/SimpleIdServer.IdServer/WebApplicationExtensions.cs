@@ -47,6 +47,10 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Authorization,
                 defaults: new { controller = "Authorization", action = "Get" });
 
+            webApplication.SidMapControllerRoute("authorizationCallback",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthorizationCallback,
+                defaults: new { controller = "Authorization", action = "Callback" });
+
             webApplication.SidMapControllerRoute("token",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Token,
                 defaults: new { controller = "Token", action = "Post" });
@@ -75,6 +79,7 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
                 defaults: new { controller = "Registration", action = "Update" });
 
+
             webApplication.SidMapControllerRoute("userInfoGet",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UserInfo,
                 defaults: new { controller = "UserInfo", action = "Get" });
@@ -96,7 +101,7 @@ namespace Microsoft.AspNetCore.Builder
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsPrefix + "/" + Constants.EndPoints.TokenRevoke,
                     defaults: new { controller = "Token", action = "Revoke" });
 
-                if(opts.IsBCEnabled)
+                if (opts.IsBCEnabled)
                 {
                     webApplication.SidMapControllerRoute("bcAuthorizeMtls",
                         pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.MtlsBCAuthorize,
@@ -104,7 +109,7 @@ namespace Microsoft.AspNetCore.Builder
                 }
             }
 
-            if(opts.IsBCEnabled)
+            if (opts.IsBCEnabled)
             {
                 // Occurs every 15 seconds.
                 reccuringJobManager.AddOrUpdate<BCNotificationJob>(nameof(BCNotificationJob), j => webApplication.Services.GetRequiredService<BCNotificationJob>().Execute(), "*/15 * * * * *");
@@ -117,7 +122,7 @@ namespace Microsoft.AspNetCore.Builder
                     defaults: new { controller = "BCCallback", action = "Post" });
             }
 
-            if(opts.IsUMAEnabled)
+            if (opts.IsUMAEnabled)
             {
                 webApplication.SidMapControllerRoute("umaConfiguration",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAConfiguration,
@@ -156,6 +161,13 @@ namespace Microsoft.AspNetCore.Builder
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.UMAResources + "/{id}/permissions",
                     defaults: new { controller = "UMAResources", action = "DeletePermissions" });
             }
+
+            webApplication.SidMapControllerRoute("relaunchErrorMessage",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ErrorMessages + "/{id}/relaunch",
+                defaults: new { controller = "ErrorMessages", action = "Relaunch" });
+            webApplication.SidMapControllerRoute("relaunchErrorMessagesByExternalid",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ErrorMessages + "/relaunch",
+                defaults: new { controller = "ErrorMessages", action = "RelaunchAllByExternalId" });
 
             webApplication.SidMapControllerRoute("getGrant",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Grants + "/{id}",
@@ -353,6 +365,12 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.FidoConfiguration,
                 defaults: new { controller = "FidoConfiguration", action = "Index" });
 
+            webApplication.SidMapControllerRoute("GetUserLockingOptions",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/userlockingoptions",
+                defaults: new { controller = "AuthenticationMethods", action = "GetUserLockingOptions" });
+            webApplication.SidMapControllerRoute("UpdateUserLockingOptions",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods + "/userlockingoptions",
+                defaults: new { controller = "AuthenticationMethods", action = "UpdateUserLockingOptions" });
             webApplication.SidMapControllerRoute("getAllAuthMethods",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthMethods,
                 defaults: new { controller = "AuthenticationMethods", action = "GetAll" });
@@ -393,6 +411,9 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Auditing + "/.search",
                 defaults: new { controller = "Auditing", action = "Search" });
 
+            webApplication.SidMapControllerRoute("getAllRealmScopes",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/realmscopes",
+                defaults: new { controller = "Scopes", action = "GetAllRealmScopes" });
             webApplication.SidMapControllerRoute("searchScopes",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Scopes + "/.search",
                 defaults: new { controller = "Scopes", action = "Search" });
@@ -494,6 +515,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addClientRole",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/roles",
                 defaults: new { controller = "Clients", action = "AddRole" });
+            webApplication.SidMapControllerRoute("updateClientRealms",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Clients + "/{id}/realms",
+                defaults: new { controller = "Clients", action = "UpdateRealms" });
 
             webApplication.SidMapControllerRoute("searchGroups",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Groups + "/.search",
@@ -527,6 +551,18 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addRealm",
                 pattern: Constants.EndPoints.Realms,
                 defaults: new { controller = "Realms", action = "Add" });
+            webApplication.SidMapControllerRoute("searchRealmRoles",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/.search",
+                defaults: new { controller = "Realms", action = "SearchRoles" });
+            webApplication.SidMapControllerRoute("getRealmRole",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "GetRole" });
+            webApplication.SidMapControllerRoute("removeRealmRole",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "RemoveRole" });
+            webApplication.SidMapControllerRoute("updateRealmRoles",
+                pattern: Constants.EndPoints.Realms + "/{id}/roles/{roleId}",
+                defaults: new { controller = "Realms", action = "UpdateRoleScopes" });
 
             webApplication.SidMapControllerRoute("getAllLanguages",
                 pattern: Constants.EndPoints.Languages,

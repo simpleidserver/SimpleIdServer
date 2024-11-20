@@ -4,6 +4,7 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
+@inject IUrlHelper urlHelper
 @inject NotificationService notificationService
 @inject IState<SearchIdProvidersState> searchIdProvidersState
 @inject IDispatcher dispatcher
@@ -12,7 +13,11 @@
     @Global.IdentityProvidersDescription
 </p>
 
-<RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="@Global.AddIdentityProvider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+<SidAuthorizeView Roles=@($"/authentication/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddIdProvider())" Icon="add" Text="@Global.AddIdentityProvider" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
 
 <RadzenDataGrid @ref=idProvidersGrid
                 AllowFiltering="true"
@@ -41,13 +46,17 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Value.DisplayName" Path="@($"/authentications/idproviders/{data.Value.Name}/details")" />
+                <RadzenLink Text="@data.Value.DisplayName" Path="@(urlHelper.GetUrl($"/authentications/idproviders/{data.Value.Name}/details"))" />
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn TItem="SelectableIdProvider" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableIdProvider" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                <SidAuthorizeView Roles=@($"/authentication/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -64,11 +73,6 @@
             SubscribeToAction<RemoveSelectedIdProvidersSuccessAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdProvidersRemoved });
-                StateHasChanged();
-            });
-            SubscribeToAction<SelectRealmSuccessAction>((act) =>
-            {
-                idProvidersGrid.Reload();
                 StateHasChanged();
             });
             if (!searchIdProvidersState.Value.IsLoading)

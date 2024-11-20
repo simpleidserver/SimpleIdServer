@@ -11,10 +11,15 @@ public class SugarAuthenticationSchemeProviderDefinition
 {
     [SugarColumn(IsPrimaryKey = true)]
     public string Name { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Description { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Image { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? HandlerFullQualifiedName { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? OptionsFullQualifiedName { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? OptionsName { get; set; } = null;
     [Navigate(NavigateType.OneToMany, nameof(SugarAuthenticationSchemeProvider.AuthSchemeProviderDefinitionName))]
     public List<SugarAuthenticationSchemeProvider> AuthSchemeProviders { get; set; }
@@ -29,6 +34,20 @@ public class SugarAuthenticationSchemeProviderDefinition
             HandlerFullQualifiedName = HandlerFullQualifiedName,
             OptionsFullQualifiedName = OptionsFullQualifiedName,
             OptionsName = OptionsName
+        };
+    }
+
+    public static SugarAuthenticationSchemeProviderDefinition Transform(AuthenticationSchemeProviderDefinition def)
+    {
+        return new SugarAuthenticationSchemeProviderDefinition
+        {
+            Description = def.Description,
+            HandlerFullQualifiedName = def.HandlerFullQualifiedName,
+            Image = def.Image,
+            OptionsName = def.OptionsName,
+            OptionsFullQualifiedName = def.OptionsFullQualifiedName,
+            Name = def.Name,
+            AuthSchemeProviders = def.AuthSchemeProviders == null ? new List<SugarAuthenticationSchemeProvider>() : def.AuthSchemeProviders.Select(p => SugarAuthenticationSchemeProvider.Transform(p)).ToList()
         };
     }
 }

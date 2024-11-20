@@ -16,6 +16,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public string AuthenticationMethodReferences { get; set; } = null!;
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
+        [SugarColumn(IsNullable = true)]
         public string? RegistrationWorkflowId { get; set; }
         [Navigate(NavigateType.ManyToOne, nameof(RegistrationWorkflowId))]
         public SugarRegistrationWorkflow? RegistrationWorkflow { get; set; }

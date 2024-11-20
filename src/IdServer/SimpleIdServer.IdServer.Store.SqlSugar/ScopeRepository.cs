@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Api.Scopes;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 
@@ -14,6 +15,11 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
         public ScopeRepository(DbContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public Task<List<Scope>> Get(List<string> ids, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
         }
 
         public void Add(Scope scope)
@@ -118,6 +124,15 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 Count = nb,
                 Content = scopes.Select(s => s.ToDomain()).ToList()
             };
+        }
+
+        public async Task<List<Scope>> GetAllRealmScopes(string realm, CancellationToken cancellationToken)
+        {
+            var result = await _dbContext.Client.Queryable<SugarScope>()
+                .Includes(s => s.Realms)
+                .Where(s => s.Component != null && s.Realms.Any(r => r.RealmsName == realm))
+                .ToListAsync(cancellationToken);
+            return result.Select(s => s.ToDomain()).ToList();
         }
     }
 }

@@ -28,13 +28,13 @@ namespace SimpleIdServer.IdServer.Helpers
 
     public class ExtractRequestHelper : IExtractRequestHelper
     {
-        private readonly Infrastructures.IHttpClientFactory _httpClientFactory;
+        private readonly Helpers.IHttpClientFactory _httpClientFactory;
         private readonly IJwtBuilder _jwtBuilder;
         private readonly IDistributedCache _distributedCache;
         private readonly IdServerHostOptions _options;
 
         public ExtractRequestHelper(
-            Infrastructures.IHttpClientFactory httpClientFactory,
+            Helpers.IHttpClientFactory httpClientFactory,
             IJwtBuilder jwtBuilder, 
             IDistributedCache distributedCache, 
             IOptions<IdServerHostOptions> options)

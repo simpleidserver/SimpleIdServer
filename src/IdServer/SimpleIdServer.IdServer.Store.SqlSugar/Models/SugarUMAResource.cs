@@ -11,8 +11,11 @@ public class SugarUMAResource
 {
     [SugarColumn(IsPrimaryKey = true)]
     public string Id { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? IconUri { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Type { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? Subject { get; set; } = null;
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }

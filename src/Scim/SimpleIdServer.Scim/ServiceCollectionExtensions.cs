@@ -7,6 +7,7 @@ using SimpleIdServer.Scim.Api;
 using SimpleIdServer.Scim.Commands.Handlers;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Helpers;
+using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Persistence.InMemory;
 using SimpleIdServer.Scim.Queries;
@@ -108,6 +109,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.RegisterAllAssignableType(typeof(BaseApiController), assm, true);
             }
 
+            services.AddSingleton<IScimEndpointStore, ScimEndpointStore>();
             return services;
         }
     }

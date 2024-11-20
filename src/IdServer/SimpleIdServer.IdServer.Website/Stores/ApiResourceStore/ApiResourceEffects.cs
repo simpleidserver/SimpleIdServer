@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.ApiResources;
 using SimpleIdServer.IdServer.Api.Scopes;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Text.Json;
@@ -19,13 +18,13 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
-        private readonly ProtectedSessionStorage _sessionStorage;
 
-        public ApiResourceEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, ProtectedSessionStorage sessionStorage)
+        public ApiResourceEffects(
+            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            IOptions<IdServerWebsiteOptions> options)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
-            _sessionStorage = sessionStorage;
         }
 
         [EffectMethod]
@@ -153,8 +152,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
         {
             if (_options.IsReamEnabled)
             {
-                var realm = await _sessionStorage.GetAsync<string>("realm");
-                var realmStr = !string.IsNullOrWhiteSpace(realm.Value) ? realm.Value : SimpleIdServer.IdServer.Constants.DefaultRealm;
+                var realm = RealmContext.Instance()?.Realm;
+                var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/{subUrl}";
             }
 

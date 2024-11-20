@@ -3,6 +3,7 @@
 using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+using System.Xml.Linq;
 
 namespace SimpleIdServer.IdServer.Domains
 {

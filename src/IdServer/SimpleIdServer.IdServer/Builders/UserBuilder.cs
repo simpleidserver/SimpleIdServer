@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="name">(Optional) The user's first name.</param>
         /// <param name="realm">(Optional) The realm to asign.</param>
         /// <returns>An instace for building an user.</returns>
-        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null)
+        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null, bool isBase64Encoded = false)
         {
             var result = new UserBuilder();
             result._user.Id = Guid.NewGuid().ToString();
@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 CredentialType = "pwd",
                 IsActive = true,
-                Value = PasswordHelper.ComputeHash(password)
+                Value = PasswordHelper.ComputeHash(password, isBase64Encoded)
             });
             if (realm == null) result._user.Realms.Add(new RealmUser { RealmsName = Constants.StandardRealms.Master.Name });
             else result._user.Realms.Add(new RealmUser { RealmsName = realm.Name });

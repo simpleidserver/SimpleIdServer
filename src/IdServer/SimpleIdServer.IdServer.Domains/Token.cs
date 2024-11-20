@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.Domains
     {
         public string Id { get; set; } = null!;
         public string? SessionId { get; set; } = null;
-        public string ClientId { get; set; } = null!;
+        public string? ClientId { get; set; } = null!;
         public string TokenType { get; set; } = null!;
         public AccessTokenTypes? AccessTokenType { get; set; } = null;
         public string? Data { get; set; } = null;

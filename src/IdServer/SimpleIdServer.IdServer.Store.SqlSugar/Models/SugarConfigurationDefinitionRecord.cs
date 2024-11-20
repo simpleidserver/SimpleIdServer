@@ -18,11 +18,29 @@ public class SugarConfigurationDefinitionRecord
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
     public int Order { get; set; }
+    [SugarColumn(IsNullable = true)]
     public string? DisplayCondition { get; set; }
     [Navigate(typeof(SugarConfigurationDefinitionRecordTranslation), nameof(SugarConfigurationDefinitionRecordTranslation.ConfigurationDefinitionRecordId), nameof(SugarConfigurationDefinitionRecordTranslation.TranslationsId))]
     public List<SugarTranslation> Translations { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarConfigurationDefinitionRecordValue.ConfigurationDefinitionRecordId))]
     public List<SugarConfigurationDefinitionRecordValue> Values { get; set; }
+
+    public static SugarConfigurationDefinitionRecord Transform(ConfigurationDefinitionRecord record)
+    {
+        return new SugarConfigurationDefinitionRecord
+        {
+            Id = record.Id,
+            Name = record.Name,
+            IsRequired = record.IsRequired,
+            Type = record.Type,
+            CreateDateTime = record.CreateDateTime,
+            UpdateDateTime = record.UpdateDateTime,
+            Order = record.Order,
+            DisplayCondition = record.DisplayCondition,
+            Translations = record.Translations == null ? new List<SugarTranslation>() : record.Translations.Select(t => SugarTranslation.Transform(t)).ToList(),
+            Values = record.Values == null ? new List<SugarConfigurationDefinitionRecordValue>() : record.Values.Select(v => SugarConfigurationDefinitionRecordValue.Transform(v)).ToList()
+        };
+    }
 
     public ConfigurationDefinitionRecord ToDomain()
     {

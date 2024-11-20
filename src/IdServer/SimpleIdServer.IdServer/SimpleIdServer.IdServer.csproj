@@ -18,6 +18,7 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj" />
 	</ItemGroup>

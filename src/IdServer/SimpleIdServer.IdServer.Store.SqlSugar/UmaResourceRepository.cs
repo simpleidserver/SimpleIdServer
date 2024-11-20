@@ -90,7 +90,7 @@ public class UmaResourceRepository : IUmaResourceRepository
             {
                 Key = t.Key,
                 Value = t.Value,
-                Language = t.Language
+                Language = t.Language,
             }).ToList()
         };
     }

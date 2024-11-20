@@ -13,18 +13,15 @@
 <h5>@(User.Identity.IsAuthenticated ? AuthenticateWebauthnResource.update_webauthn : AuthenticateWebauthnResource.register_webauthn)</h5>
 
 <div id="registrationContainer">
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <ul class="list-group mb-3" id="errors">
-            @foreach (var modelState in ViewData.ModelState.Values)
+    <ul class="list-group mb-3" id="errors">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
             {
-                foreach (var error in modelState.Errors)
-                {
-                    <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
-                }
+                <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
             }
-        </ul>
-    }
+        }
+    </ul>
 
     <!-- Registration form -->
     <form id="registerWebauthn">

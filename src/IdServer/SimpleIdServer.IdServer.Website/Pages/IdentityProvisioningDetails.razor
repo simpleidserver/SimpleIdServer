@@ -20,7 +20,11 @@
             <RadzenTextArea Name="Description" @bind-Value="@updateIdentityProvisioning.Description" Class="w-100"></RadzenTextArea>
             <RadzenRequiredValidator Component="Description" Text="@Global.DescriptionRequired"></RadzenRequiredValidator>
         </div>
-        <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Update" />
+        <SidAuthorizeView Roles=@("/automaticidprovisioning/manage")>
+            <Authorized>
+                <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Update" />
+            </Authorized>
+        </SidAuthorizeView>
     </RadzenTemplateForm>
 }
 

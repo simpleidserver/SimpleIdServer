@@ -13,7 +13,9 @@ public class SugarClientJsonWebKey
     public string Kid { get; set; } = null!;
     public string Alg { get; set; } = null!;
     public string Usage { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public SecurityKeyTypes? KeyType { get; set; } = null;
+    [SugarColumn(Length = 5000)]
     public string SerializedJsonWebKey { get; set; } = null!;
     public string ClientId { get; set; } = null;
 

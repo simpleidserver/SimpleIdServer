@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SimpleIdServer.CredentialIssuer.Api.CredentialInstance;
 using SimpleIdServer.CredentialIssuer.CredentialFormats;
 using SimpleIdServer.CredentialIssuer.Domains;
 using SimpleIdServer.CredentialIssuer.Store;
@@ -351,7 +352,8 @@ public class CredentialConfigurationsController : BaseController
             IssueDateTime = request.IssueDateTime,
             Subject = request.Subject,
             CredentialId = request.CredentialId,
-            Claims = claims
+            Claims = claims,
+            IsDeferred = credentialConfiguration.IsDeferred
         };
         _credentialStore.Add(record);
         await _credentialStore.SaveChanges(cancellationToken);

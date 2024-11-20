@@ -4,8 +4,7 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public enum UserStatus
     {
-        CREATED = 0,
-        NOTIFIED = 1,
-        CONFIRMED = 2
+        ACTIVATED = 0,
+        BLOCKED = 1
     }
 }

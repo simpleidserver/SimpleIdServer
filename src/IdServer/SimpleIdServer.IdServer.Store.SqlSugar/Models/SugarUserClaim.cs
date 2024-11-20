@@ -12,7 +12,9 @@ public class SugarUserClaim
     public string Id { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string Value { get; set; } = null!;
+    [SugarColumn(IsNullable = true)]
     public string? Type { get; set; } = null;
+    [SugarColumn(IsNullable = true)]
     public string? UserId { get; set; } = null;
 
     public static SugarUserClaim Transform(UserClaim cl)

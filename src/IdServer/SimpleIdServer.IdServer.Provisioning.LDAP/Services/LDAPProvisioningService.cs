@@ -101,9 +101,12 @@ public class LDAPProvisioningService : BaseProvisioningService<LDAPRepresentatio
                 Version = version
             };
             users.Add(user);
-            var userGroups = ResolveUserGroups(userId, entry, options, ldapConnection, definition);
-            groups.AddRange(userGroups);
-            user.GroupIds = userGroups.Select(g => g.Id).ToList();
+            if(options.IsGroupSyncEnabled)
+            {
+                var userGroups = ResolveUserGroups(userId, entry, options, ldapConnection, definition);
+                groups.AddRange(userGroups);
+                user.GroupIds = userGroups.Select(g => g.Id).ToList();
+            }
         }
 
         return new ExtractedResult { Users = users, Groups = groups };
