@@ -38,7 +38,7 @@ public class UserSeedDto
     public string[] Roles { get; set; } = [];
 
     /// <summary>
-    /// Real to relate.
+    /// Realm to relate.
     /// </summary>
     public string Realm { get; set; }
 }

@@ -18,17 +18,20 @@ public class JsonSeedStrategy : ISeedStrategy
     private readonly JsonSeedingOptions _jsonSeedingOptions;
     private readonly ILogger<JsonSeedStrategy> _logger;
     private readonly IEntitySeeder<RealmSeedDto> _realmsSeeder;
+    private readonly IEntitySeeder<ScopeSeedDto> _scopesSeeder;
     private readonly IEntitySeeder<UserSeedDto> _usersSeeder;
 
     public JsonSeedStrategy(
         IOptions<JsonSeedingOptions> jsonSeedingOptions,
         ILogger<JsonSeedStrategy> logger,
         IEntitySeeder<RealmSeedDto> realmsSeeder,
+        IEntitySeeder<ScopeSeedDto> scopesSeeder,
         IEntitySeeder<UserSeedDto> usersSeeder)
     {
         _jsonSeedingOptions = jsonSeedingOptions.Value;
         _logger = logger;
         _realmsSeeder = realmsSeeder;
+        _scopesSeeder = scopesSeeder;
         _usersSeeder = usersSeeder;
     }
 
@@ -59,6 +62,11 @@ public class JsonSeedStrategy : ISeedStrategy
         if (seeds.Realms.Count > 0)
         {
             await _realmsSeeder?.SeedAsync(seeds.Realms , cancellationToken);
+        }
+
+        if (seeds.Scopes.Count > 0)
+        {
+            await _scopesSeeder?.SeedAsync(seeds.Scopes, cancellationToken);
         }
 
         if (seeds.Users.Count > 0)

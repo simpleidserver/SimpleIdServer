@@ -4,6 +4,16 @@
       "Name": "testing"
     }
   ],
+  "Scopes": [
+    {
+      "Name": "testing_scope",
+      "Type": "APIRESOURCE",
+      "Protocol": "OAUTH",
+      "Description": "Access to view the home page",
+      "IsExposedInConfigurationEdp": true,
+      "Realm": "testing"
+    }
+  ],
   "Users": [
     {
       "Login": "user-seeded-testing",

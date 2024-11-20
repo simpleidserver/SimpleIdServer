@@ -15,6 +15,11 @@ public class SeedsDto
     public IReadOnlyCollection<RealmSeedDto> Realms { get; set; } = [];
 
     /// <summary>
+    /// Scopes to seed.
+    /// </summary>
+    public IReadOnlyCollection<ScopeSeedDto> Scopes { get; set; } = [];
+
+    /// <summary>
     /// Users to seed.
     /// </summary>
     public IReadOnlyCollection<UserSeedDto> Users { get; set; } = [];
