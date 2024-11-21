@@ -3,7 +3,7 @@
 @inject ITranslationHelper translationHelper
 
 
- <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context">
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormCheckboxDialog" TRecord="FormCheckboxRecord" Record="@Value">
      <Children>
         <div>
             <RadzenCheckBox @bind-Value="@Value.Value"></RadzenCheckBox>

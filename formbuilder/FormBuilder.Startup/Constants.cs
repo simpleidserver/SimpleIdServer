@@ -89,7 +89,8 @@ public class Constants
                     // Register
                     new FormAnchorRecord
                     {
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build(),
+                        Url = new DirectTargetUrl { Url = "http://google.com" }
                     },
                     // Separator
                     new DividerLayoutRecord

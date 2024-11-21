@@ -1,0 +1,17 @@
+﻿@using FormBuilder.Models.Url
+@using Radzen
+@using Radzen.Blazor
+
+<!-- Controller -->
+<RadzenFormField Variant="Variant.Outlined" Text="Controller" class="fullWidth">
+    <RadzenTextBox @bind-Value="@Record.Controller"></RadzenTextBox>
+</RadzenFormField>
+<!-- Action -->
+<RadzenFormField Variant="Variant.Outlined" Text="Action" class="fullWidth">
+    <RadzenTextBox @bind-Value="@Record.Action"></RadzenTextBox>
+</RadzenFormField>
+
+
+@code {
+    [Parameter] public ControllerActionTargetUrl Record { get; set; }
+}

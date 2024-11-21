@@ -12,6 +12,7 @@ using FormBuilder.Helpers;
 using FormBuilder.Rules;
 using FormBuilder.Transformers;
 using FormBuilder.Url;
+using Radzen;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -45,6 +46,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRuleEngine, RuleEngine>();
 
         services.AddTransient<IUriProvider, UriProvider>();
+
+        services.AddScoped<DialogService>();
+
         services.AddHttpContextAccessor();
         services.AddHttpClient();
         return services;

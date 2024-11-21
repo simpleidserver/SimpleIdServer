@@ -7,6 +7,8 @@ public interface ITargetUrlHelperFactory
 {
     string Build(ITargetUrl targetUrl);
     ITargetUrlHelper Build(string type);
+    List<string> GetAllTypes();
+    ITargetUrl CreateEmptyInstance(string type);
 }
 
 public class TargetUrlHelperFactory : ITargetUrlHelperFactory
@@ -21,12 +23,18 @@ public class TargetUrlHelperFactory : ITargetUrlHelperFactory
     public string Build(ITargetUrl targetUrl)
     {
         var targetUrlHelper = Build(targetUrl.Type);
-        if (targetUrlHelper == null) return null;
         return targetUrlHelper.Build(targetUrl);
     }
 
     public ITargetUrlHelper Build(string type)
+        => _targets.Single(t => t.Type == type);
+
+    public ITargetUrl CreateEmptyInstance(string type)
     {
-        return _targets.SingleOrDefault(t => t.Type == type);
+        var targetUrlHelper = Build(type);
+        return targetUrlHelper.CreateEmptyInstance();
     }
+
+    public List<string> GetAllTypes()
+        => _targets.Select(t => t.Type).ToList();
 }

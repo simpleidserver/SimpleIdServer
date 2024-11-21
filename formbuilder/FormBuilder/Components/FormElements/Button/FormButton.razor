@@ -2,7 +2,7 @@
 @using FormBuilder.Helpers
 @inject ITranslationHelper translationHelper
 
-<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context">
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormButtonDialog" TRecord="FormButtonRecord" Record="@Value">
     <Children>
         <RadzenButton Text="@translationHelper.Translate(Value)" ButtonType="ButtonType.Submit" class="fullWidth"></RadzenButton>
     </Children>

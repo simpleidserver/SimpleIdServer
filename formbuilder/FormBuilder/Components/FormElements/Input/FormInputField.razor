@@ -3,7 +3,7 @@
 @inject ITranslationHelper translationHelper
 
 
- <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context">
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormInputDialog" TRecord="FormInputFieldRecord" Record="@Value">
      <Children>
         @if(Value.Type != FormInputTypes.HIDDEN)
         {

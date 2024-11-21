@@ -1,11 +1,16 @@
-﻿@using FormBuilder.Models
+﻿@typeparam TDialog where TDialog : ComponentBase
+@typeparam TRecord where TRecord : IFormElementRecord
+@using FormBuilder.Dialogs
+@using FormBuilder.Models
+@inject DialogService dialogService
+
 @if(IsEditModeEnabled)
 {
     <div class="draggableElement">
         <div class="toolbox">
             <ul>
                 <li>
-                    <RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleViewSettings" />
+                    <RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="(async (e) => await HandleViewSettings())" />
                     <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" />
                 </li>
             </ul>
@@ -25,6 +30,7 @@ else
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public FormViewerContext Context { get; set; }
+    [Parameter] public TRecord Record { get; set; }
 
     private void HandleEltDroppedTop()
     {
@@ -46,8 +52,12 @@ else
         ParentContext.Elements.Remove(elt);
     }
 
-    private void HandleViewSettings()
+    private async Task HandleViewSettings()
     {
-        
+        var dic = new Dictionary<string, object>
+        {
+            { "Record", Record }
+        };
+        await dialogService.OpenAsync<TDialog>(string.Empty, dic);
     }
 }

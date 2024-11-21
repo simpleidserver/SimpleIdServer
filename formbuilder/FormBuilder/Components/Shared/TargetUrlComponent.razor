@@ -1,0 +1,59 @@
+﻿@using FormBuilder.Factories
+@using FormBuilder.Models.Url
+@using FormBuilder.Url
+@inject ITargetUrlHelperFactory targetUrlHelperFactory
+
+<RadzenFormField Variant="Variant.Outlined" Text="Choose the type of URL" class="fullWidth">
+    <RadzenDropDown @bind-Value=@selectedUrlType Data=@allTypes></RadzenDropDown>
+</RadzenFormField>
+
+@CustomRender
+
+@code {
+    private string _selectedUrlType;
+    private RenderFragment? CustomRender { get; set; }
+    ComponentBase component;
+    [Parameter] public ITargetUrl Url { get; set; }
+    [Parameter] public EventCallback<ITargetUrl> UrlChanged { get; set; }
+    string selectedUrlType
+    {
+        get
+        {
+            return _selectedUrlType;
+        }
+        set
+        {
+            _selectedUrlType = value;
+            Url = targetUrlHelperFactory.CreateEmptyInstance(_selectedUrlType);
+            UrlChanged.InvokeAsync(Url).Wait();
+            CustomRender = CreateComponent();
+        }
+    }
+    List<string> allTypes { get; set; } = new List<string>();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            allTypes = targetUrlHelperFactory.GetAllTypes();
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Url != null && selectedUrlType == null)
+        {
+            _selectedUrlType = Url.Type;
+            CustomRender = CreateComponent();
+        }
+    }
+
+    private RenderFragment CreateComponent() => builder =>
+    {
+        var helper = targetUrlHelperFactory.Build(Url.Type);
+        helper.BuildComponent(Url, builder);
+    };
+}
