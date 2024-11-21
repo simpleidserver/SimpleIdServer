@@ -4,36 +4,47 @@
 
 <RadzenDialog />
 
-<RadzenRow>
-    <RadzenColumn Size="4">
-        <RadzenStack class="formEditor">
-            <h5 class="title">Elements</h5>
-            <ul class="elements">
-                @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.ELEMENT))
-                {
-                    <li draggable="true" @ondragstart="@(() => HandleDragStart(def))" @ondragend="HandleDragEnd">@def.Type</li>
-                }
-            </ul>
-            <h5 class="title">Layout</h5>
-            <ul class="elements">
-                @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.LAYOUT))
-                {
-                    <li>@def.Type</li>
-                }
-            </ul>
-            <h5 class="title">Data</h5>
-            <ul class="elements">
-                @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.DATA))
-                {
-                    <li>@def.Type</li>
-                }
-            </ul>
-        </RadzenStack>
-    </RadzenColumn>
-    <RadzenColumn Size="8">
-        <FormViewer Form="@Form" Input="@(new JsonObject())" IsEditModeEnabled="true" Context="@Context" />
-    </RadzenColumn>
-</RadzenRow>
+<div class="container">
+    <RadzenRow>
+        <RadzenColumn Size="1">
+            <RadzenStack class="formEditor">
+                <div class="category">
+                    <RadzenText TextStyle="TextStyle.H6" class="title">Elements</RadzenText>
+                    <ul class="elements">
+                        @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.ELEMENT))
+                        {
+                            <li draggable="true" @ondragstart="@(() => HandleDragStart(def))" @ondragend="HandleDragEnd">@def.Type</li>
+                        }
+                    </ul>
+                </div>
+                <div class="category">
+                    <RadzenText TextStyle="TextStyle.H6" class="title">Layout</RadzenText>
+                    <ul class="elements">
+                        @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.LAYOUT))
+                        {
+                            <li>@def.Type</li>
+                        }
+                    </ul>
+                </div>
+                <div class="category">
+                    <RadzenText TextStyle="TextStyle.H6" class="title">Data</RadzenText>
+                    <ul class="elements">
+                        @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.DATA))
+                        {
+                            <li>@def.Type</li>
+                        }
+                    </ul>
+                </div>
+            </RadzenStack>
+        </RadzenColumn>
+        <RadzenColumn Size="8">
+            <FormViewer Form="@Form" Input="@(new JsonObject())" IsEditModeEnabled="true" Context="@Context" />
+        </RadzenColumn>
+        <RadzenColumn Size="3">
+
+        </RadzenColumn>
+    </RadzenRow>
+</div>
 
 @code {
     [Parameter] public FormRecord Form { get; set; }
@@ -41,7 +52,7 @@
 
     private void HandleDragStart(IFormElementDefinition def)
     {
-        Context.SelectedDefinition = def;
+        Context.Set(def);
     }
 
     private void HandleDragEnd()

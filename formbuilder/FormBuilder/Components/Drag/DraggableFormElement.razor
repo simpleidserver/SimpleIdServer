@@ -6,7 +6,7 @@
 
 @if(IsEditModeEnabled)
 {
-    <div class="draggableElement">
+    <div class="draggableElement" draggable="true" @ondragstart="@(() => HandleDragStart())">
         <div class="toolbox">
             <ul>
                 <li>
@@ -32,18 +32,45 @@ else
     [Parameter] public FormViewerContext Context { get; set; }
     [Parameter] public TRecord Record { get; set; }
 
-    private void HandleEltDroppedTop()
+    private void HandleDragStart()
     {
-        var def = Context.SelectedDefinition;
-        var record = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
-        ParentContext.Elements.Insert(ParentContext.Index, record);
+        Context.Set(Record, HandleCurrentEltDropped);
     }
 
-    private void HandleEltDroppedBottom()
+    private void HandleEltDroppedTop() => HandleEltDropped(false);
+
+    private void HandleEltDroppedBottom() => HandleEltDropped(true);
+
+    private void HandleEltDropped(bool isBottom)
     {
-        var def = Context.SelectedDefinition;
-        var record = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
-        ParentContext.Elements.Insert(ParentContext.Index + 1, record);
+        IFormElementRecord eltRecord = null;
+        int projectedEltIndex = ParentContext.Index;
+        switch(Context.SelectionType)
+        {
+            case SelectionTypes.DEFINITION:
+                var def = Context.SelectedDefinition;
+                eltRecord = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
+                break;
+            case SelectionTypes.RECORD:
+                eltRecord = Context.SelectedRecord;
+                if (eltRecord == (IFormElementRecord)Record) return;
+                var existingEltIndex = ParentContext.Elements.IndexOf(eltRecord);
+                if(existingEltIndex != -1 && projectedEltIndex > existingEltIndex)
+                    projectedEltIndex--;
+
+                break;
+        }
+
+        if (eltRecord == null) return;
+        Context.DropElement();
+        projectedEltIndex = isBottom ? projectedEltIndex + 1 : projectedEltIndex;
+        if (projectedEltIndex >= ParentContext.Elements.Count()) ParentContext.Elements.Add(eltRecord);
+        else ParentContext.Elements.Insert(projectedEltIndex, eltRecord);
+    }
+
+    private void HandleCurrentEltDropped()
+    {
+        ParentContext.Elements.RemoveAt(ParentContext.Index);
     }
 
     private void HandleRemove()

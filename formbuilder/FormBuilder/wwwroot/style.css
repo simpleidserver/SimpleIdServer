@@ -20,17 +20,25 @@
 }
 
 /* Form editor */
+.formEditor {
+    border: 1px solid gray;
+}
+
+.formEditor .category {
+    border-top: 1px solid gray;
+}
+
 .formEditor .title {
-    background-color: #00000008;
-    border: 1px solid rgba(0,0,0,.125);
-    padding: 10px;
-    margin-bottom: 0px;
+    margin: 0px !important;
+    background-color: #e4e2e2;
+    padding-bottom: 5px;
+    text-align: center;
 }
 
 .formEditor ul.elements {
     list-style-type: none;
     margin: 0;
-    padding: 0;
+    padding: 5px;
 }
 
 .formEditor ul.elements > li {
@@ -39,12 +47,14 @@
     border: 1px solid gray;
     background-color: #f3f3f3;
     margin-bottom: 2px;
+    cursor: move;
 }
 
 /* Drop zone */
 .draggableElement {
     position: relative;
     border: 1px solid transparent;
+    cursor: move;
 }
 
 .draggableElement:hover {
@@ -94,6 +104,12 @@
     height: 10px;
 }
 
+
+/* Common */
 .fullWidth {
     width: 100%;
+}
+
+.container {
+    padding: 5px;
 }
