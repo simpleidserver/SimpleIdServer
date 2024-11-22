@@ -1,0 +1,27 @@
+﻿@using FormBuilder.Models
+@using Radzen
+@using Radzen.Blazor
+@inject DialogService dialogService
+
+<RadzenText>Input data (JSON)</RadzenText>
+<RadzenTextArea class="fullWidth" @bind-Value="@json" Rows="20"></RadzenTextArea>
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
+    <RadzenButton Text="Cancel" Click="HandleCancel" />
+    <RadzenButton Text="Debug" Click="HandleDebug" />
+</RadzenStack>
+
+@code {
+    [Parameter] public FormRecord Form { get; set; }
+    string json { get; set; }
+
+    private void HandleCancel()
+    {
+        dialogService.Close();
+    }
+
+    private void HandleDebug()
+    {
+        
+    }
+}

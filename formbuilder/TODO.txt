@@ -1,9 +1,13 @@
 * Faire fonctionner le formulaire blazor			:	OK
 * Pouvoir naviguer									:	OK
 
+* Corriger problème SAML2.0 logout							:	TODO
 * Ajouter un éditeur graphique								:	OK
-* Pouvoir bouger les éléments du formulaire					:	TODO
+* Pouvoir bouger les éléments du formulaire					:	OK
+* Pouvoir éditer les paramètres d'un stacklayout			:	OK
+* Pouvoir lancer la simulation du formulaire				:	TODO
 * Afficher une image										:	TODO
 * Afficher target _blank									:	TODO
 * Désactiver le boutton quand l'auth est en progression		:	TODO
 * Afficher la liste des étapes								:	TODO
+* Pouvoir afficher le JSON									:	TODO

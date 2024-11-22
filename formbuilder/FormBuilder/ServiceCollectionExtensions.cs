@@ -18,8 +18,10 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddFormBuilder(this IServiceCollection services)
+    public static IServiceCollection AddFormBuilder(this IServiceCollection services, Action<FormBuilderOptions> cb = null)
     {
+        if (cb == null) services.Configure<FormBuilderOptions>((c) => { });
+        else services.Configure<FormBuilderOptions>(cb);
         services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormButtonDefinition>();

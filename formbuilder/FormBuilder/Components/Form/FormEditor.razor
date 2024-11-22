@@ -1,5 +1,7 @@
-﻿@using FormBuilder.Models
+﻿@using FormBuilder.Dialogs
+@using FormBuilder.Models
 @using System.Text.Json.Nodes
+@inject DialogService dialogService
 @inject IEnumerable<IFormElementDefinition> definitions
 
 <RadzenDialog />
@@ -7,13 +9,13 @@
 <div class="container">
     <RadzenRow>
         <RadzenColumn Size="1">
-            <RadzenStack class="formEditor">
+            <RadzenStack class="formEditorWindow">
                 <div class="category">
                     <RadzenText TextStyle="TextStyle.H6" class="title">Elements</RadzenText>
                     <ul class="elements">
                         @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.ELEMENT))
                         {
-                            <li draggable="true" @ondragstart="@(() => HandleDragStart(def))" @ondragend="HandleDragEnd">@def.Type</li>
+                            <li draggable="true" @ondragstart="@(() => HandleDragStart(def))">@def.Type</li>
                         }
                     </ul>
                 </div>
@@ -41,7 +43,14 @@
             <FormViewer Form="@Form" Input="@(new JsonObject())" IsEditModeEnabled="true" Context="@Context" />
         </RadzenColumn>
         <RadzenColumn Size="3">
-
+            <RadzenStack class="formEditorWindow">
+                <div class="category">
+                    <RadzenText TextStyle="TextStyle.H6" class="title">Debugger</RadzenText>
+                    <div class="container">                        
+                        <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
+                    </div>
+                </div>
+            </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
 </div>
@@ -55,8 +64,11 @@
         Context.Set(def);
     }
 
-    private void HandleDragEnd()
+    private Task LaunchDebug()
     {
-        
+        return dialogService.OpenAsync<DebugFormDialog>("", new Dictionary<string, object>
+        {
+            { "Form", Form }
+        });
     }
 }

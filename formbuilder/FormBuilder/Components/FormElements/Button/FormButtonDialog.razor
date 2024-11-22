@@ -1,1 +1,29 @@
-﻿
+﻿@using System.Text.Json
+@using FormBuilder.Components.Shared
+@inject DialogService dialogService
+
+<RadzenStack>
+    <EditLabelsComponent Labels="@CopyRecord.Labels" />
+    <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
+</RadzenStack>
+
+@code {
+    FormButtonRecord CopyRecord { get; set; } = new FormButtonRecord();
+    [Parameter] public FormButtonRecord Record { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Record != null)
+        {
+            CopyRecord = JsonSerializer.Deserialize<FormButtonRecord>(JsonSerializer.Serialize(Record));
+        }
+    }
+
+    private void HandleSave()
+    {
+        Record.Transformation = CopyRecord.Transformation;
+        Record.Labels = CopyRecord.Labels;
+        dialogService.Close();
+    }
+}

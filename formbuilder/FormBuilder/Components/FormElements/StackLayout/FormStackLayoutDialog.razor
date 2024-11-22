@@ -1,0 +1,52 @@
+﻿@using System.Text.Json
+@using FormBuilder.Models.Url
+@using FormBuilder.Components.Shared
+@inject DialogService dialogService
+
+<RadzenStack>
+   <!-- Act as a form -->
+   <div>
+       <RadzenCheckBox @bind-Value="CopyRecord.IsFormEnabled" />
+       <RadzenLabel>Act as a form ?</RadzenLabel>
+   </div>
+    @if (CopyRecord.IsFormEnabled)
+    {        
+       <!-- Add antiforgery token -->
+       <div>
+           <RadzenCheckBox @bind-Value="Record.IsAntiforgeryEnabled" />
+           <RadzenLabel>Do you want to automatically generate an anti-forgery token?</RadzenLabel>
+       </div>
+       <!-- Edit the URL -->
+       <TargetUrlComponent Url="@CopyRecord.Url" UrlChanged="HandleUrlChanged" />
+    }
+
+    <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
+</RadzenStack>
+
+@code {
+    [Parameter] public FormStackLayoutRecord Record { get; set; }
+    FormStackLayoutRecord CopyRecord { get; set; } = new FormStackLayoutRecord();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Record != null)
+        {
+            CopyRecord = JsonSerializer.Deserialize<FormStackLayoutRecord>(JsonSerializer.Serialize(Record));
+        }
+    }
+
+    private void HandleUrlChanged(ITargetUrl url)
+    {
+        CopyRecord.Url = url;
+    }
+
+    private void HandleSave()
+    {
+        Record.Url = CopyRecord.Url;
+        Record.IsFormEnabled = CopyRecord.IsFormEnabled;
+        Record.IsAntiforgeryEnabled = CopyRecord.IsAntiforgeryEnabled;
+        Record.Labels = CopyRecord.Labels;
+        dialogService.Close();
+    }
+}

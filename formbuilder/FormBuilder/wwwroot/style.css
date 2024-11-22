@@ -20,28 +20,28 @@
 }
 
 /* Form editor */
-.formEditor {
+.formEditorWindow {
     border: 1px solid gray;
 }
 
-.formEditor .category {
+.formEditorWindow .category {
     border-top: 1px solid gray;
 }
 
-.formEditor .title {
+.formEditorWindow .title {
     margin: 0px !important;
     background-color: #e4e2e2;
     padding-bottom: 5px;
     text-align: center;
 }
 
-.formEditor ul.elements {
+.formEditorWindow ul.elements {
     list-style-type: none;
     margin: 0;
     padding: 5px;
 }
 
-.formEditor ul.elements > li {
+.formEditorWindow ul.elements > li {
     padding: 5px 5px 5px 8px;
     border-radius: .3em;
     border: 1px solid gray;
@@ -51,36 +51,28 @@
 }
 
 /* Drop zone */
-.draggableElement {
-    position: relative;
+.editableLayoutContainer, .draggableElement {
     border: 1px solid transparent;
-    cursor: move;
+    position: relative;
 }
 
-.draggableElement:hover {
+.draggableElement:hover, .editableLayoutContainer:hover {
     border-color: gray;
 }
 
-.draggableElement:hover > .toolbox {
+.draggableElement:hover > .toolbox,
+.editableLayoutContainer:hover > .toolbox{
     display: block;
     z-index: 2;
 }
 
-.draggableElement > .toolbox {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    display: none;
+.draggableElement:hover > .info,
+.editableLayoutContainer:hover > .info {
+    display: block;
 }
 
-.toolbox > ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-}
-
-.toolbox > ul > li {
-    padding-left: 2px;
+.draggableElement {
+    cursor: move;
 }
 
 .dropZone {
@@ -104,6 +96,45 @@
     height: 10px;
 }
 
+/* Editable layout container */
+.editableLayoutContainer {
+    padding: 10px;
+}
+
+/* Metadata info */
+.info {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    background-color: gray;
+    color: white;
+    display: none;
+    z-index: 2;
+}
+
+/* Toolbox */
+.toolbox {
+    display: block;
+    z-index: 2;
+}
+
+.toolbox {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    display: none;
+}
+
+.toolbox > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.toolbox > ul > li {
+    padding-left: 2px;
+    display: inline-block;
+}
 
 /* Common */
 .fullWidth {

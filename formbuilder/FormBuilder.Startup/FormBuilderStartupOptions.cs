@@ -1,6 +1,6 @@
 ﻿namespace FormBuilder.Startup;
 
-public class FormBuilderOptions
+public class FormBuilderStartupOptions
 {
     public string AntiforgeryCookieName { get; set; } = "XSFR-TOKEN";
 }

@@ -10,9 +10,9 @@ namespace FormBuilder.Startup.Controllers;
 public class AuthController : Controller
 {
     private readonly IAntiforgery _antiforgery;
-    private readonly FormBuilderOptions _options;
+    private readonly FormBuilderStartupOptions _options;
 
-    public AuthController(IAntiforgery antiforgery, IOptions<FormBuilderOptions> options)
+    public AuthController(IAntiforgery antiforgery, IOptions<FormBuilderStartupOptions> options)
     {
         _antiforgery = antiforgery;
         _options = options.Value;

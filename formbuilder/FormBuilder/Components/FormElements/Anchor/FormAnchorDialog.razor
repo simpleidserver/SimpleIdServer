@@ -4,7 +4,7 @@
 @inject DialogService dialogService
 
 <RadzenStack>
-    <RadzenTabs>
+    <RadzenTabs @bind-SelectedIndex=@selectedIndex>
         <Tabs>
             <RadzenTabsItem Text="Properties">
                 <RadzenStack>
@@ -18,7 +18,7 @@
                 </RadzenStack>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Label">
-
+                <EditLabelsComponent Labels="@CopyRecord.Labels" />
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>

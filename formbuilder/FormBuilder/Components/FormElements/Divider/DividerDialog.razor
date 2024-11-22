@@ -1,1 +1,28 @@
-﻿
+﻿@using System.Text.Json
+@using FormBuilder.Components.Shared
+@inject DialogService dialogService
+
+<RadzenStack>
+    <EditLabelsComponent Labels="@CopyRecord.Labels" />
+    <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
+</RadzenStack>
+
+@code {
+    DividerLayoutRecord CopyRecord { get; set; } = new DividerLayoutRecord();
+    [Parameter] public DividerLayoutRecord Record { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Record != null)
+        {
+            CopyRecord = JsonSerializer.Deserialize<DividerLayoutRecord>(JsonSerializer.Serialize(Record));
+        }
+    }
+
+    private void HandleSave()
+    {
+        Record.Labels = CopyRecord.Labels;
+        dialogService.Close();
+    }
+}

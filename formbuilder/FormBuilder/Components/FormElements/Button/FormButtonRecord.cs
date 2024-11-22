@@ -9,5 +9,6 @@ public class FormButtonRecord : BaseFormFieldRecord
 
     public override void Apply(JsonNode node)
     {
+
     }
 }

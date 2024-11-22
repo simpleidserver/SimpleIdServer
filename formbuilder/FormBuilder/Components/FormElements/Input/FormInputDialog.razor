@@ -1,1 +1,53 @@
-﻿
+﻿@using System.Text.Json
+@using FormBuilder.Components.Shared
+@inject DialogService dialogService
+
+<RadzenStack>
+    <RadzenTabs @bind-SelectedIndex=@selectedIndex>        
+        <Tabs>
+            <RadzenTabsItem Text="Properties">
+                <RadzenStack>
+                    <!-- Name -->
+                    <RadzenFormField Variant="Variant.Outlined" Text="Name" class="fullWidth">
+                        <RadzenTextBox @bind-Value="@CopyRecord.Name"></RadzenTextBox>
+                    </RadzenFormField>
+                    <!-- Choose the input type -->
+                    <RadzenFormField Variant="Variant.Outlined" Text="Choose the input type" class="fullWidth">
+                        <RadzenDropDown @bind-Value=@CopyRecord.Type Data="@mappingInputTypeToDisplayName" TextProperty="Value" ValueProperty="Key" />
+                    </RadzenFormField>
+                </RadzenStack>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Label">
+                <EditLabelsComponent Labels="@CopyRecord.Labels" />
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenStack>
+
+@code {
+    public int selectedIndex { get; set; } = 0;
+    [Parameter] public FormInputFieldRecord Record { get; set; }
+    FormInputFieldRecord CopyRecord { get; set; } = new FormInputFieldRecord();
+    Dictionary<FormInputTypes, string> mappingInputTypeToDisplayName = new Dictionary<FormInputTypes, string>
+    {
+        { FormInputTypes.TEXT, "text" },
+        { FormInputTypes.HIDDEN, "hidden" }
+    };
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Record != null)
+        {
+            CopyRecord = JsonSerializer.Deserialize<FormInputFieldRecord>(JsonSerializer.Serialize(Record));
+        }
+    }
+
+    private void HandleSave()
+    {
+        Record.Transformation = CopyRecord.Transformation;
+        Record.Labels = CopyRecord.Labels;
+        Record.Name = CopyRecord.Name;
+        dialogService.Close();
+    }
+}

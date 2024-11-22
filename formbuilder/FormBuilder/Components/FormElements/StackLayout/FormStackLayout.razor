@@ -1,20 +1,25 @@
-﻿@using FormBuilder.Components.Form
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Components.Form
 @using FormBuilder.Helpers
 
-@if (Value.Elements != null)
-{
-    if(Value.IsFormEnabled)
-    {
-        <EditForm Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
-            <RadzenStack Orientation="Orientation.Vertical">
-                @CustomRender
-            </RadzenStack>
-        </EditForm>
-    }
-    else
-    {
-        <RadzenStack Orientation="Orientation.Vertical">
-            @CustomRender
-        </RadzenStack>
-    }
-}
+<EditableLayoutContainerElement Record="@Value" TRecord="FormStackLayoutRecord" TDialog="FormStackLayoutDialog" ParentContext="@ParentContext">
+    <Children>
+        @if (Value.Elements != null)
+        {
+            if(Value.IsFormEnabled)
+            {
+                <EditForm Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        @CustomRender
+                    </RadzenStack>
+                </EditForm>
+            }
+            else
+            {
+                <RadzenStack Orientation="Orientation.Vertical">
+                    @CustomRender
+                </RadzenStack>
+            }
+        }
+    </Children>
+</EditableLayoutContainerElement>

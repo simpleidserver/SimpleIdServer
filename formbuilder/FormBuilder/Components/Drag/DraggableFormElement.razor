@@ -7,6 +7,9 @@
 @if(IsEditModeEnabled)
 {
     <div class="draggableElement" draggable="true" @ondragstart="@(() => HandleDragStart())">
+        <div class="info">
+            @Record.GetType().Name
+        </div>
         <div class="toolbox">
             <ul>
                 <li>
