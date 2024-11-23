@@ -842,7 +842,7 @@ namespace SimpleIdServer.IdServer
         public static class StandardUsers
         {
             public static User AdministratorUser = UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorGroup).GenerateRandomTOTPKey().Build();
-            public static User AdministratorReadonlyUser = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
+            public static User AdministratorReadonlyUser = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm-ro@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
         }
 
         public static class StandardAcrs

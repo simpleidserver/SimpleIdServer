@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json;
@@ -229,6 +230,7 @@ namespace SimpleIdServer.IdServer.Options
         public string GetSessionCookieName(string userName)
         {
             var realm = RealmContext.Instance().Realm;
+            userName = userName.SanitizeNameIdentifier();
             if (!string.IsNullOrWhiteSpace(realm))
                 return $"{SessionCookieName}.{realm}-{userName}";
             return $"{SessionCookieName}-{userName}";
