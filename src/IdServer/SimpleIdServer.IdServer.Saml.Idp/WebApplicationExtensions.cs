@@ -26,6 +26,9 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("ssoArtifact",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.RouteNames.SingleSignOnArtifact,
             defaults: new { controller = "SamlSSO", action = "LoginArtifact" });
+        webApplication.SidMapControllerRoute("ssoLogout",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.RouteNames.SingleSignLogout,
+            defaults: new { controller = "SamlSSO", action = "Logout" });
 
         return webApplication;
     }

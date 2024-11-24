@@ -23,6 +23,7 @@ using SimpleIdServer.IdServer.Saml.Idp.DTOs;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Saml.Idp.Factories;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.Scim.Domains;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -109,6 +110,39 @@ namespace SimpleIdServer.IdServer.Saml2.Api
                     area = Constants.Areas.Password
                 });
                 return Redirect(url);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout([FromRoute] string prefix, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            ClientResult clientResult = null;
+            var httpRequest = await Request.ToGenericHttpRequestAsync(validate: false);
+            var binding = new Saml2PostBinding();
+            var requestedIssuer = binding.ReadSamlRequest(httpRequest, new Saml2LogoutRequest(new Saml2Configuration())).Issuer;
+            try
+            {
+                clientResult = await GetClient(requestedIssuer, prefix, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
+            }
+
+            var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(Request.GetAbsoluteUriWithVirtualPath(), Request.GetAbsoluteUriWithVirtualPath(), prefix);
+            var saml2LogoutRequest = new Saml2LogoutRequest(clientResult.SpSamlConfiguration);
+            try
+            {
+                httpRequest.Binding.Unbind(httpRequest, saml2LogoutRequest);
+                return LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Success, httpRequest.Binding.RelayState, saml2LogoutRequest.SessionIndex, clientResult, idpSamlConfiguration);
+
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                return LogoutResponse(saml2LogoutRequest.Id, Saml2StatusCodes.Responder, httpRequest.Binding.RelayState, saml2LogoutRequest.SessionIndex, clientResult, idpSamlConfiguration);
             }
         }
 
@@ -251,6 +285,23 @@ namespace SimpleIdServer.IdServer.Saml2.Api
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Name));
 
             return new ClaimsIdentity(claims, "idserver");
+        }
+
+        private IActionResult LogoutResponse(Saml2Id inResponseTo, Saml2StatusCodes status, string relayState, string sessionIndex, ClientResult relyingParty, Saml2Configuration idpSamlConfiguration)
+        {
+            var responsebinding = new Saml2PostBinding
+            {
+                RelayState = relayState
+            };
+            var destination = relyingParty.EntityDescriptor.SPSsoDescriptor.SingleLogoutServices.FirstOrDefault()?.Location;
+            var saml2LogoutResponse = new Saml2LogoutResponse(idpSamlConfiguration)
+            {
+                InResponseTo = inResponseTo,
+                Status = status,
+                SessionIndex = sessionIndex,
+                Destination = destination
+            };
+            return responsebinding.Bind(saml2LogoutResponse).ToActionResult();
         }
 
         private IActionResult BuildError(Exception ex) => BuildError(ex.ToString());
