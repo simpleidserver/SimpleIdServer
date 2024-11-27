@@ -1,0 +1,22 @@
+﻿@using FormBuilder.Models.Transformer
+@using System.Text.Json
+@inject DialogService dialogService
+
+<RadzenStack>
+    <TransformerComponent Transformer="@Transformer" TransformerChanged="@HandleTransformerChanged"></TransformerComponent>
+    <RadzenButton Icon="edit" Text="Update" Click="@UpdateTransformer" />
+</RadzenStack>
+
+@code {
+    [Parameter] public ITransformerParameters Transformer { get; set; }
+
+    private void HandleTransformerChanged(ITransformerParameters parameters)
+    {
+        Transformer = parameters;
+    }
+
+    private void UpdateTransformer()
+    {
+        dialogService.CloseSide(Transformer);
+    }
+}

@@ -1,4 +1,9 @@
-﻿
-<RadzenStack Orientation="Orientation.Vertical">
-    @CustomRender
-</RadzenStack>
+﻿@using FormBuilder.Components.Drag
+
+ <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="ListDataDialog" TRecord="ListDataRecord" Record="@Value">
+    <Children>
+        <RadzenStack Orientation="Orientation.Vertical">
+            @CustomRender
+        </RadzenStack>
+    </Children>
+</DraggableFormElement>

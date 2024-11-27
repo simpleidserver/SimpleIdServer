@@ -1,0 +1,8 @@
+﻿@using Radzen.Blazor
+
+<RadzenText>JSON</RadzenText>
+<RadzenTextArea class="fullWidth" @bind-Value="@Json" Rows="20"></RadzenTextArea>
+
+@code {
+    [Parameter] public string Json { get; set; }
+}

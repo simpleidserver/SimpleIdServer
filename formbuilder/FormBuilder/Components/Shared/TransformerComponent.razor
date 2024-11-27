@@ -1,0 +1,64 @@
+﻿@using FormBuilder.Factories
+@using FormBuilder.Models.Transformer
+@using FormBuilder.Transformers
+@inject ITransformerFactory transformerFactory
+
+<RadzenFormField Variant="Variant.Outlined" Text="Choose the type of transformer" class="fullWidth">
+    <RadzenDropDown @bind-Value=@selectedTransformer Data=@allTypes></RadzenDropDown>
+</RadzenFormField>
+
+@CustomRender
+
+@code {
+    private string _selectedTransformer;
+    private RenderFragment? CustomRender { get; set; }
+    [Parameter] public ITransformerParameters Transformer { get; set; }
+    [Parameter] public EventCallback<ITransformerParameters> TransformerChanged { get; set; }
+    List<string> allTypes { get; set; } = new List<string>();
+
+    string selectedTransformer
+    {
+        get
+        {
+            return _selectedTransformer;
+        }
+        set
+        {
+            _selectedTransformer = value;
+            Transformer = transformerFactory.CreateEmptyInstance(_selectedTransformer);
+            TransformerChanged.InvokeAsync(Transformer).Wait();
+            CustomRender = CreateComponent();
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            allTypes = transformerFactory.GetAll();
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Transformer != null)
+        {
+            _selectedTransformer = Transformer.Type;
+            CustomRender = CreateComponent();
+        }
+        else
+        {
+            _selectedTransformer = null;
+        }
+    }
+
+    private RenderFragment CreateComponent() => builder =>
+    {
+        if (Transformer == null) return;
+        var helper = transformerFactory.Build(Transformer.Type);
+        helper.BuildComponent(Transformer, builder);
+    };
+}

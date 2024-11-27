@@ -1,0 +1,56 @@
+﻿@using FormBuilder.Factories
+@using FormBuilder.Models.Rules
+@inject IRepetitionRuleEngineFactory repetitionRuleEngineFactory
+
+<RadzenFormField Variant="Variant.Outlined" Text="Choose the type of repetition rule" class="fullWidth">
+    <RadzenDropDown @bind-Value=@selectedRepetitionRule Data=@allTypes></RadzenDropDown>
+</RadzenFormField>
+
+@CustomRender
+
+@code {
+    private string _selectedRepetitionRule;
+    private RenderFragment? CustomRender { get; set; }
+    [Parameter] public IRepetitionRule RepetitionRule { get; set; }
+    [Parameter] public Type RecordType { get; set; }
+
+    string selectedRepetitionRule
+    {
+        get
+        {
+            return _selectedRepetitionRule;
+        }
+        set
+        {
+            _selectedRepetitionRule = value;
+            CustomRender = CreateComponent();
+        }
+    }
+
+    public List<string> allTypes { get; set; } = new List<string>();
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            allTypes = repetitionRuleEngineFactory.GetAll();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (RepetitionRule != null && _selectedRepetitionRule == null)
+        {
+            _selectedRepetitionRule = RepetitionRule.Type;
+            CustomRender = CreateComponent();
+        }
+    }
+
+    private RenderFragment CreateComponent() => builder =>
+    {
+        var helper = repetitionRuleEngineFactory.Build(RepetitionRule.Type);
+        helper.BuildComponent(RepetitionRule, RecordType, builder);
+    };
+}

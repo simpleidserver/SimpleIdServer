@@ -1,0 +1,124 @@
+﻿@inject IOptions<FormBuilderOptions> options
+@inject DialogService dialogService
+@using FormBuilder.Components.Shared
+@using FormBuilder.Models.Rules
+@using FormBuilder.Models.Transformer
+@using Microsoft.Extensions.Options
+@using Radzen
+@using Radzen.Blazor
+@using System.Reflection
+@using System.Text.Json
+
+<RadzenStack>
+    <RadzenFormField Variant="Variant.Outlined" Text="JSON Path" class="fullWidth">
+        <RadzenTextBox @bind-Value="@path"></RadzenTextBox>
+    </RadzenFormField>
+    <RadzenRow>
+        <RadzenColumn Size="6">
+            <RadzenText TextStyle="TextStyle.H6" class="title">Mapping rules</RadzenText>
+            <RadzenDataGrid Data="@mappingRules" TItem="MappingRule">
+                <Columns>
+                    <RadzenDataGridColumn Title="JSON source" TItem="MappingRule">                            
+                        <Template Context="mappingRule">                                
+                            <RadzenTextBox @bind-Value="@mappingRule.Source"></RadzenTextBox>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Target" TItem="MappingRule" Property="@nameof(MappingRule.Target)" />
+                    <RadzenDataGridColumn Title="Transformer" TItem="MappingRule">
+                        <Template Context="mappingRule">
+                            <RadzenButton Icon="edit" Text="Edit" Click="@(async (e) => await HandleEditTransformer(mappingRule))" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+        <RadzenColumn Size="6">
+            <RadzenText TextStyle="TextStyle.H6" class="title">Translations</RadzenText>
+            <RadzenDataGrid Data="@labelMappingRules" TItem="LabelMappingRule">
+                <Columns>
+                    <RadzenDataGridColumn Title="JSON source" TItem="LabelMappingRule">
+                        <Template Context="labelMappingRule">
+                            <RadzenTextBox @bind-Value="@labelMappingRule.Source"></RadzenTextBox>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Language" TItem="LabelMappingRule">
+                        <Template Context="labelMappingRule">
+                            <RadzenLabel>@TranslateLanguage(labelMappingRule.Language)</RadzenLabel>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenButton Text="Update" Click="Save" />
+</RadzenStack>
+
+@code {
+    private bool isEditTransformerDialogDisplayed = false;
+    private static List<string> _excludedPropertyNames = new List<string>
+    {
+        "Labels", "Transformation"
+    };
+    [Parameter] public IncomingTokensRepetitionRule Record { get; set; }
+    [Parameter] public Type RecordType { get; set; }
+    List<MappingRule> mappingRules { get; set; } = new List<MappingRule>();
+    List<LabelMappingRule> labelMappingRules { get; set; } = new List<LabelMappingRule>();
+    string path { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(RecordType != null && Record != null && !mappingRules.Any() && !labelMappingRules.Any())
+        {
+            InitLabelMappingRules();
+            InitMappingRules();
+            path = Record.Path;
+        }
+    }
+
+    private void InitLabelMappingRules()
+    {
+        labelMappingRules = JsonSerializer.Deserialize<List<LabelMappingRule>>(JsonSerializer.Serialize(Record.LabelMappingRules));
+        var missingLabelMappingRules = options.Value.SupportedLanguages.Where(l => !labelMappingRules.Any(la => la.Language == l.Code)).Select(l => new LabelMappingRule
+        {
+            Language = l.Code,
+            Source = string.Empty
+        });
+        labelMappingRules.AddRange(missingLabelMappingRules);
+    }
+
+    private void InitMappingRules()
+    {
+        var allProperties = RecordType.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).ToList();
+        mappingRules = JsonSerializer.Deserialize<List<MappingRule>>(JsonSerializer.Serialize(Record.MappingRules));
+        var unknownMappingRules = allProperties.Where(p => !mappingRules.Any(r => r.Target == p.Name) && !_excludedPropertyNames.Contains(p.Name)).Select(p => new MappingRule
+        {
+            Target = p.Name
+        });
+        mappingRules.AddRange(unknownMappingRules);
+    }
+
+    string TranslateLanguage(string lng)
+        => options.Value.SupportedLanguages.Single(l => l.Code == lng).DisplayName;
+
+    private async Task HandleEditTransformer(MappingRule mappingRule)
+    {
+        isEditTransformerDialogDisplayed = true;
+        var result = await dialogService.OpenSideAsync<EditTransformerDialog>("", new Dictionary<string, object>
+        {
+            { nameof(EditTransformerDialog.Transformer), mappingRule.Transformer }
+        });
+        isEditTransformerDialogDisplayed = false;
+        if (result == null) return;
+        mappingRule.Transformer = result;
+    }
+
+    private void Save()
+    {
+        if (isEditTransformerDialogDisplayed) dialogService.CloseSide();
+        Record.Path = path;
+        Record.LabelMappingRules = labelMappingRules;
+        Record.MappingRules = mappingRules;
+        dialogService.Close();
+    }
+}

@@ -7,6 +7,8 @@ namespace FormBuilder.Factories;
 
 public interface IRepetitionRuleEngineFactory
 {
+    List<string> GetAll();
+    IRepetitionRuleEngine Build(string type);
     List<IFormElementRecord> Transform<T>(string fieldType, JsonObject jsonObj, T parameter, Dictionary<string, object> parameters) where T : IRepetitionRule;
 }
 
@@ -18,6 +20,12 @@ public class RepetitionRuleEngineFactory : IRepetitionRuleEngineFactory
     {
         _ruleEngines = ruleEngines;
     }
+
+    public List<string> GetAll()
+        => _ruleEngines.Select(r => r.Type).ToList();
+
+    public IRepetitionRuleEngine Build(string type)
+        => _ruleEngines.Single(r => r.Type == type);
 
     public List<IFormElementRecord> Transform<T>(string fieldType, JsonObject jsonObj, T parameter, Dictionary<string, object> parameters) where T : IRepetitionRule
     {

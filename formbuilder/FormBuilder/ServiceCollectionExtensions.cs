@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<ITransformerFactory, TransformerFactory>();
         services.AddTransient<ITransformationRuleEngineFactory, TransformationRuleEngineFactory>();
         services.AddTransient<IRepetitionRuleEngineFactory, RepetitionRuleEngineFactory>();
+        services.AddTransient<IFormElementDefinitionFactory, FormElementDefinitionFactory>();
 
         services.AddTransient<ITargetUrlHelper, DirectTargetUrlHelper>();
         services.AddTransient<ITargetUrlHelper, ControllerActionTargetUrlHelper>();

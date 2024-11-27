@@ -1,6 +1,8 @@
 ﻿using FormBuilder.Factories;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Models.Url;
+using FormBuilder.Transformers.Components;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace FormBuilder.Transformers;
 
@@ -24,7 +26,12 @@ public class ControllerActionTransformer : GenericTransformer<ControllerActionTr
 
     public override string Type => ControllerActionTransformerParameters.TYPE;
 
-    public override object InternalTransform(string value, ControllerActionTransformerParameters parameters)
+    public override ITransformerParameters CreateEmptyInstance()
+    {
+        return new ControllerActionTransformerParameters();
+    }
+
+    internal override object InternalTransform(string value, ControllerActionTransformerParameters parameters)
     {
         return new ControllerActionTargetUrl
         {
@@ -35,5 +42,12 @@ public class ControllerActionTransformer : GenericTransformer<ControllerActionTr
                 { parameters.QueryParameterName, value }
             }
         };
+    }
+
+    internal override void InternalBuild(ControllerActionTransformerParameters parameters, RenderTreeBuilder builder)
+    {
+        builder.OpenComponent<ControllerActionTransformerComponent>(0);
+        builder.AddAttribute(1, nameof(ControllerActionTransformerComponent.Record), parameters);
+        builder.CloseComponent();
     }
 }

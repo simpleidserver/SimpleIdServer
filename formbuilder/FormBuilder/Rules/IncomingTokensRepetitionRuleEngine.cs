@@ -1,7 +1,9 @@
 ﻿using FormBuilder.Factories;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
+using FormBuilder.Rules.Components;
 using Json.Path;
+using Microsoft.AspNetCore.Components.Rendering;
 using System.Reflection;
 using System.Text.Json.Nodes;
 
@@ -52,6 +54,13 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         }
 
         return result;
+    }
+    protected override void InternalBuildComponent(IncomingTokensRepetitionRule target, Type recordType, RenderTreeBuilder builder)
+    {
+        builder.OpenComponent<IncomingTokensRepetitionRuleComponent>(0);
+        builder.AddAttribute(1, nameof(IncomingTokensRepetitionRuleComponent.Record), target);
+        builder.AddAttribute(2, nameof(IncomingTokensRepetitionRuleComponent.RecordType), recordType);
+        builder.CloseComponent();
     }
 
     private void ApplyProperty(object instance, MappingRule mappingRule, JsonNode node, List<PropertyInfo> properties)

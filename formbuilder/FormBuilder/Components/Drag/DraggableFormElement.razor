@@ -88,6 +88,10 @@ else
         {
             { "Record", Record }
         };
-        await dialogService.OpenAsync<TDialog>(string.Empty, dic);
+        var opts = new DialogOptions
+        {
+            Width = "1200px"
+        };
+        await dialogService.OpenAsync<TDialog>(string.Empty, dic, opts);
     }
 }

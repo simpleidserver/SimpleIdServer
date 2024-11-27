@@ -1,6 +1,7 @@
 ﻿@using FormBuilder.Dialogs
 @using FormBuilder.Models
 @using System.Text.Json.Nodes
+@using System.Text.Json
 @inject DialogService dialogService
 @inject IEnumerable<IFormElementDefinition> definitions
 
@@ -48,6 +49,7 @@
                     <RadzenText TextStyle="TextStyle.H6" class="title">Debugger</RadzenText>
                     <div class="container">                        
                         <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
+                        <RadzenButton Icon="draft" Text="Json" Click="@(async() => await ViewJson())" />
                     </div>
                 </div>
             </RadzenStack>
@@ -69,6 +71,15 @@
         return dialogService.OpenAsync<DebugFormDialog>("", new Dictionary<string, object>
         {
             { "Form", Form }
+        });
+    }
+
+    private Task ViewJson()
+    {
+        var json = JsonSerializer.Serialize(Form);
+        return dialogService.OpenAsync<ViewJsonDialog>("", new Dictionary<string, object>
+        {
+            { nameof(ViewJsonDialog.Json), json }
         });
     }
 }

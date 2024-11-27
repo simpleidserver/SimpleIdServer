@@ -6,7 +6,7 @@ public class IncomingTokensRepetitionRule : IRepetitionRule
 {
     public const string TYPE = "INCOMINGTOKENS";
     public string Path { get; set; }
-    public List<MappingRule> MappingRules { get; set; }
-    public List<LabelMappingRule> LabelMappingRules { get; set; }
+    public List<MappingRule> MappingRules { get; set; } = new List<MappingRule>();
+    public List<LabelMappingRule> LabelMappingRules { get; set; } = new List<LabelMappingRule>();
     public string Type => TYPE;
 }
