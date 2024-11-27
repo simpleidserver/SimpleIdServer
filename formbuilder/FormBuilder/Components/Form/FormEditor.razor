@@ -1,4 +1,5 @@
 ﻿@using FormBuilder.Dialogs
+@using FormBuilder.Helpers
 @using FormBuilder.Models
 @using System.Text.Json.Nodes
 @using System.Text.Json
@@ -76,10 +77,9 @@
 
     private Task ViewJson()
     {
-        var json = JsonSerializer.Serialize(Form);
         return dialogService.OpenAsync<ViewJsonDialog>("", new Dictionary<string, object>
         {
-            { nameof(ViewJsonDialog.Json), json }
+            { nameof(ViewJsonDialog.Form), Form }
         });
     }
 }

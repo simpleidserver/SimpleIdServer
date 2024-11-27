@@ -144,3 +144,7 @@
 .container {
     padding: 5px;
 }
+
+.jsonEditor {
+    height: 400px;
+}

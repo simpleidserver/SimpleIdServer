@@ -6,8 +6,10 @@
 * Pouvoir bouger les éléments du formulaire					:	OK
 * Pouvoir éditer les paramètres d'un stacklayout			:	OK
 * Editer foreach											:	OK
-* Afficher correctement le JSON								:	TODO
-* Pouvoir lancer la simulation du formulaire				:	TODO
+* Pouvoir lancer la simulation du formulaire				:	OK
+* Afficher correctement le JSON								:	OK
+* Voir si on peut ajouter l'intellisense dans le JSON		:	TODO (utiliser monaco)
+* Générer de façon aléatoire un JSON en entrée				:	TODO
 * Afficher une image										:	TODO
 * Afficher target _blank									:	TODO
 * Désactiver le boutton quand l'auth est en progression		:	TODO

@@ -1,8 +1,22 @@
-﻿@using Radzen.Blazor
+﻿@using BlazorMonaco.Editor
+@using FormBuilder.Models
+@using Radzen.Blazor
+@using System.Text.Json
 
 <RadzenText>JSON</RadzenText>
-<RadzenTextArea class="fullWidth" @bind-Value="@Json" Rows="20"></RadzenTextArea>
+<StandaloneCodeEditor Id="my-editor-instance-id" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
+
 
 @code {
-    [Parameter] public string Json { get; set; }
+    [Parameter] public FormRecord Form { get; set; }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+            {
+                AutomaticLayout = true,
+                Language = "json",
+                Value = JsonSerializer.Serialize(Form, new JsonSerializerOptions { WriteIndented = true })
+            };
+    }
 }

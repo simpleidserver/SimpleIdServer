@@ -2,7 +2,7 @@
 @using FormBuilder.Components.Form
 @using FormBuilder.Helpers
 
-<EditableLayoutContainerElement Record="@Value" TRecord="FormStackLayoutRecord" TDialog="FormStackLayoutDialog" ParentContext="@ParentContext">
+<EditableLayoutContainerElement Record="@Value" TRecord="FormStackLayoutRecord" TDialog="FormStackLayoutDialog" ParentContext="@ParentContext" IsEditModeEnabled="@IsEditModeEnabled">
     <Children>
         @if (Value.Elements != null)
         {

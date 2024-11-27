@@ -1,27 +1,41 @@
-﻿@using FormBuilder.Models
+﻿@using FormBuilder.Components
+@using FormBuilder.Components.Form
+@using FormBuilder.Models
 @using Radzen
 @using Radzen.Blazor
+@using System.Text.Json.Nodes
+@using System.Text.Json
 @inject DialogService dialogService
 
-<RadzenText>Input data (JSON)</RadzenText>
-<RadzenTextArea class="fullWidth" @bind-Value="@json" Rows="20"></RadzenTextArea>
-
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-    <RadzenButton Text="Cancel" Click="HandleCancel" />
-    <RadzenButton Text="Debug" Click="HandleDebug" />
-</RadzenStack>
+<RadzenSteps Change="@HandleChange">
+    <Steps>
+        <RadzenStepsItem Text="Input data (JSON)">
+            <RadzenTextArea class="fullWidth" @bind-Value="@json" Rows="20"></RadzenTextArea>
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Viewer">
+            <FormViewer Form="@copyRecord" Input="@input" IsEditModeEnabled="false" Context="@context"></FormViewer>
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
 
 @code {
     [Parameter] public FormRecord Form { get; set; }
+    private FormRecord copyRecord { get; set; }
+    JsonObject input { get; set; }
+    FormViewerContext context { get; set; }
     string json { get; set; }
 
-    private void HandleCancel()
+    protected override void OnParametersSet()
     {
-        dialogService.Close();
+        base.OnParametersSet();
+        if (copyRecord == null && Form != null)
+        {
+            copyRecord = JsonSerializer.Deserialize<FormRecord>(JsonSerializer.Serialize(Form));
+        }
     }
 
-    private void HandleDebug()
+    private void HandleChange(int index)
     {
-        
+        if (index == 1 && !string.IsNullOrWhiteSpace(json)) input = JsonObject.Parse(json).AsObject();
     }
 }

@@ -3,20 +3,28 @@
 @typeparam TRecord where TRecord : IFormElementRecord
 @inject DialogService dialogService
 
-<div class="editableLayoutContainer">
-    <div class="toolbox">
-        <ul>
-            <li><RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="(async (e) => await HandleViewSettings())" /></li>
-            <li><RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" /></li>
-        </ul>
+@if (IsEditModeEnabled)
+{
+    <div class="editableLayoutContainer">
+        <div class="toolbox">
+            <ul>
+                <li><RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="(async (e) => await HandleViewSettings())" /></li>
+                <li><RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" /></li>
+            </ul>
+        </div>
+        @Children
     </div>
+}
+else
+{
     @Children
-</div>
+}
 
 @code {
     [Parameter] public RenderFragment Children { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public TRecord Record { get; set; }
+    [Parameter] public bool IsEditModeEnabled { get; set; }
 
     private async Task HandleViewSettings()
     {
