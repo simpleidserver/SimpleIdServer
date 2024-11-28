@@ -9,7 +9,8 @@ public class EditorController : Controller
     {
         var viewModel = new IndexEditorViewModel
         {
-            Record = Constants.LoginPwdAuthForm
+            Record = Constants.LoginPwdAuthForm,
+            InputRecordType = typeof(AuthViewModel).AssemblyQualifiedName
         };
         return View(viewModel);
     }

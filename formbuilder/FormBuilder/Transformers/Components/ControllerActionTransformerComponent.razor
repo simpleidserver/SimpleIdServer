@@ -1,4 +1,6 @@
-﻿@using Radzen
+﻿@using Microsoft.AspNetCore.Mvc.Controllers
+@using Microsoft.AspNetCore.Mvc.Infrastructure
+@using Radzen
 @using Radzen.Blazor
 
 <!-- Controller -->
@@ -16,4 +18,22 @@
 
 @code {
     [Parameter] public ControllerActionTransformerParameters Record { get; set; }
+    [Inject] public IActionDescriptorCollectionProvider ActionCollectionProvider { get; set; }
+
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            var descriptors = ActionCollectionProvider.ActionDescriptors.Items.OfType<ControllerActionDescriptor>();
+            
+        }
+    }
+
+    record ControllerAction
+    {
+        public string ControllerName { get; set; }
+        public string ActionName { get; set; }
+    }
 }

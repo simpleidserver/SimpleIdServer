@@ -60,6 +60,7 @@
 
 @code {
     [Parameter] public FormRecord Form { get; set; }
+    [Parameter] public string InputRecordType { get; set; }
     FormViewerContext Context { get; set; } = new FormViewerContext();
 
     private void HandleDragStart(IFormElementDefinition def)
@@ -67,11 +68,14 @@
         Context.Set(def);
     }
 
+
     private Task LaunchDebug()
     {
+        var inputRecordType = Type.GetType(InputRecordType);
         return dialogService.OpenAsync<DebugFormDialog>("", new Dictionary<string, object>
         {
-            { "Form", Form }
+            { nameof(DebugFormDialog.Form), Form },
+            { nameof(DebugFormDialog.InputRecordType), inputRecordType }
         });
     }
 

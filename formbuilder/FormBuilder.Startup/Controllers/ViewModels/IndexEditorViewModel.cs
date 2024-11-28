@@ -1,9 +1,9 @@
 ﻿using FormBuilder.Models;
 
-namespace FormBuilder.Startup.Controllers.ViewModels
+namespace FormBuilder.Startup.Controllers.ViewModels;
+
+public class IndexEditorViewModel
 {
-    public class IndexEditorViewModel
-    {
-        public FormRecord Record { get; set; }
-    }
+    public FormRecord Record { get; set; }
+    public string InputRecordType { get; set; }
 }

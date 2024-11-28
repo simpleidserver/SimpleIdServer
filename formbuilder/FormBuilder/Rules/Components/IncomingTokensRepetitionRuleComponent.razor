@@ -1,9 +1,13 @@
 ﻿@inject IOptions<FormBuilderOptions> options
 @inject DialogService dialogService
+@using BlazorMonaco
+@using BlazorMonaco.Editor
+@using BlazorMonaco.Languages
 @using FormBuilder.Components.Shared
 @using FormBuilder.Models.Rules
 @using FormBuilder.Models.Transformer
 @using Microsoft.Extensions.Options
+@using Microsoft.JSInterop
 @using Radzen
 @using Radzen.Blazor
 @using System.Reflection
@@ -11,7 +15,7 @@
 
 <RadzenStack>
     <RadzenFormField Variant="Variant.Outlined" Text="JSON Path" class="fullWidth">
-        <RadzenTextBox @bind-Value="@path"></RadzenTextBox>
+        <JsonPathFieldComponent @bind-Value="@path"></JsonPathFieldComponent>
     </RadzenFormField>
     <RadzenRow>
         <RadzenColumn Size="6">
@@ -54,6 +58,7 @@
 </RadzenStack>
 
 @code {
+    private StandaloneCodeEditor editor;
     private bool isEditTransformerDialogDisplayed = false;
     private static List<string> _excludedPropertyNames = new List<string>
     {
@@ -64,6 +69,7 @@
     List<MappingRule> mappingRules { get; set; } = new List<MappingRule>();
     List<LabelMappingRule> labelMappingRules { get; set; } = new List<LabelMappingRule>();
     string path { get; set; }
+    string newPath { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -75,6 +81,7 @@
             path = Record.Path;
         }
     }
+
 
     private void InitLabelMappingRules()
     {
@@ -96,6 +103,11 @@
             Target = p.Name
         });
         mappingRules.AddRange(unknownMappingRules);
+    }
+
+    private async Task HandleOnEditorContentChanged()
+    {
+        newPath = await editor.GetValue();
     }
 
     string TranslateLanguage(string lng)

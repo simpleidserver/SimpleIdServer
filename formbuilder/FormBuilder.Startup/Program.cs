@@ -1,5 +1,6 @@
 using FormBuilder;
 using FormBuilder.Startup;
+using FormBuilder.Startup.Fakers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,7 @@ const string cookieName = "XSFR-TOKEN";
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddFormBuilder();
+builder.Services.AddTransient<IFakerDataService, AuthViewModelFakeService>();
 builder.Services.Configure<FormBuilderStartupOptions>(cb => cb.AntiforgeryCookieName = cookieName);
 builder.Services.AddAntiforgery(c =>
 {
