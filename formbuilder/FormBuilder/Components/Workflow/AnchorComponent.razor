@@ -1,0 +1,100 @@
+﻿@inject IJSRuntime jsRuntime
+@using FormBuilder.Models
+
+<div class="@GetClass()"
+     draggable="true"
+     ondragover="event.preventDefault()"
+     @ondragstart="@(async (e) => await HandleDragStart())"
+     @ondrop="@(async(e) => await HandleDrop(e))"
+     @ondragenter="@(async (e) => await HandleDragEnter())"
+     @ondragleave="@(async (e) => await HandleDragLeave())"></div>
+
+@code {
+    private Dictionary<AnchorDirections, string> mappingDirectionToClassName = new Dictionary<AnchorDirections, string>
+    {
+        { AnchorDirections.TOP, "top" },
+        { AnchorDirections.RIGHT, "right" },
+        { AnchorDirections.BOTTOM, "bottom" },
+        { AnchorDirections.LEFT, "left" }
+    };
+    [Parameter] public string DraggableComponentId { get; set; }
+    [Parameter] public bool IsHover { get; set; }
+    [Parameter] public WorkflowStep Step { get; set; }
+    [Parameter] public WorkflowLink SelectedLink { get; set; }
+    [Parameter] public AnchorDirections Direction { get; set; }
+    [Parameter] public EventCallback<WorkflowLink> LinkDropped { get; set; }
+    [Parameter] public EventCallback<bool> IsHoverChanged { get; set; }
+    [Parameter] public EventCallback<WorkflowLink> SelectedLinkChanged { get; set; }
+
+    private string GetClass()
+        => $"anchor {mappingDirectionToClassName[Direction]}";
+
+    private async Task HandleDragStart()
+    {
+        var rect = await jsRuntime.InvokeAsync<Size>("FormBuilder.getSize", DraggableComponentId);
+        var offsetWidth = rect.width;
+        var offsetHeight = rect.height;
+        switch (Direction)
+        {
+            case AnchorDirections.TOP:
+                offsetHeight = 0;
+                offsetWidth = offsetWidth / 2;
+                break;
+            case AnchorDirections.BOTTOM:
+                offsetWidth = offsetWidth / 2;
+                break;
+            case AnchorDirections.LEFT:
+                offsetHeight = rect.height / 2;
+                offsetWidth = 0;
+                break;
+            case AnchorDirections.RIGHT:
+                offsetHeight = rect.height / 2;
+                break;
+        }
+
+        SelectedLink = new WorkflowLink
+        {
+            SourceCoordinate = new Coordinate
+            {
+                X = offsetWidth + Step.Coordinate.X,
+                Y = offsetHeight + Step.Coordinate.Y
+            },
+            TargetCoordinate = new Coordinate
+            {
+                X = offsetWidth + Step.Coordinate.X,
+                Y = offsetHeight + Step.Coordinate.Y
+            }
+        };
+        await SelectedLinkChanged.InvokeAsync(SelectedLink);
+    }
+
+    private async Task HandleDrop(DragEventArgs e)
+    {
+        if (SelectedLink == null) return;
+        await LinkDropped.InvokeAsync(new WorkflowLink
+        {
+            SourceCoordinate = new Coordinate
+            {
+                X = SelectedLink.SourceCoordinate.X,
+                Y = SelectedLink.SourceCoordinate.Y
+            },
+            TargetCoordinate = new Coordinate
+            {
+                X = SelectedLink.TargetCoordinate.X,
+                Y = SelectedLink.TargetCoordinate.Y
+            }
+        });
+    }
+
+    private async Task HandleDragEnter()
+    {
+        IsHover = true;
+        await IsHoverChanged.InvokeAsync(IsHover);
+    }
+
+    private async Task HandleDragLeave()
+    {
+        IsHover = false;
+        await IsHoverChanged.InvokeAsync(IsHover);
+    }
+}

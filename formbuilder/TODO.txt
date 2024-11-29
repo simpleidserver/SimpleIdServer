@@ -8,7 +8,7 @@
 * Editer foreach											:	OK
 * Pouvoir lancer la simulation du formulaire				:	OK
 * Afficher correctement le JSON								:	OK
-* Voir si on peut ajouter l'intellisense dans le JSON		:	TODO (utiliser monaco)
+* Voir si on peut ajouter l'intellisense dans le JSON		:	OK
 * Générer de façon aléatoire un JSON en entrée				:	TODO
 * Afficher une image										:	TODO
 * Afficher target _blank									:	TODO

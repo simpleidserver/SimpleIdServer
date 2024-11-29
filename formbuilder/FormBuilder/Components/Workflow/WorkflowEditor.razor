@@ -1,0 +1,233 @@
+﻿@    using FormBuilder.Components.Form
+@    using FormBuilder.Models
+@    using System.Diagnostics
+@inject IJSRuntime jsRuntime
+
+<RadzenRow class="fullHeight workflowEditor">    
+    <RadzenColumn Size="2">        
+        <RadzenStack class="toolbar fullHeight">
+            <div class="category">
+                <RadzenText TextStyle="TextStyle.H6" class="title">Elements</RadzenText>
+                <ul class="elements">
+                    @foreach (var record in Records)
+                    {
+                        <li draggable="true" @ondragstart="@(() => HandleDragStart(record))">
+                            <div class="icon"></div><span class="text">@record.Name</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="10">
+        <svg @ref="@svgRef" class="workflowDig" @ondragover:preventDefault="true" @ondragover="@(async(e) => await HandleDragHover(e))" @ondrop="@(async(e) => await HandleDrop(e))">
+            <defs>
+                <marker id='head'
+                        orient="auto"
+                        markerWidth='3'
+                        markerHeight='4'
+                        refX='0.1'
+                        refY='2'>
+                    <path d='M0,0 V4 L2,2 Z' fill="black" />
+                </marker>
+            </defs>
+            @foreach (var step in Workflow.Steps)
+            {
+                int i = 0;
+                string id = $"draggableElt{i}";
+                <foreignObject x="@step.Coordinate.X" y="@step.Coordinate.Y" width="200">
+                    <div class="draggableElement" @ref=@DivRef id="@step.Id" @onload="HandleOnLoad">
+                        <div class="toolbox left"
+                             @ondragstart="@(() => HandleStartDragElt(step))">
+                            <ul>
+                                <li>
+                                    <RadzenIcon draggable="true"Icon="drag_pan"></RadzenIcon>
+                                </li>
+                            </ul>
+                        </div>
+                        <AnchorComponent DraggableComponentId="@id" 
+                            @bind-IsHover=@isHoverAnchor 
+                            @bind-SelectedLink=@selectedLink 
+                            Step="@step" 
+                            Direction="AnchorDirections.TOP" 
+                            LinkDropped="HandleLinkDropped"></AnchorComponent>
+                        <AnchorComponent DraggableComponentId="@id" 
+                            @bind-IsHover=@isHoverAnchor 
+                            Step="@step" 
+                            @bind-SelectedLink=@selectedLink 
+                            Direction="AnchorDirections.RIGHT" 
+                            LinkDropped="HandleLinkDropped"></AnchorComponent>
+                        <AnchorComponent DraggableComponentId="@id" 
+                            @bind-IsHover=@isHoverAnchor 
+                            Step="@step" 
+                            @bind-SelectedLink=@selectedLink 
+                            Direction="AnchorDirections.BOTTOM" 
+                            LinkDropped="HandleLinkDropped"></AnchorComponent>
+                        <AnchorComponent DraggableComponentId="@id" 
+                            @bind-IsHover=@isHoverAnchor 
+                            Step="@step" 
+                            @bind-SelectedLink=@selectedLink 
+                            Direction="AnchorDirections.LEFT" 
+                            LinkDropped="HandleLinkDropped"></AnchorComponent>
+                        <FormViewer Form="@GetFormRecord(step.FormRecordName)" IsEditModeEnabled="false"></FormViewer>
+                    </div>
+                </foreignObject>
+                i++;
+            }
+
+            @foreach (var link in Workflow.Links)
+            {
+                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(link)"></path>
+            }
+            @if(selectedLink != null)
+            {
+                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(selectedLink)"></path>
+            }
+        </svg>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter] public List<FormRecord> Records { get; set; }
+    private WorkflowStep selectedStep { get; set; }
+    private FormRecord selectedFormRecord;
+    private WorkflowLink selectedLink { get; set; }
+    private WorkflowRecord Workflow { get; set; } = new WorkflowRecord();
+
+    private ElementReference DivRef
+    {
+        set
+        {
+            Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+                await RefereshStepsSize();
+            });
+        }
+    }
+    private bool isHoverAnchor = false;
+    private ElementReference svgRef;
+    private Position svgPosition;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            svgPosition = await jsRuntime.InvokeAsync<Position>("FormBuilder.getPosition", svgRef);
+        }
+    }
+
+    #region Drag & Drop UI element
+
+    private void HandleDragStart(FormRecord record)
+        => selectedFormRecord = record;
+
+    private async Task HandleDrop(DragEventArgs args)
+    {
+        if (TryDropSelectedLink()) return;
+        TryDropFormRecord();
+        selectedStep = null;
+
+        bool TryDropSelectedLink()
+        {
+            if (selectedLink != null)
+            {
+                selectedLink = null;
+                return true;
+            }
+
+            return false;
+        }
+
+        bool TryDropFormRecord()
+        {
+            if (selectedFormRecord == null) return false;
+            var id = Guid.NewGuid().ToString();
+            Workflow.Steps.Add(new WorkflowStep
+            {
+                Id = id,
+                Coordinate = new Coordinate
+                {
+                    X = args.OffsetX,
+                    Y = args.OffsetY
+                },
+                FormRecordName = selectedFormRecord.Name
+            });
+            selectedFormRecord = null;
+            return true;
+        }
+    }
+
+    private async Task HandleDragHover(DragEventArgs args)
+    {
+        var positionX = Math.Floor(args.ClientX - svgPosition.left);
+        var positionY = Math.Floor(args.ClientY - svgPosition.top);
+        if (TryDragSelectedLink()) return;
+        TryDragSelectedStep();
+
+        bool TryDragSelectedLink()
+        {
+            if (selectedLink == null) return false;
+            selectedLink.TargetCoordinate.X = positionX;
+            selectedLink.TargetCoordinate.Y = positionY;
+            return true;
+        }
+
+        bool TryDragSelectedStep()
+        {
+            if (selectedStep == null) return false;
+            selectedStep.Coordinate.X = positionX;
+            selectedStep.Coordinate.Y = positionY;
+            var links = Workflow.GetLinks(selectedStep);
+
+            return true;
+        }
+    }
+
+    #endregion
+
+    #region Drag & Drop Arrow
+
+    private void HandleLinkDropped(WorkflowLink workflowLink)
+    {
+
+        Workflow.Links.Add(workflowLink);
+        selectedLink = null;
+    }
+
+    #endregion
+
+    #region Drag & Drop Existing element
+
+    private void HandleStartDragElt(WorkflowStep step)
+        => selectedStep = step;
+
+    #endregion
+
+    private async Task SetReference(string idName)
+    {
+
+    }
+
+    private void HandleOnLoad()
+    {
+
+    }
+
+    private string GetLinkCoordinate(WorkflowLink link)
+        => $"M{link.SourceCoordinate.X} {link.SourceCoordinate.Y} {link.TargetCoordinate.X} {link.TargetCoordinate.Y}";
+
+    private FormRecord GetFormRecord(string name)
+        => Records.Single(t => t.Name == name);
+
+    private async Task RefereshStepsSize()
+    {
+        var steps = Workflow.Steps;
+        foreach(var step in steps)
+        {
+            var size = await jsRuntime.InvokeAsync<Size>("FormBuilder.getSize", step.Id);
+            step.Size = size;
+        }
+    }
+}

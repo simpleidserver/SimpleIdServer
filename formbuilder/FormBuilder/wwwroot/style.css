@@ -1,4 +1,8 @@
-﻿/* Divider */
+﻿html, body {
+    height: 100%;
+}
+
+/* Divider */
 .divider {
     display: flex;
     align-items: center;
@@ -17,37 +21,6 @@
     margin-top: 0px;
     margin-bottom: 0px;
     color: var(--divider-text);
-}
-
-/* Form editor */
-.formEditorWindow {
-    border: 1px solid gray;
-}
-
-.formEditorWindow .category {
-    border-top: 1px solid gray;
-}
-
-.formEditorWindow .title {
-    margin: 0px !important;
-    background-color: #e4e2e2;
-    padding-bottom: 5px;
-    text-align: center;
-}
-
-.formEditorWindow ul.elements {
-    list-style-type: none;
-    margin: 0;
-    padding: 5px;
-}
-
-.formEditorWindow ul.elements > li {
-    padding: 5px 5px 5px 8px;
-    border-radius: .3em;
-    border: 1px solid gray;
-    background-color: #f3f3f3;
-    margin-bottom: 2px;
-    cursor: move;
 }
 
 /* Drop zone */
@@ -73,6 +46,40 @@
 
 .draggableElement {
     cursor: move;
+}
+
+.draggableElement .anchor {
+    position: absolute;
+    cursor: move;
+    border-radius: 50%;
+    background-color: white;
+    border: 3px solid red;
+    width: 10px;
+    height: 10px;
+}
+
+.draggableElement .anchor:hover {
+    border-color: green;
+}
+
+.draggableElement .anchor.top {
+    top: 0px;
+    left: 50%;
+}
+
+.draggableElement .anchor.right {
+    top: 50%;
+    left: 100%;
+}
+
+.draggableElement .anchor.bottom {
+    top: 100%;
+    left: 50%;
+}
+
+.draggableElement .anchor.left {
+    top: 50%;
+    left: 0;
 }
 
 .dropZone {
@@ -112,6 +119,52 @@
     z-index: 2;
 }
 
+/*Editor toolbar */
+.toolbar {
+    border-right: 1px solid #F1F1F1;
+    -webkit-box-shadow: 5px 10px 5px 0px rgba(222,222,222,1);
+    -moz-box-shadow: 5px 10px 5px 0px rgba(222,222,222,1);
+    box-shadow: 5px 10px 5px 0px rgba(222,222,222,1);
+    padding: 20px;
+}
+
+.toolbar ul.elements {
+    list-style-type: none;
+    margin: 0;
+    padding: 5px;
+}
+
+.toolbar ul.elements > li {
+    padding: 5px 5px 5px 8px;
+    border-radius: .3em;
+    border: 1px solid #EEEEEE;
+    margin-bottom: 2px;
+    cursor: move;
+}
+
+.toolbar li > .icon {
+    padding: 10px 4px 2px 4px;
+    padding: 2px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+.toolbar li .text {
+    padding-left: 10px;
+}
+
+.toolbar li > .icon,
+.workflowEditor .toolbox li {    
+    background-color: #F1F1F1;
+}
+
+.header {
+    text-align: center;
+    border-bottom: 1px solid #F1F1F1;
+    height: 50px;
+    line-height: 50px;
+}
+
 /* Toolbox */
 .toolbox {
     display: block;
@@ -125,6 +178,11 @@
     display: none;
 }
 
+.toolbox.left {
+    left: 0px;
+    right: unset !important;
+}
+
 .toolbox > ul {
     list-style-type: none;
     margin: 0;
@@ -136,9 +194,28 @@
     display: inline-block;
 }
 
+/*Workflow editor*/
+.workflowEditor .workflowDig {
+    width: 100%;
+    height: 100%;
+}
+
+.workflowEditor .workflowDig foreignObject {
+    overflow: visible;
+}
+
+.workflowEditor .toolbox li {
+    padding: 2px;
+    cursor: move;
+}
+
 /* Common */
 .fullWidth {
     width: 100%;
+}
+
+.fullHeight {
+    height: 100%;
 }
 
 .container {

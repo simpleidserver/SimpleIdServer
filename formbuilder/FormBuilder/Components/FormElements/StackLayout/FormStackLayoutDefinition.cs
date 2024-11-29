@@ -7,6 +7,7 @@ public class FormStackLayoutDefinition : IFormElementDefinition
 
     public Type RecordType => typeof(FormStackLayoutRecord);
     public string Type => TYPE;
+    public string Icon => "view_agenda";
     public static string TYPE = "Stacklayout";
     public ElementDefinitionCategories Category => ElementDefinitionCategories.LAYOUT;
 }

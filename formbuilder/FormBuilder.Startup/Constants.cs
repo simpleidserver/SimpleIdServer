@@ -19,6 +19,7 @@ public class Constants
 {
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
+        Name = "Login and password",
         Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord
