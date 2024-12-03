@@ -8,7 +8,7 @@ namespace FormBuilder.Helpers;
 
 public interface IRenderFormElementsHelper
 {
-    void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled);
+    void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled, WorkflowViewerContext workflowContext);
 }
 
 public class RenderFormElementsHelper : IRenderFormElementsHelper
@@ -20,18 +20,18 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
         _definitions = definitions;
     }
 
-    public void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled)
+    public void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled, WorkflowViewerContext workflowContext)
     {
         var i = 0;
         foreach (var record in elements)
         {
             var parentEltCtx = new ParentEltContext(elements, i);
-            AddElt(builder, record, context, parentEltCtx, isEditModeEnabled);
+            AddElt(builder, record, context, parentEltCtx, isEditModeEnabled, workflowContext);
             i++;
         }
     }
 
-    private void AddElt(RenderTreeBuilder builder, IFormElementRecord record, FormViewerContext context, ParentEltContext parentEltContext, bool isEditModeEnabled)
+    private void AddElt(RenderTreeBuilder builder, IFormElementRecord record, FormViewerContext context, ParentEltContext parentEltContext, bool isEditModeEnabled, WorkflowViewerContext workflowContext)
     {
         var expectedType = record.GetType();
         var definition = _definitions.Single(d => d.RecordType == expectedType);
@@ -41,6 +41,7 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
         builder.AddAttribute(2, "Context", context);
         builder.AddAttribute(3, "IsEditModeEnabled", isEditModeEnabled);
         builder.AddAttribute(4, "ParentContext", parentEltContext);
+        builder.AddAttribute(5, "WorkflowContext", workflowContext);
         builder.CloseComponent();
     }
 }

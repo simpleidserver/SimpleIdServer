@@ -11,7 +11,8 @@ public class WorkflowController : Controller
         {
             Records = new List<Models.FormRecord>
             {
-                Constants.LoginPwdAuthForm
+                Constants.LoginPwdAuthForm,
+                Constants.ConfirmationForm
             }
         };
         return View(viewModel);

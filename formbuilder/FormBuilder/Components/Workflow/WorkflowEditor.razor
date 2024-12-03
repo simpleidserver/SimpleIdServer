@@ -1,7 +1,9 @@
-﻿@    using FormBuilder.Components.Form
-@    using FormBuilder.Models
-@    using System.Diagnostics
+﻿@using FormBuilder.Components.Form
+@using FormBuilder.Models
+@using System.Diagnostics
+@using FormBuilder.Services
 @inject IJSRuntime jsRuntime
+@inject IFormBuilderJsService formBuilderJsService
 
 <RadzenRow class="fullHeight workflowEditor">    
     <RadzenColumn Size="2">        
@@ -11,7 +13,7 @@
                 <ul class="elements">
                     @foreach (var record in Records)
                     {
-                        <li draggable="true" @ondragstart="@(() => HandleDragStart(record))">
+                        <li draggable="true" @ondragstart="@(async () => await HandleDragStart(record))">
                             <div class="icon"></div><span class="text">@record.Name</span>
                         </li>
                     }
@@ -20,7 +22,7 @@
         </RadzenStack>
     </RadzenColumn>
     <RadzenColumn Size="10">
-        <svg @ref="@svgRef" class="workflowDig" @ondragover:preventDefault="true" @ondragover="@(async(e) => await HandleDragHover(e))" @ondrop="@(async(e) => await HandleDrop(e))">
+        <svg @ref="@svgRef" class="workflowDig" @ondragover:preventDefault="true" @ondragover="@((e) => HandleDragHover(e))" @ondrop="@((e) => HandleDrop(e))">
             <defs>
                 <marker id='head'
                         orient="auto"
@@ -33,46 +35,7 @@
             </defs>
             @foreach (var step in Workflow.Steps)
             {
-                int i = 0;
-                string id = $"draggableElt{i}";
-                <foreignObject x="@step.Coordinate.X" y="@step.Coordinate.Y" width="200">
-                    <div class="draggableElement" @ref=@DivRef id="@step.Id" @onload="HandleOnLoad">
-                        <div class="toolbox left"
-                             @ondragstart="@(() => HandleStartDragElt(step))">
-                            <ul>
-                                <li>
-                                    <RadzenIcon draggable="true"Icon="drag_pan"></RadzenIcon>
-                                </li>
-                            </ul>
-                        </div>
-                        <AnchorComponent DraggableComponentId="@id" 
-                            @bind-IsHover=@isHoverAnchor 
-                            @bind-SelectedLink=@selectedLink 
-                            Step="@step" 
-                            Direction="AnchorDirections.TOP" 
-                            LinkDropped="HandleLinkDropped"></AnchorComponent>
-                        <AnchorComponent DraggableComponentId="@id" 
-                            @bind-IsHover=@isHoverAnchor 
-                            Step="@step" 
-                            @bind-SelectedLink=@selectedLink 
-                            Direction="AnchorDirections.RIGHT" 
-                            LinkDropped="HandleLinkDropped"></AnchorComponent>
-                        <AnchorComponent DraggableComponentId="@id" 
-                            @bind-IsHover=@isHoverAnchor 
-                            Step="@step" 
-                            @bind-SelectedLink=@selectedLink 
-                            Direction="AnchorDirections.BOTTOM" 
-                            LinkDropped="HandleLinkDropped"></AnchorComponent>
-                        <AnchorComponent DraggableComponentId="@id" 
-                            @bind-IsHover=@isHoverAnchor 
-                            Step="@step" 
-                            @bind-SelectedLink=@selectedLink 
-                            Direction="AnchorDirections.LEFT" 
-                            LinkDropped="HandleLinkDropped"></AnchorComponent>
-                        <FormViewer Form="@GetFormRecord(step.FormRecordName)" IsEditModeEnabled="false"></FormViewer>
-                    </div>
-                </foreignObject>
-                i++;
+                <WorkflowEditorStep Step="@step" SelectedStepChanged="@(async (e) => await HandleSelectedStepChanged(e))" SelectedStep="@selectedStep" SelectedLink="@selectedLink" Records="@Records" WorkflowLinkChanged="@(async (item) => await HandleWorkflowLinkChanged(item))" LinkDropped="HandleLinkDropped"></WorkflowEditorStep>
             }
 
             @foreach (var link in Workflow.Links)
@@ -88,42 +51,62 @@
 </RadzenRow>
 
 @code {
+    private ElementReference _divRef;
     [Parameter] public List<FormRecord> Records { get; set; }
+    private WorkflowViewerContext WorkflowContext { get; set; } = new WorkflowViewerContext();
     private WorkflowStep selectedStep { get; set; }
     private FormRecord selectedFormRecord;
     private WorkflowLink selectedLink { get; set; }
     private WorkflowRecord Workflow { get; set; } = new WorkflowRecord();
-
-    private ElementReference DivRef
-    {
-        set
-        {
-            Task.Run(async () =>
-            {
-                await Task.Delay(1000);
-                await RefereshStepsSize();
-            });
-        }
-    }
-    private bool isHoverAnchor = false;
     private ElementReference svgRef;
-    private Position svgPosition;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        await base.OnAfterRenderAsync(firstRender);
-        if(firstRender)
-        {
-            svgPosition = await jsRuntime.InvokeAsync<Position>("FormBuilder.getPosition", svgRef);
-        }
-    }
+    private Coordinate svgPosition;
 
     #region Drag & Drop UI element
 
-    private void HandleDragStart(FormRecord record)
-        => selectedFormRecord = record;
+    private async Task HandleSelectedStepChanged(WorkflowStep step)
+    {
+        svgPosition = await formBuilderJsService.GetPosition(svgRef);
+        selectedStep = step;
+        selectedFormRecord = null;
+        selectedLink = null;
+    }
 
-    private async Task HandleDrop(DragEventArgs args)
+    private async Task HandleDragStart(FormRecord record)
+    {
+        svgPosition = await formBuilderJsService.GetPosition(svgRef);
+        selectedStep = null;
+        selectedFormRecord = record;
+        selectedLink = null;
+    }
+
+    private void HandleDragHover(DragEventArgs args)
+    {
+        var positionX = Math.Floor(args.ClientX - svgPosition.X);
+        var positionY = Math.Floor(args.ClientY - svgPosition.Y);
+        if (TryDragSelectedLink()) return;
+        TryDragSelectedStep();
+
+        bool TryDragSelectedLink()
+        {
+            if (selectedLink == null || selectedLink.IsLinkHoverStep) return false;
+            selectedLink.TargetCoordinate.X = positionX;
+            selectedLink.TargetCoordinate.Y = positionY;
+            return true;
+        }
+
+        bool TryDragSelectedStep()
+        {
+            if (selectedStep == null) return false;
+            selectedStep.Coordinate.X = positionX;
+            selectedStep.Coordinate.Y = positionY;
+            var links = Workflow.GetLinks(selectedStep);
+            foreach (var link in links)
+                link.UpdateCoordinate(selectedStep);
+            return true;
+        }
+    }
+
+    private void HandleDrop(DragEventArgs args)
     {
         if (TryDropSelectedLink()) return;
         TryDropFormRecord();
@@ -159,60 +142,32 @@
         }
     }
 
-    private async Task HandleDragHover(DragEventArgs args)
-    {
-        var positionX = Math.Floor(args.ClientX - svgPosition.left);
-        var positionY = Math.Floor(args.ClientY - svgPosition.top);
-        if (TryDragSelectedLink()) return;
-        TryDragSelectedStep();
-
-        bool TryDragSelectedLink()
-        {
-            if (selectedLink == null) return false;
-            selectedLink.TargetCoordinate.X = positionX;
-            selectedLink.TargetCoordinate.Y = positionY;
-            return true;
-        }
-
-        bool TryDragSelectedStep()
-        {
-            if (selectedStep == null) return false;
-            selectedStep.Coordinate.X = positionX;
-            selectedStep.Coordinate.Y = positionY;
-            var links = Workflow.GetLinks(selectedStep);
-
-            return true;
-        }
-    }
-
     #endregion
 
     #region Drag & Drop Arrow
 
-    private void HandleLinkDropped(WorkflowLink workflowLink)
+    private void HandleLinkDropped(WorkflowStep workflowStep)
     {
-
-        Workflow.Links.Add(workflowLink);
+        var clone = this.selectedLink.Clone();
+        clone.TargetStepId = workflowStep.Id;
+        Workflow.Links.Add(clone);
         selectedLink = null;
     }
 
     #endregion
 
-    #region Drag & Drop Existing element
-
-    private void HandleStartDragElt(WorkflowStep step)
-        => selectedStep = step;
-
-    #endregion
-
-    private async Task SetReference(string idName)
+    private async Task HandleWorkflowLinkChanged((FormEltEventArgs args, WorkflowStep step) item)
     {
-
-    }
-
-    private void HandleOnLoad()
-    {
-
+        var args = item.args;
+        var parentStep = item.step;
+        svgPosition = await formBuilderJsService.GetPosition(svgRef);
+        var eltSize = await formBuilderJsService.GetSize(args.EltReference);
+        var eltPosition = await formBuilderJsService.GetPosition(args.EltReference);
+        var stepPosition = await formBuilderJsService.GetPosition(parentStep.EltRef);
+        var coordinateRelativeToStep = eltPosition - stepPosition;
+        selectedStep = null;
+        selectedFormRecord = null;
+        selectedLink = WorkflowLink.Create(parentStep.Id, args.Record, eltPosition - svgPosition, eltSize, coordinateRelativeToStep);
     }
 
     private string GetLinkCoordinate(WorkflowLink link)
@@ -220,14 +175,4 @@
 
     private FormRecord GetFormRecord(string name)
         => Records.Single(t => t.Name == name);
-
-    private async Task RefereshStepsSize()
-    {
-        var steps = Workflow.Steps;
-        foreach(var step in steps)
-        {
-            var size = await jsRuntime.InvokeAsync<Size>("FormBuilder.getSize", step.Id);
-            step.Size = size;
-        }
-    }
 }

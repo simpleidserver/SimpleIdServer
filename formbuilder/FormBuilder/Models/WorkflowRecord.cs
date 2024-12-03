@@ -6,5 +6,5 @@ public class WorkflowRecord
     public List<WorkflowLink> Links { get; set; } = new List<WorkflowLink>();
 
     public List<WorkflowLink> GetLinks(WorkflowStep step)
-        => Links.Where(l => l.SourceStepId == step.Id || l.TargetStepId == step.Id).ToList();
+        => Links.Where(l => l.IsLinked(step.Id)).ToList();
 }

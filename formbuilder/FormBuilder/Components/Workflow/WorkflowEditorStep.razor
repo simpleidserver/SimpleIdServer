@@ -1,0 +1,81 @@
+﻿@using FormBuilder.Models
+@using FormBuilder.Components.Form
+@using FormBuilder.Services
+@inject IFormBuilderJsService formBuilderJsService
+
+<foreignObject x="@Step.Coordinate.X" y="@Step.Coordinate.Y" width="200">
+    <div class="@GetClassName()" @ref=@divRef>
+        <div class="toolbox left">
+            <ul>
+                <li>
+                    <RadzenIcon draggable="true" Icon="drag_pan" @ondragstart="@(async () => await HandleStartDragElt(Step))"></RadzenIcon>
+                </li>
+            </ul>
+        </div>
+        <div class="zone" @ondragover:preventDefault="true" @ondragover="@(async (e) => await HandleDragHover(e))" @ondrop="@(async(e) => await HandleDrop(e))" @ondragleave="HandleDragLeave"></div>
+        <FormViewer Form="@GetFormRecord(Step.FormRecordName)" IsEditModeEnabled="false" WorkflowContext="@workflowContext"></FormViewer>
+    </div>
+</foreignObject>
+
+@code {
+    [Parameter] public WorkflowStep Step { get; set; }
+    [Parameter] public WorkflowStep SelectedStep { get; set; }
+    [Parameter] public WorkflowLink SelectedLink { get; set; }
+    [Parameter] public EventCallback<WorkflowStep> SelectedStepChanged { get; set; }
+    [Parameter] public EventCallback<WorkflowStep> LinkDropped { get; set; }
+    [Parameter] public EventCallback<(FormEltEventArgs, WorkflowStep)> WorkflowLinkChanged { get; set; }
+    [Parameter] public List<FormRecord> Records { get; set; }
+    bool isHover = false;
+    ElementReference divRef;
+    WorkflowViewerContext workflowContext { get; set; } = new WorkflowViewerContext();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            Step.EltRef = divRef;
+            workflowContext.WorkflowLinkChanged += async (o, e) =>
+            {
+                await WorkflowLinkChanged.InvokeAsync((e, Step));
+            };
+        }
+    }
+
+    private async Task HandleStartDragElt(WorkflowStep step)
+    {
+        SelectedStep = Step;
+        SelectedStep.Size = await formBuilderJsService.GetSize(SelectedStep.EltRef);
+        await SelectedStepChanged.InvokeAsync(step);
+    }
+
+    private async Task HandleDragHover(DragEventArgs e)
+    {
+        if (SelectedLink == null) return;
+        if (Step != null && Step.Size == null) Step.Size = await formBuilderJsService.GetSize(Step.EltRef);
+        SelectedLink.TargetStepId = Step.Id;
+        SelectedLink.IsLinkHoverStep = true;
+        isHover = true;
+        SelectedLink.UpdateCoordinate(Step);
+    }
+
+    private void HandleDragLeave()
+    {
+        isHover = false;
+        if (SelectedLink == null) return;
+        SelectedLink.IsLinkHoverStep = false;
+    }
+
+    private async Task HandleDrop(DragEventArgs e)
+    {
+        isHover = false;
+        if (SelectedLink == null) return;
+        await LinkDropped.InvokeAsync(Step);
+    }
+
+    private FormRecord GetFormRecord(string name)
+        => Records.Single(t => t.Name == name);
+
+    private string GetClassName()
+        => $"stepElement draggableElement {(isHover ? "isActive": string.Empty)}";
+}

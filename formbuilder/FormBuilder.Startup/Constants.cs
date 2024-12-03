@@ -17,6 +17,25 @@ namespace FormBuilder.Startup;
 
 public class Constants
 {
+    public static FormRecord ConfirmationForm = new FormRecord
+    {
+        Name = "Confirmation",
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new DividerLayoutRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+                    }
+                }
+            }
+        }
+    };
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
         Name = "Login and password",
@@ -24,11 +43,13 @@ public class Constants
         {
             new FormStackLayoutRecord
             {
+                Id = Guid.NewGuid().ToString(),
                 Elements = new ObservableCollection<IFormElementRecord>
                 {
                     // Authentication form
                     new FormStackLayoutRecord
                     {
+                        Id = Guid.NewGuid().ToString(),
                         IsFormEnabled = true,
                         IsAntiforgeryEnabled = true,
                         Url = new ControllerActionTargetUrl
@@ -40,6 +61,7 @@ public class Constants
                         {
                             new FormInputFieldRecord
                             {
+                                Id = Guid.NewGuid().ToString(),
                                 Name = "ReturnUrl",
                                 Value = string.Empty,
                                 Type = FormInputTypes.HIDDEN,
@@ -50,24 +72,28 @@ public class Constants
                             },
                             new FormInputFieldRecord
                             {
+                                Id = Guid.NewGuid().ToString(),
                                 Name = "Login",
                                 Value = "Login",
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
                             },
                             new FormPasswordFieldRecord
-                            {
+                            {   
+                                Id = Guid.NewGuid().ToString(),
                                 Name = "Password",
                                 Value = "Password",
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
                             },
                             new FormCheckboxRecord
                             {
+                                Id = Guid.NewGuid().ToString(),
                                 Name = "RememberLogin",
                                 Value = true,
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").Build()
                             },
                             new FormButtonRecord
                             {
+                                Id = Guid.NewGuid().ToString(),
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
                             }
                         }
@@ -75,32 +101,38 @@ public class Constants
                     // Separator
                     new DividerLayoutRecord
                     {
+                        Id = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
                     },
                     // Forget my password
                     new FormAnchorRecord
                     {
+                        Id = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
                     },
                     // Separator
                     new DividerLayoutRecord
                     {
+                        Id = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
                     },
                     // Register
                     new FormAnchorRecord
                     {
+                        Id = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build(),
                         Url = new DirectTargetUrl { Url = "http://google.com" }
                     },
                     // Separator
                     new DividerLayoutRecord
                     {
+                        Id = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
                     },
                     // List all external identity providers.
                     new ListDataRecord
                     {
+                        Id = Guid.NewGuid().ToString(),
                         FieldType = FormAnchorDefinition.TYPE,
                         Parameters = new Dictionary<string, object>
                         {

@@ -21,6 +21,8 @@ namespace FormBuilder.Models;
 [JsonDerivedType(typeof(ListDataRecord), typeDiscriminator: "ListData")]
 public interface IFormElementRecord
 {
+    string Id { get; set; }
     List<LabelTranslation> Labels { get; set; }
     void ExtractJson(JsonObject json);
+    IFormElementRecord GetChild(string id);
 }

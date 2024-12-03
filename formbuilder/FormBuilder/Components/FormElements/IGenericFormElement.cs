@@ -7,5 +7,6 @@ public interface IGenericFormElement<T> where T : IFormElementRecord
     T Value { get; set; }
     FormViewerContext Context { get; set; }
     ParentEltContext ParentContext { get; set; }
+    WorkflowViewerContext WorkflowContext { get; set; }
     bool IsEditModeEnabled { get; set; }
 }

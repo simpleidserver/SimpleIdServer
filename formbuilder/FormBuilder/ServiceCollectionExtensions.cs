@@ -10,6 +10,7 @@ using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
 using FormBuilder.Rules;
+using FormBuilder.Services;
 using FormBuilder.Transformers;
 using FormBuilder.Url;
 using Radzen;
@@ -22,6 +23,8 @@ public static class ServiceCollectionExtensions
     {
         if (cb == null) services.Configure<FormBuilderOptions>((c) => { });
         else services.Configure<FormBuilderOptions>(cb);
+        services.AddTransient<IFormBuilderJsService, FormBuilderJsService>();
+
         services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormButtonDefinition>();

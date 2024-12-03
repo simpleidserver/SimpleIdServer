@@ -14,6 +14,7 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     [Parameter] public FormViewerContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext {  get; set; }
+    [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
     [Inject] private ITargetUrlHelperFactory targetUrlHelperFactory { get; set; }
     [Inject] private IJSRuntime JSRuntime { get; set; }
 

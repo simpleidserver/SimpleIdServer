@@ -1,0 +1,31 @@
+﻿@using FormBuilder.Components.Workflow
+@using FormBuilder.Models
+@using FormBuilder.Services
+@inject IJSRuntime jsRuntime
+@inject IFormBuilderJsService formBuilderJsService
+@typeparam TRecord where TRecord : IFormElementRecord
+
+<!-- IMPLEMENT DROP -->
+<div class="interactableElement" draggable="true" @ondragstart="@(() => HandleDragStart())" @ref="@interactableElement">
+    <div class="zone"></div>
+    @Children
+</div>
+
+@code {
+    private ElementReference interactableElement;
+    private Coordinate interactableElementPosition;
+    private Size interactableElementSize;
+    [Parameter] public RenderFragment Children { get; set; }
+    [Parameter] public WorkflowViewerContext Context { get; set; }
+    [Parameter] public TRecord Record { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async void HandleDragStart()
+    {
+        Context.StartDragElt(interactableElement, Record);
+    }
+}

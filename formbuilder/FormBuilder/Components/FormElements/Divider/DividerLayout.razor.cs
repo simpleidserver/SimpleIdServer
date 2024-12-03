@@ -9,4 +9,5 @@ public partial class DividerLayout : IGenericFormElement<DividerLayoutRecord>
     [Parameter] public FormViewerContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
+    [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
 }

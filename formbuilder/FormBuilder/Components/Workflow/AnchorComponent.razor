@@ -31,59 +31,17 @@
 
     private async Task HandleDragStart()
     {
-        var rect = await jsRuntime.InvokeAsync<Size>("FormBuilder.getSize", DraggableComponentId);
-        var offsetWidth = rect.width;
-        var offsetHeight = rect.height;
-        switch (Direction)
-        {
-            case AnchorDirections.TOP:
-                offsetHeight = 0;
-                offsetWidth = offsetWidth / 2;
-                break;
-            case AnchorDirections.BOTTOM:
-                offsetWidth = offsetWidth / 2;
-                break;
-            case AnchorDirections.LEFT:
-                offsetHeight = rect.height / 2;
-                offsetWidth = 0;
-                break;
-            case AnchorDirections.RIGHT:
-                offsetHeight = rect.height / 2;
-                break;
-        }
-
-        SelectedLink = new WorkflowLink
-        {
-            SourceCoordinate = new Coordinate
-            {
-                X = offsetWidth + Step.Coordinate.X,
-                Y = offsetHeight + Step.Coordinate.Y
-            },
-            TargetCoordinate = new Coordinate
-            {
-                X = offsetWidth + Step.Coordinate.X,
-                Y = offsetHeight + Step.Coordinate.Y
-            }
-        };
-        await SelectedLinkChanged.InvokeAsync(SelectedLink);
+        // SelectedLink = WorkflowLink.Create(Step.Id, Direction);
+        // SelectedLink.InitCoordinate(Step);
+        // await SelectedLinkChanged.InvokeAsync(SelectedLink);
     }
 
     private async Task HandleDrop(DragEventArgs e)
     {
         if (SelectedLink == null) return;
-        await LinkDropped.InvokeAsync(new WorkflowLink
-        {
-            SourceCoordinate = new Coordinate
-            {
-                X = SelectedLink.SourceCoordinate.X,
-                Y = SelectedLink.SourceCoordinate.Y
-            },
-            TargetCoordinate = new Coordinate
-            {
-                X = SelectedLink.TargetCoordinate.X,
-                Y = SelectedLink.TargetCoordinate.Y
-            }
-        });
+        SelectedLink.TargetStepId = Step.Id;
+        // SelectedLink.TargetDirection = Direction;
+        await LinkDropped.InvokeAsync(SelectedLink.Clone());
     }
 
     private async Task HandleDragEnter()

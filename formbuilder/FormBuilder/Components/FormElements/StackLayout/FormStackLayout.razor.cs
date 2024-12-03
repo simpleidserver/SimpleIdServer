@@ -19,6 +19,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Parameter] public FormViewerContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
+    [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -64,7 +65,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled);
+        renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled, WorkflowContext);
     };
 
     private void HandleCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

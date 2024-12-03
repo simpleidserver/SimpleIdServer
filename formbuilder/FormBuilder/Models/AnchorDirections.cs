@@ -1,4 +1,4 @@
-﻿namespace FormBuilder.Components.Workflow;
+﻿namespace FormBuilder.Models;
 
 public enum AnchorDirections
 {
