@@ -8,7 +8,10 @@
         <div class="toolbox left">
             <ul>
                 <li>
-                    <RadzenIcon draggable="true" Icon="drag_pan" @ondragstart="@(async () => await HandleStartDragElt(Step))"></RadzenIcon>
+                    <RadzenIcon class="move" Icon="drag_pan" @onmousedown="@(async () => await HandleStartDragElt(Step))"></RadzenIcon>
+                </li>
+                <li>
+                    <RadzenIcon Icon="delete" class="remove" @onclick="@(async () => await HandleRemoveStep())"></RadzenIcon>
                 </li>
             </ul>
         </div>
@@ -22,6 +25,7 @@
     [Parameter] public WorkflowStep SelectedStep { get; set; }
     [Parameter] public WorkflowLink SelectedLink { get; set; }
     [Parameter] public EventCallback<WorkflowStep> SelectedStepChanged { get; set; }
+    [Parameter] public EventCallback<WorkflowStep> StepRemoved { get; set; }
     [Parameter] public EventCallback<WorkflowStep> LinkDropped { get; set; }
     [Parameter] public EventCallback<(FormEltEventArgs, WorkflowStep)> WorkflowLinkChanged { get; set; }
     [Parameter] public List<FormRecord> Records { get; set; }
@@ -45,8 +49,13 @@
     private async Task HandleStartDragElt(WorkflowStep step)
     {
         SelectedStep = Step;
-        SelectedStep.Size = await formBuilderJsService.GetSize(SelectedStep.EltRef);
+        SelectedStep.Size = await formBuilderJsService.GetSize(divRef);
         await SelectedStepChanged.InvokeAsync(step);
+    }
+
+    private async Task HandleRemoveStep()
+    {
+        await StepRemoved.InvokeAsync(Step);
     }
 
     private async Task HandleDragHover(DragEventArgs e)

@@ -21,8 +21,32 @@
             </div>
         </RadzenStack>
     </RadzenColumn>
-    <RadzenColumn Size="10">
-        <svg @ref="@svgRef" class="workflowDig" @ondragover:preventDefault="true" @ondragover="@((e) => HandleDragHover(e))" @ondrop="@((e) => HandleDrop(e))">
+    <RadzenColumn Size="10" @ref=_svgContainer>
+        <svg @ref="@svgRef" 
+            viewBox="@viewBox"
+            class="workflowDig"
+            @onmousedown="@((e) => HandleOnPanStart(e))"
+            @onmousemove="@(async (e) => await HandleOnPanMove(e))"
+            @onmouseup="@((e) => HandleOnPanLeave())"
+            @ondragover:preventDefault="true" 
+            @ondragover="@(async (e) => await HandleDragHover(e))" 
+            @ondrop="@(async (e) => await HandleDrop(e))" 
+            @onmousewheel="@HandleZoom" 
+            @onmousewheel:preventDefault=true 
+            @onmousewheel:stopPropagation=true>
+            @foreach (var step in Workflow.Steps)
+            {
+                <WorkflowEditorStep Step="@step" StepRemoved="HandleStepRemoved" SelectedStepChanged="@(async (e) => await HandleSelectedStepChanged(e))" SelectedStep="@selectedStep" SelectedLink="@selectedLink" Records="@Records" WorkflowLinkChanged="@(async (item) => await HandleWorkflowLinkChanged(item))" LinkDropped="HandleLinkDropped"></WorkflowEditorStep>
+            }
+
+            @foreach (var link in Workflow.Links)
+            {
+                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(link)"></path>
+            }
+            @if (selectedLink != null)
+            {
+                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(selectedLink)"></path>
+            }
             <defs>
                 <marker id='head'
                         orient="auto"
@@ -33,25 +57,13 @@
                     <path d='M0,0 V4 L2,2 Z' fill="black" />
                 </marker>
             </defs>
-            @foreach (var step in Workflow.Steps)
-            {
-                <WorkflowEditorStep Step="@step" SelectedStepChanged="@(async (e) => await HandleSelectedStepChanged(e))" SelectedStep="@selectedStep" SelectedLink="@selectedLink" Records="@Records" WorkflowLinkChanged="@(async (item) => await HandleWorkflowLinkChanged(item))" LinkDropped="HandleLinkDropped"></WorkflowEditorStep>
-            }
-
-            @foreach (var link in Workflow.Links)
-            {
-                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(link)"></path>
-            }
-            @if(selectedLink != null)
-            {
-                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(selectedLink)"></path>
-            }
         </svg>
     </RadzenColumn>
 </RadzenRow>
 
 @code {
     private ElementReference _divRef;
+    private RadzenColumn _svgContainer;
     [Parameter] public List<FormRecord> Records { get; set; }
     private WorkflowViewerContext WorkflowContext { get; set; } = new WorkflowViewerContext();
     private WorkflowStep selectedStep { get; set; }
@@ -60,6 +72,20 @@
     private WorkflowRecord Workflow { get; set; } = new WorkflowRecord();
     private ElementReference svgRef;
     private Coordinate svgPosition;
+    private string viewBox { get; set; }
+    private string transform { get; set; } = "matrix(1 0 0 1 0 0)";
+    private (double x, double y) previousMousePosition;
+    private bool isMoving = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            var svgSize = await formBuilderJsService.GetSize(_svgContainer.Element);
+            viewBox = $"0 0 {svgSize.width} {svgSize.height}";
+        }
+    }
 
     #region Drag & Drop UI element
 
@@ -79,37 +105,25 @@
         selectedLink = null;
     }
 
-    private void HandleDragHover(DragEventArgs args)
+    private async Task HandleDragHover(DragEventArgs args)
     {
-        var positionX = Math.Floor(args.ClientX - svgPosition.X);
-        var positionY = Math.Floor(args.ClientY - svgPosition.Y);
+        var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
         if (TryDragSelectedLink()) return;
-        TryDragSelectedStep();
+        // TryDragSelectedStep();
 
         bool TryDragSelectedLink()
         {
             if (selectedLink == null || selectedLink.IsLinkHoverStep) return false;
-            selectedLink.TargetCoordinate.X = positionX;
-            selectedLink.TargetCoordinate.Y = positionY;
-            return true;
-        }
-
-        bool TryDragSelectedStep()
-        {
-            if (selectedStep == null) return false;
-            selectedStep.Coordinate.X = positionX;
-            selectedStep.Coordinate.Y = positionY;
-            var links = Workflow.GetLinks(selectedStep);
-            foreach (var link in links)
-                link.UpdateCoordinate(selectedStep);
+            selectedLink.TargetCoordinate.X = pos.X;
+            selectedLink.TargetCoordinate.Y = pos.Y;
             return true;
         }
     }
 
-    private void HandleDrop(DragEventArgs args)
+    private async Task HandleDrop(DragEventArgs args)
     {
         if (TryDropSelectedLink()) return;
-        TryDropFormRecord();
+        await TryDropFormRecord();
         selectedStep = null;
 
         bool TryDropSelectedLink()
@@ -123,17 +137,18 @@
             return false;
         }
 
-        bool TryDropFormRecord()
+        async Task<bool> TryDropFormRecord()
         {
             if (selectedFormRecord == null) return false;
             var id = Guid.NewGuid().ToString();
+            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
             Workflow.Steps.Add(new WorkflowStep
             {
                 Id = id,
                 Coordinate = new Coordinate
                 {
-                    X = args.OffsetX,
-                    Y = args.OffsetY
+                    X = Math.Round(pos.X),
+                    Y = Math.Round(pos.Y)
                 },
                 FormRecordName = selectedFormRecord.Name
             });
@@ -156,6 +171,78 @@
 
     #endregion
 
+    #region Handle pan
+
+    private void HandleOnPanStart(MouseEventArgs args)
+    {
+        var numbers = viewBox.Split(' ').Select(n => double.Parse(n)).ToArray();
+        var (x, y) = (numbers[0], numbers[1]);
+        previousMousePosition = (args.ClientX + x, args.ClientY + y);
+        isMoving = true;
+    }
+
+    private async Task HandleOnPanMove(MouseEventArgs args)
+    {
+        if (await TryMoveSelectedStep()) return;
+        if (TryMove()) return;
+
+        bool TryMove()
+        {
+            if (!isMoving) return false;
+            var diffX = -(args.ClientX - previousMousePosition.x);
+            var diffY = -(args.ClientY - previousMousePosition.y);
+            var viewBoxInfo = GetViewBoxInfo();
+            viewBox = $"{Math.Round(diffX)} {Math.Round(diffY)} {viewBoxInfo.width} {viewBoxInfo.height}";
+            return true;
+        }
+
+        async Task<bool> TryMoveSelectedStep()
+        {
+            if (selectedStep == null) return false;
+            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
+            selectedStep.Coordinate.X = Math.Round(pos.X);
+            selectedStep.Coordinate.Y = Math.Round(pos.Y);
+            var links = Workflow.GetLinks(selectedStep);
+            foreach (var link in links)
+                link.UpdateCoordinate(selectedStep);
+            return true;
+        }
+    }
+
+    private void HandleOnPanLeave()
+    {
+        isMoving = false;
+        selectedStep = null;
+    }
+
+    #endregion
+
+
+    #region Handle zoom
+
+    private async Task HandleZoom(WheelEventArgs args)
+    {
+        var scale = args.DeltaY / 1000;
+        scale = Math.Abs(scale) < .1 ? .1 * args.DeltaY / Math.Abs(args.DeltaY) : scale;
+        var pt = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
+        var viewBoxInfo = GetViewBoxInfo();
+        var xPropW = (pt.X - viewBoxInfo.x) / viewBoxInfo.width;
+        var yPropH = (pt.Y - viewBoxInfo.y) / viewBoxInfo.height;
+        var width2 = viewBoxInfo.width + viewBoxInfo.width * scale;
+        var height2 = viewBoxInfo.height + viewBoxInfo.height * scale;
+        var x2 = pt.X - xPropW * width2;
+        var y2 = pt.Y - yPropH *height2;
+        viewBox = $"{Math.Round(x2)} {Math.Round(y2)} {Math.Round(width2)} {Math.Round(height2)}";
+    }
+
+    #endregion
+
+    private void HandleStepRemoved(WorkflowStep step)
+    {
+        Workflow.Steps.Remove(step);
+        Workflow.Links = Workflow.Links.Where(l => !l.IsLinked(step.Id)).ToList();
+    }
+
     private async Task HandleWorkflowLinkChanged((FormEltEventArgs args, WorkflowStep step) item)
     {
         var args = item.args;
@@ -175,4 +262,13 @@
 
     private FormRecord GetFormRecord(string name)
         => Records.Single(t => t.Name == name);
+
+    private (double x, double y, double width, double height) GetViewBoxInfo()
+        => GetViewBoxInfo(viewBox);
+
+    private (double x, double y, double width, double height) GetViewBoxInfo(string vb)
+    {
+        var numbers = vb.Split(' ').Select(n => double.Parse(n)).ToArray();
+        return (numbers[0], numbers[1], numbers[2], numbers[3]);
+    }
 }

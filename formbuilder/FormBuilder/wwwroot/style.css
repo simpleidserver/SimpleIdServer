@@ -48,6 +48,10 @@
     cursor: move;
 }
 
+.stepElement {
+    background-color: white;
+}
+
 .stepElement,
 .interactableElement {
     position: relative;
@@ -215,6 +219,14 @@
     display: inline-block;
 }
 
+.toolbox .move {    
+    cursor: move;
+}
+
+.toolbox .remove {
+    cursor: pointer;
+}
+
 /*Workflow editor*/
 .workflowEditor .workflowDig {
     width: 100%;
@@ -229,7 +241,6 @@
 
 .workflowEditor .toolbox li {
     padding: 2px;
-    cursor: move;
 }
 
 /* Common */
