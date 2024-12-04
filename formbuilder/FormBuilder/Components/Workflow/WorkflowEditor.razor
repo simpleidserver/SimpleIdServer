@@ -114,6 +114,7 @@
         bool TryDragSelectedLink()
         {
             if (selectedLink == null || selectedLink.IsLinkHoverStep) return false;
+            pos.Round();
             selectedLink.TargetCoordinate.X = pos.X;
             selectedLink.TargetCoordinate.Y = pos.Y;
             return true;
@@ -142,13 +143,14 @@
             if (selectedFormRecord == null) return false;
             var id = Guid.NewGuid().ToString();
             var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
+            pos.Round();
             Workflow.Steps.Add(new WorkflowStep
             {
                 Id = id,
                 Coordinate = new Coordinate
                 {
-                    X = Math.Round(pos.X),
-                    Y = Math.Round(pos.Y)
+                    X = pos.X,
+                    Y = pos.Y
                 },
                 FormRecordName = selectedFormRecord.Name
             });
@@ -200,8 +202,9 @@
         {
             if (selectedStep == null) return false;
             var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-            selectedStep.Coordinate.X = Math.Round(pos.X);
-            selectedStep.Coordinate.Y = Math.Round(pos.Y);
+            pos.Round();
+            selectedStep.Coordinate.X = pos.X;
+            selectedStep.Coordinate.Y = pos.Y;
             var links = Workflow.GetLinks(selectedStep);
             foreach (var link in links)
                 link.UpdateCoordinate(selectedStep);
@@ -247,14 +250,16 @@
     {
         var args = item.args;
         var parentStep = item.step;
-        svgPosition = await formBuilderJsService.GetPosition(svgRef);
         var eltSize = await formBuilderJsService.GetSize(args.EltReference);
         var eltPosition = await formBuilderJsService.GetPosition(args.EltReference);
         var stepPosition = await formBuilderJsService.GetPosition(parentStep.EltRef);
         var coordinateRelativeToStep = eltPosition - stepPosition;
+        var newCoordinate = parentStep.Coordinate + coordinateRelativeToStep;
+        // newCoordinate = await formBuilderJsService.GetPointInSvgSpace(newCoordinate.X, newCoordinate.Y, svgRef);
+        newCoordinate.Round();
         selectedStep = null;
         selectedFormRecord = null;
-        selectedLink = WorkflowLink.Create(parentStep.Id, args.Record, eltPosition - svgPosition, eltSize, coordinateRelativeToStep);
+        selectedLink = WorkflowLink.Create(parentStep.Id, args.Record, newCoordinate, eltSize, coordinateRelativeToStep);
     }
 
     private string GetLinkCoordinate(WorkflowLink link)

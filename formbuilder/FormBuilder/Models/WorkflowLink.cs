@@ -93,10 +93,12 @@ public class WorkflowLink
                 break;
         }
 
-        return new Coordinate
+        var result = new Coordinate
         {
-            X = Math.Round(offsetWidth + coordinate.X),
-            Y = Math.Round(offsetHeight + coordinate.Y)
+            X = offsetWidth + coordinate.X,
+            Y = offsetHeight + coordinate.Y
         };
+        result.Round();
+        return result;
     }
 }

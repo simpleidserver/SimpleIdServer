@@ -9,6 +9,12 @@ public class Coordinate
 
     public static Coordinate operator +(Coordinate pos1, Coordinate pos2) => new Coordinate { X = pos1.X + pos2.X, Y = pos1.Y + pos2.Y };
 
+    public void Round()
+    {
+        X = Math.Round(X);
+        Y = Math.Round(Y);
+    }
+
     public Coordinate Clone()
     {
         return new Coordinate
