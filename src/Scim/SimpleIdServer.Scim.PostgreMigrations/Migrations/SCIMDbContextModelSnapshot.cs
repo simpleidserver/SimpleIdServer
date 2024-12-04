@@ -18,7 +18,7 @@ namespace SimpleIdServer.Scim.PostgreMigrations.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("scim")
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -199,8 +199,8 @@ namespace SimpleIdServer.Scim.PostgreMigrations.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("integer");
+                    b.Property<string>("Version")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -250,7 +250,8 @@ namespace SimpleIdServer.Scim.PostgreMigrations.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<decimal?>("ValueDecimal")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<int?>("ValueInteger")
                         .HasColumnType("integer");

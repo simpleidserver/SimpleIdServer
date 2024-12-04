@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -25,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -607,10 +605,10 @@ namespace SimpleIdServer.Scim.Api
             return BuildHTTPResult(status, location, representation.Version, content);
         }
 
-        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, int version, JObject content)
+        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, string version, JObject content)
         {
             HttpContext.Response.Headers.Add("Location", location);
-            HttpContext.Response.Headers.Add("ETag", version.ToString());
+            HttpContext.Response.Headers.Add("ETag", version);
             return new ContentResult
             {
                 StatusCode = (int)status,

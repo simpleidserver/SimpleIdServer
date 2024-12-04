@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Domains
 
         public string ExternalId { get; set; }
         public string ResourceType { get; set; }
-        public int Version { get; set; }
+        public string Version { get; set; }
         public string DisplayName { get; set; }
         public string? RealmName { get; set; } = null;
         public DateTime Created { get; set; }
@@ -234,14 +234,9 @@ namespace SimpleIdServer.Scim.Domains
             ExternalId = externalId;
         }
 
-        public void SetUpdated(DateTime lastModified)
+        public void SetUpdated(DateTime lastModified, string version)
         {
-            Version++;
             LastModified = lastModified;
-        }
-
-        public void SetVersion(int version)
-        {
             Version = version;
         }
 
@@ -302,7 +297,7 @@ namespace SimpleIdServer.Scim.Domains
                 {
                     AddAttribute(metadata, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), StandardSchemas.StandardResponseSchemas.GetAttribute($"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}"), StandardSchemas.ResourceTypeSchema.Id)
                     {
-                        ValueInteger = Version
+                        ValueString = Version
                     });
                 }
 

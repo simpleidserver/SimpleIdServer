@@ -1,6 +1,5 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
@@ -25,6 +24,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly IRepresentationHelper _representationHelper;
+        private readonly IRepresentationVersionBuilder _representationVersionBuilder;
         private readonly SCIMHostOptions _options;
 
         public PatchRepresentationCommandHandler(
@@ -33,6 +33,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
             IRepresentationHelper representationHelper,
+            IRepresentationVersionBuilder representationVersionBuilder,
             IOptions<SCIMHostOptions> options,
             IBusHelper busControl) : base(busControl)
         {
@@ -41,6 +42,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
             _representationHelper = representationHelper;
+            _representationVersionBuilder = representationVersionBuilder;
             _options = options.Value;
         }
 
@@ -62,7 +64,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var patchResultLst = patchResult.Patches.Where(p => p.Attr != null).ToList();
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             if (!patchResult.Patches.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
-            existingRepresentation.SetUpdated(DateTime.UtcNow);
+            existingRepresentation.SetUpdated(DateTime.UtcNow, _representationVersionBuilder.Build(existingRepresentation));
             var references = await _representationReferenceSync.Sync(patchRepresentationCommand.ResourceType, existingRepresentation, patchResultLst, patchRepresentationCommand.Location, schema, displayNameDifferent);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {

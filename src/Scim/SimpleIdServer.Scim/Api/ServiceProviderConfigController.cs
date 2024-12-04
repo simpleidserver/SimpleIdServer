@@ -18,12 +18,14 @@ namespace SimpleIdServer.Scim.Api
         private readonly SCIMHostOptions _options;
         private readonly IUriProvider _uriProvider;
         private readonly ILogger _logger;
+        private readonly IRepresentationVersionBuilder _representationVersionBuilder;
 
-        public ServiceProviderConfigController(IOptionsMonitor<SCIMHostOptions> options, IUriProvider uriProvider, ILogger<ServiceProviderConfigController> logger)
+        public ServiceProviderConfigController(IOptionsMonitor<SCIMHostOptions> options, IUriProvider uriProvider, ILogger<ServiceProviderConfigController> logger, IRepresentationVersionBuilder representationVersionBuilder)
         {
             _options = options.CurrentValue;
             _uriProvider = uriProvider;
             _logger = logger;
+            _representationVersionBuilder = representationVersionBuilder;
         }
 
         /// <summary>
@@ -74,7 +76,7 @@ namespace SimpleIdServer.Scim.Api
                     c.AddBooleanAttribute("primary", new List<bool> { true });
                 }).Build();
             representation.Created = _options.StartDateTime;
-            representation.SetUpdated(_options.StartDateTime);
+            representation.SetUpdated(_options.StartDateTime, _representationVersionBuilder.Build(representation));
             representation.SetResourceType(SCIMResourceTypes.ServiceProviderConfig);
             representation.Id = _options.ServiceProviderConfigId;
             var location = $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}/{SCIMEndpoints.ServiceProviderConfig}";

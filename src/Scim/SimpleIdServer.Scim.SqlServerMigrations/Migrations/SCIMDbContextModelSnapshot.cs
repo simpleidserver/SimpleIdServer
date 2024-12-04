@@ -18,7 +18,7 @@ namespace SimpleIdServer.Scim.SqlServerMigrations.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("scim")
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -199,8 +199,8 @@ namespace SimpleIdServer.Scim.SqlServerMigrations.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
+                    b.Property<string>("Version")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -250,6 +250,7 @@ namespace SimpleIdServer.Scim.SqlServerMigrations.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<decimal?>("ValueDecimal")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ValueInteger")

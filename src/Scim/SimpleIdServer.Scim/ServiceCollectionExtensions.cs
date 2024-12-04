@@ -93,6 +93,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection AddHelpers(this IServiceCollection services)
         {
+            services.AddTransient<IRepresentationVersionBuilder, IncrementalRepresentationVersionBuilder>();
             services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
             services.AddTransient<IRepresentationReferenceSync, RepresentationReferenceSync>();
             services.AddTransient<IResourceTypeResolver, ResourceTypeResolver>();
