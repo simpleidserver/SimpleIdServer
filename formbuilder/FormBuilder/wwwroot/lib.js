@@ -13,6 +13,10 @@ FormBuilder.getPosition = function (elt) {
     return { X: rect.left, Y: rect.top };
 }
 
+FormBuilder.getOffsetPosition = function (elt) {
+    return { X: elt.offsetLeft, Y: elt.offsetTop };
+}
+
 FormBuilder.getPointInSvgSpace = function (clientX, clientY, svg) {
     let pt = new DOMPoint(clientX, clientY);
     pt = pt.matrixTransform(svg.getScreenCTM().inverse());

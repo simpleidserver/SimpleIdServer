@@ -98,7 +98,6 @@ public class WorkflowLink
             X = offsetWidth + coordinate.X,
             Y = offsetHeight + coordinate.Y
         };
-        result.Round();
         return result;
     }
 }

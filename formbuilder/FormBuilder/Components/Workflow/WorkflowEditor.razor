@@ -91,30 +91,22 @@
 
     private async Task HandleSelectedStepChanged(WorkflowStep step)
     {
-        svgPosition = await formBuilderJsService.GetPosition(svgRef);
         selectedStep = step;
-        selectedFormRecord = null;
-        selectedLink = null;
     }
 
     private async Task HandleDragStart(FormRecord record)
     {
-        svgPosition = await formBuilderJsService.GetPosition(svgRef);
-        selectedStep = null;
         selectedFormRecord = record;
-        selectedLink = null;
     }
 
     private async Task HandleDragHover(DragEventArgs args)
     {
-        var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-        if (TryDragSelectedLink()) return;
-        // TryDragSelectedStep();
+        if (await TryDragSelectedLink()) return;
 
-        bool TryDragSelectedLink()
+        async Task<bool> TryDragSelectedLink()
         {
             if (selectedLink == null || selectedLink.IsLinkHoverStep) return false;
-            pos.Round();
+            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
             selectedLink.TargetCoordinate.X = pos.X;
             selectedLink.TargetCoordinate.Y = pos.Y;
             return true;
@@ -123,6 +115,7 @@
 
     private async Task HandleDrop(DragEventArgs args)
     {
+        isMoving = false;
         if (TryDropSelectedLink()) return;
         await TryDropFormRecord();
         selectedStep = null;
@@ -143,7 +136,6 @@
             if (selectedFormRecord == null) return false;
             var id = Guid.NewGuid().ToString();
             var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-            pos.Round();
             Workflow.Steps.Add(new WorkflowStep
             {
                 Id = id,
@@ -202,7 +194,6 @@
         {
             if (selectedStep == null) return false;
             var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-            pos.Round();
             selectedStep.Coordinate.X = pos.X;
             selectedStep.Coordinate.Y = pos.Y;
             var links = Workflow.GetLinks(selectedStep);
@@ -214,8 +205,7 @@
 
     private void HandleOnPanLeave()
     {
-        isMoving = false;
-        selectedStep = null;
+        ResetInteraction();
     }
 
     #endregion
@@ -251,14 +241,9 @@
         var args = item.args;
         var parentStep = item.step;
         var eltSize = await formBuilderJsService.GetSize(args.EltReference);
-        var eltPosition = await formBuilderJsService.GetPosition(args.EltReference);
-        var stepPosition = await formBuilderJsService.GetPosition(parentStep.EltRef);
-        var coordinateRelativeToStep = eltPosition - stepPosition;
+        var coordinateRelativeToStep = await formBuilderJsService.GetOffsetPosition(args.EltReference);
         var newCoordinate = parentStep.Coordinate + coordinateRelativeToStep;
-        // newCoordinate = await formBuilderJsService.GetPointInSvgSpace(newCoordinate.X, newCoordinate.Y, svgRef);
-        newCoordinate.Round();
-        selectedStep = null;
-        selectedFormRecord = null;
+        ResetInteraction();
         selectedLink = WorkflowLink.Create(parentStep.Id, args.Record, newCoordinate, eltSize, coordinateRelativeToStep);
     }
 
@@ -275,5 +260,13 @@
     {
         var numbers = vb.Split(' ').Select(n => double.Parse(n)).ToArray();
         return (numbers[0], numbers[1], numbers[2], numbers[3]);
+    }
+
+    private void ResetInteraction()
+    {
+        selectedLink = null;
+        selectedStep = null;
+        selectedFormRecord = null;
+        isMoving = false;
     }
 }
