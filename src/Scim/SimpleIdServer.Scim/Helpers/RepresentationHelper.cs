@@ -627,13 +627,12 @@ namespace SimpleIdServer.Scim.Helpers
                 if (record.SchemaAttribute.MultiValued)
                 {
                     var jArr = record.Content as JArray;
-                    if (jArr == null)
+                    if (jArr == null && !record.Content.IsEmpty())
                     {
                         throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotArray, record.SchemaAttribute.Name));
                     }
 
-
-                    attributes.AddRange(BuildAttributes(jArr, record.SchemaAttribute, record.Schema, ignoreUnsupportedCanonicalValues));
+                    if(jArr != null) attributes.AddRange(BuildAttributes(jArr, record.SchemaAttribute, record.Schema, ignoreUnsupportedCanonicalValues));
                 }
                 else
                 {
@@ -908,12 +907,14 @@ namespace SimpleIdServer.Scim.Helpers
         private static ICollection<ResolutionRowResult> ResolveFullQualifiedName(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> extensionSchemas)
         {
             var jObj = kvp.Value as JObject;
-            if (jObj == null)
+            var jArr = kvp.Value as JArray;
+            if (jArr != null)
             {
                 throw new SCIMSchemaViolatedException(string.Format(Global.PropertyCannotContainsArray, kvp.Key));
             }
 
             var result = new List<ResolutionRowResult>();
+            if (jObj == null) return result;
             var schema = extensionSchemas.First(e => kvp.Key == e.Id);
             foreach (var skvp in jObj)
             {
