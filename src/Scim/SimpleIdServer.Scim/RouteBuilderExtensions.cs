@@ -23,7 +23,7 @@ public static class RouteBuilderExtensions
             defaults: new { controller = "Schemas", action = "GetAll" });
         webApp.ScimMapControllerRoute("getSchema",
             pattern: SCIMEndpoints.Schemas + "/{id}",
-            defaults: new { controller = "Schema", action = "Get" });
+            defaults: new { controller = "Schemas", action = "Get" });
 
         webApp.ScimMapControllerRoute("getServiceProviderConfig",
             pattern: SCIMEndpoints.ServiceProviderConfig,
