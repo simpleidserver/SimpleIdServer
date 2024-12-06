@@ -8,7 +8,7 @@ namespace FormBuilder.Helpers;
 
 public interface IRenderFormElementsHelper
 {
-    void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled, WorkflowViewerContext workflowContext);
+    void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled, WorkflowViewerContext workflowContext, bool isInteractableElementEnabled, WorkflowExecutionContext workflowExecutionContext);
 }
 
 public class RenderFormElementsHelper : IRenderFormElementsHelper
@@ -20,18 +20,18 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
         _definitions = definitions;
     }
 
-    public void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled, WorkflowViewerContext workflowContext)
+    public void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled, WorkflowViewerContext workflowContext, bool isInteractableElementEnabled, WorkflowExecutionContext workflowExecutionContext)
     {
         var i = 0;
         foreach (var record in elements)
         {
             var parentEltCtx = new ParentEltContext(elements, i);
-            AddElt(builder, record, context, parentEltCtx, isEditModeEnabled, workflowContext);
+            AddElt(builder, record, context, parentEltCtx, isEditModeEnabled, workflowContext, isInteractableElementEnabled, workflowExecutionContext);
             i++;
         }
     }
 
-    private void AddElt(RenderTreeBuilder builder, IFormElementRecord record, FormViewerContext context, ParentEltContext parentEltContext, bool isEditModeEnabled, WorkflowViewerContext workflowContext)
+    private void AddElt(RenderTreeBuilder builder, IFormElementRecord record, FormViewerContext context, ParentEltContext parentEltContext, bool isEditModeEnabled, WorkflowViewerContext workflowContext, bool isInteractableElementEnabled, WorkflowExecutionContext workflowExecutionContext)
     {
         var expectedType = record.GetType();
         var definition = _definitions.Single(d => d.RecordType == expectedType);
@@ -42,6 +42,8 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
         builder.AddAttribute(3, "IsEditModeEnabled", isEditModeEnabled);
         builder.AddAttribute(4, "ParentContext", parentEltContext);
         builder.AddAttribute(5, "WorkflowContext", workflowContext);
+        builder.AddAttribute(6, "IsInteractableElementEnabled", isInteractableElementEnabled);
+        builder.AddAttribute(7, "WorkflowExecutionContext", workflowExecutionContext);
         builder.CloseComponent();
     }
 }

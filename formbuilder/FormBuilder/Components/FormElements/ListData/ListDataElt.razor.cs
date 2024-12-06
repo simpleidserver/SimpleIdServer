@@ -15,6 +15,8 @@ namespace FormBuilder.Components.FormElements.ListData
         [Parameter] public bool IsEditModeEnabled { get; set; }
         [Parameter] public ParentEltContext ParentContext { get; set; }
         [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
+        [Parameter] public bool IsInteractableElementEnabled { get; set; }
+        [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -27,7 +29,7 @@ namespace FormBuilder.Components.FormElements.ListData
 
         private RenderFragment CreateComponent() => builder =>
         {
-            renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled, WorkflowContext);
+            renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled, WorkflowContext, IsInteractableElementEnabled, WorkflowExecutionContext);
         };
     }
 }

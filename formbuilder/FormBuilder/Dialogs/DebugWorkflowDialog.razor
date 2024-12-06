@@ -1,0 +1,12 @@
+﻿@using FormBuilder.Components
+@using FormBuilder.Components.Form
+@using FormBuilder.Models
+
+@{
+    <FormViewer WorkflowExecutionContext="@Workflow" IsEditModeEnabled="false" WorkflowViewerContext="@WorkflowContext"></FormViewer>
+}
+
+@code {
+    [Parameter] public WorkflowExecutionContext Workflow { get; set; }
+    private WorkflowViewerContext WorkflowContext { get; set; } = new WorkflowViewerContext();
+}

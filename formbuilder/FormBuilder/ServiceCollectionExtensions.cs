@@ -9,6 +9,7 @@ using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
+using FormBuilder.Link;
 using FormBuilder.Rules;
 using FormBuilder.Services;
 using FormBuilder.Transformers;
@@ -53,6 +54,8 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRuleEngine, RuleEngine>();
 
         services.AddTransient<IUriProvider, UriProvider>();
+
+        services.AddTransient<IWorkflowLinkAction, WorkflowLinkPopupAction>();
 
         services.AddScoped<DialogService>();
 

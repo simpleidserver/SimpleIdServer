@@ -16,7 +16,10 @@
             </ul>
         </div>
         <div class="zone" @ondragover:preventDefault="true" @ondragover="@(async (e) => await HandleDragHover(e))" @ondrop="@(async(e) => await HandleDrop(e))" @ondragleave="HandleDragLeave"></div>
-        <FormViewer Form="@GetFormRecord(Step.FormRecordName)" IsEditModeEnabled="false" WorkflowContext="@workflowContext"></FormViewer>
+        @if(workflowExecutionContext != null)
+        {
+            <FormViewer WorkflowExecutionContext="@workflowExecutionContext" IsEditModeEnabled="false" IsInteractableElementEnabled="true" WorkflowViewerContext="@workflowContext"></FormViewer>
+        }
     </div>
 </foreignObject>
 
@@ -32,6 +35,7 @@
     bool isHover = false;
     ElementReference divRef;
     WorkflowViewerContext workflowContext { get; set; } = new WorkflowViewerContext();
+    WorkflowExecutionContext workflowExecutionContext { get; set; } = null;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -43,6 +47,16 @@
             {
                 await WorkflowLinkChanged.InvokeAsync((e, Step));
             };
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (workflowExecutionContext == null && Step != null)
+        {
+            var formRecord = GetFormRecord(Step.FormRecordName);
+            workflowExecutionContext = new WorkflowExecutionContext(formRecord);
         }
     }
 

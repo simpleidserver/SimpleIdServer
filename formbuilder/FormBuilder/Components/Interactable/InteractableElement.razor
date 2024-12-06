@@ -5,11 +5,17 @@
 @inject IFormBuilderJsService formBuilderJsService
 @typeparam TRecord where TRecord : IFormElementRecord
 
-<!-- IMPLEMENT DROP -->
-<div class="interactableElement" draggable="true" @ondragstart="@(() => HandleDragStart())" @ref="@interactableElement">
-    <div class="zone"></div>
+@if (IsInteractableElementEnabled)
+{
+    <div class="interactableElement" draggable="true" @ondragstart="@(() => HandleDragStart())" @ref="@interactableElement">
+        <div class="zone"></div>
+        @Children
+    </div>
+}
+else
+{
     @Children
-</div>
+}
 
 @code {
     private ElementReference interactableElement;
@@ -18,6 +24,7 @@
     [Parameter] public RenderFragment Children { get; set; }
     [Parameter] public WorkflowViewerContext Context { get; set; }
     [Parameter] public TRecord Record { get; set; }
+    [Parameter] public bool IsInteractableElementEnabled { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

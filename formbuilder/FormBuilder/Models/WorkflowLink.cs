@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using FormBuilder.Link;
+using System.Text.Json.Serialization;
 
 namespace FormBuilder.Models;
 
@@ -9,8 +10,11 @@ public class WorkflowLink
     public WorkflowLinkSource Source { get; set; }
     public string SourceStepId { get; set; }
     public string TargetStepId { get; set; }
+    public string ActionType { get; set; }
     [JsonIgnore]
     public bool IsLinkHoverStep { get; set; }
+    [JsonIgnore]
+    public bool IsHover { get; set; }
 
     public WorkflowLink Clone()
     {
@@ -20,7 +24,8 @@ public class WorkflowLink
             TargetCoordinate = TargetCoordinate.Clone(),
             Source = Source.Clone(),
             TargetStepId = TargetStepId,
-            SourceStepId = SourceStepId
+            SourceStepId = SourceStepId,
+            ActionType = ActionType
         };
     }
 
@@ -38,24 +43,11 @@ public class WorkflowLink
                 Size = size,
                 CoordinateRelativeToStep = coordinateRelativeToStep
             },
+            ActionType = WorkflowLinkPopupAction.ActionType,
             SourceStepId = sourceStepid,
             SourceCoordinate = anchorCoordinate,
             TargetCoordinate = anchorCoordinate.Clone()
         };
-    }
-
-    public static WorkflowLink Create(string id)
-    {
-        return null;
-    }
-
-    public void InitCoordinate(WorkflowStep step)
-    {
-        /*
-        var coordinate = GetAnchorCoordinate(step);
-        SourceCoordinate = coordinate;
-        TargetCoordinate = coordinate.Clone();
-        */
     }
 
     public void UpdateCoordinate(WorkflowStep step)

@@ -1,6 +1,7 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
+using FormBuilder.Models;
 using Microsoft.AspNetCore.Components;
 using System.Net;
 using System.Text.Json.Nodes;
@@ -15,11 +16,13 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Inject] private ITargetUrlHelperFactory targetUrlHelperFactory { get; set; }
     [Inject] private IUriProvider uriProvider {  get; set; }
     [Inject] private IServiceProvider serviceProvider { get; set; }
+    [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
     [Parameter] public FormStackLayoutRecord Value { get; set; }
     [Parameter] public FormViewerContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
+    [Parameter] public bool IsInteractableElementEnabled { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -65,7 +68,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled, WorkflowContext);
+        renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled, WorkflowContext, IsInteractableElementEnabled, WorkflowExecutionContext);
     };
 
     private void HandleCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

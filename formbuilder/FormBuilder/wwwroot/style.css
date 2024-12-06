@@ -243,6 +243,12 @@
     padding: 2px;
 }
 
+/*Hitbox*/
+.hitbox {
+    visibility: hidden;
+    pointer-events: all;
+}
+
 /* Common */
 .fullWidth {
     width: 100%;

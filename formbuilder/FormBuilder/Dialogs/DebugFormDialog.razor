@@ -16,7 +16,7 @@
             <StandaloneCodeEditor @ref=editor OnDidInit="HandleOnDidInit" OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
         </RadzenStepsItem>
         <RadzenStepsItem Text="Viewer" Disabled="@(input == null)">
-            <FormViewer Form="@copyRecord" Input="@input" IsEditModeEnabled="false" Context="@context"></FormViewer>
+            <FormViewer WorkflowExecutionContext="@workflowExecutionContext" Input="@input" IsEditModeEnabled="false" IsInteractableElementEnabled="false" Context="@context"></FormViewer>
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
@@ -25,16 +25,17 @@
     private StandaloneCodeEditor editor;
     [Parameter] public FormRecord Form { get; set; }
     [Parameter] public Type InputRecordType { get; set; }
-    FormRecord copyRecord { get; set; }
+    WorkflowExecutionContext workflowExecutionContext { get; set; }
     JsonObject input { get; set; }
     FormViewerContext context { get; set; }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if (copyRecord == null && Form != null)
+        if (workflowExecutionContext == null && Form != null)
         {
-            copyRecord = JsonSerializer.Deserialize<FormRecord>(JsonSerializer.Serialize(Form));
+            var copyRecord = JsonSerializer.Deserialize<FormRecord>(JsonSerializer.Serialize(Form));
+            workflowExecutionContext = new WorkflowExecutionContext(copyRecord);
         }
     }
 
@@ -63,7 +64,6 @@
         var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
         await editor.SetValue(json);
     }
-
 
     private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
     {

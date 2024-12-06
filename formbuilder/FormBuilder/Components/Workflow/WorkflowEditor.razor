@@ -1,10 +1,17 @@
 ﻿@using FormBuilder.Components.Form
+@using FormBuilder.Dialogs
 @using FormBuilder.Models
 @using System.Diagnostics
 @using FormBuilder.Services
 @inject IJSRuntime jsRuntime
 @inject IFormBuilderJsService formBuilderJsService
+@inject DialogService dialogService
 
+<RadzenDialog />
+
+<div class="header">
+    <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
+</div>
 <RadzenRow class="fullHeight workflowEditor">    
     <RadzenColumn Size="2">        
         <RadzenStack class="toolbar fullHeight">
@@ -41,7 +48,8 @@
 
             @foreach (var link in Workflow.Links)
             {
-                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(link)"></path>
+                <path class="hitbox" @onclick="@(async (e) => await HandleEditWorkflowLink(link))" stroke-width="10" @onmousemove="@((e) => HandleOnHoverLink(link))" @onmouseleave="@((e) => HandleOnLeaveLink(link))" fill="none" d="@GetLinkCoordinate(link)"></path>
+                <path marker-end="@(link.IsHover ? "url(#headSelected)" : "url(#head)")" stroke-width="2" fill="none" stroke="@(link.IsHover ? "red" : "black")" d="@GetLinkCoordinate(link)"></path>
             }
             @if (selectedLink != null)
             {
@@ -55,6 +63,14 @@
                         refX='0.1'
                         refY='2'>
                     <path d='M0,0 V4 L2,2 Z' fill="black" />
+                </marker>
+                <marker id='headSelected'
+                        orient="auto"
+                        markerWidth='3'
+                        markerHeight='4'
+                        refX='0.1'
+                        refY='2'>
+                    <path d='M0,0 V4 L2,2 Z' fill="red" />
                 </marker>
             </defs>
         </svg>
@@ -159,7 +175,8 @@
     {
         var clone = this.selectedLink.Clone();
         clone.TargetStepId = workflowStep.Id;
-        Workflow.Links.Add(clone);
+        Workflow.AddLink(clone);
+        // Workflow.Links.Add(clone);
         selectedLink = null;
     }
 
@@ -210,7 +227,6 @@
 
     #endregion
 
-
     #region Handle zoom
 
     private async Task HandleZoom(WheelEventArgs args)
@@ -230,6 +246,28 @@
 
     #endregion
 
+    #region Handle relationships
+
+    private void HandleOnHoverLink(WorkflowLink link)
+    {
+        link.IsHover = true;
+    }
+
+    private void HandleOnLeaveLink(WorkflowLink link)
+    {
+        link.IsHover = false;
+    }
+
+    private Task HandleEditWorkflowLink(WorkflowLink link)
+    {
+        return dialogService.OpenAsync<EditWorkflowLinkDialog>(string.Empty, new Dictionary<string, object>
+        {
+            { "WorkflowLink", link }
+        });
+    }
+
+    #endregion
+
     private void HandleStepRemoved(WorkflowStep step)
     {
         Workflow.Steps.Remove(step);
@@ -245,6 +283,19 @@
         var newCoordinate = parentStep.Coordinate + coordinateRelativeToStep;
         ResetInteraction();
         selectedLink = WorkflowLink.Create(parentStep.Id, args.Record, newCoordinate, eltSize, coordinateRelativeToStep);
+    }
+
+    private Task LaunchDebug()
+    {
+        var opts = new DialogOptions
+        {
+            Width = "1200px"
+        };
+        var workflowExecutionContext = new WorkflowExecutionContext(Workflow, Records);
+        return dialogService.OpenAsync<DebugWorkflowDialog>(string.Empty, new Dictionary<string, object>
+        {
+            { nameof(DebugWorkflowDialog.Workflow), workflowExecutionContext }
+        }, opts);
     }
 
     private string GetLinkCoordinate(WorkflowLink link)
