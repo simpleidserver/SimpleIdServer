@@ -13,7 +13,7 @@ namespace SimpleIdServer.Scim.ExternalEvents
 
         }
 
-        public RepresentationUpdatedEvent(string id, string version, string resourceType, JObject representation, string token, List<SCIMPatchResult> patchOperations) : base(id, version, resourceType, representation) 
+        public RepresentationUpdatedEvent(string id, string version, string resourceType, string realm, JObject representation, string token, List<SCIMPatchResult> patchOperations) : base(id, version, resourceType, realm, representation) 
         {
             Token = token;
             PatchOperations = PatchAttributeOperation.Transform(patchOperations);
