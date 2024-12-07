@@ -1,5 +1,6 @@
 ﻿@using FormBuilder.Components.Form
 @using FormBuilder.Dialogs
+@using FormBuilder.Factories
 @using FormBuilder.Models
 @using System.Diagnostics
 @using FormBuilder.Services
@@ -16,7 +17,7 @@
     <RadzenColumn Size="2">        
         <RadzenStack class="toolbar fullHeight">
             <div class="category">
-                <RadzenText TextStyle="TextStyle.H6" class="title">Elements</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" class="title">Steps</RadzenText>
                 <ul class="elements">
                     @foreach (var record in Records)
                     {
@@ -100,6 +101,8 @@
         {
             var svgSize = await formBuilderJsService.GetSize(_svgContainer.Element);
             viewBox = $"0 0 {svgSize.width} {svgSize.height}";
+            Records.Add(Constants.EmptyStep);
+            StateHasChanged();
         }
     }
 
@@ -176,7 +179,6 @@
         var clone = this.selectedLink.Clone();
         clone.TargetStepId = workflowStep.Id;
         Workflow.AddLink(clone);
-        // Workflow.Links.Add(clone);
         selectedLink = null;
     }
 

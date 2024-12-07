@@ -1,0 +1,25 @@
+﻿@using FormBuilder.Models
+@using System.Text.Json
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenFormField Variant="Variant.Outlined" Text="Url" class="fullWidth">
+    <RadzenTextBox @bind-Value="@Url"></RadzenTextBox>
+</RadzenFormField>
+
+@code {
+    public string Url
+    {
+        get
+        {
+            return Parameter.Url;
+        }
+        set
+        {
+            Parameter.Url = value;
+            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+        }
+    }
+    [Parameter] public WorkflowLinkUrlParameter Parameter { get; set; }
+    [Parameter] public WorkflowLink WorkflowLink { get; set; }
+}

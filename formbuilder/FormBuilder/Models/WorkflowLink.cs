@@ -11,6 +11,7 @@ public class WorkflowLink
     public string SourceStepId { get; set; }
     public string TargetStepId { get; set; }
     public string ActionType { get; set; }
+    public string ActionParameter { get; set; }
     [JsonIgnore]
     public bool IsLinkHoverStep { get; set; }
     [JsonIgnore]
@@ -25,7 +26,8 @@ public class WorkflowLink
             Source = Source.Clone(),
             TargetStepId = TargetStepId,
             SourceStepId = SourceStepId,
-            ActionType = ActionType
+            ActionType = ActionType,
+            ActionParameter = ActionParameter
         };
     }
 

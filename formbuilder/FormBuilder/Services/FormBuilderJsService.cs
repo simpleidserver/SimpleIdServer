@@ -11,6 +11,7 @@ public interface IFormBuilderJsService
     Task<Coordinate> GetOffsetPosition(ElementReference eltRef);
     Task<Size> GetSize(ElementReference eltRef);
     Task<Coordinate> GetPointInSvgSpace(double clientX, double clientY, ElementReference svgEltRef);
+    Task Navigate(string url);
 }
 
 public class FormBuilderJsService : IFormBuilderJsService
@@ -49,4 +50,7 @@ public class FormBuilderJsService : IFormBuilderJsService
         result.Round();
         return result;
     }
+
+    public async Task Navigate(string url)
+        => await _jsRuntime.InvokeVoidAsync("FormBuilder.navigate", url);
 }

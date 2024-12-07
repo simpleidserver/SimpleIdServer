@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Components.FormElements.ListData;
+using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Factories;
 using FormBuilder.Models;
@@ -60,4 +61,6 @@ public class RuleEngine : IRuleEngine
     public void Apply(BaseFormDataRecord record, JsonObject input)
     {
     }
+
+    public void Apply(ParagraphRecord record, JsonObject input) { }
 }

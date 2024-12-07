@@ -1,7 +1,72 @@
-﻿@using FormBuilder.Models
+﻿@using FormBuilder.Factories
+@using FormBuilder.Link
+@using FormBuilder.Models
+@inject DialogService dialogService
 
+@inject IWorkflowLinkActionFactory workflowLinkActionFactory
 
+<RadzenStack>
+    <RadzenFormField Variant="Variant.Outlined" Text="Choose the type action" class="fullWidth">
+        <RadzenDropDown @bind-Value=@SelectedActionType Data="@actions" TextProperty="DisplayName" ValueProperty="Type" />
+    </RadzenFormField>
+    @CustomRender
+    <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
+</RadzenStack>
 
 @code {
+    private string _selectedActionType;
+    private WorkflowLink _copyWorkflowLink { get; set; }
+    private RenderFragment? CustomRender { get; set; }
+    private List<IWorkflowLinkAction> actions { get; set; }
+    private string SelectedActionType
+    {
+        get
+        {
+            return _copyWorkflowLink.ActionType;
+        }
+        set
+        {
+            _copyWorkflowLink.ActionType = value;
+            CustomRender = CreateComponent();
+        }
+    }
     [Parameter] public WorkflowLink WorkflowLink { get; set; }
+
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(WorkflowLink != null && _copyWorkflowLink == null)
+        {
+            _copyWorkflowLink = WorkflowLink.Clone();
+            if (_copyWorkflowLink.ActionType != null)
+                SelectedActionType = _copyWorkflowLink.ActionType;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            actions = workflowLinkActionFactory.GetAll();
+            StateHasChanged();
+            CustomRender = CreateComponent();
+        }
+    }
+
+    private RenderFragment CreateComponent() => builder =>
+    {
+        if (_copyWorkflowLink.ActionType == null) return;
+        var workflowLinkAction = actions?.SingleOrDefault(a => a.Type == _copyWorkflowLink.ActionType);
+        if (workflowLinkAction == null) return;
+        workflowLinkAction.Render(builder, _copyWorkflowLink);
+    };
+
+    private void HandleSave()
+    {
+        WorkflowLink.ActionType = _copyWorkflowLink.ActionType;
+        WorkflowLink.ActionParameter = _copyWorkflowLink.ActionParameter;
+        dialogService.Close();
+    }
 }

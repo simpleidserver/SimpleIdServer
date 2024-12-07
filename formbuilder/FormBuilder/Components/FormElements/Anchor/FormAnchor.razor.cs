@@ -1,6 +1,5 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Factories;
-using FormBuilder.Link;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -18,7 +17,7 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     [Parameter] public FormViewerContext Context { get; set; }
     [Inject] private ITargetUrlHelperFactory targetUrlHelperFactory { get; set; }
     [Inject] private IJSRuntime JSRuntime { get; set; }
-    [Inject] private IEnumerable<IWorkflowLinkAction> Actions { get; set; }
+    [Inject] private IWorkflowLinkActionFactory WorkflowLinkActionFactory { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -29,7 +28,7 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     {
         var link = WorkflowExecutionContext.GetLink(Value);
         if (link == null) return;
-        var act = Actions.Single(a => a.Type == link.ActionType);
+        var act = WorkflowLinkActionFactory.Build(link.ActionType);
         await act.Execute(link, WorkflowExecutionContext);
     }
 }

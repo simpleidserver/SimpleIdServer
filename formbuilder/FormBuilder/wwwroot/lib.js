@@ -1,9 +1,5 @@
 var FormBuilder = FormBuilder || {};
 
-FormBuilder.navigate = function (element) {
-    element.click();
-};
-
 FormBuilder.getSize = function (elt) {
     return { height: elt.offsetHeight, width: elt.offsetWidth };
 }
@@ -21,4 +17,8 @@ FormBuilder.getPointInSvgSpace = function (clientX, clientY, svg) {
     let pt = new DOMPoint(clientX, clientY);
     pt = pt.matrixTransform(svg.getScreenCTM().inverse());
     return { X: pt.x, Y: pt.y };
+}
+
+FormBuilder.navigate = function (url) {
+    window.open(url, '_blank').focus();
 }

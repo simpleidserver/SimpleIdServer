@@ -1,5 +1,6 @@
 ﻿using FormBuilder.Components;
 using FormBuilder.Models;
+using Microsoft.AspNetCore.Components.Rendering;
 using Radzen;
 
 namespace FormBuilder.Link;
@@ -15,6 +16,8 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
 
     public string Type => ActionType;
 
+    public string DisplayName => "Popup";
+
     public static string ActionType => "Popup";
 
     public async Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context)
@@ -24,5 +27,9 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
         {
             { nameof(WorkflowLinkPopupActionComponent.Context), context }
         });
+    }
+
+    public void Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
+    {
     }
 }

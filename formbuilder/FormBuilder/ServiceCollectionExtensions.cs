@@ -5,6 +5,7 @@ using FormBuilder.Components.FormElements.Checkbox;
 using FormBuilder.Components.FormElements.Divider;
 using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
+using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Factories;
@@ -34,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFormElementDefinition, DividerLayoutDefinition>();
         services.AddTransient<IFormElementDefinition, FormAnchorDefinition>();
         services.AddTransient<IFormElementDefinition, ListDataDefinition>();
+        services.AddTransient<IFormElementDefinition, ParagraphDefinition>();
 
         services.AddTransient<ITranslationHelper, TranslationHelper>();
         services.AddTransient<IRenderFormElementsHelper, RenderFormElementsHelper>();
@@ -42,6 +44,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRepetitionRuleEngineFactory, RepetitionRuleEngineFactory>();
         services.AddTransient<IFormElementDefinitionFactory, FormElementDefinitionFactory>();
         services.AddTransient<IFakerDataServiceFactory, FakerDataServiceFactory>();
+        services.AddTransient<IWorkflowLinkActionFactory, WorkflowLinkActionFactory>();
 
         services.AddTransient<ITargetUrlHelper, DirectTargetUrlHelper>();
         services.AddTransient<ITargetUrlHelper, ControllerActionTargetUrlHelper>();
@@ -56,6 +59,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUriProvider, UriProvider>();
 
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkPopupAction>();
+        services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlAction>();
 
         services.AddScoped<DialogService>();
 

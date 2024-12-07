@@ -4,6 +4,7 @@ public class WorkflowRecord
 {
     public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
     public List<WorkflowLink> Links { get; set; } = new List<WorkflowLink>();
+    public List<WorkflowAction> Actions { get; set; } = new List<WorkflowAction>();
 
     public WorkflowStep GetFirstStep()
     {
