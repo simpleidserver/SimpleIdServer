@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Models;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components;
 
@@ -35,6 +36,8 @@ public class WorkflowExecutionContext
     public WorkflowRecord Workflow { get; private set; }
     public List<FormRecord> Records { get; private set; }
     public string CurrentStepId { get; private set; }
+    public JsonObject StepOutput { get; private set; }
+    public AntiforgeryTokenRecord AntiforgeryToken { get; private set; }
 
     public WorkflowLink GetLink(IFormElementRecord record)
     {
@@ -52,6 +55,12 @@ public class WorkflowExecutionContext
         var currentStep = GetCurrentStep();
         return Records.Single(r => r.Name == currentStep.FormRecordName);
     }
+
+    public void SetStepOutput(JsonObject output)
+        => StepOutput = output;
+
+    public void SetAntifogeryToken(AntiforgeryTokenRecord antiforgeryToken)
+        => AntiforgeryToken = antiforgeryToken;
 
     private WorkflowStep GetCurrentStep()
     {

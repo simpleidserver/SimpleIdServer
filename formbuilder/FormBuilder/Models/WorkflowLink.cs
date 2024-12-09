@@ -5,6 +5,7 @@ namespace FormBuilder.Models;
 
 public class WorkflowLink
 {
+    public string Id { get; set; }
     public Coordinate SourceCoordinate { get; set; }
     public Coordinate TargetCoordinate { get; set; }
     public WorkflowLinkSource Source { get; set; }

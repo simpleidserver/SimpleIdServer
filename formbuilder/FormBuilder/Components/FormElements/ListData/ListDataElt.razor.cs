@@ -1,8 +1,6 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Helpers;
-using FormBuilder.Models;
 using Microsoft.AspNetCore.Components;
-using System.Collections.ObjectModel;
 
 namespace FormBuilder.Components.FormElements.ListData
 {

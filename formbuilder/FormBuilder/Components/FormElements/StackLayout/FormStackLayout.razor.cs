@@ -1,9 +1,7 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
-using FormBuilder.Models;
 using Microsoft.AspNetCore.Components;
-using System.Net;
 using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components.FormElements.StackLayout;
@@ -16,6 +14,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Inject] private ITargetUrlHelperFactory targetUrlHelperFactory { get; set; }
     [Inject] private IUriProvider uriProvider {  get; set; }
     [Inject] private IServiceProvider serviceProvider { get; set; }
+    [Inject] private IWorkflowLinkActionFactory WorkflowLinkActionFactory { get; set; }
     [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
     [Parameter] public FormStackLayoutRecord Value { get; set; }
     [Parameter] public FormViewerContext Context { get; set; }
@@ -36,34 +35,10 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
 
     async Task Submit()
     {
-        if (Value.Url == null) return;
-        var json = new JsonObject();
-        Value.ExtractJson(json);
-        var dic = ConvertToDic(json);
-        if(Value.IsAntiforgeryEnabled && Context.AntiforgeryToken != null)
-            dic.Add(Context.AntiforgeryToken.FormField, Context.AntiforgeryToken.FormValue);
-
-        var targetUrl = targetUrlHelperFactory.Build(Value.Url);
-        var cookieContainer = new CookieContainer();
-        using(var handler = new HttpClientHandler { CookieContainer = cookieContainer })
-        {
-            using (var httpClient = new HttpClient(handler))
-            {
-                var baseUrl = uriProvider.GetAbsoluteUriWithVirtualPath();
-                var url = new Uri($"{baseUrl}{targetUrl}");
-                var requestMessage = new HttpRequestMessage
-                {
-                    Content = new FormUrlEncodedContent(dic),
-                    Method = HttpMethod.Post,
-                    RequestUri = url
-                };
-                if (Value.IsAntiforgeryEnabled && Context.AntiforgeryToken != null)
-                    cookieContainer.Add(new Uri(baseUrl), new Cookie(Context.AntiforgeryToken.CookieName, Context.AntiforgeryToken.CookieValue));
-
-                var httpResult = await httpClient.SendAsync(requestMessage);
-                string sss = "";
-            }
-        }
+        var link = WorkflowExecutionContext.GetLink(Value);
+        if (link == null) return;
+        var act = WorkflowLinkActionFactory.Build(link.ActionType);
+        await act.Execute(link, WorkflowExecutionContext);
     }
 
     private RenderFragment CreateComponent() => builder =>

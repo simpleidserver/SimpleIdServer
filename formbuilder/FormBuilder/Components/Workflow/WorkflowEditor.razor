@@ -12,6 +12,7 @@
 
 <div class="header">
     <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
+    <RadzenButton Icon="draft" Text="Json" Click="@(async() => await ViewJson())" />
 </div>
 <RadzenRow class="fullHeight workflowEditor">    
     <RadzenColumn Size="2">        
@@ -298,6 +299,14 @@
         {
             { nameof(DebugWorkflowDialog.Workflow), workflowExecutionContext }
         }, opts);
+    }
+
+    private Task ViewJson()
+    {
+        return dialogService.OpenAsync<ViewWorkflowJsonDialog>("", new Dictionary<string, object>
+        {
+            { nameof(ViewWorkflowJsonDialog.Workflow), Workflow }
+        });
     }
 
     private string GetLinkCoordinate(WorkflowLink link)

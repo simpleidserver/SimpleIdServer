@@ -7,8 +7,10 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
 		<PackageReference Include="Radzen.Blazor" Version="5.6.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\FormBuilder.EF\FormBuilder.EF.csproj" />
 	  <ProjectReference Include="..\FormBuilder\FormBuilder.csproj" />
 	</ItemGroup>
 	<ItemGroup>

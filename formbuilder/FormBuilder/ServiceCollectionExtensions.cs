@@ -21,7 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddFormBuilder(this IServiceCollection services, Action<FormBuilderOptions> cb = null)
+    public static FormBuilderRegistration AddFormBuilder(this IServiceCollection services, Action<FormBuilderOptions> cb = null)
     {
         if (cb == null) services.Configure<FormBuilderOptions>((c) => { });
         else services.Configure<FormBuilderOptions>(cb);
@@ -60,11 +60,12 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkPopupAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlAction>();
+        services.AddTransient<IWorkflowLinkAction, WorkflowLinkHttpRequestAction>();
 
         services.AddScoped<DialogService>();
 
         services.AddHttpContextAccessor();
         services.AddHttpClient();
-        return services;
+        return new FormBuilderRegistration(services);
     }
 }

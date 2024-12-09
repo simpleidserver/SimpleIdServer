@@ -87,9 +87,9 @@
 
     private Task ViewJson()
     {
-        return dialogService.OpenAsync<ViewJsonDialog>("", new Dictionary<string, object>
+        return dialogService.OpenAsync<ViewFormJsonDialog>("", new Dictionary<string, object>
         {
-            { nameof(ViewJsonDialog.Form), Form }
+            { nameof(ViewFormJsonDialog.Form), Form }
         });
     }
 }

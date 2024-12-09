@@ -17,6 +17,11 @@ namespace FormBuilder.Startup;
 
 public class Constants
 {
+    private static string forgetMyPasswordId = Guid.NewGuid().ToString();
+    private static string workflowId = "loginPwd";
+
+    #region Forms
+
     public static FormRecord ConfirmationForm = new FormRecord
     {
         Name = "Confirmation",
@@ -36,6 +41,7 @@ public class Constants
             }
         }
     };
+
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
         Name = "Login and password",
@@ -107,7 +113,7 @@ public class Constants
                     // Forget my password
                     new FormAnchorRecord
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = forgetMyPasswordId,
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
                     },
                     // Separator
@@ -155,4 +161,27 @@ public class Constants
             }
         }
     };
+
+    public static List<FormRecord> AllForms => new List<FormRecord>
+    {
+        LoginPwdAuthForm,
+        ConfirmationForm
+    };
+
+    #endregion
+
+    #region Workflows
+
+    public static WorkflowRecord LoginPwdAuthWorkflow = WorkflowBuilder.New(Guid.NewGuid().ToString())
+        .AddStep(LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(ConfirmationForm, new Coordinate(200, 100))
+        .AddLinkPopupAction(LoginPwdAuthForm, ConfirmationForm, forgetMyPasswordId)
+        .Build();
+
+    public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>
+    {
+        LoginPwdAuthWorkflow
+    };
+
+    #endregion
 }

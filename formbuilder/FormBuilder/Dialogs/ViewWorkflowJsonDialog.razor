@@ -1,0 +1,22 @@
+﻿@using BlazorMonaco.Editor
+@using FormBuilder.Models
+@using Radzen.Blazor
+@using System.Text.Json
+
+<RadzenText>JSON</RadzenText>
+<StandaloneCodeEditor Id="my-editor-instance-id" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
+
+
+@code {
+    [Parameter] public WorkflowRecord Workflow { get; set; }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+            {
+                AutomaticLayout = true,
+                Language = "json",
+                Value = JsonSerializer.Serialize(Workflow, new JsonSerializerOptions { WriteIndented = true })
+            };
+    }
+}

@@ -1,4 +1,5 @@
-﻿using FormBuilder.Startup.Controllers.ViewModels;
+﻿using FormBuilder.Repositories;
+using FormBuilder.Startup.Controllers.ViewModels;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -10,6 +11,7 @@ namespace FormBuilder.Startup.Controllers;
 public class AuthController : Controller
 {
     private readonly IAntiforgery _antiforgery;
+    private readonly IWorkflowStore _workflowStore;
     private readonly FormBuilderStartupOptions _options;
 
     public AuthController(IAntiforgery antiforgery, IOptions<FormBuilderStartupOptions> options)
@@ -18,8 +20,9 @@ public class AuthController : Controller
         _options = options.Value;
     }
 
-    public IActionResult Index()
+    public IActionResult Index(string workflowId, CancellationToken cancellationToken)
     {
+        var workflow = _workflowStore.Get(workflowId, cancellationToken);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         var viewModel = new AuthViewModel
         {
