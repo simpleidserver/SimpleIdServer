@@ -310,7 +310,9 @@
     }
 
     private string GetLinkCoordinate(WorkflowLink link)
-        => $"M{link.SourceCoordinate.X} {link.SourceCoordinate.Y} {link.TargetCoordinate.X} {link.TargetCoordinate.Y}";
+        => $"M{Sanitize(link.SourceCoordinate.X)} {Sanitize(link.SourceCoordinate.Y)} {Sanitize(link.TargetCoordinate.X)} {Sanitize(link.TargetCoordinate.Y)}";
+
+    private string Sanitize(double number) => number.ToString().Replace(',', '.');
 
     private FormRecord GetFormRecord(string name)
         => Records.Single(t => t.Name == name);
