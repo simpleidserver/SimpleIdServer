@@ -30,14 +30,18 @@ public class WorkflowExecutionContext
     {
         Workflow = workflow;
         Records = records;
+    }
 
+    public WorkflowExecutionContext(WorkflowRecord workflow, List<FormRecord> records, string currentStepId) : this(workflow, records)
+    {
+        CurrentStepId = currentStepId;
     }
 
     public WorkflowRecord Workflow { get; private set; }
     public List<FormRecord> Records { get; private set; }
     public string CurrentStepId { get; private set; }
     public JsonObject StepOutput { get; private set; }
-    public AntiforgeryTokenRecord AntiforgeryToken { get; private set; }
+    public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
 
     public WorkflowLink GetLink(IFormElementRecord record)
     {

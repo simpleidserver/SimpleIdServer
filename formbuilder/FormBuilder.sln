@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.Startup", "Form
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.Tests", "FormBuilder.Tests\FormBuilder.Tests.csproj", "{9DCD32D4-BA2A-4D75-8C05-4DAC4880E69C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.EF", "FormBuilder.EF\FormBuilder.EF.csproj", "{F7262589-9F63-4518-8367-A41406991159}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.EF", "FormBuilder.EF\FormBuilder.EF.csproj", "{F7262589-9F63-4518-8367-A41406991159}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

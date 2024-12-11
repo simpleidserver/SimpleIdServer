@@ -10,7 +10,7 @@ public static class WorkflowBuilderExtensions
     {
         builder.AddLink(sourceForm, targetForm, eltId, (a) =>
         {
-            a.ActionParameter = WorkflowLinkPopupAction.ActionType;
+            a.ActionType = WorkflowLinkPopupAction.ActionType;
         });
         return builder;
     }
@@ -19,7 +19,7 @@ public static class WorkflowBuilderExtensions
     {
         builder.AddLink(sourceForm, targetForm, eltId, (a) =>
         {
-            a.ActionParameter = WorkflowLinkUrlAction.ActionType;
+            a.ActionType = WorkflowLinkUrlAction.ActionType;
             a.ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlParameter { Url = url });
         });
         return builder;
@@ -29,7 +29,7 @@ public static class WorkflowBuilderExtensions
     {
         builder.AddLink(sourceForm, targetForm, eltId, (a) =>
         {
-            a.ActionParameter = WorkflowLinkHttpRequestAction.ActionType;
+            a.ActionType = WorkflowLinkHttpRequestAction.ActionType;
             a.ActionParameter = JsonSerializer.Serialize(parameter);
         });
         return builder;

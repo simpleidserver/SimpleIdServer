@@ -16,7 +16,7 @@ public class WorkflowLinkConfiguration : IEntityTypeConfiguration<WorkflowLink>
         builder.Ignore(w => w.IsLinkHoverStep);
         builder.Ignore(w => w.IsHover);
         builder.Property(w => w.Source).HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonTypeInfo)null),
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                 v => string.IsNullOrWhiteSpace(v) ? null : JsonSerializer.Deserialize<WorkflowLinkSource>(v, (JsonSerializerOptions)null));
     }
 }

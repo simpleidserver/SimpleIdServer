@@ -7,4 +7,7 @@ public class FormBuilderOptions
         new Language { Code = "en", DisplayName = "English" },
         new Language { Code = "fr", DisplayName = "French" }
     };
+
+    public string AntiforgeryCookieName { get; set; } = "XSFR-TOKEN";
+    public string CurrentWorkflowHeaderName { get; set; } = "Workflow";
 }

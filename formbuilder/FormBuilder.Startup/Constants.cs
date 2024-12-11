@@ -18,6 +18,7 @@ namespace FormBuilder.Startup;
 public class Constants
 {
     private static string forgetMyPasswordId = Guid.NewGuid().ToString();
+    private static string authFormId = Guid.NewGuid().ToString();
     private static string workflowId = "loginPwd";
 
     #region Forms
@@ -44,7 +45,7 @@ public class Constants
 
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
-        Name = "Login and password",
+        Name = "pwd",
         Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord
@@ -55,7 +56,7 @@ public class Constants
                     // Authentication form
                     new FormStackLayoutRecord
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = authFormId,
                         IsFormEnabled = true,
                         IsAntiforgeryEnabled = true,
                         Url = new ControllerActionTargetUrl
@@ -172,10 +173,15 @@ public class Constants
 
     #region Workflows
 
-    public static WorkflowRecord LoginPwdAuthWorkflow = WorkflowBuilder.New(Guid.NewGuid().ToString())
+    public static WorkflowRecord LoginPwdAuthWorkflow = WorkflowBuilder.New(workflowId)
         .AddStep(LoginPwdAuthForm, new Coordinate(100, 100))
         .AddStep(ConfirmationForm, new Coordinate(200, 100))
         .AddLinkPopupAction(LoginPwdAuthForm, ConfirmationForm, forgetMyPasswordId)
+        .AddLinkHttpRequestAction(LoginPwdAuthForm, ConfirmationForm, authFormId, new Link.WorkflowLinkHttpRequestParameter
+        {
+            IsAntiforgeryEnabled = true,
+            Target = "http://localhost:62734/Auth/Confirm"
+        })
         .Build();
 
     public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>

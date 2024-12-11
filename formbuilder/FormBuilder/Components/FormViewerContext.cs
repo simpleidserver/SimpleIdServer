@@ -5,7 +5,6 @@ namespace FormBuilder.Components;
 public class FormViewerContext
 {
     private Action _droppedCallback;
-    public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
     public IFormElementDefinition SelectedDefinition { get; private set; }
     public IFormElementRecord SelectedRecord { get; private set; }
     public SelectionTypes SelectionType { get; private set; }

@@ -1,0 +1,20 @@
+﻿@using System.Text.Json.Nodes
+@using FormBuilder.Models
+@using FormBuilder.Components.Form
+
+<RadzenDialog />
+
+<FormViewer Input=@Input 
+    IsEditModeEnabled=false 
+    IsInteractableElementEnabled=false 
+    Context=@(new FormViewerContext())
+    WorkflowViewerContext=@(new WorkflowViewerContext())
+    WorkflowExecutionContext=@(new WorkflowExecutionContext(Workflow, Records, CurrentStepId) { AntiforgeryToken = Antifogery })></FormViewer>
+
+@code {
+    [Parameter] public JsonObject Input { get; set; }
+    [Parameter] public WorkflowRecord Workflow { get; set; }
+    [Parameter] public List<FormRecord> Records { get; set; }
+    [Parameter] public string CurrentStepId { get; set; }
+    [Parameter] public AntiforgeryTokenRecord Antifogery { get; set; }
+}

@@ -12,6 +12,7 @@ public interface IFormBuilderJsService
     Task<Size> GetSize(ElementReference eltRef);
     Task<Coordinate> GetPointInSvgSpace(double clientX, double clientY, ElementReference svgEltRef);
     Task Navigate(string url);
+    Task NavigateForce(string url);
 }
 
 public class FormBuilderJsService : IFormBuilderJsService
@@ -53,4 +54,7 @@ public class FormBuilderJsService : IFormBuilderJsService
 
     public async Task Navigate(string url)
         => await _jsRuntime.InvokeVoidAsync("FormBuilder.navigate", url);
+
+    public async Task NavigateForce(string url)
+        => await _jsRuntime.InvokeVoidAsync("FormBuilder.navigateForce", url);
 }

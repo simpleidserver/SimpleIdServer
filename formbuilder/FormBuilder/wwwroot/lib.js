@@ -22,3 +22,7 @@ FormBuilder.getPointInSvgSpace = function (clientX, clientY, svg) {
 FormBuilder.navigate = function (url) {
     window.open(url, '_blank').focus();
 }
+
+FormBuilder.navigateForce = function (url) {
+    window.location.href = url;
+}

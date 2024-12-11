@@ -12,7 +12,7 @@ public class WorkflowStepConfiguration : IEntityTypeConfiguration<WorkflowStep>
     {
         builder.HasKey(w => w.Id);
         builder.Property(w => w.Coordinate).HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonTypeInfo)null),
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                 v => string.IsNullOrWhiteSpace(v) ? null : JsonSerializer.Deserialize<Coordinate>(v, (JsonSerializerOptions)null));
         builder.Ignore(w => w.EltRef);
         builder.Ignore(w => w.Size);

@@ -12,7 +12,7 @@ public class WorkflowLink
     public string SourceStepId { get; set; }
     public string TargetStepId { get; set; }
     public string ActionType { get; set; }
-    public string ActionParameter { get; set; }
+    public string? ActionParameter { get; set; }
     [JsonIgnore]
     public bool IsLinkHoverStep { get; set; }
     [JsonIgnore]

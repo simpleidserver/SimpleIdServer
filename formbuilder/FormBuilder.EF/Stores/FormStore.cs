@@ -15,4 +15,7 @@ public class FormStore : IFormStore
 
     public Task<FormRecord> Get(string name, CancellationToken cancellationToken)
         => _dbContext.Forms.SingleOrDefaultAsync(f => f.Name == name, cancellationToken);
+
+    public Task<List<FormRecord>> GetAll(CancellationToken cancellationToken)
+        => _dbContext.Forms.ToListAsync(cancellationToken);
 }

@@ -13,7 +13,8 @@ builder.Services.AddControllersWithViews();
 const string cookieName = "XSFR-TOKEN";
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddFormBuilder();
+builder.Services.AddFormBuilder()
+    .UseEF();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IFakerDataService, AuthViewModelFakeService>();
@@ -33,6 +34,12 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+SeedData(app);
+app.Use(async (context, next) =>
+{
+    var cookie = context.Request.Headers;
+    await next.Invoke();
+});
 app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI();
@@ -49,7 +56,7 @@ app.UseEndpoints(edps =>
 
 app.Run();
 
-void SeedData(WebApplication application, string scimBaseUrl)
+void SeedData(WebApplication application)
 {
     using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
     {

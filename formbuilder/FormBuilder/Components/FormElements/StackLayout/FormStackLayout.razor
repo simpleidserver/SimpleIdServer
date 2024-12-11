@@ -4,7 +4,7 @@
 @using FormBuilder.Helpers
 
 
-<InteractableElement Record="@Value" TRecord="FormStackLayoutRecord" Context=@WorkflowContext IsInteractableElementEnabled="@IsInteractableElementEnabled">
+<InteractableElement Record="@Value" TRecord="FormStackLayoutRecord" Context=@WorkflowContext IsInteractableElementEnabled="@(IsInteractableElementEnabled && Value.IsFormEnabled)">
     <Children>
         <EditableLayoutContainerElement Record="@Value" TRecord="FormStackLayoutRecord" TDialog="FormStackLayoutDialog" ParentContext="@ParentContext" IsEditModeEnabled="@IsEditModeEnabled">
             <Children>

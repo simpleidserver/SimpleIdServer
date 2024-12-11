@@ -6,7 +6,7 @@ namespace FormBuilder.EF;
 
 public class FormBuilderDbContext : DbContext
 {
-    public FormBuilderDbContext()
+    public FormBuilderDbContext(DbContextOptions<FormBuilderDbContext> options) : base(options)
     {
         
     }
