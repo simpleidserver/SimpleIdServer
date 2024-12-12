@@ -58,12 +58,6 @@ public class Constants
                     {
                         Id = authFormId,
                         IsFormEnabled = true,
-                        IsAntiforgeryEnabled = true,
-                        Url = new ControllerActionTargetUrl
-                        {
-                            Action = "Confirm",
-                            Controller = "Auth"
-                        },
                         Elements = new ObservableCollection<IFormElementRecord>
                         {
                             new FormInputFieldRecord
@@ -127,8 +121,7 @@ public class Constants
                     new FormAnchorRecord
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build(),
-                        Url = new DirectTargetUrl { Url = "http://google.com" }
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
                     },
                     // Separator
                     new DividerLayoutRecord
@@ -151,10 +144,6 @@ public class Constants
                             LabelMappingRules = new List<Rules.LabelMappingRule>
                             {
                                 new Rules.LabelMappingRule { Language = "en", Source = "$.DisplayName" }
-                            },
-                            MappingRules = new List<MappingRule>
-                            {
-                                new MappingRule { Source = "$.AuthenticationScheme", Target = nameof(FormAnchorRecord.Url), Transformer = new ControllerActionTransformerParameters { Action = "Callback", Controller = "Auth", QueryParameterName = "scheme" } } // Transformer !!!
                             }
                         }
                     }

@@ -5,7 +5,7 @@ namespace FormBuilder.Startup.Fakers;
 
 public class AuthViewModelFakeService : IFakerDataService
 {
-    public Type RecordType => typeof(AuthViewModel);
+    public string FormRecordName => Constants.LoginPwdAuthForm.Name;
 
     public object Generate()
     {

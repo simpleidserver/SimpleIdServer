@@ -1,20 +1,17 @@
 ﻿using FormBuilder.Models;
-using FormBuilder.Models.Url;
 using System.Text.Json.Nodes;
 
-namespace FormBuilder.Components.FormElements.Anchor
+namespace FormBuilder.Components.FormElements.Anchor;
+
+public class FormAnchorRecord : BaseFormFieldRecord
 {
-    public class FormAnchorRecord : BaseFormFieldRecord
+    public bool ActAsButton { get; set; } = false;
+
+    public override void Apply(JsonNode node)
     {
-        public ITargetUrl Url { get; set; }
-        public bool ActAsButton { get; set; } = false;
+    }
 
-        public override void Apply(JsonNode node)
-        {
-        }
-
-        public override void ExtractJson(JsonObject json)
-        {
-        }
+    public override void ExtractJson(JsonObject json)
+    {
     }
 }

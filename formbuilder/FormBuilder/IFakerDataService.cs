@@ -2,6 +2,6 @@
 
 public interface IFakerDataService
 {
-    Type RecordType { get; }
+    string FormRecordName { get; }
     object Generate();
 }

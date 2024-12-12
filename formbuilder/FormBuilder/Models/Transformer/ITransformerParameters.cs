@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace FormBuilder.Models.Transformer;
 
-[JsonDerivedType(typeof(ControllerActionTransformerParameters), typeDiscriminator: "ControllerActionTransformer")]
+[JsonDerivedType(typeof(DirectTargetUrlTransformerParameters), typeDiscriminator: "DirectTargetUrlTransformer")]
 public interface ITransformerParameters
 {
     string Type { get; }

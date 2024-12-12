@@ -8,4 +8,5 @@ public interface IRepetitionRule
     string Path { get; }
     string Type { get; }
     List<MappingRule> MappingRules { get; set; }
+    List<LinkWorkflowMappingRule> LinkWorkflowMappingRules { get; set; }
 }

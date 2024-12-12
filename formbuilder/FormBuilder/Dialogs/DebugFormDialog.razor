@@ -24,7 +24,6 @@
 @code {
     private StandaloneCodeEditor editor;
     [Parameter] public FormRecord Form { get; set; }
-    [Parameter] public Type InputRecordType { get; set; }
     WorkflowExecutionContext workflowExecutionContext { get; set; }
     JsonObject input { get; set; }
     FormViewerContext context { get; set; }
@@ -59,7 +58,7 @@
 
     private async Task GenerateFakeData()
     {
-        var fakerDataService = fakerDataServiceFactory.Build(InputRecordType);
+        var fakerDataService = fakerDataServiceFactory.Build(Form.Name);
         var obj = fakerDataService.Generate();
         var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
         await editor.SetValue(json);

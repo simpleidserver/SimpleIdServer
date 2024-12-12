@@ -1,4 +1,5 @@
-﻿@using FormBuilder.Factories
+﻿@using FormBuilder.Components.FormElements.ListData
+@using FormBuilder.Factories
 @using FormBuilder.Link
 @using FormBuilder.Models
 @inject DialogService dialogService
@@ -30,8 +31,10 @@
             CustomRender = CreateComponent();
         }
     }
-    [Parameter] public WorkflowLink WorkflowLink { get; set; }
 
+    [Parameter] public List<FormRecord> Forms { get; set; }
+    [Parameter] public WorkflowLink WorkflowLink { get; set; }
+    [Parameter] public WorkflowRecord Workflow { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -49,9 +52,9 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            actions = workflowLinkActionFactory.GetAll();
-            StateHasChanged();
+            actions = workflowLinkActionFactory.GetAll(Workflow, Forms, WorkflowLink);
             CustomRender = CreateComponent();
+            StateHasChanged();
         }
     }
 

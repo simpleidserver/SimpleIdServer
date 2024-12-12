@@ -14,7 +14,6 @@ using FormBuilder.Link;
 using FormBuilder.Rules;
 using FormBuilder.Services;
 using FormBuilder.Transformers;
-using FormBuilder.Url;
 using Radzen;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -46,11 +45,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFakerDataServiceFactory, FakerDataServiceFactory>();
         services.AddTransient<IWorkflowLinkActionFactory, WorkflowLinkActionFactory>();
 
-        services.AddTransient<ITargetUrlHelper, DirectTargetUrlHelper>();
-        services.AddTransient<ITargetUrlHelper, ControllerActionTargetUrlHelper>();
-        services.AddTransient<ITargetUrlHelperFactory, TargetUrlHelperFactory>();
-
-        services.AddTransient<ITransformer, ControllerActionTransformer>();
+        services.AddTransient<ITransformer, DirectTargetUrlTransformer>();
 
         services.AddTransient<ITransformationRuleEngine, IncomingTokensTransformationRuleEngine>();
         services.AddTransient<IRepetitionRuleEngine, IncomingTokensRepetitionRuleEngine>();
@@ -61,6 +56,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkPopupAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkHttpRequestAction>();
+        services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlTransformerAction>();
 
         services.AddScoped<DialogService>();
 

@@ -1,5 +1,6 @@
 ﻿using FormBuilder.Components;
 using FormBuilder.Extensions;
+using FormBuilder.Link.Components;
 using FormBuilder.Models;
 using FormBuilder.Services;
 using FormBuilder.UIs;
@@ -27,6 +28,10 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
     public static string ActionType => "HttpRequest";
 
     public string DisplayName => "Http request";
+
+    public List<string> ExcludedStepNames => new List<string>();
+
+    public bool CanBeAppliedMultipleTimes => false;
 
     public async Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context)
     {

@@ -22,9 +22,19 @@
                 <ul class="elements">
                     @foreach (var record in Records)
                     {
-                        <li draggable="true" @ondragstart="@(async () => await HandleDragStart(record))">
-                            <div class="icon"></div><span class="text">@record.Name</span>
-                        </li>
+                        var isDisabled = disabledFormRecords.Contains(record.Name);
+                        if(!isDisabled)
+                        {
+                            <li draggable="true" @ondragstart="@(async () => await HandleDragStart(record))">
+                                <div class="icon"></div><span class="text">@record.Name</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="disabled">
+                                <div class="icon"></div><span class="text">@record.Name</span>
+                            </li>
+                        }
                     }
                 </ul>
             </div>
@@ -50,6 +60,12 @@
 
             @foreach (var link in Workflow.Links)
             {
+                var textInfoCoordinate = link.ComputeTextInfoCoordinate();
+                <foreignObject x="@textInfoCoordinate.X" y="@textInfoCoordinate.Y" width="100">
+                    <div class="linkInfo">
+                        <span><RadzenIcon Icon="delete" class="icon" @onclick="@(() => HandleRemoveLink(link))" /></span><span class="text">@link.ActionType</span>
+                    </div>
+                </foreignObject>
                 <path class="hitbox" @onclick="@(async (e) => await HandleEditWorkflowLink(link))" stroke-width="10" @onmousemove="@((e) => HandleOnHoverLink(link))" @onmouseleave="@((e) => HandleOnLeaveLink(link))" fill="none" d="@GetLinkCoordinate(link)"></path>
                 <path marker-end="@(link.IsHover ? "url(#headSelected)" : "url(#head)")" stroke-width="2" fill="none" stroke="@(link.IsHover ? "red" : "black")" d="@GetLinkCoordinate(link)"></path>
             }
@@ -80,14 +96,15 @@
 </RadzenRow>
 
 @code {
+    [Parameter] public List<FormRecord> Records { get; set; }
+    [Parameter] public WorkflowRecord Workflow { get; set; } = new WorkflowRecord();
+    private List<string> disabledFormRecords { get; set; }
     private ElementReference _divRef;
     private RadzenColumn _svgContainer;
-    [Parameter] public List<FormRecord> Records { get; set; }
     private WorkflowViewerContext WorkflowContext { get; set; } = new WorkflowViewerContext();
     private WorkflowStep selectedStep { get; set; }
     private FormRecord selectedFormRecord;
     private WorkflowLink selectedLink { get; set; }
-    private WorkflowRecord Workflow { get; set; } = new WorkflowRecord();
     private ElementReference svgRef;
     private Coordinate svgPosition;
     private string viewBox { get; set; }
@@ -104,6 +121,16 @@
             viewBox = $"0 0 {svgSize.width} {svgSize.height}";
             Records.Add(Constants.EmptyStep);
             StateHasChanged();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Records != null && Workflow != null && disabledFormRecords == null)
+        {
+            var activeSteps = Workflow.Steps.Select(s => s.FormRecordName);
+            disabledFormRecords = Records.Select(r => r.Name).Where(r => activeSteps.Contains(r)).ToList();
         }
     }
 
@@ -166,6 +193,7 @@
                 },
                 FormRecordName = selectedFormRecord.Name
             });
+            disabledFormRecords.Add(selectedFormRecord.Name);
             selectedFormRecord = null;
             return true;
         }
@@ -265,8 +293,15 @@
     {
         return dialogService.OpenAsync<EditWorkflowLinkDialog>(string.Empty, new Dictionary<string, object>
         {
-            { "WorkflowLink", link }
+            { "WorkflowLink", link },
+            { "Workflow", Workflow },
+            { "Forms", Records }
         });
+    }
+
+    private void HandleRemoveLink(WorkflowLink link)
+    {
+        Workflow.Links.Remove(link);
     }
 
     #endregion
@@ -274,6 +309,7 @@
     private void HandleStepRemoved(WorkflowStep step)
     {
         Workflow.Steps.Remove(step);
+        disabledFormRecords.Remove(step.FormRecordName);
         Workflow.Links = Workflow.Links.Where(l => !l.IsLinked(step.Id)).ToList();
     }
 

@@ -1,0 +1,15 @@
+﻿@using Radzen
+@using Radzen.Blazor
+
+<!-- Controller -->
+<RadzenFormField Variant="Variant.Outlined" Text="Url" class="fullWidth">
+    <RadzenTextBox @bind-Value="@Record.Url"></RadzenTextBox>
+</RadzenFormField>
+<!-- Query parameter -->
+<RadzenFormField Variant="Variant.Outlined" Text="Name of the query parameter" class="fullWidth">
+    <RadzenTextBox @bind-Value="@Record.QueryParameterName"></RadzenTextBox>
+</RadzenFormField>
+
+@code {
+    [Parameter] public DirectTargetUrlTransformerParameters Record { get; set; }
+}

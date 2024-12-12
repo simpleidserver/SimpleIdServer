@@ -8,6 +8,7 @@ public interface IFormElementDefinitionFactory
 public class FormElementDefinitionFactory : IFormElementDefinitionFactory
 {
     private readonly IEnumerable<IFormElementDefinition> _definitions;
+
     public FormElementDefinitionFactory(IEnumerable<IFormElementDefinition> definitions)
     {
         _definitions = definitions;

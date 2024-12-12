@@ -35,6 +35,13 @@ public class WorkflowLink
     public bool IsLinked(string stepId)
         => SourceStepId == stepId || TargetStepId == stepId;
 
+    public Coordinate ComputeTextInfoCoordinate()
+    {
+        var result = (TargetCoordinate - SourceCoordinate).Positive().Div(2).Round();
+        var minCoordinate = SourceCoordinate.Min(TargetCoordinate);
+        return result + minCoordinate;
+    }
+
     public static WorkflowLink Create(string sourceStepid, IFormElementRecord eltRecord, Coordinate coordinate, Size size, Coordinate coordinateRelativeToStep)
     {
         var anchorCoordinate = GetAnchorCoordinate(size, coordinate, AnchorDirections.RIGHT);
@@ -46,7 +53,6 @@ public class WorkflowLink
                 Size = size,
                 CoordinateRelativeToStep = coordinateRelativeToStep
             },
-            ActionType = WorkflowLinkPopupAction.ActionType,
             SourceStepId = sourceStepid,
             SourceCoordinate = anchorCoordinate,
             TargetCoordinate = anchorCoordinate.Clone()

@@ -3,9 +3,16 @@
 @using Radzen
 @using Radzen.Blazor
 
+<!-- Target -->
 <RadzenFormField Variant="Variant.Outlined" Text="Target" class="fullWidth">
     <RadzenTextBox @bind-Value="@Target"></RadzenTextBox>
 </RadzenFormField>
+<!-- Antiforgery -->
+<div>
+    <RadzenCheckBox @bind-Value="IsAntiforgeryEnabled" />
+    <RadzenLabel>Do you want to automatically generate an anti-forgery token?</RadzenLabel>
+</div>
+
 
 @code {
     public string Target
@@ -20,6 +27,20 @@
             WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
         }
     }
+
+    public bool IsAntiforgeryEnabled
+    {
+        get
+        {
+            return Parameter.IsAntiforgeryEnabled;
+        }
+        set
+        {
+            Parameter.IsAntiforgeryEnabled = value;
+            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+        }
+    }
+
     [Parameter] public WorkflowLinkHttpRequestParameter Parameter { get; set; }
     [Parameter] public WorkflowLink WorkflowLink { get; set; }
 }

@@ -12,4 +12,11 @@ public class WorkflowStep
     public ElementReference EltRef { get; set; }
     [JsonIgnore]
     public Size Size { get; set; }
+    public bool IsEmptyStep
+    {
+        get
+        {
+            return FormRecordName == Constants.EmptyStep.Name;
+        }
+    }
 }

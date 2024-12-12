@@ -1,13 +1,11 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Factories;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace FormBuilder.Components.FormElements.Anchor;
 
 public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
 {
-    ElementReference LinkElt;
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public FormAnchorRecord Value { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
@@ -15,14 +13,7 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
     [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
     [Parameter] public FormViewerContext Context { get; set; }
-    [Inject] private ITargetUrlHelperFactory targetUrlHelperFactory { get; set; }
-    [Inject] private IJSRuntime JSRuntime { get; set; }
     [Inject] private IWorkflowLinkActionFactory WorkflowLinkActionFactory { get; set; }
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-    }
 
     async Task Navigate()
     {

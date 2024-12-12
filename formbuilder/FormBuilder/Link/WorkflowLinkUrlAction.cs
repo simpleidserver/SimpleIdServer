@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Components;
+using FormBuilder.Link.Components;
 using FormBuilder.Models;
 using FormBuilder.Services;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -20,6 +21,10 @@ public class WorkflowLinkUrlAction : IWorkflowLinkAction
     public string DisplayName => "URL";
 
     public static string ActionType => "URL";
+
+    public List<string> ExcludedStepNames => new List<string>();
+
+    public bool CanBeAppliedMultipleTimes => false;
 
     public async Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context)
     {

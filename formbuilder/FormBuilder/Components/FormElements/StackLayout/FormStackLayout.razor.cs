@@ -10,10 +10,6 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
 {
     private RenderFragment? CustomRender { get; set; }
     [Inject] private IRenderFormElementsHelper renderFormsElementsHelper {  get; set; }
-    [Inject] private IHttpClientFactory httpClientFactory { get; set; }
-    [Inject] private ITargetUrlHelperFactory targetUrlHelperFactory { get; set; }
-    [Inject] private IUriProvider uriProvider {  get; set; }
-    [Inject] private IServiceProvider serviceProvider { get; set; }
     [Inject] private IWorkflowLinkActionFactory WorkflowLinkActionFactory { get; set; }
     [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
     [Parameter] public FormStackLayoutRecord Value { get; set; }
@@ -53,16 +49,5 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     {
         CustomRender = CreateComponent();
         StateHasChanged();
-    }
-
-    private Dictionary<string, string> ConvertToDic(JsonObject json)
-    {
-        var result = new Dictionary<string, string>();
-        foreach (var kvp in json)
-        {
-            result.Add(kvp.Key, json[kvp.Key].ToString());
-        }
-
-        return result;
     }
 }

@@ -57,7 +57,6 @@
 
 @code {
     [Parameter] public FormRecord Form { get; set; }
-    [Parameter] public string InputRecordType { get; set; }
     FormViewerContext Context { get; set; } = new FormViewerContext();
     WorkflowExecutionContext workflowExecutionContext = null;
 
@@ -77,11 +76,9 @@
 
     private Task LaunchDebug()
     {
-        var inputRecordType = Type.GetType(InputRecordType);
         return dialogService.OpenAsync<DebugFormDialog>("", new Dictionary<string, object>
         {
-            { nameof(DebugFormDialog.Form), Form },
-            { nameof(DebugFormDialog.InputRecordType), inputRecordType }
+            { nameof(DebugFormDialog.Form), Form }
         });
     }
 

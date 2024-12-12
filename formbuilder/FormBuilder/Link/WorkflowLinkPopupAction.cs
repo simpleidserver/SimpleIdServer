@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Components;
+using FormBuilder.Link.Components;
 using FormBuilder.Models;
 using Microsoft.AspNetCore.Components.Rendering;
 using Radzen;
@@ -20,6 +21,13 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
 
     public static string ActionType => "Popup";
 
+    public List<string> ExcludedStepNames => new List<string>
+    {
+        Constants.EmptyStep.Name
+    };
+
+    public bool CanBeAppliedMultipleTimes => false;
+
     public async Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context)
     {
         context.NextStep(activeLink);
@@ -31,5 +39,6 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
 
     public void Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
     {
+
     }
 }

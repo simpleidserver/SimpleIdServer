@@ -16,15 +16,39 @@ public class Coordinate
     public double X { get; set; }
     public double Y { get; set; }
 
-    public static Coordinate operator -(Coordinate pos1, Coordinate pos2) => new Coordinate { X = pos1.X - pos2.X, Y = pos1.Y - pos2.Y };
+    public Coordinate Positive()
+    {
+        X = X < 0 ? -X : X;
+        Y = Y < 0 ? -Y : Y;
+        return this;
+    }
 
-    public static Coordinate operator +(Coordinate pos1, Coordinate pos2) => new Coordinate { X = pos1.X + pos2.X, Y = pos1.Y + pos2.Y };
+    public Coordinate Div(double divisor)
+    {
+        X = (double)X / divisor;
+        Y = (double)Y / divisor;
+        return this;
+    }
 
-    public void Round()
+    public Coordinate Round()
     {
         X = Math.Round(X);
         Y = Math.Round(Y);
+        return this;
     }
+
+    public Coordinate Min(Coordinate secondCoordinate)
+    {
+        return new Coordinate
+        {
+            X = X < secondCoordinate.X ? X : secondCoordinate.X,
+            Y = Y < secondCoordinate.Y ? Y : secondCoordinate.Y
+        };
+    }
+
+    public static Coordinate operator -(Coordinate pos1, Coordinate pos2) => new Coordinate { X = pos1.X - pos2.X, Y = pos1.Y - pos2.Y };
+
+    public static Coordinate operator +(Coordinate pos1, Coordinate pos2) => new Coordinate { X = pos1.X + pos2.X, Y = pos1.Y + pos2.Y };
 
     public Coordinate Clone()
     {

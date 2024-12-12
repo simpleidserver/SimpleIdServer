@@ -55,6 +55,7 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
 
         return result;
     }
+    
     protected override void InternalBuildComponent(IncomingTokensRepetitionRule target, Type recordType, RenderTreeBuilder builder)
     {
         builder.OpenComponent<IncomingTokensRepetitionRuleComponent>(0);

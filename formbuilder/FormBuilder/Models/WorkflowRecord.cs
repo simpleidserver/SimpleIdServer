@@ -1,4 +1,6 @@
-﻿namespace FormBuilder.Models;
+﻿using FormBuilder.Components.FormElements.ListData;
+
+namespace FormBuilder.Models;
 
 public class WorkflowRecord
 {
@@ -17,8 +19,19 @@ public class WorkflowRecord
     }
 
     public void AddLink(WorkflowLink workflowLink)
+        => Links.Add(workflowLink);
+
+    public (FormRecord form, ListDataRecord formElt) GetListDataRecord(WorkflowLink workflowLink, List<FormRecord> forms)
     {
-        Links.Add(workflowLink);
+        var record = GetElementRecord(workflowLink, forms);
+        return (record.form, record.formElt as ListDataRecord);
+    }
+
+    public (FormRecord form, IFormElementRecord formElt) GetElementRecord(WorkflowLink workflowLink, List<FormRecord> forms)
+    {
+        var workflowStep = Steps.Single(f => f.Id == workflowLink.SourceStepId);
+        var form = forms.Single(f => f.Name == workflowStep.FormRecordName);
+        return (form, form.GetChild(workflowLink.Source.EltId));
     }
 
     public List<WorkflowLink> GetLinks(WorkflowStep step)

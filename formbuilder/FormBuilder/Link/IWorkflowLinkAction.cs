@@ -8,6 +8,8 @@ public interface IWorkflowLinkAction
 {
     string Type { get; }
     string DisplayName { get; }
+    List<string> ExcludedStepNames { get; }
+    bool CanBeAppliedMultipleTimes { get; }
     Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context);
     void Render(RenderTreeBuilder builder, WorkflowLink workflowLink);
 }

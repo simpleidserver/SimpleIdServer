@@ -2,7 +2,7 @@
 
 public interface IFakerDataServiceFactory
 {
-    IFakerDataService Build(Type type);
+    IFakerDataService Build(string formRecordName);
 }
 
 public class FakerDataServiceFactory : IFakerDataServiceFactory
@@ -14,6 +14,6 @@ public class FakerDataServiceFactory : IFakerDataServiceFactory
         _fakerDataServices = fakerDataServices;
     }
 
-    public IFakerDataService Build(Type type)
-        => _fakerDataServices.Single(f => f.RecordType == type);
+    public IFakerDataService Build(string formRecordName)
+        => _fakerDataServices.Single(f => f.FormRecordName == formRecordName);
 }
