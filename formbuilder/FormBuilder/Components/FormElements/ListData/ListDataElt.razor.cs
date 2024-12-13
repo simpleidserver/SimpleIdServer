@@ -1,6 +1,8 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Helpers;
+using FormBuilder.Models;
 using Microsoft.AspNetCore.Components;
+using System.Collections.ObjectModel;
 
 namespace FormBuilder.Components.FormElements.ListData
 {
@@ -27,7 +29,14 @@ namespace FormBuilder.Components.FormElements.ListData
 
         private RenderFragment CreateComponent() => builder =>
         {
-            renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled, WorkflowContext, IsInteractableElementEnabled, WorkflowExecutionContext);
+            foreach(var record in Value.Elements)
+            {
+                var col = new ObservableCollection<IFormElementRecord>
+                {
+                    record.Item1
+                };
+                renderFormsElementsHelper.Render(builder, col, Context, IsEditModeEnabled, WorkflowContext, IsInteractableElementEnabled, record.Item2);
+            }
         };
     }
 }

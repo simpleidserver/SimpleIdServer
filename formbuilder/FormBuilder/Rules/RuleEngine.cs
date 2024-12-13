@@ -1,4 +1,5 @@
-﻿using FormBuilder.Components.FormElements.ListData;
+﻿using FormBuilder.Components;
+using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Factories;
@@ -10,7 +11,7 @@ namespace FormBuilder.Rules;
 
 public interface IRuleEngine
 {
-    void Apply(FormRecord formRecord, JsonObject input);
+    void Apply(FormRecord formRecord, JsonObject input, WorkflowExecutionContext workflowExecutionContext);
 }
 
 public class RuleEngine : IRuleEngine
@@ -26,24 +27,24 @@ public class RuleEngine : IRuleEngine
        _repetitionRuleEngineFactory = repetitionRuleEngineFactory;
     }
 
-    public void Apply(FormRecord formRecord, JsonObject input)
+    public void Apply(FormRecord formRecord, JsonObject input, WorkflowExecutionContext workflowExecutionContext)
     {
         foreach(var elt in formRecord.Elements)
-            Apply(elt, input);
+            Apply(elt, input, workflowExecutionContext);
     }
 
-    public void Apply(dynamic elt, JsonObject input) => Apply(elt, input);
+    public void Apply(dynamic elt, JsonObject input, WorkflowExecutionContext workflowExecutionContext) => Apply(elt, input, workflowExecutionContext);
 
-    public void Apply(BaseFormLayoutRecord record, JsonObject input) { }
+    public void Apply(BaseFormLayoutRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
 
-    public void Apply(FormStackLayoutRecord record, JsonObject input)
+    public void Apply(FormStackLayoutRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext)
     {
         if (record.Elements == null) return;
         foreach (var elt in record.Elements)
-            Apply(elt, input);
+            Apply(elt, input, workflowExecutionContext);
     }
 
-    public void Apply(BaseFormFieldRecord record, JsonObject input)
+    public void Apply(BaseFormFieldRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext)
     {
         if (record.Transformation == null) return;
         var transformationResult = _transformationRuleEngineFactory.Transform(input, record.Transformation);
@@ -51,16 +52,39 @@ public class RuleEngine : IRuleEngine
         record.Apply(transformationResult.First());
     }
 
-    public void Apply(ListDataRecord record, JsonObject input)
+    public void Apply(ListDataRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext)
     {
         if (record.RepetitionRule == null) return;
-        var elts = _repetitionRuleEngineFactory.Transform(record.FieldType, input, record.RepetitionRule, record.Parameters);
-        record.Elements = new ObservableCollection<IFormElementRecord>(elts);
+        var result = _repetitionRuleEngineFactory.Transform(record.FieldType, input, record.RepetitionRule, record.Parameters);
+        var tmp = new ObservableCollection<(IFormElementRecord, WorkflowExecutionContext)>();
+        var link = workflowExecutionContext.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
+        result.ForEach(r =>
+        {
+            var copyContext = workflowExecutionContext.Clone();
+            if(link != null)
+            {
+                copyContext.Workflow.Links.Add(new WorkflowLink
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Source = new WorkflowLinkSource
+                    {
+                        EltId = r.Item1.Id
+                    },
+                    ActionParameter = link.ActionParameter,
+                    ActionType = link.ActionType,
+                    TargetStepId = link.TargetStepId,
+                    SourceStepId = link.SourceStepId
+                });
+            }
+
+            copyContext.RepetitionRuleData = r.Item2;
+            tmp.Add((r.Item1, copyContext));
+        });
+
+        record.Elements = tmp;
     }
 
-    public void Apply(BaseFormDataRecord record, JsonObject input)
-    {
-    }
+    public void Apply(BaseFormDataRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
 
-    public void Apply(ParagraphRecord record, JsonObject input) { }
+    public void Apply(ParagraphRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
 }

@@ -1,10 +1,16 @@
 ﻿using FormBuilder.Models;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components;
 
 public class WorkflowExecutionContext
 {
+    public WorkflowExecutionContext()
+    {
+        
+    }
+
     public WorkflowExecutionContext(FormRecord formRecord)
     {
         var currentStepId = Guid.NewGuid().ToString();
@@ -42,6 +48,19 @@ public class WorkflowExecutionContext
     public string CurrentStepId { get; private set; }
     public JsonObject StepOutput { get; private set; }
     public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
+    public JsonNode RepetitionRuleData { get; set; }
+
+    public WorkflowExecutionContext Clone()
+    {
+        return new WorkflowExecutionContext()
+        {
+            AntiforgeryToken = AntiforgeryToken,
+            CurrentStepId = CurrentStepId,
+            Records = Records,
+            StepOutput = StepOutput,
+            Workflow = JsonSerializer.Deserialize<WorkflowRecord>(JsonSerializer.Serialize(Workflow))
+        };
+    }
 
     public WorkflowLink GetLink(IFormElementRecord record)
     {

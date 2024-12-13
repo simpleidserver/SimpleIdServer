@@ -22,9 +22,9 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
 
     public override string Type => IncomingTokensRepetitionRule.TYPE;
 
-    protected override List<IFormElementRecord> InternalTransform(string fieldType, JsonObject input, IncomingTokensRepetitionRule parameter, Dictionary<string, object> parameters)
+    protected override List<(IFormElementRecord, JsonNode)> InternalTransform(string fieldType, JsonObject input, IncomingTokensRepetitionRule parameter, Dictionary<string, object> parameters)
     {
-        var result = new List<IFormElementRecord>();
+        var result = new List<(IFormElementRecord, JsonNode)>();
         var path = JsonPath.Parse(parameter.Path);
         var pathResult = path.Evaluate(input);
         var nodes = pathResult.Matches.Select(m => m.Value);
@@ -50,7 +50,8 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
             }
 
             ApplyParameters(instance, allProperties, parameters);
-            result.Add((IFormElementRecord)instance);
+            var record = (IFormElementRecord)instance;
+            result.Add((record, node));
         }
 
         return result;

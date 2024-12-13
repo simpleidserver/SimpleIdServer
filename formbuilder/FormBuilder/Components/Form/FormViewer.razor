@@ -34,7 +34,7 @@
         if (WorkflowExecutionContext != null && Form == null)
             Form = WorkflowExecutionContext.GetCurrentRecord();
 
-        RuleEngine.Apply(Form, Input);
+        RuleEngine.Apply(Form, Input, WorkflowExecutionContext);
         CustomRender = CreateComponent();
         Form.Elements.CollectionChanged += HandleChanged;
     }

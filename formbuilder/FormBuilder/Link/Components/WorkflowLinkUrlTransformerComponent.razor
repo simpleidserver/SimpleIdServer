@@ -8,6 +8,10 @@
 @using Radzen.Blazor
 @using System.Text.Json
 
+<!-- Json Source -->
+<RadzenFormField Variant="Variant.Outlined" Text="JSON Source" class="fullWidth">
+    <RadzenTextBox @bind-Value="@JsonSource"></RadzenTextBox>
+</RadzenFormField>
 <!-- Url -->
 <RadzenFormField Variant="Variant.Outlined" Text="Url" class="fullWidth">
     <RadzenTextBox @bind-Value="@Url"></RadzenTextBox>
@@ -19,6 +23,19 @@
 
 
 @code {
+    public string JsonSource
+    {
+        get
+        {
+            return Parameter.JsonSource;
+        }
+        set
+        {
+            Parameter.JsonSource = value;
+            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+        }
+    }
+
     public string Url
     {
         get

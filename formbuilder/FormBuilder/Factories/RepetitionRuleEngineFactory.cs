@@ -9,7 +9,7 @@ public interface IRepetitionRuleEngineFactory
 {
     List<string> GetAll();
     IRepetitionRuleEngine Build(string type);
-    List<IFormElementRecord> Transform<T>(string fieldType, JsonObject jsonObj, T parameter, Dictionary<string, object> parameters) where T : IRepetitionRule;
+    List<(IFormElementRecord, JsonNode)> Transform<T>(string fieldType, JsonObject jsonObj, T parameter, Dictionary<string, object> parameters) where T : IRepetitionRule;
 }
 
 public class RepetitionRuleEngineFactory : IRepetitionRuleEngineFactory
@@ -27,7 +27,7 @@ public class RepetitionRuleEngineFactory : IRepetitionRuleEngineFactory
     public IRepetitionRuleEngine Build(string type)
         => _ruleEngines.Single(r => r.Type == type);
 
-    public List<IFormElementRecord> Transform<T>(string fieldType, JsonObject jsonObj, T parameter, Dictionary<string, object> parameters) where T : IRepetitionRule
+    public List<(IFormElementRecord, JsonNode)> Transform<T>(string fieldType, JsonObject jsonObj, T parameter, Dictionary<string, object> parameters) where T : IRepetitionRule
     {
         var ruleEngine = _ruleEngines.Single(r => r.Type == parameter.Type);
         return ruleEngine.Transform(fieldType, jsonObj, parameter, parameters);
