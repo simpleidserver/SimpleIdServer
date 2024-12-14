@@ -1,0 +1,64 @@
+﻿@using BlazorMonaco.Editor
+@using FormBuilder.Components
+@using FormBuilder.Components.Form
+@using FormBuilder.Factories
+@using FormBuilder.Models
+@using Radzen.Blazor
+@using System.Text.Json
+@using System.Text.Json.Nodes
+@inject IFakerDataServiceFactory fakerDataServiceFactory
+
+<RadzenSteps>
+    <Steps>        
+        <RadzenStepsItem Text="Input data (JSON)">            
+            <StandaloneCodeEditor @ref=editor OnDidInit="HandleOnDidInit" OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Viewer" Disabled="@(input == null)">
+            <FormViewer Input="@input" WorkflowExecutionContext="@Workflow" IsEditModeEnabled="false" WorkflowViewerContext="@WorkflowContext"></FormViewer>
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    private StandaloneCodeEditor editor;
+    [Parameter] public WorkflowExecutionContext Workflow { get; set; }
+    private WorkflowViewerContext WorkflowContext { get; set; } = new WorkflowViewerContext();
+    JsonObject input { get; set; }
+
+    private async Task HandleOnDidInit()
+    {
+        await GenerateFakeData();
+    }
+
+    private async Task GenerateFakeData()
+    {
+        var currentRecord = Workflow.GetCurrentRecord();
+        var fakerDataService = fakerDataServiceFactory.Build(currentRecord.Name);
+        var obj = fakerDataService.Generate();
+        var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
+        await editor.SetValue(json);
+    }
+
+    private async Task HandleOnEditorContentChanged()
+    {
+        var value = await editor.GetValue();
+        try
+        {
+            input = JsonObject.Parse(value).AsObject();
+        }
+        catch
+        {
+            input = null;
+        }
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "json",
+            Value = "{}"
+        };
+    }
+}

@@ -1,0 +1,67 @@
+﻿@using FormBuilder.Components.FormElements.ListData
+@using FormBuilder.Components.Shared
+@using FormBuilder.Factories
+@using FormBuilder.Models
+@using FormBuilder.Models.Rules
+@using FormBuilder.Transformers.Components
+@using Radzen
+@using Radzen.Blazor
+@using System.Text.Json
+
+<!-- Json Source -->
+<RadzenFormField Variant="Variant.Outlined" Text="JSON Source" class="fullWidth">
+    <RadzenTextBox @bind-Value="@JsonSource"></RadzenTextBox>
+</RadzenFormField>
+<!-- Url -->
+<RadzenFormField Variant="Variant.Outlined" Text="Url" class="fullWidth">
+    <RadzenTextBox @bind-Value="@Url"></RadzenTextBox>
+</RadzenFormField>
+<!-- Query parameter -->
+<RadzenFormField Variant="Variant.Outlined" Text="Name of the query parameter" class="fullWidth">
+    <RadzenTextBox @bind-Value="@QueryParameterName"></RadzenTextBox>
+</RadzenFormField>
+
+
+@code {
+    public string JsonSource
+    {
+        get
+        {
+            return Parameter.JsonSource;
+        }
+        set
+        {
+            Parameter.JsonSource = value;
+            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+        }
+    }
+
+    public string Url
+    {
+        get
+        {
+            return Parameter.Url;
+        }
+        set
+        {
+            Parameter.Url = value;
+            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+        }
+    }
+
+    public string QueryParameterName
+    {
+        get
+        {
+            return Parameter.QueryParameterName;
+        }
+        set
+        {
+            Parameter.QueryParameterName = value;
+            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+        }
+    }
+
+    [Parameter] public WorkflowLinkUrlTransformationParameter Parameter { get; set; }
+    [Parameter] public WorkflowLink WorkflowLink { get; set; }
+}

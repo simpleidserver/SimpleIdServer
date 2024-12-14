@@ -1,0 +1,31 @@
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Components.Form
+@using FormBuilder.Components.Interactable
+@using FormBuilder.Helpers
+
+
+<InteractableElement Record="@Value" TRecord="FormStackLayoutRecord" Context=@WorkflowContext IsInteractableElementEnabled="@(IsInteractableElementEnabled && Value.IsFormEnabled)">
+    <Children>
+        <EditableLayoutContainerElement Record="@Value" TRecord="FormStackLayoutRecord" TDialog="FormStackLayoutDialog" ParentContext="@ParentContext" IsEditModeEnabled="@IsEditModeEnabled">
+            <Children>
+                @if (Value.Elements != null)
+                {
+                    if(Value.IsFormEnabled)
+                    {
+                        <EditForm Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
+                            <RadzenStack Orientation="Orientation.Vertical">
+                                @CustomRender
+                            </RadzenStack>
+                        </EditForm>
+                    }
+                    else
+                    {
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            @CustomRender
+                        </RadzenStack>
+                    }
+                }
+            </Children>
+        </EditableLayoutContainerElement>
+    </Children>
+</InteractableElement>

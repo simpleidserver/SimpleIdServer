@@ -1,0 +1,22 @@
+﻿@using FormBuilder.Components.Shared
+@using FormBuilder.Models.Rules
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenStack>
+    <!-- Display the path -->
+    <RadzenFormField Variant="Variant.Outlined" Text="JSON Path" class="fullWidth">
+        <JsonPathFieldComponent Value="@path"></JsonPathFieldComponent>
+    </RadzenFormField>
+    <!-- For each record, add a workflow link -->
+</RadzenStack>
+
+<h3>IncomingTokensRepetitionRulesWorkflowComponent</h3>
+
+
+@code {
+    [Parameter] public IncomingTokensRepetitionRule Record { get; set; }
+    string path { get; set; }
+
+
+}

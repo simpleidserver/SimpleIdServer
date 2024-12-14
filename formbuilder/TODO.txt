@@ -1,0 +1,21 @@
+* Faire fonctionner le formulaire blazor			:	OK
+* Pouvoir naviguer									:	OK
+
+* Corriger problème SAML2.0 logout							:	TODO
+* Ajouter un éditeur graphique								:	OK
+* Pouvoir bouger les éléments du formulaire					:	OK
+* Pouvoir éditer les paramètres d'un stacklayout			:	OK
+* Editer foreach											:	OK
+* Pouvoir lancer la simulation du formulaire				:	OK
+* Afficher correctement le JSON								:	OK
+* Voir si on peut ajouter l'intellisense dans le JSON		:	OK
+* Générer de façon aléatoire un JSON en entrée				:	TODO
+* Afficher une image										:	TODO
+* Afficher target _blank									:	TODO
+* Désactiver le boutton quand l'auth est en progression		:	TODO
+* Afficher la liste des étapes								:	TODO
+* Pouvoir afficher le JSON									:	TODO
+
+1600 => 
+
+60 => euros pour le mois d'octobre 1600 => km

@@ -1,0 +1,26 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using FormBuilder.Components
+@namespace FormBuilder.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">
+    <link rel="stylesheet" href="_content/FormBuilder/themes.css" />
+    <link rel="stylesheet" href="_content/FormBuilder/style.css" />
+    <link rel="stylesheet" href="FormBuilder.Startup.styles.css" />
+</head>
+<body class="orange">
+    @RenderBody()
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="_content/FormBuilder/lib.js"></script>
+    <script src="_content/BlazorMonaco/jsInterop.js"></script>
+    <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js"></script>
+    <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
+</body>
+</html>

@@ -86,6 +86,7 @@ namespace Microsoft.Extensions.DependencyInjection
             var b = services.AddDataProtection();
             if (dataProtectionBuilderCallback != null) dataProtectionBuilderCallback(b);
             services.AddDistributedMemoryCache();
+            services.AddFormBuilder();
             services.AddResponseModeHandlers()
                 .AddOAuthClientAuthentication()
                 .AddClientAssertionParsers()

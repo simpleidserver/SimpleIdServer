@@ -1,0 +1,52 @@
+﻿@using FormBuilder.Helpers
+@using System.Text.Json.Nodes
+@using FormBuilder.Rules
+@using System.Collections.ObjectModel
+@using System.ComponentModel
+@using System.Collections.Specialized
+@using global::FormBuilder.Models
+@inject IRenderFormElementsHelper renderFormsElementsHelper
+
+@if(Form.Elements != null)
+{
+    @CustomRender
+}
+
+@code {
+    private RenderFragment? CustomRender { get; set; }
+    [Inject] public IRuleEngine RuleEngine { get; set; }
+    [Parameter] public JsonObject Input { get; set; }
+    [Parameter] public bool IsEditModeEnabled { get; set; }
+    [Parameter] public bool IsInteractableElementEnabled { get; set; }
+    [Parameter] public FormViewerContext Context { get; set; }
+    [Parameter] public WorkflowViewerContext WorkflowViewerContext { get; set; }
+    [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
+    private FormRecord Form { get; set; } = null;
+
+    private void HandleClick()
+    {
+        
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (WorkflowExecutionContext != null && Form == null)
+            Form = WorkflowExecutionContext.GetCurrentRecord();
+
+        RuleEngine.Apply(Form, Input, WorkflowExecutionContext);
+        CustomRender = CreateComponent();
+        Form.Elements.CollectionChanged += HandleChanged;
+    }
+
+    private RenderFragment CreateComponent() => builder =>
+    {
+        renderFormsElementsHelper.Render(builder, Form.Elements, Context, IsEditModeEnabled, WorkflowViewerContext, IsInteractableElementEnabled, WorkflowExecutionContext);
+    };
+
+    private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)
+    {
+        CustomRender = CreateComponent();
+        StateHasChanged();
+    }
+}

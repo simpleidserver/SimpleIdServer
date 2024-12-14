@@ -1,0 +1,97 @@
+﻿@typeparam TDialog where TDialog : ComponentBase
+@typeparam TRecord where TRecord : IFormElementRecord
+@using FormBuilder.Dialogs
+@using FormBuilder.Models
+@inject DialogService dialogService
+
+@if(IsEditModeEnabled)
+{
+    <div class="draggableElement" draggable="true" @ondragstart="@(() => HandleDragStart())">
+        <div class="info">
+            @Record.GetType().Name
+        </div>
+        <div class="toolbox">
+            <ul>
+                <li>
+                    <RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="(async (e) => await HandleViewSettings())" />
+                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" />
+                </li>
+            </ul>
+        </div>
+        <DropZoneComponent ClassName="top" Dropped="@HandleEltDroppedTop"></DropZoneComponent>
+        @Children
+        <DropZoneComponent ClassName="bottom" Dropped="@HandleEltDroppedBottom"></DropZoneComponent>
+    </div>
+}
+else 
+{
+    @Children
+}
+
+@code {
+    [Parameter] public RenderFragment Children { get; set; }
+    [Parameter] public bool IsEditModeEnabled { get; set; }
+    [Parameter] public ParentEltContext ParentContext { get; set; }
+    [Parameter] public FormViewerContext Context { get; set; }
+    [Parameter] public TRecord Record { get; set; }
+
+    private void HandleDragStart()
+    {
+        Context.Set(Record, HandleCurrentEltDropped);
+    }
+
+    private void HandleEltDroppedTop() => HandleEltDropped(false);
+
+    private void HandleEltDroppedBottom() => HandleEltDropped(true);
+
+    private void HandleEltDropped(bool isBottom)
+    {
+        IFormElementRecord eltRecord = null;
+        int projectedEltIndex = ParentContext.Index;
+        switch(Context.SelectionType)
+        {
+            case SelectionTypes.DEFINITION:
+                var def = Context.SelectedDefinition;
+                eltRecord = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
+                break;
+            case SelectionTypes.RECORD:
+                eltRecord = Context.SelectedRecord;
+                if (eltRecord == (IFormElementRecord)Record) return;
+                var existingEltIndex = ParentContext.Elements.IndexOf(eltRecord);
+                if(existingEltIndex != -1 && projectedEltIndex > existingEltIndex)
+                    projectedEltIndex--;
+
+                break;
+        }
+
+        if (eltRecord == null) return;
+        Context.DropElement();
+        projectedEltIndex = isBottom ? projectedEltIndex + 1 : projectedEltIndex;
+        if (projectedEltIndex >= ParentContext.Elements.Count()) ParentContext.Elements.Add(eltRecord);
+        else ParentContext.Elements.Insert(projectedEltIndex, eltRecord);
+    }
+
+    private void HandleCurrentEltDropped()
+    {
+        ParentContext.Elements.RemoveAt(ParentContext.Index);
+    }
+
+    private void HandleRemove()
+    {
+        var elt = ParentContext.Elements[ParentContext.Index];
+        ParentContext.Elements.Remove(elt);
+    }
+
+    private async Task HandleViewSettings()
+    {
+        var dic = new Dictionary<string, object>
+        {
+            { "Record", Record }
+        };
+        var opts = new DialogOptions
+        {
+            Width = "1200px"
+        };
+        await dialogService.OpenAsync<TDialog>(string.Empty, dic, opts);
+    }
+}

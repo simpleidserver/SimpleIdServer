@@ -1,0 +1,24 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using Microsoft.Extensions.Options
+@using FormBuilder.Components
+@using FormBuilder.Components.Workflow
+@using FormBuilder
+@using Microsoft.AspNetCore.Http;
+@inject IOptions<FormBuilderOptions> options
+@inject IHttpContextAccessor HttpContextAccessor;
+@model FormBuilder.UIs.WorkflowViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    string s = "";    
+}
+
+<component type="typeof(WorkflowViewer)" 
+    render-mode="ServerPrerendered" 
+    param-Input="@Model.Input" 
+    param-Workflow="@Model.Workflow"
+    param-Records="@Model.FormRecords"
+    param-CurrentStepId="@Model.CurrentStepId"
+    param-Antifogery="@Model.AntiforgeryToken"/>

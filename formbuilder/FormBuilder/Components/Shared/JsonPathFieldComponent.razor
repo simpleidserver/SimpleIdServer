@@ -1,0 +1,92 @@
+﻿@using BlazorMonaco
+@using BlazorMonaco.Editor
+@using BlazorMonaco.Languages
+@inject IJSRuntime jsRuntime
+
+<StandaloneCodeEditor @ref=editor OnDidInit="HandleOnDidInit" OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonPathEditor" />
+    
+@code {
+    private StandaloneCodeEditor editor;
+    [Parameter] public string Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+
+
+    private async Task HandleOnEditorContentChanged()
+    {
+        Value = await editor.GetValue();
+    }
+
+    private async Task HandleOnDidInit()
+    {
+        await RegisterCompletion();
+        await editor.SetValue(Value);
+        await editor.AddAction(new ActionDescriptor
+        {
+            Id = "submitInSingleMode",
+            Label = "Submit in single mode",
+            Keybindings = new int[] { (int)KeyCode.Enter },
+            Run = (e) => { }
+        });
+    }
+
+    private async Task RegisterCompletion()
+    {
+        await BlazorMonaco.Languages.Global.RegisterCompletionItemProvider(jsRuntime, "javascript", (modelUri, position, context) =>
+        {
+            var completionList = new CompletionList()
+            {
+                Suggestions = new List<CompletionItem>
+                {
+                    new CompletionItem
+                    {
+                        LabelAsString = "$.Test",
+                        InsertText = "$.Test",
+                        Kind = CompletionItemKind.Variable
+                    }
+                }
+            };
+            return completionList;
+        });
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            RenderLineHighlight = "none",
+            GlyphMargin = false,
+            LineDecorationsWidth = 0,
+            Folding = false,
+            FixedOverflowWidgets = true,
+            AutomaticLayout = true,
+            OverviewRulerLanes = 0,
+            OverviewRulerBorder = false,
+            WordWrap = "false",
+            LineNumbers = "false",
+            HideCursorInOverviewRuler = true,
+            Contextmenu = false,
+            RoundedSelection = false,
+            Language = "javascript",
+            WordBasedSuggestions = false,
+            LineNumbersMinChars = 0,
+            ScrollBeyondLastColumn = 0,
+            Find = new EditorFindOptions
+            {
+                AddExtraSpaceOnTop = false,
+                AutoFindInSelection = false,
+                SeedSearchStringFromSelection = "never"
+            },
+            Minimap = new EditorMinimapOptions
+            {
+                Enabled = false
+            },
+            Scrollbar = new EditorScrollbarOptions
+            {
+                Horizontal = "hidden",
+                Vertical = "hidden",
+                AlwaysConsumeMouseWheel = false
+            },
+            Value = "$"
+        };
+    }
+}

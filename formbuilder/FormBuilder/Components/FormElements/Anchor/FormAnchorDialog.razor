@@ -1,0 +1,47 @@
+﻿@using FormBuilder.Components.Shared
+@using System.Text.Json
+@using FormBuilder.Models.Url
+@inject DialogService dialogService
+
+<RadzenStack>
+    <RadzenTabs @bind-SelectedIndex=@selectedIndex>
+        <Tabs>
+            <RadzenTabsItem Text="Properties">
+                <RadzenStack>
+                    <!-- Act as a button -->
+                    <div>
+                        <RadzenCheckBox @bind-Value="CopyRecord.ActAsButton" />
+                        <RadzenLabel>Act as a button ?</RadzenLabel>
+                    </div>
+                </RadzenStack>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Label">
+                <EditLabelsComponent Labels="@CopyRecord.Labels" />
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+    <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
+</RadzenStack>
+
+@code {
+    public int selectedIndex { get; set; } = 0;
+    FormAnchorRecord CopyRecord { get; set; } = new FormAnchorRecord();
+    [Parameter] public FormAnchorRecord Record { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Record != null)
+        {
+            CopyRecord = JsonSerializer.Deserialize<FormAnchorRecord>(JsonSerializer.Serialize(Record));
+        }
+    }
+
+    private void HandleSave()
+    {
+        Record.ActAsButton = CopyRecord.ActAsButton;
+        Record.Transformation = CopyRecord.Transformation;
+        Record.Labels = CopyRecord.Labels;
+        dialogService.Close();
+    }
+}

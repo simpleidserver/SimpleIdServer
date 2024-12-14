@@ -1,0 +1,76 @@
+﻿@using BlazorMonaco.Editor
+@using FormBuilder.Components
+@using FormBuilder.Components.Form
+@using FormBuilder.Factories
+@using FormBuilder.Models
+@using Radzen
+@using Radzen.Blazor
+@using System.Text.Json.Nodes
+@using System.Text.Json
+@inject DialogService dialogService
+@inject IFakerDataServiceFactory fakerDataServiceFactory
+
+<RadzenSteps>
+    <Steps>
+        <RadzenStepsItem Text="Input data (JSON)">
+            <StandaloneCodeEditor @ref=editor OnDidInit="HandleOnDidInit" OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
+        </RadzenStepsItem>
+        <RadzenStepsItem Text="Viewer" Disabled="@(input == null)">
+            <FormViewer WorkflowExecutionContext="@workflowExecutionContext" Input="@input" IsEditModeEnabled="false" IsInteractableElementEnabled="false" Context="@context"></FormViewer>
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    private StandaloneCodeEditor editor;
+    [Parameter] public FormRecord Form { get; set; }
+    WorkflowExecutionContext workflowExecutionContext { get; set; }
+    JsonObject input { get; set; }
+    FormViewerContext context { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (workflowExecutionContext == null && Form != null)
+        {
+            var copyRecord = JsonSerializer.Deserialize<FormRecord>(JsonSerializer.Serialize(Form));
+            workflowExecutionContext = new WorkflowExecutionContext(copyRecord);
+        }
+    }
+
+    private async Task HandleOnDidInit()
+    {
+        await GenerateFakeData();
+    }
+
+    private async Task HandleOnEditorContentChanged()
+    {
+        var value = await editor.GetValue();
+        try
+        {
+            input = JsonObject.Parse(value).AsObject();
+        }
+        catch
+        {
+            input = null;    
+        }
+    }
+
+    private async Task GenerateFakeData()
+    {
+        var fakerDataService = fakerDataServiceFactory.Build(Form.Name);
+        var obj = fakerDataService.Generate();
+        var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
+        await editor.SetValue(json);
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "json",
+            Value = "{}"
+        };
+    }
+}

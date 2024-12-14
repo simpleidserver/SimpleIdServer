@@ -1,0 +1,18 @@
+﻿using System.Text.Json.Nodes;
+using System.Xml.Linq;
+
+namespace FormBuilder.Models;
+
+public class BaseFormDataRecord : IFormElementRecord
+{
+    public string FieldType { get; set; }
+    public Dictionary<string, object> Parameters { get; set; }
+    public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
+    public string Id { get; set; }
+
+    public void ExtractJson(JsonObject json)
+    {
+
+    }
+    public IFormElementRecord GetChild(string id) => null;
+}

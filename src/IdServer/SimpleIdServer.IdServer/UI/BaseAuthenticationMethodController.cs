@@ -1,10 +1,20 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Builders;
+using FormBuilder.Components.FormElements.Anchor;
+using FormBuilder.Components.FormElements.Button;
+using FormBuilder.Components.FormElements.Checkbox;
+using FormBuilder.Components.FormElements.Divider;
+using FormBuilder.Components.FormElements.Input;
+using FormBuilder.Components.FormElements.Password;
+using FormBuilder.Components.FormElements.StackLayout;
+using FormBuilder.Models;
 using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -27,6 +37,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
+using SimpleIdServer.IdServer.UI.Blazor;
 
 namespace SimpleIdServer.IdServer.UI
 {
@@ -73,7 +84,7 @@ namespace SimpleIdServer.IdServer.UI
 
         #region Get Authenticate View
 
-        public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
+        public async Task<object> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
@@ -142,7 +153,7 @@ namespace SimpleIdServer.IdServer.UI
                     viewModel.RememberLogin = false;
                 }
 
-                return View(viewModel);
+                return new RazorComponentResult<AuthenticateComponent>();
             }
             catch(CryptographicException)
             {
@@ -310,6 +321,74 @@ namespace SimpleIdServer.IdServer.UI
             var section = _configuration.GetSection(typeof(UserLockingOptions).Name);
             return section.Get<UserLockingOptions>();
         }
+
+        private static FormRecord BuildRecord() => new FormRecord
+        {
+            Elements = new List<IFormElementRecord>
+            {
+                new FormStackLayoutRecord
+                {
+                    Elements = new List<IFormElementRecord>
+                    {
+                        // Authentication form
+                        new FormStackLayoutRecord
+                        {
+                            IsFormEnabled = true,
+                            Elements = new List<IFormElementRecord>
+                            {
+                                new FormInputFieldRecord
+                                {
+                                    Name = "Login",
+                                    Value = "Login",
+                                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
+                                },
+                                new FormPasswordFieldRecord
+                                {
+                                    Name = "Password",
+                                    Value = "Password",
+                                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
+                                },
+                                new FormCheckboxRecord
+                                {
+                                  Name = "IsRememberMe",
+                                  Value = true,
+                                  Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").Build()
+                                },
+                                new FormButtonRecord
+                                {
+                                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
+                                }
+                            }
+                        },
+                        // Separator
+                        new DividerLayoutRecord
+                        {
+                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+                        },
+                        // Forget my password
+                        new FormAnchorRecord
+                        {
+                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
+                        },
+                        // Separator
+                        new DividerLayoutRecord
+                        {
+                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+                        },
+                        // Register
+                        new FormAnchorRecord
+                        {
+                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+                        },
+                        // Separator
+                        new DividerLayoutRecord
+                        {
+                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+                        }
+                    }
+                }
+            }
+        };
     }
 
     public record UserAuthenticationResult

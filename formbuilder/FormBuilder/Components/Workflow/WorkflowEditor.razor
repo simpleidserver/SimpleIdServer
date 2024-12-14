@@ -1,0 +1,372 @@
+﻿@using FormBuilder.Components.Form
+@using FormBuilder.Dialogs
+@using FormBuilder.Factories
+@using FormBuilder.Models
+@using System.Diagnostics
+@using FormBuilder.Services
+@inject IJSRuntime jsRuntime
+@inject IFormBuilderJsService formBuilderJsService
+@inject DialogService dialogService
+
+<RadzenDialog />
+
+<div class="header">
+    <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
+    <RadzenButton Icon="draft" Text="Json" Click="@(async() => await ViewJson())" />
+</div>
+<RadzenRow class="fullHeight workflowEditor">    
+    <RadzenColumn Size="2">        
+        <RadzenStack class="toolbar fullHeight">
+            <div class="category">
+                <RadzenText TextStyle="TextStyle.H6" class="title">Steps</RadzenText>
+                <ul class="elements">
+                    @foreach (var record in Records)
+                    {
+                        var isDisabled = disabledFormRecords.Contains(record.Name);
+                        if(!isDisabled)
+                        {
+                            <li draggable="true" @ondragstart="@(async () => await HandleDragStart(record))">
+                                <div class="icon"></div><span class="text">@record.Name</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="disabled">
+                                <div class="icon"></div><span class="text">@record.Name</span>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="10" @ref=_svgContainer>
+        <svg @ref="@svgRef" 
+            viewBox="@viewBox"
+            class="workflowDig"
+            @onmousedown="@((e) => HandleOnPanStart(e))"
+            @onmousemove="@(async (e) => await HandleOnPanMove(e))"
+            @onmouseup="@((e) => HandleOnPanLeave())"
+            @ondragover:preventDefault="true" 
+            @ondragover="@(async (e) => await HandleDragHover(e))" 
+            @ondrop="@(async (e) => await HandleDrop(e))" 
+            @onmousewheel="@HandleZoom" 
+            @onmousewheel:preventDefault=true 
+            @onmousewheel:stopPropagation=true>
+            @foreach (var step in Workflow.Steps)
+            {
+                <WorkflowEditorStep Step="@step" StepRemoved="HandleStepRemoved" SelectedStepChanged="@(async (e) => await HandleSelectedStepChanged(e))" SelectedStep="@selectedStep" SelectedLink="@selectedLink" Records="@Records" WorkflowLinkChanged="@(async (item) => await HandleWorkflowLinkChanged(item))" LinkDropped="HandleLinkDropped"></WorkflowEditorStep>
+            }
+
+            @foreach (var link in Workflow.Links)
+            {
+                var textInfoCoordinate = link.ComputeTextInfoCoordinate();
+                <foreignObject x="@textInfoCoordinate.X" y="@textInfoCoordinate.Y" width="100">
+                    <div class="linkInfo">
+                        <span><RadzenIcon Icon="delete" class="icon" @onclick="@(() => HandleRemoveLink(link))" /></span><span class="text">@link.ActionType</span>
+                    </div>
+                </foreignObject>
+                <path class="hitbox" @onclick="@(async (e) => await HandleEditWorkflowLink(link))" stroke-width="10" @onmousemove="@((e) => HandleOnHoverLink(link))" @onmouseleave="@((e) => HandleOnLeaveLink(link))" fill="none" d="@GetLinkCoordinate(link)"></path>
+                <path marker-end="@(link.IsHover ? "url(#headSelected)" : "url(#head)")" stroke-width="2" fill="none" stroke="@(link.IsHover ? "red" : "black")" d="@GetLinkCoordinate(link)"></path>
+            }
+            @if (selectedLink != null)
+            {
+                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(selectedLink)"></path>
+            }
+            <defs>
+                <marker id='head'
+                        orient="auto"
+                        markerWidth='3'
+                        markerHeight='4'
+                        refX='0.1'
+                        refY='2'>
+                    <path d='M0,0 V4 L2,2 Z' fill="black" />
+                </marker>
+                <marker id='headSelected'
+                        orient="auto"
+                        markerWidth='3'
+                        markerHeight='4'
+                        refX='0.1'
+                        refY='2'>
+                    <path d='M0,0 V4 L2,2 Z' fill="red" />
+                </marker>
+            </defs>
+        </svg>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter] public List<FormRecord> Records { get; set; }
+    [Parameter] public WorkflowRecord Workflow { get; set; } = new WorkflowRecord();
+    private List<string> disabledFormRecords { get; set; }
+    private ElementReference _divRef;
+    private RadzenColumn _svgContainer;
+    private WorkflowViewerContext WorkflowContext { get; set; } = new WorkflowViewerContext();
+    private WorkflowStep selectedStep { get; set; }
+    private FormRecord selectedFormRecord;
+    private WorkflowLink selectedLink { get; set; }
+    private ElementReference svgRef;
+    private Coordinate svgPosition;
+    private string viewBox { get; set; }
+    private string transform { get; set; } = "matrix(1 0 0 1 0 0)";
+    private (double x, double y) previousMousePosition;
+    private bool isMoving = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            var svgSize = await formBuilderJsService.GetSize(_svgContainer.Element);
+            viewBox = $"0 0 {svgSize.width} {svgSize.height}";
+            Records.Add(Constants.EmptyStep);
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Records != null && Workflow != null && disabledFormRecords == null)
+        {
+            var activeSteps = Workflow.Steps.Select(s => s.FormRecordName);
+            disabledFormRecords = Records.Select(r => r.Name).Where(r => activeSteps.Contains(r)).ToList();
+        }
+    }
+
+    #region Drag & Drop UI element
+
+    private async Task HandleSelectedStepChanged(WorkflowStep step)
+    {
+        selectedStep = step;
+    }
+
+    private async Task HandleDragStart(FormRecord record)
+    {
+        selectedFormRecord = record;
+    }
+
+    private async Task HandleDragHover(DragEventArgs args)
+    {
+        if (await TryDragSelectedLink()) return;
+
+        async Task<bool> TryDragSelectedLink()
+        {
+            if (selectedLink == null || selectedLink.IsLinkHoverStep) return false;
+            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
+            selectedLink.TargetCoordinate.X = pos.X;
+            selectedLink.TargetCoordinate.Y = pos.Y;
+            return true;
+        }
+    }
+
+    private async Task HandleDrop(DragEventArgs args)
+    {
+        isMoving = false;
+        if (TryDropSelectedLink()) return;
+        await TryDropFormRecord();
+        selectedStep = null;
+
+        bool TryDropSelectedLink()
+        {
+            if (selectedLink != null)
+            {
+                selectedLink = null;
+                return true;
+            }
+
+            return false;
+        }
+
+        async Task<bool> TryDropFormRecord()
+        {
+            if (selectedFormRecord == null) return false;
+            var id = Guid.NewGuid().ToString();
+            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
+            Workflow.Steps.Add(new WorkflowStep
+            {
+                Id = id,
+                Coordinate = new Coordinate
+                {
+                    X = pos.X,
+                    Y = pos.Y
+                },
+                FormRecordName = selectedFormRecord.Name
+            });
+            disabledFormRecords.Add(selectedFormRecord.Name);
+            selectedFormRecord = null;
+            return true;
+        }
+    }
+
+    #endregion
+
+    #region Drag & Drop Arrow
+
+    private void HandleLinkDropped(WorkflowStep workflowStep)
+    {
+        var clone = this.selectedLink.Clone();
+        clone.TargetStepId = workflowStep.Id;
+        Workflow.AddLink(clone);
+        selectedLink = null;
+    }
+
+    #endregion
+
+    #region Handle pan
+
+    private void HandleOnPanStart(MouseEventArgs args)
+    {
+        var numbers = viewBox.Split(' ').Select(n => double.Parse(n)).ToArray();
+        var (x, y) = (numbers[0], numbers[1]);
+        previousMousePosition = (args.ClientX + x, args.ClientY + y);
+        isMoving = true;
+    }
+
+    private async Task HandleOnPanMove(MouseEventArgs args)
+    {
+        if (await TryMoveSelectedStep()) return;
+        if (TryMove()) return;
+
+        bool TryMove()
+        {
+            if (!isMoving) return false;
+            var diffX = -(args.ClientX - previousMousePosition.x);
+            var diffY = -(args.ClientY - previousMousePosition.y);
+            var viewBoxInfo = GetViewBoxInfo();
+            viewBox = $"{Math.Round(diffX)} {Math.Round(diffY)} {viewBoxInfo.width} {viewBoxInfo.height}";
+            return true;
+        }
+
+        async Task<bool> TryMoveSelectedStep()
+        {
+            if (selectedStep == null) return false;
+            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
+            selectedStep.Coordinate.X = pos.X;
+            selectedStep.Coordinate.Y = pos.Y;
+            var links = Workflow.GetLinks(selectedStep);
+            foreach (var link in links)
+                link.UpdateCoordinate(selectedStep);
+            return true;
+        }
+    }
+
+    private void HandleOnPanLeave()
+    {
+        ResetInteraction();
+    }
+
+    #endregion
+
+    #region Handle zoom
+
+    private async Task HandleZoom(WheelEventArgs args)
+    {
+        var scale = args.DeltaY / 1000;
+        scale = Math.Abs(scale) < .1 ? .1 * args.DeltaY / Math.Abs(args.DeltaY) : scale;
+        var pt = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
+        var viewBoxInfo = GetViewBoxInfo();
+        var xPropW = (pt.X - viewBoxInfo.x) / viewBoxInfo.width;
+        var yPropH = (pt.Y - viewBoxInfo.y) / viewBoxInfo.height;
+        var width2 = viewBoxInfo.width + viewBoxInfo.width * scale;
+        var height2 = viewBoxInfo.height + viewBoxInfo.height * scale;
+        var x2 = pt.X - xPropW * width2;
+        var y2 = pt.Y - yPropH *height2;
+        viewBox = $"{Math.Round(x2)} {Math.Round(y2)} {Math.Round(width2)} {Math.Round(height2)}";
+    }
+
+    #endregion
+
+    #region Handle relationships
+
+    private void HandleOnHoverLink(WorkflowLink link)
+    {
+        link.IsHover = true;
+    }
+
+    private void HandleOnLeaveLink(WorkflowLink link)
+    {
+        link.IsHover = false;
+    }
+
+    private Task HandleEditWorkflowLink(WorkflowLink link)
+    {
+        return dialogService.OpenAsync<EditWorkflowLinkDialog>(string.Empty, new Dictionary<string, object>
+        {
+            { "WorkflowLink", link },
+            { "Workflow", Workflow },
+            { "Forms", Records }
+        });
+    }
+
+    private void HandleRemoveLink(WorkflowLink link)
+    {
+        Workflow.Links.Remove(link);
+    }
+
+    #endregion
+
+    private void HandleStepRemoved(WorkflowStep step)
+    {
+        Workflow.Steps.Remove(step);
+        disabledFormRecords.Remove(step.FormRecordName);
+        Workflow.Links = Workflow.Links.Where(l => !l.IsLinked(step.Id)).ToList();
+    }
+
+    private async Task HandleWorkflowLinkChanged((FormEltEventArgs args, WorkflowStep step) item)
+    {
+        var args = item.args;
+        var parentStep = item.step;
+        var eltSize = await formBuilderJsService.GetSize(args.EltReference);
+        var coordinateRelativeToStep = await formBuilderJsService.GetOffsetPosition(args.EltReference);
+        var newCoordinate = parentStep.Coordinate + coordinateRelativeToStep;
+        ResetInteraction();
+        selectedLink = WorkflowLink.Create(parentStep.Id, args.Record, newCoordinate, eltSize, coordinateRelativeToStep);
+    }
+
+    private Task LaunchDebug()
+    {
+        var opts = new DialogOptions
+        {
+            Width = "1200px"
+        };
+        var workflowExecutionContext = new WorkflowExecutionContext(Workflow, Records);
+        return dialogService.OpenAsync<DebugWorkflowDialog>(string.Empty, new Dictionary<string, object>
+        {
+            { nameof(DebugWorkflowDialog.Workflow), workflowExecutionContext }
+        }, opts);
+    }
+
+    private Task ViewJson()
+    {
+        return dialogService.OpenAsync<ViewWorkflowJsonDialog>("", new Dictionary<string, object>
+        {
+            { nameof(ViewWorkflowJsonDialog.Workflow), Workflow }
+        });
+    }
+
+    private string GetLinkCoordinate(WorkflowLink link)
+        => $"M{Sanitize(link.SourceCoordinate.X)} {Sanitize(link.SourceCoordinate.Y)} {Sanitize(link.TargetCoordinate.X)} {Sanitize(link.TargetCoordinate.Y)}";
+
+    private string Sanitize(double number) => number.ToString().Replace(',', '.');
+
+    private FormRecord GetFormRecord(string name)
+        => Records.Single(t => t.Name == name);
+
+    private (double x, double y, double width, double height) GetViewBoxInfo()
+        => GetViewBoxInfo(viewBox);
+
+    private (double x, double y, double width, double height) GetViewBoxInfo(string vb)
+    {
+        var numbers = vb.Split(' ').Select(n => double.Parse(n)).ToArray();
+        return (numbers[0], numbers[1], numbers[2], numbers[3]);
+    }
+
+    private void ResetInteraction()
+    {
+        selectedLink = null;
+        selectedStep = null;
+        selectedFormRecord = null;
+        isMoving = false;
+    }
+}

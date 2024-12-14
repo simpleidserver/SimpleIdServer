@@ -1,0 +1,12 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using FormBuilder.Components.Form
+@using System.Text.Json.Nodes
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Models
+@model FormBuilder.Startup.Controllers.ViewModels.WorkflowIndexViewModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<component type="typeof(WorkflowEditor)" render-mode="ServerPrerendered" param-Records=@Model.Records/>

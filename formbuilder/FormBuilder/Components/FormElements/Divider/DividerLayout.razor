@@ -1,0 +1,9 @@
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
+@inject ITranslationHelper translationHelper
+
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="DividerDialog" TRecord="DividerLayoutRecord" Record="@Value">
+     <Children>
+        <div class="divider"><p class="text">@translationHelper.Translate(Value)</p></div>
+    </Children>
+</DraggableFormElement>

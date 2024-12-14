@@ -1,0 +1,92 @@
+﻿@using FormBuilder.Dialogs
+@using FormBuilder.Helpers
+@using FormBuilder.Models
+@using System.Text.Json.Nodes
+@using System.Text.Json
+@inject DialogService dialogService
+@inject IEnumerable<IFormElementDefinition> definitions
+
+<RadzenDialog />
+
+<div class="header">
+    <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
+    <RadzenButton Icon="draft" Text="Json" Click="@(async() => await ViewJson())" />
+</div>
+<RadzenRow class="fullHeight">
+    <RadzenColumn Size="2">
+        <RadzenStack class="toolbar fullHeight">
+            <div class="category">
+                <RadzenText TextStyle="TextStyle.H6" class="title">Elements</RadzenText>
+                <ul class="elements">
+                    @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.ELEMENT))
+                    {
+                        <li draggable="true" @ondragstart="@(() => HandleDragStart(def))">
+                            <div class="icon"><RadzenIcon Icon="@def.Icon" class="icon" /></div><span class="text">@def.Type</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="category">
+                    <RadzenText TextStyle="TextStyle.H6" class="title">Layout</RadzenText>
+                    <ul class="elements">
+                        @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.LAYOUT))
+                        {
+                            <li>
+                                <div class="icon"><RadzenIcon Icon="@def.Icon" class="icon" /></div><span class="text">@def.Type</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            <div class="category">
+                    <RadzenText TextStyle="TextStyle.H6" class="title">Data</RadzenText>
+                    <ul class="elements">
+                        @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.DATA))
+                        {
+                            <li>
+                                <div class="icon"><RadzenIcon Icon="@def.Icon" class="icon" /></div><span class="text">@def.Type</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="10">
+        <FormViewer Input="@(new JsonObject())" IsEditModeEnabled="true" WorkflowExecutionContext="@workflowExecutionContext" Context="@Context" />
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter] public FormRecord Form { get; set; }
+    FormViewerContext Context { get; set; } = new FormViewerContext();
+    WorkflowExecutionContext workflowExecutionContext = null;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Form != null && workflowExecutionContext == null)
+        {
+            workflowExecutionContext = new WorkflowExecutionContext(Form);
+        }
+    }
+
+    private void HandleDragStart(IFormElementDefinition def)
+    {
+        Context.Set(def);
+    }
+
+    private Task LaunchDebug()
+    {
+        return dialogService.OpenAsync<DebugFormDialog>("", new Dictionary<string, object>
+        {
+            { nameof(DebugFormDialog.Form), Form }
+        });
+    }
+
+    private Task ViewJson()
+    {
+        return dialogService.OpenAsync<ViewFormJsonDialog>("", new Dictionary<string, object>
+        {
+            { nameof(ViewFormJsonDialog.Form), Form }
+        });
+    }
+}
