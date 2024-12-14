@@ -13,5 +13,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string UpdateDateTime = "update_datetime";
         public const string RegistrationWorkflow = "registration_workflow";
         public const string WorkflowId = "workflow_id";
+        public const string AuthenticationWorkflow = "authentication_workflow";
     }
 }

@@ -5,6 +5,7 @@
 		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\formbuilder\FormBuilder.EF\FormBuilder.EF.csproj" />
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />

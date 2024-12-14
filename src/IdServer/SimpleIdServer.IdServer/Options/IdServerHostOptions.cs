@@ -217,6 +217,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Maximum number of active sessions.
         /// </summary>
         public int MaxNbActiveSessions { get; set; } = 4;
+        /// <summary>
+        /// The default authentication workflow.
+        /// </summary>
+        public string DefaultAuthenticationWorkflowId { get; set; }
         public ScimClientOptions ScimClientOptions { get; set; }
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);

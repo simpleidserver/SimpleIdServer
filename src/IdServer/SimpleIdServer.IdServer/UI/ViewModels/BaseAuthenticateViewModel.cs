@@ -19,6 +19,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public bool IsLoginMissing { get; set; }
         public bool IsAuthInProgress { get; set; } = false;
         public bool IsFirstAmr { get; set; } = false;
+        public bool MaximumNumberOfActiveSessions { get; set; }
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
         public AmrAuthInfo AmrAuthInfo { get; set; } = null;
         public RegistrationWorkflow RegistrationWorkflow { get; set; }

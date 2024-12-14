@@ -1,12 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
+using FormBuilder;
+using FormBuilder.EF;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -185,6 +188,7 @@ void ConfigureIdServer(IServiceCollection services)
     services.AddServerSideBlazor();
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
+            cb.DefaultAuthenticationWorkflowId = FormBuilderConfiguration.defaultWorkflowId;
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
@@ -235,6 +239,15 @@ void ConfigureIdServer(IServiceCollection services)
         });
     var isRealmEnabled = identityServerConfiguration.IsRealmEnabled;
     if (isRealmEnabled) idServerBuilder.UseRealm();
+    var cookieName = "XSFR-TOKEN";
+    builder.Services.AddAntiforgery(c =>
+    {
+        c.Cookie.Name = cookieName;
+    });
+    services.AddFormBuilder(o =>
+    {
+        o.AntiforgeryCookieName = cookieName;
+    }).UseEF();
     services.AddDidKey();
     ConfigureDistributedCache();
     ConfigureMessageBroker(idServerBuilder);
@@ -513,6 +526,13 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             // seedingService.SeedDataAsync().Wait();
         }
 
+        using (var formBuilderDbContext = scope.ServiceProvider.GetService<FormBuilderDbContext>())
+        {
+            formBuilderDbContext.Forms.AddRange(FormBuilderConfiguration.AllForms);
+            formBuilderDbContext.Workflows.AddRange(FormBuilderConfiguration.AllWorkflows);
+            formBuilderDbContext.SaveChanges();
+        }
+
         void EnableIsolationLevel(StoreDbContext dbContext)
         {
             if (dbContext.Database.IsInMemory()) return;
@@ -572,7 +592,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             }
         }
 
-        void AddMissingLanguage(StoreDbContext dbContext, Language language)
+        void AddMissingLanguage(StoreDbContext dbContext, SimpleIdServer.IdServer.Domains.Language language)
         {
             if (!dbContext.Languages.Any(l => l.Code == language.Code))
                 dbContext.Languages.Add(language);

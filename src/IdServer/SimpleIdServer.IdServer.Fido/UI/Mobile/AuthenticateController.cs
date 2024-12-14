@@ -1,6 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
+using FormBuilder;
 using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
@@ -52,7 +55,10 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IBusControl busControl,
             IAntiforgery antiforgery,
             IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
-            ISessionManager sessionManager) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager)
+            ISessionManager sessionManager, 
+            IWorkflowStore workflowStore,
+            IFormStore formStore,
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, formBuilderOptions)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;

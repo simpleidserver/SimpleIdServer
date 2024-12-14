@@ -33,6 +33,8 @@ namespace SimpleIdServer.IdServer.Domains
         public string? RegistrationWorkflowId { get; set; }
         [JsonPropertyName(AuthenticationContextClassReferenceNames.RegistrationWorkflow)]
         public RegistrationWorkflow? RegistrationWorkflow { get; set; }
+        [JsonPropertyName(AuthenticationContextClassReferenceNames.AuthenticationWorkflow)]
+        public string? AuthenticationWorkflow { get; set; }
         [JsonIgnore]
         public ICollection<Realm> Realms { get; set; } = new List<Realm>();
         [JsonIgnore]

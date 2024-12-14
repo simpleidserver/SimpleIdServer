@@ -1,20 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using FormBuilder.Builders;
-using FormBuilder.Components.FormElements.Anchor;
-using FormBuilder.Components.FormElements.Button;
-using FormBuilder.Components.FormElements.Checkbox;
-using FormBuilder.Components.FormElements.Divider;
-using FormBuilder.Components.FormElements.Input;
-using FormBuilder.Components.FormElements.Password;
-using FormBuilder.Components.FormElements.StackLayout;
+using FormBuilder;
 using FormBuilder.Models;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
+using FormBuilder.UIs;
 using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -37,7 +32,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using SimpleIdServer.IdServer.UI.Blazor;
 
 namespace SimpleIdServer.IdServer.UI
 {
@@ -49,6 +43,9 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAntiforgery _antiforgery;
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
         private readonly ISessionManager _sessionManager;
+        private readonly IWorkflowStore _workflowStore;
+        private readonly IFormStore _formStore;
+        private readonly FormBuilderOptions _formBuilderOptions;
 
         public BaseAuthenticationMethodController(
             IConfiguration configuration,
@@ -68,7 +65,10 @@ namespace SimpleIdServer.IdServer.UI
             IBusControl busControl,
             IAntiforgery antiforgery,
             IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
-            ISessionManager sessionManager) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
+            ISessionManager sessionManager,
+            IWorkflowStore workflowStore,
+            IFormStore formStore,
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
         {
             _configuration = configuration;
             _authenticationSchemeProvider = authenticationSchemeProvider;
@@ -76,6 +76,9 @@ namespace SimpleIdServer.IdServer.UI
             _antiforgery = antiforgery;
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
             _sessionManager = sessionManager;
+            _workflowStore = workflowStore;
+            _formStore = formStore;
+            _formBuilderOptions = formBuilderOptions.Value;
         }
 
         protected abstract string Amr { get; }
@@ -84,28 +87,57 @@ namespace SimpleIdServer.IdServer.UI
 
         #region Get Authenticate View
 
-        public async Task<object> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
+        public async Task<IActionResult> Index([FromRoute] string prefix, string returnUrl, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(returnUrl))
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
 
             try
             {
+                var records = await _formStore.GetAll(cancellationToken);
+                var viewModel = await BuildViewModel();
+                WorkflowRecord workflow = null;
+                if (IsProtected(returnUrl))
+                {
+                    var acr = await ParseRedirectUrl(viewModel);
+                    workflow = await _workflowStore.Get(acr.AuthenticationWorkflow, cancellationToken);
+                }
+                else
+                {
+                    viewModel.IsFirstAmr = true;
+                    viewModel.RememberLogin = false;
+                    workflow = await _workflowStore.Get(Options.DefaultAuthenticationWorkflowId, cancellationToken);
+                }
+
+                var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
+                var step = workflow.GetStep(Amr);
+                var result = new WorkflowViewModel
+                {
+                    CurrentStepId = step.Id,
+                    Workflow = workflow,
+                    FormRecords = records,
+                    AntiforgeryToken = new AntiforgeryTokenRecord
+                    {
+                        CookieName=  _formBuilderOptions.AntiforgeryCookieName,
+                        CookieValue = tokenSet.CookieToken,
+                        FormField = tokenSet.FormFieldName,
+                        FormValue = tokenSet.RequestToken
+                    }
+                };
+                result.SetInput(viewModel);
+                return View(result);
+            }
+            catch(CryptographicException)
+            {
+                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
+            }
+
+            async Task<T> BuildViewModel()
+            {
                 var viewModel = Activator.CreateInstance<T>();
                 var allTickets = _sessionManager.FetchTicketsFromAllRealm(HttpContext);
-                if(allTickets.Count()  >= Options.MaxNbActiveSessions)
-                {
-                    ViewBag.MaximumNumberOfActiveSessions = "true";
-                    return View(viewModel);
-                }
-
-                IEnumerable<Microsoft.AspNetCore.Authentication.AuthenticationScheme> externalIdProviders = new List<Microsoft.AspNetCore.Authentication.AuthenticationScheme>();
-                if (IsExternalIdProvidersDisplayed)
-                {
-                    var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
-                    externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
-                }
-
+                var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
+                var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
                 viewModel.ReturnUrl = returnUrl;
                 viewModel.Realm = prefix;
                 viewModel.IsFirstAmr = false;
@@ -114,50 +146,42 @@ namespace SimpleIdServer.IdServer.UI
                     AuthenticationScheme = e.Name,
                     DisplayName = e.DisplayName
                 }).ToList();
+                viewModel.MaximumNumberOfActiveSessions = (allTickets.Count() >= Options.MaxNbActiveSessions);
                 EnrichViewModel(viewModel);
-                if (IsProtected(returnUrl))
+                return viewModel;
+            }
+
+            async Task<AuthenticationContextClassReference> ParseRedirectUrl(T viewModel)
+            {
+                var query = ExtractQuery(returnUrl);
+                var clientId = query.GetClientIdFromAuthorizationRequest();
+                var str = prefix ?? Constants.DefaultRealm;
+                var client = await ClientRepository.GetByClientId(str, clientId, cancellationToken);
+                var loginHint = query.GetLoginHintFromAuthorizationRequest();
+                var amrInfo = await ResolveAmrInfo(query, str, client, cancellationToken);
+                bool isLoginMissing = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
+                if (amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login) && TryGetLogin(amrInfo.Value.Item1, out string login))
                 {
-                    var query = ExtractQuery(returnUrl);
-                    var clientId = query.GetClientIdFromAuthorizationRequest();
-                    var str = prefix ?? Constants.DefaultRealm;
-                    var client = await ClientRepository.GetByClientId(str, clientId, cancellationToken);
-                    var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                    var amrInfo = await ResolveAmrInfo(query, str, client, cancellationToken);
-                    bool isLoginMissing = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
-                    if (amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login) && TryGetLogin(amrInfo.Value.Item1, out string login))
-                    {
-                        loginHint = login;
-                        isLoginMissing = false;
-                    }
-
-                    if (amrInfo != null && amrInfo.Value.Item1.CurrentAmr == amrInfo.Value.Item1.AllAmr.First())
-                    {
-                        viewModel.IsFirstAmr = true;
-                        viewModel.RememberLogin = false;
-                        viewModel.RegistrationWorkflow = amrInfo.Value.Item2.RegistrationWorkflow;
-                    }
-
-                    viewModel.ClientName = client.ClientName;
-                    viewModel.Login = loginHint;
-                    viewModel.LogoUri = client.LogoUri;
-                    viewModel.TosUri = client.TosUri;
-                    viewModel.PolicyUri = client.PolicyUri;
-                    viewModel.IsLoginMissing = isLoginMissing;
-                    viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
-                    viewModel.AmrAuthInfo = amrInfo.Value.Item1;
-                    return View(viewModel);
+                    loginHint = login;
+                    isLoginMissing = false;
                 }
-                else
+
+                if (amrInfo != null && amrInfo.Value.Item1.CurrentAmr == amrInfo.Value.Item1.AllAmr.First())
                 {
                     viewModel.IsFirstAmr = true;
                     viewModel.RememberLogin = false;
+                    viewModel.RegistrationWorkflow = amrInfo.Value.Item2.RegistrationWorkflow;
                 }
 
-                return new RazorComponentResult<AuthenticateComponent>();
-            }
-            catch(CryptographicException)
-            {
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
+                viewModel.ClientName = client.ClientName;
+                viewModel.Login = loginHint;
+                viewModel.LogoUri = client.LogoUri;
+                viewModel.TosUri = client.TosUri;
+                viewModel.PolicyUri = client.PolicyUri;
+                viewModel.IsLoginMissing = isLoginMissing;
+                viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
+                viewModel.AmrAuthInfo = amrInfo.Value.Item1;
+                return amrInfo.Value.Item2;
             }
         }
 
@@ -264,7 +288,7 @@ namespace SimpleIdServer.IdServer.UI
                Amr,
                authenticationResult.AuthenticatedUser,
                token,
-               !viewModel.IsFirstAmr ? null : viewModel.RememberLogin);
+               /*!viewModel.IsFirstAmr ? null : */ viewModel.RememberLogin);
         }
 
         protected abstract Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken);
@@ -298,7 +322,7 @@ namespace SimpleIdServer.IdServer.UI
             var amrInfo = GetAmrInfo();
             if (amrInfo != null)
             {
-	      var resolvedAcr = await _authenticationContextClassReferenceRepository.GetByName(realm, amrInfo.CurrentAmr, cancellationToken);
+	            var resolvedAcr = await _authenticationContextClassReferenceRepository.GetByName(realm, amrInfo.CurrentAmr, cancellationToken);
                 return (amrInfo, resolvedAcr);
             }
 
@@ -321,74 +345,6 @@ namespace SimpleIdServer.IdServer.UI
             var section = _configuration.GetSection(typeof(UserLockingOptions).Name);
             return section.Get<UserLockingOptions>();
         }
-
-        private static FormRecord BuildRecord() => new FormRecord
-        {
-            Elements = new List<IFormElementRecord>
-            {
-                new FormStackLayoutRecord
-                {
-                    Elements = new List<IFormElementRecord>
-                    {
-                        // Authentication form
-                        new FormStackLayoutRecord
-                        {
-                            IsFormEnabled = true,
-                            Elements = new List<IFormElementRecord>
-                            {
-                                new FormInputFieldRecord
-                                {
-                                    Name = "Login",
-                                    Value = "Login",
-                                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
-                                },
-                                new FormPasswordFieldRecord
-                                {
-                                    Name = "Password",
-                                    Value = "Password",
-                                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
-                                },
-                                new FormCheckboxRecord
-                                {
-                                  Name = "IsRememberMe",
-                                  Value = true,
-                                  Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").Build()
-                                },
-                                new FormButtonRecord
-                                {
-                                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
-                                }
-                            }
-                        },
-                        // Separator
-                        new DividerLayoutRecord
-                        {
-                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
-                        },
-                        // Forget my password
-                        new FormAnchorRecord
-                        {
-                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
-                        },
-                        // Separator
-                        new DividerLayoutRecord
-                        {
-                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
-                        },
-                        // Register
-                        new FormAnchorRecord
-                        {
-                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
-                        },
-                        // Separator
-                        new DividerLayoutRecord
-                        {
-                            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
-                        }
-                    }
-                }
-            }
-        };
     }
 
     public record UserAuthenticationResult
