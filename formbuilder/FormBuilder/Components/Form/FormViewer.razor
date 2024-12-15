@@ -7,9 +7,35 @@
 @using global::FormBuilder.Models
 @inject IRenderFormElementsHelper renderFormsElementsHelper
 
-@if(Form.Elements != null)
+@if (!IsInteractableElementEnabled)
 {
-    @CustomRender
+    <div class="form">
+        <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
+            @if (ErrorMessages != null && ErrorMessages.Any())
+            {
+                <RadzenStack>
+                    @foreach (var errorMessage in ErrorMessages)
+                    {
+                        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            @errorMessage
+                        </RadzenAlert>
+                    }
+                </RadzenStack>
+            }
+
+            @if (Form.Elements != null)
+            {
+                @CustomRender
+            }
+        </div>
+    </div>
+}
+else
+{
+    @if (Form.Elements != null)
+    {
+        @CustomRender
+    }
 }
 
 @code {
@@ -21,6 +47,7 @@
     [Parameter] public FormViewerContext Context { get; set; }
     [Parameter] public WorkflowViewerContext WorkflowViewerContext { get; set; }
     [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
+    [Parameter] public List<string> ErrorMessages { get; set; }
     private FormRecord Form { get; set; } = null;
 
     private void HandleClick()

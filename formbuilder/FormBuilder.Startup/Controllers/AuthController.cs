@@ -1,5 +1,4 @@
-﻿using FormBuilder.Components.FormElements;
-using FormBuilder.Repositories;
+﻿using FormBuilder.Repositories;
 using FormBuilder.Startup.Controllers.ViewModels;
 using FormBuilder.Stores;
 using FormBuilder.UIs;
@@ -17,6 +16,37 @@ public class AuthController : BaseWorkflowController
 
     public async Task<IActionResult> Index(string workflowId, string stepName, CancellationToken cancellationToken)
     {
+        var viewModel = await BuildViewModel(workflowId, stepName, cancellationToken);
+        return View(viewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Index(AuthViewModel viewModel, CancellationToken cancellationToken)
+    {
+        if(string.IsNullOrWhiteSpace(viewModel.Login))
+        {
+            var vm = await BuildViewModel(viewModel.WorkflowId, viewModel.StepName, cancellationToken);
+            vm.ErrorMessages = new List<string>
+            {
+                "The login is required"
+            };
+            return View(vm);
+        }
+
+        var result = await GetNextWorkflowStep(cancellationToken);
+        if (result == null) return Content("finish");
+        return RedirectToAction("Index", new { workflowId = result.Value.Item1.Id, stepName = result.Value.Item2.FormRecordName });
+    }
+
+    [HttpGet]
+    public IActionResult Callback(string scheme)
+    {
+        return NoContent();
+    }
+
+    private async Task<WorkflowViewModel> BuildViewModel(string workflowId, string stepName, CancellationToken cancellationToken)
+    {
         var viewModel = await Get(workflowId, stepName, cancellationToken);
         var authViewModel = new AuthViewModel
         {
@@ -27,21 +57,6 @@ public class AuthController : BaseWorkflowController
             }
         };
         viewModel.SetInput(authViewModel);
-        return View(viewModel);
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Confirm(AuthViewModel viewModel, CancellationToken cancellationToken)
-    {
-        var result = await GetNextWorkflowStep(cancellationToken);
-        if (result == null) return Content("finish");
-        return RedirectToAction("Index", new { workflowId = result.Value.Item1.Id, stepName = result.Value.Item2.FormRecordName });
-    }
-
-    [HttpGet]
-    public IActionResult Callback(string scheme)
-    {
-        return NoContent();
+        return viewModel;
     }
 }

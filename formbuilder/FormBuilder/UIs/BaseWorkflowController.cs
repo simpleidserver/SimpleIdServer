@@ -46,18 +46,14 @@ public class BaseWorkflowController : Controller
 
     protected async Task<(WorkflowRecord, WorkflowStep)?> GetNextWorkflowStep(CancellationToken cancellationToken)
     {
+        /*
         var currentWorkflow = GetExecutedLink();
         if (currentWorkflow == null) return null;
         var workflow = await _workflowStore.Get(currentWorkflow.WorkflowId, cancellationToken);
         var link = workflow.Links.Single(l => l.Id == currentWorkflow.CurrentLink);
         var nextStep = workflow.Steps.Single(s => s.Id == link.TargetStepId);
         return (workflow, nextStep);
-    }
-
-    protected ExecutedLink GetExecutedLink()
-    {
-        if (!HttpContext.Request.Headers.ContainsKey(_options.CurrentWorkflowHeaderName)) return null;
-        var serializedWorkflow = HttpContext.Request.Headers[_options.CurrentWorkflowHeaderName].ToString();
-        return JsonSerializer.Deserialize<ExecutedLink>(serializedWorkflow);
+        */
+        return null;
     }
 }

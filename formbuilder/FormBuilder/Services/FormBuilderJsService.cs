@@ -2,6 +2,7 @@
 using FormBuilder.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Services;
 
@@ -13,6 +14,7 @@ public interface IFormBuilderJsService
     Task<Coordinate> GetPointInSvgSpace(double clientX, double clientY, ElementReference svgEltRef);
     Task Navigate(string url);
     Task NavigateForce(string url);
+    Task SubmitForm(string url, JsonObject data);
 }
 
 public class FormBuilderJsService : IFormBuilderJsService
@@ -57,4 +59,7 @@ public class FormBuilderJsService : IFormBuilderJsService
 
     public async Task NavigateForce(string url)
         => await _jsRuntime.InvokeVoidAsync("FormBuilder.navigateForce", url);
+
+    public async Task SubmitForm(string url, JsonObject data)
+        => await _jsRuntime.InvokeVoidAsync("FormBuilder.submitForm", url, data);
 }

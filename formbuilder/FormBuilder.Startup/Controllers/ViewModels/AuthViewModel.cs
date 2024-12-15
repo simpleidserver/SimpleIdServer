@@ -1,6 +1,8 @@
-﻿namespace FormBuilder.Startup.Controllers.ViewModels;
+﻿using FormBuilder.UIs;
 
-public class AuthViewModel
+namespace FormBuilder.Startup.Controllers.ViewModels;
+
+public class AuthViewModel : StepViewModel
 {
     public string Login { get; set; }
     public string ReturnUrl { get; set; }

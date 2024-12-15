@@ -1,0 +1,29 @@
+﻿:root {
+    --prompt-width: 600px;
+    --outer-padding: 80px;
+    --bg-color: #F7F7F6;
+    --from-bg-color: white;
+    --from-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    --from-radius: 5px;
+}
+
+
+.form {
+    padding: var(--outer-padding);
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.form-content {
+    width: var(--prompt-width);
+    background-color: var(--from-bg-color);
+    box-shadow: var(--from-shadow);
+    border-radius: var(--from-radius);
+}
+
+.form-content.view {
+    padding: 10px;
+}

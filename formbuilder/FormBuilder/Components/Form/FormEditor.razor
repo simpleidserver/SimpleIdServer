@@ -76,10 +76,14 @@
 
     private Task LaunchDebug()
     {
+        var opts = new DialogOptions
+        {
+            Width = "1200px"
+        };
         return dialogService.OpenAsync<DebugFormDialog>("", new Dictionary<string, object>
         {
             { nameof(DebugFormDialog.Form), Form }
-        });
+        }, opts);
     }
 
     private Task ViewJson()

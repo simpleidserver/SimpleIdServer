@@ -32,12 +32,14 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     async Task Submit()
     {
         var link = WorkflowExecutionContext.GetLink(Value);
-        if (link == null) return;
+        if (link == null || Value.IsSubmitting) return;
+        Value.Submit();
         var json = new JsonObject();
         Value.ExtractJson(json);
         WorkflowExecutionContext.SetStepOutput(json);
         var act = WorkflowLinkActionFactory.Build(link.ActionType);
         await act.Execute(link, WorkflowExecutionContext);
+        Value.FinishSubmit();
     }
 
     private RenderFragment CreateComponent() => builder =>

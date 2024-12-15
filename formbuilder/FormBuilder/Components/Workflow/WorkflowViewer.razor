@@ -7,6 +7,7 @@
 <FormViewer Input=@Input 
     IsEditModeEnabled=false 
     IsInteractableElementEnabled=false 
+    ErrorMessages="@ErrorMessages"
     Context=@(new FormViewerContext())
     WorkflowViewerContext=@(new WorkflowViewerContext())
     WorkflowExecutionContext=@(new WorkflowExecutionContext(Workflow, Records, CurrentStepId) { AntiforgeryToken = Antifogery })></FormViewer>
@@ -17,4 +18,5 @@
     [Parameter] public List<FormRecord> Records { get; set; }
     [Parameter] public string CurrentStepId { get; set; }
     [Parameter] public AntiforgeryTokenRecord Antifogery { get; set; }
+    [Parameter] public List<string> ErrorMessages { get; set; }
 }

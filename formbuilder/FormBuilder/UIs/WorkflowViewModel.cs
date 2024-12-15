@@ -11,6 +11,7 @@ public class WorkflowViewModel
     public JsonObject Input { get; set; }
     public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
     public string CurrentStepId { get; set; }
+    public List<string> ErrorMessages { get; set; }
 
     public void SetInput<T>(T record) where T : class
     {

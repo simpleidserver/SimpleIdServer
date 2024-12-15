@@ -1,8 +1,8 @@
 ﻿namespace FormBuilder.UIs;
 
-public class ExecutedLink
+public class StepViewModel
 {
+    public string StepName { get; set; }
     public string WorkflowId { get; set; }
-    public string CurrentStepId { get; set; }
     public string CurrentLink { get; set; }
 }

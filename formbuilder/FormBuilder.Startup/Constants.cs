@@ -64,7 +64,6 @@ public class Constants
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "ReturnUrl",
-                                Value = string.Empty,
                                 Type = FormInputTypes.HIDDEN,
                                 Transformation = new IncomingTokensTransformationRule
                                 {
@@ -75,21 +74,18 @@ public class Constants
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "Login",
-                                Value = "Login",
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
                             },
                             new FormPasswordFieldRecord
                             {   
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "Password",
-                                Value = "Password",
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
                             },
                             new FormCheckboxRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "RememberLogin",
-                                Value = true,
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").Build()
                             },
                             new FormButtonRecord
@@ -169,7 +165,7 @@ public class Constants
         .AddLinkHttpRequestAction(LoginPwdAuthForm, ConfirmationForm, authFormId, new Link.WorkflowLinkHttpRequestParameter
         {
             IsAntiforgeryEnabled = true,
-            Target = "http://localhost:62734/Auth/Confirm"
+            Target = "http://localhost:62734/Auth"
         })
         .Build();
 
