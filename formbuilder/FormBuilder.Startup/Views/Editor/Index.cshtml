@@ -1,13 +1,20 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using FormBuilder.Components.Form
 @using System.Text.Json.Nodes
+@using FormBuilder.Helpers
 @using FormBuilder.Models
+@inject IUriProvider uriProvider
 @model FormBuilder.Startup.Controllers.ViewModels.IndexEditorViewModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var path = uriProvider.GetActiveFormCssUrl(Model.Record.Name);
 }
 
 <component type="typeof(FormEditor)" 
-    render-mode="ServerPrerendered" 
-    param-Form="@Model.Record" />
+    render-mode="ServerPrerendered"
+           param-Form="@Model.Record" />
+
+@section Header {
+    <link rel="stylesheet" href="@path" />
+}

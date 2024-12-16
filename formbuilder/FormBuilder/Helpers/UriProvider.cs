@@ -4,6 +4,7 @@ namespace FormBuilder.Helpers;
 
 public interface IUriProvider
 {
+    string GetActiveFormCssUrl(string name);
     string GetAbsoluteUriWithVirtualPath();
     string GetRelativePath();
 }
@@ -16,6 +17,9 @@ public class UriProvider : IUriProvider
     {
         _httpContextAccessor = httpContextAccessor;
     }
+
+    public string GetActiveFormCssUrl(string name)
+        => $"{GetAbsoluteUriWithVirtualPath()}/forms/{name}/styles/active";
 
     public string GetAbsoluteUriWithVirtualPath()
     {

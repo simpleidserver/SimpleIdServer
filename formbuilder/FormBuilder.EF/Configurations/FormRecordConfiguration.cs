@@ -15,5 +15,6 @@ public class FormRecordConfiguration : IEntityTypeConfiguration<FormRecord>
         builder.Property(w => w.Elements).HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                 v => string.IsNullOrWhiteSpace(v) ? null : new ObservableCollection<IFormElementRecord>(JsonSerializer.Deserialize<List<IFormElementRecord>>(v, (JsonSerializerOptions)null)));
+        builder.HasMany(f => f.AvailableStyles).WithOne().HasForeignKey(f => f.FormId).OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -1,0 +1,65 @@
+﻿@using BlazorMonaco.Editor
+@using FormBuilder.Controllers
+@using FormBuilder.Helpers
+@using System.Text.Json
+@using System.Text
+
+<RadzenStack>
+    <StandaloneCodeEditor @ref=editor OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="cssEditor" />
+    <RadzenButton Text="Save" Click="@(async () => await HandleSave())" ButtonType="ButtonType.Button" class="fullWidth"></RadzenButton>
+</RadzenStack>
+
+@code {
+    private string cssContent { get; set; }
+    private StandaloneCodeEditor editor;
+    [Parameter] public string FormName { get; set; }
+    [Inject] public IUriProvider uriProvider { get; set; }
+    [Inject] public DialogService dialogService { get; set; }
+    [Inject] public NotificationService notificationService { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if(!string.IsNullOrWhiteSpace(FormName))
+        {
+            var url = uriProvider.GetActiveFormCssUrl(FormName);
+            using(var httpClient = new HttpClient())
+            {
+                cssContent = await httpClient.GetStringAsync(url);
+                await editor.SetValue(cssContent);
+            }
+        }
+    }
+
+    private async Task HandleOnEditorContentChanged()
+    {
+        cssContent = await editor.GetValue();
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "css",
+            Value = ""
+        };
+    }
+
+    private async Task HandleSave()
+    {
+        using(var httpClient = new HttpClient())
+        {
+            var url = uriProvider.GetActiveFormCssUrl(FormName);
+            var requestMessage = new HttpRequestMessage
+            {
+                Content = new StringContent(JsonSerializer.Serialize(new UpdateFormStyleCommand { Content = cssContent }), Encoding.UTF8, "application/json"),
+                Method = HttpMethod.Put,
+                RequestUri = new Uri(url)
+            };
+            await httpClient.SendAsync(requestMessage);
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated, please refer your browser", Duration = 4000 });
+            dialogService.Close();
+        }
+    }
+}

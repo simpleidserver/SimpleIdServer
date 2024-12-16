@@ -62,7 +62,19 @@ void SeedData(WebApplication application)
     {
         using (var dbContext = scope.ServiceProvider.GetService<FormBuilderDbContext>())
         {
-            dbContext.Forms.AddRange(FormBuilder.Startup.Constants.AllForms);
+            var content = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "form.css"));
+            var allForms = FormBuilder.Startup.Constants.AllForms;
+            foreach(var form in allForms)
+            {
+                form.AvailableStyles.Add(new FormBuilder.Models.FormStyle
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Content = content,
+                    IsActive = true
+                });
+            }
+
+            dbContext.Forms.AddRange(allForms);
             dbContext.Workflows.AddRange(FormBuilder.Startup.Constants.AllWorkflows);
             dbContext.SaveChanges();
         }

@@ -21,5 +21,6 @@ public class FormBuilderDbContext : DbContext
         modelBuilder.ApplyConfiguration(new WorkflowStepConfiguration());
         modelBuilder.ApplyConfiguration(new WorkflowLinkConfiguration());
         modelBuilder.ApplyConfiguration(new FormRecordConfiguration());
+        modelBuilder.ApplyConfiguration(new FormStyleConfiguration());
     }
 }

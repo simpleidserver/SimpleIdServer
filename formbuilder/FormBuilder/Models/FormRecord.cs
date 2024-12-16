@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 
 namespace FormBuilder.Models;
 
@@ -6,6 +7,16 @@ public class FormRecord
 {
     public string Name { get; set; }
     public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();
+    [JsonIgnore]
+    public List<FormStyle> AvailableStyles { get; set; } = new List<FormStyle>();
+    [JsonIgnore]
+    public FormStyle ActiveStyle
+    {
+        get
+        {
+            return AvailableStyles.SingleOrDefault(s => s.IsActive);
+        }
+    }
 
     public IFormElementRecord GetChild(string id)
     {

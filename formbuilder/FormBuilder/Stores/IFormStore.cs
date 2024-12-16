@@ -6,4 +6,5 @@ public interface IFormStore
 {
     Task<FormRecord> Get(string name, CancellationToken cancellationToken);
     Task<List<FormRecord>> GetAll(CancellationToken cancellationToken);
+    Task<int> SaveChanges(CancellationToken cancellationToken);
 }

@@ -63,6 +63,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUrlEvaluator, DirectTargetUrlEvaluator>();
 
         services.AddScoped<DialogService>();
+        services.AddScoped<NotificationService>();
 
         services.AddHttpContextAccessor();
         services.AddHttpClient();

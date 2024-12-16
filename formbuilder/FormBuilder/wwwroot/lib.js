@@ -1,5 +1,4 @@
 var FormBuilder = FormBuilder || {};
-
 FormBuilder.getSize = function (elt) {
     return { height: elt.offsetHeight, width: elt.offsetWidth };
 }

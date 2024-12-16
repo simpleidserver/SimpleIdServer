@@ -7,6 +7,7 @@
 @inject IEnumerable<IFormElementDefinition> definitions
 
 <RadzenDialog />
+<RadzenNotification />
 
 <div class="header">
     <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
@@ -47,7 +48,15 @@
                             </li>
                         }
                     </ul>
-                </div>
+            </div
+            <div class="category">
+                <RadzenText TextStyle="TextStyle.H6" class="title">Style</RadzenText>
+                <ul class="elements">                    
+                    <li @onclick="@(async (e) => await HandleEditCss())" class="clickable">
+                        <div class="icon"><RadzenIcon Icon="css" class="icon" /></div><span class="text">CSS</span>
+                    </li>
+                </ul>
+            </div>
         </RadzenStack>
     </RadzenColumn>
     <RadzenColumn Size="10">
@@ -91,6 +100,14 @@
         return dialogService.OpenAsync<ViewFormJsonDialog>("", new Dictionary<string, object>
         {
             { nameof(ViewFormJsonDialog.Form), Form }
+        });
+    }
+
+    private Task HandleEditCss()
+    {
+        return dialogService.OpenAsync<EditFormCssStyleDialog>("", new Dictionary<string, object>
+        {
+            { nameof(EditFormCssStyleDialog.FormName), Form.Name }
         });
     }
 }
