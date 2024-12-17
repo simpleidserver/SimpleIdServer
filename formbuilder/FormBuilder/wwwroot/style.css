@@ -263,7 +263,7 @@
 /*Hitbox*/
 .hitbox {
     visibility: hidden;
-    pointer-events: all;
+    pointer-events: all !important;
 }
 
 /* Common */

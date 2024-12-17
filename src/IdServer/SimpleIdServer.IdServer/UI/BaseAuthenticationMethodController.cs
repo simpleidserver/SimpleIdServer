@@ -125,6 +125,7 @@ namespace SimpleIdServer.IdServer.UI
                     }
                 };
                 result.SetInput(viewModel);
+                if(IsMaximumActiveSessionReached()) result.SetErrorMessage(Global.MaximumNumberActiveSessions);
                 return View(result);
             }
             catch(CryptographicException)
@@ -135,7 +136,6 @@ namespace SimpleIdServer.IdServer.UI
             async Task<T> BuildViewModel()
             {
                 var viewModel = Activator.CreateInstance<T>();
-                var allTickets = _sessionManager.FetchTicketsFromAllRealm(HttpContext);
                 var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
                 var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
                 viewModel.ReturnUrl = returnUrl;
@@ -146,7 +146,6 @@ namespace SimpleIdServer.IdServer.UI
                     AuthenticationScheme = e.Name,
                     DisplayName = e.DisplayName
                 }).ToList();
-                viewModel.MaximumNumberOfActiveSessions = (allTickets.Count() >= Options.MaxNbActiveSessions);
                 EnrichViewModel(viewModel);
                 return viewModel;
             }
@@ -192,32 +191,22 @@ namespace SimpleIdServer.IdServer.UI
         [HttpPost]
         public async virtual Task<IActionResult> Index([FromRoute] string prefix, T viewModel, CancellationToken token)
         {
-            try
-            {
-                await _antiforgery.ValidateRequestAsync(this.HttpContext);
-            }
-            catch (AntiforgeryValidationException)
-            {
-                if (!User.Identity.IsAuthenticated)
-                {
-                    return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = Global.InvalidAntiForgeryToken });
-                }
-
-                var returnUrl = viewModel.ReturnUrl;
-                if (!IsProtected(returnUrl))
-                {
-                    return Redirect(returnUrl);
-                }
-
-                var unprotectedUrl = Unprotect(returnUrl);
-                return Redirect(unprotectedUrl);
-            }
-
-            viewModel.Realm = prefix;
+            // 1. Validate antiforgery.
             prefix = prefix ?? Constants.DefaultRealm;
-            if (viewModel == null)
-                return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
-            AmrAuthInfo amrInfo = null;
+            if (viewModel == null) return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
+            var checkResult = await CheckAntiforgery();
+            if (checkResult != null) return checkResult;
+            // 2. Build view model
+            viewModel.Realm = prefix;
+            EnrichViewModel(viewModel);
+            await UpdateViewModel(viewModel);
+            await ExtractRegistrationWorkflow();
+
+            // 3. Build workflow result
+            var workflowResult = await BuildWorkflowViewModel();
+            workflowResult.SetInput(viewModel);
+            var amrInfo = GetAmrInfo();
+            /*
             if (IsProtected(viewModel.ReturnUrl))
             {
                 var query = ExtractQuery(viewModel.ReturnUrl);
@@ -233,13 +222,37 @@ namespace SimpleIdServer.IdServer.UI
                     viewModel.RegistrationWorkflow = res.Value.Item2.RegistrationWorkflow;
                 }
             }
+            */
 
-            EnrichViewModel(viewModel);
-            await UpdateViewModel(viewModel);
-            viewModel.Validate(ModelState);
-            if (!ModelState.IsValid) return View(viewModel);
+            // 4. Validate view model.
+            var errors = viewModel.Validate();
+            if (errors.Any())
+            {
+                workflowResult.ErrorMessages = errors;
+                return View(workflowResult);
+            }
+
+            if (IsMaximumActiveSessionReached())
+            {
+                workflowResult.SetErrorMessage(Global.MaximumNumberActiveSessions);
+                return View(workflowResult);
+            }
+
+            // 5. Try to authenticate the user.
             var result = await CustomAuthenticate(prefix, amrInfo?.UserId, viewModel, token);
-            if (result.ActionResult != null) return result.ActionResult;
+            if (result.Errors != null && result.Errors.Any())
+            {
+                workflowResult.ErrorMessages = result.Errors;
+                return View(workflowResult);
+            }
+
+            if (result.SuccessMessages != null && result.SuccessMessages.Any())
+            {
+                workflowResult.SuccessMessages = result.SuccessMessages;
+                return View(workflowResult);
+            }
+
+            // 6. Validate the credentials.
             CredentialsValidationResult authenticationResult = null;
             if (result.AuthenticatedUser != null) authenticationResult = await _authenticationService.Validate(prefix, result.AuthenticatedUser, viewModel, token);
             else authenticationResult = await _authenticationService.Validate(prefix, amrInfo?.UserId, viewModel, token);
@@ -248,22 +261,23 @@ namespace SimpleIdServer.IdServer.UI
                 switch (authenticationResult.Status)
                 {
                     case ValidationStatus.UNKNOWN_USER:
-                        ModelState.AddModelError("unknown_user", "unknown_user");
+                        workflowResult.SetErrorMessage(Global.UserDoesntExist);
                         await Bus.Publish(new UserLoginFailureEvent
                         {
                             Realm = prefix,
                             Amr = Amr,
                             Login = viewModel.Login
                         });
-                        return View(viewModel);
+                        return View(workflowResult);
                     case ValidationStatus.NOCONTENT:
-                        if (!string.IsNullOrWhiteSpace(authenticationResult.ErrorCode) && !string.IsNullOrWhiteSpace(authenticationResult.ErrorMessage)) ModelState.AddModelError(authenticationResult.ErrorCode, authenticationResult.ErrorMessage);
-                        return View(viewModel);
+                        if (!string.IsNullOrWhiteSpace(authenticationResult.ErrorCode) && !string.IsNullOrWhiteSpace(authenticationResult.ErrorMessage))
+                            workflowResult.SetErrorMessage(authenticationResult.ErrorMessage);
+                        return View(workflowResult);
                     case ValidationStatus.INVALIDCREDENTIALS:
                         using (var transaction = TransactionBuilder.Build())
                         {
                             var options = GetOptions();
-                            ModelState.AddModelError("invalid_credential", "invalid_credential");
+                            workflowResult.SetErrorMessage(Global.InvalidCredential);
                             await Bus.Publish(new UserLoginFailureEvent
                             {
                                 Realm = prefix,
@@ -277,7 +291,7 @@ namespace SimpleIdServer.IdServer.UI
                             }
 
                             await transaction.Commit(token);
-                            return View(viewModel);
+                            return View(workflowResult);
                         }
                 }
             }
@@ -289,6 +303,52 @@ namespace SimpleIdServer.IdServer.UI
                authenticationResult.AuthenticatedUser,
                token,
                /*!viewModel.IsFirstAmr ? null : */ viewModel.RememberLogin);
+
+            async Task<IActionResult> CheckAntiforgery()
+            {
+                try
+                {
+                    await _antiforgery.ValidateRequestAsync(this.HttpContext);
+                    return null;
+                }
+                catch (AntiforgeryValidationException)
+                {
+                    if (!User.Identity.IsAuthenticated) return RedirectToAction("Index", "Errors", new { code = "invalid_request", message = Global.InvalidAntiForgeryToken });
+                    var returnUrl = viewModel.ReturnUrl;
+                    if (!IsProtected(returnUrl)) return Redirect(returnUrl);
+                    var unprotectedUrl = Unprotect(returnUrl);
+                    return Redirect(unprotectedUrl);
+                }
+            }
+
+            async Task ExtractRegistrationWorkflow()
+            {
+                if (!IsProtected(viewModel.ReturnUrl)) return;
+                var acr = await _authenticationContextClassReferenceRepository.GetByAuthenticationWorkflow(prefix, viewModel.WorkflowId, token);
+                viewModel.RegistrationWorkflowId = acr.RegistrationWorkflowId;
+            }
+
+            async Task<WorkflowViewModel> BuildWorkflowViewModel()
+            {
+                var records = await _formStore.GetAll(token);
+                var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
+                var workflow = await _workflowStore.Get(viewModel.WorkflowId, token);
+                var step = workflow.GetStep(Amr);
+                var workflowResult = new WorkflowViewModel
+                {
+                    CurrentStepId = step.Id,
+                    Workflow = workflow,
+                    FormRecords = records,
+                    AntiforgeryToken = new AntiforgeryTokenRecord
+                    {
+                        CookieName = _formBuilderOptions.AntiforgeryCookieName,
+                        CookieValue = tokenSet.CookieToken,
+                        FormField = tokenSet.FormFieldName,
+                        FormValue = tokenSet.RequestToken
+                    }
+                };
+                return workflowResult;
+            }
         }
 
         protected abstract Task<UserAuthenticationResult> CustomAuthenticate(string prefix, string authenticatedUserId, T viewModel, CancellationToken cancellationToken);
@@ -312,6 +372,12 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         #endregion
+
+        private bool IsMaximumActiveSessionReached()
+        {
+            var allTickets = _sessionManager.FetchTicketsFromAllRealm(HttpContext);
+            return (allTickets.Count() >= Options.MaxNbActiveSessions);
+        }
 
         protected void SetSuccessMessage(string msg) => ViewBag.SuccessMessage = msg;
 
@@ -349,9 +415,14 @@ namespace SimpleIdServer.IdServer.UI
 
     public record UserAuthenticationResult
     {
-        private UserAuthenticationResult(IActionResult result)
+        private UserAuthenticationResult()
         {
-            ActionResult = result;
+            
+        }
+
+        private UserAuthenticationResult(List<string> errors)
+        {
+            Errors = errors;
         }
 
         private UserAuthenticationResult(User authenticatedUser)
@@ -359,10 +430,14 @@ namespace SimpleIdServer.IdServer.UI
             AuthenticatedUser = authenticatedUser;
         }
 
-        public IActionResult ActionResult { get; set; }
-        public User AuthenticatedUser { get; set; }
+        public List<string> Errors { get; private set; }
+        public List<string> SuccessMessages { get; private set; }
+        public User AuthenticatedUser { get; private set; }
 
         public static UserAuthenticationResult Ok(User authenticatedUser = null) => new UserAuthenticationResult(authenticatedUser);
-        public static UserAuthenticationResult Error(IActionResult result) => new UserAuthenticationResult(result);
+        public static UserAuthenticationResult Success(List<string> successMessages) => new UserAuthenticationResult { SuccessMessages = successMessages };
+        public static UserAuthenticationResult Success(string successMessage) => Success(new List<string> { successMessage });
+        public static UserAuthenticationResult Error(List<string> errors) => new UserAuthenticationResult(errors);
+        public static UserAuthenticationResult Error(string error) => Error(new List<string> { error });
     }
 }

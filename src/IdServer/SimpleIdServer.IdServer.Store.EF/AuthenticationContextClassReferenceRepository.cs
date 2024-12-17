@@ -23,6 +23,14 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
             .SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == realm) && a.Id == id, cancellationToken);
     }
 
+    public Task<AuthenticationContextClassReference> GetByAuthenticationWorkflow(string realm, string workflowId, CancellationToken cancellationToken)
+    {
+        return _dbContext.Acrs
+            .Include(a => a.Realms)
+            .Include(a => a.RegistrationWorkflow)
+            .SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == realm) && a.AuthenticationWorkflow == workflowId, cancellationToken);
+    }
+
     public Task<AuthenticationContextClassReference> GetByName(string realm, string name, CancellationToken cancellationToken)
     {
         return _dbContext.Acrs

@@ -61,7 +61,7 @@
             @foreach (var link in Workflow.Links)
             {
                 var textInfoCoordinate = link.ComputeTextInfoCoordinate();
-                <foreignObject x="@textInfoCoordinate.X" y="@textInfoCoordinate.Y" width="100">
+                <foreignObject x="@Sanitize(textInfoCoordinate.X)" y="@Sanitize(textInfoCoordinate.Y)" width="100">
                     <div class="linkInfo">
                         <span><RadzenIcon Icon="delete" class="icon" @onclick="@(() => HandleRemoveLink(link))" /></span><span class="text">@link.ActionType</span>
                     </div>

@@ -1,0 +1,51 @@
+﻿:root {
+    --prompt-width: 600px;
+    --outer-padding: 80px;
+    --bg-color: #F7F7F6;
+    --from-bg-color: white;
+    --from-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    --from-radius: 5px;
+    --divider-bg: #eee;
+    --divider-color: #6c757d;
+}
+
+.form {
+    padding: var(--outer-padding);
+    background-color: var(--bg-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.form-content {
+    width: var(--prompt-width);
+    background-color: var(--from-bg-color);
+    box-shadow: var(--from-shadow);
+    border-radius: var(--from-radius);
+}
+
+.form-content.view {
+    padding: 10px;
+}
+
+
+.divider {
+    display: flex;
+    align-items: center;
+}
+
+.divider::before, .divider::after {
+    content: "";
+    height: 1px;
+    background: var(--divider-bg);
+    flex: 1;
+}
+
+.divider .text {
+    margin-right: 1rem;
+    margin-left: 1rem;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    color: var(--divider-color);
+}

@@ -43,6 +43,7 @@ using SimpleIdServer.IdServer.VerifiablePresentation;
 using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
@@ -528,7 +529,19 @@ async void SeedData(WebApplication application, string scimBaseUrl)
 
         using (var formBuilderDbContext = scope.ServiceProvider.GetService<FormBuilderDbContext>())
         {
-            formBuilderDbContext.Forms.AddRange(FormBuilderConfiguration.AllForms);
+            var allForms = FormBuilderConfiguration.AllForms;
+            var content = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "form.css"));
+            foreach (var form in allForms)
+            {
+                form.AvailableStyles.Add(new FormBuilder.Models.FormStyle
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Content = content,
+                    IsActive = true
+                });
+            }
+
+            formBuilderDbContext.Forms.AddRange(allForms);
             formBuilderDbContext.Workflows.AddRange(FormBuilderConfiguration.AllWorkflows);
             formBuilderDbContext.SaveChanges();
         }

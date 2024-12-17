@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Email.Resources;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Email.UI.ViewModels
@@ -9,9 +10,12 @@ namespace SimpleIdServer.IdServer.Email.UI.ViewModels
     {
         public AuthenticateEmailViewModel() { }
 
-        public override void SpecificValidate(ModelStateDictionary modelStateDictionary)
+        public override List<string> SpecificValidate()
         {
-            if (!string.IsNullOrWhiteSpace(Login) && !EmailValidator.IsValidEmail(Login)) modelStateDictionary.AddModelError("invalid_email", "invalid_email");
+            var errors = new List<string>();
+            if (!string.IsNullOrWhiteSpace(Login) && !EmailValidator.IsValidEmail(Login))
+                errors.Add(Global.InvalidEmail);
+            return errors;
         }
     }
 }

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Fido.Resources;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
@@ -18,13 +19,16 @@ namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
         public string LoginStatusUrl { get; set; } = null!;
         public bool IsDeveloperModeEnabled { get; set; } = false;
 
-        public override void Validate(ModelStateDictionary modelStateDictionary)
+        public override List<string> Validate()
         {
+            var result = new List<string>();
             if (string.IsNullOrWhiteSpace(Login))
-                modelStateDictionary.AddModelError("missing_login", "missing_login");
+                result.Add(Global.MissingLogin);
 
             if (string.IsNullOrWhiteSpace(SessionId))
-                modelStateDictionary.AddModelError("missing_session_id", "missing_session_id");
+                result.Add(Global.MissingSessionId);
+
+            return result;
         }
     }
 }

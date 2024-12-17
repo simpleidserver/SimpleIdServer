@@ -46,7 +46,6 @@ public class FormBuilderConfiguration
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "ReturnUrl",
-                                Value = string.Empty,
                                 Type = FormInputTypes.HIDDEN,
                                 Transformation = new IncomingTokensTransformationRule
                                 {
@@ -57,14 +56,12 @@ public class FormBuilderConfiguration
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "Login",
-                                Value = "Login",
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
                             },
                             new FormPasswordFieldRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "Password",
-                                Value = "Password",
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
                             },
                             new FormCheckboxRecord
@@ -122,7 +119,7 @@ public class FormBuilderConfiguration
                         },
                         RepetitionRule = new IncomingTokensRepetitionRule
                         {
-                            Path = "$.ExternalIdProviders[*]",
+                            Path = "$.ExternalIdsProviders[*]",
                             LabelMappingRules = new List<FormBuilder.Rules.LabelMappingRule>
                             {
                                 new FormBuilder.Rules.LabelMappingRule { Language = "en", Source = "$.DisplayName" }

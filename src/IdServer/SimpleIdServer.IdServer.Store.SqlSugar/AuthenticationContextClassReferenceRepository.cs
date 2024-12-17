@@ -41,6 +41,15 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             return result?.ToDomain();
         }
 
+        public async Task<AuthenticationContextClassReference> GetByAuthenticationWorkflow(string realm, string workflowId, CancellationToken cancellationToken)
+        {
+            var result = await _dbContext.Client.Queryable<SugarAuthenticationContextClassReference>()
+                .Includes(a => a.Realms)
+                .Includes(a => a.RegistrationWorkflow)
+                .FirstAsync(a => a.Realms.Any(r => r.RealmsName == realm) && a.AuthenticationWorkflow == workflowId, cancellationToken);
+            return result?.ToDomain();
+        }
+
         public async Task<List<AuthenticationContextClassReference>> GetAll(CancellationToken cancellationToken)
         {
             var result = await _dbContext.Client.Queryable<SugarAuthenticationContextClassReference>()

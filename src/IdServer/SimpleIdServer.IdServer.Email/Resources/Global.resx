@@ -117,28 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AuthenticationNotConfirmed" xml:space="preserve">
-    <value>authentication is not yet confirmed</value>
-  </data>
-  <data name="NoCredential" xml:space="preserve">
-    <value>there is no credential enrolled</value>
-  </data>
-  <data name="NotAllowedToRegister" xml:space="preserve">
-    <value>you are not allowed to register an account</value>
-  </data>
-  <data name="RegistrationNotConfirmed" xml:space="preserve">
-    <value>registration is not yet confirmed</value>
-  </data>
-  <data name="SessionCannotBeExtracted" xml:space="preserve">
-    <value>either the session doesn't exist or is expired</value>
-  </data>
-  <data name="MissingReturnUrl" xml:space="preserve">
-    <value>The return url is missing</value>
-  </data>
-  <data name="MissingLogin" xml:space="preserve">
-    <value>The login is missing</value>
-  </data>
-  <data name="MissingSessionId" xml:space="preserve">
-    <value>The session identifier is missing</value>
+  <data name="InvalidEmail" xml:space="preserve">
+    <value>The email is invalid</value>
   </data>
 </root>

@@ -14,6 +14,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public string Name { get; set; } = null;
         public string DisplayName { get; set; } = null;
         public string AuthenticationMethodReferences { get; set; } = null!;
+        public string AuthenticationWorkflow { get; set; } = null;
         public DateTime CreateDateTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         [SugarColumn(IsNullable = true)]

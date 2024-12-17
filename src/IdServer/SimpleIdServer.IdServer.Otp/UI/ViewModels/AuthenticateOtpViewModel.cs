@@ -8,7 +8,6 @@ namespace SimpleIdServer.IdServer.Otp.UI.ViewModels;
 
 public class AuthenticateOtpViewModel : BaseOTPAuthenticateViewModel
 {
-    public override void SpecificValidate(ModelStateDictionary modelStateDictionary)
-    {
-    }
+    public override List<string> SpecificValidate()
+        => new List<string>();
 }

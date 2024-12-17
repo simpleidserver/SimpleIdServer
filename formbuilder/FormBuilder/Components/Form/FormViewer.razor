@@ -13,14 +13,12 @@
         <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
             @if (ErrorMessages != null && ErrorMessages.Any())
             {
-                <RadzenStack>
-                    @foreach (var errorMessage in ErrorMessages)
-                    {
-                        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
-                            @errorMessage
-                        </RadzenAlert>
-                    }
-                </RadzenStack>
+                @foreach (var errorMessage in ErrorMessages)
+                {
+                    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                        @errorMessage
+                    </RadzenAlert>
+                }
             }
 
             @if (Form.Elements != null)

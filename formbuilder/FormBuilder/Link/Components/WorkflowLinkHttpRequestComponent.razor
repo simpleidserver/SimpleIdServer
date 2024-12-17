@@ -1,5 +1,6 @@
 ﻿@using FormBuilder.Models
 @using System.Text.Json
+@using FormBuilder.Models.Rules
 @using Radzen
 @using Radzen.Blazor
 
@@ -7,12 +8,35 @@
 <RadzenFormField Variant="Variant.Outlined" Text="Target" class="fullWidth">
     <RadzenTextBox @bind-Value="@Target"></RadzenTextBox>
 </RadzenFormField>
+<!-- Http method -->
+<RadzenFormField Variant="Variant.Outlined" Text="Select the type of HTTP method" class="fullWidth">
+    <RadzenDropDown @bind-Value=@HttpMethod Data=@allHttpMethods TextProperty="Value" ValueProperty="Key"></RadzenDropDown>
+</RadzenFormField>
 <!-- Antiforgery -->
 <div>
     <RadzenCheckBox @bind-Value="IsAntiforgeryEnabled" />
     <RadzenLabel>Do you want to automatically generate an anti-forgery token?</RadzenLabel>
 </div>
+<!-- Use custom parameters -->
+<div>
+    <RadzenCheckBox @bind-Value="IsAntiforgeryEnabled" />
+    <RadzenLabel>Do-you want to use custom parameters?</RadzenLabel>
+</div>
+@if (IsCustomParametersEnabled)
+{
+    <RadzenDataGrid Data="@Parameter.Rules" TItem="MappingRule">
+        <Columns>
+            <RadzenDataGridColumn Title="JSON source" TItem="MappingRule">
+                <Template Context="mappingRule">
+                    <RadzenTextBox @bind-Value="@mappingRule.Source"></RadzenTextBox>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Title="Target" TItem="MappingRule" Property="@nameof(MappingRule.Target)" />
+        </Columns>
+    </RadzenDataGrid>
+}
 
+<!-- Custom parameter -->
 
 @code {
     public string Target
@@ -40,6 +64,38 @@
             WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
         }
     }
+
+    public HttpMethods HttpMethod
+    {
+        get
+        {
+            return Parameter.Method;
+        }
+        set
+        {
+            Parameter.Method = value;
+            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+        }
+    }
+
+    public bool IsCustomParametersEnabled
+    {
+        get
+        {
+            return Parameter.IsCustomParametersEnabled;
+        }
+        set
+        {
+            Parameter.IsCustomParametersEnabled = value;
+            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+        }
+    }
+
+    Dictionary<HttpMethods, string> allHttpMethods = new Dictionary<HttpMethods, string>
+    {
+        { HttpMethods.POST, "POST" },
+        { HttpMethods.GET, "GET" }
+    };
 
     [Parameter] public WorkflowLinkHttpRequestParameter Parameter { get; set; }
     [Parameter] public WorkflowLink WorkflowLink { get; set; }

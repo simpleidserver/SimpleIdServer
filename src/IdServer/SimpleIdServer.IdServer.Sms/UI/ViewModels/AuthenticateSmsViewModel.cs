@@ -10,8 +10,7 @@ namespace SimpleIdServer.IdServer.Sms.UI.ViewModels
     {
         public AuthenticateSmsViewModel() { }
 
-        public override void SpecificValidate(ModelStateDictionary modelStateDictionary)
-        {
-        }
+        public override List<string> SpecificValidate()
+            => new List<string>();
     }
 }

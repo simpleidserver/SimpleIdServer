@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Stores;
 public interface IAuthenticationContextClassReferenceRepository
 {
     Task<AuthenticationContextClassReference> Get(string realm, string id, CancellationToken cancellationToken);
+    Task<AuthenticationContextClassReference> GetByAuthenticationWorkflow(string realm, string workflowId, CancellationToken cancellationToken);
     Task<AuthenticationContextClassReference> GetByName(string realm, string name, CancellationToken cancellationToken);
     Task<List<AuthenticationContextClassReference>> GetByNames(List<string> names, CancellationToken cancellationToken);
     Task<List<AuthenticationContextClassReference>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken);

@@ -8,7 +8,6 @@ namespace SimpleIdServer.IdServer.Console.UI.ViewModels;
 
 public class AuthenticateConsoleViewModel : BaseOTPAuthenticateViewModel
 {
-    public override void SpecificValidate(ModelStateDictionary modelStateDictionary)
-    {
-    }
+    public override List<string> SpecificValidate()
+        => new List<string>();
 }

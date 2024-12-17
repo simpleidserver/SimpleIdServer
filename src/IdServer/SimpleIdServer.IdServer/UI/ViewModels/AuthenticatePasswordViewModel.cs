@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Resources;
+using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
 {
@@ -11,16 +13,19 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public string Password { get; set; }
         public bool CanResetPassword { get; set; }
 
-        public override void Validate(ModelStateDictionary modelStateDictionary)
+        public override List<string> Validate()
         {
+            var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(ReturnUrl))
-                modelStateDictionary.AddModelError("missing_return_url", "missing_return_url");
+                errors.Add(Global.MissingReturnUrl);
 
             if (string.IsNullOrWhiteSpace(Login))
-                modelStateDictionary.AddModelError("missing_login", "missing_login");
+                errors.Add(Global.MissingLogin);
 
             if (string.IsNullOrWhiteSpace(Password))
-                modelStateDictionary.AddModelError("missing_password", "missing_password");
+                errors.Add(Global.MissingPassword);
+
+            return errors;
         }
     }
 }

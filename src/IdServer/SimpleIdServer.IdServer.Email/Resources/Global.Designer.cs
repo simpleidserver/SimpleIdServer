@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SimpleIdServer.IdServer.Fido.Resources {
+namespace SimpleIdServer.IdServer.Email.Resources {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Fido.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Fido.Resources.Global", typeof(Global).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Email.Resources.Global", typeof(Global).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,74 +61,11 @@ namespace SimpleIdServer.IdServer.Fido.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à authentication is not yet confirmed.
+        ///   Recherche une chaîne localisée semblable à The email is invalid.
         /// </summary>
-        internal static string AuthenticationNotConfirmed {
+        internal static string InvalidEmail {
             get {
-                return ResourceManager.GetString("AuthenticationNotConfirmed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à The login is missing.
-        /// </summary>
-        internal static string MissingLogin {
-            get {
-                return ResourceManager.GetString("MissingLogin", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à The return url is missing.
-        /// </summary>
-        internal static string MissingReturnUrl {
-            get {
-                return ResourceManager.GetString("MissingReturnUrl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à The session identifier is missing.
-        /// </summary>
-        internal static string MissingSessionId {
-            get {
-                return ResourceManager.GetString("MissingSessionId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à there is no credential enrolled.
-        /// </summary>
-        internal static string NoCredential {
-            get {
-                return ResourceManager.GetString("NoCredential", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à you are not allowed to register an account.
-        /// </summary>
-        internal static string NotAllowedToRegister {
-            get {
-                return ResourceManager.GetString("NotAllowedToRegister", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à registration is not yet confirmed.
-        /// </summary>
-        internal static string RegistrationNotConfirmed {
-            get {
-                return ResourceManager.GetString("RegistrationNotConfirmed", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à either the session doesn&apos;t exist or is expired.
-        /// </summary>
-        internal static string SessionCannotBeExtracted {
-            get {
-                return ResourceManager.GetString("SessionCannotBeExtracted", resourceCulture);
+                return ResourceManager.GetString("InvalidEmail", resourceCulture);
             }
         }
     }

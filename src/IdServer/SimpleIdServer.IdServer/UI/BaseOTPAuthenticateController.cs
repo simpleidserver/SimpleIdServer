@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
-using FormBuilder;
 using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
@@ -65,15 +66,13 @@ namespace SimpleIdServer.IdServer.UI
             var authenticatedUser = await UserAuthenticationService.GetUser(authenticatedUserId, viewModel, prefix, cancellationToken);
             if (authenticatedUser == null)
             {
-                ModelState.AddModelError("unknown_user", "unknown_user");
-                return UserAuthenticationResult.Error(View(viewModel));
+                return UserAuthenticationResult.Error(Global.UserDoesntExist);
             }
 
             var activeOtp = authenticatedUser.ActiveOTP;
             if(activeOtp == null)
             {
-                ModelState.AddModelError("no_active_otp", "no_active_otp");
-                return UserAuthenticationResult.Error(View(viewModel));
+                return UserAuthenticationResult.Error(Global.NoActiveOtp);
             }
 
             var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
@@ -83,12 +82,11 @@ namespace SimpleIdServer.IdServer.UI
                     var notificationService = _notificationServices.First(n => n.Name == Amr);
                     var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
                     await notificationService.Send("One Time Password", string.Format(FormattedMessage, otpCode), new Dictionary<string, string>(), authenticatedUser);
-                    SetSuccessMessage("confirmationcode_sent");
                     if(activeOtp.OTPAlg == Domains.OTPAlgs.TOTP) viewModel.TOTPStep = activeOtp.TOTPStep;
-                    return UserAuthenticationResult.Error(View(viewModel));
+                    return UserAuthenticationResult.Success(Global.ConfirmationcodeSent);
                 default:
-                    viewModel.CheckConfirmationCode(ModelState);
-                    if (!ModelState.IsValid) return UserAuthenticationResult.Error(View(viewModel));
+                    var errors = viewModel.CheckConfirmationCode();
+                    if (!errors.Any()) return UserAuthenticationResult.Error(errors);
                     break;
             }
 

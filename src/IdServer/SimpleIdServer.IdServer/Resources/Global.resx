@@ -1056,4 +1056,28 @@
   <data name="CannotRemoveMasterRealm" xml:space="preserve">
     <value>Master realm cannot be removed</value>
   </data>
+  <data name="MissingReturnUrl" xml:space="preserve">
+    <value>Return url is missing</value>
+  </data>
+  <data name="MissingLogin" xml:space="preserve">
+    <value>The login is missing</value>
+  </data>
+  <data name="MissingPassword" xml:space="preserve">
+    <value>The password is missing</value>
+  </data>
+  <data name="UserDoesntExist" xml:space="preserve">
+    <value>The user doesn't exist</value>
+  </data>
+  <data name="MissingConfirmationCode" xml:space="preserve">
+    <value>Confirmation code is missing</value>
+  </data>
+  <data name="ConfirmationcodeSent" xml:space="preserve">
+    <value>Confirmation code has been sent</value>
+  </data>
+  <data name="InvalidCredential" xml:space="preserve">
+    <value>Credential is invalid</value>
+  </data>
+  <data name="MaximumNumberActiveSessions" xml:space="preserve">
+    <value>The maximum number of active sessions has been reached.</value>
+  </data>
 </root>

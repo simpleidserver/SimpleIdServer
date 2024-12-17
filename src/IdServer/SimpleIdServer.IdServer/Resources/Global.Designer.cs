@@ -988,6 +988,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code has been sent.
+        /// </summary>
+        public static string ConfirmationcodeSent {
+            get {
+                return ResourceManager.GetString("ConfirmationcodeSent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the content-type is not correct.
         /// </summary>
         public static string ContentTypeNotSupported {
@@ -1254,6 +1263,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string InvalidClientMetadataUri {
             get {
                 return ResourceManager.GetString("InvalidClientMetadataUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential is invalid.
+        /// </summary>
+        public static string InvalidCredential {
+            get {
+                return ResourceManager.GetString("InvalidCredential", resourceCulture);
             }
         }
         
@@ -1645,6 +1663,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The maximum number of active sessions has been reached..
+        /// </summary>
+        public static string MaximumNumberActiveSessions {
+            get {
+                return ResourceManager.GetString("MaximumNumberActiveSessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à access token is missing.
         /// </summary>
         public static string MissingAccessToken {
@@ -1668,6 +1695,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string MissingClientIdClaim {
             get {
                 return ResourceManager.GetString("MissingClientIdClaim", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Confirmation code is missing.
+        /// </summary>
+        public static string MissingConfirmationCode {
+            get {
+                return ResourceManager.GetString("MissingConfirmationCode", resourceCulture);
             }
         }
         
@@ -1699,6 +1735,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The login is missing.
+        /// </summary>
+        public static string MissingLogin {
+            get {
+                return ResourceManager.GetString("MissingLogin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the openid_relying_party doesn&apos;t exist in the entity statement.
         /// </summary>
         public static string MissingOpenidRpInEntityStatement {
@@ -1722,6 +1767,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string MissingParameters {
             get {
                 return ResourceManager.GetString("MissingParameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The password is missing.
+        /// </summary>
+        public static string MissingPassword {
+            get {
+                return ResourceManager.GetString("MissingPassword", resourceCulture);
             }
         }
         
@@ -1767,6 +1821,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string MissingResponseTypes {
             get {
                 return ResourceManager.GetString("MissingResponseTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Return url is missing.
+        /// </summary>
+        public static string MissingReturnUrl {
+            get {
+                return ResourceManager.GetString("MissingReturnUrl", resourceCulture);
             }
         }
         
@@ -2856,6 +2919,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string UserAlreadyExists {
             get {
                 return ResourceManager.GetString("UserAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The user doesn&apos;t exist.
+        /// </summary>
+        public static string UserDoesntExist {
+            get {
+                return ResourceManager.GetString("UserDoesntExist", resourceCulture);
             }
         }
         

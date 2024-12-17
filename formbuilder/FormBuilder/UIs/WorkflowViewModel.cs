@@ -12,6 +12,10 @@ public class WorkflowViewModel
     public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
     public string CurrentStepId { get; set; }
     public List<string> ErrorMessages { get; set; }
+    public List<string> SuccessMessages { get; set; }
+
+    public void SetErrorMessage(string errorMessage)
+        => ErrorMessages = new List<string> { errorMessage };
 
     public void SetInput<T>(T record) where T : class
     {

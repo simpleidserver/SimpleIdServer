@@ -1,6 +1,7 @@
 ﻿@using FormBuilder.Models
 @using FormBuilder.Components.Form
 @using FormBuilder.Services
+@using System.Diagnostics
 @inject IFormBuilderJsService formBuilderJsService
 
 <foreignObject x="@Step.Coordinate.X" y="@Step.Coordinate.Y" width="200">
@@ -15,10 +16,13 @@
                 </li>
             </ul>
         </div>
-        <div class="zone" @ondragover:preventDefault="true" @ondragover="@(async (e) => await HandleDragHover(e))" @ondrop="@(async(e) => await HandleDrop(e))" @ondragleave="HandleDragLeave"></div>
+        <div class="zone" @ondragover:preventDefault="true" @ondragover="@(async (e) => await HandleDragHover(e))" @ondrop="@(async(e) => await HandleDrop(e))" @ondragleave="HandleDragLeave">
+        </div>
         @if(workflowExecutionContext != null)
         {
-            <FormViewer WorkflowExecutionContext="@workflowExecutionContext" IsEditModeEnabled="false" IsInteractableElementEnabled="true" WorkflowViewerContext="@workflowContext"></FormViewer>
+            <div style="@PointerEvtCss">
+                <FormViewer WorkflowExecutionContext="@workflowExecutionContext" IsEditModeEnabled="false" IsInteractableElementEnabled="true" WorkflowViewerContext="@workflowContext"></FormViewer>
+            </div>
         }
     </div>
 </foreignObject>
@@ -36,6 +40,14 @@
     ElementReference divRef;
     WorkflowViewerContext workflowContext { get; set; } = new WorkflowViewerContext();
     WorkflowExecutionContext workflowExecutionContext { get; set; } = null;
+
+    string PointerEvtCss
+    {
+        get
+        {
+            return SelectedLink == null ? string.Empty : "pointer-events: none";
+        }
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

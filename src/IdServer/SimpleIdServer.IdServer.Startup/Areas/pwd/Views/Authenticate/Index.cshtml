@@ -1,16 +1,19 @@
 ﻿@using FormBuilder
 @using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
 @using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Options
 @model FormBuilder.UIs.WorkflowViewModel
 @inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
 @inject IHttpContextAccessor HttpContextAccessor;
 
 @{
     Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
-    string s = "";
+    var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveFormCssUrl(step.FormRecordName);
 }
 
 <component type="typeof(WorkflowViewer)"
@@ -19,4 +22,9 @@
            param-Workflow="@Model.Workflow"
            param-Records="@Model.FormRecords"
            param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
            param-Antifogery="@Model.AntiforgeryToken" />
+
+@section Header {
+    <link rel="stylesheet" href="@path" />
+}

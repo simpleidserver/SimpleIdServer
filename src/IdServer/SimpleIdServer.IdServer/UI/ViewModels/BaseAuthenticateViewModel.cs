@@ -1,12 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.UIs;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
 {
-    public abstract class BaseAuthenticateViewModel
+    public abstract class BaseAuthenticateViewModel : StepViewModel
     {
         public string ReturnUrl { get; set; }
         public string Login { get; set; }
@@ -23,7 +24,8 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
         public AmrAuthInfo AmrAuthInfo { get; set; } = null;
         public RegistrationWorkflow RegistrationWorkflow { get; set; }
-        public abstract void Validate(ModelStateDictionary modelStateDictionary);
+        public string RegistrationWorkflowId { get; set; }
+        public abstract List<string> Validate();
     }
 
     public record AmrAuthInfo
