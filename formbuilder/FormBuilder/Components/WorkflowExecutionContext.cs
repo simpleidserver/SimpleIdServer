@@ -49,6 +49,7 @@ public class WorkflowExecutionContext
     public JsonObject StepOutput { get; private set; }
     public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
     public JsonNode RepetitionRuleData { get; set; }
+    public JsonObject InputData { get; set; }
 
     public WorkflowExecutionContext Clone()
     {

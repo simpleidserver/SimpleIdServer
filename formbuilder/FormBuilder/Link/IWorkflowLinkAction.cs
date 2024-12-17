@@ -11,5 +11,5 @@ public interface IWorkflowLinkAction
     List<string> ExcludedStepNames { get; }
     bool CanBeAppliedMultipleTimes { get; }
     Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context);
-    void Render(RenderTreeBuilder builder, WorkflowLink workflowLink);
+    object Render(RenderTreeBuilder builder, WorkflowLink workflowLink);
 }

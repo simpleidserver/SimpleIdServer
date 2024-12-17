@@ -7,10 +7,8 @@ using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
-using FormBuilder.Models.Rules;
-using FormBuilder.Models.Url;
 using FormBuilder.Models;
-using FormBuilder.Transformers;
+using FormBuilder.Models.Rules;
 using System.Collections.ObjectModel;
 
 namespace FormBuilder.Startup;
@@ -18,7 +16,8 @@ namespace FormBuilder.Startup;
 public class Constants
 {
     private static string forgetMyPasswordId = Guid.NewGuid().ToString();
-    private static string authFormId = Guid.NewGuid().ToString();
+    private static string authPwdFormId = Guid.NewGuid().ToString();
+    private static string resetPwdFormId = Guid.NewGuid().ToString();
     private static string workflowId = "loginPwd";
 
     #region Forms
@@ -56,7 +55,7 @@ public class Constants
                     // Authentication form
                     new FormStackLayoutRecord
                     {
-                        Id = authFormId,
+                        Id = authPwdFormId,
                         IsFormEnabled = true,
                         Elements = new ObservableCollection<IFormElementRecord>
                         {
@@ -148,10 +147,51 @@ public class Constants
         }
     };
 
+    public static FormRecord ResetLoginPwdForm = new FormRecord
+    {
+        Name = "resetPwd",
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormStackLayoutRecord
+                    {
+                        Id = resetPwdFormId,
+                        IsFormEnabled = true,
+                        Elements = new ObservableCollection<IFormElementRecord>
+                        {
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Login",
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
+                            },
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Value",
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Email").Build()
+                            },
+                            new FormButtonRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Send link").Build()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     public static List<FormRecord> AllForms => new List<FormRecord>
     {
         LoginPwdAuthForm,
-        ConfirmationForm
+        ConfirmationForm,
+        ResetLoginPwdForm
     };
 
     #endregion
@@ -162,7 +202,7 @@ public class Constants
         .AddStep(LoginPwdAuthForm, new Coordinate(100, 100))
         .AddStep(ConfirmationForm, new Coordinate(200, 100))
         .AddLinkPopupAction(LoginPwdAuthForm, ConfirmationForm, forgetMyPasswordId)
-        .AddLinkHttpRequestAction(LoginPwdAuthForm, ConfirmationForm, authFormId, new Link.WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(LoginPwdAuthForm, ConfirmationForm, authPwdFormId, new Link.WorkflowLinkHttpRequestParameter
         {
             IsAntiforgeryEnabled = true,
             Target = "http://localhost:62734/Auth"

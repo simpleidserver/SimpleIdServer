@@ -34,14 +34,14 @@ public class WorkflowLinkUrlAction : IWorkflowLinkAction
         await _formBuidlerJsService.Navigate(parameter.Url);
     }
 
-    public void Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
+    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
     {
         var parameter = new WorkflowLinkUrlParameter();
         if(!string.IsNullOrWhiteSpace(workflowLink.ActionParameter))
             parameter = JsonSerializer.Deserialize<WorkflowLinkUrlParameter>(workflowLink.ActionParameter);
         builder.OpenComponent<EditWorkflowLinkComponent>(0);
         builder.AddAttribute(1, nameof(EditWorkflowLinkComponent.Parameter), parameter);
-        builder.AddAttribute(2, nameof(EditWorkflowLinkComponent.WorkflowLink), workflowLink);
         builder.CloseComponent();
+        return parameter;
     }
 }

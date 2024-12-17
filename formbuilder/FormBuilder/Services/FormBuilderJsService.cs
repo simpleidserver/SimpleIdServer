@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Components.Workflow;
+using FormBuilder.Link;
 using FormBuilder.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -14,11 +15,16 @@ public interface IFormBuilderJsService
     Task<Coordinate> GetPointInSvgSpace(double clientX, double clientY, ElementReference svgEltRef);
     Task Navigate(string url);
     Task NavigateForce(string url);
-    Task SubmitForm(string url, JsonObject data);
+    Task SubmitForm(string url, JsonObject data, HttpMethods method);
 }
 
 public class FormBuilderJsService : IFormBuilderJsService
 {
+    private Dictionary<HttpMethods, string> _httpMethodToName = new Dictionary<HttpMethods, string>
+    {
+        {  HttpMethods.GET, "get" },
+        { HttpMethods.POST, "post" }
+    };
     private readonly IJSRuntime _jsRuntime;
 
     public FormBuilderJsService(IJSRuntime jsRuntime)
@@ -60,6 +66,8 @@ public class FormBuilderJsService : IFormBuilderJsService
     public async Task NavigateForce(string url)
         => await _jsRuntime.InvokeVoidAsync("FormBuilder.navigateForce", url);
 
-    public async Task SubmitForm(string url, JsonObject data)
-        => await _jsRuntime.InvokeVoidAsync("FormBuilder.submitForm", url, data);
+    public async Task SubmitForm(string url, JsonObject data, HttpMethods method)
+    {
+        await _jsRuntime.InvokeVoidAsync("FormBuilder.submitForm", url, data, _httpMethodToName[method]);
+    }
 }

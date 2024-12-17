@@ -2,6 +2,7 @@
 @using FormBuilder.Factories
 @using FormBuilder.Link
 @using FormBuilder.Models
+@using System.Text.Json
 @inject DialogService dialogService
 
 @inject IWorkflowLinkActionFactory workflowLinkActionFactory
@@ -17,6 +18,7 @@
 @code {
     private string _selectedActionType;
     private WorkflowLink _copyWorkflowLink { get; set; }
+    private object linkParameter { get; set; }
     private RenderFragment? CustomRender { get; set; }
     private List<IWorkflowLinkAction> actions { get; set; }
     private string SelectedActionType
@@ -63,13 +65,13 @@
         if (_copyWorkflowLink.ActionType == null) return;
         var workflowLinkAction = actions?.SingleOrDefault(a => a.Type == _copyWorkflowLink.ActionType);
         if (workflowLinkAction == null) return;
-        workflowLinkAction.Render(builder, _copyWorkflowLink);
+        linkParameter = workflowLinkAction.Render(builder, _copyWorkflowLink);
     };
 
     private void HandleSave()
     {
         WorkflowLink.ActionType = _copyWorkflowLink.ActionType;
-        WorkflowLink.ActionParameter = _copyWorkflowLink.ActionParameter;
+        if(linkParameter != null) WorkflowLink.ActionParameter = JsonSerializer.Serialize(linkParameter);
         dialogService.Close();
     }
 }

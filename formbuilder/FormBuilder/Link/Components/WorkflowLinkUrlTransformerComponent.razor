@@ -10,58 +10,18 @@
 
 <!-- Json Source -->
 <RadzenFormField Variant="Variant.Outlined" Text="JSON Source" class="fullWidth">
-    <RadzenTextBox @bind-Value="@JsonSource"></RadzenTextBox>
+    <RadzenTextBox @bind-Value="@Parameter.JsonSource"></RadzenTextBox>
 </RadzenFormField>
 <!-- Url -->
 <RadzenFormField Variant="Variant.Outlined" Text="Url" class="fullWidth">
-    <RadzenTextBox @bind-Value="@Url"></RadzenTextBox>
+    <RadzenTextBox @bind-Value="@Parameter.Url"></RadzenTextBox>
 </RadzenFormField>
 <!-- Query parameter -->
 <RadzenFormField Variant="Variant.Outlined" Text="Name of the query parameter" class="fullWidth">
-    <RadzenTextBox @bind-Value="@QueryParameterName"></RadzenTextBox>
+    <RadzenTextBox @bind-Value="@Parameter.QueryParameterName"></RadzenTextBox>
 </RadzenFormField>
 
 
 @code {
-    public string JsonSource
-    {
-        get
-        {
-            return Parameter.JsonSource;
-        }
-        set
-        {
-            Parameter.JsonSource = value;
-            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
-        }
-    }
-
-    public string Url
-    {
-        get
-        {
-            return Parameter.Url;
-        }
-        set
-        {
-            Parameter.Url = value;
-            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
-        }
-    }
-
-    public string QueryParameterName
-    {
-        get
-        {
-            return Parameter.QueryParameterName;
-        }
-        set
-        {
-            Parameter.QueryParameterName = value;
-            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
-        }
-    }
-
     [Parameter] public WorkflowLinkUrlTransformationParameter Parameter { get; set; }
-    [Parameter] public WorkflowLink WorkflowLink { get; set; }
 }

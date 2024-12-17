@@ -26,10 +26,10 @@ FormBuilder.navigateForce = function (url) {
     window.location.href = url;
 }
 
-FormBuilder.submitForm = function (url, json) {
+FormBuilder.submitForm = function (url, json, method) {
     console.log(json);
     const div = document.createElement("div");
-    var form = "<form id='tmpForm' action='"+ url +"' method='post'>";
+    var form = "<form id='tmpForm' action='"+ url +"' method='"+ method +"'>";
     for (var record in json) {
         var value = json[record] ?? "";
         form += "<input type='hidden' name='" + record + "' value='" + value +"' />";

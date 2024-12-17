@@ -56,7 +56,7 @@ public class WorkflowLinkUrlTransformerAction : IWorkflowLinkAction
         await _formBuilderJsService.NavigateForce(url);
     }
 
-    public void Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
+    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
     {
         var parameter = new WorkflowLinkUrlTransformationParameter();
         if(!string.IsNullOrWhiteSpace(workflowLink.ActionParameter))
@@ -64,7 +64,7 @@ public class WorkflowLinkUrlTransformerAction : IWorkflowLinkAction
 
         builder.OpenComponent<WorkflowLinkUrlTransformerComponent>(0);
         builder.AddAttribute(1, nameof(WorkflowLinkUrlTransformerComponent.Parameter), parameter);
-        builder.AddAttribute(2, nameof(WorkflowLinkUrlTransformerComponent.WorkflowLink), workflowLink);
         builder.CloseComponent();
+        return parameter;
     }
 }

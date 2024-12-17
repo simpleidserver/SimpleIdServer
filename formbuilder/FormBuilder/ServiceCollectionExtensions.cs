@@ -48,9 +48,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUrlEvaluatorFactory, UrlEvaluatorFactory>();
 
         services.AddTransient<ITransformer, DirectTargetUrlTransformer>();
+        services.AddTransient<ITransformer, RegexTransformer>();
 
         services.AddTransient<ITransformationRuleEngine, IncomingTokensTransformationRuleEngine>();
         services.AddTransient<IRepetitionRuleEngine, IncomingTokensRepetitionRuleEngine>();
+        services.AddTransient<IMappingRuleService, MappingRuleService>();
         services.AddTransient<IRuleEngine, RuleEngine>();
 
         services.AddTransient<IUriProvider, UriProvider>();

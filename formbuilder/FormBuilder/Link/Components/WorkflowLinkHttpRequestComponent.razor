@@ -1,93 +1,82 @@
-﻿@using FormBuilder.Models
+﻿@using FormBuilder.Components.Shared
+@using FormBuilder.Models
 @using System.Text.Json
 @using FormBuilder.Models.Rules
+@using FormBuilder.Models.Transformer
 @using Radzen
+@using FormBuilder.Transformers.Components
 @using Radzen.Blazor
+@inject DialogService dialogService
 
 <!-- Target -->
 <RadzenFormField Variant="Variant.Outlined" Text="Target" class="fullWidth">
-    <RadzenTextBox @bind-Value="@Target"></RadzenTextBox>
+    <RadzenTextBox @bind-Value="@Parameter.Target"></RadzenTextBox>
 </RadzenFormField>
+<!-- Is transformer enabled -->
+<div>
+    <RadzenCheckBox @bind-Value="IsTransformerEnabled" />
+    <RadzenLabel>Do-you want to transform the URL ?</RadzenLabel>
+</div>
+@if(IsTransformerEnabled)
+{
+    <RegexTransformerComponent Record="@Parameter.TargetTransformer"></RegexTransformerComponent>
+}
+
 <!-- Http method -->
 <RadzenFormField Variant="Variant.Outlined" Text="Select the type of HTTP method" class="fullWidth">
-    <RadzenDropDown @bind-Value=@HttpMethod Data=@allHttpMethods TextProperty="Value" ValueProperty="Key"></RadzenDropDown>
+    <RadzenDropDown @bind-Value=@Parameter.Method Data=@allHttpMethods TextProperty="Value" ValueProperty="Key"></RadzenDropDown>
 </RadzenFormField>
 <!-- Antiforgery -->
 <div>
-    <RadzenCheckBox @bind-Value="IsAntiforgeryEnabled" />
+    <RadzenCheckBox @bind-Value="Parameter.IsAntiforgeryEnabled" />
     <RadzenLabel>Do you want to automatically generate an anti-forgery token?</RadzenLabel>
 </div>
 <!-- Use custom parameters -->
 <div>
-    <RadzenCheckBox @bind-Value="IsAntiforgeryEnabled" />
-    <RadzenLabel>Do-you want to use custom parameters?</RadzenLabel>
+    <RadzenCheckBox @bind-Value="Parameter.IsCustomParametersEnabled" />
+    <RadzenLabel>Do you want to use custom parameters? The data passed into the form will be used to construct the outgoing request.</RadzenLabel>
 </div>
-@if (IsCustomParametersEnabled)
+<!-- Custom parameters -->
+@if (Parameter.IsCustomParametersEnabled)
 {
     <RadzenDataGrid Data="@Parameter.Rules" TItem="MappingRule">
+        <HeaderTemplate>
+            <RadzenButton Icon="add" Text="Add" Click=@(() => HandleAddMappingRule()) />
+        </HeaderTemplate>
         <Columns>
             <RadzenDataGridColumn Title="JSON source" TItem="MappingRule">
                 <Template Context="mappingRule">
                     <RadzenTextBox @bind-Value="@mappingRule.Source"></RadzenTextBox>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Title="Target" TItem="MappingRule" Property="@nameof(MappingRule.Target)" />
+            <RadzenDataGridColumn Title="Target" TItem="MappingRule">
+                <Template Context="mappingRule">
+                    <RadzenTextBox @bind-Value="@mappingRule.Target"></RadzenTextBox>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="MappingRule">
+                <Template Context="mappingRule">
+                    <RadzenButton Icon="delete" Text="Remove" Click="@(() => HandleRemoveMappingRule(mappingRule))" />
+                </Template>
+            </RadzenDataGridColumn>
         </Columns>
     </RadzenDataGrid>
 }
 
-<!-- Custom parameter -->
-
 @code {
-    public string Target
-    {
-        get
-        {
-            return Parameter.Target;
-        }
-        set
-        {
-            Parameter.Target = value;
-            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
-        }
-    }
+    private bool _isTransformerEnabled;
 
-    public bool IsAntiforgeryEnabled
+    public bool IsTransformerEnabled
     {
         get
         {
-            return Parameter.IsAntiforgeryEnabled;
+            return _isTransformerEnabled;
         }
         set
         {
-            Parameter.IsAntiforgeryEnabled = value;
-            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
-        }
-    }
-
-    public HttpMethods HttpMethod
-    {
-        get
-        {
-            return Parameter.Method;
-        }
-        set
-        {
-            Parameter.Method = value;
-            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
-        }
-    }
-
-    public bool IsCustomParametersEnabled
-    {
-        get
-        {
-            return Parameter.IsCustomParametersEnabled;
-        }
-        set
-        {
-            Parameter.IsCustomParametersEnabled = value;
-            WorkflowLink.ActionParameter = JsonSerializer.Serialize(Parameter);
+            if (value) Parameter.TargetTransformer = new Transformers.RegexTransformerParameters();
+            else Parameter.TargetTransformer = null;
+            _isTransformerEnabled = value;
         }
     }
 
@@ -98,5 +87,23 @@
     };
 
     [Parameter] public WorkflowLinkHttpRequestParameter Parameter { get; set; }
-    [Parameter] public WorkflowLink WorkflowLink { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Parameter != null)
+        {
+            _isTransformerEnabled = Parameter.TargetTransformer != null;
+        }
+    }
+
+    private void HandleAddMappingRule()
+    {
+        Parameter.Rules.Add(new MappingRule());
+    }
+
+    private void HandleRemoveMappingRule(MappingRule mappingRule)
+    {
+        Parameter.Rules.Remove(mappingRule);
+    }
 }

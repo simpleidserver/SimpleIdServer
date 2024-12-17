@@ -38,8 +38,8 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
         });
     }
 
-    public void Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
+    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
     {
-
+        return null;
     }
 }

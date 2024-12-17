@@ -50,7 +50,7 @@ else
 
     private void HandleClick()
     {
-        
+
     }
 
     protected override void OnParametersSet()
@@ -59,6 +59,7 @@ else
         if (WorkflowExecutionContext != null && Form == null)
             Form = WorkflowExecutionContext.GetCurrentRecord();
 
+        WorkflowExecutionContext.InputData = Input;
         RuleEngine.Apply(Form, Input, WorkflowExecutionContext);
         CustomRender = CreateComponent();
         Form.Elements.CollectionChanged += HandleChanged;

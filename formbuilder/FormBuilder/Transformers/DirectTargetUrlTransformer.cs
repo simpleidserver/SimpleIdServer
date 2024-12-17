@@ -2,6 +2,7 @@
 using FormBuilder.Models.Url;
 using FormBuilder.Transformers.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Transformers;
 
@@ -22,7 +23,7 @@ public class DirectTargetUrlTransformer : GenericTransformer<DirectTargetUrlTran
         return new DirectTargetUrlTransformerParameters();
     }
 
-    internal override object InternalTransform(string value, DirectTargetUrlTransformerParameters parameters)
+    internal override object InternalTransform(string value, DirectTargetUrlTransformerParameters parameters, JsonNode data)
     {
         return new DirectTargetUrl
         {

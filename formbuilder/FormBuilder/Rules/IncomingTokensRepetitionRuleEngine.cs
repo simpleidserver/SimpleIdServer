@@ -72,7 +72,7 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         var nodes = pathResult.Matches.Select(m => m.Value);
         if (nodes.Count() != 1) return;
         object value = nodes.Single();
-        if (mappingRule.Transformer != null) value = _transformerFactory.Transform(value?.ToString(), mappingRule.Transformer);
+        if (mappingRule.Transformer != null) value = _transformerFactory.Transform(value?.ToString(), mappingRule.Transformer, node);
         var definitionProperty = properties.SingleOrDefault(p => p.Name == mappingRule.Target);
         if (definitionProperty == null) return;
         definitionProperty.SetValue(instance, value);

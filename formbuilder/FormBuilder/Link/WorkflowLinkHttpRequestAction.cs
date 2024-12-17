@@ -1,6 +1,8 @@
 ﻿using FormBuilder.Components;
+using FormBuilder.Factories;
 using FormBuilder.Link.Components;
 using FormBuilder.Models;
+using FormBuilder.Rules;
 using FormBuilder.Services;
 using FormBuilder.UIs;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -13,11 +15,15 @@ namespace FormBuilder.Link;
 public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
 {
     private readonly IFormBuilderJsService _formBuilderJsService;
+    private readonly IMappingRuleService _mappingRuleService;
+    private readonly ITransformerFactory _transformerFactory;
     private readonly FormBuilderOptions _options;
 
-    public WorkflowLinkHttpRequestAction(IFormBuilderJsService formBuilderJsService, IOptions<FormBuilderOptions> options)
+    public WorkflowLinkHttpRequestAction(IFormBuilderJsService formBuilderJsService, IMappingRuleService mappingRuleService, ITransformerFactory transformerFactory, IOptions<FormBuilderOptions> options)
     {
         _formBuilderJsService = formBuilderJsService;
+        _mappingRuleService = mappingRuleService;
+        _transformerFactory = transformerFactory;
         _options = options.Value;
     }
 
@@ -35,24 +41,36 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
     {
         if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(activeLink.ActionParameter);
+        JsonObject jObj = context.StepOutput ?? context.InputData;
         var json = context.StepOutput;
+        if(parameter.IsCustomParametersEnabled)
+        {
+            json = _mappingRuleService.Extract(context.InputData, parameter.Rules);
+        }
+
         if (parameter.IsAntiforgeryEnabled && context.AntiforgeryToken != null)
             json.Add(context.AntiforgeryToken.FormField, context.AntiforgeryToken.FormValue);
-        json.Add(nameof(StepViewModel.StepName), context.Workflow.Steps.Single(s => s.Id == context.CurrentStepId).FormRecordName);
+
+        var target = parameter.Target;
+        if(parameter.TargetTransformer != null)
+            target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, jObj)?.ToString();
+
+        var currentRecord = context.GetCurrentRecord();
+        json.Add(nameof(StepViewModel.StepName), currentRecord.Name);
         json.Add(nameof(StepViewModel.WorkflowId), context.Workflow.Id);
         json.Add(nameof(StepViewModel.CurrentLink), activeLink.Id);
-        await _formBuilderJsService.SubmitForm(parameter.Target, json);
+        await _formBuilderJsService.SubmitForm(target, json, parameter.Method);
     }
 
-    public void Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
+    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
     {
         var parameter = new WorkflowLinkHttpRequestParameter();
         if (!string.IsNullOrWhiteSpace(workflowLink.ActionParameter))
             parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(workflowLink.ActionParameter);
         builder.OpenComponent<WorkflowLinkHttpRequestComponent>(0);
         builder.AddAttribute(1, nameof(WorkflowLinkHttpRequestComponent.Parameter), parameter);
-        builder.AddAttribute(2, nameof(WorkflowLinkHttpRequestComponent.WorkflowLink), workflowLink);
         builder.CloseComponent();
+        return parameter;
     }
 
     private Dictionary<string, string> ConvertToDic(JsonObject json)

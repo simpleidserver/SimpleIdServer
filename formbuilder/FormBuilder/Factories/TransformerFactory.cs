@@ -1,12 +1,13 @@
 ﻿using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Factories;
 
 public interface ITransformerFactory
 {
     ITransformer Build(string type);
-    object Transform<T>(string value, T parameters) where T : ITransformerParameters;
+    object Transform<T>(string value, T parameters, JsonNode data) where T : ITransformerParameters;
     List<string> GetAll();
     ITransformerParameters CreateEmptyInstance(string type);
 }
@@ -25,10 +26,10 @@ public class TransformerFactory : ITransformerFactory
     public List<string> GetAll()
         => _transformers.Select(t => t.Type).ToList();
 
-    public object Transform<T>(string value, T parameters) where T : ITransformerParameters
+    public object Transform<T>(string value, T parameters, JsonNode data) where T : ITransformerParameters
     {
         var transformer = Build(parameters.Type);
-        return transformer.Transform(value, parameters);
+        return transformer.Transform(value, parameters, data);
     }
 
     public ITransformerParameters CreateEmptyInstance(string type)

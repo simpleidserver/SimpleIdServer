@@ -1,0 +1,39 @@
+﻿@using FormBuilder.Models.Rules
+@using Radzen.Blazor
+
+<RadzenDataGrid Data="@Record.Rules" TItem="MappingRule">
+    <HeaderTemplate>
+        <RadzenButton Icon="add" Text="Add" Click=@(() => HandleAddMappingRule()) />
+    </HeaderTemplate>
+    <Columns>
+        <RadzenDataGridColumn Title="JSON source" TItem="MappingRule">
+            <Template Context="mappingRule">
+                <RadzenTextBox @bind-Value="@mappingRule.Source"></RadzenTextBox>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Title="Target" TItem="MappingRule">
+            <Template Context="mappingRule">
+                <RadzenTextBox @bind-Value="@mappingRule.Target"></RadzenTextBox>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="MappingRule">
+            <Template Context="mappingRule">
+                <RadzenButton Icon="delete" Text="Remove" Click="@(() => HandleRemoveMappingRule(mappingRule))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter] public RegexTransformerParameters Record { get; set; }
+
+    private void HandleAddMappingRule()
+    {
+        Record.Rules.Add(new MappingRule());
+    }
+
+    private void HandleRemoveMappingRule(MappingRule mappingRule)
+    {
+        Record.Rules.Remove(mappingRule);
+    }
+}

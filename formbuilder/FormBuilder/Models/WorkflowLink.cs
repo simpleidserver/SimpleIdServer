@@ -22,6 +22,7 @@ public class WorkflowLink
     {
         return new WorkflowLink
         {
+            Id = Id,
             SourceCoordinate = SourceCoordinate.Clone(),
             TargetCoordinate = TargetCoordinate.Clone(),
             Source = Source.Clone(),
@@ -47,6 +48,7 @@ public class WorkflowLink
         var anchorCoordinate = GetAnchorCoordinate(size, coordinate, AnchorDirections.RIGHT);
         return new WorkflowLink
         {
+            Id = Guid.NewGuid().ToString(),
             Source = new WorkflowLinkSource
             {
                 EltId = eltRecord.Id,
