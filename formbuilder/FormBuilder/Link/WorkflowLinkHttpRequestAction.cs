@@ -42,7 +42,7 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
         if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(activeLink.ActionParameter);
         JsonObject jObj = context.StepOutput ?? context.InputData;
-        var json = context.StepOutput;
+        var json = context.StepOutput ?? new JsonObject();
         if(parameter.IsCustomParametersEnabled)
         {
             json = _mappingRuleService.Extract(context.InputData, parameter.Rules);

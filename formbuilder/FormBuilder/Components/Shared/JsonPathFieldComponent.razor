@@ -1,6 +1,7 @@
 ﻿@using BlazorMonaco
 @using BlazorMonaco.Editor
 @using BlazorMonaco.Languages
+@using System.Text.Json.Nodes
 @inject IJSRuntime jsRuntime
 
 <StandaloneCodeEditor @ref=editor OnDidInit="HandleOnDidInit" OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonPathEditor" />
@@ -8,6 +9,7 @@
 @code {
     private StandaloneCodeEditor editor;
     [Parameter] public string Value { get; set; }
+    [Parameter] public JsonObject Json { get; set; }
     [Parameter] public EventCallback<string> ValueChanged { get; set; }
 
 

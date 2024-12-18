@@ -2,27 +2,6 @@
     height: 100%;
 }
 
-/* Divider */
-.divider {
-    display: flex;
-    align-items: center;
-}
-
-.divider::before, .divider::after {
-    content: "";
-    height: 1px;
-    background: var(--divider-bg);
-    flex: 1;
-}
-
-.divider .text {
-    margin-right: 1rem;
-    margin-left: 1rem;
-    margin-top: 0px;
-    margin-bottom: 0px;
-    color: var(--divider-color);
-}
-
 /* Drop zone */
 .editableLayoutContainer, .draggableElement {
     border: 1px solid transparent;

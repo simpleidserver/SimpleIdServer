@@ -3,7 +3,7 @@
 
 <InteractableElement Record="@Value" TRecord="ListDataRecord" Context=@WorkflowContext IsInteractableElementEnabled="@IsInteractableElementEnabled">
     <Children>
-        <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="ListDataDialog" TRecord="ListDataRecord" Record="@Value">
+        <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" WorkflowContext="@WorkflowContext" Context="@Context" TDialog="ListDataDialog" TRecord="ListDataRecord" Record="@Value">
             <Children>
                 <RadzenStack Orientation="Orientation.Vertical">
                     @if (IsEditModeEnabled || IsInteractableElementEnabled)

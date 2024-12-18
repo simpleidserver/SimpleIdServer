@@ -33,6 +33,7 @@ else
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public FormViewerContext Context { get; set; }
+    [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
     [Parameter] public TRecord Record { get; set; }
 
     private void HandleDragStart()

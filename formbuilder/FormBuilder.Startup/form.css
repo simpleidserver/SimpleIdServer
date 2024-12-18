@@ -26,3 +26,32 @@
 .form-content.view {
     padding: 10px;
 }
+
+/* Divider */
+.divider {
+    display: flex;
+    align-items: center;
+}
+
+.divider::before, .divider::after {
+    content: "";
+    height: 1px;
+    background: var(--divider-bg);
+    flex: 1;
+}
+
+.divider .text {
+    margin-right: 1rem;
+    margin-left: 1rem;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    color: var(--divider-color);
+}
+
+.picture-container {
+    text-align: center;
+}
+
+.picture-container .picture {
+    width: 150px;
+}

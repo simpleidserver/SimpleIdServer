@@ -4,6 +4,8 @@
 
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="ParagraphDialog" TRecord="ParagraphRecord" Record="@Value">
     <Children>
-        @translationHelper.Translate(Value, (IsEditModeEnabled ? "Please provide a description" : string.Empty))
+        <p>
+            @translationHelper.Translate(Value, (IsEditModeEnabled ? "Please provide a description" : string.Empty))
+        </p>
     </Children>
 </DraggableFormElement>

@@ -1,0 +1,31 @@
+﻿@using FormBuilder.Components.Shared
+@using System.Text.Json
+@inject DialogService dialogService
+
+<RadzenStack>
+    <!-- Url -->
+    <RadzenFormField Variant="Variant.Outlined" Text="Url of the image" class="fullWidth">
+        <RadzenTextBox @bind-Value="@CopyRecord.Url"></RadzenTextBox>
+    </RadzenFormField>
+    <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
+</RadzenStack>
+
+@code {
+    [Parameter] public ImageRecord Record { get; set; }
+    ImageRecord CopyRecord { get; set; } = new ImageRecord();
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Record != null)
+        {
+            CopyRecord = JsonSerializer.Deserialize<ImageRecord>(JsonSerializer.Serialize(Record));
+        }
+    }
+
+    private void HandleSave()
+    {
+        Record.Url = CopyRecord.Url;
+        dialogService.Close();
+    }
+}

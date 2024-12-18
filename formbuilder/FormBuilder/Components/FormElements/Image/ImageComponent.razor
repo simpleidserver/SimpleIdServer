@@ -1,0 +1,11 @@
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
+@inject ITranslationHelper translationHelper
+
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="ImageDialog" TRecord="ImageRecord" Record="@Value">
+    <Children>
+        <div class="picture-container">
+            <RadzenImage class="picture" Path="@Value.Url" />
+        </div>
+    </Children>
+</DraggableFormElement>

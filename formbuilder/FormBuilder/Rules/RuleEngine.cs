@@ -1,7 +1,9 @@
 ﻿using FormBuilder.Components;
+using FormBuilder.Components.FormElements.Image;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.StackLayout;
+using FormBuilder.Components.FormElements.Title;
 using FormBuilder.Factories;
 using FormBuilder.Models;
 using System.Collections.ObjectModel;
@@ -87,4 +89,8 @@ public class RuleEngine : IRuleEngine
     public void Apply(BaseFormDataRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
 
     public void Apply(ParagraphRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
+
+    public void Apply(TitleRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
+
+    public void Apply(ImageRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
 }

@@ -1,0 +1,9 @@
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
+@inject ITranslationHelper translationHelper
+
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="TitleDialog" TRecord="TitleRecord" Record="@Value">
+    <Children>
+        <RadzenText TextStyle="@Value.Style">@translationHelper.Translate(Value, (IsEditModeEnabled ? "Please provide a description" : string.Empty))</RadzenText>
+    </Children>
+</DraggableFormElement>

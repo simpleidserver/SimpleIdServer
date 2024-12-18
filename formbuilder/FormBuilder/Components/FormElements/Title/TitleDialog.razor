@@ -1,0 +1,45 @@
+﻿@using FormBuilder.Components.Shared
+@using System.Text.Json
+@inject DialogService dialogService
+
+<RadzenStack>
+    <!-- Select the style -->
+    <RadzenFormField Variant="Variant.Outlined" Text="Choose the style" class="fullWidth">
+        <RadzenDropDown @bind-Value=@CopyRecord.Style Data=@allTextStyles TextProperty="Value" ValueProperty="Key"></RadzenDropDown>
+    </RadzenFormField>
+    <!-- Edit the labels -->
+    <EditLabelsComponent Labels="@CopyRecord.Labels" />
+    <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
+</RadzenStack>
+
+@code {
+    [Parameter] public TitleRecord Record { get; set; }
+    TitleRecord CopyRecord { get; set; } = new TitleRecord();
+    private Dictionary<TextStyle, string> allTextStyles = new Dictionary<TextStyle, string>
+    {
+        { TextStyle.H1, "H1" },
+        { TextStyle.H2, "H2" },
+        { TextStyle.H3, "H3" },
+        { TextStyle.H4, "H4" },
+        { TextStyle.H5, "H5" },
+        { TextStyle.H6, "H6" },
+        { TextStyle.Subtitle1, "Subtitle 1" },
+        { TextStyle.Subtitle2, "Subtitle 2" }
+    };
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Record != null)
+        {
+            CopyRecord = JsonSerializer.Deserialize<TitleRecord>(JsonSerializer.Serialize(Record));
+        }
+    }
+
+    private void HandleSave()
+    {
+        Record.Labels = CopyRecord.Labels;
+        Record.Style = CopyRecord.Style;
+        dialogService.Close();
+    }
+}
