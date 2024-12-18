@@ -60,27 +60,23 @@
         </RadzenStack>
     </RadzenColumn>
     <RadzenColumn Size="10">
-        <FormViewer Input="@(new JsonObject())" IsEditModeEnabled="true" WorkflowExecutionContext="@workflowExecutionContext" Context="@Context" />
+        <FormViewer Input="@(new JsonObject())" IsEditModeEnabled="true" Context="@context" />
     </RadzenColumn>
 </RadzenRow>
 
 @code {
     [Parameter] public FormRecord Form { get; set; }
-    FormViewerContext Context { get; set; } = new FormViewerContext();
-    WorkflowExecutionContext workflowExecutionContext = null;
+    WorkflowContext context = null;
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if (Form != null && workflowExecutionContext == null)
-        {
-            workflowExecutionContext = new WorkflowExecutionContext(Form);
-        }
+        if (Form != null && context == null) context = WorkflowContext.CreateOneStepWorkflow(Form);
     }
 
     private void HandleDragStart(IFormElementDefinition def)
     {
-        Context.Set(def);
+        context.FormEditorContext.SelectDefinition(def);
     }
 
     private Task LaunchDebug()

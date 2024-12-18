@@ -10,13 +10,11 @@ namespace FormBuilder.Components.FormElements.ListData
     {
         private RenderFragment? CustomRender { get; set; }
         [Inject] private IRenderFormElementsHelper renderFormsElementsHelper { get; set; }
-        [Parameter] public FormViewerContext Context { get; set; }
+        [Parameter] public WorkflowContext Context { get; set; }
         [Parameter] public ListDataRecord Value { get; set; }
         [Parameter] public bool IsEditModeEnabled { get; set; }
         [Parameter] public ParentEltContext ParentContext { get; set; }
-        [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
         [Parameter] public bool IsInteractableElementEnabled { get; set; }
-        [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -33,9 +31,9 @@ namespace FormBuilder.Components.FormElements.ListData
             {
                 var col = new ObservableCollection<IFormElementRecord>
                 {
-                    record.Item1
+                    record
                 };
-                renderFormsElementsHelper.Render(builder, col, Context, IsEditModeEnabled, WorkflowContext, IsInteractableElementEnabled, record.Item2);
+                renderFormsElementsHelper.Render(builder, col, Context, IsEditModeEnabled, IsInteractableElementEnabled);
             }
         };
     }

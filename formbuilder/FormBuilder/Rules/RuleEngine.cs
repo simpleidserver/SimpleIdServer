@@ -7,13 +7,12 @@ using FormBuilder.Components.FormElements.Title;
 using FormBuilder.Factories;
 using FormBuilder.Models;
 using System.Collections.ObjectModel;
-using System.Text.Json.Nodes;
 
 namespace FormBuilder.Rules;
 
 public interface IRuleEngine
 {
-    void Apply(FormRecord formRecord, JsonObject input, WorkflowExecutionContext workflowExecutionContext);
+    void Apply(WorkflowContext context);
 }
 
 public class RuleEngine : IRuleEngine
@@ -29,68 +28,65 @@ public class RuleEngine : IRuleEngine
        _repetitionRuleEngineFactory = repetitionRuleEngineFactory;
     }
 
-    public void Apply(FormRecord formRecord, JsonObject input, WorkflowExecutionContext workflowExecutionContext)
+    public void Apply(WorkflowContext context)
     {
+        var formRecord = context.GetCurrentFormRecord();
         foreach(var elt in formRecord.Elements)
-            Apply(elt, input, workflowExecutionContext);
+            Apply(elt, context);
     }
 
-    public void Apply(dynamic elt, JsonObject input, WorkflowExecutionContext workflowExecutionContext) => Apply(elt, input, workflowExecutionContext);
+    public void Apply(dynamic elt, WorkflowContext context) => Apply(elt, context);
 
-    public void Apply(BaseFormLayoutRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
+    public void Apply(BaseFormLayoutRecord record, WorkflowContext context) { }
 
-    public void Apply(FormStackLayoutRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext)
+    public void Apply(FormStackLayoutRecord record, WorkflowContext context)
     {
         if (record.Elements == null) return;
         foreach (var elt in record.Elements)
-            Apply(elt, input, workflowExecutionContext);
+            Apply(elt, context);
     }
 
-    public void Apply(BaseFormFieldRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext)
+    public void Apply(BaseFormFieldRecord record, WorkflowContext context)
     {
         if (record.Transformation == null) return;
-        var transformationResult = _transformationRuleEngineFactory.Transform(input, record.Transformation);
+        var inputData = context.GetCurrentStepInputData();
+        var transformationResult = _transformationRuleEngineFactory.Transform(inputData, record.Transformation);
         if (!transformationResult.Any()) return;
         record.Apply(transformationResult.First());
     }
 
-    public void Apply(ListDataRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext)
+    public void Apply(ListDataRecord record, WorkflowContext context)
     {
         if (record.RepetitionRule == null) return;
-        var result = _repetitionRuleEngineFactory.Transform(record.FieldType, input, record.RepetitionRule, record.Parameters);
-        var tmp = new ObservableCollection<(IFormElementRecord, WorkflowExecutionContext)>();
-        var link = workflowExecutionContext.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
+        var inputData = context.GetCurrentStepInputData();
+        var result = _repetitionRuleEngineFactory.Transform(record.FieldType, inputData, record.RepetitionRule, record.Parameters);
+        var tmp = new ObservableCollection<IFormElementRecord>();
+        var link = context.Definition.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
         result.ForEach(r =>
         {
-            var copyContext = workflowExecutionContext.Clone();
+            var executionContext = context.GetCurrentStepExecution();
             if(link != null)
             {
-                copyContext.Workflow.Links.Add(new WorkflowLink
+                executionContext.Links.Add(new WorkflowStepLinkExecution
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Source = new WorkflowLinkSource
-                    {
-                        EltId = r.Item1.Id
-                    },
-                    ActionParameter = link.ActionParameter,
-                    ActionType = link.ActionType,
-                    TargetStepId = link.TargetStepId,
-                    SourceStepId = link.SourceStepId
+                    LinkId = link.Id,
+                    EltId = r.Item1.Id,
+                    InputData = r.Item2
                 });
             }
 
-            copyContext.RepetitionRuleData = r.Item2;
-            tmp.Add((r.Item1, copyContext));
+            tmp.Add(r.Item1);
         });
 
         record.Elements = tmp;
     }
 
-    public void Apply(BaseFormDataRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
+    public void Apply(BaseFormDataRecord record, WorkflowContext context) { }
 
-    public void Apply(ParagraphRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
+    public void Apply(ParagraphRecord record, WorkflowContext context) { }
 
-    public void Apply(TitleRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
+    public void Apply(TitleRecord record, WorkflowContext context) { }
 
-    public void Apply(ImageRecord record, JsonObject input, WorkflowExecutionContext workflowExecutionContext) { }
+    public void Apply(ImageRecord record, WorkflowContext context) { }
 }

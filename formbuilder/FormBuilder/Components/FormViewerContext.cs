@@ -31,9 +31,3 @@ public class FormViewerContext
         if (_droppedCallback != null) _droppedCallback();
     }
 }
-
-public enum SelectionTypes
-{
-    DEFINITION = 0,
-    RECORD = 1
-}

@@ -4,7 +4,7 @@
 
 @inject ITranslationHelper translationHelper
 
-<InteractableElement Record="@Value" TRecord="FormAnchorRecord" Context=@WorkflowContext IsInteractableElementEnabled="@IsInteractableElementEnabled">
+<InteractableElement Record="@Value" TRecord="FormAnchorRecord" Context=@Context IsInteractableElementEnabled="@IsInteractableElementEnabled">
     <Children>        
         <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormAnchorDialog" TRecord="FormAnchorRecord" Record="@Value">
             <Children>

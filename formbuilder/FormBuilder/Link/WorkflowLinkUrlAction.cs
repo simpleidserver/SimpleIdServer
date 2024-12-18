@@ -4,7 +4,6 @@ using FormBuilder.Models;
 using FormBuilder.Services;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 
 namespace FormBuilder.Link;
 
@@ -27,7 +26,7 @@ public class WorkflowLinkUrlAction : IWorkflowLinkAction
 
     public bool CanBeAppliedMultipleTimes => false;
 
-    public async Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context)
+    public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
     {
         if(string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkUrlParameter>(activeLink.ActionParameter);

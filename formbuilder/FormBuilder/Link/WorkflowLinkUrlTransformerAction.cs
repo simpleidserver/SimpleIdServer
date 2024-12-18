@@ -3,14 +3,11 @@ using FormBuilder.Factories;
 using FormBuilder.Link.Components;
 using FormBuilder.Models;
 using FormBuilder.Models.Url;
-using FormBuilder.Rules;
 using FormBuilder.Services;
-using FormBuilder.Transformers;
 using Json.Path;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using System.Xml.Linq;
 
 namespace FormBuilder.Link;
 
@@ -35,13 +32,15 @@ public class WorkflowLinkUrlTransformerAction : IWorkflowLinkAction
 
     public bool CanBeAppliedMultipleTimes => true;
 
-    public async Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context)
+    public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
     {
-        if (string.IsNullOrWhiteSpace(activeLink.ActionParameter) || context.RepetitionRuleData == null) return;
+        if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkUrlTransformationParameter>(activeLink.ActionParameter);
+        var executedLink = context.GetLinkExecutionFromCurrentStep(activeLink.Id);
+        var json = JsonObject.Parse(executedLink.OutputData.ToString()).AsObject();
         if (string.IsNullOrWhiteSpace(parameter.JsonSource)) return;
         var path = JsonPath.Parse(parameter.JsonSource);
-        var pathResult = path.Evaluate(context.RepetitionRuleData);
+        var pathResult = path.Evaluate(json);
         var nodes = pathResult.Matches.Select(m => m.Value);
         if (nodes.Count() != 1) return;
         var value = nodes.Single()?.ToString();

@@ -32,13 +32,12 @@ else
     [Parameter] public RenderFragment Children { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
-    [Parameter] public FormViewerContext Context { get; set; }
-    [Parameter] public WorkflowViewerContext WorkflowContext { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public TRecord Record { get; set; }
 
     private void HandleDragStart()
     {
-        Context.Set(Record, HandleCurrentEltDropped);
+        Context.FormEditorContext.SelectInstance(Record, HandleCurrentEltDropped);
     }
 
     private void HandleEltDroppedTop() => HandleEltDropped(false);
@@ -49,14 +48,14 @@ else
     {
         IFormElementRecord eltRecord = null;
         int projectedEltIndex = ParentContext.Index;
-        switch(Context.SelectionType)
+        switch(Context.FormEditorContext.SelectionType)
         {
             case SelectionTypes.DEFINITION:
-                var def = Context.SelectedDefinition;
+                var def = Context.FormEditorContext.SelectedEltDefinition;
                 eltRecord = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
                 break;
             case SelectionTypes.RECORD:
-                eltRecord = Context.SelectedRecord;
+                eltRecord = Context.FormEditorContext.SelectedEltInstance;
                 if (eltRecord == (IFormElementRecord)Record) return;
                 var existingEltIndex = ParentContext.Elements.IndexOf(eltRecord);
                 if(existingEltIndex != -1 && projectedEltIndex > existingEltIndex)
@@ -66,7 +65,7 @@ else
         }
 
         if (eltRecord == null) return;
-        Context.DropElement();
+        Context.FormEditorContext.DropElement();
         projectedEltIndex = isBottom ? projectedEltIndex + 1 : projectedEltIndex;
         if (projectedEltIndex >= ParentContext.Elements.Count()) ParentContext.Elements.Add(eltRecord);
         else ParentContext.Elements.Insert(projectedEltIndex, eltRecord);

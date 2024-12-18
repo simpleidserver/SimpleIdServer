@@ -39,35 +39,24 @@ else
 @code {
     private RenderFragment? CustomRender { get; set; }
     [Inject] public IRuleEngine RuleEngine { get; set; }
-    [Parameter] public JsonObject Input { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public bool IsInteractableElementEnabled { get; set; }
-    [Parameter] public FormViewerContext Context { get; set; }
-    [Parameter] public WorkflowViewerContext WorkflowViewerContext { get; set; }
-    [Parameter] public WorkflowExecutionContext WorkflowExecutionContext { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public List<string> ErrorMessages { get; set; }
     private FormRecord Form { get; set; } = null;
-
-    private void HandleClick()
-    {
-
-    }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if (WorkflowExecutionContext != null && Form == null)
-            Form = WorkflowExecutionContext.GetCurrentRecord();
-
-        WorkflowExecutionContext.InputData = Input;
-        RuleEngine.Apply(Form, Input, WorkflowExecutionContext);
+        if (Context == null) return;
+        RuleEngine.Apply(Context);
         CustomRender = CreateComponent();
         Form.Elements.CollectionChanged += HandleChanged;
     }
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Form.Elements, Context, IsEditModeEnabled, WorkflowViewerContext, IsInteractableElementEnabled, WorkflowExecutionContext);
+        renderFormsElementsHelper.Render(builder, Form.Elements, Context, IsEditModeEnabled, IsInteractableElementEnabled);
     };
 
     private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)

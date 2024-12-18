@@ -3,7 +3,6 @@ using FormBuilder.Link.Components;
 using FormBuilder.Models;
 using Microsoft.AspNetCore.Components.Rendering;
 using Radzen;
-using System.Text.Json.Nodes;
 
 namespace FormBuilder.Link;
 
@@ -29,7 +28,7 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
 
     public bool CanBeAppliedMultipleTimes => false;
 
-    public async Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context)
+    public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
     {
         context.NextStep(activeLink);
         await _dialogService.OpenAsync<WorkflowLinkPopupActionComponent>(string.Empty, new Dictionary<string, object>

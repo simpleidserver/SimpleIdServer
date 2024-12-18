@@ -8,7 +8,8 @@ namespace FormBuilder.Helpers;
 
 public interface IRenderFormElementsHelper
 {
-    void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled, WorkflowViewerContext workflowContext, bool isInteractableElementEnabled, WorkflowExecutionContext workflowExecutionContext);
+    void RenderCurrentStep(RenderTreeBuilder builder, WorkflowContext context, bool isEditModeEnabled, bool isInteractableElementEnabled);
+    void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, WorkflowContext context, bool isEditModeEnabled, bool isInteractableElementEnabled);
 }
 
 public class RenderFormElementsHelper : IRenderFormElementsHelper
@@ -20,18 +21,24 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
         _definitions = definitions;
     }
 
-    public void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, FormViewerContext context, bool isEditModeEnabled, WorkflowViewerContext workflowContext, bool isInteractableElementEnabled, WorkflowExecutionContext workflowExecutionContext)
+    public void RenderCurrentStep(RenderTreeBuilder builder, WorkflowContext context, bool isEditModeEnabled, bool isInteractableElementEnabled)
+    {
+        var currentForm = context.GetCurrentFormRecord();
+        Render(builder, currentForm.Elements, context, isEditModeEnabled, isInteractableElementEnabled);
+    }
+
+    public void Render(RenderTreeBuilder builder, ObservableCollection<IFormElementRecord> elements, WorkflowContext context, bool isEditModeEnabled, bool isInteractableElementEnabled)
     {
         var i = 0;
         foreach (var record in elements)
         {
             var parentEltCtx = new ParentEltContext(elements, i);
-            AddElt(builder, record, context, parentEltCtx, isEditModeEnabled, workflowContext, isInteractableElementEnabled, workflowExecutionContext);
+            AddElt(builder, record, context, parentEltCtx, isEditModeEnabled, isInteractableElementEnabled);
             i++;
         }
     }
 
-    private void AddElt(RenderTreeBuilder builder, IFormElementRecord record, FormViewerContext context, ParentEltContext parentEltContext, bool isEditModeEnabled, WorkflowViewerContext workflowContext, bool isInteractableElementEnabled, WorkflowExecutionContext workflowExecutionContext)
+    private void AddElt(RenderTreeBuilder builder, IFormElementRecord record, WorkflowContext context, ParentEltContext parentEltContext, bool isEditModeEnabled, bool isInteractableElementEnabled)
     {
         var expectedType = record.GetType();
         var definition = _definitions.Single(d => d.RecordType == expectedType);
@@ -41,9 +48,7 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
         builder.AddAttribute(2, "Context", context);
         builder.AddAttribute(3, "IsEditModeEnabled", isEditModeEnabled);
         builder.AddAttribute(4, "ParentContext", parentEltContext);
-        builder.AddAttribute(5, "WorkflowContext", workflowContext);
-        builder.AddAttribute(6, "IsInteractableElementEnabled", isInteractableElementEnabled);
-        builder.AddAttribute(7, "WorkflowExecutionContext", workflowExecutionContext);
+        builder.AddAttribute(5, "IsInteractableElementEnabled", isInteractableElementEnabled);
         builder.CloseComponent();
     }
 }

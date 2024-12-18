@@ -37,27 +37,25 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
 
     public bool CanBeAppliedMultipleTimes => false;
 
-    public async Task Execute(WorkflowLink activeLink, WorkflowExecutionContext context)
+    public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
     {
         if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(activeLink.ActionParameter);
-        JsonObject jObj = context.StepOutput ?? context.InputData;
-        var json = context.StepOutput ?? new JsonObject();
+        var executedLink = context.GetLinkExecutionFromCurrentStep(activeLink.Id);
+        var json = JsonObject.Parse(executedLink.OutputData.ToString()).AsObject();
         if(parameter.IsCustomParametersEnabled)
-        {
-            json = _mappingRuleService.Extract(context.InputData, parameter.Rules);
-        }
+            json = _mappingRuleService.Extract(json, parameter.Rules);
 
-        if (parameter.IsAntiforgeryEnabled && context.AntiforgeryToken != null)
-            json.Add(context.AntiforgeryToken.FormField, context.AntiforgeryToken.FormValue);
+        if (parameter.IsAntiforgeryEnabled && context.Execution.AntiforgeryToken != null)
+            json.Add(context.Execution.AntiforgeryToken.FormField, context.Execution.AntiforgeryToken.FormValue);
 
         var target = parameter.Target;
         if(parameter.TargetTransformer != null)
-            target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, jObj)?.ToString();
+            target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, executedLink.OutputData)?.ToString();
 
-        var currentRecord = context.GetCurrentRecord();
+        var currentRecord = context.GetCurrentFormRecord();
         json.Add(nameof(StepViewModel.StepName), currentRecord.Name);
-        json.Add(nameof(StepViewModel.WorkflowId), context.Workflow.Id);
+        json.Add(nameof(StepViewModel.WorkflowId), context.Definition.Workflow.Id);
         json.Add(nameof(StepViewModel.CurrentLink), activeLink.Id);
         await _formBuilderJsService.SubmitForm(target, json, parameter.Method);
     }
