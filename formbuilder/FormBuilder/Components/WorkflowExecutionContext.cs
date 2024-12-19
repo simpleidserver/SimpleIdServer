@@ -14,6 +14,17 @@ public class WorkflowContext
     public FormEditorContext FormEditorContext { get; private set; }
     public WorkflowEditorContext WorkflowEditorContext { get; private set; }
 
+    public static WorkflowContext CreateEmptyWorkflow(List<FormRecord> records)
+    {
+        return new WorkflowContext
+        {
+            Definition = new WorkflowDefinition(new WorkflowRecord(), records),
+            Execution = new WorkflowExecution(),
+            FormEditorContext = new FormEditorContext(),
+            WorkflowEditorContext = new WorkflowEditorContext()
+        };
+    }
+
     public static WorkflowContext CreateOneStepWorkflow(FormRecord form)
     {
         var currentStepId = Guid.NewGuid().ToString();
@@ -35,10 +46,30 @@ public class WorkflowContext
         var result = new WorkflowContext
         {
             Definition = new WorkflowDefinition(workflow, records),
-            Execution = new WorkflowExecution { CurrentStepId = currentStepId },
+            Execution = new WorkflowExecution(currentStepId),
             FormEditorContext = new FormEditorContext(),
             WorkflowEditorContext = new WorkflowEditorContext()
         };
+        return result;
+    }
+
+    public static WorkflowContext CreateOneStepWorkflow(FormRecord form, JsonObject inputData)
+    {
+        var result = CreateOneStepWorkflow(form);
+        InitializeWorkflowExecution(result, inputData);
+        return result;
+    }
+
+    public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> records, string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, JsonObject inputData)
+    {
+        var result = new WorkflowContext
+        {
+            Definition = new WorkflowDefinition(workflow, records),
+            Execution = new WorkflowExecution(currentStepId, errorMessages, successMessages, antiforgeryTokenRecord),
+            FormEditorContext = new FormEditorContext(),
+            WorkflowEditorContext = new WorkflowEditorContext()
+        };
+        InitializeWorkflowExecution(result, inputData);
         return result;
     }
 
@@ -47,6 +78,7 @@ public class WorkflowContext
     public FormRecord GetCurrentFormRecord()
     {
         var currentStep = GetCurrentStepDefinition();
+        if (currentStep == null) return null;
         return Definition.Records.Single(r => r.Name == currentStep.FormRecordName);
     }
 
@@ -79,15 +111,90 @@ public class WorkflowContext
         => Execution.StepExecutions.SingleOrDefault(e => e.StepId == Execution.CurrentStepId);
 
     public WorkflowStep GetCurrentStepDefinition()
-        => Definition.Workflow.Steps.Single(s => s.Id == Execution.CurrentStepId);
+        => Definition.Workflow.Steps.SingleOrDefault(s => s.Id == Execution.CurrentStepId);
 
     #endregion
 
     #region Actions
 
-    public void NextStep(WorkflowLink link)
+    public WorkflowStep GetFirstStep()
     {
-        Execution.CurrentStepId = link.TargetStepId;
+        var allLinkedSteps = Definition.Workflow.Links.Select(l => l.TargetStepId);
+        var firstStep = Definition.Workflow.Steps.FirstOrDefault(s => !allLinkedSteps.Contains(s.Id));
+        return firstStep;
+    }
+
+    public void NavigateToFirstStep()
+    {
+        var firstStep = GetFirstStep();
+        if (firstStep == null) return;
+        Execution.CurrentStepId = firstStep.Id;
+    }
+
+    public void NextStep(WorkflowLink link)
+        => NavigateToStep(link.TargetStepId);
+
+    public void NavigateToStep(string stepId)
+        => Execution.CurrentStepId = stepId;
+
+    public WorkflowContext BuildContextAndMoveToStep(string stepId)
+    {
+        var result = new WorkflowContext
+        {
+            WorkflowEditorContext = new WorkflowEditorContext(),
+            FormEditorContext = new FormEditorContext(),
+            Definition = Definition,
+            Execution = new WorkflowExecution
+            {
+                StepExecutions = Execution.StepExecutions,
+                AntiforgeryToken = Execution.AntiforgeryToken
+            }
+        };
+        result.NavigateToStep(stepId);
+        return result;
+    }
+
+    public WorkflowContext BuildEmptyContextAndMoveToStep(string stepId)
+    {
+        return new WorkflowContext
+        {
+            WorkflowEditorContext = new WorkflowEditorContext(),
+            FormEditorContext = new FormEditorContext(),
+            Definition = Definition,
+            Execution= new WorkflowExecution(stepId)
+        };
+    }
+
+    public WorkflowContext BuildNewContextAndMoveToFirstStep(JsonObject input)
+    {
+        var result = new WorkflowContext
+        {
+            WorkflowEditorContext = new WorkflowEditorContext(),
+            FormEditorContext = new FormEditorContext(),
+            Definition = Definition,
+            Execution = new WorkflowExecution()
+        };
+        result.NavigateToFirstStep();
+        InitializeWorkflowExecution(result, input);
+        return result;
+    }
+
+    private static void InitializeWorkflowExecution(WorkflowContext context, JsonObject jsonObject)
+    {
+        var links = new List<WorkflowStepLinkExecution>();
+        var currentStepLinks = context.Definition.Workflow.Links.Where(l => l.SourceStepId == context.Execution.CurrentStepId);
+        context.Execution.StepExecutions.Add(new WorkflowStepExecution
+        {
+            InputData = jsonObject,
+            Links = currentStepLinks.Select(l => new WorkflowStepLinkExecution
+            {
+                Id = Guid.NewGuid().ToString(),
+                EltId = l.Source.EltId,
+                InputData = jsonObject,
+                LinkId = l.Id
+            }).ToList(),
+            StepId = context.Execution.CurrentStepId
+        });
     }
 
     #endregion
@@ -95,7 +202,26 @@ public class WorkflowContext
 
 public class WorkflowExecution
 {
+    public WorkflowExecution()
+    {
+        
+    }
+
+    public WorkflowExecution(string currentStepId)
+    {
+        CurrentStepId = currentStepId;
+    }
+
+    public WorkflowExecution(string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord)  : this(currentStepId)
+    {
+        ErrorMessages = errorMessages;
+        SuccessMessages = successMessages;
+        AntiforgeryToken = antiforgeryTokenRecord;
+    }
+
     public string CurrentStepId { get; set; }
+    public List<string> ErrorMessages { get; set; }
+    public List<string> SuccessMessages { get; set; }
     public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
     public List<WorkflowStepExecution> StepExecutions { get; set; } = new List<WorkflowStepExecution>();
 }

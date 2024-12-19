@@ -18,10 +18,10 @@
         </div>
         <div class="zone" @ondragover:preventDefault="true" @ondragover="@(async (e) => await HandleDragHover(e))" @ondrop="@(async(e) => await HandleDrop(e))" @ondragleave="HandleDragLeave">
         </div>
-        @if(workflowExecutionContext != null)
+        @if (stepContext != null)
         {
             <div style="@PointerEvtCss">
-                <FormViewer WorkflowExecutionContext="@workflowExecutionContext" IsEditModeEnabled="false" IsInteractableElementEnabled="true" WorkflowViewerContext="@workflowContext"></FormViewer>
+                <FormViewer Context="@stepContext" IsEditModeEnabled="false" IsInteractableElementEnabled="true"></FormViewer>
             </div>
         }
     </div>
@@ -31,15 +31,14 @@
     [Parameter] public WorkflowStep Step { get; set; }
     [Parameter] public WorkflowStep SelectedStep { get; set; }
     [Parameter] public WorkflowLink SelectedLink { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public EventCallback<WorkflowStep> SelectedStepChanged { get; set; }
     [Parameter] public EventCallback<WorkflowStep> StepRemoved { get; set; }
     [Parameter] public EventCallback<WorkflowStep> LinkDropped { get; set; }
     [Parameter] public EventCallback<(FormEltEventArgs, WorkflowStep)> WorkflowLinkChanged { get; set; }
-    [Parameter] public List<FormRecord> Records { get; set; }
     bool isHover = false;
     ElementReference divRef;
-    WorkflowViewerContext workflowContext { get; set; } = new WorkflowViewerContext();
-    WorkflowExecutionContext workflowExecutionContext { get; set; } = null;
+    WorkflowContext stepContext { get; set; }
 
     string PointerEvtCss
     {
@@ -55,7 +54,7 @@
         if(firstRender)
         {
             Step.EltRef = divRef;
-            workflowContext.WorkflowLinkChanged += async (o, e) =>
+            stepContext.WorkflowEditorContext.WorkflowLinkChanged += async (o, e) =>
             {
                 await WorkflowLinkChanged.InvokeAsync((e, Step));
             };
@@ -65,10 +64,10 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if (workflowExecutionContext == null && Step != null)
+        if (stepContext == null && Step != null)
         {
             var formRecord = GetFormRecord(Step.FormRecordName);
-            workflowExecutionContext = new WorkflowExecutionContext(formRecord);
+            stepContext = Context.BuildEmptyContextAndMoveToStep(Step.Id);
         }
     }
 
@@ -109,7 +108,7 @@
     }
 
     private FormRecord GetFormRecord(string name)
-        => Records.Single(t => t.Name == name);
+        => Context.Definition.Records.Single(t => t.Name == name);
 
     private string GetClassName()
         => $"stepElement draggableElement {(isHover ? "isActive": string.Empty)}";

@@ -30,10 +30,10 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
 
     public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
     {
-        context.NextStep(activeLink);
+        var newContext = context.BuildContextAndMoveToStep(activeLink.TargetStepId);
         await _dialogService.OpenAsync<WorkflowLinkPopupActionComponent>(string.Empty, new Dictionary<string, object>
         {
-            { nameof(WorkflowLinkPopupActionComponent.Context), context }
+            { nameof(WorkflowLinkPopupActionComponent.Context), newContext }
         });
     }
 

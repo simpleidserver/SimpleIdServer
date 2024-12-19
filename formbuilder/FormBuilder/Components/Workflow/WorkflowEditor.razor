@@ -20,7 +20,7 @@
             <div class="category">
                 <RadzenText TextStyle="TextStyle.H6" class="title">Steps</RadzenText>
                 <ul class="elements">
-                    @foreach (var record in Records)
+                    @foreach (var record in Context.Definition.Records)
                     {
                         var isDisabled = disabledFormRecords.Contains(record.Name);
                         if(!isDisabled)
@@ -53,12 +53,12 @@
             @onmousewheel="@HandleZoom" 
             @onmousewheel:preventDefault=true 
             @onmousewheel:stopPropagation=true>
-            @foreach (var step in Workflow.Steps)
+            @foreach (var step in Context.Definition.Workflow.Steps)
             {
-                <WorkflowEditorStep Step="@step" StepRemoved="HandleStepRemoved" SelectedStepChanged="@(async (e) => await HandleSelectedStepChanged(e))" SelectedStep="@selectedStep" SelectedLink="@selectedLink" Records="@Records" WorkflowLinkChanged="@(async (item) => await HandleWorkflowLinkChanged(item))" LinkDropped="HandleLinkDropped"></WorkflowEditorStep>
+                <WorkflowEditorStep Context="@Context" Step="@step" StepRemoved="HandleStepRemoved" SelectedStepChanged="@(async (e) => await HandleSelectedStepChanged(e))" SelectedStep="@selectedStep" SelectedLink="@selectedLink" WorkflowLinkChanged="@(async (item) => await HandleWorkflowLinkChanged(item))" LinkDropped="HandleLinkDropped"></WorkflowEditorStep>
             }
 
-            @foreach (var link in Workflow.Links)
+            @foreach (var link in Context.Definition.Workflow.Links)
             {
                 var textInfoCoordinate = link.ComputeTextInfoCoordinate();
                 <foreignObject x="@Sanitize(textInfoCoordinate.X)" y="@Sanitize(textInfoCoordinate.Y)" width="100">
@@ -97,8 +97,8 @@
 
 @code {
     [Parameter] public List<FormRecord> Records { get; set; }
-    [Parameter] public WorkflowRecord Workflow { get; set; } = new WorkflowRecord();
     private List<string> disabledFormRecords { get; set; }
+    private WorkflowContext Context { get; set; }
     private ElementReference _divRef;
     private RadzenColumn _svgContainer;
     private WorkflowStep selectedStep { get; set; }
@@ -118,7 +118,7 @@
         {
             var svgSize = await formBuilderJsService.GetSize(_svgContainer.Element);
             viewBox = $"0 0 {svgSize.width} {svgSize.height}";
-            Records.Add(Constants.EmptyStep);
+            Context.Definition.Records.Add(Constants.EmptyStep);
             StateHasChanged();
         }
     }
@@ -126,10 +126,11 @@
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if(Records != null && Workflow != null && disabledFormRecords == null)
+        if (Records != null && disabledFormRecords == null)
         {
-            var activeSteps = Workflow.Steps.Select(s => s.FormRecordName);
-            disabledFormRecords = Records.Select(r => r.Name).Where(r => activeSteps.Contains(r)).ToList();
+            Context = WorkflowContext.CreateEmptyWorkflow(Records);
+            var activeSteps = Context.Definition.Workflow.Steps.Select(s => s.FormRecordName);
+            disabledFormRecords = Context.Definition.Records.Select(r => r.Name).Where(r => activeSteps.Contains(r)).ToList();
         }
     }
 
@@ -182,7 +183,7 @@
             if (selectedFormRecord == null) return false;
             var id = Guid.NewGuid().ToString();
             var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-            Workflow.Steps.Add(new WorkflowStep
+            Context.Definition.Workflow.Steps.Add(new WorkflowStep
             {
                 Id = id,
                 Coordinate = new Coordinate
@@ -206,7 +207,7 @@
     {
         var clone = this.selectedLink.Clone();
         clone.TargetStepId = workflowStep.Id;
-        Workflow.AddLink(clone);
+        Context.Definition.Workflow.AddLink(clone);
         selectedLink = null;
     }
 
@@ -243,7 +244,7 @@
             var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
             selectedStep.Coordinate.X = pos.X;
             selectedStep.Coordinate.Y = pos.Y;
-            var links = Workflow.GetLinks(selectedStep);
+            var links = Context.Definition.Workflow.GetLinks(selectedStep);
             foreach (var link in links)
                 link.UpdateCoordinate(selectedStep);
             return true;
@@ -293,23 +294,22 @@
         return dialogService.OpenAsync<EditWorkflowLinkDialog>(string.Empty, new Dictionary<string, object>
         {
             { "WorkflowLink", link },
-            { "Workflow", Workflow },
-            { "Forms", Records }
+            { "Context", Context }
         });
     }
 
     private void HandleRemoveLink(WorkflowLink link)
     {
-        Workflow.Links.Remove(link);
+        Context.Definition.Workflow.Links.Remove(link);
     }
 
     #endregion
 
     private void HandleStepRemoved(WorkflowStep step)
     {
-        Workflow.Steps.Remove(step);
+        Context.Definition.Workflow.Steps.Remove(step);
         disabledFormRecords.Remove(step.FormRecordName);
-        Workflow.Links = Workflow.Links.Where(l => !l.IsLinked(step.Id)).ToList();
+        Context.Definition.Workflow.Links = Context.Definition.Workflow.Links.Where(l => !l.IsLinked(step.Id)).ToList();
     }
 
     private async Task HandleWorkflowLinkChanged((FormEltEventArgs args, WorkflowStep step) item)
@@ -329,10 +329,9 @@
         {
             Width = "1200px"
         };
-        var workflowExecutionContext = new WorkflowExecutionContext(Workflow, Records);
         return dialogService.OpenAsync<DebugWorkflowDialog>(string.Empty, new Dictionary<string, object>
         {
-            { nameof(DebugWorkflowDialog.Workflow), workflowExecutionContext }
+            { nameof(DebugWorkflowDialog.Context), Context }
         }, opts);
     }
 
@@ -340,7 +339,7 @@
     {
         return dialogService.OpenAsync<ViewWorkflowJsonDialog>("", new Dictionary<string, object>
         {
-            { nameof(ViewWorkflowJsonDialog.Workflow), Workflow }
+            { nameof(ViewWorkflowJsonDialog.Context), Context }
         });
     }
 
@@ -350,7 +349,7 @@
     private string Sanitize(double number) => number.ToString().Replace(',', '.');
 
     private FormRecord GetFormRecord(string name)
-        => Records.Single(t => t.Name == name);
+        => Context.Definition.Records.Single(t => t.Name == name);
 
     private (double x, double y, double width, double height) GetViewBoxInfo()
         => GetViewBoxInfo(viewBox);

@@ -11,13 +11,26 @@
 {
     <div class="form">
         <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
-            @if (ErrorMessages != null && ErrorMessages.Any())
+            @if (Context.Execution != null)
             {
-                @foreach (var errorMessage in ErrorMessages)
+                if(Context.Execution.ErrorMessages != null)
                 {
-                    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
-                        @errorMessage
-                    </RadzenAlert>
+                    @foreach (var errorMessage in Context.Execution.ErrorMessages)
+                    {
+                        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            @errorMessage
+                        </RadzenAlert>
+                    }
+                }
+
+                if(Context.Execution.SuccessMessages != null)
+                {
+                    @foreach (var successMessage in Context.Execution.SuccessMessages)
+                    {
+                        <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            @successMessage
+                        </RadzenAlert>
+                    }
                 }
             }
 
@@ -30,7 +43,7 @@
 }
 else
 {
-    @if (Form.Elements != null)
+    @if (Form != null && Form.Elements != null)
     {
         @CustomRender
     }
@@ -41,14 +54,15 @@ else
     [Inject] public IRuleEngine RuleEngine { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public bool IsInteractableElementEnabled { get; set; }
-    [Parameter] public WorkflowContext Context { get; set; }
-    [Parameter] public List<string> ErrorMessages { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }    
     private FormRecord Form { get; set; } = null;
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (Context == null) return;
+        Form = Context.GetCurrentFormRecord();
+        if (Form == null) return;
         RuleEngine.Apply(Context);
         CustomRender = CreateComponent();
         Form.Elements.CollectionChanged += HandleChanged;

@@ -1,11 +1,12 @@
-﻿using FormBuilder.Link;
+﻿using FormBuilder.Components;
+using FormBuilder.Link;
 using FormBuilder.Models;
 
 namespace FormBuilder.Factories;
 
 public interface IWorkflowLinkActionFactory
 {
-    List<IWorkflowLinkAction> GetAll(WorkflowRecord workflow, List<FormRecord> forms, WorkflowLink workflowLink);
+    List<IWorkflowLinkAction> GetAll(WorkflowContext context, WorkflowLink workflowLink);
     IWorkflowLinkAction Build(string actionType);
 }
 
@@ -18,9 +19,9 @@ public class WorkflowLinkActionFactory : IWorkflowLinkActionFactory
         _actions = actions.ToList();
     }
 
-    public List<IWorkflowLinkAction> GetAll(WorkflowRecord workflow, List<FormRecord> forms, WorkflowLink workflowLink)
+    public List<IWorkflowLinkAction> GetAll(WorkflowContext context, WorkflowLink workflowLink)
     {
-        var record = workflow.GetListDataRecord(workflowLink, forms);
+        var record = context.Definition.Workflow.GetListDataRecord(workflowLink, context.Definition.Records);
         if(record.formElt != null)
             return _actions.Where(a => a.CanBeAppliedMultipleTimes).ToList();
 

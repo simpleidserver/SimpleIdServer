@@ -4,19 +4,10 @@
 
 <RadzenDialog />
 
-<FormViewer Input=@Input 
-    IsEditModeEnabled=false 
+<FormViewer IsEditModeEnabled=false 
     IsInteractableElementEnabled=false 
-    ErrorMessages="@ErrorMessages"
-    Context=@(new FormViewerContext())
-    WorkflowViewerContext=@(new WorkflowViewerContext())
-    WorkflowExecutionContext=@(new WorkflowExecutionContext(Workflow, Records, CurrentStepId) { AntiforgeryToken = Antifogery })></FormViewer>
+    Context=@Context></FormViewer>
 
 @code {
-    [Parameter] public JsonObject Input { get; set; }
-    [Parameter] public WorkflowRecord Workflow { get; set; }
-    [Parameter] public List<FormRecord> Records { get; set; }
-    [Parameter] public string CurrentStepId { get; set; }
-    [Parameter] public AntiforgeryTokenRecord Antifogery { get; set; }
-    [Parameter] public List<string> ErrorMessages { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
 }

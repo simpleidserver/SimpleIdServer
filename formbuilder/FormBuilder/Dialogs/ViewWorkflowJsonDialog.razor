@@ -1,4 +1,5 @@
 ﻿@using BlazorMonaco.Editor
+@using FormBuilder.Components
 @using FormBuilder.Models
 @using Radzen.Blazor
 @using System.Text.Json
@@ -8,15 +9,16 @@
 
 
 @code {
-    [Parameter] public WorkflowRecord Workflow { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
 
     private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
     {
+        var json = JsonSerializer.Serialize(Context.Definition.Workflow, new JsonSerializerOptions { WriteIndented = true });
         return new StandaloneEditorConstructionOptions
-            {
-                AutomaticLayout = true,
-                Language = "json",
-                Value = JsonSerializer.Serialize(Workflow, new JsonSerializerOptions { WriteIndented = true })
-            };
+        {
+            AutomaticLayout = true,
+            Language = "json",
+            Value = json
+        };
     }
 }

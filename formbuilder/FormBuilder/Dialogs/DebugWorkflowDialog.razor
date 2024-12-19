@@ -14,15 +14,15 @@
             <StandaloneCodeEditor @ref=editor OnDidInit="HandleOnDidInit" OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
         </RadzenStepsItem>
         <RadzenStepsItem Text="Viewer" Disabled="@(input == null)">
-            <FormViewer Input="@input" WorkflowExecutionContext="@Workflow" IsEditModeEnabled="false" WorkflowViewerContext="@WorkflowContext"></FormViewer>
+            <FormViewer Context=@debuggingWorkflowContext IsEditModeEnabled="false"></FormViewer>
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>
 
 @code {
     private StandaloneCodeEditor editor;
-    [Parameter] public WorkflowExecutionContext Workflow { get; set; }
-    private WorkflowViewerContext WorkflowContext { get; set; } = new WorkflowViewerContext();
+    [Parameter] public WorkflowContext Context { get; set; }
+    private WorkflowContext debuggingWorkflowContext { get; set; }
     JsonObject input { get; set; }
 
     private async Task HandleOnDidInit()
@@ -32,10 +32,13 @@
 
     private async Task GenerateFakeData()
     {
-        var currentRecord = Workflow.GetCurrentRecord();
-        var fakerDataService = fakerDataServiceFactory.Build(currentRecord.Name);
+        if (Context == null || !Context.Definition.Workflow.Steps.Any()) return;
+        var firstStep = Context.GetFirstStep();
+        if (firstStep == null) return;
+        var fakerDataService = fakerDataServiceFactory.Build(firstStep.FormRecordName);
         var obj = fakerDataService.Generate();
         var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
+        debuggingWorkflowContext = Context.BuildNewContextAndMoveToFirstStep(JsonObject.Parse(json).AsObject());
         await editor.SetValue(json);
     }
 

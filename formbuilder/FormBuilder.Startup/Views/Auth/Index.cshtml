@@ -16,16 +16,12 @@
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
     var path = uriProvider.GetActiveFormCssUrl(step.FormRecordName);
+    var context = WorkflowContext.CreateWorkflow(Model.Workflow, Model.FormRecords, Model.CurrentStepId, Model.ErrorMessages, new List<string>(), Model.AntiforgeryToken, Model.Input);
 }
 
 <component type="typeof(WorkflowViewer)" 
     render-mode="ServerPrerendered" 
-    param-Input="@Model.Input" 
-    param-Workflow="@Model.Workflow"
-    param-ErrorMessages=@Model.ErrorMessages
-    param-Records="@Model.FormRecords"
-    param-CurrentStepId="@Model.CurrentStepId"
-    param-Antifogery="@Model.AntiforgeryToken" />
+    param-Context="@context" />
 
 @section Header {
     <link rel="stylesheet" href="@path" />

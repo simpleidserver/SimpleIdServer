@@ -34,9 +34,8 @@
         }
     }
 
-    [Parameter] public List<FormRecord> Forms { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public WorkflowLink WorkflowLink { get; set; }
-    [Parameter] public WorkflowRecord Workflow { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -54,7 +53,7 @@
         base.OnAfterRender(firstRender);
         if (firstRender)
         {
-            actions = workflowLinkActionFactory.GetAll(Workflow, Forms, WorkflowLink);
+            actions = workflowLinkActionFactory.GetAll(Context, WorkflowLink);
             CustomRender = CreateComponent();
             StateHasChanged();
         }
