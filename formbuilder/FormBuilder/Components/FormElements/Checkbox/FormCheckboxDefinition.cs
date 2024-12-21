@@ -1,12 +1,17 @@
-﻿namespace FormBuilder.Components.FormElements.Checkbox;
+﻿using FormBuilder.Factories;
 
-public class FormCheckboxDefinition : IFormElementDefinition
+namespace FormBuilder.Components.FormElements.Checkbox;
+
+public class FormCheckboxDefinition : BaseFormFieldElementDefinition<FormCheckboxRecord>
 {
-    public Type UiElt => typeof(FormCheckbox);
+    public FormCheckboxDefinition(ITransformationRuleEngineFactory transformationRuleEngineFactory) : base(transformationRuleEngineFactory)
+    {
 
-    public Type RecordType => typeof(FormCheckboxRecord);
-    public string Type => TYPE;
-    public string Icon => "priority";
+    }
+
     public static string TYPE = "Checkbox";
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
+    public override Type UiElt => typeof(FormCheckbox);
+    public override string Type => TYPE;
+    public override string Icon => "priority";
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
 }

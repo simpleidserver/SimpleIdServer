@@ -7,6 +7,8 @@ public class FormPasswordFieldRecord : BaseFormFieldRecord
 {
     public string Value { get; set; }
 
+    public override string Type => FormPasswordFieldDefinition.TYPE;
+
     public override void ExtractJson(JsonObject json)
         => json.Add(Name, Value);
 

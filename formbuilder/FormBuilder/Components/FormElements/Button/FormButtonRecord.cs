@@ -1,4 +1,5 @@
-﻿using FormBuilder.Models;
+﻿using FormBuilder.Components.FormElements.Anchor;
+using FormBuilder.Models;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
@@ -6,6 +7,7 @@ namespace FormBuilder.Components.FormElements.Button;
 
 public class FormButtonRecord : BaseFormFieldRecord
 {
+    public override string Type => FormButtonDefinition.TYPE;
     private bool _isSubmitting;
 
     [JsonIgnore]

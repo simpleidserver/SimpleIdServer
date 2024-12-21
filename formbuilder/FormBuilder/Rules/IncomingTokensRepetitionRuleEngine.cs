@@ -11,24 +11,22 @@ namespace FormBuilder.Rules;
 
 public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<IncomingTokensRepetitionRule>
 {
-    private readonly IEnumerable<IFormElementDefinition> _definitions;
     private readonly ITransformerFactory _transformerFactory;
 
-    public IncomingTokensRepetitionRuleEngine(IEnumerable<IFormElementDefinition> definitions, ITransformerFactory transformerFactory)
+    public IncomingTokensRepetitionRuleEngine(ITransformerFactory transformerFactory)
     {
-        _definitions = definitions;
         _transformerFactory = transformerFactory;
     }
 
     public override string Type => IncomingTokensRepetitionRule.TYPE;
 
-    protected override List<(IFormElementRecord, JsonNode)> InternalTransform(string fieldType, JsonObject input, IncomingTokensRepetitionRule parameter, Dictionary<string, object> parameters)
+    protected override List<(IFormElementRecord, JsonNode)> InternalTransform(List<IFormElementDefinition> definitions, string fieldType, JsonObject input, IncomingTokensRepetitionRule parameter, Dictionary<string, object> parameters)
     {
         var result = new List<(IFormElementRecord, JsonNode)>();
         var path = JsonPath.Parse(parameter.Path);
         var pathResult = path.Evaluate(input);
         var nodes = pathResult.Matches.Select(m => m.Value);
-        var definition = _definitions.Single(d => d.Type == fieldType);
+        var definition = definitions.Single(d => d.Type == fieldType);
         var recordType = definition.RecordType;
         var allMappingRuleSourceLst = parameter.MappingRules.Select(r => r.Target).Distinct();
         var allProperties = recordType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
@@ -48,6 +46,10 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
                 foreach (var labelMappingRule in parameter.LabelMappingRules)
                     ApplyLabel(formField, node, labelMappingRule);
             }
+
+            var formElt = instance as IFormElementRecord;
+            if(formElt != null)
+                formElt.Id = Guid.NewGuid().ToString();
 
             ApplyParameters(instance, allProperties, parameters);
             var record = (IFormElementRecord)instance;

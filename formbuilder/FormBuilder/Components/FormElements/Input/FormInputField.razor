@@ -5,7 +5,7 @@
 
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormInputDialog" TRecord="FormInputFieldRecord" Record="@Value">
      <Children>
-        @if(Value.Type != FormInputTypes.HIDDEN)
+        @if (Value.FormType != FormInputTypes.HIDDEN)
         {
             <RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value)" class="fullWidth">
                 <RadzenTextBox @bind-Value="@Value.Value"></RadzenTextBox>

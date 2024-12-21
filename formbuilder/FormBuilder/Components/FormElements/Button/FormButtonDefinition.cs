@@ -1,12 +1,14 @@
-﻿
-namespace FormBuilder.Components.FormElements.Button;
+﻿namespace FormBuilder.Components.FormElements.Button;
 
-public class FormButtonDefinition : IFormElementDefinition
+public class FormButtonDefinition : GenericFormElementDefinition<FormButtonRecord>
 {
-    public Type UiElt => typeof(FormButton);
-    public Type RecordType => typeof(FormButtonRecord);
-    public string Type => TYPE;
     public static string TYPE = "Button";
-    public string Icon => "variables";
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
+    public override Type UiElt => typeof(FormButton);
+    public override string Type => TYPE;
+    public override string Icon => "variables";
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
+
+    protected override void ProtectedInit(FormButtonRecord record, WorkflowContext context, List<IFormElementDefinition> definitions)
+    {
+    }
 }

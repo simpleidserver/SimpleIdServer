@@ -1,11 +1,17 @@
-﻿namespace FormBuilder.Components.FormElements.Input;
+﻿using FormBuilder.Factories;
 
-public class FormInputFieldDefinition : IFormElementDefinition
+namespace FormBuilder.Components.FormElements.Input;
+
+public class FormInputFieldDefinition : BaseFormFieldElementDefinition<FormInputFieldRecord>
 {
-    public Type UiElt => typeof(FormInputField);
-    public Type RecordType => typeof(FormInputFieldRecord);
-    public string Type => TYPE;
-    public string Icon => "text_fields";
+    public FormInputFieldDefinition(ITransformationRuleEngineFactory transformationRuleEngineFactory) : base(transformationRuleEngineFactory)
+    {
+        
+    }
+
     public static string TYPE = "Input";
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
+    public override Type UiElt => typeof(FormInputField);
+    public override string Type => TYPE;
+    public override string Icon => "text_fields";
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
 }

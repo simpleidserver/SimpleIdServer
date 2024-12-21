@@ -3,8 +3,9 @@ using System.Xml.Linq;
 
 namespace FormBuilder.Models;
 
-public class BaseFormDataRecord : IFormElementRecord
+public abstract class BaseFormDataRecord : IFormElementRecord
 {
+    public abstract string Type { get; }
     public string FieldType { get; set; }
     public Dictionary<string, object> Parameters { get; set; }
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();

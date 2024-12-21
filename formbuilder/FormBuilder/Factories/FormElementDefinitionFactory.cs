@@ -2,6 +2,7 @@
 
 public interface IFormElementDefinitionFactory
 {
+    List<IFormElementDefinition> GetAll();
     IFormElementDefinition Build(string type);
 }
 
@@ -13,6 +14,8 @@ public class FormElementDefinitionFactory : IFormElementDefinitionFactory
     {
         _definitions = definitions;
     }
+
+    public List<IFormElementDefinition> GetAll() => _definitions.ToList();
 
     public IFormElementDefinition Build(string type)
         => _definitions.Single(d => d.Type == type);

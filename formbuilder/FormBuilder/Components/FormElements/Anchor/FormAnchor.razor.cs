@@ -15,9 +15,10 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
 
     async Task Navigate()
     {
+        var linkExecution = Context.GetLinkExecutionFromFormEltAndCurrentStep(Value.Id);
         var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);
-        if (link == null) return;
+        if (linkExecution == null || link == null) return;
         var act = WorkflowLinkActionFactory.Build(link.ActionType);
-        await act.Execute(link, Context);
+        await act.Execute(link, linkExecution, Context);
     }
 }

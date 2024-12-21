@@ -28,6 +28,7 @@ namespace FormBuilder.Models;
 public interface IFormElementRecord
 {
     string Id { get; set; }
+    string Type { get; }
     List<LabelTranslation> Labels { get; set; }
     void ExtractJson(JsonObject json);
     IFormElementRecord GetChild(string id);

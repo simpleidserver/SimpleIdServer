@@ -1,13 +1,19 @@
 ﻿
+using FormBuilder.Factories;
+
 namespace FormBuilder.Components.FormElements.Anchor;
 
-public class FormAnchorDefinition : IFormElementDefinition
+public class FormAnchorDefinition : BaseFormFieldElementDefinition<FormAnchorRecord>
 {
-    public Type UiElt => typeof(FormAnchor);
-    public Type RecordType => typeof(FormAnchorRecord);
-    public string Type => TYPE;
-    public string Icon => "alternate_email";
+    public FormAnchorDefinition(ITransformationRuleEngineFactory transformationRuleEngineFactory) : base(transformationRuleEngineFactory)
+    {
+
+    }
+
 
     public static string TYPE = "FormAnchor";
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
+    public override Type UiElt => typeof(FormAnchor);
+    public override string Type => TYPE;
+    public override string Icon => "alternate_email";
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
 }

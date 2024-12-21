@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Components.FormElements.Button;
+using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Models;
 using System.Text.Json.Serialization;
 
@@ -6,6 +7,7 @@ namespace FormBuilder.Components.FormElements.StackLayout;
 
 public class FormStackLayoutRecord : BaseFormLayoutRecord
 {
+    public override string Type => FormStackLayoutDefinition.TYPE;
     public bool IsFormEnabled { get; set; } = false;
     [JsonIgnore]
     public bool IsSubmitting { get; set; }

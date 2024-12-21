@@ -1,4 +1,7 @@
-﻿namespace FormBuilder;
+﻿using FormBuilder.Components;
+using FormBuilder.Models;
+
+namespace FormBuilder;
 
 public interface IFormElementDefinition
 {
@@ -7,4 +10,5 @@ public interface IFormElementDefinition
     Type UiElt { get; }
     Type RecordType {  get; }
     ElementDefinitionCategories Category { get; }
+    void Init(IFormElementRecord record, WorkflowContext context, List<IFormElementDefinition> definitions);
 }

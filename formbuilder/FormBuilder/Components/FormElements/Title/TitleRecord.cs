@@ -6,6 +6,7 @@ namespace FormBuilder.Components.FormElements.Title;
 
 public class TitleRecord : IFormElementRecord
 {
+    public string Type => TitleDefinition.TYPE;
     public string Id { get; set; }
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
     public TextStyle Style { get; set; } = TextStyle.H5;

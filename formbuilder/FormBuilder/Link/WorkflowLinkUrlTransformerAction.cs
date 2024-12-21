@@ -32,12 +32,11 @@ public class WorkflowLinkUrlTransformerAction : IWorkflowLinkAction
 
     public bool CanBeAppliedMultipleTimes => true;
 
-    public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
+    public async Task Execute(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context)
     {
         if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkUrlTransformationParameter>(activeLink.ActionParameter);
-        var executedLink = context.GetLinkExecutionFromCurrentStep(activeLink.Id);
-        var json = JsonObject.Parse(executedLink.OutputData.ToString()).AsObject();
+        var json = JsonObject.Parse(linkExecution.OutputData.ToString()).AsObject();
         if (string.IsNullOrWhiteSpace(parameter.JsonSource)) return;
         var path = JsonPath.Parse(parameter.JsonSource);
         var pathResult = path.Evaluate(json);

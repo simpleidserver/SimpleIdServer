@@ -1,12 +1,18 @@
 ﻿
+using FormBuilder.Factories;
+
 namespace FormBuilder.Components.FormElements.Password;
 
-public class FormPasswordFieldDefinition : IFormElementDefinition
+public class FormPasswordFieldDefinition : BaseFormFieldElementDefinition<FormPasswordFieldRecord>
 {
-    public Type UiElt => typeof(FormPasswordField);
-    public Type RecordType => typeof(FormPasswordFieldRecord);
-    public string Type => TYPE;
-    public string Icon => "password";
     public static string TYPE = "Password";
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
+
+    public FormPasswordFieldDefinition(ITransformationRuleEngineFactory transformationRuleEngineFactory) : base(transformationRuleEngineFactory)
+    {
+    }
+
+    public override Type UiElt => typeof(FormPasswordField);
+    public override string Type => TYPE;
+    public override string Icon => "password";
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
 }

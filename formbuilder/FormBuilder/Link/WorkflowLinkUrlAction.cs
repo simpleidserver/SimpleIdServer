@@ -26,7 +26,7 @@ public class WorkflowLinkUrlAction : IWorkflowLinkAction
 
     public bool CanBeAppliedMultipleTimes => false;
 
-    public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
+    public async Task Execute(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context)
     {
         if(string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkUrlParameter>(activeLink.ActionParameter);

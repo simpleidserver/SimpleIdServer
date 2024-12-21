@@ -92,13 +92,19 @@ public class WorkflowContext
     {
         var executionLink = GetLinkExecutionFromElementAndCurrentStep(eltId);
         if (executionLink == null) return null;
-        return Definition.Workflow.Links.SingleOrDefault(l => l.Source.EltId == eltId);
+        return Definition.Workflow.Links.SingleOrDefault(l => l.Id == executionLink.LinkId);
     }
 
     public WorkflowStepLinkExecution GetLinkExecutionFromCurrentStep(string id)
     {
         var stepExecution = GetCurrentStepExecution();
         return stepExecution.Links.SingleOrDefault(l => l.Id == id);
+    }
+
+    public WorkflowStepLinkExecution GetLinkExecutionFromFormEltAndCurrentStep(string eltId)
+    {
+        var stepExecution = GetCurrentStepExecution();
+        return stepExecution.Links.SingleOrDefault(l => l.EltId == eltId);
     }
 
     public WorkflowStepLinkExecution GetLinkExecutionFromElementAndCurrentStep(string eltId)
@@ -191,6 +197,7 @@ public class WorkflowContext
                 Id = Guid.NewGuid().ToString(),
                 EltId = l.Source.EltId,
                 InputData = jsonObject,
+                OutputData = jsonObject,
                 LinkId = l.Id
             }).ToList(),
             StepId = context.Execution.CurrentStepId
@@ -239,7 +246,7 @@ public class WorkflowStepLinkExecution
     public string LinkId { get; set; }
     public string EltId { get; set; }
     public JsonNode InputData { get; set; }
-    public JsonObject OutputData { get; set; }
+    public JsonNode OutputData { get; set; }
 }
 
 public class WorkflowDefinition

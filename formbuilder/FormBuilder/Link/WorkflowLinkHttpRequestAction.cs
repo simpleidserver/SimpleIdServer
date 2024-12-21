@@ -37,12 +37,11 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
 
     public bool CanBeAppliedMultipleTimes => false;
 
-    public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
+    public async Task Execute(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context)
     {
         if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(activeLink.ActionParameter);
-        var executedLink = context.GetLinkExecutionFromCurrentStep(activeLink.Id);
-        var json = JsonObject.Parse(executedLink.OutputData.ToString()).AsObject();
+        var json = JsonObject.Parse(linkExecution.OutputData.ToString()).AsObject();
         if(parameter.IsCustomParametersEnabled)
             json = _mappingRuleService.Extract(json, parameter.Rules);
 
@@ -51,7 +50,7 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
 
         var target = parameter.Target;
         if(parameter.TargetTransformer != null)
-            target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, executedLink.OutputData)?.ToString();
+            target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, linkExecution.OutputData)?.ToString();
 
         var currentRecord = context.GetCurrentFormRecord();
         json.Add(nameof(StepViewModel.StepName), currentRecord.Name);

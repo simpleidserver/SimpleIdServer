@@ -1,17 +1,16 @@
 ﻿
 namespace FormBuilder.Components.FormElements.Paragraph;
 
-public class ParagraphDefinition : IFormElementDefinition
+public class ParagraphDefinition : GenericFormElementDefinition<ParagraphRecord>
 {
-    public string Type => TYPE;
 
     public static string TYPE = "paragraph";
+    public override string Type => TYPE;
+    public override string Icon => "description";
+    public override Type UiElt => typeof(ParagraphComponent);
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
 
-    public string Icon => "description";
-
-    public Type UiElt => typeof(ParagraphComponent);
-
-    public Type RecordType => typeof(ParagraphRecord);
-
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
+    protected override void ProtectedInit(ParagraphRecord record, WorkflowContext context, List<IFormElementDefinition> definitions)
+    {
+    }
 }

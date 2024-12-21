@@ -28,7 +28,7 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
 
     public bool CanBeAppliedMultipleTimes => false;
 
-    public async Task Execute(WorkflowLink activeLink, WorkflowContext context)
+    public async Task Execute(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context)
     {
         var newContext = context.BuildContextAndMoveToStep(activeLink.TargetStepId);
         await _dialogService.OpenAsync<WorkflowLinkPopupActionComponent>(string.Empty, new Dictionary<string, object>

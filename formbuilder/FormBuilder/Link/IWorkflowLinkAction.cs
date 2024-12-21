@@ -10,6 +10,6 @@ public interface IWorkflowLinkAction
     string DisplayName { get; }
     List<string> ExcludedStepNames { get; }
     bool CanBeAppliedMultipleTimes { get; }
-    Task Execute(WorkflowLink activeLink, WorkflowContext context);
+    Task Execute(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context);
     object Render(RenderTreeBuilder builder, WorkflowLink workflowLink);
 }

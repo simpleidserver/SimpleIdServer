@@ -1,12 +1,14 @@
-﻿
-namespace FormBuilder.Components.FormElements.Divider;
+﻿namespace FormBuilder.Components.FormElements.Divider;
 
-public class DividerLayoutDefinition : IFormElementDefinition
+public class DividerLayoutDefinition : GenericFormElementDefinition<DividerLayoutRecord>
 {
-    public Type UiElt => typeof(DividerLayout);
-    public Type RecordType => typeof(DividerLayoutRecord);
-    public string Icon => "horizontal_rule";
-    public string Type => TYPE;
     public static string TYPE = "Divider";
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.LAYOUT;
+    public override Type UiElt => typeof(DividerLayout);
+    public override string Icon => "horizontal_rule";
+    public override string Type => TYPE;
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.LAYOUT;
+
+    protected override void ProtectedInit(DividerLayoutRecord record, WorkflowContext context, List<IFormElementDefinition> definitions)
+    {
+    }
 }

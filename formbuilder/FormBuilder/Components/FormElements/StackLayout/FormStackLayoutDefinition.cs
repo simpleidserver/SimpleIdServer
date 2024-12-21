@@ -1,13 +1,23 @@
 ﻿
+using FormBuilder.Factories;
+
 namespace FormBuilder.Components.FormElements.StackLayout;
 
-public class FormStackLayoutDefinition : IFormElementDefinition
+public class FormStackLayoutDefinition : GenericFormElementDefinition<FormStackLayoutRecord>
 {
-    public Type UiElt => typeof(FormStackLayout);
-
-    public Type RecordType => typeof(FormStackLayoutRecord);
-    public string Type => TYPE;
-    public string Icon => "view_agenda";
     public static string TYPE = "Stacklayout";
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.LAYOUT;
+    public override Type UiElt => typeof(FormStackLayout);
+    public override string Type => TYPE;
+    public override string Icon => "view_agenda";
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.LAYOUT;
+
+    protected override void ProtectedInit(FormStackLayoutRecord record, WorkflowContext context, List<IFormElementDefinition> definitions)
+    {
+        if (record.Elements == null) return;
+        foreach (var elt in record.Elements)
+        {
+            var definition = definitions.Single(d => d.Type == elt.Type);
+            definition.Init(elt, context, definitions);
+        }
+    }
 }

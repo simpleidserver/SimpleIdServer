@@ -37,7 +37,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
         var execution = Context.GetLinkExecutionFromElementAndCurrentStep(Value.Id);
         execution.OutputData = json;
         var act = WorkflowLinkActionFactory.Build(link.ActionType);
-        await act.Execute(link, Context);
+        await act.Execute(link, execution, Context);
         Value.FinishSubmit();
     }
 

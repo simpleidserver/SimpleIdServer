@@ -6,6 +6,7 @@ namespace FormBuilder.Components.FormElements.ListData;
 
 public class ListDataRecord : BaseFormDataRecord
 {
+    public override string Type => ListDataDefinition.TYPE;
     public IRepetitionRule RepetitionRule { get; set; }
     internal ObservableCollection<IFormElementRecord> Elements { get; set; }
 }

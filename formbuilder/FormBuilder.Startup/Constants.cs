@@ -63,7 +63,7 @@ public class Constants
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "ReturnUrl",
-                                Type = FormInputTypes.HIDDEN,
+                                FormType = FormInputTypes.HIDDEN,
                                 Transformation = new IncomingTokensTransformationRule
                                 {
                                     Source = "$.ReturnUrl"

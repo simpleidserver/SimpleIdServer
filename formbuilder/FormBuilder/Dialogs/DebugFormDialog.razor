@@ -24,16 +24,16 @@
 @code {
     private StandaloneCodeEditor editor;
     [Parameter] public FormRecord Form { get; set; }
+    FormRecord copyRecord { get; set; }
     WorkflowContext context { get; set; }
     JsonObject input { get; set; }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if (context == null && Form != null)
+        if (copyRecord == null && Form != null)
         {
-            var copyRecord = JsonSerializer.Deserialize<FormRecord>(JsonSerializer.Serialize(Form));
-            context = WorkflowContext.CreateOneStepWorkflow(copyRecord);
+            copyRecord = JsonSerializer.Deserialize<FormRecord>(JsonSerializer.Serialize(Form));
         }
     }
 
@@ -48,6 +48,7 @@
         try
         {
             input = JsonObject.Parse(value).AsObject();
+            context = WorkflowContext.CreateOneStepWorkflow(copyRecord, input);
         }
         catch
         {

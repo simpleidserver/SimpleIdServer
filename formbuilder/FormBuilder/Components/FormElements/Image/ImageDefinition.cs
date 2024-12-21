@@ -1,17 +1,15 @@
-﻿
-namespace FormBuilder.Components.FormElements.Image;
+﻿namespace FormBuilder.Components.FormElements.Image;
 
-public class ImageDefinition : IFormElementDefinition
+public class ImageDefinition : GenericFormElementDefinition<ImageRecord>
 {
     public static string TYPE => "image";
 
-    public string Type => TYPE;
+    public override string Type => TYPE;
+    public override string Icon => "image";
+    public override Type UiElt => typeof(ImageComponent);
+    public override ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
 
-    public string Icon => "image";
-
-    public Type UiElt => typeof(ImageComponent);
-
-    public Type RecordType => typeof(ImageRecord);
-
-    public ElementDefinitionCategories Category => ElementDefinitionCategories.ELEMENT;
+    protected override void ProtectedInit(ImageRecord record, WorkflowContext context, List<IFormElementDefinition> definitions)
+    {
+    }
 }

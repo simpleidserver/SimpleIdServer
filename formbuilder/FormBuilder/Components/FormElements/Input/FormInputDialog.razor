@@ -13,7 +13,7 @@
                     </RadzenFormField>
                     <!-- Choose the input type -->
                     <RadzenFormField Variant="Variant.Outlined" Text="Choose the input type" class="fullWidth">
-                        <RadzenDropDown @bind-Value=@CopyRecord.Type Data="@mappingInputTypeToDisplayName" TextProperty="Value" ValueProperty="Key" />
+                        <RadzenDropDown @bind-Value=@CopyRecord.FormType Data="@mappingInputTypeToDisplayName" TextProperty="Value" ValueProperty="Key" />
                     </RadzenFormField>
                 </RadzenStack>
             </RadzenTabsItem>

@@ -4,10 +4,30 @@
 
 <RadzenDialog />
 
-<FormViewer IsEditModeEnabled=false 
-    IsInteractableElementEnabled=false 
-    Context=@Context></FormViewer>
+@if(Context != null)
+{
+    <FormViewer IsEditModeEnabled=false
+                IsInteractableElementEnabled=false
+                Context=@Context></FormViewer>
+}
 
 @code {
-    [Parameter] public WorkflowContext Context { get; set; }
+    [Parameter] public List<FormRecord> FormRecords { get; set; }
+    [Parameter] public WorkflowRecord Workflow { get; set; }
+    [Parameter] public JsonObject Input { get; set; }
+    [Parameter] public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
+    [Parameter] public string CurrentStepId { get; set; }
+    [Parameter] public List<string> ErrorMessages { get; set; }
+    [Parameter] public List<string> SuccessMessages { get; set; }
+    private WorkflowContext Context { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Context == null)
+        {
+            var step = Workflow.Steps.Single(s => s.Id == CurrentStepId);
+            Context = WorkflowContext.CreateWorkflow(Workflow, FormRecords, CurrentStepId, ErrorMessages, SuccessMessages, AntiforgeryToken, Input);
+        }
+    }
 }
