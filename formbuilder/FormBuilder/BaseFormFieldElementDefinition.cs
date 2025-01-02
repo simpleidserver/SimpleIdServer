@@ -17,7 +17,7 @@ public abstract class BaseFormFieldElementDefinition<T> : GenericFormElementDefi
     {
         if (record.Transformation == null) return;
         var inputData = context.GetCurrentStepInputData();
-        var transformationResult = _transformationRuleEngineFactory.Transform(inputData, record.Transformation);
+        var transformationResult = _transformationRuleEngineFactory.Transform(inputData, record.Transformation).Where(r => r != null);
         if (!transformationResult.Any()) return;
         record.Apply(transformationResult.First());
     }

@@ -16,13 +16,17 @@ using System.Collections.ObjectModel;
 using System;
 using FormBuilder.Link;
 using FormBuilder.Transformers;
+using FormBuilder.Components.FormElements.Title;
 
 namespace SimpleIdServer.IdServer.Startup;
 
 public class FormBuilderConfiguration
 {
+    private static string pwdStepId = "pwd";
+    private static string resetPwdStepId = "resetPwd";
     private static string authFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
     private static string forgetPwdId = "777b8f76-c7b0-475a-a3c7-5ef0e54ce8e6";
+    private static string resetFormId = "8bf5ba00-a9b3-476b-8469-abe123abc797";
     public static string defaultWorkflowId = "241a7509-4c58-4f49-b1df-49011b2c9bcb";
 
     #region Forms
@@ -145,7 +149,7 @@ public class FormBuilderConfiguration
                 {
                     new FormStackLayoutRecord
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = resetFormId,
                         IsFormEnabled = true,
                         Elements = new ObservableCollection<IFormElementRecord>
                         {
@@ -158,6 +162,21 @@ public class FormBuilderConfiguration
                                 {
                                     Source = "$.ReturnUrl"
                                 }
+                            },
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Realm",
+                                FormType = FormInputTypes.HIDDEN,
+                                Transformation = new IncomingTokensTransformationRule
+                                {
+                                    Source = "$.Realm"
+                                }
+                            },
+                            new TitleRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Reset your password").Build()
                             },
                             new FormInputFieldRecord
                             {
@@ -183,6 +202,11 @@ public class FormBuilderConfiguration
         }
     };
 
+    public static FormRecord ConfirmResetPwdForm = new FormRecord
+    {
+        Name = "confirmResetPwd"
+    };
+
     public static List<FormRecord> AllForms => new List<FormRecord>
     {
         LoginPwdAuthForm,
@@ -195,12 +219,12 @@ public class FormBuilderConfiguration
     #region Workflows
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(defaultWorkflowId)
-        .AddStep(LoginPwdAuthForm, new Coordinate(100, 100))
-        .AddStep(ResetPwdForm, new Coordinate(200, 100))
-        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
+        .AddStep(LoginPwdAuthForm, new Coordinate(100, 100), pwdStepId)
+        .AddStep(ResetPwdForm, new Coordinate(200, 100), resetPwdStepId)
+        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(400, 100))
         .AddLinkHttpRequestAction(LoginPwdAuthForm, FormBuilder.Constants.EmptyStep, authFormId, new WorkflowLinkHttpRequestParameter
         {
-            Method = HttpMethods.GET,
+            Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
             Target = "https://localhost:5001/{realm}/pwd/Authenticate",
             TargetTransformer = new RegexTransformerParameters()
@@ -228,6 +252,19 @@ public class FormBuilderConfiguration
 
             },
             Target = "https://localhost:5001/{realm}/pwd/Reset?returnUrl={returnUrl}"
+        })
+        .AddLinkHttpRequestAction(ResetPwdForm, FormBuilder.Constants.EmptyStep, resetFormId, new WorkflowLinkHttpRequestParameter
+        {
+            Method = HttpMethods.POST,
+            IsAntiforgeryEnabled = true,
+            Target = "https://localhost:5001/{realm}/pwd/Reset",
+            TargetTransformer = new RegexTransformerParameters()
+            {
+                Rules = new ObservableCollection<MappingRule>
+                {
+                    new MappingRule { Source = "$.Realm", Target = "realm" }
+                }
+            }
         })
         .Build();
 

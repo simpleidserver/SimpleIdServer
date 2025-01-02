@@ -1,66 +1,31 @@
-﻿@using Microsoft.Extensions.Options;
-@using SimpleIdServer.IdServer.Options;
-@using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.Pwd.UI.ViewModels.ResetPasswordViewModel;
-@inject IOptions<IdServerHostOptions> configuration
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@model FormBuilder.UIs.WorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    ViewBag.Title = ResetPasswordResource.title;
-    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveFormCssUrl(step.FormRecordName);
 }
-            
-<div class="loginContainer">
-    <div class="card login">
-        <div class="card-body">
-            @if(Model.IsResetLinkedSent)
-            {
-                <div class="alert alert-success">@string.Format(ResetPasswordResource.reset_link_sent, Model.NotificationMode)</div>
-                if (!string.IsNullOrWhiteSpace(Model.ReturnUrl))
-                {
-                    <a href="@Model.ReturnUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
-                }
-            }
-            else
-            {
-                <h5>@ResetPasswordResource.title</h5>
-                <!-- Errors -->
-                @if (!ViewData.ModelState.IsValid)
-                {
-                    <ul class="list-group mb-3">
-                        @foreach (var modelState in ViewData.ModelState.Values)
-                        {
-                            foreach (var error in modelState.Errors)
-                            {
-                                <li class="list-group-item list-group-item-danger">@ResetPasswordResource.ResourceManager.GetString(error.ErrorMessage)</li>
-                            }
-                        }
-                    </ul>
-                }
 
-                <!-- Information -->
-                <div class="alert alert-info">
-                    The reset link will be sent to your <b>@Model.NotificationMode</b>
-                </div>
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken" />
 
-                <!-- Reset form  -->
-                @using (Html.BeginForm("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    <input asp-for="ReturnUrl" type="hidden" />
-                    <input asp-for="NotificationMode" type="hidden" />
-                    <!-- Login -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="Login" placeholder="@ResetPasswordResource.login" id="floatingLogin" type="text" class="form-control" />
-                        <label for="floatingLogin">@ResetPasswordResource.login</label>
-                    </div>
-                    <!-- Destination -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="Value" placeholder="@Model.NotificationMode" id="floatingDestination" type="text" class="form-control" />
-                        <label for="floatingDestination">@Model.NotificationMode</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary card-link">@ResetPasswordResource.send_link</button>
-                }
-            }
-        </div>
-    </div>
-</div>
+@section Header {
+    <link rel="stylesheet" href="@path" />
+}

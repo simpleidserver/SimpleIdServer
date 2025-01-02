@@ -727,6 +727,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à An error occured while trying to send the OTP.
+        /// </summary>
+        public static string CannotSendOtpCode {
+            get {
+                return ResourceManager.GetString("CannotSendOtpCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the parameters client_metadata and client_metadata_uri cannot be used the same time.
         /// </summary>
         public static string CannotUseClientMetadataAndClientMetadataUri {
@@ -1272,6 +1281,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string InvalidCredential {
             get {
                 return ResourceManager.GetString("InvalidCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The destination is invalid.
+        /// </summary>
+        public static string InvalidDestination {
+            get {
+                return ResourceManager.GetString("InvalidDestination", resourceCulture);
             }
         }
         
@@ -1870,6 +1888,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The value is missing.
+        /// </summary>
+        public static string MissingValue {
+            get {
+                return ResourceManager.GetString("MissingValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the user doesn&apos;t have an active OTP.
         /// </summary>
         public static string NoActiveOtp {
@@ -2001,6 +2028,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string OnlyPingOrPollModeCanBeUsed {
             get {
                 return ResourceManager.GetString("OnlyPingOrPollModeCanBeUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The OTP code is sent.
+        /// </summary>
+        public static string OtpCodeIsSent {
+            get {
+                return ResourceManager.GetString("OtpCodeIsSent", resourceCulture);
             }
         }
         
@@ -2937,6 +2973,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string UserExists {
             get {
                 return ResourceManager.GetString("UserExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The user is unknown.
+        /// </summary>
+        public static string UserIsUnknown {
+            get {
+                return ResourceManager.GetString("UserIsUnknown", resourceCulture);
             }
         }
         

@@ -18,8 +18,23 @@ public class WorkflowViewModel
     public void SetErrorMessage(string errorMessage)
         => ErrorMessages = new List<string> { errorMessage };
 
+    public void SetSuccessMessage(string successMessage)
+        => SuccessMessages = new List<string> { successMessage };
+
     public void SetInput<T>(T record) where T : class
     {
         Input = JsonObject.Parse(JsonSerializer.Serialize(record)).AsObject();
+    }
+
+    public void StayCurrentStep(StepViewModel viewModel)
+    {
+        var link = Workflow.Links.Single(l => l.Id == viewModel.CurrentLink);
+        CurrentStepId = link.SourceStepId;
+    }
+
+    public void MoveNextStep(StepViewModel viewModel)
+    {
+        var link = Workflow.Links.Single(l => l.Id == viewModel.CurrentLink);
+        CurrentStepId = link.TargetStepId;
     }
 }
