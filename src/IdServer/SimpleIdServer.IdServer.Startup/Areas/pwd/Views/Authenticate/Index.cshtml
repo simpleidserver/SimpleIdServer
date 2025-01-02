@@ -20,10 +20,11 @@
            render-mode="ServerPrerendered"
            param-Input="@Model.Input"
            param-Workflow="@Model.Workflow"
-           param-Records="@Model.FormRecords"
+           param-FormRecords="@Model.FormRecords"
            param-CurrentStepId="@Model.CurrentStepId"
            param-ErrorMessages="@Model.ErrorMessages"
-           param-Antifogery="@Model.AntiforgeryToken" />
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken" />
 
 @section Header {
     <link rel="stylesheet" href="@path" />

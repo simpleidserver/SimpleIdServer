@@ -15,12 +15,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System;
 using FormBuilder.Link;
+using FormBuilder.Transformers;
 
 namespace SimpleIdServer.IdServer.Startup;
 
 public class FormBuilderConfiguration
 {
     private static string authFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
+    private static string forgetPwdId = "777b8f76-c7b0-475a-a3c7-5ef0e54ce8e6";
     public static string defaultWorkflowId = "241a7509-4c58-4f49-b1df-49011b2c9bcb";
 
     #region Forms
@@ -46,7 +48,7 @@ public class FormBuilderConfiguration
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "ReturnUrl",
-                                Type = FormInputTypes.HIDDEN,
+                                FormType = FormInputTypes.HIDDEN,
                                 Transformation = new IncomingTokensTransformationRule
                                 {
                                     Source = "$.ReturnUrl"
@@ -87,7 +89,7 @@ public class FormBuilderConfiguration
                     // Forget my password
                     new FormAnchorRecord
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = forgetPwdId,
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
                     },
                     // Separator
@@ -131,9 +133,60 @@ public class FormBuilderConfiguration
         }
     };
 
+    public static FormRecord ResetPwdForm = new FormRecord
+    {
+        Name = "resetPwd",
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormStackLayoutRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        IsFormEnabled = true,
+                        Elements = new ObservableCollection<IFormElementRecord>
+                        {
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "ReturnUrl",
+                                FormType = FormInputTypes.HIDDEN,
+                                Transformation = new IncomingTokensTransformationRule
+                                {
+                                    Source = "$.ReturnUrl"
+                                }
+                            },
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Login",
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
+                            },
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Value",
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Email").Build()
+                            },
+                            new FormButtonRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Send link").Build()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     public static List<FormRecord> AllForms => new List<FormRecord>
     {
         LoginPwdAuthForm,
+        ResetPwdForm,
         FormBuilder.Constants.EmptyStep
     };
 
@@ -143,11 +196,38 @@ public class FormBuilderConfiguration
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(defaultWorkflowId)
         .AddStep(LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(ResetPwdForm, new Coordinate(200, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
         .AddLinkHttpRequestAction(LoginPwdAuthForm, FormBuilder.Constants.EmptyStep, authFormId, new WorkflowLinkHttpRequestParameter
         {
+            Method = HttpMethods.GET,
             IsAntiforgeryEnabled = true,
-            Target = "https://localhost:5001/master/pwd/Authenticate"
+            Target = "https://localhost:5001/{realm}/pwd/Authenticate",
+            TargetTransformer = new RegexTransformerParameters()
+            {
+                Rules = new ObservableCollection<MappingRule>
+                {
+                    new MappingRule { Source = "$.Realm", Target = "realm" }
+                }
+            }
+        })
+        .AddLinkHttpRequestAction(LoginPwdAuthForm, ResetPwdForm, forgetPwdId, new WorkflowLinkHttpRequestParameter
+        {
+            Method = HttpMethods.GET,
+            TargetTransformer = new RegexTransformerParameters()
+            {
+                Rules = new ObservableCollection<MappingRule>
+                {
+                    new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" },
+                    new MappingRule { Source = "$.Realm", Target = "realm" }
+                }
+            },
+            IsCustomParametersEnabled = true,
+            Rules = new ObservableCollection<MappingRule>
+            {
+
+            },
+            Target = "https://localhost:5001/{realm}/pwd/Reset?returnUrl={returnUrl}"
         })
         .Build();
 
