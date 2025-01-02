@@ -13,6 +13,7 @@ public class WorkflowContext
     public WorkflowExecution Execution { get; private set; }
     public FormEditorContext FormEditorContext { get; private set; }
     public WorkflowEditorContext WorkflowEditorContext { get; private set; }
+    public List<string> FilteredJsonPath { get; set; } = new List<string>();
 
     public static WorkflowContext CreateEmptyWorkflow(List<FormRecord> records)
     {
@@ -82,6 +83,9 @@ public class WorkflowContext
         return Definition.Records.Single(r => r.Name == currentStep.FormRecordName);
     }
 
+    public IFormElementRecord GetFormRecord(string eltId)
+        => Definition.Records.Select(r => r.GetChild(eltId)).FirstOrDefault(r => r != null);
+
     public JsonObject GetCurrentStepInputData()
     {
         var stepExecution = GetCurrentStepExecution();
@@ -113,11 +117,16 @@ public class WorkflowContext
         return stepExecution.Links.SingleOrDefault(l => l.EltId == eltId);
     }
 
+    public WorkflowStepLinkExecution GetLinkExecution(string id)
+        => Execution.StepExecutions.SelectMany(s => s.Links).SingleOrDefault(l => l.Id == id);
     public WorkflowStepExecution GetCurrentStepExecution()
         => Execution.StepExecutions.SingleOrDefault(e => e.StepId == Execution.CurrentStepId);
 
     public WorkflowStep GetCurrentStepDefinition()
-        => Definition.Workflow.Steps.SingleOrDefault(s => s.Id == Execution.CurrentStepId);
+        => GetStepDefinition(Execution.CurrentStepId);
+
+    public WorkflowStep GetStepDefinition(string stepId)
+        => Definition.Workflow.Steps.SingleOrDefault(s => s.Id == stepId);
 
     #endregion
 

@@ -3,6 +3,7 @@ using FormBuilder.Link.Components;
 using FormBuilder.Models;
 using Microsoft.AspNetCore.Components.Rendering;
 using Radzen;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Link;
 
@@ -37,7 +38,7 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
         });
     }
 
-    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
+    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink, JsonNode fakeData, WorkflowContext context)
     {
         return null;
     }

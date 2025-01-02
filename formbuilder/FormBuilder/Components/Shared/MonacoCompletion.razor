@@ -1,0 +1,32 @@
+﻿@using BlazorMonaco.Languages
+@inject IJSRuntime jsRuntime
+
+@code {
+    [Parameter] public WorkflowContext Context { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await RegisterJsonPathCompletion();
+        }
+    }
+
+    private async Task RegisterJsonPathCompletion()
+    {
+        await BlazorMonaco.Languages.Global.RegisterCompletionItemProvider(jsRuntime, "javascript", (modelUri, position, context) =>
+        {
+            var result = new CompletionList
+                {
+                    Suggestions = this.Context.FilteredJsonPath.Select(j => new CompletionItem
+                    {
+                        LabelAsString = j,
+                        InsertText = j,
+                        Kind = CompletionItemKind.Variable
+                    }).ToList()
+                };
+            return result;
+        });
+    }
+}

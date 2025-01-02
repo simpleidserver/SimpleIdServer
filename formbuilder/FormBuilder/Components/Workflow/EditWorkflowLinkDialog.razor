@@ -3,8 +3,8 @@
 @using FormBuilder.Link
 @using FormBuilder.Models
 @using System.Text.Json
+@using System.Text.Json.Nodes
 @inject DialogService dialogService
-
 @inject IWorkflowLinkActionFactory workflowLinkActionFactory
 
 <RadzenStack>
@@ -36,6 +36,8 @@
 
     [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public WorkflowLink WorkflowLink { get; set; }
+    [Inject] private IFakerDataServiceFactory fakerDataServiceFactory { get; set; }
+    [Inject] private IFormElementTransformerFactory formElementTransformerFactory { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -64,7 +66,8 @@
         if (_copyWorkflowLink.ActionType == null) return;
         var workflowLinkAction = actions?.SingleOrDefault(a => a.Type == _copyWorkflowLink.ActionType);
         if (workflowLinkAction == null) return;
-        linkParameter = workflowLinkAction.Render(builder, _copyWorkflowLink);
+        var fakeData = GenerateFakeJson();
+        linkParameter = workflowLinkAction.Render(builder, _copyWorkflowLink, fakeData, Context);
     };
 
     private void HandleSave()
@@ -72,5 +75,14 @@
         WorkflowLink.ActionType = _copyWorkflowLink.ActionType;
         if(linkParameter != null) WorkflowLink.ActionParameter = JsonSerializer.Serialize(linkParameter);
         dialogService.Close();
+    }
+
+    private JsonNode GenerateFakeJson()
+    {
+        var step = Context.GetStepDefinition(_copyWorkflowLink.SourceStepId);
+        var formEltRecord = Context.GetFormRecord(_copyWorkflowLink.Source.EltId);
+        var fakeDataService = fakerDataServiceFactory.Build(step.FormRecordName);
+        var input = JsonObject.Parse(JsonSerializer.Serialize(fakeDataService.Generate())).AsObject();
+        return formElementTransformerFactory.Build(formEltRecord.Type)?.Transform(input, formEltRecord) ?? input;
     }
 }

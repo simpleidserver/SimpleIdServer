@@ -1,4 +1,5 @@
-﻿using FormBuilder.Factories;
+﻿using FormBuilder.Components;
+using FormBuilder.Factories;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
 using FormBuilder.Rules.Components;
@@ -59,16 +60,18 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         return result;
     }
     
-    protected override void InternalBuildComponent(IncomingTokensRepetitionRule target, Type recordType, RenderTreeBuilder builder)
+    protected override void InternalBuildComponent(WorkflowContext context, IncomingTokensRepetitionRule target, Type recordType, RenderTreeBuilder builder)
     {
         builder.OpenComponent<IncomingTokensRepetitionRuleComponent>(0);
         builder.AddAttribute(1, nameof(IncomingTokensRepetitionRuleComponent.Record), target);
         builder.AddAttribute(2, nameof(IncomingTokensRepetitionRuleComponent.RecordType), recordType);
+        builder.AddAttribute(3, nameof(IncomingTokensRepetitionRuleComponent.Context), context);
         builder.CloseComponent();
     }
 
     private void ApplyProperty(object instance, MappingRule mappingRule, JsonNode node, List<PropertyInfo> properties)
     {
+        if (mappingRule.Source == null) return;
         var path = JsonPath.Parse(mappingRule.Source);
         var pathResult = path.Evaluate(node);
         var nodes = pathResult.Matches.Select(m => m.Value);

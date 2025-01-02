@@ -13,6 +13,7 @@
     private RenderFragment? CustomRender { get; set; }
     [Parameter] public IRepetitionRule RepetitionRule { get; set; }
     [Parameter] public Type RecordType { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
 
     string selectedRepetitionRule
     {
@@ -51,6 +52,6 @@
     private RenderFragment CreateComponent() => builder =>
     {
         var helper = repetitionRuleEngineFactory.Build(RepetitionRule.Type);
-        helper.BuildComponent(RepetitionRule, RecordType, builder);
+        helper.BuildComponent(Context, RepetitionRule, RecordType, builder);
     };
 }

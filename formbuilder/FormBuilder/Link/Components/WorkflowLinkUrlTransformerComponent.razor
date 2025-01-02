@@ -1,27 +1,46 @@
-﻿@using FormBuilder.Components.FormElements.ListData
+﻿@using FormBuilder.Components
+@using FormBuilder.Components.FormElements.ListData
 @using FormBuilder.Components.Shared
 @using FormBuilder.Factories
+@using FormBuilder.Link.Services
 @using FormBuilder.Models
 @using FormBuilder.Models.Rules
 @using FormBuilder.Transformers.Components
 @using Radzen
 @using Radzen.Blazor
 @using System.Text.Json
+@using System.Text.Json.Nodes
 
-<!-- Json Source -->
-<RadzenFormField Variant="Variant.Outlined" Text="JSON Source" class="fullWidth">
-    <RadzenTextBox @bind-Value="@Parameter.JsonSource"></RadzenTextBox>
-</RadzenFormField>
 <!-- Url -->
 <RadzenFormField Variant="Variant.Outlined" Text="Url" class="fullWidth">
     <RadzenTextBox @bind-Value="@Parameter.Url"></RadzenTextBox>
 </RadzenFormField>
-<!-- Query parameter -->
-<RadzenFormField Variant="Variant.Outlined" Text="Name of the query parameter" class="fullWidth">
-    <RadzenTextBox @bind-Value="@Parameter.QueryParameterName"></RadzenTextBox>
+<RadzenStack Orientation="Orientation.Horizontal">
+    <!-- Query parameter -->
+    <RadzenFormField Variant="Variant.Outlined" Text="Name of the query parameter" class="fullWidth">
+        <RadzenTextBox @bind-Value="@Parameter.QueryParameterName"></RadzenTextBox>
+    </RadzenFormField>
+    <!-- Value (JSON-Source) -->
+    <RadzenFormField Variant="Variant.Outlined" Text="Value (JSON Source)" class="fullWidth">
+        <JsonPathFieldComponent Context="@Context" FakeData="@FakeData" @bind-Value="@Parameter.JsonSource"></JsonPathFieldComponent>
+    </RadzenFormField>
+</RadzenStack>
+<RadzenButton Icon="launch" Text="Generate a fake URL" Click="Simulate"></RadzenButton>
+<RadzenFormField Variant="Variant.Outlined" Text="Output url" class="fullWidth">
+    <RadzenTextBox Value="@OutputUrl" Disabled="true"></RadzenTextBox>
 </RadzenFormField>
 
 
 @code {
     [Parameter] public WorkflowLinkUrlTransformationParameter Parameter { get; set; }
+    [Parameter] public JsonObject FakeData { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
+    [Inject] private IWorkflowLinkUrlTransformerService workflowLinkUrlTransformerService { get; set; }
+
+    private string OutputUrl { get; set; }
+
+    private void Simulate()
+    {
+        OutputUrl = workflowLinkUrlTransformerService.BuildUrl(Parameter, FakeData);
+    }
 }

@@ -9,6 +9,7 @@
 
 @code {
     [Parameter] public ParagraphRecord Record { get; set; }
+    [Parameter] public WorkflowContext WorkflowContext { get; set; }
     ParagraphRecord CopyRecord { get; set; } = new ParagraphRecord();
 
     protected override void OnParametersSet()

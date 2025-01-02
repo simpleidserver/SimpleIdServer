@@ -14,6 +14,7 @@
 @code {
     FormCheckboxRecord CopyRecord { get; set; } = new FormCheckboxRecord();
     [Parameter] public FormCheckboxRecord Record { get; set; }
+    [Parameter] public WorkflowContext WorkflowContext { get; set; }
 
     protected override void OnParametersSet()
     {

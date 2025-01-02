@@ -12,6 +12,7 @@
 
 @code {
     [Parameter] public ImageRecord Record { get; set; }
+    [Parameter] public WorkflowContext WorkflowContext { get; set; }
     ImageRecord CopyRecord { get; set; } = new ImageRecord();
 
     protected override void OnParametersSet()

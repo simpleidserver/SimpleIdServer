@@ -4,6 +4,7 @@ using FormBuilder.Models;
 using FormBuilder.Services;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Link;
 
@@ -33,7 +34,7 @@ public class WorkflowLinkUrlAction : IWorkflowLinkAction
         await _formBuidlerJsService.Navigate(parameter.Url);
     }
 
-    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
+    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink, JsonNode fakeData, WorkflowContext context)
     {
         var parameter = new WorkflowLinkUrlParameter();
         if(!string.IsNullOrWhiteSpace(workflowLink.ActionParameter))

@@ -28,6 +28,7 @@
 @code {
     public int selectedIndex { get; set; } = 0;
     [Parameter] public FormInputFieldRecord Record { get; set; }
+    [Parameter] public WorkflowContext WorkflowContext { get; set; }
     FormInputFieldRecord CopyRecord { get; set; } = new FormInputFieldRecord();
     Dictionary<FormInputTypes, string> mappingInputTypeToDisplayName = new Dictionary<FormInputTypes, string>
     {

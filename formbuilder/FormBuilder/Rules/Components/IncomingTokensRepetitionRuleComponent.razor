@@ -3,7 +3,9 @@
 @using BlazorMonaco
 @using BlazorMonaco.Editor
 @using BlazorMonaco.Languages
+@using FormBuilder.Components
 @using FormBuilder.Components.Shared
+@using FormBuilder.Factories
 @using FormBuilder.Models.Rules
 @using FormBuilder.Models.Transformer
 @using Microsoft.Extensions.Options
@@ -14,8 +16,8 @@
 @using System.Text.Json
 
 <RadzenStack>
-    <RadzenFormField Variant="Variant.Outlined" Text="JSON Path" class="fullWidth">
-        <JsonPathFieldComponent @bind-Value="@path"></JsonPathFieldComponent>
+    <RadzenFormField Variant="Variant.Outlined" Text="JSON Path (must be an array)" class="fullWidth">
+        <JsonPathFieldComponent DisplayArray="true" Context="@Context" @bind-Value="@path"></JsonPathFieldComponent>
     </RadzenFormField>
     <RadzenRow>
         <RadzenColumn Size="6">
@@ -23,8 +25,8 @@
             <RadzenDataGrid Data="@mappingRules" TItem="MappingRule">
                 <Columns>
                     <RadzenDataGridColumn Title="JSON source" TItem="MappingRule">                            
-                        <Template Context="mappingRule">                                
-                            <RadzenTextBox @bind-Value="@mappingRule.Source"></RadzenTextBox>
+                        <Template Context="mappingRule">
+                            <JsonPathFieldComponent ParentPath="@path" Context="@Context" @bind-Value="@mappingRule.Source"></JsonPathFieldComponent>
                         </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Target" TItem="MappingRule" Property="@nameof(MappingRule.Target)" />
@@ -42,7 +44,7 @@
                 <Columns>
                     <RadzenDataGridColumn Title="JSON source" TItem="LabelMappingRule">
                         <Template Context="labelMappingRule">
-                            <RadzenTextBox @bind-Value="@labelMappingRule.Source"></RadzenTextBox>
+                            <JsonPathFieldComponent ParentPath="@path" Context="@Context" @bind-Value="@labelMappingRule.Source"></JsonPathFieldComponent>
                         </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Language" TItem="LabelMappingRule">
@@ -58,7 +60,6 @@
 </RadzenStack>
 
 @code {
-    private StandaloneCodeEditor editor;
     private bool isEditTransformerDialogDisplayed = false;
     private static List<string> _excludedPropertyNames = new List<string>
     {
@@ -66,10 +67,10 @@
     };
     [Parameter] public IncomingTokensRepetitionRule Record { get; set; }
     [Parameter] public Type RecordType { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
     List<MappingRule> mappingRules { get; set; } = new List<MappingRule>();
     List<LabelMappingRule> labelMappingRules { get; set; } = new List<LabelMappingRule>();
     string path { get; set; }
-    string newPath { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -103,11 +104,6 @@
             Target = p.Name
         });
         mappingRules.AddRange(unknownMappingRules);
-    }
-
-    private async Task HandleOnEditorContentChanged()
-    {
-        newPath = await editor.GetValue();
     }
 
     string TranslateLanguage(string lng)

@@ -27,6 +27,7 @@
     public int selectedIndex { get; set; } = 0;
     FormAnchorRecord CopyRecord { get; set; } = new FormAnchorRecord();
     [Parameter] public FormAnchorRecord Record { get; set; }
+    [Parameter] public WorkflowContext WorkflowContext { get; set; }
 
     protected override void OnParametersSet()
     {

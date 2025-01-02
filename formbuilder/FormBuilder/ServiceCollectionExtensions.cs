@@ -13,6 +13,7 @@ using FormBuilder.Components.FormElements.Title;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
 using FormBuilder.Link;
+using FormBuilder.Link.Services;
 using FormBuilder.Rules;
 using FormBuilder.Services;
 using FormBuilder.Transformers;
@@ -65,6 +66,13 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkHttpRequestAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlTransformerAction>();
+
+        services.AddTransient<IFormElementTransformerFactory, FormElementTransformerFactory>();
+        services.AddTransient<IFormElementTransformer, ListDataTransformer>();
+        services.AddTransient<IFormElementTransformer, FormStackLayoutDataTransformer>();
+
+        services.AddTransient<IWorkflowLinkUrlTransformerService, WorkflowLinkUrlTransformerService>();
+        services.AddTransient<IWorkflowLinkHttpRequestService, WorkflowLinkHttpRequestService>();
 
         services.AddTransient<IUrlEvaluator, DirectTargetUrlEvaluator>();
 

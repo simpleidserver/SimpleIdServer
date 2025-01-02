@@ -1,4 +1,7 @@
-﻿@using FormBuilder.Components.Shared
+﻿@using BlazorMonaco.Editor
+@using FormBuilder.Components
+@using FormBuilder.Components.Shared
+@using FormBuilder.Link.Services
 @using FormBuilder.Models
 @using System.Text.Json
 @using FormBuilder.Models.Rules
@@ -6,63 +9,79 @@
 @using Radzen
 @using FormBuilder.Transformers.Components
 @using Radzen.Blazor
+@using System.Text.Json.Nodes
 @inject DialogService dialogService
 
-<!-- Target -->
-<RadzenFormField Variant="Variant.Outlined" Text="Target" class="fullWidth">
-    <RadzenTextBox @bind-Value="@Parameter.Target"></RadzenTextBox>
-</RadzenFormField>
-<!-- Is transformer enabled -->
-<div>
-    <RadzenCheckBox @bind-Value="IsTransformerEnabled" />
-    <RadzenLabel>Do-you want to transform the URL ?</RadzenLabel>
-</div>
-@if(IsTransformerEnabled)
-{
-    <RegexTransformerComponent Record="@Parameter.TargetTransformer"></RegexTransformerComponent>
-}
+<RadzenRow>
+    <RadzenColumn Size="8">
+        <RadzenStack>
+            <!-- Target -->
+            <RadzenFormField Variant="Variant.Outlined" Text="Target" class="fullWidth">
+                <RadzenTextBox @bind-Value="@Parameter.Target"></RadzenTextBox>
+            </RadzenFormField>
+            <!-- Http method -->
+            <RadzenFormField Variant="Variant.Outlined" Text="Select the type of HTTP method" class="fullWidth">
+                <RadzenDropDown @bind-Value=@Parameter.Method Data=@allHttpMethods TextProperty="Value" ValueProperty="Key"></RadzenDropDown>
+            </RadzenFormField>
+            <!-- Antiforgery -->
+            <div>
+                <RadzenCheckBox @bind-Value="Parameter.IsAntiforgeryEnabled" />
+                <RadzenLabel>Do you want to automatically generate an anti-forgery token?</RadzenLabel>
+            </div>
+            <!-- Is transformer enabled -->
+            <div>
+                <RadzenCheckBox @bind-Value="IsTransformerEnabled" />
+                <RadzenLabel>Do-you want to pass custom parameters to the URL ?</RadzenLabel>
+            </div>
+            @if (IsTransformerEnabled)
+            {
+                <RegexTransformerComponent Record="@Parameter.TargetTransformer"></RegexTransformerComponent>
+            }
 
-<!-- Http method -->
-<RadzenFormField Variant="Variant.Outlined" Text="Select the type of HTTP method" class="fullWidth">
-    <RadzenDropDown @bind-Value=@Parameter.Method Data=@allHttpMethods TextProperty="Value" ValueProperty="Key"></RadzenDropDown>
-</RadzenFormField>
-<!-- Antiforgery -->
-<div>
-    <RadzenCheckBox @bind-Value="Parameter.IsAntiforgeryEnabled" />
-    <RadzenLabel>Do you want to automatically generate an anti-forgery token?</RadzenLabel>
-</div>
-<!-- Use custom parameters -->
-<div>
-    <RadzenCheckBox @bind-Value="Parameter.IsCustomParametersEnabled" />
-    <RadzenLabel>Do you want to use custom parameters? The data passed into the form will be used to construct the outgoing request.</RadzenLabel>
-</div>
-<!-- Custom parameters -->
-@if (Parameter.IsCustomParametersEnabled)
-{
-    <RadzenDataGrid Data="@Parameter.Rules" TItem="MappingRule">
-        <HeaderTemplate>
-            <RadzenButton Icon="add" Text="Add" Click=@(() => HandleAddMappingRule()) />
-        </HeaderTemplate>
-        <Columns>
-            <RadzenDataGridColumn Title="JSON source" TItem="MappingRule">
-                <Template Context="mappingRule">
-                    <RadzenTextBox @bind-Value="@mappingRule.Source"></RadzenTextBox>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Title="Target" TItem="MappingRule">
-                <Template Context="mappingRule">
-                    <RadzenTextBox @bind-Value="@mappingRule.Target"></RadzenTextBox>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="MappingRule">
-                <Template Context="mappingRule">
-                    <RadzenButton Icon="delete" Text="Remove" Click="@(() => HandleRemoveMappingRule(mappingRule))" />
-                </Template>
-            </RadzenDataGridColumn>
-        </Columns>
-    </RadzenDataGrid>
-}
-
+            <!-- Use custom parameters -->
+            <div>
+                <RadzenCheckBox @bind-Value="Parameter.IsCustomParametersEnabled" />
+                <RadzenLabel>Do you want to use custom parameters? The data passed into the form will be used to construct the outgoing request.</RadzenLabel>
+            </div>
+            <!-- Custom parameters -->
+            @if (Parameter.IsCustomParametersEnabled)
+            {
+                <RadzenDataGrid Data="@Parameter.Rules" TItem="MappingRule">
+                    <HeaderTemplate>
+                        <RadzenButton Icon="add" Text="Add" Click=@(() => HandleAddMappingRule()) />
+                    </HeaderTemplate>
+                    <Columns>
+                        <RadzenDataGridColumn Title="JSON source" TItem="MappingRule">
+                            <Template Context="mappingRule">
+                                <JsonPathFieldComponent Context="@Context" FakeData="@FakeData" @bind-Value="@mappingRule.Source"></JsonPathFieldComponent>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn Title="Target" TItem="MappingRule">
+                            <Template Context="mappingRule">
+                                <RadzenTextBox @bind-Value="@mappingRule.Target"></RadzenTextBox>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="MappingRule">
+                            <Template Context="mappingRule">
+                                <RadzenButton Icon="delete" Text="Remove" Click="@(() => HandleRemoveMappingRule(mappingRule))" />
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            }
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="4">
+        <RadzenStack>
+            <RadzenButton Icon="launch" Text="Generate a fake request" Click="Simulate"></RadzenButton>
+            <RadzenFormField Variant="Variant.Outlined" Text="Output url" class="fullWidth">
+                <RadzenTextBox Value="@outputUrl" Disabled="true"></RadzenTextBox>
+            </RadzenFormField>
+            <RadzenLabel>Parameters</RadzenLabel>
+            <RadzenTextArea Rows="10" Value="@outputJson"></RadzenTextArea>
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
 @code {
     private bool _isTransformerEnabled;
 
@@ -87,6 +106,11 @@
     };
 
     [Parameter] public WorkflowLinkHttpRequestParameter Parameter { get; set; }
+    [Parameter] public JsonObject FakeData { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
+    [Inject] private IWorkflowLinkHttpRequestService workflowLinkHttpRequestService { get; set; }
+    private string outputUrl { get; set; }
+    private string outputJson { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -105,5 +129,12 @@
     private void HandleRemoveMappingRule(MappingRule mappingRule)
     {
         Parameter.Rules.Remove(mappingRule);
+    }
+
+    private void Simulate()
+    {
+        var result = workflowLinkHttpRequestService.BuildUrl(Parameter, FakeData, new AntiforgeryTokenRecord { FormField = "Antiforgery", FormValue = "Antiforgery" }, "stepName", "workflowId", "currentLinkId");
+        outputUrl = result.url;
+        outputJson = JsonSerializer.Serialize(result.json, new JsonSerializerOptions { WriteIndented = true });
     }
 }

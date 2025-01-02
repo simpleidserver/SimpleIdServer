@@ -1,4 +1,5 @@
 ﻿@using FormBuilder.Components.Form
+@using FormBuilder.Components.Shared
 @using FormBuilder.Dialogs
 @using FormBuilder.Factories
 @using FormBuilder.Models
@@ -9,6 +10,7 @@
 @inject DialogService dialogService
 
 <RadzenDialog />
+<MonacoCompletion Context="@Context" />
 
 <div class="header">
     <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
@@ -291,11 +293,15 @@
 
     private Task HandleEditWorkflowLink(WorkflowLink link)
     {
+        var opts = new DialogOptions
+        {
+            Width = "1200px"
+        };
         return dialogService.OpenAsync<EditWorkflowLinkDialog>(string.Empty, new Dictionary<string, object>
         {
             { "WorkflowLink", link },
             { "Context", Context }
-        });
+        }, opts);
     }
 
     private void HandleRemoveLink(WorkflowLink link)

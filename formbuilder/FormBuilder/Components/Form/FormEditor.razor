@@ -1,13 +1,17 @@
-﻿@using FormBuilder.Dialogs
+﻿@using BlazorMonaco.Languages
+@using FormBuilder.Components.Shared
+@using FormBuilder.Dialogs
 @using FormBuilder.Helpers
 @using FormBuilder.Models
 @using System.Text.Json.Nodes
 @using System.Text.Json
 @inject DialogService dialogService
 @inject IEnumerable<IFormElementDefinition> definitions
+@inject IJSRuntime jsRuntime
 
 <RadzenDialog />
 <RadzenNotification />
+<MonacoCompletion Context="@context" />
 
 <div class="header">
     <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
@@ -68,10 +72,13 @@
     [Parameter] public FormRecord Form { get; set; }
     WorkflowContext context = null;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
-        base.OnParametersSet();
-        if (Form != null && context == null) context = WorkflowContext.CreateOneStepWorkflow(Form);
+        await base.OnParametersSetAsync();
+        if (Form != null && context == null) 
+        {
+            context = WorkflowContext.CreateOneStepWorkflow(Form);
+        }
     }
 
     private void HandleDragStart(IFormElementDefinition def)

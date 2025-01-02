@@ -18,7 +18,7 @@ public class MappingRuleService : IMappingRuleService
         {
             var path = JsonPath.Parse(rule.Source);
             var pathResult = path.Evaluate(data);
-            var nodes = pathResult.Matches.Select(m => m.Value);
+            var nodes = pathResult.Matches.Select(m => m.Value).Where(m => m != null);
             if (nodes.Count() != 1) continue;
             result.Add(rule.Target, nodes.Single().ToString());
         }

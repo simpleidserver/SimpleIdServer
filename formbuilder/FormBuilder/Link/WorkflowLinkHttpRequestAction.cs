@@ -1,10 +1,8 @@
 ﻿using FormBuilder.Components;
-using FormBuilder.Factories;
 using FormBuilder.Link.Components;
+using FormBuilder.Link.Services;
 using FormBuilder.Models;
-using FormBuilder.Rules;
 using FormBuilder.Services;
-using FormBuilder.UIs;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -15,15 +13,13 @@ namespace FormBuilder.Link;
 public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
 {
     private readonly IFormBuilderJsService _formBuilderJsService;
-    private readonly IMappingRuleService _mappingRuleService;
-    private readonly ITransformerFactory _transformerFactory;
+    private readonly IWorkflowLinkHttpRequestService _workflowLinkHttpRequestService;
     private readonly FormBuilderOptions _options;
 
-    public WorkflowLinkHttpRequestAction(IFormBuilderJsService formBuilderJsService, IMappingRuleService mappingRuleService, ITransformerFactory transformerFactory, IOptions<FormBuilderOptions> options)
+    public WorkflowLinkHttpRequestAction(IFormBuilderJsService formBuilderJsService, IWorkflowLinkHttpRequestService workflowLinkHttpRequestService, IOptions<FormBuilderOptions> options)
     {
         _formBuilderJsService = formBuilderJsService;
-        _mappingRuleService = mappingRuleService;
-        _transformerFactory = transformerFactory;
+        _workflowLinkHttpRequestService = workflowLinkHttpRequestService;
         _options = options.Value;
     }
 
@@ -41,31 +37,20 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
     {
         if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(activeLink.ActionParameter);
-        var json = JsonObject.Parse(linkExecution.OutputData.ToString()).AsObject();
-        if(parameter.IsCustomParametersEnabled)
-            json = _mappingRuleService.Extract(json, parameter.Rules);
-
-        if (parameter.IsAntiforgeryEnabled && context.Execution.AntiforgeryToken != null)
-            json.Add(context.Execution.AntiforgeryToken.FormField, context.Execution.AntiforgeryToken.FormValue);
-
-        var target = parameter.Target;
-        if(parameter.TargetTransformer != null)
-            target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, linkExecution.OutputData)?.ToString();
-
         var currentRecord = context.GetCurrentFormRecord();
-        json.Add(nameof(StepViewModel.StepName), currentRecord.Name);
-        json.Add(nameof(StepViewModel.WorkflowId), context.Definition.Workflow.Id);
-        json.Add(nameof(StepViewModel.CurrentLink), activeLink.Id);
-        await _formBuilderJsService.SubmitForm(target, json, parameter.Method);
+        var result = _workflowLinkHttpRequestService.BuildUrl(parameter, linkExecution.OutputData.AsObject(), context.Execution.AntiforgeryToken, currentRecord.Name, context.Definition.Workflow.Id, activeLink.Id);
+        await _formBuilderJsService.SubmitForm(result.url, result.json, parameter.Method);
     }
 
-    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink)
+    public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink, JsonNode fakeData, WorkflowContext context)
     {
         var parameter = new WorkflowLinkHttpRequestParameter();
         if (!string.IsNullOrWhiteSpace(workflowLink.ActionParameter))
             parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(workflowLink.ActionParameter);
         builder.OpenComponent<WorkflowLinkHttpRequestComponent>(0);
         builder.AddAttribute(1, nameof(WorkflowLinkHttpRequestComponent.Parameter), parameter);
+        builder.AddAttribute(2, nameof(WorkflowLinkHttpRequestComponent.FakeData), fakeData);
+        builder.AddAttribute(3, nameof(WorkflowLinkHttpRequestComponent.Context), context);
         builder.CloseComponent();
         return parameter;
     }
