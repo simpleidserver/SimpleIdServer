@@ -14,12 +14,14 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
 {
     private readonly IFormBuilderJsService _formBuilderJsService;
     private readonly IWorkflowLinkHttpRequestService _workflowLinkHttpRequestService;
+    private readonly INavigationHistoryService _navigationHistoryService;
     private readonly FormBuilderOptions _options;
 
-    public WorkflowLinkHttpRequestAction(IFormBuilderJsService formBuilderJsService, IWorkflowLinkHttpRequestService workflowLinkHttpRequestService, IOptions<FormBuilderOptions> options)
+    public WorkflowLinkHttpRequestAction(IFormBuilderJsService formBuilderJsService, IWorkflowLinkHttpRequestService workflowLinkHttpRequestService, INavigationHistoryService navigationHistoryService, IOptions<FormBuilderOptions> options)
     {
         _formBuilderJsService = formBuilderJsService;
         _workflowLinkHttpRequestService = workflowLinkHttpRequestService;
+        _navigationHistoryService = navigationHistoryService;
         _options = options.Value;
     }
 
@@ -39,6 +41,7 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
         var parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(activeLink.ActionParameter);
         var currentRecord = context.GetCurrentFormRecord();
         var result = _workflowLinkHttpRequestService.BuildUrl(parameter, linkExecution.OutputData.AsObject(), context.Execution.AntiforgeryToken, currentRecord.Name, context.Definition.Workflow.Id, activeLink.Id);
+        await _navigationHistoryService.SaveExecutedLink(context, linkExecution.LinkId);
         await _formBuilderJsService.SubmitForm(result.url, result.json, parameter.Method);
     }
 

@@ -1,5 +1,6 @@
 ﻿using FormBuilder;
 using FormBuilder.Components.FormElements.Anchor;
+using FormBuilder.Components.FormElements.Back;
 using FormBuilder.Components.FormElements.Button;
 using FormBuilder.Components.FormElements.Checkbox;
 using FormBuilder.Components.FormElements.Divider;
@@ -29,6 +30,7 @@ public static class ServiceCollectionExtensions
         if (cb == null) services.Configure<FormBuilderOptions>((c) => { });
         else services.Configure<FormBuilderOptions>(cb);
         services.AddTransient<IFormBuilderJsService, FormBuilderJsService>();
+        services.AddTransient<INavigationHistoryService, NavigationHistoryService>();
 
         services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();
@@ -41,6 +43,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFormElementDefinition, ParagraphDefinition>();
         services.AddTransient<IFormElementDefinition, TitleDefinition>();
         services.AddTransient<IFormElementDefinition, ImageDefinition>();
+        services.AddTransient<IFormElementDefinition, BackButtonDefinition>();
 
         services.AddTransient<ITranslationHelper, TranslationHelper>();
         services.AddTransient<IRenderFormElementsHelper, RenderFormElementsHelper>();

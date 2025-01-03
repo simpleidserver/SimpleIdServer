@@ -25,6 +25,7 @@ public class Constants
     public static FormRecord ConfirmationForm = new FormRecord
     {
         Name = "Confirmation",
+        ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord
@@ -45,6 +46,7 @@ public class Constants
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
         Name = "pwd",
+        ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord

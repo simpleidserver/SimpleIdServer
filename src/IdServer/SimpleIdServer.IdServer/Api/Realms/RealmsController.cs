@@ -175,7 +175,6 @@ public class RealmsController : BaseController
 
                         realm.AuthenticationContextClassReferences.Add(new AuthenticationContextClassReference
                         {
-                            AuthenticationMethodReferences = acr.AuthenticationMethodReferences,
                             CreateDateTime = DateTime.UtcNow,
                             DisplayName = acr.DisplayName,
                             Id = Guid.NewGuid().ToString(),

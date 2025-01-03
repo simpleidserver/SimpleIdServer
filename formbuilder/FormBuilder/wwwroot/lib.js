@@ -27,7 +27,6 @@ FormBuilder.navigateForce = function (url) {
 }
 
 FormBuilder.submitForm = function (url, json, method) {
-    console.log(json);
     const div = document.createElement("div");
     var form = "<form id='tmpForm' action='"+ url +"' method='"+ method +"'>";
     for (var record in json) {

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
@@ -30,6 +32,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         private readonly IEnumerable<IOAuthResponseMode> _oauthResponseModes;
         private readonly IClientHelper _clientHelper;
         private readonly IJwtBuilder _jwtBuilder;
+        private readonly IWorkflowStore _workflowStore;
+        private readonly IFormStore _formStore;
         private readonly IdServerHostOptions _options;
 
         public OAuthAuthorizationRequestValidator(
@@ -41,6 +45,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             IEnumerable<IOAuthResponseMode> oauthResponseModes, 
             IClientHelper clientHelper, 
             IJwtBuilder jwtBuilder,
+            IWorkflowStore workflowStore,
+            IFormStore formStore,
             IOptions<IdServerHostOptions> options)
         {
             _responseTypeHandlers = responseTypeHandlers;
@@ -51,6 +57,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             _oauthResponseModes = oauthResponseModes;
             _clientHelper = clientHelper;
             _jwtBuilder = jwtBuilder;
+            _workflowStore = workflowStore;
+            _formStore = formStore;
             _options = options.Value;
         }
 
@@ -174,10 +182,10 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 
             if(context.Request.Amrs.Any())
             {
-                var acr = await _amrHelper.FetchDefaultAcr(context.Realm, acrValues, claims, openidClient, cancellationToken);
-                var notAuthorizedAmrs = acr.AuthenticationMethodReferences.Where(c => !context.Request.Amrs.Contains(c));
+                var acrResult = await _amrHelper.FetchDefaultAcr(context.Realm, acrValues, claims, openidClient, cancellationToken);
+                var notAuthorizedAmrs = acrResult.AllAmrs.Where(c => !context.Request.Amrs.Contains(c));
                 if (notAuthorizedAmrs.Any())
-                    throw new OAuthAuthenticatedUserAmrMissingException(acr.Name, notAuthorizedAmrs.First(), acr.AuthenticationMethodReferences);
+                    throw new OAuthAuthenticatedUserAmrMissingException(acrResult.Acr.Name, notAuthorizedAmrs.First(), acrResult.AllAmrs);
             }
         }
 
@@ -274,11 +282,11 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 
         protected async Task<string> GetFirstAmr(string realm, IEnumerable<string> acrValues, IEnumerable<AuthorizedClaim> claims, Client client, CancellationToken cancellationToken)
         {
-            var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, claims, client, cancellationToken);
-            if (acr == null)
+            var acrResult = await _amrHelper.FetchDefaultAcr(realm, acrValues, claims, client, cancellationToken);
+            if (acrResult == null)
                 return null;
 
-            return acr.AuthenticationMethodReferences.First();
+            return acrResult.AllAmrs.First();
         }
 
         protected JsonWebToken ExtractIdTokenHint(string realm, string idTokenHint)

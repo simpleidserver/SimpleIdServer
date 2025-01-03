@@ -13,6 +13,4 @@ public class AddAuthenticationClassReferenceRequest
     public string Name { get; set; }
     [JsonPropertyName(AuthenticationContextClassReferenceNames.DisplayName)]
     public string DisplayName { get; set; }
-    [JsonPropertyName(AuthenticationContextClassReferenceNames.AuthenticationMethodReferences)]
-    public IEnumerable<string> AuthenticationMethodReferences { get; set; }
 }

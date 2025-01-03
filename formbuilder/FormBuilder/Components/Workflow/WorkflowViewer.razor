@@ -1,6 +1,8 @@
 ﻿@using System.Text.Json.Nodes
 @using FormBuilder.Models
 @using FormBuilder.Components.Form
+@using FormBuilder.Services
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
 <RadzenDialog />
 
@@ -8,6 +10,7 @@
 {
     <FormViewer IsEditModeEnabled=false
                 IsInteractableElementEnabled=false
+                IsNavigationDisplayed=true
                 Context=@Context></FormViewer>
 }
 
@@ -19,6 +22,7 @@
     [Parameter] public string CurrentStepId { get; set; }
     [Parameter] public List<string> ErrorMessages { get; set; }
     [Parameter] public List<string> SuccessMessages { get; set; }
+    [Inject] private INavigationHistoryService navigationHistoryService { get; set; }
     private WorkflowContext Context { get; set; }
 
     protected override void OnParametersSet()
@@ -28,6 +32,15 @@
         {
             var step = Workflow.Steps.Single(s => s.Id == CurrentStepId);
             Context = WorkflowContext.CreateWorkflow(Workflow, FormRecords, CurrentStepId, ErrorMessages, SuccessMessages, AntiforgeryToken, Input);
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            await navigationHistoryService.SaveCurrentStep(Context);
         }
     }
 }

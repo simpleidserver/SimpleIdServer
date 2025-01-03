@@ -1,0 +1,9 @@
+﻿@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
+@inject ITranslationHelper translationHelper
+
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="BackButtonDialog" TRecord="BackButtonRecord" Record="@Value">
+    <Children>
+        <RadzenButton Click="@(async() => await HandleBack())" Text="Back" class="fullWidth"></RadzenButton>
+    </Children>
+</DraggableFormElement>

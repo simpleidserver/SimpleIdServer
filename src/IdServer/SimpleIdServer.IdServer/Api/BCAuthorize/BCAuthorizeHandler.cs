@@ -80,8 +80,8 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
 
                     var bindingMessage = context.Request.RequestData.GetBindingMessage();
                     var acrLst = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
-                    var acr = await _amrHelper.FetchDefaultAcr(context.Realm, acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
-                    var amr = acr.AuthenticationMethodReferences.First();
+                    var acrResult = await _amrHelper.FetchDefaultAcr(context.Realm, acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
+                    var amr = acrResult.AllAmrs.First();
                     await _bcNotificationService.Notify(context, new BCNotificationMessage
                     {
                         ClientId = context.Client.ClientId,

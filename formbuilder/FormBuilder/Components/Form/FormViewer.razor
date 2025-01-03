@@ -11,6 +11,22 @@
 {
     <div class="form">
         <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
+            @{
+                var records = Context.Definition.Records.Where(s => s.ActAsStep);
+                var currentFormRecord = Context.GetCurrentFormRecord();
+                if (currentFormRecord.ActAsStep && IsNavigationDisplayed)
+                {
+                    <RadzenSteps ShowStepsButtons="false">
+                        <Steps>
+                            @foreach (var record in records)
+                            {
+                                <RadzenStepsItem Text="@record.Name" Disabled="@(record.Name != currentFormRecord.Name)" Selected="@(record.Name == currentFormRecord.Name)"></RadzenStepsItem>
+                            }
+                        </Steps>
+                    </RadzenSteps>
+                }
+            }
+
             @if (Context.Execution != null)
             {
                 if(Context.Execution.ErrorMessages != null)
@@ -54,7 +70,8 @@ else
     [Inject] public IRuleEngine RuleEngine { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public bool IsInteractableElementEnabled { get; set; }
-    [Parameter] public WorkflowContext Context { get; set; }    
+    [Parameter] public bool IsNavigationDisplayed { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }   
     private FormRecord Form { get; set; } = null;
 
     protected override void OnParametersSet()

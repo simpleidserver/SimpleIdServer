@@ -11,10 +11,12 @@ namespace FormBuilder.Link;
 public class WorkflowLinkUrlAction : IWorkflowLinkAction
 {
     private readonly IFormBuilderJsService _formBuidlerJsService;
+    private readonly INavigationHistoryService _navigationHistoryService;
 
-    public WorkflowLinkUrlAction(IFormBuilderJsService formBuilderJsService)
+    public WorkflowLinkUrlAction(IFormBuilderJsService formBuilderJsService, INavigationHistoryService navigationHistoryService)
     {
         _formBuidlerJsService = formBuilderJsService;
+        _navigationHistoryService = navigationHistoryService;
     }
 
     public string Type => ActionType;
@@ -31,6 +33,7 @@ public class WorkflowLinkUrlAction : IWorkflowLinkAction
     {
         if(string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkUrlParameter>(activeLink.ActionParameter);
+        await _navigationHistoryService.SaveExecutedLink(context, linkExecution.LinkId);
         await _formBuidlerJsService.Navigate(parameter.Url);
     }
 

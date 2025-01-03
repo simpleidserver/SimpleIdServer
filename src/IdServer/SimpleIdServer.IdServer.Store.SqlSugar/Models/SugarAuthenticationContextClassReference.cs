@@ -36,7 +36,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 Name = record.Name,
                 RegistrationWorkflowId = record.RegistrationWorkflowId,
                 UpdateDateTime = record.UpdateDateTime,
-                AuthenticationMethodReferences = record.AuthenticationMethodReferences.Join(","),
                 Realms = record.Realms.Select(r => new SugarRealm
                 {
                     RealmsName = r.Name
@@ -54,7 +53,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 CreateDateTime = CreateDateTime,
                 UpdateDateTime = UpdateDateTime,
                 RegistrationWorkflowId = RegistrationWorkflowId,
-                AuthenticationMethodReferences = AuthenticationMethodReferences.Split(','),
                 Realms = Realms == null ? new List<Realm>() : Realms.Select(r => r.ToDomain()).ToList(),
                 Clients = Clients == null ? new List<Client>() : Clients.Select(c => c.ToDomain()).ToList(),
                 RegistrationWorkflow = RegistrationWorkflow?.ToDomain()

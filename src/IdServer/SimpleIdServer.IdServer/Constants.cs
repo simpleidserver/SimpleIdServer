@@ -850,7 +850,6 @@ namespace SimpleIdServer.IdServer
             public static AuthenticationContextClassReference FirstLevelAssurance = new AuthenticationContextClassReference
             {
                 Id = Guid.NewGuid().ToString(),
-                AuthenticationMethodReferences = new[] { Areas.Password },
                 Name = "sid-load-01",
                 DisplayName = "First level of assurance",
                 UpdateDateTime = DateTime.UtcNow,
@@ -862,7 +861,6 @@ namespace SimpleIdServer.IdServer
             public static AuthenticationContextClassReference IapSilver = new AuthenticationContextClassReference
             {
                 Id = Guid.NewGuid().ToString(),
-                AuthenticationMethodReferences = new[] { Areas.Password },
                 Name = "urn:mace:incommon:iap:silver",
                 DisplayName = "Silver",
                 UpdateDateTime = DateTime.UtcNow,

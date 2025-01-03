@@ -13,11 +13,13 @@ public class WorkflowLinkUrlTransformerAction : IWorkflowLinkAction
 {
     private readonly IFormBuilderJsService _formBuilderJsService;
     private readonly IWorkflowLinkUrlTransformerService _workflowLinkUrlTransformerService;
+    private readonly INavigationHistoryService _navigationHistoryService;
 
-    public WorkflowLinkUrlTransformerAction(IFormBuilderJsService formBuilderJsService, IWorkflowLinkUrlTransformerService workflowLinkUrlTransformerService)
+    public WorkflowLinkUrlTransformerAction(IFormBuilderJsService formBuilderJsService, IWorkflowLinkUrlTransformerService workflowLinkUrlTransformerService, INavigationHistoryService navigationHistoryService)
     {
         _formBuilderJsService = formBuilderJsService;
         _workflowLinkUrlTransformerService = workflowLinkUrlTransformerService;
+        _navigationHistoryService = navigationHistoryService;
     }
 
     public static string ActionType => "UrlTransformation";
@@ -37,6 +39,7 @@ public class WorkflowLinkUrlTransformerAction : IWorkflowLinkAction
         var json = JsonObject.Parse(linkExecution.OutputData.ToString()).AsObject();
         var url = _workflowLinkUrlTransformerService.BuildUrl(parameter, json);
         if (string.IsNullOrWhiteSpace(url)) return;
+        await _navigationHistoryService.SaveExecutedLink(context, linkExecution.LinkId);
         await _formBuilderJsService.NavigateForce(url);
     }
 

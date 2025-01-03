@@ -17,6 +17,7 @@ using System;
 using FormBuilder.Link;
 using FormBuilder.Transformers;
 using FormBuilder.Components.FormElements.Title;
+using FormBuilder.Components.FormElements.Back;
 
 namespace SimpleIdServer.IdServer.Startup;
 
@@ -27,6 +28,7 @@ public class FormBuilderConfiguration
     private static string authFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
     private static string forgetPwdId = "777b8f76-c7b0-475a-a3c7-5ef0e54ce8e6";
     private static string resetFormId = "8bf5ba00-a9b3-476b-8469-abe123abc797";
+    private static string backBtnFormId = "bd744dba-b3c6-49c1-b4b8-2df90a925430";
     public static string defaultWorkflowId = "241a7509-4c58-4f49-b1df-49011b2c9bcb";
 
     #region Forms
@@ -34,6 +36,7 @@ public class FormBuilderConfiguration
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
         Name = "pwd",
+        ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord
@@ -196,6 +199,11 @@ public class FormBuilderConfiguration
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Send link").Build()
                             }
                         }
+                    },
+                    new BackButtonRecord
+                    {
+                        Id = backBtnFormId,
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Back").Build()
                     }
                 }
             }

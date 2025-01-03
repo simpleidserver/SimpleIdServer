@@ -1,0 +1,59 @@
+﻿using FormBuilder.Components;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+
+namespace FormBuilder.Services;
+
+public interface INavigationHistoryService
+{
+    Task SaveCurrentStep(WorkflowContext context);
+    Task SaveExecutedLink(WorkflowContext context, string linkId);
+    Task Back(WorkflowContext context);
+}
+
+public class NavigationHistoryService : INavigationHistoryService
+{
+    private readonly NavigationManager _navigationManager;
+    private readonly ProtectedSessionStorage _sessionStorage;
+    private readonly IFormBuilderJsService _formBuilderJsService;
+
+    public NavigationHistoryService(NavigationManager navigationManager, ProtectedSessionStorage sessionStorage, IFormBuilderJsService formBuilderJsService)
+    {
+        _navigationManager = navigationManager;
+        _sessionStorage = sessionStorage;
+        _formBuilderJsService = formBuilderJsService;
+    }
+
+    public async Task SaveCurrentStep(WorkflowContext context)
+    {
+        var uri = _navigationManager.Uri;
+        await _sessionStorage.SetAsync($"Step.{context.Definition.Workflow.Id}.{context.Execution.CurrentStepId}", uri);
+    }
+
+    public async Task SaveExecutedLink(WorkflowContext context, string linkId)
+    {
+        var name = $"Step.{context.Definition.Workflow.Id}.executedLinks";
+        var res = await _sessionStorage.GetAsync<List<string>>(name);
+        var links = res.Success ? res.Value : new List<string>();
+        if(!links.Contains(linkId)) links.Add(linkId);
+        await _sessionStorage.SetAsync(name, links);
+    }
+
+    public async Task Back(WorkflowContext context)
+    {
+        var res = await _sessionStorage.GetAsync<List<string>>($"Step.{context.Definition.Workflow.Id}.executedLinks");
+        if (!res.Success) return;
+        var allLinks = context.Definition.Workflow.Links;
+        for(var i = res.Value.Count - 1; i >= 0; i--)
+        {
+            var linkId = res.Value[i];
+            var link = allLinks.FirstOrDefault(l => l.Id == linkId);
+            if (link == null) continue;
+            var linkDef = context.Definition.Workflow.Links.SingleOrDefault(l => l.Id == link.Id);
+            if (linkDef == null || context.Execution.CurrentStepId == linkDef.SourceStepId) continue;
+            var uri = await _sessionStorage.GetAsync<string>($"Step.{context.Definition.Workflow.Id}.{linkDef.SourceStepId}");
+            if (!uri.Success) return;
+            await _formBuilderJsService.NavigateForce(uri.Value);
+        }
+    }
+}

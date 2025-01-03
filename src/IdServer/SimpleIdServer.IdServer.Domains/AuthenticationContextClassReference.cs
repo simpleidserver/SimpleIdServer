@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains.DTOs;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
@@ -20,11 +21,6 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(AuthenticationContextClassReferenceNames.DisplayName)]
         public string DisplayName { get; set; }
-        /// <summary>
-        /// Array of strings that specifies the authentication methods.
-        [JsonPropertyName(AuthenticationContextClassReferenceNames.AuthenticationMethodReferences)]
-        /// </summary>
-        public IEnumerable<string> AuthenticationMethodReferences { get; set; } = new List<string>();
         [JsonPropertyName(AuthenticationContextClassReferenceNames.CreateDateTime)]
         public DateTime CreateDateTime { get; set; }
         [JsonPropertyName(AuthenticationContextClassReferenceNames.UpdateDateTime)]

@@ -11,9 +11,6 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<AuthenticationContextClassReference> builder)
         {
             builder.HasKey(c => c.Id);
-            builder.Property(a => a.AuthenticationMethodReferences).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
             builder.HasMany(a => a.Realms).WithMany(a => a.AuthenticationContextClassReferences);
         }
     }

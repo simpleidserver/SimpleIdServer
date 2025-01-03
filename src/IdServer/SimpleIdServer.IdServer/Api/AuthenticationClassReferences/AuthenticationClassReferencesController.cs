@@ -74,13 +74,12 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                     {
                         prefix = prefix ?? Constants.DefaultRealm;
                         await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
-                        await Validate();
+                        // await Validate();
                         var realm = await _realmRepository.Get(prefix, cancellationToken);
                         var record = new AuthenticationContextClassReference
                         {
                             Id = Guid.NewGuid().ToString(),
                             Name = request.Name,
-                            AuthenticationMethodReferences = request.AuthenticationMethodReferences,
                             DisplayName = request.DisplayName,
                             CreateDateTime = DateTime.UtcNow,
                             UpdateDateTime = DateTime.UtcNow
@@ -105,18 +104,20 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences
                 }
             }
 
+            /*
             async Task Validate()
             {
                 if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthenticationContextClassReferenceNames.Name));
-                if (request.AuthenticationMethodReferences == null || !request.AuthenticationMethodReferences.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthenticationContextClassReferenceNames.AuthenticationMethodReferences));
+                // if (request.AuthenticationMethodReferences == null || !request.AuthenticationMethodReferences.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthenticationContextClassReferenceNames.AuthenticationMethodReferences));
                 var supportedAmrs = _authMethodServices.Select(a => a.Amr);
-                var unsupportedAmrs = request.AuthenticationMethodReferences.Where(a => !supportedAmrs.Contains(a));
+                // var unsupportedAmrs = request.AuthenticationMethodReferences.Where(a => !supportedAmrs.Contains(a));
                 if (unsupportedAmrs.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedAmrs, string.Join(",", unsupportedAmrs)));
                 var existingAcr = await _authenticationContextClassReferenceRepository
                     .GetByName(prefix, request.Name, cancellationToken);
                 if (existingAcr != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.AcrWithSameNameExists);
             }
+            */
         }
 
         [HttpDelete]

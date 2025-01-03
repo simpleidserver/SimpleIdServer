@@ -8,7 +8,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Id = "id";
         public const string Name = "name";
         public const string DisplayName = "display_name";
-        public const string AuthenticationMethodReferences = "amrs";
         public const string CreateDateTime = "create_datetime";
         public const string UpdateDateTime = "update_datetime";
         public const string RegistrationWorkflow = "registration_workflow";

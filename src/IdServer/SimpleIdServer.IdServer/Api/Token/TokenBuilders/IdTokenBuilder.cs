@@ -86,11 +86,11 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (!string.IsNullOrWhiteSpace(nonce))
                 claims.Add(JwtRegisteredClaimNames.Nonce, nonce);
 
-            var defaultAcr = await _amrHelper.FetchDefaultAcr(currentContext.Realm, acrValues, requestedClaims, openidClient, cancellationToken);
-            if (defaultAcr != null)
+            var acrResult = await _amrHelper.FetchDefaultAcr(currentContext.Realm, acrValues, requestedClaims, openidClient, cancellationToken);
+            if (acrResult != null)
             {
-                claims.Add(JwtRegisteredClaimNames.Amr, defaultAcr.AuthenticationMethodReferences);
-                claims.Add(JwtRegisteredClaimNames.Acr, defaultAcr.Name);
+                claims.Add(JwtRegisteredClaimNames.Amr, acrResult.AllAmrs);
+                claims.Add(JwtRegisteredClaimNames.Acr, acrResult.Acr.Name);
             }
 
             IEnumerable<Scope> scopes = new Scope[1] { StandardScopes.OpenIdScope };

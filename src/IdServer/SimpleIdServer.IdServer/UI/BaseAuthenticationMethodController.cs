@@ -97,14 +97,15 @@ namespace SimpleIdServer.IdServer.UI
                 var records = await _formStore.GetAll(cancellationToken);
                 var viewModel = await BuildViewModel();
                 WorkflowRecord workflow = null;
+                AmrAuthInfo amrInfo = null;
                 if (IsProtected(returnUrl))
                 {
-                    var acr = await ParseRedirectUrl(viewModel);
-                    workflow = await _workflowStore.Get(acr.AuthenticationWorkflow, cancellationToken);
+                    var parseResult = await ParseRedirectUrl(viewModel);
+                    workflow = await _workflowStore.Get(parseResult.Value.Item2.AuthenticationWorkflow, cancellationToken);
+                    amrInfo = parseResult.Value.Item1;
                 }
                 else
                 {
-                    viewModel.IsFirstAmr = true;
                     viewModel.RememberLogin = false;
                     workflow = await _workflowStore.Get(Options.DefaultAuthenticationWorkflowId, cancellationToken);
                 }
@@ -127,6 +128,7 @@ namespace SimpleIdServer.IdServer.UI
                 };
                 result.SetInput(viewModel);
                 if(IsMaximumActiveSessionReached()) result.SetErrorMessage(Global.MaximumNumberActiveSessions);
+                if(amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login)) result.SetErrorMessage(Global.MissingLogin);
                 return View(result);
             }
             catch(CryptographicException)
@@ -141,7 +143,6 @@ namespace SimpleIdServer.IdServer.UI
                 var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
                 viewModel.ReturnUrl = returnUrl;
                 viewModel.Realm = prefix;
-                viewModel.IsFirstAmr = false;
                 viewModel.ExternalIdsProviders = externalIdProviders.Select(e => new ExternalIdProvider
                 {
                     AuthenticationScheme = e.Name,
@@ -151,7 +152,7 @@ namespace SimpleIdServer.IdServer.UI
                 return viewModel;
             }
 
-            async Task<AuthenticationContextClassReference> ParseRedirectUrl(T viewModel)
+            async Task<(AmrAuthInfo, AuthenticationContextClassReference)?> ParseRedirectUrl(T viewModel)
             {
                 var query = ExtractQuery(returnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
@@ -159,29 +160,16 @@ namespace SimpleIdServer.IdServer.UI
                 var client = await ClientRepository.GetByClientId(str, clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
                 var amrInfo = await ResolveAmrInfo(query, str, client, cancellationToken);
-                bool isLoginMissing = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
                 if (amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login) && TryGetLogin(amrInfo.Value.Item1, out string login))
-                {
                     loginHint = login;
-                    isLoginMissing = false;
-                }
-
-                if (amrInfo != null && amrInfo.Value.Item1.CurrentAmr == amrInfo.Value.Item1.AllAmr.First())
-                {
-                    viewModel.IsFirstAmr = true;
-                    viewModel.RememberLogin = false;
-                    viewModel.RegistrationWorkflow = amrInfo.Value.Item2.RegistrationWorkflow;
-                }
 
                 viewModel.ClientName = client.ClientName;
                 viewModel.Login = loginHint;
                 viewModel.LogoUri = client.LogoUri;
                 viewModel.TosUri = client.TosUri;
                 viewModel.PolicyUri = client.PolicyUri;
-                viewModel.IsLoginMissing = isLoginMissing;
                 viewModel.IsAuthInProgress = amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login);
-                viewModel.AmrAuthInfo = amrInfo.Value.Item1;
-                return amrInfo.Value.Item2;
+                return amrInfo;
             }
         }
 
@@ -207,6 +195,7 @@ namespace SimpleIdServer.IdServer.UI
             var workflowResult = await BuildWorkflowViewModel();
             workflowResult.SetInput(viewModel);
             var amrInfo = GetAmrInfo();
+            // The workflow process is stored into the cookie.
             /*
             if (IsProtected(viewModel.ReturnUrl))
             {
@@ -390,15 +379,15 @@ namespace SimpleIdServer.IdServer.UI
             var amrInfo = GetAmrInfo();
             if (amrInfo != null)
             {
-	            var resolvedAcr = await _authenticationContextClassReferenceRepository.GetByName(realm, amrInfo.CurrentAmr, cancellationToken);
+	            var resolvedAcr = await _authenticationContextClassReferenceRepository.GetByName(realm, amrInfo.CurrentAcr, cancellationToken);
                 return (amrInfo, resolvedAcr);
             }
 
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
-            var acr = await AmrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
-            if (acr == null) return null;
-            return (new AmrAuthInfo(null, null, null, null, acr.AuthenticationMethodReferences, acr.Name, acr.AuthenticationMethodReferences.First()), acr);
+            var acrResult = await AmrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
+            if (acrResult == null) return null;
+            return (new AmrAuthInfo(null, null, null, acrResult.Acr.Name, null), acrResult.Acr);
         }
 
         protected AmrAuthInfo GetAmrInfo()

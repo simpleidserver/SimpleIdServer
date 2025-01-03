@@ -470,7 +470,6 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "email",
-                    AuthenticationMethodReferences = new[] { "email" },
                     DisplayName = "Email authentication",
                     UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>
@@ -482,7 +481,6 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "sms",
-                    AuthenticationMethodReferences = new[] { "sms" },
                     DisplayName = "Sms authentication",
                     UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>
@@ -494,7 +492,6 @@ async void SeedData(WebApplication application, string scimBaseUrl)
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = "pwd-email",
-                    AuthenticationMethodReferences = new[] { "pwd", "email" },
                     DisplayName = "Password and email authentication",
                     UpdateDateTime = DateTime.UtcNow,
                     Realms = new List<Realm>

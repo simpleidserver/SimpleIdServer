@@ -22,7 +22,6 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public bool IsFirstAmr { get; set; } = false;
         public bool MaximumNumberOfActiveSessions { get; set; }
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
-        public AmrAuthInfo AmrAuthInfo { get; set; } = null;
         public RegistrationWorkflow RegistrationWorkflow { get; set; }
         public string RegistrationWorkflowId { get; set; }
         public abstract List<string> Validate();
@@ -30,23 +29,22 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
 
     public record AmrAuthInfo
     {
-        public AmrAuthInfo(string userId, string login, string email, List<KeyValuePair<string, string>> claims, IEnumerable<string> allAmr, string currentAcr, string currentAmr)
+        public AmrAuthInfo(string userId, string login, string email, string currentAcr, List<KeyValuePair<string, string>> claims)
         {
             UserId = userId;
             Login = login;
             Email = email;
-            Claims = claims;
-            AllAmr = allAmr;
             CurrentAcr = currentAcr;
-            CurrentAmr = currentAmr;
+            Claims = claims;
         }
 
         public string UserId { get; private set; }
         public string Login { get; private set; }
         public string Email { get; private set; }
         public List<KeyValuePair<string, string>> Claims { get; set; }
-        public IEnumerable<string> AllAmr { get; set; }
-        public string CurrentAcr { get; private set; }
-        public string CurrentAmr { get; private set; }
+        public string CurrentAcr { get; set; }
+        public string WorkflowId { get; set; }
+        public string CurrentStepId { get; set; }
+        public string LastExecutedLinkId { get; set; }
     }
 }

@@ -12,25 +12,6 @@
         @if (string.IsNullOrWhiteSpace(ViewBag.MaximumNumberOfActiveSessions))
         {
             <div class="card-body">
-                @if (Model.AmrAuthInfo != null && Model.AmrAuthInfo.AllAmr != null && Model.AmrAuthInfo.AllAmr.Count() > 1)
-                {
-                    <ul class="progressbar">
-                        @{
-                            bool isAmrActive = true;
-                            int i = 1;
-                            foreach (var amr in Model.AmrAuthInfo.AllAmr)
-                            {
-                                var className = isAmrActive ? "active" : string.Empty;
-                                var id = "step" + i;
-                                i++;
-                                if (amr == Model.AmrAuthInfo.CurrentAmr) isAmrActive = false;
-                                <li class="@className" id="@id">
-                                    <strong>@amr</strong>
-                                </li>
-                            }
-                        }
-                    </ul>
-                }
                 <div class="clientinfo">
                     @Html.ClientPicture(Model.LogoUri)
                 </div>

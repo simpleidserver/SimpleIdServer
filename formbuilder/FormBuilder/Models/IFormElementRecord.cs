@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Components.FormElements.Anchor;
+using FormBuilder.Components.FormElements.Back;
 using FormBuilder.Components.FormElements.Button;
 using FormBuilder.Components.FormElements.Checkbox;
 using FormBuilder.Components.FormElements.Divider;
@@ -25,6 +26,7 @@ namespace FormBuilder.Models;
 [JsonDerivedType(typeof(ParagraphRecord), typeDiscriminator: "Paragraph")]
 [JsonDerivedType(typeof(TitleRecord), typeDiscriminator: "Title")]
 [JsonDerivedType(typeof(ImageRecord), typeDiscriminator: "Image")]
+[JsonDerivedType(typeof(BackButtonRecord), typeDiscriminator: "BackButton")]
 public interface IFormElementRecord
 {
     string Id { get; set; }
