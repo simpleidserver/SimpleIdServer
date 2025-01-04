@@ -27,19 +27,6 @@
         <RadzenTextBox Name="Value" @bind-Value="@addAcr.DisplayName" Class="w-100"></RadzenTextBox>
         <RadzenRequiredValidator Component="Value" Text="@Global.DisplayNameRequired"></RadzenRequiredValidator>
     </div>
-    <!-- AMRS -->
-    <div class="mt-3">
-        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">
-            @Global.SelectAmrsHelper
-        </RadzenText>
-        <RadzenDropDown @bind-Value=@selectedAmrs 
-            Chips=true 
-            Data=@amrs
-            Multiple=true 
-            AllowClear=true 
-            Placeholder="Select Authentication Methods" 
-            class="w-100"></RadzenDropDown>
-    </div>
     <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateAcrState.Value.IsUpdating ? Global.Adding : Global.Add)" Disabled="@(updateAcrState.Value.IsUpdating)" />
 </RadzenTemplateForm>
 
@@ -53,7 +40,6 @@
 
     AddAcrForm addAcr = new AddAcrForm();
     List<string> amrs { get; set; } = new List<string>();
-    IEnumerable<string> selectedAmrs { get; set; } = new List<string>();
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -77,7 +63,7 @@
 
     void SubmitAddAcr(AddAcrForm acrForm)
     {
-        dispatcher.Dispatch(new AddAcrAction { AuthenticationMethodReferences = selectedAmrs.ToList(), DisplayName = acrForm.DisplayName, Name = acrForm.Name });
+        dispatcher.Dispatch(new AddAcrAction { DisplayName = acrForm.DisplayName, Name = acrForm.Name });
     }
 
     void ToggleChanged(bool isSelected, SelectableAmr amr)

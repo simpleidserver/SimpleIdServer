@@ -15,10 +15,9 @@ public abstract class BaseFormFieldElementDefinition<T> : GenericFormElementDefi
 
     protected override void ProtectedInit(T record, WorkflowContext context, List<IFormElementDefinition> definitions)
     {
-        if (record.Transformation == null) return;
+        if (record.Transformations == null) return;
         var inputData = context.GetCurrentStepInputData();
-        var transformationResult = _transformationRuleEngineFactory.Transform(inputData, record.Transformation).Where(r => r != null);
-        if (!transformationResult.Any()) return;
-        record.Apply(transformationResult.First());
+        foreach(var transformation in record.Transformations)
+            _transformationRuleEngineFactory.Apply(record, inputData, transformation);
     }
 }

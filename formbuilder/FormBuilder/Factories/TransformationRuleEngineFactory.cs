@@ -1,4 +1,5 @@
-﻿using FormBuilder.Models.Rules;
+﻿using FormBuilder.Models;
+using FormBuilder.Models.Rules;
 using FormBuilder.Rules;
 using System.Text.Json.Nodes;
 
@@ -6,7 +7,7 @@ namespace FormBuilder.Factories;
 
 public interface ITransformationRuleEngineFactory
 {
-    List<JsonNode> Transform<T>(JsonObject input, T parameter) where T : ITransformationRule;
+    void Apply<T, R>(R record, JsonObject input, T parameter) where T : ITransformationRule where R : BaseFormFieldRecord;
     ITransformationRuleEngine Build(string type);
 }
 
@@ -19,10 +20,10 @@ public class TransformationRuleEngineFactory : ITransformationRuleEngineFactory
         _engines = engines;
     }
 
-    public List<JsonNode> Transform<T>(JsonObject input, T parameter) where T : ITransformationRule
+    public void Apply<T, R>(R record, JsonObject input, T parameter) where T : ITransformationRule where R : BaseFormFieldRecord
     {
         var engine = Build(parameter.Type);
-        return engine.Transform(input, parameter);
+        engine.Apply(record, input, parameter);
     }
 
     public ITransformationRuleEngine Build(string type)

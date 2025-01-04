@@ -128,7 +128,7 @@ namespace SimpleIdServer.IdServer.UI
                 };
                 result.SetInput(viewModel);
                 if(IsMaximumActiveSessionReached()) result.SetErrorMessage(Global.MaximumNumberActiveSessions);
-                if(amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Login)) result.SetErrorMessage(Global.MissingLogin);
+                if(amrInfo != null && amrInfo.UserId != null && string.IsNullOrWhiteSpace(amrInfo.Login)) result.SetErrorMessage(Global.MissingLogin);
                 return View(result);
             }
             catch(CryptographicException)
@@ -163,6 +163,7 @@ namespace SimpleIdServer.IdServer.UI
                 if (amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.Value.Item1.Login) && TryGetLogin(amrInfo.Value.Item1, out string login))
                     loginHint = login;
 
+                viewModel.Realm = str;
                 viewModel.ClientName = client.ClientName;
                 viewModel.Login = loginHint;
                 viewModel.LogoUri = client.LogoUri;
@@ -189,12 +190,12 @@ namespace SimpleIdServer.IdServer.UI
             viewModel.Realm = prefix;
             EnrichViewModel(viewModel);
             await UpdateViewModel(viewModel);
-            await ExtractRegistrationWorkflow();
 
             // 3. Build workflow result
             var workflowResult = await BuildWorkflowViewModel();
             workflowResult.SetInput(viewModel);
             var amrInfo = GetAmrInfo();
+            await ExtractRegistrationWorkflow(amrInfo);
             // The workflow process is stored into the cookie.
             /*
             if (IsProtected(viewModel.ReturnUrl))
@@ -311,10 +312,10 @@ namespace SimpleIdServer.IdServer.UI
                 }
             }
 
-            async Task ExtractRegistrationWorkflow()
+            async Task ExtractRegistrationWorkflow(AmrAuthInfo amrAuthInfo)
             {
-                if (!IsProtected(viewModel.ReturnUrl)) return;
-                var acr = await _authenticationContextClassReferenceRepository.GetByAuthenticationWorkflow(prefix, viewModel.WorkflowId, token);
+                if (amrAuthInfo == null) return;
+                var acr = await _authenticationContextClassReferenceRepository.Get(prefix, amrAuthInfo.CurrentAcr, token);
                 viewModel.RegistrationWorkflowId = acr.RegistrationWorkflowId;
             }
 

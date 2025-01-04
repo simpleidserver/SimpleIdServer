@@ -1,4 +1,5 @@
-﻿using FormBuilder.Models.Rules;
+﻿using FormBuilder.Models;
+using FormBuilder.Models.Rules;
 using System.Text.Json.Nodes;
 
 namespace FormBuilder.Rules;
@@ -6,5 +7,5 @@ namespace FormBuilder.Rules;
 public interface ITransformationRuleEngine
 {
     string Type { get; }
-    List<JsonNode> Transform(JsonObject input, ITransformationRule parameter);
+    void Apply<R>(R record, JsonObject input, ITransformationRule parameter) where R : BaseFormFieldRecord;
 }

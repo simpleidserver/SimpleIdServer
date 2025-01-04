@@ -11,6 +11,7 @@ using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Components.FormElements.Title;
+using FormBuilder.Conditions;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
 using FormBuilder.Link;
@@ -54,11 +55,13 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFakerDataServiceFactory, FakerDataServiceFactory>();
         services.AddTransient<IWorkflowLinkActionFactory, WorkflowLinkActionFactory>();
         services.AddTransient<IUrlEvaluatorFactory, UrlEvaluatorFactory>();
+        services.AddTransient<IConditionRuleEngineFactory, ConditionRuleEngineFactory>();
 
         services.AddTransient<ITransformer, DirectTargetUrlTransformer>();
         services.AddTransient<ITransformer, RegexTransformer>();
 
         services.AddTransient<ITransformationRuleEngine, IncomingTokensTransformationRuleEngine>();
+        services.AddTransient<ITransformationRuleEngine, PropertyTransformationRuleEngine>();
         services.AddTransient<IRepetitionRuleEngine, IncomingTokensRepetitionRuleEngine>();
         services.AddTransient<IMappingRuleService, MappingRuleService>();
         services.AddTransient<IRuleEngine, RuleEngine>();
@@ -76,6 +79,8 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IWorkflowLinkUrlTransformerService, WorkflowLinkUrlTransformerService>();
         services.AddTransient<IWorkflowLinkHttpRequestService, WorkflowLinkHttpRequestService>();
+
+        services.AddTransient<IConditionRuleEngine, PresentRuleEngine>();
 
         services.AddTransient<IUrlEvaluator, DirectTargetUrlEvaluator>();
 

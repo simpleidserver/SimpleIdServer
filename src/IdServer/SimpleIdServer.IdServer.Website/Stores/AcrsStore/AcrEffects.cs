@@ -53,9 +53,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
                 [AuthenticationContextClassReferenceNames.Name] = action.Name,
                 [AuthenticationContextClassReferenceNames.DisplayName] = action.DisplayName
             };
-            if (action.AuthenticationMethodReferences != null && action.AuthenticationMethodReferences.Any())
-                requestJsonObj.Add(AuthenticationContextClassReferenceNames.AuthenticationMethodReferences, JsonArray.Parse(JsonSerializer.Serialize(action.AuthenticationMethodReferences)));
-
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(baseUrl),
@@ -140,7 +137,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
     {
         public string Name { get; set; }
         public string DisplayName { get; set; }
-        public IEnumerable<string> AuthenticationMethodReferences { get; set; }
     }
 
     public class AddAcrSuccessAction

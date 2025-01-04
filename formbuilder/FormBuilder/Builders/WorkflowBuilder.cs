@@ -16,13 +16,13 @@ public class WorkflowBuilder
         return new WorkflowBuilder(new WorkflowRecord { Id = id });
     }
 
-    public WorkflowBuilder AddStep(FormRecord record, Coordinate coordinate, string id = null)
+    public WorkflowBuilder AddStep(FormRecord record, Coordinate coordinate)
     {
         _workflow.Steps.Add(new WorkflowStep
         {
             Coordinate = coordinate,
             FormRecordName = record.Name,
-            Id = id ?? Guid.NewGuid().ToString()
+            Id = Guid.NewGuid().ToString()
         });
         return this;
     }

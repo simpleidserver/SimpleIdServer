@@ -7,8 +7,10 @@ using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
+using FormBuilder.Conditions;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
+using FormBuilder.Rules;
 using System.Collections.ObjectModel;
 
 namespace FormBuilder.Startup;
@@ -66,16 +68,35 @@ public class Constants
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "ReturnUrl",
                                 FormType = FormInputTypes.HIDDEN,
-                                Transformation = new IncomingTokensTransformationRule
+                                Transformations = new List<ITransformationRule>
                                 {
-                                    Source = "$.ReturnUrl"
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.ReturnUrl"
+                                    }
                                 }
                             },
                             new FormInputFieldRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "Login",
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build(),
+                                Transformations = new List<ITransformationRule>
+                                {
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.Login"
+                                    },
+                                    new PropertyTransformationRule
+                                    {
+                                        Condition = new PresentParameter
+                                        {
+                                            Source = "$.Login"
+                                        },
+                                        PropertyName = "Disabled",
+                                        PropertyValue = "true"
+                                    }
+                                }
                             },
                             new FormPasswordFieldRecord
                             {   

@@ -8,10 +8,12 @@ public class IncomingTokensTransformationRuleEngine : GenericTransformationRule<
 {
     public override string Type => IncomingTokensTransformationRule.TYPE;
 
-    protected override List<JsonNode> InternalTransform(JsonObject input, IncomingTokensTransformationRule parameter)
+    protected override void ProtectedApply<R>(R record, JsonObject input, IncomingTokensTransformationRule parameter)
     {
         var path = JsonPath.Parse(parameter.Source);
-        var result = path.Evaluate(input);
-        return result.Matches.Select(m => m.Value).ToList();
+        var pathResult = path.Evaluate(input);
+        var result = pathResult.Matches.Select(m => m.Value).ToList().Where(r => r != null);
+        if (!result.Any()) return;
+        record.Apply(result.First());
     }
 }

@@ -18,6 +18,8 @@ using FormBuilder.Link;
 using FormBuilder.Transformers;
 using FormBuilder.Components.FormElements.Title;
 using FormBuilder.Components.FormElements.Back;
+using FormBuilder.Conditions;
+using FormBuilder.Rules;
 
 namespace SimpleIdServer.IdServer.Startup;
 
@@ -25,17 +27,23 @@ public class FormBuilderConfiguration
 {
     private static string pwdStepId = "pwd";
     private static string resetPwdStepId = "resetPwd";
-    private static string authFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
-    private static string forgetPwdId = "777b8f76-c7b0-475a-a3c7-5ef0e54ce8e6";
-    private static string resetFormId = "8bf5ba00-a9b3-476b-8469-abe123abc797";
-    private static string backBtnFormId = "bd744dba-b3c6-49c1-b4b8-2df90a925430";
+    private static string consoleStepId = "console";
+
+    private static string pwdAuthFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
+    private static string pwdForgetBtnId = "777b8f76-c7b0-475a-a3c7-5ef0e54ce8e6";
+    private static string pwdResetFormId = "8bf5ba00-a9b3-476b-8469-abe123abc797";
+
+    private static string consoleSendConfirmationCode = "7c07b6f7-f619-4e4f-97d8-3dab508c1c3b";
+    private static string consoleAuthForm = "dd9de53a-7165-4019-8073-b5b6476e0892";
+
     public static string defaultWorkflowId = "241a7509-4c58-4f49-b1df-49011b2c9bcb";
+    public static string pwdConsoleWorkflowId = "e7593fa9-5a73-41a3-bfb5-e489fabbe17a";
 
     #region Forms
 
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
-        Name = "pwd",
+        Name = pwdStepId,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
         {
@@ -47,7 +55,7 @@ public class FormBuilderConfiguration
                     // Authentication form
                     new FormStackLayoutRecord
                     {
-                        Id = authFormId,
+                        Id = pwdAuthFormId,
                         IsFormEnabled = true,
                         Elements = new ObservableCollection<IFormElementRecord>
                         {
@@ -56,9 +64,25 @@ public class FormBuilderConfiguration
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "ReturnUrl",
                                 FormType = FormInputTypes.HIDDEN,
-                                Transformation = new IncomingTokensTransformationRule
+                                Transformations = new List<ITransformationRule>
                                 {
-                                    Source = "$.ReturnUrl"
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.ReturnUrl"
+                                    }
+                                }
+                            },
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Realm",
+                                FormType = FormInputTypes.HIDDEN,
+                                Transformations = new List<ITransformationRule>
+                                {
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.Realm"
+                                    }
                                 }
                             },
                             new FormInputFieldRecord
@@ -96,7 +120,7 @@ public class FormBuilderConfiguration
                     // Forget my password
                     new FormAnchorRecord
                     {
-                        Id = forgetPwdId,
+                        Id = pwdForgetBtnId,
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
                     },
                     // Separator
@@ -140,6 +164,123 @@ public class FormBuilderConfiguration
         }
     };
 
+    public static FormRecord ConsoleAuthForm = new FormRecord
+    {
+        Name = consoleStepId,
+        ActAsStep = true,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            // Send confirmation code.
+            new FormStackLayoutRecord
+            {
+                Id = consoleSendConfirmationCode,
+                IsFormEnabled = true,
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ReturnUrl",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.ReturnUrl"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Action",
+                        FormType = FormInputTypes.HIDDEN,
+                        // ADD AUTHENTICATE
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Login",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build(),
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Login"
+                            },
+                            new PropertyTransformationRule
+                            {
+                                Condition = new PresentParameter
+                                {
+                                    Source = "$.Login"
+                                },
+                                PropertyName = "Disabled",
+                                PropertyValue = "true"
+                            }
+                        }
+                    },
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Send confirmation code").Build()
+                    }
+                }
+            },
+            // Authentication.
+            new FormStackLayoutRecord
+            {
+                Id = consoleAuthForm,
+                IsFormEnabled = true,
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ReturnUrl",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.ReturnUrl"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Action",
+                        FormType = FormInputTypes.HIDDEN
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Login",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Login"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "OTPCode",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Confirmation code").Build()
+                    },
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
+                    }
+                }
+            }
+        }
+    };
+
     public static FormRecord ResetPwdForm = new FormRecord
     {
         Name = "resetPwd",
@@ -152,7 +293,7 @@ public class FormBuilderConfiguration
                 {
                     new FormStackLayoutRecord
                     {
-                        Id = resetFormId,
+                        Id = pwdResetFormId,
                         IsFormEnabled = true,
                         Elements = new ObservableCollection<IFormElementRecord>
                         {
@@ -161,9 +302,12 @@ public class FormBuilderConfiguration
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "ReturnUrl",
                                 FormType = FormInputTypes.HIDDEN,
-                                Transformation = new IncomingTokensTransformationRule
+                                Transformations = new List<ITransformationRule>
                                 {
-                                    Source = "$.ReturnUrl"
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.ReturnUrl"
+                                    }
                                 }
                             },
                             new FormInputFieldRecord
@@ -171,9 +315,12 @@ public class FormBuilderConfiguration
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "Realm",
                                 FormType = FormInputTypes.HIDDEN,
-                                Transformation = new IncomingTokensTransformationRule
+                                Transformations = new List<ITransformationRule>
                                 {
-                                    Source = "$.Realm"
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.Realm"
+                                    }
                                 }
                             },
                             new TitleRecord
@@ -202,7 +349,7 @@ public class FormBuilderConfiguration
                     },
                     new BackButtonRecord
                     {
-                        Id = backBtnFormId,
+                        Id = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Back").Build()
                     }
                 }
@@ -219,6 +366,7 @@ public class FormBuilderConfiguration
     {
         LoginPwdAuthForm,
         ResetPwdForm,
+        ConsoleAuthForm,
         FormBuilder.Constants.EmptyStep
     };
 
@@ -227,10 +375,10 @@ public class FormBuilderConfiguration
     #region Workflows
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(defaultWorkflowId)
-        .AddStep(LoginPwdAuthForm, new Coordinate(100, 100), pwdStepId)
-        .AddStep(ResetPwdForm, new Coordinate(200, 100), resetPwdStepId)
+        .AddStep(LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(ResetPwdForm, new Coordinate(200, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(400, 100))
-        .AddLinkHttpRequestAction(LoginPwdAuthForm, FormBuilder.Constants.EmptyStep, authFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(LoginPwdAuthForm, FormBuilder.Constants.EmptyStep, pwdAuthFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -243,7 +391,7 @@ public class FormBuilderConfiguration
                 }
             }
         })
-        .AddLinkHttpRequestAction(LoginPwdAuthForm, ResetPwdForm, forgetPwdId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(LoginPwdAuthForm, ResetPwdForm, pwdForgetBtnId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.GET,
             TargetTransformer = new RegexTransformerParameters()
@@ -261,7 +409,7 @@ public class FormBuilderConfiguration
             },
             Target = "https://localhost:5001/{realm}/pwd/Reset?returnUrl={returnUrl}"
         })
-        .AddLinkHttpRequestAction(ResetPwdForm, FormBuilder.Constants.EmptyStep, resetFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(ResetPwdForm, FormBuilder.Constants.EmptyStep, pwdResetFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -276,9 +424,28 @@ public class FormBuilderConfiguration
         })
         .Build();
 
+    public static WorkflowRecord PwdConsoleWorkflow = WorkflowBuilder.New(pwdConsoleWorkflowId)
+        .AddStep(LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(ConsoleAuthForm, new Coordinate(200, 100))
+        .AddLinkHttpRequestAction(LoginPwdAuthForm, ConsoleAuthForm, pwdAuthFormId, new WorkflowLinkHttpRequestParameter
+        {
+            Method = HttpMethods.POST,
+            IsAntiforgeryEnabled = true,
+            Target = "https://localhost:5001/{realm}/pwd/Authenticate",
+            TargetTransformer = new RegexTransformerParameters()
+            {
+                Rules = new ObservableCollection<MappingRule>
+                {
+                    new MappingRule { Source = "$.Realm", Target = "realm" }
+                }
+            }
+        })
+        .Build();
+
     public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>
     {
-        DefaultWorkflow
+        DefaultWorkflow,
+        PwdConsoleWorkflow
     };
 
     #endregion

@@ -92,14 +92,6 @@
                         </SidAuthorizeView>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
-                    <Template Context="data">
-                        @foreach (var amr in data.Value.AuthenticationMethodReferences)
-                        {
-                            <RadzenBadge Text="@amr" IsPill="true" />
-                        }
-                    </Template>
-                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">

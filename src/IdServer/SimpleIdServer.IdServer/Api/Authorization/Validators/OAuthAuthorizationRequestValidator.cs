@@ -185,7 +185,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 var acrResult = await _amrHelper.FetchDefaultAcr(context.Realm, acrValues, claims, openidClient, cancellationToken);
                 var notAuthorizedAmrs = acrResult.AllAmrs.Where(c => !context.Request.Amrs.Contains(c));
                 if (notAuthorizedAmrs.Any())
-                    throw new OAuthAuthenticatedUserAmrMissingException(acrResult.Acr.Name, notAuthorizedAmrs.First(), acrResult.AllAmrs);
+                    throw new OAuthAuthenticatedUserAmrMissingException(acrResult.Acr.Name, notAuthorizedAmrs.First());
             }
         }
 

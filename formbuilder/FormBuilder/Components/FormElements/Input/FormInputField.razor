@@ -8,12 +8,19 @@
         @if (Value.FormType != FormInputTypes.HIDDEN)
         {
             <RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value)" class="fullWidth">
-                <RadzenTextBox @bind-Value="@Value.Value"></RadzenTextBox>
+                <RadzenTextBox @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenTextBox>
             </RadzenFormField>
         }
         else
         {
-            <input type="hidden" value="@Value.Value" name="@Value.Name" />
+            if(IsEditModeEnabled)
+            {
+                <span>@($"Configure the hidden type {Value.Name}")</span>
+            }
+            else
+            {
+                <input type="hidden" value="@Value.Value" name="@Value.Name" />
+            }
         }
     </Children>
 </DraggableFormElement>

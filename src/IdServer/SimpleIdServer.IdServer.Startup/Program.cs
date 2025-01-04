@@ -464,8 +464,14 @@ async void SeedData(WebApplication application, string scimBaseUrl)
 
             if (!dbContext.Acrs.Any())
             {
-                dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance);
-                dbContext.Acrs.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver);
+                var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
+                var iapSilver = SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver;
+                firstLevelAssurance.AuthenticationWorkflow = FormBuilderConfiguration.pwdConsoleWorkflowId;
+                iapSilver.AuthenticationWorkflow = FormBuilderConfiguration.pwdConsoleWorkflowId;
+                // firstLevelAssurance.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
+                // iapSilver.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
+                dbContext.Acrs.Add(firstLevelAssurance);
+                dbContext.Acrs.Add(iapSilver);
                 dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
                 {
                     Id = Guid.NewGuid().ToString(),
