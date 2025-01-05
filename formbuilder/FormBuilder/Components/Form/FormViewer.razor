@@ -12,15 +12,16 @@
     <div class="form">
         <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
             @{
-                var records = Context.Definition.Records.Where(s => s.ActAsStep);
+                var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep).Select(s => s.Name);
+                var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => s.FormRecordName).Where(s => formsActingAsStep.Contains(s));
                 var currentFormRecord = Context.GetCurrentFormRecord();
                 if (currentFormRecord.ActAsStep && IsNavigationDisplayed)
                 {
                     <RadzenSteps ShowStepsButtons="false">
                         <Steps>
-                            @foreach (var record in records)
+                            @foreach (var stepName in workflowFormsActingAsStep)
                             {
-                                <RadzenStepsItem Text="@record.Name" Disabled="@(record.Name != currentFormRecord.Name)" Selected="@(record.Name == currentFormRecord.Name)"></RadzenStepsItem>
+                                <RadzenStepsItem Text="@stepName" Disabled="@(stepName != currentFormRecord.Name)" Selected="@(stepName == currentFormRecord.Name)"></RadzenStepsItem>
                             }
                         </Steps>
                     </RadzenSteps>

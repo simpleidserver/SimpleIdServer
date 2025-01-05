@@ -62,6 +62,7 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<ITransformationRuleEngine, IncomingTokensTransformationRuleEngine>();
         services.AddTransient<ITransformationRuleEngine, PropertyTransformationRuleEngine>();
+        services.AddTransient<ITransformationRuleEngine, StaticValueTransformationRuleEngine>();
         services.AddTransient<IRepetitionRuleEngine, IncomingTokensRepetitionRuleEngine>();
         services.AddTransient<IMappingRuleService, MappingRuleService>();
         services.AddTransient<IRuleEngine, RuleEngine>();

@@ -35,6 +35,7 @@ using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
+using SimpleIdServer.IdServer.Startup.Forms;
 using SimpleIdServer.IdServer.Store.EF;
 using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
@@ -189,7 +190,7 @@ void ConfigureIdServer(IServiceCollection services)
     services.AddServerSideBlazor();
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
-            cb.DefaultAuthenticationWorkflowId = FormBuilderConfiguration.defaultWorkflowId;
+            cb.DefaultAuthenticationWorkflowId = StandardWorkflows.defaultWorkflowId;
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
@@ -466,8 +467,8 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             {
                 var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
                 var iapSilver = SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver;
-                firstLevelAssurance.AuthenticationWorkflow = FormBuilderConfiguration.pwdConsoleWorkflowId;
-                iapSilver.AuthenticationWorkflow = FormBuilderConfiguration.pwdConsoleWorkflowId;
+                firstLevelAssurance.AuthenticationWorkflow = StandardWorkflows.pwdSmsWorkflowId;
+                iapSilver.AuthenticationWorkflow = StandardWorkflows.pwdSmsWorkflowId;
                 // firstLevelAssurance.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
                 // iapSilver.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
                 dbContext.Acrs.Add(firstLevelAssurance);
@@ -524,7 +525,6 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             AddMissingConfigurationDefinition<UserLockingOptions>(dbContext);
             EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
-
             // Uncomment these two lines to enable seed data from an external resource like JSON file.
             // ISeedStrategy seedingService = scope.ServiceProvider.GetService<ISeedStrategy>();
             // seedingService.SeedDataAsync().Wait();
@@ -532,7 +532,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
 
         using (var formBuilderDbContext = scope.ServiceProvider.GetService<FormBuilderDbContext>())
         {
-            var allForms = FormBuilderConfiguration.AllForms;
+            var allForms = StandardForms.AllForms;
             var content = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "form.css"));
             foreach (var form in allForms)
             {
@@ -545,7 +545,7 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             }
 
             formBuilderDbContext.Forms.AddRange(allForms);
-            formBuilderDbContext.Workflows.AddRange(FormBuilderConfiguration.AllWorkflows);
+            formBuilderDbContext.Workflows.AddRange(StandardWorkflows.AllWorkflows);
             formBuilderDbContext.SaveChanges();
         }
 

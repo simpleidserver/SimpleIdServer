@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Helpers;
@@ -66,6 +67,12 @@ namespace SimpleIdServer.IdServer.Builders
         public UserBuilder SetEmail(string email)
         {
             _user.Email = email;
+            return this;
+        }
+
+        public UserBuilder SetPhoneNumber(string phoneNumber)
+        {
+            _user.AddClaim(JwtRegisteredClaimNames.PhoneNumber, phoneNumber);
             return this;
         }
 

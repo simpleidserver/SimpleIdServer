@@ -86,7 +86,7 @@ namespace SimpleIdServer.IdServer.UI
                     return UserAuthenticationResult.Success(Global.ConfirmationcodeSent);
                 default:
                     var errors = viewModel.CheckConfirmationCode();
-                    if (!errors.Any()) return UserAuthenticationResult.Error(errors);
+                    if (errors.Any()) return UserAuthenticationResult.Error(errors);
                     break;
             }
 

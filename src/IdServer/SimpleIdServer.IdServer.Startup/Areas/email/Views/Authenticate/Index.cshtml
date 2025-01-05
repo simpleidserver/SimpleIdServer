@@ -1,118 +1,31 @@
-﻿@using Microsoft.Extensions.Options;
-@using SimpleIdServer.IdServer.Options;
-@using SimpleIdServer.IdServer.Startup;
-@using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.Email.UI.ViewModels.AuthenticateEmailViewModel
-@inject IOptions<IdServerHostOptions> configuration
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@model FormBuilder.UIs.WorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    ViewBag.Title = AuthenticateEmailResource.title;
-    Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
-    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
-    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
-    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveFormCssUrl(step.FormRecordName);
 }
 
-@if (!ViewData.ModelState.IsValid)
-{
-    <ul class="list-group mb-3">
-        @foreach (var modelState in ViewData.ModelState.Values)
-        {
-            foreach (var error in modelState.Errors)
-            {
-                <li class="list-group-item list-group-item-danger">@AuthenticateEmailResource.ResourceManager.GetString(error.ErrorMessage)</li>
-            }
-        }
-    </ul>
-}
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken" />
 
-@if(Model.IsLoginMissing)
-{
-    <div class="alert alert-danger">
-        @AuthenticateEmailResource.missing_login
-    </div>
-}
-else
-{
-    <!-- Send confirmation code -->
-    <div class="mt-3">
-        @if (!string.IsNullOrWhiteSpace(ViewBag.SuccessMessage))
-        {
-            <div class="alert alert-success">
-                @AuthenticateConsoleResource.ResourceManager.GetString(ViewBag.SuccessMessage)
-                @if (Model.TOTPStep != null)
-                {
-                    @string.Format(AuthenticateConsoleResource.code_validity, Model.TOTPStep)
-                }
-            </div>
-        }
-
-        @using (Html.BeginForm("Index", "Authenticate", new { area = "email", returnUrl = Model.ReturnUrl }, FormMethod.Post))
-        {
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="ReturnUrl" />
-            <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
-            <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
-            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
-            <div class="input-group mb-3">
-                @if(Model.IsAuthInProgress)
-                {
-                    <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" disabled="disabled" />
-                    <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="hidden" class="form-control" />
-                }
-                else
-                {
-                    <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="text" class="form-control" />
-                }
-            </div>
-            <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.sendconfirmationcode</button>
-        }
-    </div>
-
-    <!-- Login form -->
-    <div class="mt-3">
-        @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Email.Constants.AMR, returnUrl = Model.ReturnUrl }, FormMethod.Post))
-        {
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="ReturnUrl" />
-            <input type="hidden" name="Action" value="AUTHENTICATE" />
-            <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
-            <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
-            <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
-            <input asp-for="Login" placeholder="@AuthenticateEmailResource.email" type="hidden" class="form-control" />
-            <!-- Confirmation code -->
-            <div class="input-group mb-3">
-                <input asp-for="OTPCode" placeholder="@AuthenticateEmailResource.confirmationcode" type="password" class="form-control" />
-            </div>
-            @if(Model.IsFirstAmr)
-            {
-                <div>
-                    <input type="checkbox" asp-for="RememberLogin " />
-                    <label>@AuthenticateEmailResource.remember_login</label>
-                </div>
-            }
-            <button type="submit" class="btn btn-primary">@AuthenticateEmailResource.authenticate</button>
-        }
-    </div>
-
-    @if (Model.IsFirstAmr && Model.RegistrationWorkflow != null)
-    {
-        <div>
-            <div class="divider">
-                <p class="fw-bold text">OR</p>
-            </div>
-            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
-        </div>
-    }
-}
-
-@section SubScripts {
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $(".login input[name='RememberLogin']").change(function (e) {
-                $(this).val($(this).is(':checked'));
-            });
-        });
-    </script>
+@section Header {
+    <link rel="stylesheet" href="@path" />
 }

@@ -128,7 +128,7 @@ namespace SimpleIdServer.IdServer.UI
                 };
                 result.SetInput(viewModel);
                 if(IsMaximumActiveSessionReached()) result.SetErrorMessage(Global.MaximumNumberActiveSessions);
-                if(amrInfo != null && amrInfo.UserId != null && string.IsNullOrWhiteSpace(amrInfo.Login)) result.SetErrorMessage(Global.MissingLogin);
+                if(amrInfo != null && amrInfo.UserId != null && string.IsNullOrWhiteSpace(viewModel.Login)) result.SetErrorMessage(Global.MissingLogin);
                 return View(result);
             }
             catch(CryptographicException)
@@ -220,6 +220,13 @@ namespace SimpleIdServer.IdServer.UI
             if (errors.Any())
             {
                 workflowResult.ErrorMessages = errors;
+                return View(workflowResult);
+            }
+
+            if (amrInfo != null && !string.IsNullOrWhiteSpace(amrInfo.UserId) && !TryGetLogin(amrInfo, out string login))
+            {
+                viewModel.Login = null;
+                workflowResult.SetErrorMessage(Global.MissingLogin);
                 return View(workflowResult);
             }
 
@@ -315,7 +322,7 @@ namespace SimpleIdServer.IdServer.UI
             async Task ExtractRegistrationWorkflow(AmrAuthInfo amrAuthInfo)
             {
                 if (amrAuthInfo == null) return;
-                var acr = await _authenticationContextClassReferenceRepository.Get(prefix, amrAuthInfo.CurrentAcr, token);
+                var acr = await _authenticationContextClassReferenceRepository.GetByName(prefix, amrAuthInfo.CurrentAcr, token);
                 viewModel.RegistrationWorkflowId = acr.RegistrationWorkflowId;
             }
 
