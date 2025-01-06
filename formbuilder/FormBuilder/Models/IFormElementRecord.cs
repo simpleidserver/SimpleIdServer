@@ -32,6 +32,7 @@ public interface IFormElementRecord
     string Id { get; set; }
     string Type { get; }
     List<LabelTranslation> Labels { get; set; }
+    Dictionary<string, object> HtmlAttributes { get; set; }
     void ExtractJson(JsonObject json);
     IFormElementRecord GetChild(string id);
 }

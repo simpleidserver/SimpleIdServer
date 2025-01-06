@@ -43,6 +43,15 @@ public class WorkflowLinkUrlTransformerAction : IWorkflowLinkAction
         await _formBuilderJsService.NavigateForce(url);
     }
 
+    public (JsonObject json, string url)? GetRequest(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context)
+    {
+        if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return null;
+        var parameter = JsonSerializer.Deserialize<WorkflowLinkUrlTransformationParameter>(activeLink.ActionParameter);
+        var json = JsonObject.Parse(linkExecution.OutputData.ToString()).AsObject();
+        var url = _workflowLinkUrlTransformerService.BuildUrl(parameter, json);
+        return (null, parameter.Url);
+    }
+
     public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink, JsonNode fakeData, WorkflowContext context)
     {
         var parameter = new WorkflowLinkUrlTransformationParameter();

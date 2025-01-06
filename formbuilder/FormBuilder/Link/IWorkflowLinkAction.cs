@@ -11,6 +11,7 @@ public interface IWorkflowLinkAction
     string DisplayName { get; }
     List<string> ExcludedStepNames { get; }
     bool CanBeAppliedMultipleTimes { get; }
+    (JsonObject json, string url)? GetRequest(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context);
     Task Execute(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context);
     object Render(RenderTreeBuilder builder, WorkflowLink workflowLink, JsonNode fakeData, WorkflowContext context);
 }

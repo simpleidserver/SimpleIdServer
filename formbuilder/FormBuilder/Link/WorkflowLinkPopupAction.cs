@@ -38,6 +38,9 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
         });
     }
 
+    public (JsonObject json, string url)? GetRequest(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context)
+        => null;
+
     public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink, JsonNode fakeData, WorkflowContext context)
     {
         return null;

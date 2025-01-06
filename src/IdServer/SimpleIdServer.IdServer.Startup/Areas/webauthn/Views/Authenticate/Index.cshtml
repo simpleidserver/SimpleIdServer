@@ -1,99 +1,72 @@
-﻿@using Microsoft.Extensions.Options;
-@using SimpleIdServer.IdServer.Options;
-@using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.Fido.UI.ViewModels.AuthenticateWebauthnViewModel;
-@inject IOptions<IdServerHostOptions> configuration
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@using SimpleIdServer.IdServer.Fido.UI.ViewModels
+@using System.Text.Json
+@model FormBuilder.UIs.WorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    ViewBag.Title = AuthenticateSmsResource.title;
-    Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveFormCssUrl(step.FormRecordName);    
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
-    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
-    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
-    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
+    var vm = JsonSerializer.Deserialize<AuthenticateWebauthnViewModel>(Model.Input.ToString());
 }
 
-<ul class="list-group mb-3" id="errors">
-    @foreach (var modelState in ViewData.ModelState.Values)
-    {
-        foreach (var error in modelState.Errors)
-        {
-            <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
-        }
-    }
-</ul>
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken" />
 
-@if (Model.IsLoginMissing)
-{    
-    <div class="alert alert-danger">
-        @AuthenticateWebauthnResource.missing_login
-    </div>
-}
-else
-{
-    <!-- Login form -->
-    @using (Html.BeginForm("Index", "Authenticate", new { area = "webauthn" }, FormMethod.Post, null, new { id = "fido2Auth" }))
-    {
-        @Html.AntiForgeryToken()
-        <input type="hidden" asp-for="ReturnUrl" />
-        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
-        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
-        <input asp-for="BeginLoginUrl" type="hidden" class="form-control" />
-        <input asp-for="EndLoginUrl" type="hidden" class="form-control" />
-        <input asp-for="SessionId" type="hidden" class="form-control" />
-        <div class="input-group mb-3">
-            @if (Model.IsAuthInProgress)
-            {
-                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" disabled="disabled" />
-                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="hidden" class="form-control" />
-            }
-            else
-            {
-                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" type="text" class="form-control" />
-            }
-        </div>
-        @if(Model.IsFirstAmr)
-        {
-            <div>
-                <input type="checkbox" asp-for="RememberLogin " />
-                <label>@AuthenticateWebauthnResource.remember_login</label>
-            </div>
-        }
-        <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.authenticate</button>        
-    }
-
-    @if (Model.IsFirstAmr && Model.RegistrationWorkflow != null)
-    {
-        <div>
-            <div class="divider">
-                <p class="fw-bold text">OR</p>
-            </div>
-            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
-        </div>
-    }
+@section Header {
+    <link rel="stylesheet" href="@path" />
 }
 
-@section SubScripts {
+@section Scripts {    
     <script type="text/javascript">
-        $(document).ready(function () {
-            $(".login input[name='RememberLogin']").change(function (e) {
-                $(this).val($(this).is(':checked'));
-            });
-            
-            var beginLoginUrl = "@Model.BeginLoginUrl";
-            var endLoginUrl = "@Model.EndLoginUrl";
+        let csharpReference;
+
+        var init = function () {
+            var beginLoginUrl = "@vm.BeginLoginUrl";
+            var endLoginUrl = "@vm.EndLoginUrl";
             var makeAssertionsUrl = "@makeAssertionsOptionsUrl";
             var authenticateUrl = "@authenticateUrl";
+            var isInitialized = false;
 
-            var toggleBtn = function(isDisabled) {
+            var toggleBtn = function (isDisabled) {
                 $("#fido2Auth button[type='submit']").attr('disabled', isDisabled);
             }
 
             var displayError = function (errorJson) {
-                console.error(errorJson);
-                $("#errors").empty();
-                $("#errors").append("<li  class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
+                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
+            }
+
+            var tryListenForm = function () {
+                const elt = $("#webauthForm");
+                if (isInitialized === true) return;
+                if (elt.length === 0) {
+                    setTimeout(() => tryListenForm(), 500);
+                    return;
+                }
+
+                isInitialized = true;
+                elt.submit(function (e) {
+                    e.preventDefault();
+                    makeAssertionOptions(convertFormToJSON($(e.target)));
+                });
             }
 
             async function makeAssertion(credential, form, sessionId) {
@@ -127,18 +100,18 @@ else
                     displayError(json);
                     return;
                 }
-                
 
-                $("#fido2Auth").unbind("submit");
-                $("#fido2Auth input[name='SessionId']").val(sessionId);
-                $("#fido2Auth").trigger("submit");
+
+                $("#webauthForm").unbind("submit");
+                $("#webauthForm input[name='SessionId']").val(sessionId);
+                $("#webauthForm").trigger("submit");
             }
 
             async function makeAssertionOptions(form) {
                 toggleBtn(true);
                 let response = await fetch(beginLoginUrl, {
                     method: 'POST',
-                    body: JSON.stringify({ login : form.Login, credential_type: 'webauthn' }),
+                    body: JSON.stringify({ login: form.Login, credential_type: 'webauthn' }),
                     headers: {
                         "Accept": "application/json",
                         "Content-Type": "application/json"
@@ -171,10 +144,13 @@ else
                 await makeAssertion(credential, form, sessionId);
             }
 
-            $("#fido2Auth").submit(function(e) {
-                e.preventDefault();
-                makeAssertionOptions(convertFormToJSON($(e.target)));
-            });
-        });
+            tryListenForm();
+        };
+
+        setCsharpReference  = function(ref) {
+            console.log(ref);
+            csharpReference = ref;
+            init();
+        };
     </script>
 }

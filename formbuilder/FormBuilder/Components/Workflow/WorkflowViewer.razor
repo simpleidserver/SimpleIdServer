@@ -23,12 +23,23 @@
     [Parameter] public List<string> ErrorMessages { get; set; }
     [Parameter] public List<string> SuccessMessages { get; set; }
     [Inject] private INavigationHistoryService navigationHistoryService { get; set; }
+    [Inject] public IJSRuntime jsRuntime { get; set; }
     private WorkflowContext Context { get; set; }
+
+    [JSInvokable]
+    public void SetErrorMessage(string errorMessage)
+    {
+        Context.Execution.ErrorMessages = new List<string>
+        {
+            errorMessage
+        };
+        StateHasChanged();
+    }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
-        if(Context == null)
+        if (Context == null)
         {
             var step = Workflow.Steps.Single(s => s.Id == CurrentStepId);
             Context = WorkflowContext.CreateWorkflow(Workflow, FormRecords, CurrentStepId, ErrorMessages, SuccessMessages, AntiforgeryToken, Input);
@@ -41,6 +52,7 @@
         if(firstRender)
         {
             await navigationHistoryService.SaveCurrentStep(Context);
+            await jsRuntime.InvokeVoidAsync("setCsharpReference", DotNetObjectReference.Create(this));
         }
     }
 }

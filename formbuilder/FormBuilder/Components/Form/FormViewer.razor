@@ -69,6 +69,7 @@ else
 @code {
     private RenderFragment? CustomRender { get; set; }
     [Inject] public IRuleEngine RuleEngine { get; set; }
+    [Inject] public IJSRuntime jsRuntime { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public bool IsInteractableElementEnabled { get; set; }
     [Parameter] public bool IsNavigationDisplayed { get; set; }

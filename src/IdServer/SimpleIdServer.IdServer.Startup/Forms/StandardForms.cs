@@ -26,6 +26,7 @@ public static class StandardForms
     public static string consoleStepId = "console";
     public static string emailStepId = "email";
     public static string smsStepId = "sms";
+    public static string webAuthnStepId = "webauthn";
 
     public static string pwdAuthFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
     public static string pwdForgetBtnId = "777b8f76-c7b0-475a-a3c7-5ef0e54ce8e6";
@@ -39,6 +40,8 @@ public static class StandardForms
 
     public static string smsSendConfirmationCode = "b08e3449-b912-4bf7-9b9d-76a8054e5ff2";
     public static string smsAuthForm = "c7a16cfb-33bf-40c0-a0ce-827ff25e441b";
+
+    public static string webauthnFormId = "aae6a19d-4c09-4099-a425-ce7bb5e4d6dd";
 
     #region Auth forms
 
@@ -633,6 +636,75 @@ public static class StandardForms
         }
     };
 
+    public static FormRecord WebauthnForm = new FormRecord
+    {
+        Name = webAuthnStepId,
+        ActAsStep = true,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            // Authentication.
+            new FormStackLayoutRecord
+            {
+                Id = webauthnFormId,
+                IsFormEnabled = true,
+                FormType = FormTypes.HTML,
+                HtmlAttributes = new Dictionary<string, object>
+                {
+                    { "id", "webauthForm" }
+                },
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Realm",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Realm"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "SessionId",
+                        FormType = FormInputTypes.HIDDEN
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Login",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build(),
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Login"
+                            },
+                            new PropertyTransformationRule
+                            {
+                                Condition = new PresentParameter
+                                {
+                                    Source = "$.Login"
+                                },
+                                PropertyName = "Disabled",
+                                PropertyValue = "true"
+                            }
+                        }
+                    },
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
+                    }
+                }
+            }
+        }
+    };
+
     #endregion
 
     #region Reset forms
@@ -722,6 +794,7 @@ public static class StandardForms
         ConsoleAuthForm,
         EmailAuthForm,
         SmsAuthForm,
+        WebauthnForm,
         FormBuilder.Constants.EmptyStep
     };
 }

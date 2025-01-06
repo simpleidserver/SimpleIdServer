@@ -37,6 +37,13 @@ public class WorkflowLinkUrlAction : IWorkflowLinkAction
         await _formBuidlerJsService.Navigate(parameter.Url);
     }
 
+    public (JsonObject json, string url)? GetRequest(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context)
+    {
+        if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return null;
+        var parameter = JsonSerializer.Deserialize<WorkflowLinkUrlParameter>(activeLink.ActionParameter);
+        return (null, parameter.Url);
+    }
+
     public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink, JsonNode fakeData, WorkflowContext context)
     {
         var parameter = new WorkflowLinkUrlParameter();

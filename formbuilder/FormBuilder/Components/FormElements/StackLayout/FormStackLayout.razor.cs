@@ -17,6 +17,18 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public bool IsInteractableElementEnabled { get; set; }
 
+    public string GetTargetUrl()
+    {
+        var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);
+        var json = new JsonObject();
+        Value.ExtractJson(json);
+        var execution = Context.GetLinkExecutionFromElementAndCurrentStep(Value.Id);
+        execution.OutputData = json;
+        var act = WorkflowLinkActionFactory.Build(link.ActionType);
+        var res = act.GetRequest(link, execution, Context);
+        return res?.url;
+    }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
@@ -27,7 +39,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
         }
     }
 
-    async Task Submit()
+    private async Task Submit()
     {
         var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);
         if (link == null || Value.IsSubmitting) return;

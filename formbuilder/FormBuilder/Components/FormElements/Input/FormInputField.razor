@@ -8,7 +8,7 @@
         @if (Value.FormType != FormInputTypes.HIDDEN)
         {
             <RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value)" class="fullWidth">
-                <RadzenTextBox @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenTextBox>
+                <RadzenTextBox Name="@Value.Name" @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenTextBox>
             </RadzenFormField>
         }
         else

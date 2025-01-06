@@ -8,6 +8,7 @@ public abstract class BaseFormLayoutRecord : IFormElementRecord
     public string Id { get; set; }
     public abstract string Type { get; }
     public ObservableCollection<IFormElementRecord> Elements { get; set; }
+    public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
 
     public void ExtractJson(JsonObject json)

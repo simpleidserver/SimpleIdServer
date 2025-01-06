@@ -1,5 +1,4 @@
 ﻿using FormBuilder.Components.FormElements.Button;
-using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Models;
 using System.Text.Json.Serialization;
 
@@ -9,8 +8,10 @@ public class FormStackLayoutRecord : BaseFormLayoutRecord
 {
     public override string Type => FormStackLayoutDefinition.TYPE;
     public bool IsFormEnabled { get; set; } = false;
+    public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     [JsonIgnore]
     public bool IsSubmitting { get; set; }
+    public FormTypes FormType { get; set; } = FormTypes.BLAZOR;
 
     public void Submit()
     {
@@ -28,4 +29,10 @@ public class FormStackLayoutRecord : BaseFormLayoutRecord
 
     private FormButtonRecord GetSubmitBtn()
         => Elements.SingleOrDefault(e => e is FormButtonRecord) as FormButtonRecord;
+}
+
+public enum FormTypes
+{
+    BLAZOR = 0,
+    HTML = 1
 }

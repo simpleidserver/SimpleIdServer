@@ -467,8 +467,8 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             {
                 var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
                 var iapSilver = SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver;
-                firstLevelAssurance.AuthenticationWorkflow = StandardWorkflows.pwdSmsWorkflowId;
-                iapSilver.AuthenticationWorkflow = StandardWorkflows.pwdSmsWorkflowId;
+                firstLevelAssurance.AuthenticationWorkflow = StandardWorkflows.webauthWorkflowId;
+                iapSilver.AuthenticationWorkflow = StandardWorkflows.webauthWorkflowId;
                 // firstLevelAssurance.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
                 // iapSilver.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
                 dbContext.Acrs.Add(firstLevelAssurance);

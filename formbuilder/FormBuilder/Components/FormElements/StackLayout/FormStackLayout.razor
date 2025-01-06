@@ -12,11 +12,23 @@
                 {
                     if(Value.IsFormEnabled)
                     {
-                        <EditForm Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
-                            <RadzenStack Orientation="Orientation.Vertical">
-                                @CustomRender
-                            </RadzenStack>
-                        </EditForm>
+                        switch(Value.FormType)
+                        {
+                            case FormTypes.BLAZOR:
+                                <EditForm AdditionalAttributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
+                                    <RadzenStack Orientation="Orientation.Vertical">
+                                        @CustomRender
+                                    </RadzenStack>
+                                </EditForm>
+                                break;
+                            default:
+                                <form @attributes=@Value.HtmlAttributes target="@GetTargetUrl()" method="post">
+                                    <RadzenStack Orientation="Orientation.Vertical">
+                                        @CustomRender
+                                    </RadzenStack>
+                                </form>
+                                break;
+                        }
                     }
                     else
                     {

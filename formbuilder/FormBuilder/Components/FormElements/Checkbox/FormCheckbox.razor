@@ -6,7 +6,7 @@
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormCheckboxDialog" TRecord="FormCheckboxRecord" Record="@Value">
      <Children>
         <div>
-            <RadzenCheckBox @bind-Value="@Value.Value"></RadzenCheckBox>
+            <RadzenCheckBox Name="@Value.Name" @bind-Value="@Value.Value"></RadzenCheckBox>
             <RadzenLabel>@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty)</RadzenLabel>
         </div>
      </Children>
