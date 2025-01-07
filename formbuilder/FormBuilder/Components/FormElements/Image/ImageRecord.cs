@@ -1,5 +1,6 @@
 ﻿using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Models;
+using FormBuilder.Models.Rules;
 using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components.FormElements.Image;
@@ -11,6 +12,13 @@ public class ImageRecord : IFormElementRecord
     public List<LabelTranslation> Labels { get; set; }
     public string Url { get; set; } = "https://simpleidserver.com/img/logo-no-shield.svg";
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
+    public List<ITransformationRule> Transformations { get; set; }
+
+    public void Apply(JsonNode node)
+    {
+        if (node == null) return;
+        Url = node.ToString();
+    }
 
     public void ExtractJson(JsonObject json) { }
 

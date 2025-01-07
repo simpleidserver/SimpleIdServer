@@ -119,6 +119,7 @@ public class WorkflowContext
 
     public WorkflowStepLinkExecution GetLinkExecution(string id)
         => Execution.StepExecutions.SelectMany(s => s.Links).SingleOrDefault(l => l.Id == id);
+
     public WorkflowStepExecution GetCurrentStepExecution()
         => Execution.StepExecutions.SingleOrDefault(e => e.StepId == Execution.CurrentStepId);
 

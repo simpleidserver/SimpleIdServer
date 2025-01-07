@@ -15,7 +15,7 @@
                 var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep).Select(s => s.Name);
                 var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => s.FormRecordName).Where(s => formsActingAsStep.Contains(s));
                 var currentFormRecord = Context.GetCurrentFormRecord();
-                if (currentFormRecord.ActAsStep && IsNavigationDisplayed)
+                if (IsNavigationDisplayed)
                 {
                     <RadzenSteps ShowStepsButtons="false">
                         <Steps>

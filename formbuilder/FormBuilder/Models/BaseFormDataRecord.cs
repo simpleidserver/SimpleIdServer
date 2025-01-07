@@ -12,6 +12,11 @@ public abstract class BaseFormDataRecord : IFormElementRecord
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public string Id { get; set; }
 
+    public void Apply(JsonNode node)
+    {
+
+    }
+
     public void ExtractJson(JsonObject json)
     {
 

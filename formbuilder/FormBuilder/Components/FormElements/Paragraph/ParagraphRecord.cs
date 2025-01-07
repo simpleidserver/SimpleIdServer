@@ -1,5 +1,4 @@
-﻿using FormBuilder.Components.FormElements.ListData;
-using FormBuilder.Models;
+﻿using FormBuilder.Models;
 using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components.FormElements.Paragraph;
@@ -10,6 +9,11 @@ public class ParagraphRecord : IFormElementRecord
     public string Id { get; set; }
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
+
+    public void Apply(JsonNode node)
+    {
+
+    }
 
     public void ExtractJson(JsonObject json)
     {

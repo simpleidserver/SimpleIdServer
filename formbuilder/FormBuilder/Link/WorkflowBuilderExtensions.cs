@@ -34,4 +34,13 @@ public static class WorkflowBuilderExtensions
         });
         return builder;
     }
+
+    public static WorkflowBuilder AddLinkAction(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId)
+    {
+        builder.AddLink(sourceForm, targetForm, eltId, (a) =>
+        {
+            a.ActionType = WorkflowLinkAction.ActionType;
+        });
+        return builder;
+    }
 }

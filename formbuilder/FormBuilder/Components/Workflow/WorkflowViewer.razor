@@ -36,6 +36,20 @@
         StateHasChanged();
     }
 
+    [JSInvokable]
+    public void Navigate(string eltId, string key, string value)
+    {
+        var stepExecution = Context.GetCurrentStepExecution();
+        var linkExecution = Context.GetLinkExecutionFromFormEltAndCurrentStep(eltId);
+        var linkDefinition = Context.Definition.Workflow.Links.Single(l => l.Id == linkExecution.LinkId);
+        var obj = new JsonObject();
+        if(linkExecution.OutputData != null) obj = linkExecution.OutputData.AsObject();
+        obj.Add(key, value);
+        linkExecution.OutputData = obj;
+        Context.NextStep(linkDefinition);
+        StateHasChanged();
+    }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();

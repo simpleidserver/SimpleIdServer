@@ -12,6 +12,10 @@ public class TitleRecord : IFormElementRecord
     public TextStyle Style { get; set; } = TextStyle.H5;
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
 
+    public void Apply(JsonNode node)
+    {
+    }
+
     public void ExtractJson(JsonObject json)
     {
     }

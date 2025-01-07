@@ -14,9 +14,6 @@
 	  <ProjectReference Include="..\FormBuilder\FormBuilder.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="wwwroot\js\" />
-	</ItemGroup>
-	<ItemGroup>
 	  <None Update="form.css">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

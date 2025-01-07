@@ -73,6 +73,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkHttpRequestAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlTransformerAction>();
+        services.AddTransient<IWorkflowLinkAction, WorkflowLinkAction>();
 
         services.AddTransient<IFormElementTransformerFactory, FormElementTransformerFactory>();
         services.AddTransient<IFormElementTransformer, ListDataTransformer>();

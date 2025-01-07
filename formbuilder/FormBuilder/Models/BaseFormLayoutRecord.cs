@@ -11,6 +11,11 @@ public abstract class BaseFormLayoutRecord : IFormElementRecord
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
 
+    public void Apply(JsonNode node)
+    {
+
+    }
+
     public void ExtractJson(JsonObject json)
     {
         foreach(var elt in Elements)

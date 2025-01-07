@@ -3,6 +3,7 @@ using FormBuilder.Components.FormElements.Anchor;
 using FormBuilder.Components.FormElements.Button;
 using FormBuilder.Components.FormElements.Checkbox;
 using FormBuilder.Components.FormElements.Divider;
+using FormBuilder.Components.FormElements.Image;
 using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Password;
@@ -20,7 +21,9 @@ public class Constants
     private static string forgetMyPasswordId = Guid.NewGuid().ToString();
     private static string authPwdFormId = Guid.NewGuid().ToString();
     private static string resetPwdFormId = Guid.NewGuid().ToString();
-    private static string workflowId = "loginPwd";
+    private static string mobileAuthFormId = "mobileAuthFormId";
+    private static string loginPwdWorkflowId = "loginPwd";
+    private static string mobileWorkflowId = "mobile";
 
     #region Forms
 
@@ -170,6 +173,59 @@ public class Constants
         }
     };
 
+    public static FormRecord MobileAuthForm = new FormRecord
+    {
+        Name = "mobile",
+        ActAsStep = true,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = mobileAuthFormId,
+                IsFormEnabled = true,
+                FormType = FormTypes.HTML,
+                HtmlAttributes = new Dictionary<string, object>
+                {
+                    { "id", "mobileAuthForm" }
+                },
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                     new FormButtonRecord
+                     {
+                         Id = Guid.NewGuid().ToString(),
+                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
+                     }
+                }
+            }
+        }
+    };
+
+    public static FormRecord ViewQrCodeForm = new FormRecord
+    {
+        Name = "viewQrCosde",
+        ActAsStep = false,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new ImageRecord
+                    {
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Url"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     public static FormRecord ResetLoginPwdForm = new FormRecord
     {
         Name = "resetPwd",
@@ -214,14 +270,16 @@ public class Constants
     {
         LoginPwdAuthForm,
         ConfirmationForm,
-        ResetLoginPwdForm
+        ResetLoginPwdForm,
+        MobileAuthForm,
+        ViewQrCodeForm
     };
 
     #endregion
 
     #region Workflows
 
-    public static WorkflowRecord LoginPwdAuthWorkflow = WorkflowBuilder.New(workflowId)
+    public static WorkflowRecord LoginPwdAuthWorkflow = WorkflowBuilder.New(loginPwdWorkflowId)
         .AddStep(LoginPwdAuthForm, new Coordinate(100, 100))
         .AddStep(ConfirmationForm, new Coordinate(200, 100))
         .AddLinkPopupAction(LoginPwdAuthForm, ConfirmationForm, forgetMyPasswordId)
@@ -232,9 +290,16 @@ public class Constants
         })
         .Build();
 
+    public static WorkflowRecord MobileAuthWorkflow = WorkflowBuilder.New(mobileWorkflowId)
+        .AddStep(MobileAuthForm, new Coordinate(100, 100))
+        .AddStep(ViewQrCodeForm, new Coordinate(200, 100))
+        .AddLinkAction(MobileAuthForm, ViewQrCodeForm, mobileAuthFormId)
+        .Build();
+
     public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>
     {
-        LoginPwdAuthWorkflow
+        LoginPwdAuthWorkflow,
+        MobileAuthWorkflow
     };
 
     #endregion

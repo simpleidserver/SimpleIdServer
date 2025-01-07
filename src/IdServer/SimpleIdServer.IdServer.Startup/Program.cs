@@ -187,7 +187,13 @@ void ConfigureIdServer(IServiceCollection services)
 {
     var section = builder.Configuration.GetSection(nameof(ScimClientOptions));
     var conf = section.Get<ScimClientOptions>();
-    services.AddServerSideBlazor();
+    services.AddServerSideBlazor().AddCircuitOptions(o =>
+    {
+        o.DetailedErrors = true;
+    }).AddHubOptions(o =>
+    {
+        o.MaximumReceiveMessageSize = 102400000;
+    });
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
             cb.DefaultAuthenticationWorkflowId = StandardWorkflows.defaultWorkflowId;
@@ -467,8 +473,8 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             {
                 var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
                 var iapSilver = SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver;
-                firstLevelAssurance.AuthenticationWorkflow = StandardWorkflows.webauthWorkflowId;
-                iapSilver.AuthenticationWorkflow = StandardWorkflows.webauthWorkflowId;
+                firstLevelAssurance.AuthenticationWorkflow = StandardWorkflows.mobileWorkflowId;
+                iapSilver.AuthenticationWorkflow = StandardWorkflows.mobileWorkflowId;
                 // firstLevelAssurance.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
                 // iapSilver.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
                 dbContext.Acrs.Add(firstLevelAssurance);

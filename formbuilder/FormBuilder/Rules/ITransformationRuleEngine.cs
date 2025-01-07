@@ -7,5 +7,5 @@ namespace FormBuilder.Rules;
 public interface ITransformationRuleEngine
 {
     string Type { get; }
-    void Apply<R>(R record, JsonObject input, ITransformationRule parameter) where R : BaseFormFieldRecord;
+    void Apply<R>(R record, JsonObject input, ITransformationRule parameter) where R : IFormElementRecord;
 }

@@ -35,4 +35,5 @@ public interface IFormElementRecord
     Dictionary<string, object> HtmlAttributes { get; set; }
     void ExtractJson(JsonObject json);
     IFormElementRecord GetChild(string id);
+    void Apply(JsonNode node);
 }

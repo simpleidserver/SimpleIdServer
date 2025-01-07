@@ -16,6 +16,7 @@ public class StandardWorkflows
     public static string pwdSmsWorkflowId = "08bea90f-2183-4c56-977f-fd0a9c5e32b8";
     public static string pwdWebauthnWorkflowId = "ad636448-90db-41da-91c7-4e96b981b354";
     public static string webauthWorkflowId = "a725b543-1403-4aab-8329-25b89f07cb48";
+    public static string mobileWorkflowId = "1f0a3398-aeb2-42c8-b6e6-ea03396f1a87";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(defaultWorkflowId)
         .AddStep(StandardForms.LoginPwdAuthForm, new Coordinate(100, 100))
@@ -252,6 +253,14 @@ public class StandardWorkflows
         })
         .Build();
 
+    public static WorkflowRecord MobileWorkflow = WorkflowBuilder.New(mobileWorkflowId)
+        .AddStep(StandardForms.MobileForm, new Coordinate(100, 100))
+        .AddStep(StandardForms.DisplayQrCodeForm, new Coordinate(200, 100))
+        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
+        .AddLinkAction(StandardForms.MobileForm, StandardForms.DisplayQrCodeForm, StandardForms.mobileFormId)
+        .AddLinkAction(StandardForms.DisplayQrCodeForm, FormBuilder.Constants.EmptyStep, StandardForms.displayQrCodeFormId)
+        .Build();
+
     public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>
     {
         DefaultWorkflow,
@@ -259,6 +268,7 @@ public class StandardWorkflows
         PwdEmailWorkflow,
         PwdSmsWorkflow,
         PwdWebauthnWorkflow,
-        WebauthnWorkflow
+        WebauthnWorkflow,
+        MobileWorkflow
     };
 }

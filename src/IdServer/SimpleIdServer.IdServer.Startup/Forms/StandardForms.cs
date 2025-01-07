@@ -4,6 +4,7 @@ using FormBuilder.Components.FormElements.Back;
 using FormBuilder.Components.FormElements.Button;
 using FormBuilder.Components.FormElements.Checkbox;
 using FormBuilder.Components.FormElements.Divider;
+using FormBuilder.Components.FormElements.Image;
 using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Password;
@@ -27,6 +28,8 @@ public static class StandardForms
     public static string emailStepId = "email";
     public static string smsStepId = "sms";
     public static string webAuthnStepId = "webauthn";
+    public static string mobileStepId = "mobile";
+    public static string displayQrCodeStepId = "displayQrCode";
 
     public static string pwdAuthFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
     public static string pwdForgetBtnId = "777b8f76-c7b0-475a-a3c7-5ef0e54ce8e6";
@@ -42,6 +45,10 @@ public static class StandardForms
     public static string smsAuthForm = "c7a16cfb-33bf-40c0-a0ce-827ff25e441b";
 
     public static string webauthnFormId = "aae6a19d-4c09-4099-a425-ce7bb5e4d6dd";
+
+    public static string mobileFormId = "96f59bb9-d01c-4f99-8b40-ddf00c287013";
+
+    public static string displayQrCodeFormId = "e33c2422-cda4-4e44-826e-26eb74ce8bc4";
 
     #region Auth forms
 
@@ -705,6 +712,109 @@ public static class StandardForms
         }
     };
 
+    public static FormRecord MobileForm = new FormRecord
+    {
+        Name = mobileStepId,
+        ActAsStep = true,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = mobileFormId,
+                IsFormEnabled = true,
+                FormType = FormTypes.HTML,
+                HtmlAttributes = new Dictionary<string, object>
+                {
+                    { "id", "mobileForm" }
+                },
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ReturnUrl",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.ReturnUrl"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Realm",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Realm"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Login",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build(),
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Login"
+                            },
+                            new PropertyTransformationRule
+                            {
+                                Condition = new PresentParameter
+                                {
+                                    Source = "$.Login"
+                                },
+                                PropertyName = "Disabled",
+                                PropertyValue = "true"
+                            }
+                        }
+                    },
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
+                    }
+                }
+            }
+        }
+    };
+
+    public static FormRecord DisplayQrCodeForm = new FormRecord
+    {
+        Name = displayQrCodeStepId,
+        ActAsStep = false,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = displayQrCodeFormId,
+                IsFormEnabled = false,
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new ImageRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Url"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     #endregion
 
     #region Reset forms
@@ -795,6 +905,8 @@ public static class StandardForms
         EmailAuthForm,
         SmsAuthForm,
         WebauthnForm,
+        MobileForm,
+        DisplayQrCodeForm,
         FormBuilder.Constants.EmptyStep
     };
 }

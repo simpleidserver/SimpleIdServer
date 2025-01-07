@@ -31,3 +31,34 @@
 @section Header {
     <link rel="stylesheet" href="@path" />
 }
+
+@section Scripts {
+    <script type="text/javascript">        
+        let csharpReference;
+        var isInitialized  = false;
+        var init = function() {
+
+            var tryListenForm = function () {
+                const elt = $("#mobileAuthForm");
+                if (isInitialized === true) return;
+                if (elt.length === 0) {
+                    setTimeout(() => tryListenForm(), 500);
+                    return;
+                }
+
+                isInitialized = true;
+                elt.submit(function (e) {
+                    e.preventDefault();
+                    csharpReference.invokeMethodAsync("Navigate", "mobileAuthFormId", "Url", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png");
+                });
+            }
+
+            tryListenForm();
+        }
+
+        var setCsharpReference = function (ref) {
+            csharpReference = ref;
+            init();
+        };
+    </script>
+}
