@@ -18,7 +18,7 @@ public class RegistrationWorkflow
     [JsonIgnore]
     public DateTime UpdateDateTime { get; set; }
     [JsonIgnore]
-    public List<string> Steps {  get; set; } = new List<string>();
+    public string? WorkflowId { get; set; }
     [JsonIgnore]
     public bool IsDefault { get; set; }
     [JsonIgnore]

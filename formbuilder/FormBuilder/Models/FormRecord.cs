@@ -5,6 +5,7 @@ namespace FormBuilder.Models;
 
 public class FormRecord
 {
+    public string Id { get; set; }
     public string Name { get; set; }
     public bool ActAsStep { get; set; }
     public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();

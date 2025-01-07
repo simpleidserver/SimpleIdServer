@@ -90,8 +90,8 @@ public class AmrHelper : IAmrHelper
             if (acr != null)
             {
                 var workflow = await _workflowStore.Get(acr.AuthenticationWorkflow, cancellationToken);
-                var allSteps = (await _formStore.GetAll(cancellationToken)).Where(f => f.ActAsStep).Select(f => f.Name);
-                var workflowAmrs = allSteps.Where(stepName => workflow.Steps.Any(s => s.FormRecordName == stepName)).ToList();
+                var allSteps = (await _formStore.GetAll(cancellationToken)).Where(f => f.ActAsStep);
+                var workflowAmrs = allSteps.Where(step => workflow.Steps.Any(s => s.FormRecordId == step.Id)).Select(s => s.Name).ToList();
                 return new AcrResult(acr, workflowAmrs);
             }
         }

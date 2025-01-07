@@ -6,14 +6,15 @@
 @using System.Collections.Specialized
 @using global::FormBuilder.Models
 @inject IRenderFormElementsHelper renderFormsElementsHelper
+@implements IDisposable
 
 @if (!IsInteractableElementEnabled)
 {
     <div class="form">
         <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
             @{
-                var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep).Select(s => s.Name);
-                var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => s.FormRecordName).Where(s => formsActingAsStep.Contains(s));
+                var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep);
+                var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => formsActingAsStep.FirstOrDefault(st => st.Id == s.FormRecordId)).Where(s => s != null).Select(s => s.Name);
                 var currentFormRecord = Context.GetCurrentFormRecord();
                 if (IsNavigationDisplayed)
                 {
@@ -76,15 +77,26 @@ else
     [Parameter] public WorkflowContext Context { get; set; }   
     private FormRecord Form { get; set; } = null;
 
+    public void Dispose()
+    {
+        if (Form != null) Form.Elements.CollectionChanged -= HandleChanged;
+    }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (Context == null) return;
+        Init();
+    }
+
+    private void Init()
+    {
         Form = Context.GetCurrentFormRecord();
         if (Form == null) return;
         RuleEngine.Apply(Context);
         CustomRender = CreateComponent();
         Form.Elements.CollectionChanged += HandleChanged;
+        Context.Execution.CurrentStepIdChanged += HandleCurrentStepIdChanged;
     }
 
     private RenderFragment CreateComponent() => builder =>
@@ -96,5 +108,18 @@ else
     {
         CustomRender = CreateComponent();
         StateHasChanged();
+    }
+
+    private void HandleCurrentStepIdChanged(object sender, EventArgs args)
+    {
+        Reset();
+        Init();
+        StateHasChanged();
+    }
+
+    private void Reset()
+    {
+        if (Form != null) Form.Elements.CollectionChanged -= HandleChanged;
+        if (Context != null) Context.Execution.CurrentStepIdChanged -= HandleCurrentStepIdChanged;
     }
 }

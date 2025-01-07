@@ -29,6 +29,7 @@ public class Constants
 
     public static FormRecord ConfirmationForm = new FormRecord
     {
+        Id = "confirmationId",
         Name = "Confirmation",
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -50,6 +51,7 @@ public class Constants
 
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
+        Id = "pwdId",
         Name = "pwd",
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -175,6 +177,7 @@ public class Constants
 
     public static FormRecord MobileAuthForm = new FormRecord
     {
+        Id = "mobileId",
         Name = "mobile",
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -202,7 +205,8 @@ public class Constants
 
     public static FormRecord ViewQrCodeForm = new FormRecord
     {
-        Name = "viewQrCosde",
+        Id = "viewQrCodeId",
+        Name = "viewQrCode",
         ActAsStep = false,
         Elements = new ObservableCollection<IFormElementRecord>
         {
@@ -228,6 +232,7 @@ public class Constants
 
     public static FormRecord ResetLoginPwdForm = new FormRecord
     {
+        Id = "resetPwdId",
         Name = "resetPwd",
         Elements = new ObservableCollection<IFormElementRecord>
         {

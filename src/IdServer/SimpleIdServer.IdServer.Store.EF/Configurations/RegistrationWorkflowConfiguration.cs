@@ -11,9 +11,6 @@ public class RegistrationWorkflowConfiguration : IEntityTypeConfiguration<Regist
     public void Configure(EntityTypeBuilder<RegistrationWorkflow> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.Property(a => a.Steps).HasConversion(
-            v => string.Join(',', v),
-            v => v.Split(',', StringSplitOptions.None).ToList());
         builder.HasMany(r => r.Acrs).WithOne(a => a.RegistrationWorkflow).HasForeignKey(a => a.RegistrationWorkflowId);
     }
 }

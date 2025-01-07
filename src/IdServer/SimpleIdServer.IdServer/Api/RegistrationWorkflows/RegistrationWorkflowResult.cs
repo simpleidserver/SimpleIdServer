@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.DTOs;
 using System;
-using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Api.RegistrationWorkflows;
@@ -17,8 +16,8 @@ public class RegistrationWorkflowResult
     public DateTime CreateDateTime { get; set; }
     [JsonPropertyName(RegistrationWorkflowNames.UpdateDateTime)]
     public DateTime UpdateDateTime { get; set; }
-    [JsonPropertyName(RegistrationWorkflowNames.Steps)]
-    public List<string> Steps { get; set; } = new List<string>();
     [JsonPropertyName(RegistrationWorkflowNames.IsDefault)]
     public bool IsDefault { get; set; }
+    [JsonPropertyName(RegistrationWorkflowNames.WorkflowId)]
+    public string WorkflowId { get; set; }
 }

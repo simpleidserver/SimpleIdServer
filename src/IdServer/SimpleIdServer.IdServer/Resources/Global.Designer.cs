@@ -2698,6 +2698,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The workflow {0} doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownWorkflow {
+            get {
+                return ResourceManager.GetString("UnknownWorkflow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the actor type {0} is not supported.
         /// </summary>
         public static string UnsupportedActorType {

@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Startup.Converters;
+using SimpleIdServer.IdServer.Startup.Forms;
 using SimpleIdServer.OpenidFederation.Domains;
 using System;
 using System.Collections.Generic;
@@ -37,10 +38,11 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<RegistrationWorkflow> RegistrationWorkflows => new List<RegistrationWorkflow>
         {
-            RegistrationWorkflowBuilder.New("pwd", true).AddStep("pwd").Build(),
-            RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build(),
-            RegistrationWorkflowBuilder.New("vp").AddStep("vp").Build(),
-            RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
+            // RegistrationWorkflowBuilder.New("pwd", true).AddStep("pwd").Build(),
+            // RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build(),
+            // RegistrationWorkflowBuilder.New("vp").AddStep("vp").Build(),
+            // RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
+            RegistrationWorkflowBuilder.New("email", StandardRegistrationWorkflows.emailWorkflowId).Build()
         };
 
         public static Scope IdProviderAdministratorScope = new Scope

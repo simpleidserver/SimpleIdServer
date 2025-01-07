@@ -66,7 +66,7 @@
         base.OnParametersSet();
         if (stepContext == null && Step != null)
         {
-            var formRecord = GetFormRecord(Step.FormRecordName);
+            var formRecord = GetFormRecord(Step.FormRecordId);
             stepContext = Context.BuildEmptyContextAndMoveToStep(Step.Id);
         }
     }
@@ -107,8 +107,8 @@
         await LinkDropped.InvokeAsync(Step);
     }
 
-    private FormRecord GetFormRecord(string name)
-        => Context.Definition.Records.Single(t => t.Name == name);
+    private FormRecord GetFormRecord(string id)
+        => Context.Definition.Records.Single(t => t.Id == id);
 
     private string GetClassName()
         => $"stepElement draggableElement {(isHover ? "isActive": string.Empty)}";

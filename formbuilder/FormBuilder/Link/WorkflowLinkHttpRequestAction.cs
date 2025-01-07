@@ -5,7 +5,6 @@ using FormBuilder.Models;
 using FormBuilder.Services;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.Extensions.Options;
-using System.Reflection.Metadata;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -41,7 +40,7 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
         if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(activeLink.ActionParameter);
         var currentRecord = context.GetCurrentFormRecord();
-        var result = _workflowLinkHttpRequestService.BuildUrl(parameter, linkExecution.OutputData.AsObject(), context.Execution.AntiforgeryToken, currentRecord.Name, context.Definition.Workflow.Id, activeLink.Id);
+        var result = _workflowLinkHttpRequestService.BuildUrl(parameter, linkExecution.OutputData.AsObject(), context.Execution.AntiforgeryToken, currentRecord.Id, context.Definition.Workflow.Id, activeLink.Id);
         await _navigationHistoryService.SaveExecutedLink(context, linkExecution.LinkId);
         await _formBuilderJsService.SubmitForm(result.url, result.json, parameter.Method);
     }
@@ -51,7 +50,7 @@ public class WorkflowLinkHttpRequestAction : IWorkflowLinkAction
         if (string.IsNullOrWhiteSpace(activeLink.ActionParameter)) return null;
         var parameter = JsonSerializer.Deserialize<WorkflowLinkHttpRequestParameter>(activeLink.ActionParameter);
         var currentRecord = context.GetCurrentFormRecord();
-        return _workflowLinkHttpRequestService.BuildUrl(parameter, linkExecution.OutputData.AsObject(), context.Execution.AntiforgeryToken, currentRecord.Name, context.Definition.Workflow.Id, activeLink.Id);
+        return _workflowLinkHttpRequestService.BuildUrl(parameter, linkExecution.OutputData.AsObject(), context.Execution.AntiforgeryToken, currentRecord.Id, context.Definition.Workflow.Id, activeLink.Id);
     }
 
     public object Render(RenderTreeBuilder builder, WorkflowLink workflowLink, JsonNode fakeData, WorkflowContext context)

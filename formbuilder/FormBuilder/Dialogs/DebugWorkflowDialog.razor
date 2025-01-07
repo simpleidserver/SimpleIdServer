@@ -35,7 +35,8 @@
         if (Context == null || !Context.Definition.Workflow.Steps.Any()) return;
         var firstStep = Context.GetFirstStep();
         if (firstStep == null) return;
-        var fakerDataService = fakerDataServiceFactory.Build(firstStep.FormRecordName);
+        var stepRecord = Context.Definition.Records.Single(r => r.Id == firstStep.FormRecordId);
+        var fakerDataService = fakerDataServiceFactory.Build(stepRecord.Name);
         var obj = fakerDataService.Generate();
         var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
         debuggingWorkflowContext = Context.BuildNewContextAndMoveToFirstStep(JsonObject.Parse(json).AsObject());

@@ -15,7 +15,7 @@ public class SugarRegistrationWorkflow
     public string RealmName { get; set; }
     public DateTime CreateDateTime { get; set; }
     public DateTime UpdateDateTime { get; set; }
-    public string Steps { get; set; } = null!;
+    public string? WorkflowId { get; set; } = null;
     public bool IsDefault { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarApiResourceRealm.RealmsName), nameof(SugarApiResourceRealm.ApiResourcesId))]
     public SugarRealm Realm { get; set; }
@@ -30,7 +30,7 @@ public class SugarRegistrationWorkflow
             CreateDateTime = record.CreateDateTime,
             Name = record.Name,
             UpdateDateTime = record.UpdateDateTime,
-            Steps = record.Steps == null ? "" : record.Steps.Join(","),
+            WorkflowId = record.WorkflowId,
             IsDefault = record.IsDefault,
             RealmName = record.RealmName ?? record.Realm?.Name,
             Acrs = record.Acrs == null ? new List<SugarAuthenticationContextClassReference>() : record.Acrs.Select(a => new SugarAuthenticationContextClassReference
@@ -51,7 +51,7 @@ public class SugarRegistrationWorkflow
             RealmName = RealmName,
             CreateDateTime = CreateDateTime,
             UpdateDateTime = UpdateDateTime,
-            Steps = Steps.Split(',').ToList(),
+            WorkflowId = WorkflowId,
             IsDefault = IsDefault,
             Acrs = Acrs == null ? new List<AuthenticationContextClassReference>() : Acrs.Select(a => a.ToDomain()).ToList(),
             Realm = Realm?.ToDomain()

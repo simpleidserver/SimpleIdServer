@@ -14,9 +14,9 @@ public class AuthController : BaseWorkflowController
     {
     }
 
-    public async Task<IActionResult> Index(string workflowId, string stepName, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(string workflowId, string stepId, CancellationToken cancellationToken)
     {
-        var viewModel = await BuildViewModel(workflowId, stepName, cancellationToken);
+        var viewModel = await BuildViewModel(workflowId, stepId, cancellationToken);
         return View(viewModel);
     }
 
@@ -26,7 +26,7 @@ public class AuthController : BaseWorkflowController
     {
         if(string.IsNullOrWhiteSpace(viewModel.Login))
         {
-            var vm = await BuildViewModel(viewModel.WorkflowId, viewModel.StepName, cancellationToken);
+            var vm = await BuildViewModel(viewModel.WorkflowId, viewModel.StepId, cancellationToken);
             vm.ErrorMessages = new List<string>
             {
                 "The login is required"
@@ -36,7 +36,7 @@ public class AuthController : BaseWorkflowController
 
         var result = await GetNextWorkflowStep(cancellationToken);
         if (result == null) return Content("finish");
-        return RedirectToAction("Index", new { workflowId = result.Value.Item1.Id, stepName = result.Value.Item2.FormRecordName });
+        return RedirectToAction("Index", new { workflowId = result.Value.Item1.Id, stepName = result.Value.Item2.FormRecordId });
     }
 
     [HttpGet]

@@ -110,7 +110,7 @@
     {
         return dialogService.OpenAsync<EditFormCssStyleDialog>("", new Dictionary<string, object>
         {
-            { nameof(EditFormCssStyleDialog.FormName), Form.Name }
+            { nameof(EditFormCssStyleDialog.FormId), Form.Id }
         });
     }
 }

@@ -13,8 +13,8 @@ public class FormStore : IFormStore
         _dbContext = dbContext;
     }
 
-    public Task<FormRecord> Get(string name, CancellationToken cancellationToken)
-        => _dbContext.Forms.Include(f => f.AvailableStyles).SingleOrDefaultAsync(f => f.Name == name, cancellationToken);
+    public Task<FormRecord> Get(string id, CancellationToken cancellationToken)
+        => _dbContext.Forms.Include(f => f.AvailableStyles).SingleOrDefaultAsync(f => f.Id == id, cancellationToken);
 
     public Task<List<FormRecord>> GetAll(CancellationToken cancellationToken)
         => _dbContext.Forms.ToListAsync(cancellationToken);

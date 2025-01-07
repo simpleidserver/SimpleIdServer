@@ -161,7 +161,7 @@ public class RealmsController : BaseController
                             CreateDateTime = DateTime.UtcNow,
                             IsDefault = registrationWorkflow.IsDefault,
                             UpdateDateTime = registrationWorkflow.UpdateDateTime,
-                            Steps = registrationWorkflow.Steps
+                            WorkflowId = registrationWorkflow.WorkflowId
                         });
                     }
 

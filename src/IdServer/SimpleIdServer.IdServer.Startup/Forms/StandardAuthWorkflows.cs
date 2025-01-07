@@ -1,4 +1,6 @@
-﻿using FormBuilder.Builders;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Builders;
 using FormBuilder.Link;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
@@ -8,7 +10,7 @@ using System.Collections.ObjectModel;
 
 namespace SimpleIdServer.IdServer.Startup.Forms;
 
-public class StandardWorkflows
+public class StandardAuthWorkflows
 {
     public static string defaultWorkflowId = "241a7509-4c58-4f49-b1df-49011b2c9bcb";
     public static string pwdConsoleWorkflowId = "e7593fa9-5a73-41a3-bfb5-e489fabbe17a";
@@ -19,10 +21,10 @@ public class StandardWorkflows
     public static string mobileWorkflowId = "1f0a3398-aeb2-42c8-b6e6-ea03396f1a87";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(defaultWorkflowId)
-        .AddStep(StandardForms.LoginPwdAuthForm, new Coordinate(100, 100))
-        .AddStep(StandardForms.ResetPwdForm, new Coordinate(200, 100))
+        .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(StandardAuthForms.ResetPwdForm, new Coordinate(200, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(400, 100))
-        .AddLinkHttpRequestAction(StandardForms.LoginPwdAuthForm, FormBuilder.Constants.EmptyStep, StandardForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -35,7 +37,7 @@ public class StandardWorkflows
                 }
             }
         })
-        .AddLinkHttpRequestAction(StandardForms.LoginPwdAuthForm, StandardForms.ResetPwdForm, StandardForms.pwdForgetBtnId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.ResetPwdForm, StandardAuthForms.pwdForgetBtnId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.GET,
             TargetTransformer = new RegexTransformerParameters()
@@ -53,7 +55,7 @@ public class StandardWorkflows
             },
             Target = "https://localhost:5001/{realm}/pwd/Reset?returnUrl={returnUrl}"
         })
-        .AddLinkHttpRequestAction(StandardForms.ResetPwdForm, FormBuilder.Constants.EmptyStep, StandardForms.pwdResetFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.ResetPwdForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.pwdResetFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -69,10 +71,10 @@ public class StandardWorkflows
         .Build();
 
     public static WorkflowRecord PwdConsoleWorkflow = WorkflowBuilder.New(pwdConsoleWorkflowId)
-        .AddStep(StandardForms.LoginPwdAuthForm, new Coordinate(100, 100))
-        .AddStep(StandardForms.ConsoleAuthForm, new Coordinate(200, 100))
+        .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(StandardAuthForms.ConsoleAuthForm, new Coordinate(200, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(300, 100))
-        .AddLinkHttpRequestAction(StandardForms.LoginPwdAuthForm, StandardForms.ConsoleAuthForm, StandardForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.ConsoleAuthForm, StandardAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -85,7 +87,7 @@ public class StandardWorkflows
                 }
             }
         })
-        .AddLinkHttpRequestAction(StandardForms.ConsoleAuthForm, FormBuilder.Constants.EmptyStep, StandardForms.consoleSendConfirmationCode, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.ConsoleAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.consoleSendConfirmationCode, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -98,7 +100,7 @@ public class StandardWorkflows
                 }
             }
         })
-        .AddLinkHttpRequestAction(StandardForms.ConsoleAuthForm, FormBuilder.Constants.EmptyStep, StandardForms.consoleAuthForm, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.ConsoleAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.consoleAuthForm, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -114,10 +116,10 @@ public class StandardWorkflows
         .Build();
 
     public static WorkflowRecord PwdEmailWorkflow = WorkflowBuilder.New(pwdEmailWorkflowId)
-        .AddStep(StandardForms.LoginPwdAuthForm, new Coordinate(100, 100))
-        .AddStep(StandardForms.EmailAuthForm, new Coordinate(200, 100))
+        .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(StandardAuthForms.EmailAuthForm, new Coordinate(200, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(300, 100))
-        .AddLinkHttpRequestAction(StandardForms.LoginPwdAuthForm, StandardForms.EmailAuthForm, StandardForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.EmailAuthForm, StandardAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -130,7 +132,7 @@ public class StandardWorkflows
                 }
             }
         })
-        .AddLinkHttpRequestAction(StandardForms.EmailAuthForm, FormBuilder.Constants.EmptyStep, StandardForms.emailSendConfirmationCode, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.EmailAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.emailSendConfirmationCode, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -143,7 +145,7 @@ public class StandardWorkflows
                 }
             }
         })
-        .AddLinkHttpRequestAction(StandardForms.EmailAuthForm, FormBuilder.Constants.EmptyStep, StandardForms.emailAuthForm, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.EmailAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.emailAuthForm, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -159,10 +161,10 @@ public class StandardWorkflows
         .Build();
 
     public static WorkflowRecord PwdSmsWorkflow = WorkflowBuilder.New(pwdSmsWorkflowId)
-        .AddStep(StandardForms.LoginPwdAuthForm, new Coordinate(100, 100))
-        .AddStep(StandardForms.SmsAuthForm, new Coordinate(200, 100))
+        .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(StandardAuthForms.SmsAuthForm, new Coordinate(200, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(300, 100))
-        .AddLinkHttpRequestAction(StandardForms.LoginPwdAuthForm, StandardForms.SmsAuthForm, StandardForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.SmsAuthForm, StandardAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -175,7 +177,7 @@ public class StandardWorkflows
                 }
             }
         })
-        .AddLinkHttpRequestAction(StandardForms.SmsAuthForm, FormBuilder.Constants.EmptyStep, StandardForms.smsSendConfirmationCode, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.SmsAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.smsSendConfirmationCode, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -188,7 +190,7 @@ public class StandardWorkflows
                 }
             }
         })
-        .AddLinkHttpRequestAction(StandardForms.SmsAuthForm, FormBuilder.Constants.EmptyStep, StandardForms.smsAuthForm, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.SmsAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.smsAuthForm, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -204,10 +206,10 @@ public class StandardWorkflows
         .Build();
 
     public static WorkflowRecord PwdWebauthnWorkflow = WorkflowBuilder.New(pwdWebauthnWorkflowId)
-        .AddStep(StandardForms.LoginPwdAuthForm, new Coordinate(100, 100))
-        .AddStep(StandardForms.WebauthnForm, new Coordinate(200, 100))
+        .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
+        .AddStep(StandardAuthForms.WebauthnForm, new Coordinate(200, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(300, 100))
-        .AddLinkHttpRequestAction(StandardForms.LoginPwdAuthForm, StandardForms.WebauthnForm, StandardForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.WebauthnForm, StandardAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -220,7 +222,7 @@ public class StandardWorkflows
                 }
             }
         })
-        .AddLinkHttpRequestAction(StandardForms.WebauthnForm, FormBuilder.Constants.EmptyStep, StandardForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.WebauthnForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -236,9 +238,9 @@ public class StandardWorkflows
         .Build();
 
     public static WorkflowRecord WebauthnWorkflow = WorkflowBuilder.New(webauthWorkflowId)
-        .AddStep(StandardForms.WebauthnForm, new Coordinate(100, 100))
+        .AddStep(StandardAuthForms.WebauthnForm, new Coordinate(100, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
-        .AddLinkHttpRequestAction(StandardForms.WebauthnForm, FormBuilder.Constants.EmptyStep, StandardForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
+        .AddLinkHttpRequestAction(StandardAuthForms.WebauthnForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
@@ -254,11 +256,11 @@ public class StandardWorkflows
         .Build();
 
     public static WorkflowRecord MobileWorkflow = WorkflowBuilder.New(mobileWorkflowId)
-        .AddStep(StandardForms.MobileForm, new Coordinate(100, 100))
-        .AddStep(StandardForms.DisplayQrCodeForm, new Coordinate(200, 100))
+        .AddStep(StandardAuthForms.MobileForm, new Coordinate(100, 100))
+        .AddStep(StandardAuthForms.DisplayQrCodeForm, new Coordinate(200, 100))
         .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
-        .AddLinkAction(StandardForms.MobileForm, StandardForms.DisplayQrCodeForm, StandardForms.mobileFormId)
-        .AddLinkAction(StandardForms.DisplayQrCodeForm, FormBuilder.Constants.EmptyStep, StandardForms.displayQrCodeFormId)
+        .AddLinkAction(StandardAuthForms.MobileForm, StandardAuthForms.DisplayQrCodeForm, StandardAuthForms.mobileFormId)
+        .AddLinkAction(StandardAuthForms.DisplayQrCodeForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.displayQrCodeFormId)
         .Build();
 
     public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>

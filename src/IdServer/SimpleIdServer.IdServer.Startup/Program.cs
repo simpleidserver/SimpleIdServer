@@ -3,6 +3,7 @@
 using Community.Microsoft.Extensions.Caching.PostgreSql;
 using FormBuilder;
 using FormBuilder.EF;
+using FormBuilder.Models;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
@@ -196,7 +197,7 @@ void ConfigureIdServer(IServiceCollection services)
     });
     var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
-            cb.DefaultAuthenticationWorkflowId = StandardWorkflows.defaultWorkflowId;
+            cb.DefaultAuthenticationWorkflowId = StandardAuthWorkflows.defaultWorkflowId;
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.SessionCookieNamePrefix))
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
@@ -473,8 +474,8 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             {
                 var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
                 var iapSilver = SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver;
-                firstLevelAssurance.AuthenticationWorkflow = StandardWorkflows.mobileWorkflowId;
-                iapSilver.AuthenticationWorkflow = StandardWorkflows.mobileWorkflowId;
+                firstLevelAssurance.AuthenticationWorkflow = StandardAuthWorkflows.mobileWorkflowId;
+                iapSilver.AuthenticationWorkflow = StandardAuthWorkflows.mobileWorkflowId;
                 // firstLevelAssurance.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
                 // iapSilver.AuthenticationWorkflow = FormBuilderConfiguration.defaultWorkflowId;
                 dbContext.Acrs.Add(firstLevelAssurance);
@@ -538,7 +539,9 @@ async void SeedData(WebApplication application, string scimBaseUrl)
 
         using (var formBuilderDbContext = scope.ServiceProvider.GetService<FormBuilderDbContext>())
         {
-            var allForms = StandardForms.AllForms;
+            var allForms = new List<FormRecord>();
+            allForms.AddRange(StandardAuthForms.AllForms);
+            allForms.AddRange(StandardRegistrationForms.AllForms);
             var content = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "form.css"));
             foreach (var form in allForms)
             {
@@ -551,7 +554,8 @@ async void SeedData(WebApplication application, string scimBaseUrl)
             }
 
             formBuilderDbContext.Forms.AddRange(allForms);
-            formBuilderDbContext.Workflows.AddRange(StandardWorkflows.AllWorkflows);
+            formBuilderDbContext.Workflows.AddRange(StandardAuthWorkflows.AllWorkflows);
+            formBuilderDbContext.Workflows.AddRange(StandardRegistrationWorkflows.AllWorkflows);
             formBuilderDbContext.SaveChanges();
         }
 

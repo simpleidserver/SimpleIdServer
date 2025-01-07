@@ -131,7 +131,7 @@
         if (Records != null && disabledFormRecords == null)
         {
             Context = WorkflowContext.CreateEmptyWorkflow(Records);
-            var activeSteps = Context.Definition.Workflow.Steps.Select(s => s.FormRecordName);
+            var activeSteps = Context.Definition.Workflow.Steps.Select(s => s.FormRecordId);
             disabledFormRecords = Context.Definition.Records.Select(r => r.Name).Where(r => activeSteps.Contains(r)).ToList();
         }
     }
@@ -193,9 +193,9 @@
                     X = pos.X,
                     Y = pos.Y
                 },
-                FormRecordName = selectedFormRecord.Name
+                FormRecordId = selectedFormRecord.Id
             });
-            disabledFormRecords.Add(selectedFormRecord.Name);
+            disabledFormRecords.Add(selectedFormRecord.Id);
             selectedFormRecord = null;
             return true;
         }
@@ -314,7 +314,7 @@
     private void HandleStepRemoved(WorkflowStep step)
     {
         Context.Definition.Workflow.Steps.Remove(step);
-        disabledFormRecords.Remove(step.FormRecordName);
+        disabledFormRecords.Remove(step.FormRecordId);
         Context.Definition.Workflow.Links = Context.Definition.Workflow.Links.Where(l => !l.IsLinked(step.Id)).ToList();
     }
 

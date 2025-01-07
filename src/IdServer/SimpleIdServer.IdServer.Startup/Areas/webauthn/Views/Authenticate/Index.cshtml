@@ -15,7 +15,7 @@
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
-    var path = uriProvider.GetActiveFormCssUrl(step.FormRecordName);    
+    var path = uriProvider.GetActiveFormCssUrl(step.FormRecordId);    
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
     var vm = JsonSerializer.Deserialize<AuthenticateWebauthnViewModel>(Model.Input.ToString());

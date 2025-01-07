@@ -1095,4 +1095,7 @@
   <data name="OtpCodeIsSent" xml:space="preserve">
     <value>The OTP code is sent</value>
   </data>
+  <data name="UnknownWorkflow" xml:space="preserve">
+    <value>The workflow {0} doesn't exist</value>
+  </data>
 </root>

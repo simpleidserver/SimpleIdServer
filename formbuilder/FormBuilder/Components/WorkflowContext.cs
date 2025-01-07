@@ -36,7 +36,7 @@ public class WorkflowContext
                 new WorkflowStep
                 {
                     Id = currentStepId,
-                    FormRecordName = form.Name
+                    FormRecordId = form.Id
                 }
             }
         };
@@ -80,7 +80,7 @@ public class WorkflowContext
     {
         var currentStep = GetCurrentStepDefinition();
         if (currentStep == null) return null;
-        return Definition.Records.Single(r => r.Name == currentStep.FormRecordName);
+        return Definition.Records.Single(r => r.Id == currentStep.FormRecordId);
     }
 
     public IFormElementRecord GetFormRecord(string eltId)
@@ -151,7 +151,10 @@ public class WorkflowContext
         => NavigateToStep(link.TargetStepId);
 
     public void NavigateToStep(string stepId)
-        => Execution.CurrentStepId = stepId;
+    {
+        Execution.CurrentStepId = stepId;
+        if(Execution.CurrentStepIdChanged != null) Execution.CurrentStepIdChanged(Execution, new EventArgs());
+    }
 
     public WorkflowContext BuildContextAndMoveToStep(string stepId)
     {
@@ -237,6 +240,7 @@ public class WorkflowExecution
     }
 
     public string CurrentStepId { get; set; }
+    public EventHandler<EventArgs> CurrentStepIdChanged { get; set; }
     public List<string> ErrorMessages { get; set; }
     public List<string> SuccessMessages { get; set; }
     public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
@@ -345,7 +349,7 @@ public class WorkflowExecutionContext
                 new WorkflowStep
                 {
                     Id = currentStepId,
-                    FormRecordName = formRecord.Name
+                    FormRecordId = formRecord.Id
                 }
             }
         };
@@ -401,7 +405,7 @@ public class WorkflowExecutionContext
     public FormRecord GetCurrentRecord()
     {
         var currentStep = GetCurrentStep();
-        return Records.Single(r => r.Name == currentStep.FormRecordName);
+        return Records.Single(r => r.Id == currentStep.FormRecordId);
     }
 
     public void SetStepOutput(JsonObject output)

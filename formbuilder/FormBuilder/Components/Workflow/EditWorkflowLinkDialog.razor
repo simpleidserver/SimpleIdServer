@@ -81,7 +81,8 @@
     {
         var step = Context.GetStepDefinition(_copyWorkflowLink.SourceStepId);
         var formEltRecord = Context.GetFormRecord(_copyWorkflowLink.Source.EltId);
-        var fakeDataService = fakerDataServiceFactory.Build(step.FormRecordName);
+        var stepRecord = Context.Definition.Records.Single(r => r.Id == step.FormRecordId);
+        var fakeDataService = fakerDataServiceFactory.Build(stepRecord.Name);
         var input = JsonObject.Parse(JsonSerializer.Serialize(fakeDataService.Generate())).AsObject();
         return formElementTransformerFactory.Build(formEltRecord.Type)?.Transform(input, formEltRecord) ?? input;
     }

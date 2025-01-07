@@ -12,7 +12,7 @@
 @code {
     private string cssContent { get; set; }
     private StandaloneCodeEditor editor;
-    [Parameter] public string FormName { get; set; }
+    [Parameter] public string FormId { get; set; }
     [Inject] public IUriProvider uriProvider { get; set; }
     [Inject] public DialogService dialogService { get; set; }
     [Inject] public NotificationService notificationService { get; set; }
@@ -20,9 +20,9 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        if(!string.IsNullOrWhiteSpace(FormName))
+        if (!string.IsNullOrWhiteSpace(FormId))
         {
-            var url = uriProvider.GetActiveFormCssUrl(FormName);
+            var url = uriProvider.GetActiveFormCssUrl(FormId);
             using(var httpClient = new HttpClient())
             {
                 cssContent = await httpClient.GetStringAsync(url);
@@ -50,7 +50,7 @@
     {
         using(var httpClient = new HttpClient())
         {
-            var url = uriProvider.GetActiveFormCssUrl(FormName);
+            var url = uriProvider.GetActiveFormCssUrl(FormId);
             var requestMessage = new HttpRequestMessage
             {
                 Content = new StringContent(JsonSerializer.Serialize(new UpdateFormStyleCommand { Content = cssContent }), Encoding.UTF8, "application/json"),

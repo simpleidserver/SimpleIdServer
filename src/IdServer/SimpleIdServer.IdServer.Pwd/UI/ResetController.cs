@@ -92,7 +92,7 @@ public class ResetController : BaseController
             ReturnUrl = vm.ReturnUrl,
             Realm = prefix,
             WorkflowId = vm.WorkflowId,
-            StepName = vm.StepName,
+            StepId = vm.StepId,
             CurrentLink = vm.CurrentLink
         };
         var result = await BuildWorkflowViewModel(vm, cancellationToken);

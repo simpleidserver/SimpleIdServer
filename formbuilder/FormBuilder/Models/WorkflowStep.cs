@@ -6,7 +6,7 @@ namespace FormBuilder.Models;
 public class WorkflowStep
 {
     public string Id { get; set; }
-    public string FormRecordName { get; set; }
+    public string FormRecordId { get; set; }
     public Coordinate Coordinate { get; set; }
     [JsonIgnore]
     public ElementReference EltRef { get; set; }
@@ -16,7 +16,7 @@ public class WorkflowStep
     {
         get
         {
-            return FormRecordName == Constants.EmptyStep.Name;
+            return FormRecordId == Constants.EmptyStep.Id;
         }
     }
 }

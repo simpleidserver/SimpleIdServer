@@ -8,8 +8,8 @@ public class WorkflowRecord
     public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
     public List<WorkflowLink> Links { get; set; } = new List<WorkflowLink>();
 
-    public WorkflowStep GetStep(string name)
-        => Steps.SingleOrDefault(s => s.FormRecordName == name);
+    public WorkflowStep GetStep(string id)
+        => Steps.SingleOrDefault(s => s.FormRecordId == id);
 
     public WorkflowStep GetFirstStep()
     {
@@ -30,7 +30,7 @@ public class WorkflowRecord
     public (FormRecord form, IFormElementRecord formElt) GetElementRecord(WorkflowLink workflowLink, List<FormRecord> forms)
     {
         var workflowStep = Steps.Single(f => f.Id == workflowLink.SourceStepId);
-        var form = forms.Single(f => f.Name == workflowStep.FormRecordName);
+        var form = forms.Single(f => f.Id == workflowStep.FormRecordId);
         return (form, form.GetChild(workflowLink.Source.EltId));
     }
 

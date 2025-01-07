@@ -15,16 +15,8 @@ public class RegistrationWorkflowBuilder
         _registrationWorkflow = registrationWorkflow;
     }
 
-    public static RegistrationWorkflowBuilder New(string name, bool isDefault = false, string realm = null)
-    {
-        return new RegistrationWorkflowBuilder(new RegistrationWorkflow { CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, RealmName = realm ?? Constants.DefaultRealm, IsDefault = isDefault, Id = Guid.NewGuid().ToString(), Name = name });
-    }
-
-    public RegistrationWorkflowBuilder AddStep(string amr)
-    {
-        _registrationWorkflow.Steps.Add(amr);
-        return this;
-    }
+    public static RegistrationWorkflowBuilder New(string name, string workflowId, bool isDefault = false, string realm = null)
+        => new RegistrationWorkflowBuilder(new RegistrationWorkflow { WorkflowId = workflowId, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, RealmName = realm ?? Constants.DefaultRealm, IsDefault = isDefault, Id = Guid.NewGuid().ToString(), Name = name });
 
     public RegistrationWorkflow Build() => _registrationWorkflow;
 }

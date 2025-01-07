@@ -1,4 +1,6 @@
-﻿using FormBuilder.Builders;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Builders;
 using FormBuilder.Components.FormElements.Anchor;
 using FormBuilder.Components.FormElements.Back;
 using FormBuilder.Components.FormElements.Button;
@@ -20,7 +22,7 @@ using System.Collections.ObjectModel;
 
 namespace SimpleIdServer.IdServer.Startup.Forms;
 
-public static class StandardForms
+public static class StandardAuthForms
 {
     public static string pwdStepId = "pwd";
     public static string resetPwdStepId = "resetPwd";
@@ -54,6 +56,7 @@ public static class StandardForms
 
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
+        Id = "c6528fa2-59fa-430f-87d1-ba7e0b8fa27c",
         Name = pwdStepId,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -177,6 +180,7 @@ public static class StandardForms
 
     public static FormRecord ConsoleAuthForm = new FormRecord
     {
+        Id = "14a41d38-0803-4e59-9b6a-a20cf83c1157",
         Name = consoleStepId,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -333,6 +337,7 @@ public static class StandardForms
 
     public static FormRecord EmailAuthForm = new FormRecord
     {
+        Id = "5ce6d774-fedd-4ada-9818-d327f7406f3c",
         Name = emailStepId,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -489,6 +494,7 @@ public static class StandardForms
 
     public static FormRecord SmsAuthForm = new FormRecord
     {
+        Id = "0528a72c-c394-4fb8-a9e6-629307bc7d01",
         Name = smsStepId,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -645,6 +651,7 @@ public static class StandardForms
 
     public static FormRecord WebauthnForm = new FormRecord
     {
+        Id = "8213b4aa-2e4f-49d8-98fe-f09460e1d800",
         Name = webAuthnStepId,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -714,6 +721,7 @@ public static class StandardForms
 
     public static FormRecord MobileForm = new FormRecord
     {
+        Id = "d9676620-c98b-45d8-a2a1-ecd3888fcee7",
         Name = mobileStepId,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -789,6 +797,7 @@ public static class StandardForms
 
     public static FormRecord DisplayQrCodeForm = new FormRecord
     {
+        Id = "1d083e2c-f532-442b-8fc3-8a6d2d6952ac",
         Name = displayQrCodeStepId,
         ActAsStep = false,
         Elements = new ObservableCollection<IFormElementRecord>
@@ -821,6 +830,7 @@ public static class StandardForms
 
     public static FormRecord ResetPwdForm = new FormRecord
     {
+        Id = "be2b496b-1ab0-47af-b495-133016c40da1",
         Name = "resetPwd",
         Elements = new ObservableCollection<IFormElementRecord>
         {

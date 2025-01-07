@@ -21,7 +21,7 @@ public class WorkflowBuilder
         _workflow.Steps.Add(new WorkflowStep
         {
             Coordinate = coordinate,
-            FormRecordName = record.Name,
+            FormRecordId = record.Id,
             Id = Guid.NewGuid().ToString()
         });
         return this;
@@ -29,8 +29,8 @@ public class WorkflowBuilder
 
     public WorkflowBuilder AddLink(FormRecord sourceForm, FormRecord targetForm, string eltId, Action<WorkflowLink> cb = null)
     {
-        var sourceStep = _workflow.GetStep(sourceForm.Name);
-        var targetStep = _workflow.GetStep(targetForm.Name);
+        var sourceStep = _workflow.GetStep(sourceForm.Id);
+        var targetStep = _workflow.GetStep(targetForm.Id);
         var workflowLink = new WorkflowLink
         {
             Id = Guid.NewGuid().ToString(),

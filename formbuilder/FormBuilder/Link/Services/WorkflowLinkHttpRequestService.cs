@@ -7,7 +7,7 @@ namespace FormBuilder.Link.Services;
 
 public interface IWorkflowLinkHttpRequestService
 {
-    (JsonObject json, string url) BuildUrl(WorkflowLinkHttpRequestParameter parameter, JsonObject json, AntiforgeryTokenRecord antiforgeryToken, string stepName, string workflowId, string currentLink);
+    (JsonObject json, string url) BuildUrl(WorkflowLinkHttpRequestParameter parameter, JsonObject json, AntiforgeryTokenRecord antiforgeryToken, string stepId, string workflowId, string currentLink);
 }
 
 public class WorkflowLinkHttpRequestService : IWorkflowLinkHttpRequestService
@@ -21,7 +21,7 @@ public class WorkflowLinkHttpRequestService : IWorkflowLinkHttpRequestService
         _mappingRuleService = mappingRuleService;
     }
 
-    public (JsonObject json, string url) BuildUrl(WorkflowLinkHttpRequestParameter parameter, JsonObject json, AntiforgeryTokenRecord antiforgeryToken, string stepName, string workflowId, string currentLink)
+    public (JsonObject json, string url) BuildUrl(WorkflowLinkHttpRequestParameter parameter, JsonObject json, AntiforgeryTokenRecord antiforgeryToken, string stepId, string workflowId, string currentLink)
     {
         var result = JsonObject.Parse(json.ToString()).AsObject();
         if (parameter.IsCustomParametersEnabled)
@@ -34,7 +34,7 @@ public class WorkflowLinkHttpRequestService : IWorkflowLinkHttpRequestService
         if (parameter.TargetTransformer != null)
             target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, json)?.ToString();
 
-        result.Add(nameof(StepViewModel.StepName), stepName);
+        result.Add(nameof(StepViewModel.StepId), stepId);
         result.Add(nameof(StepViewModel.WorkflowId), workflowId);
         result.Add(nameof(StepViewModel.CurrentLink), currentLink);
         return (result, target);

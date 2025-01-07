@@ -9,6 +9,6 @@ public class RegistrationWorkflowNames
     public const string Name = "name";
     public const string CreateDateTime = "create_datetime";
     public const string UpdateDateTime = "update_datetime";
-    public const string Steps = "steps";
     public const string IsDefault = "is_default";
+    public const string WorkflowId = "workflow_id";
 }
