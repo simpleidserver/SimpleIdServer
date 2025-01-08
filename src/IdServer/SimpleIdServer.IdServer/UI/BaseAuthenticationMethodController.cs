@@ -111,7 +111,8 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-                var step = workflow.GetStep(Amr);
+                var record = records.Single(r => r.Name == Amr);
+                var step = workflow.GetStep(record.Id);
                 var result = new WorkflowViewModel
                 {
                     CurrentStepId = step.Id,
@@ -331,7 +332,8 @@ namespace SimpleIdServer.IdServer.UI
                 var records = await _formStore.GetAll(token);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
                 var workflow = await _workflowStore.Get(viewModel.WorkflowId, token);
-                var step = workflow.GetStep(Amr);
+                var record = records.Single(r => r.Name == Amr);
+                var step = workflow.GetStep(record.Id);
                 var workflowResult = new WorkflowViewModel
                 {
                     CurrentStepId = step.Id,

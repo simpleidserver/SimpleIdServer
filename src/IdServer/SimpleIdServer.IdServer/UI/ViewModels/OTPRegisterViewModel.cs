@@ -1,11 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.UIs;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels;
 
-public abstract class OTPRegisterViewModel : IRegisterViewModel
+public abstract class OTPRegisterViewModel : StepViewModel, IRegisterViewModel
 {
     public string NameIdentifier {  get; set; }
     public string Value { get; set; }

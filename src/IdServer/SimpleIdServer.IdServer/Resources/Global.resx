@@ -1098,4 +1098,10 @@
   <data name="UnknownWorkflow" xml:space="preserve">
     <value>The workflow {0} doesn't exist</value>
   </data>
+  <data name="NotAllowedToRegister" xml:space="preserve">
+    <value />
+  </data>
+  <data name="UserNotAllowedToRegister" xml:space="preserve">
+    <value>You are not allowed to register</value>
+  </data>
 </root>

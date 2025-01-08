@@ -60,6 +60,7 @@ public class RegistrationController : BaseController
 		var amr = workflowSteps.First().Name;
         var registrationProgress = new UserRegistrationProgress 
 		{ 
+			WorkflowId = registrationWorkflow.WorkflowId,
 			RegistrationProgressId = registrationProgressId, 
 			Amr = amr, 
 			WorkflowName = registrationWorkflow.Name, 

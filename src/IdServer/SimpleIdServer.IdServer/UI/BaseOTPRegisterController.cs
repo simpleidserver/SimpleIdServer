@@ -1,6 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
+using FormBuilder.UIs;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
@@ -9,6 +14,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -23,56 +29,85 @@ namespace SimpleIdServer.IdServer.UI;
 public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegisterController<TViewModel> where TOptions : IOTPRegisterOptions
     where TViewModel : OTPRegisterViewModel
 {
+    private readonly FormBuilderOptions _formBuilderOptions;
     private readonly IUserRepository _userRepository;
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
     private readonly IConfiguration _configuration;
     private readonly IUserNotificationService _userNotificationService;
+    private readonly IAntiforgery _antiforgery;
+    private readonly IFormStore _formStore;
+    private readonly IWorkflowStore _workflowStore;
 
     public BaseOTPRegisterController(
         IOptions<IdServerHostOptions> options, 
+        IOptions<FormBuilderOptions> formOptions,
         IDistributedCache distributedCache, 
         IUserRepository userRepository, 
         ITransactionBuilder transactionBuilder,
         IEnumerable<IOTPAuthenticator> otpAuthenticators, 
         IConfiguration configuration, 
         IUserNotificationService userNotificationService,
+        IAntiforgery antiforgery,
+        IFormStore formStore,
+        IWorkflowStore workflowStore,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
     {
+        _formBuilderOptions = formOptions.Value;
         _userRepository = userRepository;
         _otpAuthenticators = otpAuthenticators;
         _configuration = configuration;
         _userNotificationService = userNotificationService;
+        _antiforgery = antiforgery;
+        _formStore = formStore;
+        _workflowStore = workflowStore;
     }
 
     protected abstract string Amr { get; }
 
-
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
     {
-        prefix = prefix ?? SimpleIdServer.IdServer.Constants.Prefix;
-        var viewModel = Activator.CreateInstance<TViewModel>();
+        prefix = prefix ?? Constants.Prefix;
         var isAuthenticated = User.Identity.IsAuthenticated;
         var registrationProgress = await GetRegistrationProgress();
         if (registrationProgress == null && !isAuthenticated)
         {
-            viewModel.IsNotAllowed = true;
-            return View(viewModel);
+            var res = new WorkflowViewModel();
+            res.SetErrorMessage(Global.NotAllowedToRegister);
+            return View(res);
         }
 
+        var viewModel = Activator.CreateInstance<TViewModel>();
+        var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
+        var records = await _formStore.GetAll(CancellationToken.None);
+        var workflow = await _workflowStore.Get(registrationProgress.WorkflowId, CancellationToken.None);
+        var record = records.Single(r => r.Name == Amr);
+        var step = workflow.GetStep(record.Id);
+        var result = new WorkflowViewModel
+        {
+            CurrentStepId = step.Id,
+            Workflow = workflow,
+            Realm = prefix,
+            FormRecords = records,
+            AntiforgeryToken = new AntiforgeryTokenRecord
+            {
+                CookieName = _formBuilderOptions.AntiforgeryCookieName,
+                CookieValue = tokenSet.CookieToken,
+                FormField = tokenSet.FormFieldName,
+                FormValue = tokenSet.RequestToken
+            }
+        };
         if (isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            viewModel.NameIdentifier = nameIdentifier;
             var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, CancellationToken.None);
             Enrich(viewModel, authenticatedUser);
         }
 
-        viewModel.Amr = registrationProgress?.Amr;
-        viewModel.Steps = registrationProgress?.Steps;
         viewModel.RedirectUrl = redirectUrl;
-        return View(viewModel);
+        result.SetInput(viewModel);
+        return View(result);
     }
 
     [HttpPost]

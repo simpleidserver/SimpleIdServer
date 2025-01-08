@@ -1987,6 +1987,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à .
+        /// </summary>
+        public static string NotAllowedToRegister {
+            get {
+                return ResourceManager.GetString("NotAllowedToRegister", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à not the same redirect_uri.
         /// </summary>
         public static string NotSameRedirectUri {
@@ -2991,6 +3000,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string UserIsUnknown {
             get {
                 return ResourceManager.GetString("UserIsUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à You are not allowed to register.
+        /// </summary>
+        public static string UserNotAllowedToRegister {
+            get {
+                return ResourceManager.GetString("UserNotAllowedToRegister", resourceCulture);
             }
         }
         

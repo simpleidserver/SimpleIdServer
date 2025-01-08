@@ -10,6 +10,7 @@ public class UserRegistrationProgress
 {
     public string RegistrationProgressId { get; set; }
     public string WorkflowName { get; set; }
+    public string WorkflowId { get; set; }
     public List<string> Steps { get; set; }
     public string Amr { get; set; }
     public string Realm { get; set; }
