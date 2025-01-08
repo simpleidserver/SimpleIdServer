@@ -157,6 +157,7 @@ namespace SimpleIdServer.Scim.Api
             newHttpContext.Request.Path = scimBulkOperationRequest.Path;
             newHttpContext.Request.PathBase = HttpContext.Request.PathBase;
             newHttpContext.Request.Host = HttpContext.Request.Host;
+            newHttpContext.Request.Scheme = HttpContext.Request.Scheme;
             newHttpContext.User = this.User;
             newHttpContext.Request.Method = scimBulkOperationRequest.HttpMethod;
             if (scimBulkOperationRequest.Data != null && (scimBulkOperationRequest.HttpMethod.Equals("POST", StringComparison.InvariantCultureIgnoreCase) ||
