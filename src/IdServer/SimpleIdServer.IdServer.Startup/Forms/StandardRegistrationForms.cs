@@ -33,6 +33,30 @@ public class StandardRegistrationForms
             {
                 Id = emailSendConfirmationCodeFormId,
                 IsFormEnabled = true,
+                Transformations = new List<ITransformationRule>
+                {
+                    new PropertyTransformationRule
+                    {
+                        PropertyName = "IsNotVisible",
+                        PropertyValue = "true",
+                        Condition = new LogicalParameter
+                        {
+                            LeftExpression = new ComparisonParameter
+                            {
+                                Source = "$.IsCreated",
+                                Operator = ComparisonOperators.EQ,
+                                Value = "true"
+                            },
+                            RightExpression = new ComparisonParameter
+                            {
+                                Source = "$.IsUpdated",
+                                Operator = ComparisonOperators.EQ,
+                                Value = "true"
+                            },
+                            Operator = LogicalOperators.OR
+                        }
+                    }
+                },
                 Elements = new ObservableCollection<IFormElementRecord>
                 {
                     new FormInputFieldRecord
@@ -87,9 +111,14 @@ public class StandardRegistrationForms
                             },
                             new PropertyTransformationRule
                             {
-                                Condition = new PresentParameter
+                                Condition = new LogicalParameter
                                 {
-                                    Source = "$.Value"
+                                    LeftExpression = new PresentParameter
+                                    {
+                                        Source = "$.Value"
+                                    },
+                                    RightExpression = new UserAuthenticatedParameter(),
+                                    Operator = LogicalOperators.AND
                                 },
                                 PropertyName = "Disabled",
                                 PropertyValue = "true"
@@ -108,6 +137,30 @@ public class StandardRegistrationForms
             {
                 Id = emailRegisterFormId,
                 IsFormEnabled = true,
+                Transformations = new List<ITransformationRule>
+                {
+                    new PropertyTransformationRule
+                    {
+                        PropertyName = "IsNotVisible",
+                        PropertyValue = "true",
+                        Condition = new LogicalParameter
+                        {
+                            LeftExpression = new ComparisonParameter
+                            {
+                                Source = "$.IsCreated",
+                                Operator = ComparisonOperators.EQ,
+                                Value = "true"
+                            },
+                            RightExpression = new ComparisonParameter
+                            {
+                                Source = "$.IsUpdated",
+                                Operator = ComparisonOperators.EQ,
+                                Value = "true"
+                            },
+                            Operator = LogicalOperators.OR
+                        }
+                    }
+                },
                 Elements = new ObservableCollection<IFormElementRecord>
                 {
                     new FormInputFieldRecord
@@ -133,6 +186,19 @@ public class StandardRegistrationForms
                             new IncomingTokensTransformationRule
                             {
                                 Source = "$.Realm"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Value",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Value"
                             }
                         }
                     },

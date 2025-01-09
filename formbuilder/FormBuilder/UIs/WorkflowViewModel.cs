@@ -26,15 +26,24 @@ public class WorkflowViewModel
         Input = JsonObject.Parse(JsonSerializer.Serialize(record)).AsObject();
     }
 
-    public void StayCurrentStep(StepViewModel viewModel)
+    public void SetInput(object record)
+        => Input = JsonObject.Parse(JsonSerializer.Serialize(record)).AsObject();
+
+    public void StayCurrentStep(IStepViewModel viewModel)
     {
         var link = Workflow.Links.Single(l => l.Id == viewModel.CurrentLink);
         CurrentStepId = link.SourceStepId;
     }
 
-    public void MoveNextStep(StepViewModel viewModel)
+    public void MoveNextStep(IStepViewModel viewModel)
     {
         var link = Workflow.Links.Single(l => l.Id == viewModel.CurrentLink);
         CurrentStepId = link.TargetStepId;
+    }
+
+    public string GetNextStepId(IStepViewModel viewModel)
+    {
+        var link = Workflow.Links.Single(l => l.Id == viewModel.CurrentLink);
+        return link.TargetStepId;
     }
 }

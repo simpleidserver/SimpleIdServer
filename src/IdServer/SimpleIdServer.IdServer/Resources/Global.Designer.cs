@@ -97,6 +97,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The action is invalid.
+        /// </summary>
+        public static string ActionIsInvalid {
+            get {
+                return ResourceManager.GetString("ActionIsInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à API resource {0} already exists.
         /// </summary>
         public static string ApiResourceAlreadyExists {
@@ -1123,6 +1132,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Impossible to send the OTP.
+        /// </summary>
+        public static string ImpossibleToSendOtpCode {
+            get {
+                return ResourceManager.GetString("ImpossibleToSendOtpCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the session is not active.
         /// </summary>
         public static string InactiveSession {
@@ -1699,6 +1717,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The action is missing.
+        /// </summary>
+        public static string MissingAction {
+            get {
+                return ResourceManager.GetString("MissingAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à missing client_id.
         /// </summary>
         public static string MissingClientId {
@@ -1767,6 +1794,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string MissingOpenidRpInEntityStatement {
             get {
                 return ResourceManager.GetString("MissingOpenidRpInEntityStatement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The OTP is missing.
+        /// </summary>
+        public static string MissingOtpCode {
+            get {
+                return ResourceManager.GetString("MissingOtpCode", resourceCulture);
             }
         }
         
@@ -1987,7 +2023,7 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à .
+        ///   Recherche une chaîne localisée semblable à You are not allowed to register.
         /// </summary>
         public static string NotAllowedToRegister {
             get {
@@ -2041,11 +2077,29 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The OTP is invalid.
+        /// </summary>
+        public static string OtpCodeIsInvalid {
+            get {
+                return ResourceManager.GetString("OtpCodeIsInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The OTP code is sent.
         /// </summary>
         public static string OtpCodeIsSent {
             get {
                 return ResourceManager.GetString("OtpCodeIsSent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The OTP must be a valid number.
+        /// </summary>
+        public static string OtpCodeMustBeNumber {
+            get {
+                return ResourceManager.GetString("OtpCodeMustBeNumber", resourceCulture);
             }
         }
         
@@ -2995,11 +3049,29 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The user is created.
+        /// </summary>
+        public static string UserIsCreated {
+            get {
+                return ResourceManager.GetString("UserIsCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The user is unknown.
         /// </summary>
         public static string UserIsUnknown {
             get {
                 return ResourceManager.GetString("UserIsUnknown", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The user is updated.
+        /// </summary>
+        public static string UserIsUpdated {
+            get {
+                return ResourceManager.GetString("UserIsUpdated", resourceCulture);
             }
         }
         
@@ -3018,6 +3090,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string UserNotAuthenticated {
             get {
                 return ResourceManager.GetString("UserNotAuthenticated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A user with the same {0} already exists.
+        /// </summary>
+        public static string UserWithSameClaimAlreadyExists {
+            get {
+                return ResourceManager.GetString("UserWithSameClaimAlreadyExists", resourceCulture);
             }
         }
     }

@@ -7,7 +7,7 @@ using SimpleIdServer.IdServer.Resources;
 
 namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 
-public class ResetPasswordViewModel : StepViewModel
+public class ResetPasswordViewModel : IStepViewModel
 {
     public string? NotificationMode { get; set; } = null;
     public string? Login { get; set; } = null;
@@ -15,6 +15,9 @@ public class ResetPasswordViewModel : StepViewModel
     public bool IsResetLinkedSent { get; set; } = false;
     public string ReturnUrl { get; set; } = null!;
     public string Realm { get; set; }
+    public string StepId { get; set; }
+    public string WorkflowId { get; set; }
+    public string CurrentLink { get; set; }
 
     public List<string> Validate(ModelStateDictionary modelState)
     {

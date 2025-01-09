@@ -1,10 +1,11 @@
 ﻿using FormBuilder.Conditions;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Factories;
 
 public interface IConditionRuleEngineFactory
 {
-    IConditionRuleEngine Build(IConditionParameter parameter);
+    bool Evaluate(JsonObject input, IConditionParameter parameter);
 }
 
 public class ConditionRuleEngineFactory : IConditionRuleEngineFactory
@@ -16,6 +17,6 @@ public class ConditionRuleEngineFactory : IConditionRuleEngineFactory
         _engines = engines;
     }
 
-    public IConditionRuleEngine Build(IConditionParameter parameter)
-        => _engines.SingleOrDefault(e => e.Type == parameter.Type);
+    public bool Evaluate(JsonObject input, IConditionParameter parameter)
+        => _engines.Single(e => e.Type == parameter.Type).Evaluate(input, parameter, _engines);
 }

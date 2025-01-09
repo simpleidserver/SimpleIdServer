@@ -21,9 +21,11 @@ public class Constants
     private static string forgetMyPasswordId = Guid.NewGuid().ToString();
     private static string authPwdFormId = Guid.NewGuid().ToString();
     private static string resetPwdFormId = Guid.NewGuid().ToString();
+    private static string registerFormId = Guid.NewGuid().ToString();
     private static string mobileAuthFormId = "mobileAuthFormId";
     private static string loginPwdWorkflowId = "loginPwd";
     private static string mobileWorkflowId = "mobile";
+    private static string registerWorkflowId = "register";
 
     #region Forms
 
@@ -271,13 +273,58 @@ public class Constants
         }
     };
 
+    public static FormRecord RegisterForm = new FormRecord
+    {
+        Id = "registerId",
+        Name = "register",
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormStackLayoutRecord
+                    {
+                        Id = registerFormId,
+                        IsFormEnabled = true,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new PropertyTransformationRule
+                            {
+                                PropertyName = "IsNotVisible",
+                                PropertyValue = "true",
+                                Condition = new ComparisonParameter
+                                {
+                                    Source = "$.IsRegistered",
+                                    Operator = ComparisonOperators.EQ,
+                                    Value = "true"
+                                }
+                            }
+                        },
+                        Elements = new ObservableCollection<IFormElementRecord>
+                        {
+                            new FormButtonRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     public static List<FormRecord> AllForms => new List<FormRecord>
     {
+        FormBuilder.Constants.EmptyStep,
         LoginPwdAuthForm,
         ConfirmationForm,
         ResetLoginPwdForm,
         MobileAuthForm,
-        ViewQrCodeForm
+        ViewQrCodeForm,
+        RegisterForm
     };
 
     #endregion
@@ -301,10 +348,22 @@ public class Constants
         .AddLinkAction(MobileAuthForm, ViewQrCodeForm, mobileAuthFormId)
         .Build();
 
+    public static WorkflowRecord RegisterWorkflow = WorkflowBuilder.New(registerWorkflowId)
+        .AddStep(RegisterForm, new Coordinate(100, 100))
+        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
+        .AddLinkHttpRequestAction(RegisterForm, FormBuilder.Constants.EmptyStep, registerFormId, new Link.WorkflowLinkHttpRequestParameter
+        {
+            IsAntiforgeryEnabled = true,
+            Method = Link.HttpMethods.POST,
+            Target = "http://localhost:62734/Register"
+        })
+        .Build();
+
     public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>
     {
         LoginPwdAuthWorkflow,
-        MobileAuthWorkflow
+        MobileAuthWorkflow,
+        RegisterWorkflow
     };
 
     #endregion

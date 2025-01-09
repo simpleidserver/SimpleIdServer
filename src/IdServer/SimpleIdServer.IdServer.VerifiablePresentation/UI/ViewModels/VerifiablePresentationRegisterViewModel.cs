@@ -15,6 +15,10 @@ public class VerifiablePresentationRegisterViewModel : IRegisterViewModel
     public string QrCodeUrl { get; set; }
     public string StatusUrl { get; set; }
     public string EndRegisterUrl { get; set; }
+    public string StepId { get; set; }
+    public string WorkflowId { get; set; }
+    public string CurrentLink { get; set; }
+    public bool IsCreated { get; set; }
 }
 
 public class VerifiablePresentationViewModel

@@ -1,12 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder.UIs;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Resources;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels;
 
-public abstract class OTPRegisterViewModel : StepViewModel, IRegisterViewModel
+public abstract class OTPRegisterViewModel : IRegisterViewModel
 {
     public string NameIdentifier {  get; set; }
     public string Value { get; set; }
@@ -19,20 +19,27 @@ public abstract class OTPRegisterViewModel : StepViewModel, IRegisterViewModel
     public string Amr { get; set; }
     public List<string> Steps { get; set; }
     public string? RedirectUrl { get; set; }
+    public bool IsCreated { get; set; }
+    public string StepId { get; set; }
+    public string WorkflowId { get; set; }
+    public string CurrentLink { get; set; }
+    public string Realm { get; set; }
 
-    public void Validate(ModelStateDictionary modelState)
+    public List<string> Validate()
     {
-        if (string.IsNullOrWhiteSpace(Value)) modelState.AddModelError("value_missing", "value_missing");
-        if (string.IsNullOrWhiteSpace(Action)) modelState.AddModelError("action_missing", "action_missing");
-        else if (Action != "SENDCONFIRMATIONCODE" && Action != "REGISTER") modelState.AddModelError("invalid_action", "invalid_action");
+        var result = new List<string>();
+        if (string.IsNullOrWhiteSpace(Value)) result.Add(Global.MissingValue);
+        if (string.IsNullOrWhiteSpace(Action)) result.Add(Global.MissingAction);
+        else if (Action != "SENDCONFIRMATIONCODE" && Action != "REGISTER") result.Add(Global.ActionIsInvalid);
         if (Action == "REGISTER")
         {
-            if (string.IsNullOrWhiteSpace(OTPCode)) modelState.AddModelError("otpcode_missing", "otpcode_missing");
-            else if (!long.TryParse(OTPCode, out long l)) modelState.AddModelError("otpcode_not_number", "otpcode_not_number");
-            else SpecificValidate(modelState);
+            if (string.IsNullOrWhiteSpace(OTPCode)) result.Add(Global.MissingOtpCode);
+            else if (!long.TryParse(OTPCode, out long l)) result.Add(Global.OtpCodeMustBeNumber);
+            else result.AddRange(SpecificValidate());
         }
-        else SpecificValidate(modelState);
+        else result.AddRange(SpecificValidate());
+        return result;
     }
 
-    public abstract void SpecificValidate(ModelStateDictionary modelState);
+    public abstract List<string> SpecificValidate();
 }

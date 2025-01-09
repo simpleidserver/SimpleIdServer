@@ -5,7 +5,10 @@ using FormBuilder.UIs;
 
 namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 
-public class ResetPasswordIndexViewModel : StepViewModel
+public class ResetPasswordIndexViewModel : IStepViewModel
 {
     public string ReturnUrl { get; set; } = null!;
+    public string StepId { get; set; }
+    public string WorkflowId { get; set; }
+    public string CurrentLink { get; set; }
 }

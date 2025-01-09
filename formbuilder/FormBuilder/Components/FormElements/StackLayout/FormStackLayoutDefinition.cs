@@ -1,10 +1,16 @@
-﻿
-using System.Text.Json.Nodes;
+﻿using FormBuilder.Factories;
 
 namespace FormBuilder.Components.FormElements.StackLayout;
 
 public class FormStackLayoutDefinition : GenericFormElementDefinition<FormStackLayoutRecord>
 {
+    private readonly ITransformationRuleEngineFactory _transformationRuleEngineFactory;
+
+    public FormStackLayoutDefinition(ITransformationRuleEngineFactory transformationRuleEngineFactory)
+    {
+        _transformationRuleEngineFactory = transformationRuleEngineFactory;
+    }
+
     public static string TYPE = "Stacklayout";
     public override Type UiElt => typeof(FormStackLayout);
     public override string Type => TYPE;
@@ -13,11 +19,18 @@ public class FormStackLayoutDefinition : GenericFormElementDefinition<FormStackL
 
     protected override void ProtectedInit(FormStackLayoutRecord record, WorkflowContext context, List<IFormElementDefinition> definitions)
     {
-        if (record.Elements == null) return;
-        foreach (var elt in record.Elements)
+        if (record.Elements != null)
         {
-            var definition = definitions.Single(d => d.Type == elt.Type);
-            definition.Init(elt, context, definitions);
+            foreach (var elt in record.Elements)
+            {
+                var definition = definitions.Single(d => d.Type == elt.Type);
+                definition.Init(elt, context, definitions);
+            }
         }
+
+        if (record.Transformations == null) return;
+        var inputData = context.GetCurrentStepInputData();
+        foreach (var transformation in record.Transformations)
+            _transformationRuleEngineFactory.Apply(record, inputData, transformation);
     }
 }

@@ -1,10 +1,15 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
 using MassTransit.Testing;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
@@ -24,6 +29,8 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions, 
     private readonly IAuthenticationHelper _authenticationHelper;
 
     public RegisterController(
+        ILogger<BaseOTPRegisterController<IdServerSmsOptions, RegisterSmsViewModel>> logger,
+        IOptions<FormBuilderOptions> formOptions,
         IAuthenticationHelper authenticationHelper,
         IOptions<IdServerHostOptions> options,
         IDistributedCache distributedCache,
@@ -32,8 +39,11 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions, 
         IConfiguration configuration,
         ISmsUserNotificationService userNotificationService,
         ITokenRepository tokenRepository,
+        IAntiforgery antiforgery,
+        IFormStore formStore,
+        IWorkflowStore workflowStore,
         ITransactionBuilder transactionBuilder,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
+        IJwtBuilder jwtBuilder) : base(logger, options, formOptions, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, antiforgery, formStore, workflowStore, tokenRepository, jwtBuilder)
     {
         _authenticationHelper = authenticationHelper;
     }

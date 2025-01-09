@@ -34,9 +34,9 @@ public class WorkflowLinkHttpRequestService : IWorkflowLinkHttpRequestService
         if (parameter.TargetTransformer != null)
             target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, json)?.ToString();
 
-        result.Add(nameof(StepViewModel.StepId), stepId);
-        result.Add(nameof(StepViewModel.WorkflowId), workflowId);
-        result.Add(nameof(StepViewModel.CurrentLink), currentLink);
+        result.Add(nameof(IStepViewModel.StepId), stepId);
+        result.Add(nameof(IStepViewModel.WorkflowId), workflowId);
+        result.Add(nameof(IStepViewModel.CurrentLink), currentLink);
         return (result, target);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using FormBuilder.Components;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using System.Reflection.Metadata;
 
 namespace FormBuilder.Services;
 
@@ -33,20 +34,35 @@ public class NavigationHistoryService : INavigationHistoryService
     public async Task SaveExecutedLink(WorkflowContext context, string linkId)
     {
         var name = $"Step.{context.Definition.Workflow.Id}.executedLinks";
-        var res = await _sessionStorage.GetAsync<List<string>>(name);
-        var links = res.Success ? res.Value : new List<string>();
+        var links = new List<string>();
+        try
+        {
+            var res = await _sessionStorage.GetAsync<List<string>>(name);
+            links = res.Success ? res.Value : new List<string>();
+        }
+        catch (Exception ex) { }
         if(!links.Contains(linkId)) links.Add(linkId);
         await _sessionStorage.SetAsync(name, links);
     }
 
     public async Task Back(WorkflowContext context)
     {
-        var res = await _sessionStorage.GetAsync<List<string>>($"Step.{context.Definition.Workflow.Id}.executedLinks");
-        if (!res.Success) return;
-        var allLinks = context.Definition.Workflow.Links;
-        for(var i = res.Value.Count - 1; i >= 0; i--)
+        List<string> executedLinks = new List<string>();
+        try
         {
-            var linkId = res.Value[i];
+            var res = await _sessionStorage.GetAsync<List<string>>($"Step.{context.Definition.Workflow.Id}.executedLinks");
+            if (!res.Success) return;
+            executedLinks = res.Value;
+        }
+        catch
+        {
+            return;
+        }
+
+        var allLinks = context.Definition.Workflow.Links;
+        for(var i = executedLinks.Count - 1; i >= 0; i--)
+        {
+            var linkId = executedLinks[i];
             var link = allLinks.FirstOrDefault(l => l.Id == linkId);
             if (link == null) continue;
             var linkDef = context.Definition.Workflow.Links.SingleOrDefault(l => l.Id == link.Id);

@@ -6,8 +6,8 @@ public abstract class GenericConditionRule<T> : IConditionRuleEngine where T : I
 {
     public abstract string Type { get; }
 
-    public bool Evaluate(JsonObject input, IConditionParameter parameter)
-        => EvaluateInternal(input, (T)parameter);
+    public bool Evaluate(JsonObject input, IConditionParameter parameter, IEnumerable<IConditionRuleEngine> conditionRuleEngines)
+        => EvaluateInternal(input, (T)parameter, conditionRuleEngines);
 
-    protected abstract bool EvaluateInternal(JsonObject input, T parameter);
+    protected abstract bool EvaluateInternal(JsonObject input, T parameter, IEnumerable<IConditionRuleEngine> conditionRuleEngines);
 }

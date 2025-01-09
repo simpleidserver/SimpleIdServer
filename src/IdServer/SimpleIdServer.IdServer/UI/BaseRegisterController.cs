@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.UIs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -49,7 +51,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         return registrationProgress;
     }
 
-    protected async Task<IActionResult> CreateUser(UserRegistrationProgress registrationProgress, TViewModel viewModel, string prefix, string amr, string redirectUrl)
+    protected async Task<IActionResult> CreateUser(WorkflowViewModel result, UserRegistrationProgress registrationProgress, TViewModel viewModel, string prefix, string amr, string redirectUrl)
     {
         var user = registrationProgress.User ?? new Domains.User
         {
@@ -59,8 +61,8 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             UpdateDateTime = DateTime.UtcNow
         };
         EnrichUser(user, viewModel);
-        var lastStep = registrationProgress.Steps.Last();
-        if(lastStep == amr)
+        var nextAmr = GetNextAmr(result, viewModel);
+        if (IsLastStep(nextAmr))
         {
             using (var transaction = TransactionBuilder.Build())
             {
@@ -70,34 +72,46 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
                 });
                 UserRepository.Add(user);
                 await transaction.Commit(CancellationToken.None);
-                viewModel.IsUpdated = true;
+                result.SetSuccessMessage(Global.UserIsCreated);
+                viewModel.IsCreated = true;
                 viewModel.RedirectUrl = registrationProgress.RedirectUrl ?? redirectUrl;
-                return View(viewModel);
+                result.SetInput(viewModel);
+                return View(result);
             }
         }
 
-        registrationProgress.NextAmr();
         registrationProgress.User = user;
         var json = JsonConvert.SerializeObject(registrationProgress);
         await DistributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
         return RedirectToAction("Index", "Register", new { area = registrationProgress.Amr });
     }
 
-    protected async Task<IActionResult> UpdateUser(UserRegistrationProgress registrationProgress, TViewModel viewModel, string amr, string redirectUrl)
+    protected async Task<IActionResult> UpdateUser(WorkflowViewModel result, UserRegistrationProgress registrationProgress, TViewModel viewModel, string amr, string redirectUrl)
     {
-        var lastStep = registrationProgress?.Steps?.Last();
-        if (lastStep == amr || registrationProgress == null)
+        var nextAmr = GetNextAmr(result, viewModel);
+        if (IsLastStep(nextAmr) || registrationProgress == null)
         {
+            result.SetSuccessMessage(Global.UserIsUpdated);
             viewModel.IsUpdated = true;
             viewModel.RedirectUrl = registrationProgress?.RedirectUrl ?? redirectUrl;
-            return View(viewModel);
+            result.SetInput(viewModel);
+            return View(result);
         }
 
-        registrationProgress.NextAmr();
         var json = JsonConvert.SerializeObject(registrationProgress);
         await DistributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
-        return RedirectToAction("Index", "Register", new { area = registrationProgress.Amr });
+        return RedirectToAction("Index", "Register", new { area = nextAmr });
     }
 
     protected abstract void EnrichUser(User user, TViewModel viewModel);
+
+    private string GetNextAmr(WorkflowViewModel result, TViewModel viewModel)
+    {
+        var nextStepId = result.GetNextStepId(viewModel);
+        var formRecord = result.FormRecords.Single(rec => rec.Id == result.Workflow.Steps.Single(r => r.Id == nextStepId).FormRecordId);
+        return formRecord.Name;
+    }
+
+    private bool IsLastStep(string stepName)
+        => stepName == FormBuilder.Constants.EmptyStep.Name;
 }

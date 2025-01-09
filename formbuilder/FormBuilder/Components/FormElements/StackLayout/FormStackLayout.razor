@@ -8,34 +8,38 @@
     <Children>
         <EditableLayoutContainerElement Record="@Value" TRecord="FormStackLayoutRecord" TDialog="FormStackLayoutDialog" ParentContext="@ParentContext" IsEditModeEnabled="@IsEditModeEnabled">
             <Children>
-                @if (Value.Elements != null)
+                @if(!Value.IsNotVisible) 
                 {
-                    if(Value.IsFormEnabled)
+                    if (Value.Elements != null)
                     {
-                        switch(Value.FormType)
+                        if(Value.IsFormEnabled)
                         {
-                            case FormTypes.BLAZOR:
-                                <EditForm AdditionalAttributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
-                                    <RadzenStack Orientation="Orientation.Vertical">
-                                        @CustomRender
-                                    </RadzenStack>
-                                </EditForm>
-                                break;
-                            default:
-                                <form @attributes=@Value.HtmlAttributes target="@GetTargetUrl()" method="post">
-                                    <RadzenStack Orientation="Orientation.Vertical">
-                                        @CustomRender
-                                    </RadzenStack>
-                                </form>
-                                break;
+                            switch(Value.FormType)
+                            {
+                                case FormTypes.BLAZOR:
+                                    <EditForm AdditionalAttributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            @CustomRender
+                                        </RadzenStack>
+                                    </EditForm>
+                                    break;
+                                default:
+                                    <form @attributes=@Value.HtmlAttributes target="@GetTargetUrl()" method="post">
+                                        <RadzenStack Orientation="Orientation.Vertical">
+                                            @CustomRender
+                                        </RadzenStack>
+                                    </form>
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            <RadzenStack Orientation="Orientation.Vertical">
+                                @CustomRender
+                            </RadzenStack>
                         }
                     }
-                    else
-                    {
-                        <RadzenStack Orientation="Orientation.Vertical">
-                            @CustomRender
-                        </RadzenStack>
-                    }
+
                 }
             </Children>
         </EditableLayoutContainerElement>

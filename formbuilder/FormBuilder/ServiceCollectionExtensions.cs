@@ -83,6 +83,9 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWorkflowLinkHttpRequestService, WorkflowLinkHttpRequestService>();
 
         services.AddTransient<IConditionRuleEngine, PresentRuleEngine>();
+        services.AddTransient<IConditionRuleEngine, ComparisonRuleEngine>();
+        services.AddTransient<IConditionRuleEngine, LogicalRuleEngine>();
+        services.AddTransient<IConditionRuleEngine, UserAuthenticatedRuleEngine>();
 
         services.AddTransient<IUrlEvaluator, DirectTargetUrlEvaluator>();
 

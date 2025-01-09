@@ -5,5 +5,5 @@ namespace FormBuilder.Conditions;
 public interface IConditionRuleEngine
 {
     string Type { get; }
-    bool Evaluate(JsonObject input, IConditionParameter parameter);
+    bool Evaluate(JsonObject input, IConditionParameter parameter, IEnumerable<IConditionRuleEngine> conditionRuleEngines);
 }

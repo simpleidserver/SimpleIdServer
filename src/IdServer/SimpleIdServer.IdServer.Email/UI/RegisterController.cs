@@ -1,8 +1,14 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
+using MassTransit.Configuration;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email.UI.ViewModels;
@@ -19,8 +25,9 @@ namespace SimpleIdServer.IdServer.Email.UI;
 public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions, RegisterEmailViewModel>
 {
     private readonly IAuthenticationHelper _authenticationHelper;
-
     public RegisterController(
+        ILogger<BaseOTPRegisterController<IdServerEmailOptions, RegisterEmailViewModel>> logger,
+        IOptions<FormBuilderOptions> formOptions,
         IAuthenticationHelper authenticationHelper, 
         IOptions<IdServerHostOptions> options, 
         IDistributedCache distributedCache, 
@@ -30,7 +37,10 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
         IConfiguration configuration, 
         IEmailUserNotificationService userNotificationService,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
+        IAntiforgery antiforgery,
+        IFormStore formStore,
+        IWorkflowStore workflowStore,
+        IJwtBuilder jwtBuilder) : base(logger, options, formOptions, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, antiforgery, formStore, workflowStore, tokenRepository, jwtBuilder)
     {
         _authenticationHelper = authenticationHelper;
     }

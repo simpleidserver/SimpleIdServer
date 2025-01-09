@@ -255,7 +255,7 @@ public class ResetController : BaseController
         return section.Get<IdServerPasswordOptions>();
     }
 
-    private async Task<WorkflowViewModel> BuildWorkflowViewModel(StepViewModel viewModel, CancellationToken cancellationToken)
+    private async Task<WorkflowViewModel> BuildWorkflowViewModel(IStepViewModel viewModel, CancellationToken cancellationToken)
     {
         var records = await _formStore.GetAll(cancellationToken);
         var workflow = await _workflowStore.Get(viewModel.WorkflowId, cancellationToken);

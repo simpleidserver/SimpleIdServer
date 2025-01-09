@@ -1099,9 +1099,36 @@
     <value>The workflow {0} doesn't exist</value>
   </data>
   <data name="NotAllowedToRegister" xml:space="preserve">
-    <value />
+    <value>You are not allowed to register</value>
   </data>
   <data name="UserNotAllowedToRegister" xml:space="preserve">
     <value>You are not allowed to register</value>
+  </data>
+  <data name="MissingAction" xml:space="preserve">
+    <value>The action is missing</value>
+  </data>
+  <data name="ActionIsInvalid" xml:space="preserve">
+    <value>The action is invalid</value>
+  </data>
+  <data name="MissingOtpCode" xml:space="preserve">
+    <value>The OTP is missing</value>
+  </data>
+  <data name="OtpCodeMustBeNumber" xml:space="preserve">
+    <value>The OTP must be a valid number</value>
+  </data>
+  <data name="UserWithSameClaimAlreadyExists" xml:space="preserve">
+    <value>A user with the same {0} already exists</value>
+  </data>
+  <data name="OtpCodeIsInvalid" xml:space="preserve">
+    <value>The OTP is invalid</value>
+  </data>
+  <data name="UserIsUpdated" xml:space="preserve">
+    <value>The user is updated</value>
+  </data>
+  <data name="UserIsCreated" xml:space="preserve">
+    <value>The user is created</value>
+  </data>
+  <data name="ImpossibleToSendOtpCode" xml:space="preserve">
+    <value>Impossible to send the OTP</value>
   </data>
 </root>

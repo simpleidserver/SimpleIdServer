@@ -18,8 +18,7 @@ public class PropertyTransformationRuleEngine : GenericTransformationRule<Proper
     {
         if(parameter.Condition != null)
         {
-            var engine = _conditionRuleEngineFactory.Build(parameter.Condition);
-            if (!engine.Evaluate(input, parameter.Condition)) return;
+            if (!_conditionRuleEngineFactory.Evaluate(input, parameter.Condition)) return;
         }
 
         var type = typeof(R);

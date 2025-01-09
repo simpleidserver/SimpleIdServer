@@ -118,7 +118,6 @@ namespace SimpleIdServer.IdServer.UI
                     CurrentStepId = step.Id,
                     Workflow = workflow,
                     FormRecords = records,
-                    Realm = prefix,
                     AntiforgeryToken = new AntiforgeryTokenRecord
                     {
                         CookieName=  _formBuilderOptions.AntiforgeryCookieName,
@@ -338,7 +337,6 @@ namespace SimpleIdServer.IdServer.UI
                 {
                     CurrentStepId = step.Id,
                     Workflow = workflow,
-                    Realm = prefix,
                     FormRecords = records,
                     AntiforgeryToken = new AntiforgeryTokenRecord
                     {

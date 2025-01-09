@@ -10,13 +10,15 @@ namespace FormBuilder.Startup.Controllers;
 
 public class AuthController : BaseWorkflowController
 {
+    private const string _workflowId = "loginPwd";
+
     public AuthController(IAntiforgery antiforgery, IWorkflowStore workflowStore, IFormStore formStore, IOptions<FormBuilderOptions> options) : base(antiforgery, workflowStore, formStore, options)
     {
     }
 
     public async Task<IActionResult> Index(string workflowId, string stepId, CancellationToken cancellationToken)
     {
-        var viewModel = await BuildViewModel(workflowId, stepId, cancellationToken);
+        var viewModel = await BuildViewModel(stepId, cancellationToken);
         return View(viewModel);
     }
 
@@ -26,7 +28,7 @@ public class AuthController : BaseWorkflowController
     {
         if(string.IsNullOrWhiteSpace(viewModel.Login))
         {
-            var vm = await BuildViewModel(viewModel.WorkflowId, viewModel.StepId, cancellationToken);
+            var vm = await BuildViewModel(viewModel.StepId, cancellationToken);
             vm.ErrorMessages = new List<string>
             {
                 "The login is required"
@@ -36,7 +38,7 @@ public class AuthController : BaseWorkflowController
 
         var result = await GetNextWorkflowStep(cancellationToken);
         if (result == null) return Content("finish");
-        return RedirectToAction("Index", new { workflowId = result.Value.Item1.Id, stepName = result.Value.Item2.FormRecordId });
+        return RedirectToAction("Index", new { workflowId = _workflowId, stepName = result.Value.Item2.FormRecordId });
     }
 
     [HttpGet]
@@ -45,9 +47,9 @@ public class AuthController : BaseWorkflowController
         return NoContent();
     }
 
-    private async Task<WorkflowViewModel> BuildViewModel(string workflowId, string stepName, CancellationToken cancellationToken)
+    private async Task<WorkflowViewModel> BuildViewModel(string stepName, CancellationToken cancellationToken)
     {
-        var viewModel = await Get(workflowId, stepName, cancellationToken);
+        var viewModel = await Get(_workflowId, stepName, cancellationToken);
         var authViewModel = new AuthViewModel
         {
             // Login = "hello",

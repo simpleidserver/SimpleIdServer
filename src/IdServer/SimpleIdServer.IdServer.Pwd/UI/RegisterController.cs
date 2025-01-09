@@ -87,7 +87,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                 return View(viewModel);
             }
 
-            return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Constants.Areas.Password, viewModel.RedirectUrl);
+            return await base.CreateUser(null, userRegistrationProgress, viewModel, prefix, Constants.Areas.Password, viewModel.RedirectUrl);
         }
 
         async Task<IActionResult> UpdateUser()
@@ -106,7 +106,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                 });
                 UserRepository.Update(user);
                 await transaction.Commit(cancellationToken);
-                return await base.UpdateUser(userRegistrationProgress, viewModel, Constants.Areas.Password, viewModel.RedirectUrl);
+                return await base.UpdateUser(null, userRegistrationProgress, viewModel, Constants.Areas.Password, viewModel.RedirectUrl);
             }
         }
     }

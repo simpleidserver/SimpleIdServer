@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
 {
-    public abstract class BaseAuthenticateViewModel : StepViewModel
+    public abstract class BaseAuthenticateViewModel : IStepViewModel
     {
         public string ReturnUrl { get; set; }
         public string Login { get; set; }
@@ -23,6 +23,10 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
         public RegistrationWorkflow RegistrationWorkflow { get; set; }
         public string RegistrationWorkflowId { get; set; }
+        public string StepId { get; set; }
+        public string WorkflowId { get; set; }
+        public string CurrentLink { get; set; }
+
         public abstract List<string> Validate();
     }
 

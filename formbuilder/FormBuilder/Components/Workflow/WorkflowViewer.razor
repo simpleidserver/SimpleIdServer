@@ -66,7 +66,11 @@
         if(firstRender)
         {
             await navigationHistoryService.SaveCurrentStep(Context);
-            await jsRuntime.InvokeVoidAsync("setCsharpReference", DotNetObjectReference.Create(this));
+            try
+            {                
+                await jsRuntime.InvokeVoidAsync("setCsharpReference", DotNetObjectReference.Create(this));
+            }
+            catch(Exception) { }
         }
     }
 }

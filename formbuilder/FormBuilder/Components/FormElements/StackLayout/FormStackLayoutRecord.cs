@@ -12,6 +12,7 @@ public class FormStackLayoutRecord : BaseFormLayoutRecord
     [JsonIgnore]
     public bool IsSubmitting { get; set; }
     public FormTypes FormType { get; set; } = FormTypes.BLAZOR;
+    public bool IsNotVisible { get; set; }
 
     public void Submit()
     {

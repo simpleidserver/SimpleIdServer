@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
@@ -37,8 +38,10 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
     private readonly IAntiforgery _antiforgery;
     private readonly IFormStore _formStore;
     private readonly IWorkflowStore _workflowStore;
+    private readonly ILogger<BaseOTPRegisterController<TOptions, TViewModel>> _logger;
 
     public BaseOTPRegisterController(
+        ILogger<BaseOTPRegisterController<TOptions, TViewModel>> logger,
         IOptions<IdServerHostOptions> options, 
         IOptions<FormBuilderOptions> formOptions,
         IDistributedCache distributedCache, 
@@ -53,6 +56,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
     {
+        _logger = logger;
         _formBuilderOptions = formOptions.Value;
         _userRepository = userRepository;
         _otpAuthenticators = otpAuthenticators;
@@ -79,32 +83,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         }
 
         var viewModel = Activator.CreateInstance<TViewModel>();
-        var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-        var records = await _formStore.GetAll(CancellationToken.None);
-        var workflow = await _workflowStore.Get(registrationProgress.WorkflowId, CancellationToken.None);
-        var record = records.Single(r => r.Name == Amr);
-        var step = workflow.GetStep(record.Id);
-        var result = new WorkflowViewModel
-        {
-            CurrentStepId = step.Id,
-            Workflow = workflow,
-            Realm = prefix,
-            FormRecords = records,
-            AntiforgeryToken = new AntiforgeryTokenRecord
-            {
-                CookieName = _formBuilderOptions.AntiforgeryCookieName,
-                CookieValue = tokenSet.CookieToken,
-                FormField = tokenSet.FormFieldName,
-                FormValue = tokenSet.RequestToken
-            }
-        };
-        if (isAuthenticated)
-        {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, CancellationToken.None);
-            Enrich(viewModel, authenticatedUser);
-        }
-
+        var result = await BuildViewModel(registrationProgress, prefix, isAuthenticated, viewModel);
         viewModel.RedirectUrl = redirectUrl;
         result.SetInput(viewModel);
         return View(result);
@@ -119,21 +98,31 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         UserRegistrationProgress userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
         {
-            viewModel.IsNotAllowed = true;
-            return View(viewModel);
+            var res = new WorkflowViewModel();
+            res.SetErrorMessage(Global.NotAllowedToRegister);
+            return View(res);
         }
 
-        viewModel.Amr = userRegistrationProgress?.Amr;
-        viewModel.Steps = userRegistrationProgress?.Steps;
-        viewModel.Validate(ModelState);
-        if (!ModelState.IsValid) return View(viewModel);
+        // 1. Check parameters.
+        var result = await BuildViewModel(userRegistrationProgress, prefix, isAuthenticated, viewModel);
+        var errorMessages = viewModel.Validate();
+        if (errorMessages.Any())
+        {
+            result.ErrorMessages = errorMessages;
+            result.SetInput(viewModel);
+            return View(result);
+        }
+
+        // 2. Check the user exists.
         var emailIsTaken = await IsUserExists(viewModel.Value, prefix);
         if (emailIsTaken)
         {
-            ModelState.AddModelError("value_exists", "value_exists");
-            return View(viewModel);
+            result.SetErrorMessage(string.Format(Global.UserWithSameClaimAlreadyExists, Amr));
+            result.SetInput(viewModel);
+            return View(result);
         }
 
+        // 3. Send the confirmation code.
         var options = GetOptions();
         var optAlg = options.OTPAlg;
         var otpAuthenticator = _otpAuthenticators.First(o => o.Alg == optAlg);
@@ -142,6 +131,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
             return await SendConfirmationCode();
         }
 
+        // 4. Check the confirmation code.
         var enteredOtpCode = viewModel.OTPCode;
         var isOtpCodeCorrect = otpAuthenticator.Verify(enteredOtpCode, new UserCredential
         {
@@ -153,19 +143,19 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         });
         if (!isOtpCodeCorrect)
         {
-            ModelState.AddModelError("invalid_confirmation_code", "invalid_confirmation_code");
-            return View(viewModel);
+            result.SetErrorMessage(Global.OtpCodeIsInvalid);
+            result.SetInput(viewModel);
+            return View(result);
         }
 
+        // 5. Update the user.
         var key = enteredOtpCode.ToString();
         var value = await DistributedCache.GetStringAsync(key);
         await DistributedCache.RemoveAsync(key);
         viewModel.Value = value;
-        if (User.Identity.IsAuthenticated)
-        {
-            return await UpdateAuthenticatedUser();
-        }
+        if (User.Identity.IsAuthenticated) return await UpdateAuthenticatedUser();
 
+        // 6. Register a user.
         return await RegisterUser();
 
         async Task<IActionResult> SendConfirmationCode()
@@ -178,13 +168,25 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
                 CredentialType = UserCredential.OTP,
                 IsActive = true
             });
-            await _userNotificationService.Send("One Time Password", string.Format(options.HttpBody, otpCode), new Dictionary<string, string>(), viewModel.Value);
+            try
+            {
+                await _userNotificationService.Send("One Time Password", string.Format(options.HttpBody, otpCode), new Dictionary<string, string>(), viewModel.Value);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                result.SetErrorMessage(Global.ImpossibleToSendOtpCode);
+                result.SetInput(viewModel);
+                return View(result);
+            }
+
             await DistributedCache.SetStringAsync(otpCode, viewModel.Value, new DistributedCacheEntryOptions
             {
                 SlidingExpiration = TimeSpan.FromHours(2)
             });
-            viewModel.IsOTPCodeSent = true;
-            return View(viewModel);
+            result.SetSuccessMessage(Global.OtpCodeIsSent);
+            result.SetInput(viewModel);
+            return View(result);
         }
 
         async Task<IActionResult> UpdateAuthenticatedUser()
@@ -200,17 +202,50 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
                 _userRepository.Update(authenticatedUser);
                 await transaction.Commit(CancellationToken.None);
-                return await base.UpdateUser(userRegistrationProgress, viewModel, Amr, viewModel.RedirectUrl);
+                return await base.UpdateUser(result, userRegistrationProgress, viewModel, Amr, viewModel.RedirectUrl);
             }
         }
 
         async Task<IActionResult> RegisterUser()
         {
-            return await base.CreateUser(userRegistrationProgress, viewModel, prefix, Amr, viewModel.RedirectUrl);
+            return await base.CreateUser(result, userRegistrationProgress, viewModel, prefix, Amr, viewModel.RedirectUrl);
         }
     }
 
     protected abstract void Enrich(TViewModel viewModel, User user);
+
+    protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProcess, string prefix, bool isAuthenticated, TViewModel viewModel)
+    {
+        var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
+        var records = await _formStore.GetAll(CancellationToken.None);
+        var workflow = await _workflowStore.Get(registrationProcess.WorkflowId, CancellationToken.None);
+        var workflowFormIds = workflow.Steps.Select(s => s.FormRecordId);
+        var filteredRecords = records.Where(r => workflowFormIds.Contains(r.Id));
+        var record = filteredRecords.Single(r => r.Name == Amr);
+        var step = workflow.GetStep(record.Id);
+        var result = new WorkflowViewModel
+        {
+            CurrentStepId = step.Id,
+            Workflow = workflow,
+            FormRecords = records,
+            AntiforgeryToken = new AntiforgeryTokenRecord
+            {
+                CookieName = _formBuilderOptions.AntiforgeryCookieName,
+                CookieValue = tokenSet.CookieToken,
+                FormField = tokenSet.FormFieldName,
+                FormValue = tokenSet.RequestToken
+            }
+        };
+        viewModel.Realm = prefix;
+        if (isAuthenticated)
+        {
+            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+            var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, CancellationToken.None);
+            Enrich(viewModel, authenticatedUser);
+        }
+
+        return result;
+    }
 
     protected abstract Task<bool> IsUserExists(string value, string prefix);
 
