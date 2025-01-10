@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FormBuilder;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
+using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
@@ -20,15 +24,21 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
 
         public RegisterController(
             IOptions<IdServerHostOptions> options, 
+            IOptions<FormBuilderOptions> formOptions,
             IDistributedCache distributedCache, 
             IUserRepository userRepository, 
             IConfiguration configuration,
             ITokenRepository tokenRepository,
             ITransactionBuilder transactionBuilder,
-            IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
+            IJwtBuilder jwtBuilder,
+            IAntiforgery antiforgery,
+            IFormStore formStore,
+            IWorkflowStore workflowStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
         {
             _configuration = configuration;
         }
+
+        protected override string Amr => Constants.MobileAMR;
 
         [HttpGet]
         public async Task<IActionResult> Index([FromRoute] string prefix)

@@ -42,7 +42,10 @@ namespace SimpleIdServer.IdServer.Startup
             // RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build(),
             // RegistrationWorkflowBuilder.New("vp").AddStep("vp").Build(),
             // RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
-            RegistrationWorkflowBuilder.New("email", StandardRegistrationWorkflows.emailWorkflowId).Build()
+            RegistrationWorkflowBuilder.New("email", StandardRegistrationWorkflows.emailWorkflowId).Build(),
+            RegistrationWorkflowBuilder.New("sms", StandardRegistrationWorkflows.smsWorkflowId).Build(),
+            RegistrationWorkflowBuilder.New("pwd", StandardRegistrationWorkflows.pwdWorkflowId).Build(),
+            RegistrationWorkflowBuilder.New("webauthn", StandardRegistrationWorkflows.webauthWorkflowId).Build()
         };
 
         public static Scope IdProviderAdministratorScope = new Scope

@@ -11,6 +11,7 @@ public interface IRegisterViewModel : IStepViewModel
     bool IsUpdated { get; set; }
     bool IsCreated { get; set; }
     string Amr { get; set; }
+    string Realm { get; set; }
     List<string> Steps { get; set; }
-    public string? RedirectUrl { get; set; }
+    string? RedirectUrl { get; set; }
 }

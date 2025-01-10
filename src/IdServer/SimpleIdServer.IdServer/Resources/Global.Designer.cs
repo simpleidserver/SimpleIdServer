@@ -1753,6 +1753,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The confirmation password is missing.
+        /// </summary>
+        public static string MissingConfirmedPassword {
+            get {
+                return ResourceManager.GetString("MissingConfirmedPassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the destination is empty.
         /// </summary>
         public static string MissingDestination {
@@ -2100,6 +2109,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string OtpCodeMustBeNumber {
             get {
                 return ResourceManager.GetString("OtpCodeMustBeNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à both password should be match.
+        /// </summary>
+        public static string PasswordMismatch {
+            get {
+                return ResourceManager.GetString("PasswordMismatch", resourceCulture);
             }
         }
         
@@ -3099,6 +3117,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string UserWithSameClaimAlreadyExists {
             get {
                 return ResourceManager.GetString("UserWithSameClaimAlreadyExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à A user with the same login already exists.
+        /// </summary>
+        public static string UserWithSameLoginAlreadyExists {
+            get {
+                return ResourceManager.GetString("UserWithSameLoginAlreadyExists", resourceCulture);
             }
         }
     }

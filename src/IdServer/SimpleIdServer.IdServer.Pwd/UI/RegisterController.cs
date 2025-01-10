@@ -1,5 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
+using FormBuilder.UIs;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
@@ -8,6 +13,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
@@ -19,26 +25,33 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 {
     public RegisterController(
         IOptions<IdServerHostOptions> options, 
+        IOptions<FormBuilderOptions> formOptions,
         IDistributedCache distributedCache, 
         IUserRepository userRepository,
         ITokenRepository tokenRepository,
         ITransactionBuilder transactionBuilder,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
+        IJwtBuilder jwtBuilder,
+        IAntiforgery antiforgery,
+        IFormStore formStore,
+        IWorkflowStore workflowStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
     {
     }
+
+    protected override string Amr => Constants.Areas.Password;
 
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
     {
         prefix = prefix ?? Constants.Prefix;
-        var viewModel = new PwdRegisterViewModel();
         var isAuthenticated = User.Identity.IsAuthenticated;
+        var viewModel = new PwdRegisterViewModel();
         viewModel.RedirectUrl = redirectUrl;
         var userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
         {
-            viewModel.IsNotAllowed = true;
-            return View(viewModel);
+            var res = new WorkflowViewModel();
+            res.SetErrorMessage(Global.NotAllowedToRegister);
+            return View(res);
         }
 
         if(isAuthenticated)
@@ -47,9 +60,9 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
             viewModel.Login = nameIdentifier;
         }
 
-        viewModel.Amr = userRegistrationProgress?.Amr;
-        viewModel.Steps = userRegistrationProgress?.Steps;
-        return View(viewModel);
+        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix);
+        result.SetInput(viewModel);
+        return View(result);
     }
 
     [HttpPost]
@@ -58,36 +71,48 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     {
         prefix = prefix ?? Constants.Prefix;
         var isAuthenticated = User.Identity.IsAuthenticated;
+        var userRegistrationProgress = await GetRegistrationProgress();
+        // 1. When the user is not authenticated then a registration process must exists.
+        if (userRegistrationProgress == null && !isAuthenticated)
+        {
+            var res = new WorkflowViewModel();
+            res.SetErrorMessage(Resources.Global.NotAllowedToRegister);
+            return View(res);
+        }
+
         if (isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             viewModel.Login = nameIdentifier;
         }
 
-        var userRegistrationProgress = await GetRegistrationProgress();
-        if (userRegistrationProgress == null && !isAuthenticated)
+        // 2. Build the view model.
+        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix);
+
+        // 3. Check the incoming request is valid.
+        var errors = viewModel.Validate();
+        if (errors.Any())
         {
-            viewModel.IsNotAllowed = true;
-            return View(viewModel);
+            result.SetInput(viewModel);
+            result.ErrorMessages = errors;
+            return View(result);
         }
 
-        viewModel.Amr = userRegistrationProgress?.Amr;
-        viewModel.Steps = userRegistrationProgress?.Steps;
-        viewModel.Validate(ModelState);
-        if (!ModelState.IsValid) return View(viewModel);
         if (!isAuthenticated) return await CreateUser();
         return await UpdateUser();
 
         async Task<IActionResult> CreateUser()
         {
+            // 4. Check a user already exists.
             var isUserExists = await UserRepository.IsSubjectExists(viewModel.Login, prefix, cancellationToken);
             if(isUserExists)
             {
-                ModelState.AddModelError("user_exists", "user_exists");
-                return View(viewModel);
+                result.SetInput(viewModel);
+                result.SetErrorMessage(Global.UserWithSameLoginAlreadyExists);
+                return View(result);
             }
 
-            return await base.CreateUser(null, userRegistrationProgress, viewModel, prefix, Constants.Areas.Password, viewModel.RedirectUrl);
+            return await base.CreateUser(result, userRegistrationProgress, viewModel, prefix, Constants.Areas.Password, viewModel.RedirectUrl);
         }
 
         async Task<IActionResult> UpdateUser()
@@ -106,7 +131,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                 });
                 UserRepository.Update(user);
                 await transaction.Commit(cancellationToken);
-                return await base.UpdateUser(null, userRegistrationProgress, viewModel, Constants.Areas.Password, viewModel.RedirectUrl);
+                return await base.UpdateUser(result, userRegistrationProgress, viewModel, Constants.Areas.Password, viewModel.RedirectUrl);
             }
         }
     }

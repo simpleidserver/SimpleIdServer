@@ -1131,4 +1131,13 @@
   <data name="ImpossibleToSendOtpCode" xml:space="preserve">
     <value>Impossible to send the OTP</value>
   </data>
+  <data name="MissingConfirmedPassword" xml:space="preserve">
+    <value>The confirmation password is missing</value>
+  </data>
+  <data name="PasswordMismatch" xml:space="preserve">
+    <value>both password should be match</value>
+  </data>
+  <data name="UserWithSameLoginAlreadyExists" xml:space="preserve">
+    <value>A user with the same login already exists</value>
+  </data>
 </root>

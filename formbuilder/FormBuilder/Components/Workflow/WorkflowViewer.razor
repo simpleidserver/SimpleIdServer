@@ -35,6 +35,16 @@
         };
         StateHasChanged();
     }
+    
+    [JSInvokable]
+    public void SetSuccessMessage(string successMessage)
+    {
+        Context.Execution.SuccessMessages = new List<string>
+        {
+            successMessage
+        };
+        StateHasChanged();
+    }
 
     [JSInvokable]
     public void Navigate(string eltId, string key, string value)

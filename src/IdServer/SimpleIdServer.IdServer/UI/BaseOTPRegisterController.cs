@@ -35,9 +35,6 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
     private readonly IConfiguration _configuration;
     private readonly IUserNotificationService _userNotificationService;
-    private readonly IAntiforgery _antiforgery;
-    private readonly IFormStore _formStore;
-    private readonly IWorkflowStore _workflowStore;
     private readonly ILogger<BaseOTPRegisterController<TOptions, TViewModel>> _logger;
 
     public BaseOTPRegisterController(
@@ -54,20 +51,14 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         IFormStore formStore,
         IWorkflowStore workflowStore,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
+        IJwtBuilder jwtBuilder) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
     {
         _logger = logger;
-        _formBuilderOptions = formOptions.Value;
         _userRepository = userRepository;
         _otpAuthenticators = otpAuthenticators;
         _configuration = configuration;
         _userNotificationService = userNotificationService;
-        _antiforgery = antiforgery;
-        _formStore = formStore;
-        _workflowStore = workflowStore;
     }
-
-    protected abstract string Amr { get; }
 
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
@@ -216,27 +207,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
     protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProcess, string prefix, bool isAuthenticated, TViewModel viewModel)
     {
-        var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-        var records = await _formStore.GetAll(CancellationToken.None);
-        var workflow = await _workflowStore.Get(registrationProcess.WorkflowId, CancellationToken.None);
-        var workflowFormIds = workflow.Steps.Select(s => s.FormRecordId);
-        var filteredRecords = records.Where(r => workflowFormIds.Contains(r.Id));
-        var record = filteredRecords.Single(r => r.Name == Amr);
-        var step = workflow.GetStep(record.Id);
-        var result = new WorkflowViewModel
-        {
-            CurrentStepId = step.Id,
-            Workflow = workflow,
-            FormRecords = records,
-            AntiforgeryToken = new AntiforgeryTokenRecord
-            {
-                CookieName = _formBuilderOptions.AntiforgeryCookieName,
-                CookieValue = tokenSet.CookieToken,
-                FormField = tokenSet.FormFieldName,
-                FormValue = tokenSet.RequestToken
-            }
-        };
-        viewModel.Realm = prefix;
+        var result = await BuildViewModel(registrationProcess, viewModel, prefix);
         if (isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;

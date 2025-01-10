@@ -19,6 +19,7 @@ public class VerifiablePresentationRegisterViewModel : IRegisterViewModel
     public string WorkflowId { get; set; }
     public string CurrentLink { get; set; }
     public bool IsCreated { get; set; }
+    public string Realm { get; set; }
 }
 
 public class VerifiablePresentationViewModel

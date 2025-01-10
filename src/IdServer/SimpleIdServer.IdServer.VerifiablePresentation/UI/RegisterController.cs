@@ -1,6 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -22,14 +26,20 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
     public RegisterController(
         IPresentationDefinitionStore presentationDefinitionStore,
         IOptions<IdServerHostOptions> options, 
+        IOptions<FormBuilderOptions> formOptions,
         IDistributedCache distributedCache, 
         IUserRepository userRepository, 
         ITokenRepository tokenRepository, 
         ITransactionBuilder transactionBuilder,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
+        IJwtBuilder jwtBuilder,
+        IAntiforgery antiforgery,
+        IFormStore formStore,
+        IWorkflowStore workflowStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
     {
         _presentationDefinitionStore = presentationDefinitionStore;
     }
+
+    protected override string Amr => Constants.AMR;
 
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] string prefix, CancellationToken cancellationToken)

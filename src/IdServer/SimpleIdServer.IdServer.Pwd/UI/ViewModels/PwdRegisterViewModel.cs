@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;
@@ -19,12 +20,15 @@ public class PwdRegisterViewModel : IRegisterViewModel
     public string WorkflowId { get; set; }
     public string CurrentLink { get; set; }
     public bool IsCreated { get; set; }
+    public string Realm { get; set; }
 
-    public void Validate(ModelStateDictionary modelState)
+    public List<string> Validate()
     {
-        if (string.IsNullOrWhiteSpace(Login)) modelState.AddModelError("login_missing", "login_missing");
-        if (string.IsNullOrWhiteSpace(Password)) modelState.AddModelError("password_missing", "password_missing");
-        if (string.IsNullOrWhiteSpace(ConfirmedPassword)) modelState.AddModelError("confirmed_password_missing", "confirmed_password_missing");
-        if (!string.IsNullOrWhiteSpace(Password) && !string.IsNullOrWhiteSpace(ConfirmedPassword) && Password != ConfirmedPassword) modelState.AddModelError("password_no_match", "password_no_match");
+        var errors = new List<string>();
+        if (string.IsNullOrWhiteSpace(Login)) errors.Add(Global.MissingLogin);
+        if (string.IsNullOrWhiteSpace(Password)) errors.Add(Global.MissingPassword);
+        if (string.IsNullOrWhiteSpace(ConfirmedPassword)) errors.Add(Global.MissingConfirmedPassword);
+        if (!string.IsNullOrWhiteSpace(Password) && !string.IsNullOrWhiteSpace(ConfirmedPassword) && Password != ConfirmedPassword) errors.Add(Global.PasswordMismatch);
+        return errors;
     }
 }
