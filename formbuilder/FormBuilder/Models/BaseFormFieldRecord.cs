@@ -7,6 +7,7 @@ public abstract class BaseFormFieldRecord : IFormElementRecord
 {
     public string Id { get; set; }
     public string Name { get; set; }
+    public string CssStyle { get; set; }
     public abstract string Type { get; }
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();

@@ -1,6 +1,7 @@
 ﻿using FormBuilder;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
+using FormBuilder.UIs;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -11,6 +12,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using System.Security.Claims;
@@ -43,14 +45,14 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         [HttpGet]
         public async Task<IActionResult> Index([FromRoute] string prefix)
         {
-            var viewModel = new RegisterMobileViewModel();
             var fidoOptions = GetOptions();
             var isAuthenticated = User.Identity.IsAuthenticated;
             var userRegistrationProgress = await GetRegistrationProgress();
             if (userRegistrationProgress == null && !isAuthenticated)
             {
-                viewModel.IsNotAllowed = true;
-                return View(viewModel);
+                var res = new WorkflowViewModel();
+                res.SetErrorMessage(Global.NotAllowedToRegister);
+                return View(res);
             }
 
             var login = string.Empty;
@@ -63,14 +65,17 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
-            viewModel.Login = login;
-            viewModel.BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginQRCodeRegister}";
-            viewModel.RegisterStatusUrl = $"{issuer}/{prefix}{Constants.EndPoints.RegisterStatus}";
-            viewModel.IsDeveloperModeEnabled = fidoOptions.IsDeveloperModeEnabled;
-            viewModel.Amr = userRegistrationProgress?.Amr;
-            viewModel.Steps = userRegistrationProgress?.Steps;
-            viewModel.RedirectUrl = userRegistrationProgress?.RedirectUrl;
-            return View(viewModel);
+            var viewModel = new RegisterMobileViewModel
+            {
+                Login = login,
+                BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginQRCodeRegister}",
+                RegisterStatusUrl = $"{issuer}/{prefix}{Constants.EndPoints.RegisterStatus}",
+                IsDeveloperModeEnabled = fidoOptions.IsDeveloperModeEnabled,
+                RedirectUrl = userRegistrationProgress?.RedirectUrl
+            };
+            var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix);
+            result.SetInput(viewModel);
+            return View(result);
         }
 
         protected override void EnrichUser(User user, RegisterMobileViewModel viewModel)

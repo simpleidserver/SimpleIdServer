@@ -33,6 +33,7 @@ public interface IFormElementRecord
     string Type { get; }
     List<LabelTranslation> Labels { get; set; }
     Dictionary<string, object> HtmlAttributes { get; set; }
+    string CssStyle { get; set; }
     void ExtractJson(JsonObject json);
     IFormElementRecord GetChild(string id);
     void Apply(JsonNode node);

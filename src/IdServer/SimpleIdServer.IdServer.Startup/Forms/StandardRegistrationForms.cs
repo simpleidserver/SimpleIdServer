@@ -2,12 +2,15 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder.Builders;
 using FormBuilder.Components.FormElements.Button;
+using FormBuilder.Components.FormElements.Image;
 using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.StackLayout;
+using FormBuilder.Components.FormElements.Title;
 using FormBuilder.Conditions;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
 using FormBuilder.Rules;
+using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,6 +28,8 @@ public class StandardRegistrationForms
     public static string pwdRegisterFormId = "e501ca67-2bc9-477e-959c-9752a603fcd1";
 
     public static string webauthnFormId = "3c5c4862-b03f-4744-935e-2f01724c97f2";
+
+    public static string mobileFormId = "79dccd2d-133c-4749-8225-2b2718337995";
 
     #region Registration forms
 
@@ -643,6 +648,110 @@ public class StandardRegistrationForms
         }
     };
 
+    public static FormRecord MobileForm = new FormRecord
+    {
+        Id = "b492a6ec-4edf-4e73-be86-9e0266ecb578",
+        Name = "mobile",
+        ActAsStep = true,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            // Generate the QR code.
+            new FormStackLayoutRecord
+            {
+                Id = mobileFormId,
+                IsFormEnabled = true,
+                FormType = FormTypes.HTML,
+                HtmlAttributes = new Dictionary<string, object>
+                {
+                    { "id", "registerMobile" }
+                },
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Realm",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Realm"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Login",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build(),
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Login"
+                            },
+                            new PropertyTransformationRule
+                            {
+                                Condition = new LogicalParameter
+                                {
+                                    LeftExpression = new PresentParameter
+                                    {
+                                        Source = "$.Login"
+                                    },
+                                    RightExpression = new UserAuthenticatedParameter(),
+                                    Operator = LogicalOperators.AND
+                                },
+                                PropertyName = "Disabled",
+                                PropertyValue = "true"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "DisplayName",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Display name").Build()
+                    },
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Generate QR code").Build()
+                    }
+                }
+            },
+            // Display the QR code.
+            new FormStackLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                IsFormEnabled = false,
+                HtmlAttributes = new Dictionary<string, object>
+                {
+                    { "id", "qrCodeContainer" }
+                },
+                CssStyle = "display: none !important; text-align: center;",
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new TitleRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Scan the QR code with your mobile application").Build()
+                    },
+                    new ImageRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        HtmlAttributes = new Dictionary<string, object>
+                        {
+                            { "id", "qrCode" }
+                        },
+                        CssStyle = "width:400px",
+                        Url = ""
+                    }
+                }
+            }
+        }
+    };
+
     #endregion
 
     public static List<FormRecord> AllForms => new List<FormRecord>
@@ -650,6 +759,7 @@ public class StandardRegistrationForms
         EmailForm,
         SmsForm,
         PwdForm,
-        WebauthnForm
+        WebauthnForm,
+        MobileForm
     };
 }

@@ -13,6 +13,7 @@ public class ImageRecord : IFormElementRecord
     public string Url { get; set; } = "https://simpleidserver.com/img/logo-no-shield.svg";
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<ITransformationRule> Transformations { get; set; }
+    public string CssStyle { get; set; }
 
     public void Apply(JsonNode node)
     {

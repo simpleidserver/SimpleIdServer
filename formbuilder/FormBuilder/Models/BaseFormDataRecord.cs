@@ -11,6 +11,7 @@ public abstract class BaseFormDataRecord : IFormElementRecord
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public string Id { get; set; }
+    public string CssStyle { get; set; }
 
     public void Apply(JsonNode node)
     {

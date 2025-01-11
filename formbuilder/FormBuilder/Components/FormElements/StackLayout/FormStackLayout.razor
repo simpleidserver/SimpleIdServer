@@ -17,14 +17,14 @@
                             switch(Value.FormType)
                             {
                                 case FormTypes.BLAZOR:
-                                    <EditForm AdditionalAttributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
+                                    <EditForm style="@Value.CssStyle" AdditionalAttributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
                                         <RadzenStack Orientation="Orientation.Vertical">
                                             @CustomRender
                                         </RadzenStack>
                                     </EditForm>
                                     break;
                                 default:
-                                    <form @attributes=@Value.HtmlAttributes target="@GetTargetUrl()" method="post">
+                                    <form style="@Value.CssStyle" @attributes=@Value.HtmlAttributes target="@GetTargetUrl()" method="post">
                                         <RadzenStack Orientation="Orientation.Vertical">
                                             @CustomRender
                                         </RadzenStack>
@@ -34,7 +34,7 @@
                         }
                         else
                         {
-                            <RadzenStack Orientation="Orientation.Vertical">
+                            <RadzenStack Attributes=@Value.HtmlAttributes Style="@Value.CssStyle" Orientation="Orientation.Vertical">
                                 @CustomRender
                             </RadzenStack>
                         }

@@ -16,6 +16,7 @@ public class StandardRegistrationWorkflows
     public static string smsWorkflowId = "0ba03d04-2990-4153-8484-0cb8092959cd";
     public static string pwdWorkflowId = "849e51f7-78a8-4a55-9609-88a5b2585870";
     public static string webauthWorkflowId = "af842842-cb22-4011-8c49-aabf09b2c455";
+    public static string mobileWorkflowId = "d97459ee-b831-4ca3-9de0-95437c7e7a93";
 
     #region Workflows
 
@@ -117,6 +118,12 @@ public class StandardRegistrationWorkflows
         })
         .Build();
 
+    public static WorkflowRecord MobileWorkflow = WorkflowBuilder.New(mobileWorkflowId)
+        .AddStep(StandardRegistrationForms.MobileForm, new Coordinate(100, 100))
+        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
+        .AddLinkHttpRequestAction(StandardRegistrationForms.MobileForm, FormBuilder.Constants.EmptyStep, StandardRegistrationForms.mobileFormId, new WorkflowLinkHttpRequestParameter())
+        .Build();
+
     #endregion
 
     public static List<WorkflowRecord> AllWorkflows = new List<WorkflowRecord>
@@ -124,6 +131,7 @@ public class StandardRegistrationWorkflows
         EmailWorkflow,
         SmsWorkflow,
         PwdWorkflow,
-        WebauthnWorkflow
+        WebauthnWorkflow,
+        MobileWorkflow
     };
 }

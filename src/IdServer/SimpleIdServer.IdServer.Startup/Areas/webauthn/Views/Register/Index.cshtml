@@ -51,7 +51,7 @@
 
             var displaySuccessMessage = function () {
                 csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
-                // TODO
+                $("#webauthForm").hide();
             }
 
             async function registerCredential(newCredential, sessionId, login, nextRegistrationRedirectUrl) {

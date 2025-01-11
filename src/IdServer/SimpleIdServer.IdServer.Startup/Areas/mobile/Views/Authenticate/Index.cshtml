@@ -19,6 +19,7 @@
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "mobile" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "mobile" });
     var vm = JsonSerializer.Deserialize<AuthenticateMobileViewModel>(Model.Input.ToString());
+    var mobileFormId = SimpleIdServer.IdServer.Startup.Forms.StandardAuthForms.mobileFormId;
 }
 
 <component type="typeof(WorkflowViewer)"
@@ -42,13 +43,14 @@
         var init = function() {
             var beginLoginUrl = "@vm.BeginLoginUrl";
             var loginStatusUrl = "@vm.LoginStatusUrl";
+            var mId = "@mobileFormId";
 
             var displayError = function (errorJson) {
                 csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
             }
 
             var displayQRCode = function (img) {
-                csharpReference.invokeMethodAsync("Navigate", "96f59bb9-d01c-4f99-8b40-ddf00c287013", "Url", img);
+                csharpReference.invokeMethodAsync("Navigate", mId, "Url", img);
             }
 
             async function checkStatus(sessionId) {
