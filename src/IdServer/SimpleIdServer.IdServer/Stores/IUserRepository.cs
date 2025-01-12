@@ -28,6 +28,7 @@ public interface IUserRepository
     void Update(User user);
     void Add(User user);
     void Remove(IEnumerable<User> users);
+    void Remove(IEnumerable<UserClaim> claims);
     Task BulkUpdate(List<UserClaim> userClaims);
     Task BulkUpdate(List<User> users);
     Task BulkUpdate(List<RealmUser> userRealms);
