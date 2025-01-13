@@ -19,6 +19,7 @@ public class StandardAuthWorkflows
     public static string pwdWebauthnWorkflowId = "ad636448-90db-41da-91c7-4e96b981b354";
     public static string webauthWorkflowId = "a725b543-1403-4aab-8329-25b89f07cb48";
     public static string mobileWorkflowId = "1f0a3398-aeb2-42c8-b6e6-ea03396f1a87";
+    public static string otpWorkflowId = "cd3a77fe-4462-4896-8d3c-4d0f77e1942b";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(defaultWorkflowId)
         .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
@@ -263,6 +264,24 @@ public class StandardAuthWorkflows
         .AddLinkAction(StandardAuthForms.DisplayQrCodeForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.displayQrCodeFormId)
         .Build();
 
+    public static WorkflowRecord OtpWorkflow = WorkflowBuilder.New(otpWorkflowId)
+        .AddStep(StandardAuthForms.OtpForm, new Coordinate(100, 100))
+        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
+        .AddLinkHttpRequestAction(StandardAuthForms.OtpForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.otpCodeFormId, new WorkflowLinkHttpRequestParameter
+        {
+            Method = HttpMethods.POST,
+            IsAntiforgeryEnabled = true,
+            Target = "https://localhost:5001/{realm}/otp/Authenticate",
+            TargetTransformer = new RegexTransformerParameters()
+            {
+                Rules = new ObservableCollection<MappingRule>
+                {
+                    new MappingRule { Source = "$.Realm", Target = "realm" }
+                }
+            }
+        })
+        .Build();
+
     public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>
     {
         DefaultWorkflow,
@@ -271,6 +290,7 @@ public class StandardAuthWorkflows
         PwdSmsWorkflow,
         PwdWebauthnWorkflow,
         WebauthnWorkflow,
-        MobileWorkflow
+        MobileWorkflow,
+        OtpWorkflow
     };
 }

@@ -1,16 +1,19 @@
 ﻿using FormBuilder.Factories;
 using FormBuilder.Models;
 using System.Collections.ObjectModel;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components.FormElements.ListData;
 
 public class ListDataDefinition : GenericFormElementDefinition<ListDataRecord>
 {
     private readonly IRepetitionRuleEngineFactory _repetitionRuleEngineFactory;
+    private readonly ITransformationRuleEngineFactory _transformationRuleEngineFactory;
 
-    public ListDataDefinition(IRepetitionRuleEngineFactory repetitionRuleEngineFactory)
+    public ListDataDefinition(IRepetitionRuleEngineFactory repetitionRuleEngineFactory, ITransformationRuleEngineFactory transformationRuleEngineFactory)
     {
         _repetitionRuleEngineFactory = repetitionRuleEngineFactory;
+        _transformationRuleEngineFactory = transformationRuleEngineFactory;
     }
 
     public static string TYPE = "ListData";
@@ -24,6 +27,9 @@ public class ListDataDefinition : GenericFormElementDefinition<ListDataRecord>
         if (record.RepetitionRule == null) return;
         var inputData = context.GetCurrentStepInputData();
         var result = _repetitionRuleEngineFactory.Transform(definitions, record.FieldType, inputData, record.RepetitionRule, record.Parameters);
+        ApplyChildren(record, result, definitions, context);
+        ApplyTransformations(record, result);
+        ApplyHtmlAttributes(record, result);
         var tmp = new ObservableCollection<IFormElementRecord>();
         var link = context.Definition.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
         result.ForEach(r =>
@@ -45,5 +51,47 @@ public class ListDataDefinition : GenericFormElementDefinition<ListDataRecord>
         });
 
         record.Elements = tmp;
+    }
+
+    private void ApplyChildren(ListDataRecord listDataRecord, List<(IFormElementRecord, JsonNode)> records, List<IFormElementDefinition> definitions, WorkflowContext context)
+    {
+        if (listDataRecord == null) return;
+        foreach (var record in records)
+        {
+            var layoutRecord = record.Item1 as BaseFormLayoutRecord;
+            if (layoutRecord == null) continue;
+            var children = new ObservableCollection<IFormElementRecord>();
+            foreach (var child in listDataRecord.Children)
+            {
+                var newContext = context.BuildNewContext(record.Item2.AsObject());
+                var definition = definitions.Single(d => d.Type == child.Type);
+                definition.Init(child, newContext, definitions);
+                children.Add(child);
+            }
+
+            layoutRecord.Elements = children;
+        }
+    }
+
+    private void ApplyTransformations(ListDataRecord listDataRecord, List<(IFormElementRecord, JsonNode)> records)
+    {
+        if (listDataRecord.Transformations == null || !listDataRecord.Transformations.Any()) return;
+        foreach (var record in records)
+        {
+            var inputData = record.Item2.AsObject();
+            foreach (var transformation in listDataRecord.Transformations)
+            {
+                _transformationRuleEngineFactory.Apply(record.Item1, inputData, transformation);
+            }
+        }
+    }
+
+    private void ApplyHtmlAttributes(ListDataRecord listDataRecord, List<(IFormElementRecord, JsonNode)> records)
+    {
+        if (listDataRecord.HtmlAttributes == null || !listDataRecord.HtmlAttributes.Any()) return;
+        foreach(var record in records)
+        {
+            record.Item1.HtmlAttributes = listDataRecord.HtmlAttributes;
+        }
     }
 }

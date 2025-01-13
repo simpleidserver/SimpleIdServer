@@ -17,7 +17,7 @@
                             switch(Value.FormType)
                             {
                                 case FormTypes.BLAZOR:
-                                    <EditForm style="@Value.CssStyle" AdditionalAttributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
+                                    <EditForm style="@Value.CssStyle" Attributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
                                         <RadzenStack Orientation="Orientation.Vertical">
                                             @CustomRender
                                         </RadzenStack>

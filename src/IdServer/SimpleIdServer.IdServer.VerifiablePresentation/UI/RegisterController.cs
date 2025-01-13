@@ -62,7 +62,9 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
             EndRegisterUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpEndRegister}",
             RedirectUrl = userRegistrationProgress?.RedirectUrl
         };
-        return View(viewModel);
+        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix);
+        result.SetInput(viewModel);
+        return View(result);
     }
 
     protected override void EnrichUser(User user, VerifiablePresentationRegisterViewModel viewModel) { }

@@ -16,7 +16,7 @@ public class AuthController : BaseWorkflowController
     {
     }
 
-    public async Task<IActionResult> Index(string workflowId, string stepId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(string stepId, CancellationToken cancellationToken)
     {
         var viewModel = await BuildViewModel(stepId, cancellationToken);
         return View(viewModel);

@@ -4,13 +4,13 @@ using FormBuilder.Builders;
 using FormBuilder.Components.FormElements.Button;
 using FormBuilder.Components.FormElements.Image;
 using FormBuilder.Components.FormElements.Input;
+using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Components.FormElements.Title;
 using FormBuilder.Conditions;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
 using FormBuilder.Rules;
-using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,6 +30,11 @@ public class StandardRegistrationForms
     public static string webauthnFormId = "3c5c4862-b03f-4744-935e-2f01724c97f2";
 
     public static string mobileFormId = "79dccd2d-133c-4749-8225-2b2718337995";
+
+    public static string displayQrCodeStepId = "3778cba5-a3ff-4f49-924e-32a41215d270";
+    public static string displayQrCodeFormId = "83bb0cdb-4c78-4add-8dd0-89a3277ee666";
+
+    public static string vpRegistrationFormId = "c08b62d4-15db-4dc1-a552-1fd3d6a26578";
 
     #region Registration forms
 
@@ -752,6 +757,92 @@ public class StandardRegistrationForms
         }
     };
 
+    public static FormRecord VpRegistrationForm = new FormRecord
+    {
+        Id = "f6389263-aa6f-410c-93c8-fd37ed4fdf2f",
+        Name = "vp",
+        ActAsStep = true,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new ListDataRecord
+            {
+                Id = vpRegistrationFormId,
+                FieldType = FormStackLayoutDefinition.TYPE,
+                Transformations = new List<ITransformationRule>
+                {
+                    new PropertyTransformationRule
+                    {
+                        PropertyName = "IsFormEnabled",
+                        PropertyValue = "true"
+                    },
+                    new PropertyTransformationRule
+                    {
+                        PropertyName = "FormType",
+                        PropertyValue = "HTML"
+                    }
+                },
+                HtmlAttributes = new Dictionary<string, object>
+                {
+                    { "class", "vpRegister" }
+                },
+                Children = new List<IFormElementRecord>
+                {
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "id",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Id"
+                            }
+                        }
+                    },
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+                    }
+                },
+                RepetitionRule = new IncomingTokensRepetitionRule
+                {
+                    Path = "$.VerifiablePresentations[*]"
+                }
+            }
+        }
+    };
+
+    public static FormRecord DisplayQrCodeForm = new FormRecord
+    {
+        Id = "71edcf7a-e810-4541-a232-616893da8bf3",
+        Name = displayQrCodeStepId,
+        ActAsStep = false,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = displayQrCodeFormId,
+                IsFormEnabled = false,
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new ImageRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Url"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     #endregion
 
     public static List<FormRecord> AllForms => new List<FormRecord>
@@ -760,6 +851,8 @@ public class StandardRegistrationForms
         SmsForm,
         PwdForm,
         WebauthnForm,
-        MobileForm
+        MobileForm,
+        VpRegistrationForm,
+        DisplayQrCodeForm
     };
 }

@@ -40,6 +40,7 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
             if (parameter.MappingRules != null)
                 foreach(var mappingRule in parameter.MappingRules)
                     ApplyProperty(instance, mappingRule, node, filteredProperties);
+
             var formField = instance as BaseFormFieldRecord;
             if(formField != null && parameter.LabelMappingRules != null)
             {

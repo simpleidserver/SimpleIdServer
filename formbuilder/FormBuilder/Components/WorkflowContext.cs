@@ -198,6 +198,19 @@ public class WorkflowContext
         return result;
     }
 
+    public WorkflowContext BuildNewContext(JsonObject input)
+    {
+        var result = new WorkflowContext
+        {
+            WorkflowEditorContext = new WorkflowEditorContext(),
+            FormEditorContext = new FormEditorContext(),
+            Definition = Definition,
+            Execution = new WorkflowExecution { CurrentStepId = Execution.CurrentStepId }
+        };
+        InitializeWorkflowExecution(result, input);
+        return result;
+    }
+
     private static void InitializeWorkflowExecution(WorkflowContext context, JsonObject jsonObject)
     {
         var links = new List<WorkflowStepLinkExecution>();

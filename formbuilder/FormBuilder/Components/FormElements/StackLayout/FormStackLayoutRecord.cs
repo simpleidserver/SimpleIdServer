@@ -8,7 +8,6 @@ public class FormStackLayoutRecord : BaseFormLayoutRecord
 {
     public override string Type => FormStackLayoutDefinition.TYPE;
     public bool IsFormEnabled { get; set; } = false;
-    public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     [JsonIgnore]
     public bool IsSubmitting { get; set; }
     public FormTypes FormType { get; set; } = FormTypes.BLAZOR;

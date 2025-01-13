@@ -31,6 +31,7 @@ public static class StandardAuthForms
     public static string smsStepId = "sms";
     public static string webAuthnStepId = "webauthn";
     public static string mobileStepId = "mobile";
+    public static string otpStepId = "otp";
     public static string displayQrCodeStepId = "displayQrCode";
 
     public static string pwdAuthFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
@@ -51,6 +52,8 @@ public static class StandardAuthForms
     public static string mobileFormId = "96f59bb9-d01c-4f99-8b40-ddf00c287013";
 
     public static string displayQrCodeFormId = "e33c2422-cda4-4e44-826e-26eb74ce8bc4";
+
+    public static string otpCodeFormId = "54df94cd-8a59-4a5b-ac5c-fea895f4373f";
 
     #region Auth forms
 
@@ -824,6 +827,97 @@ public static class StandardAuthForms
         }
     };
 
+    public static FormRecord OtpForm = new FormRecord
+    {
+        Id = "d5ed2dc8-80c4-4323-9920-d23f8083f3a8",
+        Name = otpStepId,
+        ActAsStep = true,
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            // Authentication.
+            new FormStackLayoutRecord
+            {
+                Id = otpCodeFormId,
+                IsFormEnabled = true,
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ReturnUrl",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.ReturnUrl"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Realm",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Realm"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Action",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new StaticValueTransformationRule
+                            {
+                                Value = "AUTHENTICATE"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Login",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Login"
+                            },
+                            new PropertyTransformationRule
+                            {
+                                Condition = new PresentParameter
+                                {
+                                    Source = "$.Login"
+                                },
+                                PropertyName = "Disabled",
+                                PropertyValue = "true"
+                            }
+                        }
+                    },
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "OTPCode",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Confirmation code").Build()
+                    },
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
+                    }
+                }
+            }
+        }
+    };
+
     #endregion
 
     #region Reset forms
@@ -917,6 +1011,7 @@ public static class StandardAuthForms
         WebauthnForm,
         MobileForm,
         DisplayQrCodeForm,
-        FormBuilder.Constants.EmptyStep
+        FormBuilder.Constants.EmptyStep,
+        OtpForm
     };
 }

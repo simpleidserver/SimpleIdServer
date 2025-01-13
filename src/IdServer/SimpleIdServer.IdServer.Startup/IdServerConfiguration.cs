@@ -46,7 +46,8 @@ namespace SimpleIdServer.IdServer.Startup
             RegistrationWorkflowBuilder.New("sms", StandardRegistrationWorkflows.smsWorkflowId).Build(),
             RegistrationWorkflowBuilder.New("pwd", StandardRegistrationWorkflows.pwdWorkflowId).Build(),
             RegistrationWorkflowBuilder.New("webauthn", StandardRegistrationWorkflows.webauthWorkflowId).Build(),
-            RegistrationWorkflowBuilder.New("mobile", StandardRegistrationWorkflows.mobileWorkflowId).Build()
+            RegistrationWorkflowBuilder.New("mobile", StandardRegistrationWorkflows.mobileWorkflowId).Build(),
+            RegistrationWorkflowBuilder.New("vp", StandardRegistrationWorkflows.vpWorkflowId).Build()
         };
 
         public static Scope IdProviderAdministratorScope = new Scope

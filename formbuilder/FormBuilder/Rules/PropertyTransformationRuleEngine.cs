@@ -21,8 +21,9 @@ public class PropertyTransformationRuleEngine : GenericTransformationRule<Proper
             if (!_conditionRuleEngineFactory.Evaluate(input, parameter.Condition)) return;
         }
 
-        var type = typeof(R);
+        var type = record.GetType();
         var property = type.GetProperty(parameter.PropertyName);
-        property.SetValue(record, Convert.ChangeType(parameter.PropertyValue, property.PropertyType));
+        if (property.PropertyType.IsEnum) property.SetValue(record, Enum.Parse(property.PropertyType, parameter.PropertyValue));
+        else property.SetValue(record, Convert.ChangeType(parameter.PropertyValue, property.PropertyType));
     }
 }
