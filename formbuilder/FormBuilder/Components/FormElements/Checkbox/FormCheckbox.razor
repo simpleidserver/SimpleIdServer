@@ -7,7 +7,7 @@
      <Children>
         <div>
             <RadzenCheckBox Name="@Value.Name" @bind-Value="@Value.Value"></RadzenCheckBox>
-            <RadzenLabel>@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty)</RadzenLabel>
+            <RadzenLabel>@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty, InputData, !IsEditModeEnabled)</RadzenLabel>
         </div>
      </Children>
 </DraggableFormElement>

@@ -307,7 +307,7 @@ public class Constants
                             new FormButtonRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Create").AddTranslation("en", "Update", new UserAuthenticatedParameter()).Build()
                             }
                         }
                     }

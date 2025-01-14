@@ -31,9 +31,6 @@ public class StandardRegistrationForms
 
     public static string mobileFormId = "79dccd2d-133c-4749-8225-2b2718337995";
 
-    public static string displayQrCodeStepId = "3778cba5-a3ff-4f49-924e-32a41215d270";
-    public static string displayQrCodeFormId = "83bb0cdb-4c78-4add-8dd0-89a3277ee666";
-
     public static string vpRegistrationFormId = "c08b62d4-15db-4dc1-a552-1fd3d6a26578";
 
     #region Registration forms
@@ -241,7 +238,7 @@ public class StandardRegistrationForms
                     new FormButtonRecord
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").AddTranslation("en", "Update", new UserAuthenticatedParameter()).Build()
                     }
                 }
             }
@@ -764,79 +761,91 @@ public class StandardRegistrationForms
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
         {
-            new ListDataRecord
-            {
-                Id = vpRegistrationFormId,
-                FieldType = FormStackLayoutDefinition.TYPE,
-                Transformations = new List<ITransformationRule>
-                {
-                    new PropertyTransformationRule
-                    {
-                        PropertyName = "IsFormEnabled",
-                        PropertyValue = "true"
-                    },
-                    new PropertyTransformationRule
-                    {
-                        PropertyName = "FormType",
-                        PropertyValue = "HTML"
-                    }
-                },
-                HtmlAttributes = new Dictionary<string, object>
-                {
-                    { "class", "vpRegister" }
-                },
-                Children = new List<IFormElementRecord>
-                {
-                    new FormInputFieldRecord
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = "id",
-                        FormType = FormInputTypes.HIDDEN,
-                        Transformations = new List<ITransformationRule>
-                        {
-                            new IncomingTokensTransformationRule
-                            {
-                                Source = "$.Id"
-                            }
-                        }
-                    },
-                    new FormButtonRecord
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
-                    }
-                },
-                RepetitionRule = new IncomingTokensRepetitionRule
-                {
-                    Path = "$.VerifiablePresentations[*]"
-                }
-            }
-        }
-    };
-
-    public static FormRecord DisplayQrCodeForm = new FormRecord
-    {
-        Id = "71edcf7a-e810-4541-a232-616893da8bf3",
-        Name = displayQrCodeStepId,
-        ActAsStep = false,
-        Elements = new ObservableCollection<IFormElementRecord>
-        {
+            // Registration form.
             new FormStackLayoutRecord
             {
-                Id = displayQrCodeFormId,
-                IsFormEnabled = false,
+                Id = Guid.NewGuid().ToString(),
+                HtmlAttributes = new Dictionary<string, object>
+                {
+                    { "id", "registerVp" }
+                },
                 Elements = new ObservableCollection<IFormElementRecord>
                 {
+                    new ListDataRecord
+                    {
+                        Id = vpRegistrationFormId,
+                        FieldType = FormStackLayoutDefinition.TYPE,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new PropertyTransformationRule
+                            {
+                                PropertyName = "IsFormEnabled",
+                                PropertyValue = "true"
+                            },
+                            new PropertyTransformationRule
+                            {
+                                PropertyName = "FormType",
+                                PropertyValue = "HTML"
+                            }
+                        },
+                        HtmlAttributes = new Dictionary<string, object>
+                        {
+                            { "class", "vpRegister" }
+                        },
+                        Children = new List<IFormElementRecord>
+                        {
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "id",
+                                FormType = FormInputTypes.HIDDEN,
+                                Transformations = new List<ITransformationRule>
+                                {
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.Id"
+                                    }
+                                }
+                            },
+                            new FormButtonRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+                            }
+                        },
+                        RepetitionRule = new IncomingTokensRepetitionRule
+                        {
+                            Path = "$.VerifiablePresentations[*]"
+                        }
+                    }
+                }
+            },
+            // Display qr code.
+            new FormStackLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                IsFormEnabled = false,
+                HtmlAttributes = new Dictionary<string, object>
+                {
+                    { "id", "qrCodeContainer" }
+                },
+                CssStyle = "display: none !important; text-align: center;",
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new TitleRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Scan the QR code with your mobile application").Build()
+                    },
                     new ImageRecord
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Transformations = new List<ITransformationRule>
+                        HtmlAttributes = new Dictionary<string, object>
                         {
-                            new IncomingTokensTransformationRule
-                            {
-                                Source = "$.Url"
-                            }
-                        }
+                            { "id", "qrCode" }
+                        },
+                        CssStyle = "width:400px",
+                        Url = ""
                     }
                 }
             }
@@ -852,7 +861,6 @@ public class StandardRegistrationForms
         PwdForm,
         WebauthnForm,
         MobileForm,
-        VpRegistrationForm,
-        DisplayQrCodeForm
+        VpRegistrationForm
     };
 }

@@ -91,7 +91,7 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         var nodes = pathResult.Matches.Select(m => m.Value);
         if (nodes.Count() != 1) return;
         var translation = nodes.Single()?.ToString();
-        instance.Labels.Add(new LabelTranslation { Language = labelMappingRule.Language, Translation = translation });
+        instance.Labels.Add(new LabelTranslation { Language = labelMappingRule.Language, Translation = translation, ConditionParameter = null });
     }
 
     private void ApplyParameters(object instance, IEnumerable<PropertyInfo> properties, Dictionary<string, object> parameters)

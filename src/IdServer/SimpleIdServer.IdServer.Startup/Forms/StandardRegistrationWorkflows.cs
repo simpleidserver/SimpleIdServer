@@ -127,10 +127,8 @@ public class StandardRegistrationWorkflows
 
     public static WorkflowRecord VpWorkflow = WorkflowBuilder.New(vpWorkflowId)
         .AddStep(StandardRegistrationForms.VpRegistrationForm, new Coordinate(100, 100))
-        .AddStep(StandardRegistrationForms.DisplayQrCodeForm, new Coordinate(200, 100))
-        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(300, 100))
-        .AddLinkAction(StandardRegistrationForms.VpRegistrationForm, StandardRegistrationForms.DisplayQrCodeForm, StandardRegistrationForms.vpRegistrationFormId)
-        .AddLinkAction(StandardRegistrationForms.DisplayQrCodeForm, FormBuilder.Constants.EmptyStep, StandardRegistrationForms.displayQrCodeFormId)
+        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
+        .AddLinkAction(StandardRegistrationForms.VpRegistrationForm, FormBuilder.Constants.EmptyStep, StandardRegistrationForms.vpRegistrationFormId)
         .Build();
 
 

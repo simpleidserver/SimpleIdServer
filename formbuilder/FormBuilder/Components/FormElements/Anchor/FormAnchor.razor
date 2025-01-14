@@ -10,11 +10,11 @@
             <Children>
                 @if(Value.ActAsButton)
                 {
-                    <RadzenButton Text="@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty)" Click="@(async (e) => await Navigate())" class="fullWidth"></RadzenButton>
+                    <RadzenButton Text="@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty, !IsEditModeEnabled)" Click="@(async (e) => await Navigate())" class="fullWidth"></RadzenButton>
                 }
                 else
                 {
-                    <a href="#" @onclick:stopPropagation="true" @onclick:preventDefault="true" @onclick="@(async (e) => await Navigate())">@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty)</a>
+                    <a href="#" @onclick:stopPropagation="true" @onclick:preventDefault="true" @onclick="@(async (e) => await Navigate())">@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty, InputData, !IsEditModeEnabled)</a>
                 }
             </Children>
         </DraggableFormElement>

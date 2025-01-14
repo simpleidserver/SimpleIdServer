@@ -1,4 +1,5 @@
-﻿using FormBuilder.Models;
+﻿using FormBuilder.Conditions;
+using FormBuilder.Models;
 
 namespace FormBuilder.Builders;
 
@@ -16,9 +17,9 @@ public class LabelTranslationBuilder
         return new LabelTranslationBuilder();
     }
 
-    public LabelTranslationBuilder AddTranslation(string language, string translation)
+    public LabelTranslationBuilder AddTranslation(string language, string translation, IConditionParameter conditionParameter = null)
     {
-        _translations.Add(new LabelTranslation(language, translation));
+        _translations.Add(new LabelTranslation(language, translation, conditionParameter));
         return this;
     }
 

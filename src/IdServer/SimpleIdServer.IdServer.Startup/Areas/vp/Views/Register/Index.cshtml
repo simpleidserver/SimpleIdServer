@@ -52,10 +52,15 @@
             }
 
             var viewQrCode = function (img) {
-                csharpReference.invokeMethodAsync("Navigate", mId, "Url", img);
+                $("#registerVp").attr("style", "display: none !important");
+                $("#qrCodeContainer").css("display", "");
+                $("#qrCodeContainer img").attr("src", img);
             }
 
             var displaySuccessMessage = function () {
+                csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
+                $("#registerVp").attr("style", "display: none !important");
+                $("#qrCodeContainer").css("display", "none");
             }
 
             async function register(state) {

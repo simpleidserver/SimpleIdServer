@@ -155,8 +155,8 @@ if (identityServerConfiguration.ForceHttps)
 app.UseRequestLocalization(e =>
 {
     e.SetDefaultCulture("en");
-    e.AddSupportedCultures("en");
-    e.AddSupportedUICultures("en");
+    e.AddSupportedCultures("en", "fr");
+    e.AddSupportedUICultures("en", "fr");
 });
 
 if (!app.Environment.IsDevelopment())
@@ -202,6 +202,11 @@ void ConfigureIdServer(IServiceCollection services)
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
             cb.ScimClientOptions = conf;
+            cb.SupportedUICultures = new List<UICulture>
+            {
+                new UICulture { DisplayName = "English", Name = "en" },
+                new UICulture { DisplayName = "French", Name = "fr" }
+            };
         }, cookie: c =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix))

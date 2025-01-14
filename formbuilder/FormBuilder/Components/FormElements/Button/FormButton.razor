@@ -4,6 +4,6 @@
 
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormButtonDialog" TRecord="FormButtonRecord" Record="@Value">
     <Children>
-        <RadzenButton Disabled="@(Value.IsSubmitting)" Text="@(Value.IsSubmitting ? "Submitting..." : translationHelper.Translate(Value))" ButtonType="ButtonType.Submit" class="fullWidth"></RadzenButton>
+        <RadzenButton Disabled="@(Value.IsSubmitting)" Text="@(Value.IsSubmitting ? "Submitting..." : translationHelper.Translate(Value, InputData, !IsEditModeEnabled))" ButtonType="ButtonType.Submit" class="fullWidth"></RadzenButton>
     </Children>
 </DraggableFormElement>

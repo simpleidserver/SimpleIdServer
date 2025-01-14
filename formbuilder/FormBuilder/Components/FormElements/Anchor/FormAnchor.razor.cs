@@ -1,6 +1,7 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Factories;
 using Microsoft.AspNetCore.Components;
+using System.Text.Json.Nodes;
 
 namespace FormBuilder.Components.FormElements.Anchor;
 
@@ -12,8 +13,16 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     [Parameter] public bool IsInteractableElementEnabled { get; set; }
     [Parameter] public WorkflowContext Context { get; set; }
     [Inject] private IWorkflowLinkActionFactory WorkflowLinkActionFactory { get; set; }
+    public JsonNode InputData
+    {
+        get
+        {
+            var linkExecution = Context.GetCurrentStepExecution();
+            return linkExecution?.InputData;
+        }
+    }
 
-    async Task Navigate()
+    private async Task Navigate()
     {
         var linkExecution = Context.GetLinkExecutionFromElementAndCurrentStep(Value.Id);
         var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);

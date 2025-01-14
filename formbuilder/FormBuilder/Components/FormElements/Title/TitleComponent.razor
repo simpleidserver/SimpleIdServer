@@ -4,6 +4,6 @@
 
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="TitleDialog" TRecord="TitleRecord" Record="@Value">
     <Children>
-        <RadzenText TextStyle="@Value.Style">@translationHelper.Translate(Value, (IsEditModeEnabled ? "Please provide a description" : string.Empty))</RadzenText>
+        <RadzenText TextStyle="@Value.Style">@translationHelper.Translate(Value, (IsEditModeEnabled ? "Please provide a description" : string.Empty), InputData, !IsEditModeEnabled)</RadzenText>
     </Children>
 </DraggableFormElement>

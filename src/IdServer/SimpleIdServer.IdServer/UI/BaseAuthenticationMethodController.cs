@@ -111,21 +111,7 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-                var record = records.Single(r => r.Name == Amr);
-                var step = workflow.GetStep(record.Id);
-                var result = new WorkflowViewModel
-                {
-                    CurrentStepId = step.Id,
-                    Workflow = workflow,
-                    FormRecords = records,
-                    AntiforgeryToken = new AntiforgeryTokenRecord
-                    {
-                        CookieName=  _formBuilderOptions.AntiforgeryCookieName,
-                        CookieValue = tokenSet.CookieToken,
-                        FormField = tokenSet.FormFieldName,
-                        FormValue = tokenSet.RequestToken
-                    }
-                };
+                var result = this.BuildViewModel(workflow, records);
                 result.SetInput(viewModel);
                 if(IsMaximumActiveSessionReached()) result.SetErrorMessage(Global.MaximumNumberActiveSessions);
                 if(amrInfo != null && amrInfo.UserId != null && string.IsNullOrWhiteSpace(viewModel.Login)) result.SetErrorMessage(Global.MissingLogin);
@@ -331,21 +317,7 @@ namespace SimpleIdServer.IdServer.UI
                 var records = await _formStore.GetAll(token);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
                 var workflow = await _workflowStore.Get(viewModel.WorkflowId, token);
-                var record = records.Single(r => r.Name == Amr);
-                var step = workflow.GetStep(record.Id);
-                var workflowResult = new WorkflowViewModel
-                {
-                    CurrentStepId = step.Id,
-                    Workflow = workflow,
-                    FormRecords = records,
-                    AntiforgeryToken = new AntiforgeryTokenRecord
-                    {
-                        CookieName = _formBuilderOptions.AntiforgeryCookieName,
-                        CookieValue = tokenSet.CookieToken,
-                        FormField = tokenSet.FormFieldName,
-                        FormValue = tokenSet.RequestToken
-                    }
-                };
+                var workflowResult = BuildViewModel(workflow, records);
                 return workflowResult;
             }
         }
@@ -371,6 +343,29 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         #endregion
+
+        private WorkflowViewModel BuildViewModel(WorkflowRecord workflow, List<FormRecord> records)
+        {
+            var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
+            var workflowStepFormIds = workflow.Steps.Select(s => s.FormRecordId);
+            var filteredRecords = records.Where(r => workflowStepFormIds.Contains(r.Id)).ToList();
+            var record = filteredRecords.Single(r => r.Name == Amr);
+            var step = workflow.GetStep(record.Id);
+            var result = new WorkflowViewModel
+            {
+                CurrentStepId = step.Id,
+                Workflow = workflow,
+                FormRecords = filteredRecords,
+                AntiforgeryToken = new AntiforgeryTokenRecord
+                {
+                    CookieName = _formBuilderOptions.AntiforgeryCookieName,
+                    CookieValue = tokenSet.CookieToken,
+                    FormField = tokenSet.FormFieldName,
+                    FormValue = tokenSet.RequestToken
+                }
+            };
+            return result;
+        }
 
         private bool IsMaximumActiveSessionReached()
         {
