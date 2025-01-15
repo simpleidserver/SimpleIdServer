@@ -36,6 +36,7 @@ namespace SimpleIdServer.IdServer.UI
     public class CheckSessionController : BaseController
     {
         private readonly IdServerHostOptions _options;
+        private readonly ILanguageRepository _languageRepository;
         private readonly IUserRepository _userRepository;
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly IClientRepository _clientRepository;
@@ -45,6 +46,7 @@ namespace SimpleIdServer.IdServer.UI
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
+            ILanguageRepository languageRepository,
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             IClientRepository clientRepository,
@@ -55,6 +57,7 @@ namespace SimpleIdServer.IdServer.UI
             IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
         {
             _options = options.Value;
+            _languageRepository = languageRepository;
             _userRepository = userRepository;
             _userSessionRepository = userSessionRepository;
             _clientRepository = clientRepository;
@@ -156,11 +159,13 @@ namespace SimpleIdServer.IdServer.UI
                     return Redirect($"{issuer}{url}");
                 }
 
+                var languages = await _languageRepository.GetAll(cancellationToken);
                 return View(new RevokeSessionViewModel(
                     url,
                     validationResult.Payload,
                     frontChannelLogouts,
-                    validationResult.Client.RedirectToRevokeSessionUI));
+                    validationResult.Client.RedirectToRevokeSessionUI,
+                    languages));
             }
             catch (OAuthException ex)
             {

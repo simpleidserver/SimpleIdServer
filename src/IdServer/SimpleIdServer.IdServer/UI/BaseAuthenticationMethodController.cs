@@ -45,6 +45,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly ISessionManager _sessionManager;
         private readonly IWorkflowStore _workflowStore;
         private readonly IFormStore _formStore;
+        private readonly ILanguageRepository _languageRepository;
         private readonly FormBuilderOptions _formBuilderOptions;
 
         public BaseAuthenticationMethodController(
@@ -68,6 +69,7 @@ namespace SimpleIdServer.IdServer.UI
             ISessionManager sessionManager,
             IWorkflowStore workflowStore,
             IFormStore formStore,
+            ILanguageRepository languageRepository,
             IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
         {
             _configuration = configuration;
@@ -78,6 +80,7 @@ namespace SimpleIdServer.IdServer.UI
             _sessionManager = sessionManager;
             _workflowStore = workflowStore;
             _formStore = formStore;
+            _languageRepository = languageRepository;
             _formBuilderOptions = formBuilderOptions.Value;
         }
 
@@ -111,7 +114,7 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-                var result = this.BuildViewModel(workflow, records);
+                var result = await this.BuildViewModel(workflow, records, cancellationToken);
                 result.SetInput(viewModel);
                 if(IsMaximumActiveSessionReached()) result.SetErrorMessage(Global.MaximumNumberActiveSessions);
                 if(amrInfo != null && amrInfo.UserId != null && string.IsNullOrWhiteSpace(viewModel.Login)) result.SetErrorMessage(Global.MissingLogin);
@@ -317,7 +320,7 @@ namespace SimpleIdServer.IdServer.UI
                 var records = await _formStore.GetAll(token);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
                 var workflow = await _workflowStore.Get(viewModel.WorkflowId, token);
-                var workflowResult = BuildViewModel(workflow, records);
+                var workflowResult = await BuildViewModel(workflow, records, token);
                 return workflowResult;
             }
         }
@@ -344,18 +347,20 @@ namespace SimpleIdServer.IdServer.UI
 
         #endregion
 
-        private WorkflowViewModel BuildViewModel(WorkflowRecord workflow, List<FormRecord> records)
+        private async Task<WorkflowViewModel> BuildViewModel(WorkflowRecord workflow, List<FormRecord> records, CancellationToken cancellationToken)
         {
             var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
             var workflowStepFormIds = workflow.Steps.Select(s => s.FormRecordId);
             var filteredRecords = records.Where(r => workflowStepFormIds.Contains(r.Id)).ToList();
             var record = filteredRecords.Single(r => r.Name == Amr);
             var step = workflow.GetStep(record.Id);
-            var result = new WorkflowViewModel
+            var languages = await _languageRepository.GetAll(cancellationToken);
+            var result = new SidWorkflowViewModel
             {
                 CurrentStepId = step.Id,
                 Workflow = workflow,
                 FormRecords = filteredRecords,
+                Languages = languages,
                 AntiforgeryToken = new AntiforgeryTokenRecord
                 {
                     CookieName = _formBuilderOptions.AntiforgeryCookieName,

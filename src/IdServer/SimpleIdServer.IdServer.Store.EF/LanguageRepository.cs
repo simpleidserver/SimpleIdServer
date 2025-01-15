@@ -24,6 +24,19 @@ public class LanguageRepository : ILanguageRepository
     public async Task<List<Language>> GetAll(CancellationToken cancellationToken)
     {
         var languages = await _dbContext.Languages.ToListAsync(cancellationToken);
+        foreach (var language in languages)
+        {
+            var descriptions = await _dbContext.Translations.Where(t => t.Key == language.TranslationKey).ToListAsync();
+            language.Descriptions = descriptions;
+            language.Description = GetDescription(language);
+        }
+
         return languages;
+    }
+
+    private string GetDescription(Language language)
+    {
+        var description = language.Descriptions.SingleOrDefault(d => d.Key == language.TranslationKey && d.Language == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
+        return description?.Value;
     }
 }

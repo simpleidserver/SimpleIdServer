@@ -162,4 +162,7 @@
   <data name="user_exists" xml:space="preserve">
     <value>User with the same name already exists</value>
   </data>
+  <data name="InvalidResetLink" xml:space="preserve">
+    <value>The reset link is invalid</value>
+  </data>
 </root>

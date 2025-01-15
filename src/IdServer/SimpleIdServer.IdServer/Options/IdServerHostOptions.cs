@@ -116,14 +116,6 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
         /// <summary>
-        /// UI cultures.
-        /// </summary>
-        public IEnumerable<UICulture> SupportedUICultures { get; set; } = new List<UICulture> { new UICulture { DisplayName = "English", Name = "en" } };
-        /// <summary>
-        /// Default culture.
-        /// </summary>
-        public string DefaultCulture { get; set; } = "en";
-        /// <summary>
         /// Default acr value.
         /// </summary>
         public string DefaultAcrValue { get; set; } = Constants.StandardAcrs.FirstLevelAssurance.Name;

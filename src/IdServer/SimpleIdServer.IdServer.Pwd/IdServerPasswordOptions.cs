@@ -29,4 +29,6 @@ public class IdServerPasswordOptions
     /// </summary>
     [ConfigurationRecord("Can reset the password", null, order: 4)]
     public bool CanResetPassword { get; set; }
+    [ConfigurationRecord("Identifier workflow of the reset confirmation", null, order: 5)]
+    public string ConfirmResetPasswordWorkflowId { get; set; }
 }

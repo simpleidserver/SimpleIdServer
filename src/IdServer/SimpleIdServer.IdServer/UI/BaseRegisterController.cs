@@ -35,7 +35,8 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         IJwtBuilder jwtBuilder,
         IAntiforgery antiforgery,
         IFormStore formStore,
-        IWorkflowStore workflowStore) : base(tokenRepository, jwtBuilder)
+        IWorkflowStore workflowStore,
+        ILanguageRepository languageRepository) : base(tokenRepository, jwtBuilder)
     {
         Options = options.Value;
         FormOptions = formOptions.Value;
@@ -45,6 +46,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         Antiforgery = antiforgery;
         FormStore = formStore;
         WorkflowStore = workflowStore;
+        LanguageRepository = languageRepository;
     }
 
     protected IdServerHostOptions Options { get; }
@@ -55,6 +57,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
     protected IAntiforgery Antiforgery { get; }
     protected IFormStore FormStore { get; }
     protected IWorkflowStore WorkflowStore { get; }
+    protected ILanguageRepository LanguageRepository { get; }
     protected abstract string Amr { get; }
 
     protected async Task<UserRegistrationProgress> GetRegistrationProgress()
@@ -120,7 +123,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         return RedirectToAction("Index", "Register", new { area = nextAmr });
     }
 
-    protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProgress, TViewModel viewModel, string prefix)
+    protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProgress, TViewModel viewModel, string prefix, CancellationToken cancellationToken)
     {
         var tokenSet = Antiforgery.GetAndStoreTokens(HttpContext);
         var records = await FormStore.GetAll(CancellationToken.None);
@@ -129,11 +132,13 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         var filteredRecords = records.Where(r => workflowFormIds.Contains(r.Id));
         var record = filteredRecords.Single(r => r.Name == Amr);
         var step = workflow.GetStep(record.Id);
-        var result = new WorkflowViewModel
+        var languages = await LanguageRepository.GetAll(cancellationToken);
+        var result = new SidWorkflowViewModel
         {
             CurrentStepId = step.Id,
             Workflow = workflow,
             FormRecords = records,
+            Languages = languages,
             AntiforgeryToken = new AntiforgeryTokenRecord
             {
                 CookieName = FormOptions.AntiforgeryCookieName,

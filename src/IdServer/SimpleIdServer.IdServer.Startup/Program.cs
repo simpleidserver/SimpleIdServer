@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -202,11 +201,6 @@ void ConfigureIdServer(IServiceCollection services)
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
             cb.ScimClientOptions = conf;
-            cb.SupportedUICultures = new List<UICulture>
-            {
-                new UICulture { DisplayName = "English", Name = "en" },
-                new UICulture { DisplayName = "French", Name = "fr" }
-            };
         }, cookie: c =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix))

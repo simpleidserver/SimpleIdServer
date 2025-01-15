@@ -24,6 +24,20 @@ public class LanguageRepository : ILanguageRepository
     public async Task<List<Language>> GetAll(CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarLanguage>().ToListAsync(cancellationToken);
-        return result.Select(r => r.ToDomain()).ToList();
+        var res = result.Select(r => r.ToDomain()).ToList();
+        foreach (var language in res)
+        {
+            var descriptions = await _dbContext.Client.Queryable<SugarTranslation>().Where(t => t.Key == language.TranslationKey).ToListAsync(cancellationToken);
+            language.Descriptions = descriptions.Select(d => d.ToDomain()).ToList();
+            language.Description = GetDescription(language);
+        }
+
+        return res;
+    }
+
+    private string GetDescription(Language language)
+    {
+        var description = language.Descriptions.SingleOrDefault(d => d.Key == language.TranslationKey && d.Language == Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);
+        return description?.Value;
     }
 }

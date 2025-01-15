@@ -26,7 +26,7 @@ public class ListDataDefinition : GenericFormElementDefinition<ListDataRecord>
     {
         if (record.RepetitionRule == null) return;
         var inputData = context.GetCurrentStepInputData();
-        var result = _repetitionRuleEngineFactory.Transform(definitions, record.FieldType, inputData, record.RepetitionRule, record.Parameters);
+        var result = _repetitionRuleEngineFactory.Transform(context.Execution.SupportedLanguageCodes, definitions, record.FieldType, inputData, record.RepetitionRule, record.Parameters);
         ApplyChildren(record, result, definitions, context);
         ApplyTransformations(record, result);
         ApplyHtmlAttributes(record, result);

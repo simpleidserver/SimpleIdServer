@@ -15,13 +15,13 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Jobs;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.AuthProviders;
+using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -31,7 +31,6 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using SimpleIdServer.IdServer.UI.Infrastructures;
 
 namespace SimpleIdServer.IdServer.UI
 {
@@ -52,6 +51,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly ISessionHelper _sessionHelper;
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly ISessionManager _sessionManager;
+        private readonly ILanguageRepository _languageRepository;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -69,6 +69,7 @@ namespace SimpleIdServer.IdServer.UI
             ISessionHelper sessionHelper,
             ITransactionBuilder transactionBuilder,
             ISessionManager sessionManager,
+            ILanguageRepository languageRepository,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -86,18 +87,24 @@ namespace SimpleIdServer.IdServer.UI
             _sessionHelper = sessionHelper;
             _transactionBuilder = transactionBuilder;
             _sessionManager = sessionManager;
+            _languageRepository = languageRepository;
             _logger = logger;
         }
 
         [HttpGet]
-        public virtual IActionResult Index() => View();
+        public virtual async Task<IActionResult> Index(CancellationToken cancellationToken)
+        {
+            var languages = await _languageRepository.GetAll(cancellationToken);
+            return View(new HomeIndexViewModel { Languages = languages });
+        }
 
         [HttpGet]
         [Authorize(Constants.Policies.Authenticated)]
         public async virtual Task<IActionResult> Profile([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            var viewModel = new ProfileViewModel();
+            var languages = await _languageRepository.GetAll(cancellationToken);
+            var viewModel = new ProfileViewModel { Languages = languages };
             await Build(prefix, viewModel, cancellationToken);
             return View(viewModel);
         }
@@ -353,9 +360,11 @@ namespace SimpleIdServer.IdServer.UI
                 UserName = nameIdentifier,
                 Realm = prefix
             });
+            var languages = await _languageRepository.GetAll(cancellationToken);
             return View(new DisconnectViewModel
             {
-                FrontChannelLogoutUrls = session.FrontChannelLogouts
+                FrontChannelLogoutUrls = session.FrontChannelLogouts,
+                Languages = languages
             });
         }
 

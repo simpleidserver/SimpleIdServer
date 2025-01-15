@@ -1528,6 +1528,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The reset link is invalid.
+        /// </summary>
+        public static string InvalidResetLink {
+            get {
+                return ResourceManager.GetString("InvalidResetLink", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à At least one of the provided resource identifiers was not found at the authorization server..
         /// </summary>
         public static string InvalidResourceId {
@@ -2109,6 +2118,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string OtpCodeMustBeNumber {
             get {
                 return ResourceManager.GetString("OtpCodeMustBeNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The password is updated.
+        /// </summary>
+        public static string PasswordIsUpdated {
+            get {
+                return ResourceManager.GetString("PasswordIsUpdated", resourceCulture);
             }
         }
         

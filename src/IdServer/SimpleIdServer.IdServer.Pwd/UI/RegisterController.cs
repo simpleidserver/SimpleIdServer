@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Pwd;
@@ -33,14 +34,15 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         IJwtBuilder jwtBuilder,
         IAntiforgery antiforgery,
         IFormStore formStore,
-        IWorkflowStore workflowStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
+        IWorkflowStore workflowStore,
+        ILanguageRepository languageRepository) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository)
     {
     }
 
     protected override string Amr => Constants.Areas.Password;
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
+    public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null, CancellationToken cancellationToken = default(CancellationToken))
     {
         prefix = prefix ?? Constants.Prefix;
         var isAuthenticated = User.Identity.IsAuthenticated;
@@ -49,7 +51,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         var userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
         {
-            var res = new WorkflowViewModel();
+            var res = new SidWorkflowViewModel();
             res.SetErrorMessage(Global.NotAllowedToRegister);
             return View(res);
         }
@@ -60,7 +62,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
             viewModel.Login = nameIdentifier;
         }
 
-        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix);
+        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix, cancellationToken);
         result.SetInput(viewModel);
         return View(result);
     }
@@ -75,7 +77,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         // 1. When the user is not authenticated then a registration process must exists.
         if (userRegistrationProgress == null && !isAuthenticated)
         {
-            var res = new WorkflowViewModel();
+            var res = new SidWorkflowViewModel();
             res.SetErrorMessage(Resources.Global.NotAllowedToRegister);
             return View(res);
         }
@@ -87,7 +89,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         }
 
         // 2. Build the view model.
-        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix);
+        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix, cancellationToken);
 
         // 3. Check the incoming request is valid.
         var errors = viewModel.Validate();

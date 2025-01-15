@@ -52,7 +52,8 @@ namespace SimpleIdServer.IdServer.Email.UI
             ISessionManager sessionManager, 
             IWorkflowStore workflowStore,
             IFormStore formStore,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration,notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, formBuilderOptions)
+            ILanguageRepository languageRepository,
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration,notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, formBuilderOptions)
         {
             _configuration = configuration;
         }

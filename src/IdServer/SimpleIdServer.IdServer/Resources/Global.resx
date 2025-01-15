@@ -1140,4 +1140,10 @@
   <data name="UserWithSameLoginAlreadyExists" xml:space="preserve">
     <value>A user with the same login already exists</value>
   </data>
+  <data name="InvalidResetLink" xml:space="preserve">
+    <value>The reset link is invalid</value>
+  </data>
+  <data name="PasswordIsUpdated" xml:space="preserve">
+    <value>The password is updated</value>
+  </data>
 </root>

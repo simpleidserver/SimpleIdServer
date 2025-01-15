@@ -21,7 +21,7 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
 
     public override string Type => IncomingTokensRepetitionRule.TYPE;
 
-    protected override List<(IFormElementRecord, JsonNode)> InternalTransform(List<IFormElementDefinition> definitions, string fieldType, JsonObject input, IncomingTokensRepetitionRule parameter, Dictionary<string, object> parameters)
+    protected override List<(IFormElementRecord, JsonNode)> InternalTransform(List<string> supportedLanguageCodes, List<IFormElementDefinition> definitions, string fieldType, JsonObject input, IncomingTokensRepetitionRule parameter, Dictionary<string, object> parameters)
     {
         var result = new List<(IFormElementRecord, JsonNode)>();
         var path = JsonPath.Parse(parameter.Path);
@@ -45,8 +45,12 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
             if(formField != null && parameter.LabelMappingRules != null)
             {
                 formField.Labels = new List<LabelTranslation>();
-                foreach (var labelMappingRule in parameter.LabelMappingRules)
-                    ApplyLabel(formField, node, labelMappingRule);
+                if (parameter.MapSameTranslationToAllSupportedLanguages)
+                    foreach (var grp in parameter.LabelMappingRules.GroupBy(r => r.Source))
+                        ApplyLabel(formField, node, grp.Key, supportedLanguageCodes);
+                else
+                    foreach (var labelMappingRule in parameter.LabelMappingRules)
+                        ApplyLabel(formField, node, labelMappingRule.Source, new List<string> { labelMappingRule.Language });
             }
 
             var formElt = instance as IFormElementRecord;
@@ -84,14 +88,15 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         definitionProperty.SetValue(instance, value);
     }
 
-    private void ApplyLabel(BaseFormFieldRecord instance, JsonNode node, LabelMappingRule labelMappingRule)
+    private void ApplyLabel(BaseFormFieldRecord instance, JsonNode node, string source, List<string> languages)
     {
-        var path = JsonPath.Parse(labelMappingRule.Source);
+        var path = JsonPath.Parse(source);
         var pathResult = path.Evaluate(node);
         var nodes = pathResult.Matches.Select(m => m.Value);
         if (nodes.Count() != 1) return;
         var translation = nodes.Single()?.ToString();
-        instance.Labels.Add(new LabelTranslation { Language = labelMappingRule.Language, Translation = translation, ConditionParameter = null });
+        foreach(var language in languages)
+            instance.Labels.Add(new LabelTranslation { Language = language, Translation = translation, ConditionParameter = null });
     }
 
     private void ApplyParameters(object instance, IEnumerable<PropertyInfo> properties, Dictionary<string, object> parameters)

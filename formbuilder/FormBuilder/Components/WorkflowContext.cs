@@ -61,12 +61,12 @@ public class WorkflowContext
         return result;
     }
 
-    public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> records, string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, JsonObject inputData)
+    public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> records, string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, JsonObject inputData, List<string> supportedLanguageCodes)
     {
         var result = new WorkflowContext
         {
             Definition = new WorkflowDefinition(workflow, records),
-            Execution = new WorkflowExecution(currentStepId, errorMessages, successMessages, antiforgeryTokenRecord),
+            Execution = new WorkflowExecution(currentStepId, errorMessages, successMessages, antiforgeryTokenRecord, supportedLanguageCodes),
             FormEditorContext = new FormEditorContext(),
             WorkflowEditorContext = new WorkflowEditorContext()
         };
@@ -245,11 +245,12 @@ public class WorkflowExecution
         CurrentStepId = currentStepId;
     }
 
-    public WorkflowExecution(string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord)  : this(currentStepId)
+    public WorkflowExecution(string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, List<string> supportedLanguageCodes)  : this(currentStepId)
     {
         ErrorMessages = errorMessages;
         SuccessMessages = successMessages;
         AntiforgeryToken = antiforgeryTokenRecord;
+        SupportedLanguageCodes = supportedLanguageCodes;
     }
 
     public string CurrentStepId { get; set; }
@@ -258,6 +259,7 @@ public class WorkflowExecution
     public List<string> SuccessMessages { get; set; }
     public AntiforgeryTokenRecord AntiforgeryToken { get; set; }
     public List<WorkflowStepExecution> StepExecutions { get; set; } = new List<WorkflowStepExecution>();
+    public List<string> SupportedLanguageCodes { get; set; }
 }
 
 public class WorkflowStepExecution

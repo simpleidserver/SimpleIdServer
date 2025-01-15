@@ -5,16 +5,7 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels;
 
-public class ErrorViewModel : ILayoutViewModel
+public class HomeIndexViewModel : ILayoutViewModel
 {
-    public ErrorViewModel(string code, string message, List<Language> languages)
-    {
-        Code = code;
-        Message = message;
-        Languages = languages;
-    }
-
-    public string Code { get; }
-    public string Message { get; }
     public List<Language> Languages { get; set; }
 }

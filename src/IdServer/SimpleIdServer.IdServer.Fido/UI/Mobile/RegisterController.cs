@@ -15,6 +15,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Fido.UI.Mobile
@@ -35,7 +36,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IJwtBuilder jwtBuilder,
             IAntiforgery antiforgery,
             IFormStore formStore,
-            IWorkflowStore workflowStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
+            IWorkflowStore workflowStore,
+            ILanguageRepository languageRepository) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository)
         {
             _configuration = configuration;
         }
@@ -43,14 +45,14 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         protected override string Amr => Constants.MobileAMR;
 
         [HttpGet]
-        public async Task<IActionResult> Index([FromRoute] string prefix)
+        public async Task<IActionResult> Index([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             var fidoOptions = GetOptions();
             var isAuthenticated = User.Identity.IsAuthenticated;
             var userRegistrationProgress = await GetRegistrationProgress();
             if (userRegistrationProgress == null && !isAuthenticated)
             {
-                var res = new WorkflowViewModel();
+                var res = new SidWorkflowViewModel();
                 res.SetErrorMessage(Global.NotAllowedToRegister);
                 return View(res);
             }
@@ -73,7 +75,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
                 IsDeveloperModeEnabled = fidoOptions.IsDeveloperModeEnabled,
                 RedirectUrl = userRegistrationProgress?.RedirectUrl
             };
-            var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix);
+            var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix,  cancellationToken);
             result.SetInput(viewModel);
             return View(result);
         }

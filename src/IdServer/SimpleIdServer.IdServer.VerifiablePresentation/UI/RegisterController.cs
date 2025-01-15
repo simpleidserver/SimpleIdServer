@@ -34,7 +34,8 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
         IJwtBuilder jwtBuilder,
         IAntiforgery antiforgery,
         IFormStore formStore,
-        IWorkflowStore workflowStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
+        IWorkflowStore workflowStore,
+        ILanguageRepository languageRepository) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository)
     {
         _presentationDefinitionStore = presentationDefinitionStore;
     }
@@ -62,7 +63,7 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
             EndRegisterUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpEndRegister}",
             RedirectUrl = userRegistrationProgress?.RedirectUrl
         };
-        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix);
+        var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix, cancellationToken);
         result.SetInput(viewModel);
         return View(result);
     }

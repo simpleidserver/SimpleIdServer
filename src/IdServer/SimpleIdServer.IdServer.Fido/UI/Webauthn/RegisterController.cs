@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Fido.UI.Webauthn;
@@ -33,14 +34,15 @@ public class RegisterController : BaseRegisterController<RegisterWebauthnViewMod
         IJwtBuilder jwtBuilder,
         IAntiforgery antiforgery,
         IFormStore formStore,
-        IWorkflowStore workflowStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
+        IWorkflowStore workflowStore,
+        ILanguageRepository languageRepository) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository)
     {
     }
 
     protected override string Amr => Constants.AMR;
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
+    public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null, CancellationToken cancellationToken = default(CancellationToken))
     {
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         if (!string.IsNullOrWhiteSpace(prefix))
@@ -49,7 +51,7 @@ public class RegisterController : BaseRegisterController<RegisterWebauthnViewMod
         var userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
         {
-            var res = new WorkflowViewModel();
+            var res = new SidWorkflowViewModel();
             res.SetErrorMessage(Global.NotAllowedToRegister);
             return View(res);
         }
@@ -64,7 +66,7 @@ public class RegisterController : BaseRegisterController<RegisterWebauthnViewMod
             EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}",
             RedirectUrl = userRegistrationProgress?.RedirectUrl ?? redirectUrl
         };
-        var result = await BuildViewModel(userRegistrationProgress, vm, prefix);
+        var result = await BuildViewModel(userRegistrationProgress, vm, prefix, cancellationToken);
         result.SetInput(vm);
         return View(result);
     }

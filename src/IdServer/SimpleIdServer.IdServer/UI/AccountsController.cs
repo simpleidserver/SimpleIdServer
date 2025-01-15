@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -22,20 +23,22 @@ namespace SimpleIdServer.IdServer.UI
     public class AccountsController : Controller
     {
         private readonly ISessionManager _sessionManager;
+        private readonly ILanguageRepository _languageRepository;
         private readonly IDataProtector _dataProtector;
         private readonly IBusControl _busControl;
 
-        public AccountsController(ISessionManager sessionManager, IDataProtectionProvider dataProtectionProvider, IBusControl busControl)
+        public AccountsController(ISessionManager sessionManager, ILanguageRepository languageRepository, IDataProtectionProvider dataProtectionProvider, IBusControl busControl)
         {
             _sessionManager = sessionManager;
+            _languageRepository = languageRepository;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _busControl = busControl;
         }
 
-        public async Task<IActionResult> Index(string returnUrl)
+        public async Task<IActionResult> Index(string returnUrl, CancellationToken cancellationToken)
         {
             var sessions = _sessionManager.FetchTickets(HttpContext);
-            var result = await GetAccounts(returnUrl);
+            var result = await GetAccounts(returnUrl, cancellationToken);
             return View(result);
         }
 
@@ -62,7 +65,7 @@ namespace SimpleIdServer.IdServer.UI
                             UserName = chooseSessionViewModel.AccountName,
                             Realm = realm
                         });
-                        accounts = await GetAccounts(string.Empty);
+                        accounts = await GetAccounts(string.Empty, cancellationToken);
                         ViewBag.IsSessionRejected = "true";
                         accounts.Accounts = accounts.Accounts.Where(s => s.Name != chooseSessionViewModel.AccountName).ToList();
                         break;
@@ -81,7 +84,7 @@ namespace SimpleIdServer.IdServer.UI
                             return Redirect(unprotectedUrl);
                         }
 
-                        accounts = await GetAccounts(string.Empty);
+                        accounts = await GetAccounts(string.Empty, cancellationToken);
                         ViewBag.IsUserAccountSwitched = "true";
                         break;
                 }
@@ -94,12 +97,13 @@ namespace SimpleIdServer.IdServer.UI
             return View(accounts);
         }
 
-        private async Task<AccountsIndexViewModel> GetAccounts(string returnUrl)
+        private async Task<AccountsIndexViewModel> GetAccounts(string returnUrl, CancellationToken cancellationToken)
         {
             var sessions = _sessionManager.FetchTickets(HttpContext);
             var accounts = sessions.Select(sess => new AccountViewModel(sess.Principal.Claims.First(cl => cl.Type == ClaimTypes.NameIdentifier).Value, sess.Properties.ExpiresUtc, sess.Properties.IssuedUtc));
             accounts = accounts.Where(a => a.ExpiresUct >= DateTime.UtcNow);
-            return new AccountsIndexViewModel(returnUrl, accounts);
+            var languages = await _languageRepository.GetAll(cancellationToken);
+            return new AccountsIndexViewModel(returnUrl, accounts, languages);
         }
     }
 }

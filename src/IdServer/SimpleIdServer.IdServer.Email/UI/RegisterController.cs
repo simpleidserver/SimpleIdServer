@@ -40,7 +40,8 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
         IAntiforgery antiforgery,
         IFormStore formStore,
         IWorkflowStore workflowStore,
-        IJwtBuilder jwtBuilder) : base(logger, options, formOptions, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, antiforgery, formStore, workflowStore, tokenRepository, jwtBuilder)
+        IJwtBuilder jwtBuilder,
+        ILanguageRepository languageRepository) : base(logger, options, formOptions, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, antiforgery, formStore, workflowStore, tokenRepository, jwtBuilder, languageRepository)
     {
         _authenticationHelper = authenticationHelper;
     }

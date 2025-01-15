@@ -20,6 +20,7 @@ public class StandardAuthWorkflows
     public static string webauthWorkflowId = "a725b543-1403-4aab-8329-25b89f07cb48";
     public static string mobileWorkflowId = "1f0a3398-aeb2-42c8-b6e6-ea03396f1a87";
     public static string otpWorkflowId = "cd3a77fe-4462-4896-8d3c-4d0f77e1942b";
+    public static string confirmResetPwdWorkflowId = "e05d75d5-5df1-42d4-8c1e-884fc9a2ecff"; 
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(defaultWorkflowId)
         .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
@@ -282,6 +283,24 @@ public class StandardAuthWorkflows
         })
         .Build();
 
+    public static WorkflowRecord ConfirmResetPwdWorkflow = WorkflowBuilder.New(confirmResetPwdWorkflowId)
+        .AddStep(StandardAuthForms.ConfirmResetPwdForm, new Coordinate(100, 100))
+        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(200, 100))
+        .AddLinkHttpRequestAction(StandardAuthForms.ConfirmResetPwdForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.confirmResetPwdFormId, new WorkflowLinkHttpRequestParameter
+        {
+            Method = HttpMethods.POST,
+            IsAntiforgeryEnabled = true,
+            Target = "https://localhost:5001/{realm}/pwd/Reset/Confirm",
+            TargetTransformer = new RegexTransformerParameters()
+            {
+                Rules = new ObservableCollection<MappingRule>
+                {
+                    new MappingRule { Source = "$.Realm", Target = "realm" }
+                }
+            }
+        })
+        .Build();
+
     public static List<WorkflowRecord> AllWorkflows => new List<WorkflowRecord>
     {
         DefaultWorkflow,
@@ -291,6 +310,7 @@ public class StandardAuthWorkflows
         PwdWebauthnWorkflow,
         WebauthnWorkflow,
         MobileWorkflow,
-        OtpWorkflow
+        OtpWorkflow,
+        ConfirmResetPwdWorkflow
     };
 }

@@ -3,7 +3,7 @@
 @using FormBuilder.Helpers
 @using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Options
-@model FormBuilder.UIs.WorkflowViewModel
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
 @inject IOptions<FormBuilderOptions> options
 @inject IUriProvider uriProvider
 @inject IHttpContextAccessor HttpContextAccessor;
@@ -24,7 +24,8 @@
            param-CurrentStepId="@Model.CurrentStepId"
            param-ErrorMessages="@Model.ErrorMessages"
            param-SuccessMessages="@Model.SuccessMessages"
-           param-AntiforgeryToken="@Model.AntiforgeryToken" />
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
 
 @section Header {
         <link rel="stylesheet" href="@path" />

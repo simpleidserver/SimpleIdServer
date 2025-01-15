@@ -20,6 +20,7 @@ using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Pwd.UI;
@@ -37,6 +38,7 @@ public class ResetController : BaseController
     private readonly IFormStore _formStore;
     private readonly IAntiforgery _antiforgery;
     private readonly IWorkflowStore _workflowStore;
+    private readonly ILanguageRepository _languageRepository;
     private readonly ILogger<ResetController> _logger;
     private readonly FormBuilderOptions _formBuilderOptions;
 
@@ -53,6 +55,7 @@ public class ResetController : BaseController
         IFormStore formStore,
         IAntiforgery antiforgery,
         IWorkflowStore workflowStore,
+        ILanguageRepository languageRepository,
         ILogger<ResetController> logger,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(tokenRepository, jwtBuilder)
     {
@@ -66,6 +69,7 @@ public class ResetController : BaseController
         _formStore = formStore;
         _antiforgery = antiforgery;
         _workflowStore = workflowStore;
+        _languageRepository = languageRepository;
         _logger = logger;
         _formBuilderOptions = formBuilderOptions.Value;
     }
@@ -188,22 +192,28 @@ public class ResetController : BaseController
     public async Task<IActionResult> Confirm([FromRoute] string prefix, string code, string returnUrl, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        var viewModel = new ConfirmResetPasswordViewModel();
         var resetPasswordLink = await _grantedTokenHelper.GetResetPasswordLink(code.ToString(), cancellationToken);
         if(resetPasswordLink == null)
         {
-            ModelState.AddModelError("invalid_link", "invalid_link");
-            return View(viewModel);
+            var vm = new SidWorkflowViewModel();
+            vm.SetErrorMessage(Global.InvalidResetLink);
+            return View(vm);
         }
 
         var user = await _authenticationHelper.GetUserByLogin(resetPasswordLink.Login, prefix, cancellationToken);
-        var notificationMode = GetOptions().NotificationMode;
+        var options = GetOptions();
+        var notificationMode = options.NotificationMode;
         var service = _resetPasswordServices.Single(p => p.NotificationMode == notificationMode);
         var destination = service.GetDestination(user);
-        viewModel.Destination = destination;
-        viewModel.Code = code;
-        viewModel.ReturnUrl = returnUrl;
-        return View(viewModel);
+        var viewModel = new ConfirmResetPasswordViewModel
+        {
+            Destination = destination,
+            Code = code,
+            ReturnUrl = returnUrl
+        };
+        var result = await BuildWorkflowViewModel(options.ConfirmResetPasswordWorkflowId, cancellationToken);
+        result.SetInput(viewModel);
+        return View(result);
     }
 
     [HttpPost]
@@ -213,10 +223,13 @@ public class ResetController : BaseController
         using (var transaction = _transactionBuilder.Build())
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            viewModel.Validate(ModelState);
-            if (!ModelState.IsValid)
+            var result = await BuildWorkflowViewModel(viewModel, cancellationToken);
+            var errors = viewModel.Validate(ModelState);
+            if (errors.Any())
             {
-                return View(viewModel);
+                result.ErrorMessages = errors;;
+                result.SetInput(viewModel);
+                return View(result);
             }
 
             var notificationMode = GetOptions().NotificationMode;
@@ -224,8 +237,9 @@ public class ResetController : BaseController
             var resetPasswordLink = await service.Verify(viewModel.Code, cancellationToken);
             if (resetPasswordLink == null)
             {
-                ModelState.AddModelError("invalid_otpcode", "invalid_otpcode");
-                return View(viewModel);
+                result.SetErrorMessage(Global.OtpCodeIsInvalid);
+                result.SetInput(viewModel);
+                return View(result);
             }
 
             var user = await _authenticationHelper.GetUserByLogin(resetPasswordLink.Login, prefix, cancellationToken);
@@ -245,7 +259,9 @@ public class ResetController : BaseController
             _userRepository.Update(user);
             await transaction.Commit(cancellationToken);
             viewModel.IsPasswordUpdated = true;
-            return View(viewModel);
+            result.SetInput(viewModel);
+            result.SetSuccessMessage(Global.PasswordIsUpdated);
+            return View(result);
         }
     }
 
@@ -255,15 +271,20 @@ public class ResetController : BaseController
         return section.Get<IdServerPasswordOptions>();
     }
 
-    private async Task<WorkflowViewModel> BuildWorkflowViewModel(IStepViewModel viewModel, CancellationToken cancellationToken)
+    private Task<WorkflowViewModel> BuildWorkflowViewModel(IStepViewModel viewModel, CancellationToken cancellationToken)
+        => BuildWorkflowViewModel(viewModel.WorkflowId, cancellationToken);
+
+    private async Task<WorkflowViewModel> BuildWorkflowViewModel(string workflowId, CancellationToken cancellationToken)
     {
         var records = await _formStore.GetAll(cancellationToken);
-        var workflow = await _workflowStore.Get(viewModel.WorkflowId, cancellationToken);
+        var workflow = await _workflowStore.Get(workflowId, cancellationToken);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-        return new WorkflowViewModel
+        var languages = await _languageRepository.GetAll(cancellationToken);
+        return new SidWorkflowViewModel
         {
             Workflow = workflow,
             FormRecords = records,
+            Languages = languages,
             AntiforgeryToken = new AntiforgeryTokenRecord
             {
                 CookieName = _formBuilderOptions.AntiforgeryCookieName,

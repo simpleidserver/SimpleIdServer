@@ -5,7 +5,7 @@
 @using Microsoft.Extensions.Options
 @using SimpleIdServer.IdServer.Fido.UI.ViewModels
 @using System.Text.Json
-@model FormBuilder.UIs.WorkflowViewModel
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
 @inject IOptions<FormBuilderOptions> options
 @inject IUriProvider uriProvider
 @inject IHttpContextAccessor HttpContextAccessor;
@@ -29,7 +29,8 @@
            param-CurrentStepId="@Model.CurrentStepId"
            param-ErrorMessages="@Model.ErrorMessages"
            param-SuccessMessages="@Model.SuccessMessages"
-           param-AntiforgeryToken="@Model.AntiforgeryToken" />
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
 
 @section Header {
     <link rel="stylesheet" href="@path" />

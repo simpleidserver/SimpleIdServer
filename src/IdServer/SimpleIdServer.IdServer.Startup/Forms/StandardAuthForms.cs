@@ -55,6 +55,8 @@ public static class StandardAuthForms
 
     public static string otpCodeFormId = "54df94cd-8a59-4a5b-ac5c-fea895f4373f";
 
+    public static string confirmResetPwdFormId = "e42e4c7f-90e8-455d-be48-fbfbc5424f0f";
+
     #region Auth forms
 
     public static FormRecord LoginPwdAuthForm = new FormRecord
@@ -106,25 +108,25 @@ public static class StandardAuthForms
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "Login",
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").AddTranslation("fr", "Login").Build()
                             },
                             new FormPasswordFieldRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "Password",
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").AddTranslation("fr", "Mot de passe").Build()
                             },
                             new FormCheckboxRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = "RememberLogin",
                                 Value = true,
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").Build()
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").AddTranslation("fr", "Se souvenir de moi").Build()
                             },
                             new FormButtonRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").AddTranslation("fr", "Authentifier").Build()
                             }
                         }
                     },
@@ -132,31 +134,31 @@ public static class StandardAuthForms
                     new DividerLayoutRecord
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").AddTranslation("fr", "OU").Build()
                     },
                     // Forget my password
                     new FormAnchorRecord
                     {
                         Id = pwdForgetBtnId,
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").AddTranslation("fr", "Avez-vous oublié votre mot de passe ?").Build()
                     },
                     // Separator
                     new DividerLayoutRecord
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").AddTranslation("fr", "OU").Build()
                     },
                     // Register
                     new FormAnchorRecord
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").AddTranslation("fr", "Enregistrer").Build()
                     },
                     // Separator
                     new DividerLayoutRecord
                     {
                         Id = Guid.NewGuid().ToString(),
-                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").AddTranslation("fr", "OU").Build()
                     },
                     // List all external identity providers.
                     new ListDataRecord
@@ -170,9 +172,10 @@ public static class StandardAuthForms
                         RepetitionRule = new IncomingTokensRepetitionRule
                         {
                             Path = "$.ExternalIdsProviders[*]",
+                            MapSameTranslationToAllSupportedLanguages = true,
                             LabelMappingRules = new List<FormBuilder.Rules.LabelMappingRule>
                             {
-                                new FormBuilder.Rules.LabelMappingRule { Language = "en", Source = "$.DisplayName" }
+                                new FormBuilder.Rules.LabelMappingRule { Source = "$.DisplayName" },
                             }
                         }
                     }
@@ -999,6 +1002,97 @@ public static class StandardAuthForms
         }
     };
 
+    public static FormRecord ConfirmResetPwdForm = new FormRecord
+    {
+        Id = "4e2562fb-bb3a-4fd7-953c-c5d6e64bb345",
+        Name = "confirmResetPwd",
+        Elements = new ObservableCollection<IFormElementRecord>
+        {
+            new FormStackLayoutRecord
+            {
+                Id = confirmResetPwdFormId,
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormStackLayoutRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        IsFormEnabled = true,
+                        Elements = new ObservableCollection<IFormElementRecord>
+                        {
+                            // ReturnUrl
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "ReturnUrl",
+                                FormType = FormInputTypes.HIDDEN,
+                                Transformations = new List<ITransformationRule>
+                                {
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.ReturnUrl"
+                                    }
+                                }
+                            },
+                            // Login
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Login",
+                                FormType = FormInputTypes.TEXT,
+                                Disabled = true,
+                                Transformations = new List<ITransformationRule>
+                                {
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.Destination"
+                                    }
+                                }
+                            },
+                            // Code
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Code",
+                                FormType = FormInputTypes.TEXT,
+                                Disabled = true,
+                                Transformations = new List<ITransformationRule>
+                                {
+                                    new IncomingTokensTransformationRule
+                                    {
+                                        Source = "$.Code"
+                                    }
+                                },
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Code").Build()
+                            },
+                            // Password
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "Password",
+                                FormType = FormInputTypes.PASSWORD,
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
+                            },
+                            // RepeatPassword
+                            new FormInputFieldRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = "ConfirmationPassword",
+                                FormType = FormInputTypes.PASSWORD,
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Repeat the password").Build()
+                            },
+                            // Update
+                            new FormButtonRecord
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Update").Build()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     #endregion
 
     public static List<FormRecord> AllForms => new List<FormRecord>
@@ -1012,6 +1106,7 @@ public static class StandardAuthForms
         MobileForm,
         DisplayQrCodeForm,
         FormBuilder.Constants.EmptyStep,
-        OtpForm
+        OtpForm,
+        ConfirmResetPwdForm
     };
 }

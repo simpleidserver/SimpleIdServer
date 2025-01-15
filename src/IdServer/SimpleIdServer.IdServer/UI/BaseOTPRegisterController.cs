@@ -51,7 +51,8 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         IFormStore formStore,
         IWorkflowStore workflowStore,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore)
+        IJwtBuilder jwtBuilder,
+        ILanguageRepository languageRepository) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository)
     {
         _logger = logger;
         _userRepository = userRepository;
@@ -61,20 +62,20 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null)
+    public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null, CancellationToken cancellationToken = default(CancellationToken))
     {
         prefix = prefix ?? Constants.Prefix;
         var isAuthenticated = User.Identity.IsAuthenticated;
         var registrationProgress = await GetRegistrationProgress();
         if (registrationProgress == null && !isAuthenticated)
         {
-            var res = new WorkflowViewModel();
+            var res = new SidWorkflowViewModel();
             res.SetErrorMessage(Global.NotAllowedToRegister);
             return View(res);
         }
 
         var viewModel = Activator.CreateInstance<TViewModel>();
-        var result = await BuildViewModel(registrationProgress, prefix, isAuthenticated, viewModel);
+        var result = await BuildViewModel(registrationProgress, prefix, isAuthenticated, viewModel, cancellationToken);
         viewModel.RedirectUrl = redirectUrl;
         result.SetInput(viewModel);
         return View(result);
@@ -82,20 +83,20 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Index([FromRoute] string prefix, TViewModel viewModel)
+    public async Task<IActionResult> Index([FromRoute] string prefix, TViewModel viewModel, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.Prefix;
         var isAuthenticated = User.Identity.IsAuthenticated;
         UserRegistrationProgress userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
         {
-            var res = new WorkflowViewModel();
+            var res = new SidWorkflowViewModel();
             res.SetErrorMessage(Global.NotAllowedToRegister);
             return View(res);
         }
 
         // 1. Check parameters.
-        var result = await BuildViewModel(userRegistrationProgress, prefix, isAuthenticated, viewModel);
+        var result = await BuildViewModel(userRegistrationProgress, prefix, isAuthenticated, viewModel, cancellationToken);
         var errorMessages = viewModel.Validate();
         if (errorMessages.Any())
         {
@@ -205,13 +206,13 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
     protected abstract void Enrich(TViewModel viewModel, User user);
 
-    protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProcess, string prefix, bool isAuthenticated, TViewModel viewModel)
+    protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProcess, string prefix, bool isAuthenticated, TViewModel viewModel, CancellationToken cancellationToken)
     {
-        var result = await BuildViewModel(registrationProcess, viewModel, prefix);
+        var result = await BuildViewModel(registrationProcess, viewModel, prefix, cancellationToken);
         if (isAuthenticated)
         {
             var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, CancellationToken.None);
+            var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
             Enrich(viewModel, authenticatedUser);
         }
 

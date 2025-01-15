@@ -1,11 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder.UIs;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Resources;
 
 namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels
 {
-    public class ConfirmResetPasswordViewModel
+    public class ConfirmResetPasswordViewModel : IStepViewModel
     {
         public string? Destination { get; set; }
         public string? Code { get; set; }
@@ -13,23 +15,19 @@ namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels
         public string? ConfirmationPassword { get; set; } = null;
         public bool IsPasswordUpdated { get; set; }
         public string? ReturnUrl { get; set; } = null;
+        public string StepId { get; set; }
+        public string WorkflowId { get; set; }
+        public string CurrentLink { get; set; }
 
-        public void Validate(ModelStateDictionary modelState)
+        public List<string> Validate(ModelStateDictionary modelState)
         {
-            if(Code == null)
-                modelState.AddModelError("missing_code", "missing_code");
-
-            if (string.IsNullOrWhiteSpace(Destination))
-                modelState.AddModelError("missing_destination", "missing_destination");
-
-            if (string.IsNullOrWhiteSpace(Password))
-                modelState.AddModelError("missing_password", "missing_password");
-
-            if (string.IsNullOrWhiteSpace(ConfirmationPassword))
-                modelState.AddModelError("confirmation_password", "confirmation_password");
-
-            if (Password != ConfirmationPassword)
-                modelState.AddModelError("unmatch_password", "unmatch_password");
+            var result = new List<string>();
+            if (string.IsNullOrWhiteSpace(Code)) result.Add(Global.MissingConfirmationCode);
+            if (string.IsNullOrWhiteSpace(Destination)) result.Add(Global.MissingLogin);
+            if (string.IsNullOrWhiteSpace(Password)) result.Add(Global.MissingPassword);
+            if (string.IsNullOrWhiteSpace(ConfirmationPassword)) result.Add(Global.MissingConfirmedPassword);
+            if (Password != ConfirmationPassword) result.Add(Global.PasswordMismatch);
+            return result;
         }
     }
 }
