@@ -1,5 +1,7 @@
 ﻿using FormBuilder.Link;
 using FormBuilder.Models;
+using FormBuilder.Transformers;
+using System.Security.Cryptography.Xml;
 using System.Text.Json;
 
 namespace FormBuilder.Builders;
@@ -15,7 +17,27 @@ public static class WorkflowBuilderExtensions
         return builder;
     }
 
-    public static WorkflowBuilder AddLinkUrlAction(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string url)
+    public static WorkflowBuilder AddTransformedLinkUrlAction(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string url, RegexTransformerParameters transformer)
+    {
+        builder.AddLink(sourceForm, targetForm, eltId, (a) =>
+        {
+            a.ActionType = WorkflowLinkUrlTransformerAction.ActionType;
+            a.ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter { Url = url, Transformer = transformer });
+        });
+        return builder;
+    }
+
+    public static WorkflowBuilder AddTransformedLinkUrlActionWithQueryParameter(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string url, RegexTransformerParameters transformer, string queryParameterName, string jsonSource)
+    {
+        builder.AddLink(sourceForm, targetForm, eltId, (a) =>
+        {
+            a.ActionType = WorkflowLinkUrlTransformerAction.ActionType;
+            a.ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter { Url = url, Transformer = transformer, QueryParameterName = queryParameterName, JsonSource = jsonSource });
+        });
+        return builder;
+    }
+
+    public static WorkflowBuilder AddStaticLinkUrlAction(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string url, RegexTransformerParameters transformer = null)
     {
         builder.AddLink(sourceForm, targetForm, eltId, (a) =>
         {

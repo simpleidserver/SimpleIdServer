@@ -1,72 +1,32 @@
-﻿@using Microsoft.Extensions.Options;
-@using SimpleIdServer.IdServer.Options;
-@using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.Pwd.UI.ViewModels.ConfirmResetPasswordViewModel;
-@inject IOptions<IdServerHostOptions> configuration
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    ViewBag.Title = ConfirmResetPasswordResource.title;
-    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveFormCssUrl(step.FormRecordId);
 }
-            
-<div class="loginContainer">
-    <div class="card login">
-        <div class="card-body">
-            @if(Model.IsPasswordUpdated)
-            {
-                <div class="alert alert-success">@ConfirmResetPasswordResource.password_updated</div>
-                if (!string.IsNullOrWhiteSpace(Model.ReturnUrl))
-                {
-                    <a href="@Model.ReturnUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
-                }
-            }
-            else
-            {
-                <h5>@ConfirmResetPasswordResource.title</h5>
-                <!-- Errors -->
-                @if (!ViewData.ModelState.IsValid)
-                {
-                    <ul class="list-group mb-3">
-                        @foreach (var modelState in ViewData.ModelState.Values)
-                        {
-                            foreach (var error in modelState.Errors)
-                            {
-                                <li class="list-group-item list-group-item-danger">@ConfirmResetPasswordResource.ResourceManager.GetString(error.ErrorMessage)</li>
-                            }
-                        }
-                    </ul>
-                }
 
-                <!-- Reset form  -->
-                @using (Html.BeginForm("Confirm", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password }, FormMethod.Post))
-                {
-                    @Html.AntiForgeryToken()
-                    <input asp-for="Code" type="hidden" />
-                    <input asp-for="ReturnUrl" type="hidden" />
-                    <input asp-for="Destination" type="hidden" />
-                    <!-- Login -->
-                    <div class="form-floating mb-3">
-                        <input value="@Model.Destination" placeholder="@ConfirmResetPasswordResource.login" id="floatingDestination" type="text" class="form-control" disabled="true" />
-                        <label for="floatingDestination">@ConfirmResetPasswordResource.login</label>
-                    </div>
-                    <!-- Code -->
-                    <div class="form-floating mb-3">
-                        <input value="@Model.Code" placeholder="@ConfirmResetPasswordResource.code" id="floatingCode" type="number" class="form-control" disabled="true" />
-                        <label for="floatingCode">@ConfirmResetPasswordResource.code</label>
-                    </div>
-                    <!-- Password -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="Password" placeholder="@ConfirmResetPasswordResource.password" id="floatingPassword" type="password" class="form-control" />
-                        <label for="floatingPassword">@ConfirmResetPasswordResource.password</label>
-                    </div>
-                    <!-- Repeat password -->
-                    <div class="form-floating mb-3">
-                        <input asp-for="ConfirmationPassword" placeholder="@ConfirmResetPasswordResource.repeat_password" id="floatingRepeatPassword" type="password" class="form-control" />
-                        <label for="floatingRepeatPassword">@ConfirmResetPasswordResource.repeat_password</label>
-                    </div>
-                    <button type="submit" class="btn btn-primary card-link">@ConfirmResetPasswordResource.update</button>
-                }
-            }
-        </div>
-    </div>
-</div>
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
+
+@section Header {
+    <link rel="stylesheet" href="@path" />
+}

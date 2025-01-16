@@ -18,6 +18,7 @@ namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels
         public string StepId { get; set; }
         public string WorkflowId { get; set; }
         public string CurrentLink { get; set; }
+        public string Realm { get; set; }
 
         public List<string> Validate(ModelStateDictionary modelState)
         {

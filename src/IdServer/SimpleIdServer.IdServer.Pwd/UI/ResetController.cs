@@ -144,7 +144,7 @@ public class ResetController : BaseController
         if(viewModel.Value != destination)
         {
             result.SetErrorMessage(Global.InvalidDestination);
-            return View(viewModel);
+            return View(result);
         }
 
         // 4. Send the OTP code.
@@ -209,7 +209,8 @@ public class ResetController : BaseController
         {
             Destination = destination,
             Code = code,
-            ReturnUrl = returnUrl
+            ReturnUrl = returnUrl,
+            Realm = prefix
         };
         var result = await BuildWorkflowViewModel(options.ConfirmResetPasswordWorkflowId, cancellationToken);
         result.SetInput(viewModel);
@@ -291,7 +292,8 @@ public class ResetController : BaseController
                 CookieValue = tokenSet.CookieToken,
                 FormField = tokenSet.FormFieldName,
                 FormValue = tokenSet.RequestToken
-            }
+            },
+            CurrentStepId = workflow.Steps.First().Id
         };
     }
 }

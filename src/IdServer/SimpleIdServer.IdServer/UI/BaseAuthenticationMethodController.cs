@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -131,6 +132,7 @@ namespace SimpleIdServer.IdServer.UI
                 var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
                 var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
                 viewModel.ReturnUrl = returnUrl;
+                viewModel.AuthUrl = UriHelper.GetDisplayUrl(Request);
                 viewModel.Realm = prefix;
                 viewModel.ExternalIdsProviders = externalIdProviders.Select(e => new ExternalIdProvider
                 {

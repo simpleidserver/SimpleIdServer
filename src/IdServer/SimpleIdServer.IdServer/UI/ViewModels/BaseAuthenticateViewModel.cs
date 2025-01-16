@@ -9,6 +9,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
     public abstract class BaseAuthenticateViewModel : IStepViewModel
     {
         public string ReturnUrl { get; set; }
+        public string AuthUrl { get; set; }
         public string Login { get; set; }
         public string ClientName { get; set; }
         public string LogoUri { get; set; }

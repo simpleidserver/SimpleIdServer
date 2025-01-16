@@ -56,6 +56,7 @@ public static class StandardAuthForms
     public static string otpCodeFormId = "54df94cd-8a59-4a5b-ac5c-fea895f4373f";
 
     public static string confirmResetPwdFormId = "e42e4c7f-90e8-455d-be48-fbfbc5424f0f";
+    public static string confirmResetPwdBackId = "a355339a-d3fb-4a83-90b2-c781c6f0dda4";
 
     #region Auth forms
 
@@ -1008,85 +1009,136 @@ public static class StandardAuthForms
         Name = "confirmResetPwd",
         Elements = new ObservableCollection<IFormElementRecord>
         {
+            // Update the pwd.
             new FormStackLayoutRecord
             {
                 Id = confirmResetPwdFormId,
+                IsFormEnabled = true,
+                Transformations = new List<ITransformationRule>
+                {
+                    new PropertyTransformationRule
+                    {
+                        PropertyName = "IsNotVisible",
+                        PropertyValue = "true",
+                        Condition = new ComparisonParameter
+                        {
+                            Source = "$.IsPasswordUpdated",
+                            Operator = ComparisonOperators.EQ,
+                            Value = "true"
+                        }
+                    }
+                },
                 Elements = new ObservableCollection<IFormElementRecord>
                 {
-                    new FormStackLayoutRecord
+                    // Realm
+                    new FormInputFieldRecord
                     {
                         Id = Guid.NewGuid().ToString(),
-                        IsFormEnabled = true,
-                        Elements = new ObservableCollection<IFormElementRecord>
+                        Name = "Realm",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
                         {
-                            // ReturnUrl
-                            new FormInputFieldRecord
+                            new IncomingTokensTransformationRule
                             {
-                                Id = Guid.NewGuid().ToString(),
-                                Name = "ReturnUrl",
-                                FormType = FormInputTypes.HIDDEN,
-                                Transformations = new List<ITransformationRule>
-                                {
-                                    new IncomingTokensTransformationRule
-                                    {
-                                        Source = "$.ReturnUrl"
-                                    }
-                                }
-                            },
-                            // Login
-                            new FormInputFieldRecord
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                Name = "Login",
-                                FormType = FormInputTypes.TEXT,
-                                Disabled = true,
-                                Transformations = new List<ITransformationRule>
-                                {
-                                    new IncomingTokensTransformationRule
-                                    {
-                                        Source = "$.Destination"
-                                    }
-                                }
-                            },
-                            // Code
-                            new FormInputFieldRecord
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                Name = "Code",
-                                FormType = FormInputTypes.TEXT,
-                                Disabled = true,
-                                Transformations = new List<ITransformationRule>
-                                {
-                                    new IncomingTokensTransformationRule
-                                    {
-                                        Source = "$.Code"
-                                    }
-                                },
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Code").Build()
-                            },
-                            // Password
-                            new FormInputFieldRecord
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                Name = "Password",
-                                FormType = FormInputTypes.PASSWORD,
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
-                            },
-                            // RepeatPassword
-                            new FormInputFieldRecord
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                Name = "ConfirmationPassword",
-                                FormType = FormInputTypes.PASSWORD,
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Repeat the password").Build()
-                            },
-                            // Update
-                            new FormButtonRecord
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Update").Build()
+                                Source = "$.Realm"
                             }
                         }
+                    },
+                    // ReturnUrl
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ReturnUrl",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.ReturnUrl"
+                            }
+                        }
+                    },
+                    // Login
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Destination",
+                        FormType = FormInputTypes.TEXT,
+                        Disabled = true,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Destination"
+                            }
+                        },
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
+                    },
+                    // Code
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Code",
+                        FormType = FormInputTypes.TEXT,
+                        Disabled = true,
+                        Transformations = new List<ITransformationRule>
+                        {
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.Code"
+                            }
+                        },
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Code").Build()
+                    },
+                    // Password
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Password",
+                        FormType = FormInputTypes.PASSWORD,
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
+                    },
+                    // RepeatPassword
+                    new FormInputFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ConfirmationPassword",
+                        FormType = FormInputTypes.PASSWORD,
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Repeat the password").Build()
+                    },
+                    // Update
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Update").Build()
+                    }
+                }
+            },            
+            // Display the back btn.
+            new FormStackLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                Transformations = new List<ITransformationRule>
+                {
+                    new PropertyTransformationRule
+                    {
+                        PropertyName = "IsNotVisible",
+                        PropertyValue = "true",
+                        Condition = new ComparisonParameter
+                        {
+                            Source = "$.IsPasswordUpdated",
+                            Operator = ComparisonOperators.EQ,
+                            Value = "false"
+                        }
+                    }
+                },
+                Elements = new ObservableCollection<IFormElementRecord>
+                {
+                    new FormAnchorRecord
+                    {
+                        Id = confirmResetPwdBackId,
+                        ActAsButton = true,
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Back").Build()
                     }
                 }
             }

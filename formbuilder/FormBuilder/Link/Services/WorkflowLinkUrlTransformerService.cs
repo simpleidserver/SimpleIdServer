@@ -13,28 +13,37 @@ public interface IWorkflowLinkUrlTransformerService
 public class WorkflowLinkUrlTransformerService : IWorkflowLinkUrlTransformerService
 {
     private readonly IUrlEvaluatorFactory _urlEvaluatorFactory;
-    public WorkflowLinkUrlTransformerService(IUrlEvaluatorFactory urlEvaluatorFactory)
+    private readonly ITransformerFactory _transformerFactory;
+
+    public WorkflowLinkUrlTransformerService(IUrlEvaluatorFactory urlEvaluatorFactory, ITransformerFactory transformerFactory)
     {
         _urlEvaluatorFactory = urlEvaluatorFactory;
+        _transformerFactory = transformerFactory;
     }
 
     public string BuildUrl(WorkflowLinkUrlTransformationParameter parameter, JsonObject json)
     {
-        if (parameter == null || json == null || parameter.QueryParameterName == null) return null;
-        if (string.IsNullOrWhiteSpace(parameter.JsonSource)) return null;
+        if (parameter == null || json == null) return null;
+        var url = parameter.Url;
+        url = ParseQueryParameter(url, parameter, json);
+        if (parameter.Transformer != null) url = _transformerFactory.Transform(url, parameter.Transformer, json).ToString();
+        return url;
+    }
+    private string ParseQueryParameter(string url, WorkflowLinkUrlTransformationParameter parameter, JsonObject json)
+    {
+        if (string.IsNullOrWhiteSpace(parameter.JsonSource) || string.IsNullOrWhiteSpace(parameter.QueryParameterName)) return url;
         var path = JsonPath.Parse(parameter.JsonSource);
         var pathResult = path.Evaluate(json);
         var nodes = pathResult.Matches.Select(m => m.Value);
-        if (nodes.Count() != 1) return null;
+        if (nodes.Count() != 1) return url;
         var value = nodes.Single()?.ToString();
-        var url = _urlEvaluatorFactory.Evaluate(new DirectTargetUrl
+        return _urlEvaluatorFactory.Evaluate(new DirectTargetUrl
         {
             Parameters = new Dictionary<string, string>
             {
                 { parameter.QueryParameterName, value }
             },
-            Url = parameter.Url
+            Url = url
         });
-        return url;
     }
 }

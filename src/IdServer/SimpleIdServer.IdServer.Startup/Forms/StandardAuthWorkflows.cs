@@ -42,6 +42,7 @@ public class StandardAuthWorkflows
         .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.ResetPwdForm, StandardAuthForms.pwdForgetBtnId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.GET,
+            Target = "https://localhost:5001/{realm}/pwd/Reset",
             TargetTransformer = new RegexTransformerParameters()
             {
                 Rules = new ObservableCollection<MappingRule>
@@ -53,9 +54,8 @@ public class StandardAuthWorkflows
             IsCustomParametersEnabled = true,
             Rules = new ObservableCollection<MappingRule>
             {
-
+                new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
             },
-            Target = "https://localhost:5001/{realm}/pwd/Reset?returnUrl={returnUrl}"
         })
         .AddLinkHttpRequestAction(StandardAuthForms.ResetPwdForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.pwdResetFormId, new WorkflowLinkHttpRequestParameter
         {
@@ -297,6 +297,13 @@ public class StandardAuthWorkflows
                 {
                     new MappingRule { Source = "$.Realm", Target = "realm" }
                 }
+            }
+        })
+        .AddTransformedLinkUrlAction(StandardAuthForms.ConfirmResetPwdForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.confirmResetPwdBackId, "{returnUrl}", new RegexTransformerParameters
+        {
+            Rules = new ObservableCollection<MappingRule>
+            {
+                new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" }
             }
         })
         .Build();
