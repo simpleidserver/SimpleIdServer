@@ -127,7 +127,7 @@ public class WorkflowContext
         => GetStepDefinition(Execution.CurrentStepId);
 
     public WorkflowStep GetStepDefinition(string stepId)
-        => Definition.Workflow.Steps.SingleOrDefault(s => s.Id == stepId);
+        => Definition.Workflow?.Steps?.SingleOrDefault(s => s.Id == stepId);
 
     #endregion
 
@@ -213,6 +213,7 @@ public class WorkflowContext
 
     private static void InitializeWorkflowExecution(WorkflowContext context, JsonObject jsonObject)
     {
+        if (context.Definition == null || context.Definition.Workflow == null) return;
         var links = new List<WorkflowStepLinkExecution>();
         var currentStepLinks = context.Definition.Workflow.Links.Where(l => l.SourceStepId == context.Execution.CurrentStepId);
         context.Execution.StepExecutions.Add(new WorkflowStepExecution

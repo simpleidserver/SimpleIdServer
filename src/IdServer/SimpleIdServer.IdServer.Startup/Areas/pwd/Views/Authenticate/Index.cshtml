@@ -12,8 +12,8 @@
     Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
-    var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
-    var path = uriProvider.GetActiveFormCssUrl(step.FormRecordId);
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveFormCssUrl(step?.FormRecordId);
 }
 
 <component type="typeof(WorkflowViewer)"

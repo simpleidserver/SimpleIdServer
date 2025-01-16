@@ -66,7 +66,7 @@
         base.OnParametersSet();
         if (Context == null)
         {
-            var step = Workflow.Steps.Single(s => s.Id == CurrentStepId);
+            var step = Workflow?.Steps?.SingleOrDefault(s => s.Id == CurrentStepId);
             Context = WorkflowContext.CreateWorkflow(Workflow, FormRecords, CurrentStepId, ErrorMessages, SuccessMessages, AntiforgeryToken, Input, SupportedLanguageCodes);
         }
     }

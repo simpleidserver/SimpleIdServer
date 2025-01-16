@@ -39,6 +39,23 @@ public class StandardAuthWorkflows
                 }
             }
         })
+        .AddTransformedLinkUrlAction(StandardAuthForms.LoginPwdAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.pwdAuthExternalIdProviderId, "https://localhost:5001/{realm}/ExternalAuthenticate/Login?scheme={scheme}&returnUrl={returnUrl}", new RegexTransformerParameters
+        {
+            Rules = new ObservableCollection<MappingRule>
+            {
+                new MappingRule { Source = "$.AuthenticationScheme", Target = "scheme" },
+                new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" },
+                new MappingRule { Source = "$.Realm", Target = "realm" }
+            }
+        })
+        .AddTransformedLinkUrlAction(StandardAuthForms.LoginPwdAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.pwdRegisterBtnId, "https://localhost:5001/{realm}/Registration?workflowName=pwd&returnUrl={returnUrl}", new RegexTransformerParameters
+        {
+            Rules = new ObservableCollection<MappingRule>
+            {
+                new MappingRule { Source = "$.Realm", Target = "realm" },
+                new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" }
+            }
+        })
         .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.ResetPwdForm, StandardAuthForms.pwdForgetBtnId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.GET,

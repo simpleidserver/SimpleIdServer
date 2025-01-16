@@ -26,10 +26,10 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         var result = new List<(IFormElementRecord, JsonNode)>();
         var path = JsonPath.Parse(parameter.Path);
         var pathResult = path.Evaluate(input);
-        var nodes = pathResult.Matches.Select(m => m.Value);
+        var nodes = pathResult.Matches.Select(m => m.Value).Select(m => m.AsObject());
         var definition = definitions.Single(d => d.Type == fieldType);
         var recordType = definition.RecordType;
-        var allMappingRuleSourceLst = parameter.MappingRules.Select(r => r.Target).Distinct();
+        var allMappingRuleSourceLst = parameter.FormRecordProperties.Select(r => r.Target).Distinct();
         var allProperties = recordType.GetProperties(BindingFlags.Instance | BindingFlags.Public);
         var filteredProperties = allProperties
             .Where(p => allMappingRuleSourceLst.Contains(p.Name))
@@ -37,10 +37,17 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         foreach (var node in nodes)
         {
             var instance = Activator.CreateInstance(recordType);
-            if (parameter.MappingRules != null)
-                foreach(var mappingRule in parameter.MappingRules)
+            // Retrieve tokens from the step and add them to the input.
+            if (parameter.AdditionalInputTokensComingFromStepSource != null)
+                foreach (var mapping in parameter.AdditionalInputTokensComingFromStepSource)
+                    AddToken(input, node, mapping);
+
+            // Update the properties of the form record.
+            if (parameter.FormRecordProperties != null)
+                foreach(var mappingRule in parameter.FormRecordProperties)
                     ApplyProperty(instance, mappingRule, node, filteredProperties);
 
+            // Update the labels of the form record.
             var formField = instance as BaseFormFieldRecord;
             if(formField != null && parameter.LabelMappingRules != null)
             {
@@ -51,7 +58,7 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
                 else
                     foreach (var labelMappingRule in parameter.LabelMappingRules)
                         ApplyLabel(formField, node, labelMappingRule.Source, new List<string> { labelMappingRule.Language });
-            }
+            }            
 
             var formElt = instance as IFormElementRecord;
             if(formElt != null)
@@ -72,6 +79,16 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         builder.AddAttribute(2, nameof(IncomingTokensRepetitionRuleComponent.RecordType), recordType);
         builder.AddAttribute(3, nameof(IncomingTokensRepetitionRuleComponent.Context), context);
         builder.CloseComponent();
+    }
+
+    private void AddToken(JsonObject stepData, JsonObject eltData, MappingRule mappingRule)
+    {
+        if (mappingRule.Source == null) return;
+        var path = JsonPath.Parse(mappingRule.Source);
+        var pathResult = path.Evaluate(stepData);
+        var nodes = pathResult.Matches.Select(m => m.Value);
+        if (nodes.Count() != 1 || eltData.ContainsKey(mappingRule.Target)) return;
+        eltData.Add(mappingRule.Target, nodes.First().ToString());
     }
 
     private void ApplyProperty(object instance, MappingRule mappingRule, JsonNode node, List<PropertyInfo> properties)

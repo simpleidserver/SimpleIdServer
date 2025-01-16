@@ -98,7 +98,7 @@
     private void InitMappingRules()
     {
         var allProperties = RecordType.GetProperties(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public).ToList();
-        mappingRules = JsonSerializer.Deserialize<List<MappingRule>>(JsonSerializer.Serialize(Record.MappingRules));
+        mappingRules = JsonSerializer.Deserialize<List<MappingRule>>(JsonSerializer.Serialize(Record.FormRecordProperties));
         var unknownMappingRules = allProperties.Where(p => !mappingRules.Any(r => r.Target == p.Name) && !_excludedPropertyNames.Contains(p.Name)).Select(p => new MappingRule
         {
             Target = p.Name
@@ -126,7 +126,7 @@
         if (isEditTransformerDialogDisplayed) dialogService.CloseSide();
         Record.Path = path;
         Record.LabelMappingRules = labelMappingRules;
-        Record.MappingRules = mappingRules;
+        Record.FormRecordProperties = mappingRules;
         dialogService.Close();
     }
 }

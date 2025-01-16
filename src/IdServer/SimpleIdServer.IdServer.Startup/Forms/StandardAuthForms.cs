@@ -35,7 +35,9 @@ public static class StandardAuthForms
     public static string displayQrCodeStepId = "displayQrCode";
 
     public static string pwdAuthFormId = "5929ac34-445f-4ebc-819e-d90e4973b30d";
+    public static string pwdAuthExternalIdProviderId = "58cf59f1-e63c-48e3-a0f3-00b0c3d2d38c";
     public static string pwdForgetBtnId = "777b8f76-c7b0-475a-a3c7-5ef0e54ce8e6";
+    public static string pwdRegisterBtnId = "7c81db56-24cb-4381-9d77-064424dd65fd";
     public static string pwdResetFormId = "8bf5ba00-a9b3-476b-8469-abe123abc797";
 
     public static string consoleSendConfirmationCode = "7c07b6f7-f619-4e4f-97d8-3dab508c1c3b";
@@ -152,7 +154,7 @@ public static class StandardAuthForms
                     // Register
                     new FormAnchorRecord
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = pwdRegisterBtnId,
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").AddTranslation("fr", "Enregistrer").Build()
                     },
                     // Separator
@@ -164,7 +166,7 @@ public static class StandardAuthForms
                     // List all external identity providers.
                     new ListDataRecord
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = pwdAuthExternalIdProviderId,
                         FieldType = FormAnchorDefinition.TYPE,
                         Parameters = new Dictionary<string, object>
                         {
@@ -174,6 +176,11 @@ public static class StandardAuthForms
                         {
                             Path = "$.ExternalIdsProviders[*]",
                             MapSameTranslationToAllSupportedLanguages = true,
+                            AdditionalInputTokensComingFromStepSource = new List<MappingRule>
+                            {
+                                new MappingRule { Source = "$.Realm", Target = "Realm" },
+                                new MappingRule { Source = "$.ReturnUrl", Target = "ReturnUrl" }
+                            },
                             LabelMappingRules = new List<FormBuilder.Rules.LabelMappingRule>
                             {
                                 new FormBuilder.Rules.LabelMappingRule { Source = "$.DisplayName" },

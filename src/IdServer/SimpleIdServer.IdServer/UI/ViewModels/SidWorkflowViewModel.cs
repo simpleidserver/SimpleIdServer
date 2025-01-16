@@ -9,6 +9,6 @@ namespace SimpleIdServer.IdServer.UI.ViewModels;
 
 public class SidWorkflowViewModel : WorkflowViewModel, ILayoutViewModel
 {
-    public List<Language> Languages { get; set; }
-    public List<string> SupportedLanguageCodes => Languages.Select(l => l.Code).ToList();
+    public List<Language> Languages { get; set; } = new List<Language>();
+    public List<string> SupportedLanguageCodes => Languages?.Select(l => l.Code)?.ToList() ?? new List<string>();
 }
