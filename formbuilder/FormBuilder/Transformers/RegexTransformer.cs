@@ -47,6 +47,7 @@ public class RegexTransformer : GenericTransformer<RegexTransformerParameters>
                 result = result.Replace(matchValue, json[key].ToString());
         }
 
+        result = result.Replace("//", "/");
         return result;
     }
 

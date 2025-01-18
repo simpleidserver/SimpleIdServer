@@ -31,8 +31,11 @@ public class WorkflowLinkHttpRequestService : IWorkflowLinkHttpRequestService
             result.Add(antiforgeryToken.FormField, antiforgeryToken.FormValue);
 
         var target = parameter.Target;
-        if (parameter.TargetTransformer != null)
-            target = _transformerFactory.Transform(parameter.Target, parameter.TargetTransformer, json)?.ToString();
+        if(parameter.Transformers != null)
+        {
+            foreach (var transformer in parameter.Transformers)
+                target = _transformerFactory.Transform(target, transformer, json)?.ToString();
+        }
 
         result.Add(nameof(IStepViewModel.StepId), stepId);
         result.Add(nameof(IStepViewModel.WorkflowId), workflowId);

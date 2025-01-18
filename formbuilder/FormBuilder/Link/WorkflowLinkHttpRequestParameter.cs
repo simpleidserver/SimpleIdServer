@@ -1,5 +1,5 @@
 ﻿using FormBuilder.Models.Rules;
-using FormBuilder.Transformers;
+using FormBuilder.Models.Transformer;
 using System.Collections.ObjectModel;
 
 namespace FormBuilder.Link;
@@ -7,7 +7,7 @@ namespace FormBuilder.Link;
 public class WorkflowLinkHttpRequestParameter
 {
     public string Target { get; set; }
-    public RegexTransformerParameters TargetTransformer {  get; set; }
+    public List<ITransformerParameters> Transformers { get; set; }
     public bool IsAntiforgeryEnabled { get; set; }
     public HttpMethods Method { get; set; }
     public bool IsCustomParametersEnabled { get; set; }

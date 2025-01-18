@@ -1,14 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using FormBuilder.UIs;
 using SimpleIdServer.IdServer.Resources;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels;
 
-public abstract class OTPRegisterViewModel : IRegisterViewModel
+public abstract class OTPRegisterViewModel : IRegisterViewModel, IOTPViewModel
 {
-    public string NameIdentifier {  get; set; }
     public string Value { get; set; }
     public bool IsVerified { get; set; }
     public string OTPCode { get; set; } = null!;
@@ -18,7 +16,7 @@ public abstract class OTPRegisterViewModel : IRegisterViewModel
     public bool IsNotAllowed { get; set; }
     public string Amr { get; set; }
     public List<string> Steps { get; set; }
-    public string? RedirectUrl { get; set; }
+    public string? ReturnUrl { get; set; }
     public bool IsCreated { get; set; }
     public string StepId { get; set; }
     public string WorkflowId { get; set; }

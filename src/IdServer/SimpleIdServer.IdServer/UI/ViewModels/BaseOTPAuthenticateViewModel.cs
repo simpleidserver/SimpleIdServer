@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
 {
-    public abstract class BaseOTPAuthenticateViewModel : BaseAuthenticateViewModel
+    public abstract class BaseOTPAuthenticateViewModel : BaseAuthenticateViewModel, IOTPViewModel
     {
         public string Action { get; set; }
         public string? OTPCode { get; set; }

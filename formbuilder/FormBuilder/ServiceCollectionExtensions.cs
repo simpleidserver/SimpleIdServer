@@ -59,6 +59,7 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<ITransformer, DirectTargetUrlTransformer>();
         services.AddTransient<ITransformer, RegexTransformer>();
+        services.AddTransient<ITransformer, RelativeUrlTransformer>();
 
         services.AddTransient<ITransformationRuleEngine, IncomingTokensTransformationRuleEngine>();
         services.AddTransient<ITransformationRuleEngine, PropertyTransformationRuleEngine>();

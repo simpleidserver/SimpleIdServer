@@ -15,7 +15,6 @@ public class StandardAuthWorkflows
     public static string defaultWorkflowId = "241a7509-4c58-4f49-b1df-49011b2c9bcb";
     public static string pwdConsoleWorkflowId = "e7593fa9-5a73-41a3-bfb5-e489fabbe17a";
     public static string pwdEmailWorkflowId = "62cb8fcc-34b6-4af9-8d54-db1c98827a08";
-    public static string pwdSmsWorkflowId = "08bea90f-2183-4c56-977f-fd0a9c5e32b8";
     public static string pwdWebauthnWorkflowId = "ad636448-90db-41da-91c7-4e96b981b354";
     public static string webauthWorkflowId = "a725b543-1403-4aab-8329-25b89f07cb48";
     public static string mobileWorkflowId = "1f0a3398-aeb2-42c8-b6e6-ea03396f1a87";
@@ -124,96 +123,6 @@ public class StandardAuthWorkflows
             Method = HttpMethods.POST,
             IsAntiforgeryEnabled = true,
             Target = "https://localhost:5001/{realm}/console/Authenticate",
-            TargetTransformer = new RegexTransformerParameters()
-            {
-                Rules = new ObservableCollection<MappingRule>
-                {
-                    new MappingRule { Source = "$.Realm", Target = "realm" }
-                }
-            }
-        })
-        .Build();
-
-    public static WorkflowRecord PwdEmailWorkflow = WorkflowBuilder.New(pwdEmailWorkflowId)
-        .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
-        .AddStep(StandardAuthForms.EmailAuthForm, new Coordinate(200, 100))
-        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(300, 100))
-        .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.EmailAuthForm, StandardAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
-        {
-            Method = HttpMethods.POST,
-            IsAntiforgeryEnabled = true,
-            Target = "https://localhost:5001/{realm}/pwd/Authenticate",
-            TargetTransformer = new RegexTransformerParameters()
-            {
-                Rules = new ObservableCollection<MappingRule>
-                {
-                    new MappingRule { Source = "$.Realm", Target = "realm" }
-                }
-            }
-        })
-        .AddLinkHttpRequestAction(StandardAuthForms.EmailAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.emailSendConfirmationCode, new WorkflowLinkHttpRequestParameter
-        {
-            Method = HttpMethods.POST,
-            IsAntiforgeryEnabled = true,
-            Target = "https://localhost:5001/{realm}/email/Authenticate",
-            TargetTransformer = new RegexTransformerParameters()
-            {
-                Rules = new ObservableCollection<MappingRule>
-                {
-                    new MappingRule { Source = "$.Realm", Target = "realm" }
-                }
-            }
-        })
-        .AddLinkHttpRequestAction(StandardAuthForms.EmailAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.emailAuthForm, new WorkflowLinkHttpRequestParameter
-        {
-            Method = HttpMethods.POST,
-            IsAntiforgeryEnabled = true,
-            Target = "https://localhost:5001/{realm}/email/Authenticate",
-            TargetTransformer = new RegexTransformerParameters()
-            {
-                Rules = new ObservableCollection<MappingRule>
-                {
-                    new MappingRule { Source = "$.Realm", Target = "realm" }
-                }
-            }
-        })
-        .Build();
-
-    public static WorkflowRecord PwdSmsWorkflow = WorkflowBuilder.New(pwdSmsWorkflowId)
-        .AddStep(StandardAuthForms.LoginPwdAuthForm, new Coordinate(100, 100))
-        .AddStep(StandardAuthForms.SmsAuthForm, new Coordinate(200, 100))
-        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(300, 100))
-        .AddLinkHttpRequestAction(StandardAuthForms.LoginPwdAuthForm, StandardAuthForms.SmsAuthForm, StandardAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
-        {
-            Method = HttpMethods.POST,
-            IsAntiforgeryEnabled = true,
-            Target = "https://localhost:5001/{realm}/pwd/Authenticate",
-            TargetTransformer = new RegexTransformerParameters()
-            {
-                Rules = new ObservableCollection<MappingRule>
-                {
-                    new MappingRule { Source = "$.Realm", Target = "realm" }
-                }
-            }
-        })
-        .AddLinkHttpRequestAction(StandardAuthForms.SmsAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.smsSendConfirmationCode, new WorkflowLinkHttpRequestParameter
-        {
-            Method = HttpMethods.POST,
-            IsAntiforgeryEnabled = true,
-            Target = "https://localhost:5001/{realm}/sms/Authenticate",
-            TargetTransformer = new RegexTransformerParameters()
-            {
-                Rules = new ObservableCollection<MappingRule>
-                {
-                    new MappingRule { Source = "$.Realm", Target = "realm" }
-                }
-            }
-        })
-        .AddLinkHttpRequestAction(StandardAuthForms.SmsAuthForm, FormBuilder.Constants.EmptyStep, StandardAuthForms.smsAuthForm, new WorkflowLinkHttpRequestParameter
-        {
-            Method = HttpMethods.POST,
-            IsAntiforgeryEnabled = true,
-            Target = "https://localhost:5001/{realm}/sms/Authenticate",
             TargetTransformer = new RegexTransformerParameters()
             {
                 Rules = new ObservableCollection<MappingRule>
