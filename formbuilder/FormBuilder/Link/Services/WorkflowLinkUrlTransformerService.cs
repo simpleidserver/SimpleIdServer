@@ -26,7 +26,10 @@ public class WorkflowLinkUrlTransformerService : IWorkflowLinkUrlTransformerServ
         if (parameter == null || json == null) return null;
         var url = parameter.Url;
         url = ParseQueryParameter(url, parameter, json);
-        if (parameter.Transformer != null) url = _transformerFactory.Transform(url, parameter.Transformer, json).ToString();
+        if(parameter.Transformers != null)
+            foreach(var transformer in parameter.Transformers)
+                url = _transformerFactory.Transform(url, transformer, json).ToString();
+
         return url;
     }
     private string ParseQueryParameter(string url, WorkflowLinkUrlTransformationParameter parameter, JsonObject json)

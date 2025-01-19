@@ -1,5 +1,6 @@
 ﻿using FormBuilder.Link;
 using FormBuilder.Models;
+using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
 using System.Security.Cryptography.Xml;
 using System.Text.Json;
@@ -17,22 +18,22 @@ public static class WorkflowBuilderExtensions
         return builder;
     }
 
-    public static WorkflowBuilder AddTransformedLinkUrlAction(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string url, RegexTransformerParameters transformer)
+    public static WorkflowBuilder AddTransformedLinkUrlAction(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string url, List<ITransformerParameters> transformers)
     {
         builder.AddLink(sourceForm, targetForm, eltId, (a) =>
         {
             a.ActionType = WorkflowLinkUrlTransformerAction.ActionType;
-            a.ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter { Url = url, Transformer = transformer });
+            a.ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter { Url = url, Transformers = transformers });
         });
         return builder;
     }
 
-    public static WorkflowBuilder AddTransformedLinkUrlActionWithQueryParameter(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string url, RegexTransformerParameters transformer, string queryParameterName, string jsonSource)
+    public static WorkflowBuilder AddTransformedLinkUrlActionWithQueryParameter(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string url, List<ITransformerParameters> transformers, string queryParameterName, string jsonSource)
     {
         builder.AddLink(sourceForm, targetForm, eltId, (a) =>
         {
             a.ActionType = WorkflowLinkUrlTransformerAction.ActionType;
-            a.ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter { Url = url, Transformer = transformer, QueryParameterName = queryParameterName, JsonSource = jsonSource });
+            a.ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter { Url = url, Transformers = transformers, QueryParameterName = queryParameterName, JsonSource = jsonSource });
         });
         return builder;
     }

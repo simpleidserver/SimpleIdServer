@@ -40,5 +40,6 @@ public static class StandardFidoAuthForms
                 // Authenticate
                 StandardFormComponents.NewAuthenticate()
             }
-        }).Build();
+        })
+        .AddElement(StandardFormComponents.NewScanQrCode()).Build();
 }
