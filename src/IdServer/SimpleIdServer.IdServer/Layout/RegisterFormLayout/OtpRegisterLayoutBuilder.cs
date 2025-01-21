@@ -17,11 +17,11 @@ public class OtpRegisterLayoutBuilder : RegisterLayoutBuilder
         _valueTranslations = valueTranslations;
     }
 
-    public static OtpRegisterLayoutBuilder New(string name, List<LabelTranslation> valueTranslations)
+    public static OtpRegisterLayoutBuilder New(string id, string name, List<LabelTranslation> valueTranslations)
     {
         var record = new FormRecord
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = id,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()
@@ -50,7 +50,7 @@ public class OtpRegisterLayoutBuilder : RegisterLayoutBuilder
                 StandardFormComponents.NewSendConfirmationCode()
             }
         };
-        _formRecord.Elements.Add(elt);
+        AddElement(elt);
         return this;
     }
 

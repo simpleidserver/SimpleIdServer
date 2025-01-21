@@ -19,7 +19,7 @@
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "mobile" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "mobile" });
     var vm = JsonSerializer.Deserialize<AuthenticateMobileViewModel>(Model.Input.ToString());
-    var mobileFormId = SimpleIdServer.IdServer.Startup.Forms.StandardAuthForms.mobileFormId;
+    var mobileFormId = SimpleIdServer.IdServer.Fido.StandardFidoAuthForms.mobileFormId;
 }
 
 <component type="typeof(WorkflowViewer)"
@@ -51,7 +51,9 @@
             }
 
             var displayQRCode = function (img) {
-                csharpReference.invokeMethodAsync("Navigate", mId, "Url", img);
+                $("#generateQrCodeForm").css("display", "none");
+                $("#qrCodeContainer").css("display", "");
+                $("#qrCodeContainer img").attr("src", img);
             }
 
             async function checkStatus(sessionId) {
@@ -64,9 +66,9 @@
                         displayError(responseJson);
                         await checkStatus(sessionId);
                     } else {
-                        $("#mobileForm").unbind("submit");
-                        $("#mobileForm input[name='SessionId']").val(sessionId);
-                        $("#mobileForm").trigger("submit");
+                        $("#generateQrCodeForm").unbind("submit");
+                        $("#generateQrCodeForm input[name='SessionId']").val(sessionId);
+                        $("#generateQrCodeForm").trigger("submit");
                     }
                 }, 1000);
             }
@@ -96,7 +98,7 @@
             }
 
             var tryListenForm = function () {
-                const elt = $("#mobileForm");
+                const elt = $("#generateQrCodeForm");
                 if (isInitialized === true) return;
                 if (elt.length === 0) {
                     setTimeout(() => tryListenForm(), 500);

@@ -51,12 +51,13 @@
 
             var displaySuccessMessage = function () {
                 csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
-                $("#registerMobile").css("display", "none");
-                $("#qrCodeContainer").css("display", "none");
+                csharpReference.invokeMethodAsync("ClearErrorMessages");
+                $("#generateQrCodeForm").attr("style", "display: none !important");
+                $("#qrCodeContainer").attr("style", "display: none !important");
             }
 
-            var displayQRCode = function(img, qrCode) {
-                $("#registerMobile").css("display", "none");
+            var displayQRCode = function (img, qrCode) {
+                $("#generateQrCodeForm").attr("style", "display: none !important");
                 $("#qrCodeContainer").css("display", "");
                 $("#qrCodeContainer img").attr("src", img);
             }
@@ -107,7 +108,7 @@
             };
 
             var tryListenForm = function () {
-                const elt = $("#registerMobile");
+                const elt = $("#generateQrCodeForm");
                 if (isInitialized === true) return;
                 if (elt.length === 0) {
                     setTimeout(() => tryListenForm(), 500);
@@ -117,8 +118,8 @@
                 isInitialized = true;
                 elt.submit(function (e) {
                     e.preventDefault();
-                    var login = $("#registerMobile input[name='Login']").val();
-                    var displayName = $("#registerMobile input[name='DisplayName']").val();
+                    var login = $("#generateQrCodeForm input[name='Login']").val();
+                    var displayName = $("#generateQrCodeForm input[name='DisplayName']").val();
                     makeCredential(login, displayName, convertFormToJSON($(e.target)));
                 });
             }

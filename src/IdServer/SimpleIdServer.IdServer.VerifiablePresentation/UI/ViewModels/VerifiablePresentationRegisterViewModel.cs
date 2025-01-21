@@ -6,11 +6,8 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.UI.ViewModels;
 
 public class VerifiablePresentationRegisterViewModel : IRegisterViewModel
 {
-    public bool IsNotAllowed { get; set; }
     public bool IsUpdated { get; set; }
-    public string Amr { get; set; }
-    public List<string> Steps { get; set; }
-    public string? RedirectUrl { get; set; }
+    public string? ReturnUrl { get; set; }
     public IEnumerable<VerifiablePresentationViewModel> VerifiablePresentations { get; set; }
     public string QrCodeUrl { get; set; }
     public string StatusUrl { get; set; }

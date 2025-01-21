@@ -64,7 +64,7 @@ public class RegisterController : BaseRegisterController<RegisterWebauthnViewMod
             Login = login,
             BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginRegister}",
             EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}",
-            RedirectUrl = userRegistrationProgress?.RedirectUrl ?? redirectUrl
+            ReturnUrl = userRegistrationProgress?.RedirectUrl ?? redirectUrl
         };
         var result = await BuildViewModel(userRegistrationProgress, vm, prefix, cancellationToken);
         result.SetInput(vm);

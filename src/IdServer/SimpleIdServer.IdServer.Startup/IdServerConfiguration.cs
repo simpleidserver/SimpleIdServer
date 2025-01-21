@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Builders;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -8,8 +9,8 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
+using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Startup.Converters;
-using SimpleIdServer.IdServer.Startup.Forms;
 using SimpleIdServer.OpenidFederation.Domains;
 using System;
 using System.Collections.Generic;
@@ -38,16 +39,12 @@ namespace SimpleIdServer.IdServer.Startup
 
         public static ICollection<RegistrationWorkflow> RegistrationWorkflows => new List<RegistrationWorkflow>
         {
-            // RegistrationWorkflowBuilder.New("pwd", true).AddStep("pwd").Build(),
-            // RegistrationWorkflowBuilder.New("pwd-email").AddStep("pwd").AddStep("email").Build(),
-            // RegistrationWorkflowBuilder.New("vp").AddStep("vp").Build(),
-            // RegistrationWorkflowBuilder.New("mobile").AddStep("mobile").Build()
-            RegistrationWorkflowBuilder.New("email", StandardRegistrationWorkflows.emailWorkflowId).Build(),
-            RegistrationWorkflowBuilder.New("sms", StandardRegistrationWorkflows.smsWorkflowId).Build(),
-            RegistrationWorkflowBuilder.New("pwd", StandardRegistrationWorkflows.pwdWorkflowId).Build(),
-            RegistrationWorkflowBuilder.New("webauthn", StandardRegistrationWorkflows.webauthWorkflowId).Build(),
-            RegistrationWorkflowBuilder.New("mobile", StandardRegistrationWorkflows.mobileWorkflowId).Build(),
-            RegistrationWorkflowBuilder.New("vp", StandardRegistrationWorkflows.vpWorkflowId).Build()
+            RegistrationWorkflowBuilder.New("email", StandardEmailRegisterWorkflows.workflowId).Build(),
+            RegistrationWorkflowBuilder.New("sms", StandardSmsRegisterWorkflows.workflowId).Build(),
+            RegistrationWorkflowBuilder.New("pwd", StandardPwdRegistrationWorkflows.workflowId).Build(),
+            RegistrationWorkflowBuilder.New("webauthn", StandardFidoRegistrationWorkflows.webauthWorkflowId).Build(),
+            RegistrationWorkflowBuilder.New("mobile", StandardFidoRegistrationWorkflows.mobileWorkflowId).Build(),
+            RegistrationWorkflowBuilder.New("vp", StandardVpRegistrationWorkflows.workflowId).Build()
         };
 
         public static Scope IdProviderAdministratorScope = new Scope

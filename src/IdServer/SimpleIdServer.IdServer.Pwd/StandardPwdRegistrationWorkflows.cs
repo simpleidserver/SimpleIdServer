@@ -19,7 +19,6 @@ public static class StandardPwdRegistrationWorkflows
         .AddPwdRegistration()
         .Build();
 
-
     public static WorkflowBuilder AddPwdRegistration(this WorkflowBuilder builder)
     {
         builder.AddStep(StandardPwdRegisterForms.PwdForm, new Coordinate(100, 100))

@@ -3,7 +3,7 @@
 
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Models;
-using System;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -20,11 +20,11 @@ public class QrCodeFormLayoutBuilder
         _loginTranslations = loginTranslations;
     }
 
-    public static QrCodeFormLayoutBuilder New(string name, List<LabelTranslation> loginTranslations)
+    public static QrCodeFormLayoutBuilder New(string id, string name, List<LabelTranslation> loginTranslations)
     {
         var record = new FormRecord
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = id,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()
@@ -49,6 +49,8 @@ public class QrCodeFormLayoutBuilder
                 StandardFormComponents.NewReturnUrl(),
                 // Realm.
                 StandardFormComponents.NewRealm(),
+                // SessionId
+                StandardFormComponents.NewHidden(nameof(IQRCodeAuthViewModel.SessionId)),
                 // Login.
                 StandardFormComponents.NewLogin(_loginTranslations),
                 // Generate the qr code.

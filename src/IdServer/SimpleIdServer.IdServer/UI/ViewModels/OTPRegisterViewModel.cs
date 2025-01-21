@@ -12,10 +12,6 @@ public abstract class OTPRegisterViewModel : IRegisterViewModel, IOTPViewModel
     public string OTPCode { get; set; } = null!;
     public string Action { get; set; } = null!;
     public bool IsUpdated { get; set; } = false;
-    public bool IsOTPCodeSent { get; set; } = false;
-    public bool IsNotAllowed { get; set; }
-    public string Amr { get; set; }
-    public List<string> Steps { get; set; }
     public string? ReturnUrl { get; set; }
     public bool IsCreated { get; set; }
     public string StepId { get; set; }

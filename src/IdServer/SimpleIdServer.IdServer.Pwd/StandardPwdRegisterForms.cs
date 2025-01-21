@@ -13,7 +13,7 @@ public static class StandardPwdRegisterForms
 {
     public static string pwdRegisterFormId = "e501ca67-2bc9-477e-959c-9752a603fcd1";
 
-    public static FormRecord PwdForm = RegisterLayoutBuilder.New(Constants.Areas.Password)
+    public static FormRecord PwdForm = RegisterLayoutBuilder.New("pwdRegister", Constants.Areas.Password)
         .AddElement(new FormStackLayoutRecord
         {
             Id = pwdRegisterFormId,

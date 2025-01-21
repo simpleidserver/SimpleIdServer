@@ -11,11 +11,7 @@ public class RegisterMobileViewModel : IRegisterViewModel
     public string BeginRegisterUrl { get; set; } = null!;
     public string RegisterStatusUrl { get; set; } = null!;
     public bool IsDeveloperModeEnabled { get; set; } = false;
-    public bool IsNotAllowed { get; set; }
     public bool IsUpdated { get; set; }
-    public string Amr { get; set; }
-    public List<string> Steps { get; set; }
-    public string SessionId { get; set; }
     public string? ReturnUrl { get; set; }
     public string StepId { get; set; }
     public string WorkflowId { get; set; }

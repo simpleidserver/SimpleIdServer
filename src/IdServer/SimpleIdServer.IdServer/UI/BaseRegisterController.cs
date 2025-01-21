@@ -94,7 +94,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
                 await transaction.Commit(CancellationToken.None);
                 result.SetSuccessMessage(Global.UserIsCreated);
                 viewModel.IsCreated = true;
-                viewModel.RedirectUrl = registrationProgress.RedirectUrl ?? redirectUrl;
+                viewModel.ReturnUrl = registrationProgress.RedirectUrl ?? redirectUrl;
                 result.SetInput(viewModel);
                 return View(result);
             }
@@ -113,7 +113,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         {
             result.SetSuccessMessage(Global.UserIsUpdated);
             viewModel.IsUpdated = true;
-            viewModel.RedirectUrl = registrationProgress?.RedirectUrl ?? redirectUrl;
+            viewModel.ReturnUrl = registrationProgress?.RedirectUrl ?? redirectUrl;
             result.SetInput(viewModel);
             return View(result);
         }

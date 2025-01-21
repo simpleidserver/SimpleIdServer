@@ -61,7 +61,7 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
             QrCodeUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpAuthorizeQrCode}",
             StatusUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpRegisterStatus}",
             EndRegisterUrl = $"{issuer}/{GetRealm(prefix)}{Constants.Endpoints.VpEndRegister}",
-            RedirectUrl = userRegistrationProgress?.RedirectUrl
+            ReturnUrl = userRegistrationProgress?.RedirectUrl
         };
         var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix, cancellationToken);
         result.SetInput(viewModel);

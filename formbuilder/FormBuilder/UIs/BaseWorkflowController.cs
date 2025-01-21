@@ -1,5 +1,4 @@
-﻿using FormBuilder.Models;
-using FormBuilder.Repositories;
+﻿using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
@@ -41,18 +40,5 @@ public class BaseWorkflowController : Controller
             },
             FormRecords = records
         };
-    }
-
-    protected async Task<(WorkflowRecord, WorkflowStep)?> GetNextWorkflowStep(CancellationToken cancellationToken)
-    {
-        /*
-        var currentWorkflow = GetExecutedLink();
-        if (currentWorkflow == null) return null;
-        var workflow = await _workflowStore.Get(currentWorkflow.WorkflowId, cancellationToken);
-        var link = workflow.Links.Single(l => l.Id == currentWorkflow.CurrentLink);
-        var nextStep = workflow.Steps.Single(s => s.Id == link.TargetStepId);
-        return (workflow, nextStep);
-        */
-        return null;
     }
 }

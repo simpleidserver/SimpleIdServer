@@ -8,7 +8,7 @@ public static class Constants
 {
     public static FormRecord EmptyStep => new FormRecord
     {
-        Id = "e58c55fc-cb29-44b6-98b6-87f796147604",
+        Id = "emptyStep",
         Name = "Empty",
         Elements = new ObservableCollection<IFormElementRecord>
         {

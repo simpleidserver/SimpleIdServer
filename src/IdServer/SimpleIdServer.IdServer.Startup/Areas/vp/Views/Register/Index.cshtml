@@ -19,7 +19,7 @@
     var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
     var path = uriProvider.GetActiveFormCssUrl(step?.FormRecordId);
     var vm = JsonSerializer.Deserialize<SimpleIdServer.IdServer.VerifiablePresentation.UI.ViewModels.VerifiablePresentationRegisterViewModel>(Model.Input.ToString());
-    var mobileFormId = SimpleIdServer.IdServer.Startup.Forms.StandardRegistrationForms.vpRegistrationFormId;
+    var mobileFormId = SimpleIdServer.IdServer.VerifiablePresentation.StandardVpRegisterForms.vpRegistrationFormId;
 }
 
 <component type="typeof(WorkflowViewer)"
@@ -53,15 +53,16 @@
             }
 
             var viewQrCode = function (img) {
-                $("#registerVp").attr("style", "display: none !important");
+                $("#generateQrCodeForm").attr("style", "display: none !important");
                 $("#qrCodeContainer").css("display", "");
                 $("#qrCodeContainer img").attr("src", img);
             }
 
             var displaySuccessMessage = function () {
                 csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
-                $("#registerVp").attr("style", "display: none !important");
-                $("#qrCodeContainer").css("display", "none");
+                csharpReference.invokeMethodAsync("ClearErrorMessages");
+                $("#generateQrCodeForm").attr("style", "display: none !important");
+                $("#qrCodeContainer").attr("style", "display: none !important");
             }
 
             async function register(state) {

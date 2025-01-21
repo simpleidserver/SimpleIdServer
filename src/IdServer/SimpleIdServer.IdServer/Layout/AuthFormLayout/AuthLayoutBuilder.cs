@@ -16,13 +16,13 @@ public class AuthLayoutBuilder
 
     protected FormRecord FormRecord { get; private set; }
 
-    public static AuthLayoutBuilder New(string name)
+    public static AuthLayoutBuilder New(string id, string name, bool actAsStep = true)
     {
         var record = new FormRecord
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = id,
             Name = name,
-            ActAsStep = true,
+            ActAsStep = actAsStep,
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new AuthLayoutBuilder(record);

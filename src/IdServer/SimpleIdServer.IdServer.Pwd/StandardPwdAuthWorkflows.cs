@@ -117,6 +117,7 @@ public static class StandardPwdAuthWorkflows
 
     public static WorkflowBuilder AddConfirmResetPwd(this WorkflowBuilder builder)
     {
+        builder.AddStep(StandardPwdAuthForms.ConfirmResetForm, new Coordinate(100, 100));
         builder.AddLinkHttpRequestAction(StandardPwdAuthForms.ConfirmResetForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.confirmResetPwdFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,

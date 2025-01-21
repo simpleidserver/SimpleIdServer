@@ -14,7 +14,7 @@ public class StandardFidoRegisterForms
     public static string webauthnFormId = "3c5c4862-b03f-4744-935e-2f01724c97f2";
     public static string mobileFormId = "79dccd2d-133c-4749-8225-2b2718337995";
 
-    public static FormRecord WebauthnForm = RegisterLayoutBuilder.New(Constants.AMR)
+    public static FormRecord WebauthnForm = RegisterLayoutBuilder.New("webauthnRegister", Constants.AMR)
         .AddElement(new FormStackLayoutRecord
         {
             Id = webauthnFormId,
@@ -37,7 +37,7 @@ public class StandardFidoRegisterForms
             }
         }).Build();
 
-    public static FormRecord MobileForm = RegisterLayoutBuilder.New(Constants.MobileAMR)
+    public static FormRecord MobileForm = RegisterLayoutBuilder.New("mobileRegister", Constants.MobileAMR)
         .AddElement(new FormStackLayoutRecord
         {
             Id = mobileFormId,
@@ -45,7 +45,7 @@ public class StandardFidoRegisterForms
             FormType = FormTypes.HTML,
             HtmlAttributes = new Dictionary<string, object>
             {
-                { "id", "registerMobile" }
+                { "id", "generateQrCodeForm" }
             },
             Elements = new ObservableCollection<IFormElementRecord>
             {                

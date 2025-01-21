@@ -50,7 +50,8 @@ public static class StandardFidoRegistrationWorkflows
 
     public static WorkflowBuilder AddMobileRegistration(this WorkflowBuilder builder)
     {
-        builder.AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, FormBuilder.Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, new WorkflowLinkHttpRequestParameter());
+        builder.AddStep(StandardFidoRegisterForms.MobileForm, new Coordinate(100, 100))
+            .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, FormBuilder.Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, new WorkflowLinkHttpRequestParameter());
         return builder;
     }
 }

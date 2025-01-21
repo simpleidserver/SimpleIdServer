@@ -9,13 +9,9 @@ public class RegisterWebauthnViewModel : IRegisterViewModel
 {
     public string Login { get; set; } = null!;
     public string DisplayName { get; set; } = null!;
-    public string SerializedAuthenticatorAttestationRawResponse { get; set; } = null!;
     public string BeginRegisterUrl { get; set; } = null!;
     public string EndRegisterUrl { get; set; } = null!;
-    public bool IsNotAllowed { get; set; }
     public bool IsUpdated { get; set; }
-    public string Amr { get; set; }
-    public List<string> Steps { get; set; }
     public string? ReturnUrl { get; set; }
     public string StepId { get; set; }
     public string WorkflowId { get; set; }

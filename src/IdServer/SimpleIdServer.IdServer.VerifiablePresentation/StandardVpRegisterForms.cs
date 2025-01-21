@@ -17,13 +17,13 @@ public static class StandardVpRegisterForms
 {
     public static string vpRegistrationFormId = "c08b62d4-15db-4dc1-a552-1fd3d6a26578";
 
-    public static FormRecord VpForm = RegisterLayoutBuilder.New(Constants.AMR)
+    public static FormRecord VpForm = RegisterLayoutBuilder.New("vpRegister", Constants.AMR)
         .AddElement(new FormStackLayoutRecord
         {
             Id = Guid.NewGuid().ToString(),
             HtmlAttributes = new Dictionary<string, object>
             {
-                { "id", "registerVp" }
+                { "id", "generateQrCodeForm" }
             },
             Elements = new ObservableCollection<IFormElementRecord>
             {
@@ -72,5 +72,5 @@ public static class StandardVpRegisterForms
                 }
             }
         })
-        .AddElement(StandardFormComponents.NewGenerateQrCode()).Build();
+        .AddElement(StandardFormComponents.NewScanQrCode()).Build();
 }

@@ -46,6 +46,13 @@
         };
         StateHasChanged();
     }
+    
+    [JSInvokable]
+    public void ClearErrorMessages()
+    {
+        Context.Execution.ErrorMessages = new List<string>();
+        StateHasChanged();
+    }
 
     [JSInvokable]
     public void Navigate(string eltId, string key, string value)

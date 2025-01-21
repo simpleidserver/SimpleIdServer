@@ -12,7 +12,7 @@ public static class StandardSmsRegisterForms
     public static string smsSendConfirmationCodeFormId = "bf574d6c-dc08-4cb1-a16a-24e596bd4e13";
     public static string smsRegisterFormId = "520cfd8c-4f98-4228-bf6b-b8ff7ba92272";
 
-    public static FormRecord SmsForm = OtpRegisterLayoutBuilder.New(Constants.AMR, LayoutTranslations.PhoneNumber)
+    public static FormRecord SmsForm = OtpRegisterLayoutBuilder.New("smsRegister", Constants.AMR, LayoutTranslations.PhoneNumber)
         .ConfigureRegistration(smsRegisterFormId)
         .ConfigureSendConfirmationCode(smsSendConfirmationCodeFormId)
         .Build();

@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
@@ -12,9 +11,6 @@ public class PwdRegisterViewModel : IRegisterViewModel
     public string Password { get; set; }
     public string ConfirmedPassword { get; set; }
     public bool IsUpdated { get; set; }
-    public bool IsNotAllowed { get; set; }
-    public string? Amr { get; set; }
-    public List<string>? Steps { get; set; }
     public string? ReturnUrl { get; set; }
     public string StepId { get; set; }
     public string WorkflowId { get; set; }

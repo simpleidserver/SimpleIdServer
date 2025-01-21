@@ -27,7 +27,7 @@ public class StandardPwdAuthForms
     public static string confirmResetPwdFormId = "e42e4c7f-90e8-455d-be48-fbfbc5424f0f";
     public static string confirmResetPwdBackId = "a355339a-d3fb-4a83-90b2-c781c6f0dda4";
 
-    public static FormRecord PwdForm = AuthLayoutBuilder.New(Constants.Areas.Password)
+    public static FormRecord PwdForm = AuthLayoutBuilder.New("pwdAuth", Constants.Areas.Password)
         .AddElement(new FormStackLayoutRecord
         {
             Id = Guid.NewGuid().ToString(),
@@ -91,7 +91,7 @@ public class StandardPwdAuthForms
             }
         }).Build();
 
-    public static FormRecord ResetForm = AuthLayoutBuilder.New("resetPwd")
+    public static FormRecord ResetForm = AuthLayoutBuilder.New("resetPwd", "resetPwd", false)
         .AddElement(new FormStackLayoutRecord
         {
             Id = Guid.NewGuid().ToString(),
@@ -122,7 +122,7 @@ public class StandardPwdAuthForms
             }
         }).Build();
 
-    public static FormRecord ConfirmResetForm = AuthLayoutBuilder.New("confirmResetPwd")
+    public static FormRecord ConfirmResetForm = AuthLayoutBuilder.New("confirmResetPwd", "confirmResetPwd")
         .AddElement(new FormStackLayoutRecord
         {
             Id = confirmResetPwdFormId,

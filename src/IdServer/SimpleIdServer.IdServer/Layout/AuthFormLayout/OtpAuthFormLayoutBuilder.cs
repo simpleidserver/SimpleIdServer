@@ -3,6 +3,7 @@
 
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -19,10 +20,11 @@ public class OtpAuthFormLayoutBuilder
         _loginTranslations = loginTranslations;
     }
 
-    public static OtpAuthFormLayoutBuilder New(string name, List<LabelTranslation> loginTranslations)
+    public static OtpAuthFormLayoutBuilder New(string id, string name, List<LabelTranslation> loginTranslations)
     {
         var record = new FormRecord
         {
+            Id = id,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()
@@ -45,7 +47,7 @@ public class OtpAuthFormLayoutBuilder
                  // Action = Authenticate.
                  StandardFormComponents.NewOtpAuthenticate(),
                  // Login
-                 StandardAuthFormComponents.NewLogin(_loginTranslations),
+                 StandardFormComponents.NewLogin(_loginTranslations),
                  // OTP.
                  StandardFormComponents.NewOtpCode(),
                  // Authenticate.
@@ -71,7 +73,7 @@ public class OtpAuthFormLayoutBuilder
                 // Action = Send confirmation code.
                 StandardFormComponents.NewOtpSendConfirmationCode(),
                 // Login.
-                StandardAuthFormComponents.NewLogin(_loginTranslations),
+                StandardFormComponents.NewLogin(_loginTranslations),
                 // Send confirmation code.
                 StandardFormComponents.NewSendConfirmationCode()
             }

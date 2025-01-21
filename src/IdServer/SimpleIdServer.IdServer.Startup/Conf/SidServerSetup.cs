@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
+using SimpleIdServer.Did.Encoders;
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Email;
@@ -109,7 +110,10 @@ public class SidServerSetup
         {
             o.AntiforgeryCookieName = cookieName;
         }).UseEF();
-        services.AddDidKey();
+        services.AddDidKey(o =>
+        {
+            o.PublicKeyFormat = Ed25519VerificationKey2020Standard.TYPE;
+        });
         ConfigureDistributedCache(builder);
         ConfigureMessageBroker(builder, idServerBuilder);
     }

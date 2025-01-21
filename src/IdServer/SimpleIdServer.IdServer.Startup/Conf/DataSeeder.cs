@@ -492,6 +492,7 @@ public class DataSeeder
             var isInMemory = formDbContext.Database.IsInMemory();
             if (!isInMemory) formDbContext.Database.Migrate();
             var allForms = new List<FormRecord>();
+            allForms.Add(FormBuilder.Constants.EmptyStep);
             allForms.AddRange(allAuthForms);
             allForms.AddRange(allRegForms);
             var content = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "form.css"));

@@ -73,7 +73,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
                 BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginQRCodeRegister}",
                 RegisterStatusUrl = $"{issuer}/{prefix}{Constants.EndPoints.RegisterStatus}",
                 IsDeveloperModeEnabled = fidoOptions.IsDeveloperModeEnabled,
-                RedirectUrl = userRegistrationProgress?.RedirectUrl
+                ReturnUrl = userRegistrationProgress?.RedirectUrl
             };
             var result = await BuildViewModel(userRegistrationProgress, viewModel, prefix,  cancellationToken);
             result.SetInput(viewModel);

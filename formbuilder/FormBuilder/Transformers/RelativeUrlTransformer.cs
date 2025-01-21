@@ -32,6 +32,6 @@ public class RelativeUrlTransformer : GenericTransformer<RelativeUrlTransformerP
     internal override object InternalTransform(string value, RelativeUrlTransformerParameters parameters, JsonNode data)
     {
         var request = _httpContextAccessor.HttpContext.Request.GetAbsoluteUriWithVirtualPath();
-        return $"{value}{value}";
+        return $"{request}{value}";
     }
 }

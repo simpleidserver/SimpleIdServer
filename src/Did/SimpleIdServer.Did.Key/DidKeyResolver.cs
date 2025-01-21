@@ -56,7 +56,7 @@ public class DidKeyResolver : IDidResolver
                 publicKeyFormat = JsonWebKey2020Standard.TYPE;
             else
             {
-                var verificationMethodStandard = _verificationMethodsStandardLst.FirstOrDefault(m => m.SupportedCurves.Contains(verificationMethod.CrvOrSize));
+                var verificationMethodStandard = _verificationMethodsStandardLst.FirstOrDefault(m => m.SupportedCurves != null && m.SupportedCurves.Contains(verificationMethod.CrvOrSize));
                 if (verificationMethodStandard != null)
                     publicKeyFormat = verificationMethodStandard.Type;
                 else

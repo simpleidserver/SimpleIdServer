@@ -76,7 +76,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
         var viewModel = Activator.CreateInstance<TViewModel>();
         var result = await BuildViewModel(registrationProgress, prefix, isAuthenticated, viewModel, cancellationToken);
-        viewModel.RedirectUrl = redirectUrl;
+        viewModel.ReturnUrl = redirectUrl;
         result.SetInput(viewModel);
         return View(result);
     }
@@ -194,13 +194,13 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
 
                 _userRepository.Update(authenticatedUser);
                 await transaction.Commit(CancellationToken.None);
-                return await base.UpdateUser(result, userRegistrationProgress, viewModel, Amr, viewModel.RedirectUrl);
+                return await base.UpdateUser(result, userRegistrationProgress, viewModel, Amr, viewModel.ReturnUrl);
             }
         }
 
         async Task<IActionResult> RegisterUser()
         {
-            return await base.CreateUser(result, userRegistrationProgress, viewModel, prefix, Amr, viewModel.RedirectUrl);
+            return await base.CreateUser(result, userRegistrationProgress, viewModel, prefix, Amr, viewModel.ReturnUrl);
         }
     }
 

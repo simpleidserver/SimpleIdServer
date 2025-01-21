@@ -16,11 +16,11 @@ public class RegisterLayoutBuilder
 
     protected FormRecord FormRecord { get; private set; }
 
-    public static RegisterLayoutBuilder New(string name)
+    public static RegisterLayoutBuilder New(string id, string name)
     {
         var record = new FormRecord
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = id,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()

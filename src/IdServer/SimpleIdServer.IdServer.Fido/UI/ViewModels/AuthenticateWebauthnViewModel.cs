@@ -5,7 +5,7 @@ using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
 {
-    public class AuthenticateWebauthnViewModel : BaseAuthenticateViewModel
+    public class AuthenticateWebauthnViewModel : BaseAuthenticateViewModel, IQRCodeAuthViewModel
     {
         public AuthenticateWebauthnViewModel()
         {

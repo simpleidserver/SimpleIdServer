@@ -33,10 +33,6 @@
                 <RadzenCheckBox @bind-Value="IsTransformerEnabled" />
                 <RadzenLabel>Do-you want to pass custom parameters to the URL ?</RadzenLabel>
             </div>
-            @if (IsTransformerEnabled)
-            {
-                <RegexTransformerComponent Record="@Parameter.TargetTransformer"></RegexTransformerComponent>
-            }
 
             <!-- Use custom parameters -->
             <div>
@@ -93,8 +89,8 @@
         }
         set
         {
-            if (value) Parameter.TargetTransformer = new Transformers.RegexTransformerParameters();
-            else Parameter.TargetTransformer = null;
+            // if (value) Parameter.TargetTransformer = new Transformers.RegexTransformerParameters();
+            // else Parameter.TargetTransformer = null;
             _isTransformerEnabled = value;
         }
     }
@@ -117,7 +113,7 @@
         base.OnParametersSet();
         if(Parameter != null)
         {
-            _isTransformerEnabled = Parameter.TargetTransformer != null;
+            // _isTransformerEnabled = Parameter.TargetTransformer != null;
         }
     }
 
