@@ -10,14 +10,13 @@ public static class StandardVpRegistrationWorkflows
     public static string workflowId = "6bccad47-06de-4564-af0b-b63f52ac51aa";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddVpRegistration()
         .Build();
 
-    public static WorkflowBuilder AddVpRegistration(this WorkflowBuilder builder)
+    public static WorkflowBuilder AddVpRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardVpRegisterForms.VpForm, new Coordinate(100, 100))
-        .AddLinkAction(StandardVpRegisterForms.VpForm, FormBuilder.Constants.EmptyStep, StandardVpRegisterForms.vpRegistrationFormId);
+            .AddLinkAction(StandardVpRegisterForms.VpForm, nextStep ?? Constants.EmptyStep, StandardVpRegisterForms.vpRegistrationFormId);
         return builder;
     }
 }

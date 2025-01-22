@@ -17,12 +17,10 @@ public static class StandardFidoAuthWorkflows
     public static string mobileWorkflowId = "1f0a3398-aeb2-42c8-b6e6-ea03396f1a87";
 
     public static WorkflowRecord DefaultWebauthnWorkflow = WorkflowBuilder.New(webauthnWorkflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddWebauthnAuth()
         .Build();
 
     public static WorkflowRecord DefaultMobileWorkflow = WorkflowBuilder.New(mobileWorkflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddMobileAuth()
         .Build();
 

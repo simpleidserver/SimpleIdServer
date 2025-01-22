@@ -16,14 +16,13 @@ public static class StandardEmailRegisterWorkflows
     public static string workflowId = "d53b24b4-7a8f-4dd3-8fc9-7a3888ab8d93";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddEmailRegistration()
         .Build();
 
-    public static WorkflowBuilder AddEmailRegistration(this WorkflowBuilder builder)
+    public static WorkflowBuilder AddEmailRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardEmailRegistrationForms.EmailForm, new Coordinate(100, 100))
-            .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, FormBuilder.Constants.EmptyStep, StandardEmailRegistrationForms.emailSendConfirmationCodeFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, Constants.EmptyStep, StandardEmailRegistrationForms.emailSendConfirmationCodeFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -40,7 +39,7 @@ public static class StandardEmailRegisterWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-            .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, FormBuilder.Constants.EmptyStep, StandardEmailRegistrationForms.emailRegisterFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, nextStep ?? Constants.EmptyStep, StandardEmailRegistrationForms.emailRegisterFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

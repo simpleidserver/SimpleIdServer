@@ -322,10 +322,7 @@ namespace SimpleIdServer.IdServer.UI
             var registrationProgress = new UserRegistrationProgress
             {
                 RegistrationProgressId = Guid.NewGuid().ToString(),
-                Amr = name,
-                WorkflowName = name,
                 Realm = prefix,
-                Steps = new List<string> { name },
                 RedirectUrl = redirectUrl
             };
             Response.Cookies.Append(cookieName, registrationProgress.RegistrationProgressId, new CookieOptions

@@ -103,7 +103,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         registrationProgress.User = user;
         var json = JsonConvert.SerializeObject(registrationProgress);
         await DistributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
-        return RedirectToAction("Index", "Register", new { area = registrationProgress.Amr });
+        return RedirectToAction("Index", "Register", new { area = nextAmr });
     }
 
     protected async Task<IActionResult> UpdateUser(WorkflowViewModel result, UserRegistrationProgress registrationProgress, TViewModel viewModel, string amr, string redirectUrl)

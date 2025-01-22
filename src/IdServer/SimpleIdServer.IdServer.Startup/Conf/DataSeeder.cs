@@ -74,8 +74,17 @@ public class DataSeeder
         StandardFidoRegistrationWorkflows.MobileWorkflow,
         StandardPwdRegistrationWorkflows.DefaultWorkflow,
         StandardSmsRegisterWorkflows.DefaultWorkflow,
-        StandardVpRegistrationWorkflows.DefaultWorkflow
+        StandardVpRegistrationWorkflows.DefaultWorkflow,
+        BuildComplexRegistrationWorkflow()
     };
+
+    public static WorkflowRecord BuildComplexRegistrationWorkflow() => WorkflowBuilder.New("complexRegistrationWorkflow")
+            .AddPwdRegistration(StandardSmsRegisterForms.SmsForm)
+            .AddSmsRegistration(StandardEmailRegistrationForms.EmailForm)
+            .AddEmailRegistration(StandardFidoRegisterForms.MobileForm)
+            .AddMobileRegistration(StandardVpRegisterForms.VpForm)
+            .AddVpRegistration()
+            .Build();
 
     public static void SeedData(WebApplication webApplication, string scimBaseUrl)
     {
@@ -118,14 +127,14 @@ public class DataSeeder
     {
         var masterRealm = dbContext.Realms.FirstOrDefault(r => r.Name == SimpleIdServer.IdServer.Constants.StandardRealms.Master.Name) ?? SimpleIdServer.IdServer.Constants.StandardRealms.Master;
         if (!dbContext.Realms.Any())
-            dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Realms);
+            dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Realms);
         return masterRealm;
     }
 
     private static List<Scope> SeedScopes(StoreDbContext dbContext, Realm masterRealm)
     {
         var allScopeNames = dbContext.Scopes.Select(s => s.Name);
-        var unsupportedScopes = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Scopes.Where(s => !allScopeNames.Contains(s.Name));
+        var unsupportedScopes = SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Scopes.Where(s => !allScopeNames.Contains(s.Name));
         foreach (var scope in unsupportedScopes)
             scope.Realms = new List<Realm>
                 {
@@ -137,9 +146,9 @@ public class DataSeeder
 
     private static void SeedClients(StoreDbContext dbContext, List<Scope> unsupportedScopes, Realm masterRealm)
     {
-        var confClientIds = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Select(c => c.ClientId);
+        var confClientIds = SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Clients.Select(c => c.ClientId);
         var allClientIds = dbContext.Clients.Select(s => s.ClientId);
-        var unknownClients = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Where(c => !allClientIds.Contains(c.ClientId));
+        var unknownClients = SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Clients.Where(c => !allClientIds.Contains(c.ClientId));
         var knownClients = dbContext.Clients
             .Include(c => c.Scopes)
             .Where(c => confClientIds.Contains(c.ClientId));
@@ -162,7 +171,7 @@ public class DataSeeder
 
         foreach (var knownClient in knownClients)
         {
-            var cl = SimpleIdServer.IdServer.Startup.IdServerConfiguration.Clients.Single(c => c.ClientId == knownClient.ClientId);
+            var cl = SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Clients.Single(c => c.ClientId == knownClient.ClientId);
             foreach (var scope in cl.Scopes)
             {
                 if (!knownClient.Scopes.Any(s => s.Name == scope.Name))
@@ -177,24 +186,24 @@ public class DataSeeder
     private static void SeedUmaPendings(StoreDbContext dbContext)
     {
         if (!dbContext.UmaPendingRequest.Any())
-            dbContext.UmaPendingRequest.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PendingRequests);
+            dbContext.UmaPendingRequest.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.PendingRequests);
     }
 
     private static void SeedUmaResources(StoreDbContext dbContext)
     {
         if (!dbContext.UmaResources.Any())
-            dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Resources);
+            dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Resources);
     }
 
     private static void SeedGotifySessions(StoreDbContext dbContext)
     {
         if (!dbContext.GotifySessions.Any())
-            dbContext.GotifySessions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.Sessions);
+            dbContext.GotifySessions.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Sessions);
     }
 
     private static void SeedLanguages(StoreDbContext dbContext)
     {
-        foreach (var language in SimpleIdServer.IdServer.Startup.IdServerConfiguration.Languages)
+        foreach (var language in SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Languages)
         {
             if (!dbContext.Languages.Any(l => l.Code == language.Code))
                 dbContext.Languages.Add(language);
@@ -213,7 +222,7 @@ public class DataSeeder
 
     private static void SeedAuthSchemes(StoreDbContext dbContext)
     {
-        foreach (var providerDefinition in SimpleIdServer.IdServer.Startup.IdServerConfiguration.ProviderDefinitions)
+        foreach (var providerDefinition in SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.ProviderDefinitions)
         {
             if (!dbContext.AuthenticationSchemeProviderDefinitions.Any(d => d.Name == providerDefinition.Name))
             {
@@ -223,7 +232,7 @@ public class DataSeeder
 
         if (!dbContext.AuthenticationSchemeProviders.Any())
         {
-            foreach (var provider in SimpleIdServer.IdServer.Startup.IdServerConfiguration.Providers)
+            foreach (var provider in SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Providers)
             {
                 var def = dbContext.AuthenticationSchemeProviderDefinitions.FirstOrDefault(d => d.Name == provider.AuthSchemeProviderDefinition.Name);
                 if (def != null) provider.AuthSchemeProviderDefinition = def;
@@ -243,16 +252,16 @@ public class DataSeeder
     private static void SeedIdProvisioning(StoreDbContext dbContext, string scimBaseUrl)
     {
         if (!dbContext.IdentityProvisioningDefinitions.Any())
-            dbContext.IdentityProvisioningDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.IdentityProvisioningDefLst);
+            dbContext.IdentityProvisioningDefinitions.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.IdentityProvisioningDefLst);
 
         if (!dbContext.IdentityProvisioningLst.Any())
-            dbContext.IdentityProvisioningLst.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.GetIdentityProvisiongLst(scimBaseUrl));
+            dbContext.IdentityProvisioningLst.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.GetIdentityProvisiongLst(scimBaseUrl));
     }
 
     private static void SeedRegistrationWorkflows(StoreDbContext dbContext)
     {
         if (!dbContext.RegistrationWorkflows.Any())
-            dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.RegistrationWorkflows);
+            dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.RegistrationWorkflows);
     }
 
     private static (Group adminGroup, Group adminRoGroup, Group fastFedGroup) SeedGroups(StoreDbContext dbContext, Realm masterRealm)
@@ -396,19 +405,19 @@ public class DataSeeder
     private static void SeedCertificateAuthorities(StoreDbContext dbContext)
     {
         if (!dbContext.CertificateAuthorities.Any())
-            dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.CertificateAuthorities);
+            dbContext.CertificateAuthorities.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.CertificateAuthorities);
     }
 
     private static void SeedPresentationDefinitions(StoreDbContext dbContext)
     {
         if (!dbContext.PresentationDefinitions.Any())
-            dbContext.PresentationDefinitions.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.PresentationDefinitions);
+            dbContext.PresentationDefinitions.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.PresentationDefinitions);
     }
 
     private static void SeedFederationEntities(StoreDbContext dbContext)
     {
         if (!dbContext.FederationEntities.Any())
-            dbContext.FederationEntities.AddRange(SimpleIdServer.IdServer.Startup.IdServerConfiguration.FederationEntities);
+            dbContext.FederationEntities.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.FederationEntities);
     }
 
     private static void SeedAcrs(StoreDbContext dbContext)

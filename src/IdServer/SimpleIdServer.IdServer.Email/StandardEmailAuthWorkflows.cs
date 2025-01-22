@@ -16,7 +16,6 @@ public static class StandardEmailAuthWorkflows
     public static string workflowId = "62cb8fcc-34b6-4af9-8d54-db1c98827a08";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddEmailAuth()
         .Build();
 

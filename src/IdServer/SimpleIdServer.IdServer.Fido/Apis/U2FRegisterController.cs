@@ -33,6 +33,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IDistributedCache _distributedCache;
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
+        private readonly IWorkflowHelper _workflowHelper;
         private readonly IdServerHostOptions _idServerHostOptions;
 
         public U2FRegisterController(
@@ -43,6 +44,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             IDistributedCache distributedCache,
             ITransactionBuilder transactionBuilder,
             IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
+            IWorkflowHelper workflowHelper,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
             IOptions<IdServerHostOptions> idServerHostOptions) : base(tokenRepository, jwtBuilder)
@@ -54,6 +56,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _distributedCache = distributedCache;
             _transactionBuilder = transactionBuilder;
             _authenticationMethodServices = authenticationMethodServices;
+            _workflowHelper = workflowHelper;
             _idServerHostOptions = idServerHostOptions.Value;
         }
 
@@ -192,9 +195,8 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
             async Task<IActionResult> HandleWorkflowRegistration()
             {
-                var lastStep = registrationProgress.Steps.Last();
-                var currentAmr = registrationProgress.Amr;
-                if (currentAmr == lastStep)
+                var nextAmr = await _workflowHelper.GetNextAmr(registrationProgress.WorkflowId, sessionRecord.CredentialType, cancellationToken);
+                if (WorkflowHelper.IsLastStep(nextAmr))
                 {
                     if(isNewUser)
                     {
@@ -216,7 +218,6 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                     });
                 }
 
-                registrationProgress.NextAmr();
                 registrationProgress.User = user;
                 await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress));
                 return new OkObjectResult(new EndU2FRegisterResult
@@ -270,9 +271,10 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             }, cancellationToken);
             string nextRegistrationRedirectUrl = null;
             var registrationProgress = await GetRegistrationProgress();
-            if(registrationProgress != null && !registrationProgress.IsLastStep)
+            string nextAmr = null;
+            if (registrationProgress != null) nextAmr = await _workflowHelper.GetNextAmr(registrationProgress.WorkflowId, request.CredentialType, cancellationToken);
+            if (registrationProgress != null && !WorkflowHelper.IsLastStep(nextAmr))
             {
-                var nextAmr = registrationProgress.GetNextAmr();
                 nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{nextAmr}/register";
             }
 

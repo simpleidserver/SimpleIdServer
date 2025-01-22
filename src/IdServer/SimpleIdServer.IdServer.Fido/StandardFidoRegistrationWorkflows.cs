@@ -16,19 +16,17 @@ public static class StandardFidoRegistrationWorkflows
     public static string mobileWorkflowId = "d97459ee-b831-4ca3-9de0-95437c7e7a93";
 
     public static WorkflowRecord WebauthnWorkflow = WorkflowBuilder.New(webauthWorkflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddWebauthnRegistration()
         .Build();
 
     public static WorkflowRecord MobileWorkflow = WorkflowBuilder.New(mobileWorkflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddMobileRegistration()
         .Build();
 
-    public static WorkflowBuilder AddWebauthnRegistration(this WorkflowBuilder builder)
+    public static WorkflowBuilder AddWebauthnRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardFidoRegisterForms.WebauthnForm, new Coordinate(100, 100))
-                .AddLinkHttpRequestAction(StandardFidoRegisterForms.WebauthnForm, FormBuilder.Constants.EmptyStep, StandardFidoRegisterForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
+                .AddLinkHttpRequestAction(StandardFidoRegisterForms.WebauthnForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
                 {
                     Method = HttpMethods.POST,
                     IsAntiforgeryEnabled = true,
@@ -48,10 +46,10 @@ public static class StandardFidoRegistrationWorkflows
         return builder;
     }
 
-    public static WorkflowBuilder AddMobileRegistration(this WorkflowBuilder builder)
+    public static WorkflowBuilder AddMobileRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardFidoRegisterForms.MobileForm, new Coordinate(100, 100))
-            .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, FormBuilder.Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, new WorkflowLinkHttpRequestParameter());
+            .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, new WorkflowLinkHttpRequestParameter());
         return builder;
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
@@ -22,6 +23,7 @@ public class VpRegisterController : BaseController
     private readonly IDistributedCache _distributedCache;
     private readonly IUserRepository _userRepository;
     private readonly ITransactionBuilder _transactionBuilder;
+    private readonly IWorkflowHelper _workflowHelper;
     private readonly IdServerHostOptions _idServerHostOptions;
     private readonly ILogger<VpRegisterController> _logger;
 
@@ -29,6 +31,7 @@ public class VpRegisterController : BaseController
         IDistributedCache distributedCache,
         IUserRepository userRepository,
         ITransactionBuilder transactionBuilder,
+        IWorkflowHelper workflowHelper,
         Microsoft.Extensions.Options.IOptions<IdServerHostOptions> idServerHostOptions,
         ILogger<VpRegisterController> logger,
         ITokenRepository tokenRepository,
@@ -37,6 +40,7 @@ public class VpRegisterController : BaseController
         _distributedCache = distributedCache;
         _userRepository = userRepository;
         _transactionBuilder = transactionBuilder;
+        _workflowHelper = workflowHelper;
         _idServerHostOptions = idServerHostOptions.Value;
         _logger = logger;
     }
@@ -98,8 +102,8 @@ public class VpRegisterController : BaseController
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            var lastStep = registrationProgress.Steps.Last();
-            if (lastStep == amr)
+            var nextAmr = await _workflowHelper.GetNextAmr(registrationProgress.WorkflowId, amr, cancellationToken);
+            if (WorkflowHelper.IsLastStep(nextAmr))
             {
                 user.Realms.Add(new Domains.RealmUser
                 {
@@ -110,11 +114,10 @@ public class VpRegisterController : BaseController
                 return new VpEndRegisterResult();
             }
 
-            registrationProgress.NextAmr();
             registrationProgress.User = user;
             var json = Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress);
             await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, json);
-            var nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{registrationProgress.Amr}/register";
+            var nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{nextAmr}/register";
             return new VpEndRegisterResult
             {
                 NextRegistrationRedirectUrl = nextRegistrationRedirectUrl

@@ -15,14 +15,13 @@ public static class StandardPwdRegistrationWorkflows
     public const string workflowId = "849e51f7-78a8-4a55-9609-88a5b2585870";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddPwdRegistration()
         .Build();
 
-    public static WorkflowBuilder AddPwdRegistration(this WorkflowBuilder builder)
+    public static WorkflowBuilder AddPwdRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardPwdRegisterForms.PwdForm, new Coordinate(100, 100))
-            .AddLinkHttpRequestAction(StandardPwdRegisterForms.PwdForm, Constants.EmptyStep, StandardPwdRegisterForms.pwdRegisterFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardPwdRegisterForms.PwdForm, nextStep ?? Constants.EmptyStep, StandardPwdRegisterForms.pwdRegisterFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

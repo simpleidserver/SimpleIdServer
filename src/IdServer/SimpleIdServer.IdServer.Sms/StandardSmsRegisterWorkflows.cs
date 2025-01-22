@@ -16,14 +16,13 @@ public static class StandardSmsRegisterWorkflows
     public static string workflowId = "0ba03d04-2990-4153-8484-0cb8092959cd";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddSmsRegistration()
         .Build();
 
-    public static WorkflowBuilder AddSmsRegistration(this WorkflowBuilder builder)
+    public static WorkflowBuilder AddSmsRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardSmsRegisterForms.SmsForm, new Coordinate(100, 100))
-            .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, FormBuilder.Constants.EmptyStep, StandardSmsRegisterForms.smsSendConfirmationCodeFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, Constants.EmptyStep, StandardSmsRegisterForms.smsSendConfirmationCodeFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -40,7 +39,7 @@ public static class StandardSmsRegisterWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-            .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, FormBuilder.Constants.EmptyStep, StandardSmsRegisterForms.smsRegisterFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, nextStep ?? Constants.EmptyStep, StandardSmsRegisterForms.smsRegisterFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

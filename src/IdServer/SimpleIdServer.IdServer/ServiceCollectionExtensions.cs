@@ -302,6 +302,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
             services.AddTransient<IClientHelper, StandardClientHelper>();
             services.AddTransient<IAmrHelper, AmrHelper>();
+            services.AddTransient<IWorkflowHelper, WorkflowHelper>();
             services.AddTransient<IUmaPermissionTicketHelper, UMAPermissionTicketHelper>();
             services.AddTransient<IExtractRequestHelper, ExtractRequestHelper>();
             services.AddTransient<IGrantHelper, GrantHelper>();

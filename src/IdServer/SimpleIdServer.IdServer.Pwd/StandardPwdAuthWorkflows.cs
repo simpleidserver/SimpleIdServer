@@ -16,12 +16,10 @@ public static class StandardPwdAuthWorkflows
     public static string confirmResetPwdWorkflowId = "e05d75d5-5df1-42d4-8c1e-884fc9a2ecff";
 
     public static WorkflowRecord DefaultPwdWorkflow = WorkflowBuilder.New(pwdWorkflowId)
-        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(100, 100))
         .AddPwdAuth()
         .Build();
 
     public static WorkflowRecord DefaultConfirmResetPwdWorkflow = WorkflowBuilder.New(confirmResetPwdWorkflowId)
-        .AddStep(FormBuilder.Constants.EmptyStep, new Coordinate(100, 100))
         .AddConfirmResetPwd()
         .Build();
 
@@ -59,7 +57,6 @@ public static class StandardPwdAuthWorkflows
                 },
                 new RelativeUrlTransformerParameters()
             })
-
             .AddTransformedLinkUrlAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdRegisterBtnId, "/{realm}/Registration?workflowName=pwd&returnUrl={returnUrl}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters

@@ -17,7 +17,6 @@ public static class StandardConsoleAuthWorkflows
     public static string workflowId = "e7593fa9-5a73-41a3-bfb5-e489fabbe17a";
 
     public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
-        .AddStep(Constants.EmptyStep, new Coordinate(100, 100))
         .AddConsoleAuth()
         .Build();
 

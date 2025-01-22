@@ -62,10 +62,7 @@ public class RegistrationController : BaseController
 		{ 
 			WorkflowId = registrationWorkflow.WorkflowId,
 			RegistrationProgressId = registrationProgressId, 
-			Amr = amr, 
-			WorkflowName = registrationWorkflow.Name, 
 			Realm = prefix, 
-			Steps = workflowSteps.Select(s => s.Name).ToList(),
 			RedirectUrl = redirectUrl
 		};
         Response.Cookies.Append(cookieName, registrationProgress.RegistrationProgressId, new CookieOptions

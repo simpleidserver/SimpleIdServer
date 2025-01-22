@@ -187,24 +187,6 @@ namespace SimpleIdServer.IdServer.UI
             workflowResult.SetInput(viewModel);
             var amrInfo = GetAmrInfo();
             await ExtractRegistrationWorkflow(amrInfo);
-            // The workflow process is stored into the cookie.
-            /*
-            if (IsProtected(viewModel.ReturnUrl))
-            {
-                var query = ExtractQuery(viewModel.ReturnUrl);
-                var clientId = query.GetClientIdFromAuthorizationRequest();
-                var client = await ClientRepository.GetByClientId(prefix, clientId, token);
-                var res = await ResolveAmrInfo(query, prefix, client, token);
-                amrInfo = res?.Item1;
-                viewModel.AmrAuthInfo = amrInfo;
-                if (res != null && res.Value.Item1.CurrentAmr == res.Value.Item1.AllAmr.First())
-                {
-                    viewModel.IsFirstAmr = true;
-                    viewModel.RememberLogin = false;
-                    viewModel.RegistrationWorkflow = res.Value.Item2.RegistrationWorkflow;
-                }
-            }
-            */
 
             // 4. Validate view model.
             var errors = viewModel.Validate();
