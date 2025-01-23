@@ -25,6 +25,10 @@ namespace SimpleIdServer.IdServer.Email
 
         public Task Send(string title, string body, Dictionary<string, string> data, string destination)
         {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("CODE : " + body);
+            Console.ForegroundColor = ConsoleColor.White;
+            /*
             var emailOptions = GetOptions();
             using (var smtpClient = new SmtpClient())
             {
@@ -45,7 +49,7 @@ namespace SimpleIdServer.IdServer.Email
                 mailMessage.To.Add(destination);
                 smtpClient.Send(mailMessage);
             }
-
+            */
             return Task.CompletedTask;
         }
 

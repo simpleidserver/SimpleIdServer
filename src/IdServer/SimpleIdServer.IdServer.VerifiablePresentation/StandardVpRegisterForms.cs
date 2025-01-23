@@ -16,6 +16,7 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation;
 public static class StandardVpRegisterForms
 {
     public static string vpRegistrationFormId = "c08b62d4-15db-4dc1-a552-1fd3d6a26578";
+    public static string backBtnId = "a9de2d4b-eb3c-4e2c-87a5-6b38077e473a";
 
     public static FormRecord VpForm = RegisterLayoutBuilder.New("vpRegister", Constants.AMR)
         .AddElement(new FormStackLayoutRecord
@@ -72,5 +73,6 @@ public static class StandardVpRegisterForms
                 }
             }
         })
-        .AddElement(StandardFormComponents.NewScanQrCode()).Build();
+        .AddElement(StandardFormComponents.NewScanQrCode())
+        .ConfigureBackButton(backBtnId).Build();
 }

@@ -31,12 +31,17 @@ namespace SimpleIdServer.IdServer.Sms
 
         public async Task Send(string title, string body, Dictionary<string, string> data, string destination)
         {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("CODE : " + body);
+            Console.ForegroundColor = ConsoleColor.White;
+            /*
             var smsHostOptions = GetOptions();
             TwilioClient.Init(smsHostOptions.AccountSid, smsHostOptions.AuthToken);
             await MessageResource.CreateAsync(
                 body: body,
                 from: new PhoneNumber(smsHostOptions.FromPhoneNumber),
                 to: new PhoneNumber(destination));
+            */
         }
 
         private IdServerSmsOptions GetOptions()

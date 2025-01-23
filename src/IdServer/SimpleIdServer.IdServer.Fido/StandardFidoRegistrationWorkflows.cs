@@ -6,6 +6,7 @@ using FormBuilder.Models.Rules;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
 using SimpleIdServer.IdServer.Fido;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace FormBuilder.Builders;
@@ -42,6 +43,16 @@ public static class StandardFidoRegistrationWorkflows
                         },
                         new RelativeUrlTransformerParameters()
                     }
+                })
+                .AddTransformedLinkUrlAction(StandardFidoRegisterForms.WebauthnForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.webauthnFormId, "{returnUrl}", new List<ITransformerParameters>
+                {
+                    new RegexTransformerParameters
+                    {
+                        Rules = new ObservableCollection<MappingRule>
+                        {
+                            new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
+                        }
+                    }
                 });
         return builder;
     }
@@ -49,7 +60,17 @@ public static class StandardFidoRegistrationWorkflows
     public static WorkflowBuilder AddMobileRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardFidoRegisterForms.MobileForm, new Coordinate(100, 100))
-            .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, new WorkflowLinkHttpRequestParameter());
+            .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, new WorkflowLinkHttpRequestParameter())
+             .AddTransformedLinkUrlAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileBackButtonId, "{returnUrl}", new List<ITransformerParameters>
+             {
+                 new RegexTransformerParameters
+                 {
+                     Rules = new ObservableCollection<MappingRule>
+                     {
+                         new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
+                     }
+                 }
+             });
         return builder;
     }
 }

@@ -12,6 +12,7 @@ namespace SimpleIdServer.IdServer.Pwd;
 public static class StandardPwdRegisterForms
 {
     public static string pwdRegisterFormId = "e501ca67-2bc9-477e-959c-9752a603fcd1";
+    public static string backBtnId = "ecb00170-5b5c-408d-ba67-dad2a81210e3";
 
     public static FormRecord PwdForm = RegisterLayoutBuilder.New("pwdRegister", Constants.Areas.Password)
         .AddElement(new FormStackLayoutRecord
@@ -35,5 +36,6 @@ public static class StandardPwdRegisterForms
                 StandardRegisterFormComponents.NewRegister()
             }
         })
+        .ConfigureBackButton(backBtnId)
         .Build();
 }

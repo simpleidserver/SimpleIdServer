@@ -6,6 +6,7 @@ namespace FormBuilder.Conditions;
 [JsonDerivedType(typeof(ComparisonParameter), typeDiscriminator: "ComparisonParameter")]
 [JsonDerivedType(typeof(LogicalParameter), typeDiscriminator: "LogicalParameter")]
 [JsonDerivedType(typeof(UserAuthenticatedParameter), typeDiscriminator: "UserAuthenticatedParameter")]
+[JsonDerivedType(typeof(NotPresentParameter), typeDiscriminator: "NotPresentParameter")]
 public interface IConditionParameter
 {
     public string Type { get; }

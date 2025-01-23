@@ -11,6 +11,6 @@ public class PresentRuleEngine : GenericConditionRule<PresentParameter>
     {
         var path = JsonPath.Parse(parameter.Source);
         var pathResult = path.Evaluate(input);
-        return pathResult.Matches.Select(m => m.Value).Where(m => m != null).Any();
+        return pathResult.Matches.Select(m => m.Value).Where(m => !string.IsNullOrWhiteSpace(m?.ToString())).Any();
     }
 }

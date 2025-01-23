@@ -33,6 +33,16 @@ public static class StandardFormComponents
         };
     }
 
+    public static IFormElementRecord NewBackToReturnUrl(string id)
+    {
+        return new FormAnchorRecord
+        {
+            Id = id,
+            Labels = LayoutTranslations.Back,
+            ActAsButton = true
+        };
+    }
+
     public static IFormElementRecord NewGenerateQrCode()
     {
         return new FormButtonRecord

@@ -6,6 +6,7 @@ using FormBuilder.Models.Rules;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
 using SimpleIdServer.IdServer.Pwd;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace FormBuilder.Builders;
@@ -36,6 +37,16 @@ public static class StandardPwdRegistrationWorkflows
                         }
                     },
                     new RelativeUrlTransformerParameters()
+                }
+            })
+            .AddTransformedLinkUrlAction(StandardPwdRegisterForms.PwdForm, nextStep ?? Constants.EmptyStep, StandardPwdRegisterForms.backBtnId, "{returnUrl}", new List<ITransformerParameters>
+            {
+                new RegexTransformerParameters
+                {
+                    Rules = new ObservableCollection<MappingRule>
+                    {
+                        new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
+                    }
                 }
             });
         return builder;

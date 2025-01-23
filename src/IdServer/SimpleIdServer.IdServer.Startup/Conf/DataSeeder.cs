@@ -77,14 +77,19 @@ public class DataSeeder
         StandardVpRegistrationWorkflows.DefaultWorkflow,
         BuildComplexRegistrationWorkflow()
     };
+    
+    // public static WorkflowRecord BuildComplexRegistrationWorkflow() => WorkflowBuilder.New("complexRegistrationWorkflow")
+    //         .AddPwdRegistration(StandardSmsRegisterForms.SmsForm)
+    //         .AddSmsRegistration()
+    //         .Build();
 
     public static WorkflowRecord BuildComplexRegistrationWorkflow() => WorkflowBuilder.New("complexRegistrationWorkflow")
-            .AddPwdRegistration(StandardSmsRegisterForms.SmsForm)
-            .AddSmsRegistration(StandardEmailRegistrationForms.EmailForm)
-            .AddEmailRegistration(StandardFidoRegisterForms.MobileForm)
-            .AddMobileRegistration(StandardVpRegisterForms.VpForm)
-            .AddVpRegistration()
-            .Build();
+          .AddPwdRegistration(StandardSmsRegisterForms.SmsForm)
+          .AddSmsRegistration(StandardEmailRegistrationForms.EmailForm)
+          .AddEmailRegistration(StandardFidoRegisterForms.MobileForm)
+          .AddMobileRegistration(StandardVpRegisterForms.VpForm)
+          .AddVpRegistration()
+          .Build();
 
     public static void SeedData(WebApplication webApplication, string scimBaseUrl)
     {

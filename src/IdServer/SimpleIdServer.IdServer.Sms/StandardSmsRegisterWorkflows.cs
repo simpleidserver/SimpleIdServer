@@ -7,6 +7,7 @@ using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Sms.UI.ViewModels;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.ObjectModel;
 
 namespace FormBuilder.Builders;
@@ -54,6 +55,16 @@ public static class StandardSmsRegisterWorkflows
                         }
                     },
                     new RelativeUrlTransformerParameters()
+                }
+            })
+            .AddTransformedLinkUrlAction(StandardSmsRegisterForms.SmsForm, nextStep ?? Constants.EmptyStep, StandardSmsRegisterForms.backButtonId, "{returnUrl}", new List<ITransformerParameters>
+            {
+                new RegexTransformerParameters
+                {
+                    Rules = new ObservableCollection<MappingRule>
+                    {
+                        new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
+                    }
                 }
             });
         return builder;
