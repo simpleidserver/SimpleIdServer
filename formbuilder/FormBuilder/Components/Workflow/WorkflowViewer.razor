@@ -46,6 +46,14 @@
         };
         StateHasChanged();
     }
+
+    [JSInvokable]
+    public void SetInputData(string key, string value)
+    {
+        if(Input.ContainsKey(key)) Input[key] = value;
+        else Input.Add(key, value);
+        StateHasChanged();
+    }
     
     [JSInvokable]
     public void ClearErrorMessages()

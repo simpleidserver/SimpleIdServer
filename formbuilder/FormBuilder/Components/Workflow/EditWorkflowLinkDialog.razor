@@ -44,7 +44,7 @@
         base.OnParametersSet();
         if(WorkflowLink != null && _copyWorkflowLink == null)
         {
-            _copyWorkflowLink = WorkflowLink.Clone();
+            _copyWorkflowLink = WorkflowLink.Clone() as WorkflowLink;
             if (_copyWorkflowLink.ActionType != null)
                 SelectedActionType = _copyWorkflowLink.ActionType;
         }

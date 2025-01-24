@@ -17,11 +17,12 @@ public class OtpRegisterLayoutBuilder : RegisterLayoutBuilder
         _valueTranslations = valueTranslations;
     }
 
-    public static OtpRegisterLayoutBuilder New(string id, string name, List<LabelTranslation> valueTranslations)
+    public static OtpRegisterLayoutBuilder New(string id, string correlationId, string name, List<LabelTranslation> valueTranslations)
     {
         var record = new FormRecord
         {
             Id = id,
+            CorrelationId = correlationId,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()

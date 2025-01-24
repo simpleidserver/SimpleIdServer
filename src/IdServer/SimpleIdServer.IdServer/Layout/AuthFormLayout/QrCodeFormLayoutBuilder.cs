@@ -4,6 +4,7 @@
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Models;
 using SimpleIdServer.IdServer.UI.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -20,11 +21,12 @@ public class QrCodeFormLayoutBuilder
         _loginTranslations = loginTranslations;
     }
 
-    public static QrCodeFormLayoutBuilder New(string id, string name, List<LabelTranslation> loginTranslations)
+    public static QrCodeFormLayoutBuilder New(string id, string correlationId, string name, List<LabelTranslation> loginTranslations)
     {
         var record = new FormRecord
         {
             Id = id,
+            CorrelationId = correlationId,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()

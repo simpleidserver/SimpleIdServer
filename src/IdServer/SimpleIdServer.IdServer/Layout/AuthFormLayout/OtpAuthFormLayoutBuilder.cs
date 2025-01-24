@@ -20,11 +20,12 @@ public class OtpAuthFormLayoutBuilder
         _loginTranslations = loginTranslations;
     }
 
-    public static OtpAuthFormLayoutBuilder New(string id, string name, List<LabelTranslation> loginTranslations)
+    public static OtpAuthFormLayoutBuilder New(string id, string correlationId, string name, List<LabelTranslation> loginTranslations)
     {
         var record = new FormRecord
         {
             Id = id,
+            CorrelationId = correlationId,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()

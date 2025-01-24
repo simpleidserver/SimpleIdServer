@@ -14,9 +14,9 @@ public class StandardEmailRegistrationForms
     public static string emailRegisterFormId = "fb55c356-1555-4b1b-b9fa-05f47c8ad04b";
     public static string backButtonId = "040399cf-a11d-40e6-9efd-3f64d04d267e";
 
-    public static FormRecord EmailForm = OtpRegisterLayoutBuilder.New("emailRegister", Constants.AMR, LayoutTranslations.Email)
+    public static FormRecord EmailForm = OtpRegisterLayoutBuilder.New("e92b7506-1c8f-4c18-8be8-4005e9fd57ed", "emailRegister", Constants.AMR, LayoutTranslations.Email)
         .ConfigureSendConfirmationCode(emailSendConfirmationCodeFormId)
         .ConfigureRegistration(emailRegisterFormId)
         .ConfigureBackButton(backButtonId)
-        .Build();
+        .Build(DateTime.UtcNow);
 }

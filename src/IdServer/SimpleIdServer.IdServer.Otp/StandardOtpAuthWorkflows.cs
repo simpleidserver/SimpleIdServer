@@ -15,9 +15,9 @@ public static class StandardOtpAuthWorkflows
 {
     public static string workflowId = "cd3a77fe-4462-4896-8d3c-4d0f77e1942b";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "otpAuth")
         .AddOtpAuth()
-        .Build();
+        .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddOtpAuth(this WorkflowBuilder builder)
     {

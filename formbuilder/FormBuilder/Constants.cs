@@ -9,6 +9,9 @@ public static class Constants
     public static FormRecord EmptyStep => new FormRecord
     {
         Id = "emptyStep",
+        CorrelationId = "emptyStep",
+        Status = RecordVersionStatus.Published,
+        VersionNumber = 1,
         Name = "Empty",
         Elements = new ObservableCollection<IFormElementRecord>
         {

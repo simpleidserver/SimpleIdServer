@@ -1,9 +1,10 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace FormBuilder.Models;
 
-public class FormRecord
+public class FormRecord : BaseVersionRecord
 {
     public string Id { get; set; }
     public string Name { get; set; }
@@ -31,6 +32,26 @@ public class FormRecord
         }
 
         return null;
+    }
+
+    public override BaseVersionRecord NewDraft(DateTime currentDateTime)
+    {
+        var clonedElements = JsonSerializer.Deserialize<List<IFormElementRecord>>(JsonSerializer.Serialize(Elements));
+        var availableStyles = AvailableStyles?.Select(s => (FormStyle)s.Clone()).ToList() ?? new List<FormStyle>();
+        clonedElements.ForEach(c => c.Id = Guid.NewGuid().ToString());
+        availableStyles.ForEach(c => c.Id = Guid.NewGuid().ToString());
+        return new FormRecord
+        {
+            Id = Guid.NewGuid().ToString(),
+            CorrelationId = CorrelationId,
+            Name = Name,
+            ActAsStep = ActAsStep,
+            AvailableStyles = availableStyles, 
+            UpdateDateTime = currentDateTime,
+            Status = RecordVersionStatus.Draft,
+            VersionNumber = VersionNumber + 1,
+            Elements = new ObservableCollection<IFormElementRecord>(clonedElements)
+        };
     }
 
     public bool HasChild(string id)

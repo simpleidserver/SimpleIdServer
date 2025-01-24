@@ -65,7 +65,7 @@ public class AuthenticateController : BaseOTPAuthenticateController<Authenticate
 
     protected override bool IsExternalIdProvidersDisplayed => false;
 
-    protected override bool TryGetLogin(AmrAuthInfo amrInfo, out string login)
+    protected override bool TryGetLogin(AcrAuthInfo amrInfo, out string login)
     {
         login = amrInfo.Login;
         return true;

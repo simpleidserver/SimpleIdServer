@@ -14,7 +14,7 @@ public static class StandardPwdRegisterForms
     public static string pwdRegisterFormId = "e501ca67-2bc9-477e-959c-9752a603fcd1";
     public static string backBtnId = "ecb00170-5b5c-408d-ba67-dad2a81210e3";
 
-    public static FormRecord PwdForm = RegisterLayoutBuilder.New("pwdRegister", Constants.Areas.Password)
+    public static FormRecord PwdForm = RegisterLayoutBuilder.New("d45d4e28-3720-4d0f-9ce5-637a342257de", "pwdRegister", Constants.Areas.Password)
         .AddElement(new FormStackLayoutRecord
         {
             Id = pwdRegisterFormId,
@@ -37,5 +37,5 @@ public static class StandardPwdRegisterForms
             }
         })
         .ConfigureBackButton(backBtnId)
-        .Build();
+        .Build(DateTime.UtcNow);
 }

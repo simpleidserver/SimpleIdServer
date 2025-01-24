@@ -16,9 +16,9 @@ public static class StandardSmsAuthWorkflows
 {
     public static string workflowId = "08bea90f-2183-4c56-977f-fd0a9c5e32b8";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "defaultStandardSmsAuth")
         .AddSmsAuth()
-        .Build();
+        .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddSmsAuth(this WorkflowBuilder builder)
     {

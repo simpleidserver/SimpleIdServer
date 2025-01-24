@@ -105,7 +105,7 @@ public class AuthorizationController : Controller
 
                 if(redirectActionAuthorizationResponse.AmrAuthInfo != null)
                 {
-                    HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(redirectActionAuthorizationResponse.AmrAuthInfo));
+                    HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAcrCookieName, JsonSerializer.Serialize(redirectActionAuthorizationResponse.AmrAuthInfo));
                 }
 
                 var parameters = new List<KeyValuePair<string, string>>();

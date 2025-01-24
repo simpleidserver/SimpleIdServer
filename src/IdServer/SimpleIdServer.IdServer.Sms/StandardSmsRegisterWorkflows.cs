@@ -16,9 +16,9 @@ public static class StandardSmsRegisterWorkflows
 {
     public static string workflowId = "0ba03d04-2990-4153-8484-0cb8092959cd";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "defaultStandardSmsRegister")
         .AddSmsRegistration()
-        .Build();
+        .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddSmsRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {

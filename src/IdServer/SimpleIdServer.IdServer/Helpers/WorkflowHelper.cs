@@ -44,14 +44,19 @@ public class WorkflowHelper : IWorkflowHelper
     public async Task<string> GetNextAmr(string workflowId, string amr, CancellationToken cancellationToken)
     {
         var workflow = await _workflowStore.Get(workflowId, cancellationToken);
-        var workflowFormIds = workflow.Steps.Select(r => r.FormRecordId);
         var forms = await _formStore.GetAll(cancellationToken);
+        return GetNextAmr(workflow, forms, amr);
+    }
+
+    public static string GetNextAmr(WorkflowRecord workflow, List<FormRecord> forms, string amr)
+    {
+        var workflowFormIds = workflow.Steps.Select(r => r.FormRecordId);
         var workflowForms = forms.Where(f => workflowFormIds.Contains(f.Id));
         var currentForm = workflowForms.Single(f => f.Name == amr);
         var workflowStep = workflow.Steps.Single(s => s.FormRecordId == currentForm.Id);
-        var link = workflow.Links.Where(l => l.SourceStepId == workflowStep.Id).First();
-        var targetStep = workflow.Steps.Single(s => s.Id == link.TargetStepId);
-        return workflowForms.Single(f => f.Id == targetStep.FormRecordId).Name;
+        var stepLinks = workflow.Links.Where(l => l.SourceStepId == workflowStep.Id).Select(l => l.TargetStepId);
+        var targetFormIds = workflow.Steps.Where(s => stepLinks.Contains(s.Id)).Select(s => s.FormRecordId);
+        return workflowForms.First(f => targetFormIds.Contains(f.Id) && f.ActAsStep).Name;
     }
 
     private static string GetTargetFormRecordId(WorkflowRecord workflow, string activeLink)

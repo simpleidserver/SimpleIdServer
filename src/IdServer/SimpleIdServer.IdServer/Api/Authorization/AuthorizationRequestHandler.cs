@@ -90,7 +90,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             catch (OAuthLoginRequiredException ex)
             {
                 context.Request.RequestData.Remove(AuthorizationRequestParameters.Prompt);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { Constants.DefaultCurrentAmrCookieName });
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Area, true, new List<string> { Constants.DefaultCurrentAcrCookieName });
             }
             catch (OAuthSelectAccountRequiredException)
             {
@@ -100,8 +100,8 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             catch(OAuthAuthenticatedUserAmrMissingException ex)
             {
                 var login = _authenticationHelper.GetLogin(context.User);
-                var amrAuthInfo = new AmrAuthInfo(context.User.Id, login, context.User.Email, ex.Acr, new List<KeyValuePair<string, string>>());
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(context.Request.UserSubject), Constants.DefaultCurrentAmrCookieName }, amrAuthInfo);
+                var amrAuthInfo = new AcrAuthInfo(context.User.Id, login, context.User.Email, ex.Acr, new List<KeyValuePair<string, string>>());
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(context.Request.UserSubject), Constants.DefaultCurrentAcrCookieName }, amrAuthInfo);
             }
         }
 

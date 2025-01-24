@@ -13,9 +13,9 @@ public static class StandardSmsRegisterForms
     public static string smsRegisterFormId = "520cfd8c-4f98-4228-bf6b-b8ff7ba92272";
     public static string backButtonId = "93aeef90-acd7-4c90-9c13-06c891eec3ee";
 
-    public static FormRecord SmsForm = OtpRegisterLayoutBuilder.New("smsRegister", Constants.AMR, LayoutTranslations.PhoneNumber)
+    public static FormRecord SmsForm = OtpRegisterLayoutBuilder.New("d877be50-84a4-4af2-9c96-c4775fac7e65", "smsRegister", Constants.AMR, LayoutTranslations.PhoneNumber)
         .ConfigureSendConfirmationCode(smsSendConfirmationCodeFormId)
         .ConfigureRegistration(smsRegisterFormId)
         .ConfigureBackButton(backButtonId)
-        .Build();
+        .Build(DateTime.UtcNow);
 }

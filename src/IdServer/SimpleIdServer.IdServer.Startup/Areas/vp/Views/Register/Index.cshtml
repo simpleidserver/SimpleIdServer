@@ -46,6 +46,7 @@
             var getQrCodeUrl = "@vm.QrCodeUrl";
             var statusUrl = "@vm.StatusUrl";
             var endRegisterURL = "@vm.EndRegisterUrl";
+            var isCreated = "IsCreated";
             var mId = "@mobileFormId";
 
             var displayError = function (errorJson) {
@@ -61,6 +62,7 @@
             var displaySuccessMessage = function () {
                 csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
                 csharpReference.invokeMethodAsync("ClearErrorMessages");
+                csharpReference.invokeMethodAsync("SetInputData", isCreated, "true");
                 $("#generateQrCodeForm").attr("style", "display: none !important");
                 $("#qrCodeContainer").attr("style", "display: none !important");
             }

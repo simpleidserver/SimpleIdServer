@@ -43,6 +43,7 @@
         var init = function() {
             var beginRegisterUrl = "@vm.BeginRegisterUrl";
             var registerStatusUrl = "@vm.RegisterStatusUrl";
+            var isCreated = "IsCreated";
             var isInitialized = false;
 
             var displayError = function(errorJson) {
@@ -52,6 +53,7 @@
             var displaySuccessMessage = function () {
                 csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
                 csharpReference.invokeMethodAsync("ClearErrorMessages");
+                csharpReference.invokeMethodAsync("SetInputData", isCreated, "true");
                 $("#generateQrCodeForm").attr("style", "display: none !important");
                 $("#qrCodeContainer").attr("style", "display: none !important");
             }

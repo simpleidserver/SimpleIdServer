@@ -70,7 +70,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
 
         protected override bool IsExternalIdProvidersDisplayed => false;
 
-        protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
+        protected override bool TryGetLogin(AcrAuthInfo amr, out string login)
         {
             login = null;
             if (amr == null || string.IsNullOrWhiteSpace(amr.Login)) return false;

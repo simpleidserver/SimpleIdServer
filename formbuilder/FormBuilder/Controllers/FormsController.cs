@@ -14,14 +14,14 @@ public class FormsController : Controller
     }
 
     [HttpGet("{id}/styles/active")]
-    public async Task<IActionResult> ActiveStyle(string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> ActiveStyle(string id, int version, CancellationToken cancellationToken)
     {
         var form = await _formStore.Get(id, cancellationToken);
         if (form == null || form.ActiveStyle == null) return new NoContentResult();
         return Content(form.ActiveStyle.Content, "text/css");
     }
 
-    [HttpPut("{id}/styles/active")]
+    [HttpPut("{id}/{version}/styles/active")]
     public async Task<IActionResult> UpdateStyle(string id, [FromBody] UpdateFormStyleCommand cmd, CancellationToken cancellationToken)
     {
         var form = await _formStore.Get(id, cancellationToken);

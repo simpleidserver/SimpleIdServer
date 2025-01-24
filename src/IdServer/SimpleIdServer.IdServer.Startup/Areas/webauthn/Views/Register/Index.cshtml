@@ -44,6 +44,7 @@
             var beginRegisterUrl = "@vm.BeginRegisterUrl";
             var endRegisterUrl = "@vm.EndRegisterUrl";
             var redirectUrl = "@vm.ReturnUrl";
+            var isCreated = "IsCreated";
             var isInitialized = false;
 
             var displayError = function (errorJson) {
@@ -52,6 +53,8 @@
 
             var displaySuccessMessage = function () {
                 csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
+                csharpReference.invokeMethodAsync("ClearErrorMessages");
+                csharpReference.invokeMethodAsync("SetInputData", isCreated, "true");
                 $("#webauthForm").hide();
             }
 

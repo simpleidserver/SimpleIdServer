@@ -63,7 +63,7 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         return Task.FromResult(UserAuthenticationResult.Ok());
     }
 
-    protected override bool TryGetLogin(AmrAuthInfo amrInfo, out string login)
+    protected override bool TryGetLogin(AcrAuthInfo amrInfo, out string login)
     {
         login = amrInfo.Login;
         return true;

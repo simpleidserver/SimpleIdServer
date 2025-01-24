@@ -16,11 +16,12 @@ public class AuthLayoutBuilder
 
     protected FormRecord FormRecord { get; private set; }
 
-    public static AuthLayoutBuilder New(string id, string name, bool actAsStep = true)
+    public static AuthLayoutBuilder New(string id, string correlationId, string name, bool actAsStep = true)
     {
         var record = new FormRecord
         {
             Id = id,
+            CorrelationId = correlationId,
             Name = name,
             ActAsStep = actAsStep,
             Elements = new ObservableCollection<IFormElementRecord>()

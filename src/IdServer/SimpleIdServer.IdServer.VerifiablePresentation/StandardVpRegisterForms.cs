@@ -18,7 +18,7 @@ public static class StandardVpRegisterForms
     public static string vpRegistrationFormId = "c08b62d4-15db-4dc1-a552-1fd3d6a26578";
     public static string backBtnId = "a9de2d4b-eb3c-4e2c-87a5-6b38077e473a";
 
-    public static FormRecord VpForm = RegisterLayoutBuilder.New("vpRegister", Constants.AMR)
+    public static FormRecord VpForm = RegisterLayoutBuilder.New("6b2f5313-6c4e-4080-b18c-0d2b29c443ef", "vpRegister", Constants.AMR)
         .AddElement(new FormStackLayoutRecord
         {
             Id = Guid.NewGuid().ToString(),
@@ -74,5 +74,6 @@ public static class StandardVpRegisterForms
             }
         })
         .AddElement(StandardFormComponents.NewScanQrCode())
-        .ConfigureBackButton(backBtnId).Build();
+        .ConfigureBackButton(backBtnId)
+        .Build(DateTime.UtcNow);
 }

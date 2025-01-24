@@ -14,9 +14,9 @@ public class WorkflowBuilder
         AddStep(Constants.EmptyStep, new Coordinate(100, 100));
     }
 
-    public static WorkflowBuilder New(string id)
+    public static WorkflowBuilder New(string id, string correlationId)
     {
-        return new WorkflowBuilder(new WorkflowRecord { Id = id });
+        return new WorkflowBuilder(new WorkflowRecord { Id = id, CorrelationId = id });
     }
 
     public WorkflowBuilder AddStep(FormRecord record, Coordinate coordinate)
@@ -36,7 +36,7 @@ public class WorkflowBuilder
         return this;
     }
 
-    public WorkflowRecord Build()
+    public WorkflowRecord Build(DateTime currentDateTime)
     {
         foreach(var link in _workflowLinks)
         {
@@ -56,6 +56,7 @@ public class WorkflowBuilder
             if (link.Cb != null) link.Cb(workflowLink);
         }
 
+        _workflow.Publish(currentDateTime);
         return _workflow;
     }
 

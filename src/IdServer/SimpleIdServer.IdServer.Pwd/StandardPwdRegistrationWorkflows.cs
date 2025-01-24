@@ -15,9 +15,9 @@ public static class StandardPwdRegistrationWorkflows
 {
     public const string workflowId = "849e51f7-78a8-4a55-9609-88a5b2585870";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "defaultStandardPwdRegistration")
         .AddPwdRegistration()
-        .Build();
+        .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddPwdRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {

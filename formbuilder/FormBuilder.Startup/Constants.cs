@@ -340,7 +340,7 @@ public class Constants
             IsAntiforgeryEnabled = true,
             Target = "http://localhost:62734/Auth"
         })
-        .AddLinkUrlAction(LoginPwdAuthForm, ConfirmationForm, "", "")
+        .AddLinkAction(LoginPwdAuthForm, ConfirmationForm, "")
         .Build();
 
     public static WorkflowRecord MobileAuthWorkflow = WorkflowBuilder.New(mobileWorkflowId)

@@ -41,7 +41,7 @@
         if (SelectedLink == null) return;
         SelectedLink.TargetStepId = Step.Id;
         // SelectedLink.TargetDirection = Direction;
-        await LinkDropped.InvokeAsync(SelectedLink.Clone());
+        await LinkDropped.InvokeAsync(SelectedLink.Clone() as WorkflowLink);
     }
 
     private async Task HandleDragEnter()

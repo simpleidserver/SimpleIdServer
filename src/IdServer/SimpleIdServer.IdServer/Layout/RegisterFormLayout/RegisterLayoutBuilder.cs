@@ -22,11 +22,12 @@ public class RegisterLayoutBuilder
 
     protected FormRecord FormRecord { get; private set; }
 
-    public static RegisterLayoutBuilder New(string id, string name)
+    public static RegisterLayoutBuilder New(string id, string correlationId, string name)
     {
         var record = new FormRecord
         {
             Id = id,
+            CorrelationId = correlationId,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()
@@ -89,9 +90,42 @@ public class RegisterLayoutBuilder
                     },
                     Operator = LogicalOperators.OR
                 }
+            },
+            new PropertyTransformationRule
+            {
+                PropertyName = nameof(FormStackLayoutRecord.IsNotVisible),
+                PropertyValue = "false",
+                Condition = new LogicalParameter
+                {
+                    LeftExpression = new LogicalParameter
+                    {
+                        LeftExpression = new ComparisonParameter
+                        {
+                            Source = $"$.{nameof(IRegisterViewModel.IsCreated)}",
+                            Operator = ComparisonOperators.EQ,
+                            Value = "true"
+                        },
+                        RightExpression = new ComparisonParameter
+                        {
+                            Source = $"$.{nameof(IRegisterViewModel.IsUpdated)}",
+                            Operator = ComparisonOperators.EQ,
+                            Value = "true"
+                        },
+                        Operator = LogicalOperators.OR
+                    },
+                    RightExpression = new PresentParameter
+                    {
+                        Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}"
+                    },
+                    Operator = LogicalOperators.AND
+                }
             }
         };
     }
 
-    public FormRecord Build() => FormRecord;
+    public FormRecord Build(DateTime currentDateTime)
+    {
+        FormRecord.Publish(currentDateTime);
+        return FormRecord;
+    }
 }

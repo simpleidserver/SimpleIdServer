@@ -36,9 +36,10 @@ public class AuthController : BaseWorkflowController
             return View(vm);
         }
 
-        var result = await GetNextWorkflowStep(cancellationToken);
-        if (result == null) return Content("finish");
-        return RedirectToAction("Index", new { workflowId = _workflowId, stepName = result.Value.Item2.FormRecordId });
+        //var result = await GetNextWorkflowStep(cancellationToken);
+        //if (result == null) return Content("finish");
+        //return RedirectToAction("Index", new { workflowId = _workflowId, stepName = result.Value.Item2.FormRecordId });
+        return null;
     }
 
     [HttpGet]

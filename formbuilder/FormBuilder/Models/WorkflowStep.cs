@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace FormBuilder.Models;
 
-public class WorkflowStep
+public class WorkflowStep : ICloneable
 {
     public string Id { get; set; }
     public string FormRecordId { get; set; }
@@ -16,7 +16,17 @@ public class WorkflowStep
     {
         get
         {
-            return FormRecordId == Constants.EmptyStep.Id;
+            return FormRecordId == Constants.EmptyStep.CorrelationId;
         }
+    }
+
+    public object Clone()
+    {
+        return new WorkflowStep
+        {
+            Id = Id,
+            FormRecordId = FormRecordId,
+            Coordinate = Coordinate.Clone()
+        };
     }
 }

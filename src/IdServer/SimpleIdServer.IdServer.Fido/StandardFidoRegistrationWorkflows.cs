@@ -16,13 +16,13 @@ public static class StandardFidoRegistrationWorkflows
     public static string webauthWorkflowId = "af842842-cb22-4011-8c49-aabf09b2c455";
     public static string mobileWorkflowId = "d97459ee-b831-4ca3-9de0-95437c7e7a93";
 
-    public static WorkflowRecord WebauthnWorkflow = WorkflowBuilder.New(webauthWorkflowId)
+    public static WorkflowRecord WebauthnWorkflow = WorkflowBuilder.New(webauthWorkflowId, "webauthnRegistration")
         .AddWebauthnRegistration()
-        .Build();
+        .Build(DateTime.UtcNow);
 
-    public static WorkflowRecord MobileWorkflow = WorkflowBuilder.New(mobileWorkflowId)
+    public static WorkflowRecord MobileWorkflow = WorkflowBuilder.New(mobileWorkflowId, "mobileRegistration")
         .AddMobileRegistration()
-        .Build();
+        .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddWebauthnRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
@@ -44,7 +44,7 @@ public static class StandardFidoRegistrationWorkflows
                         new RelativeUrlTransformerParameters()
                     }
                 })
-                .AddTransformedLinkUrlAction(StandardFidoRegisterForms.WebauthnForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.webauthnFormId, "{returnUrl}", new List<ITransformerParameters>
+                .AddTransformedLinkUrlAction(StandardFidoRegisterForms.WebauthnForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.webauthnBackButtonId, "{returnUrl}", new List<ITransformerParameters>
                 {
                     new RegexTransformerParameters
                     {
@@ -61,7 +61,7 @@ public static class StandardFidoRegistrationWorkflows
     {
         builder.AddStep(StandardFidoRegisterForms.MobileForm, new Coordinate(100, 100))
             .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, new WorkflowLinkHttpRequestParameter())
-             .AddTransformedLinkUrlAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileBackButtonId, "{returnUrl}", new List<ITransformerParameters>
+            .AddTransformedLinkUrlAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileBackButtonId, "{returnUrl}", new List<ITransformerParameters>
              {
                  new RegexTransformerParameters
                  {

@@ -16,9 +16,9 @@ public static class StandardConsoleAuthWorkflows
 {
     public static string workflowId = "e7593fa9-5a73-41a3-bfb5-e489fabbe17a";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "standardConsoleAuth")
         .AddConsoleAuth()
-        .Build();
+        .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddConsoleAuth(this WorkflowBuilder builder)
     {

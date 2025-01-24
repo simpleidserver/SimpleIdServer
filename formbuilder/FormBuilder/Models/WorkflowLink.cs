@@ -1,9 +1,8 @@
-﻿using FormBuilder.Link;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace FormBuilder.Models;
 
-public class WorkflowLink
+public class WorkflowLink : ICloneable
 {
     public string Id { get; set; }
     public Coordinate SourceCoordinate { get; set; }
@@ -18,7 +17,7 @@ public class WorkflowLink
     [JsonIgnore]
     public bool IsHover { get; set; }
 
-    public WorkflowLink Clone()
+    public object Clone()
     {
         return new WorkflowLink
         {

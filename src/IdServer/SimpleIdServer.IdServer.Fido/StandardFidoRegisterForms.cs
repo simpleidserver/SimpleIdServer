@@ -16,7 +16,7 @@ public class StandardFidoRegisterForms
     public static string webauthnBackButtonId = "2016c54b-d5d6-4649-a169-99aaed300c4e";
     public static string mobileBackButtonId = "39e19212-18a0-47a9-9280-38fb12173d19";
 
-    public static FormRecord WebauthnForm = RegisterLayoutBuilder.New("webauthnRegister", Constants.AMR)
+    public static FormRecord WebauthnForm = RegisterLayoutBuilder.New("f74bd92c-a49a-4e28-a4f1-4415e8f24136", "webauthnRegister", Constants.AMR)
         .AddElement(new FormStackLayoutRecord
         {
             Id = webauthnFormId,
@@ -39,9 +39,9 @@ public class StandardFidoRegisterForms
             }
         })
         .ConfigureBackButton(webauthnBackButtonId)
-        .Build();
+        .Build(DateTime.UtcNow);
 
-    public static FormRecord MobileForm = RegisterLayoutBuilder.New("mobileRegister", Constants.MobileAMR)
+    public static FormRecord MobileForm = RegisterLayoutBuilder.New("94c14531-9258-40da-8884-2b52fcf9f0f4", "mobileRegister", Constants.MobileAMR)
         .AddElement(new FormStackLayoutRecord
         {
             Id = mobileFormId,
@@ -65,5 +65,5 @@ public class StandardFidoRegisterForms
         })
         .AddElement(StandardFormComponents.NewScanQrCode())
         .ConfigureBackButton(mobileBackButtonId)
-        .Build();
+        .Build(DateTime.UtcNow);
 }

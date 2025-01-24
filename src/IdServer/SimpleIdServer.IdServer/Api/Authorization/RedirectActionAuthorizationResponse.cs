@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             QueryParameters = queryParameters;
         }
 
-        public RedirectActionAuthorizationResponse(string action, string controllerName, JsonObject queryParameters, string area, bool disconnect = false, List<string> cookiesToRemove = null, AmrAuthInfo amrAuthInfo = null) : this(action, controllerName, queryParameters)
+        public RedirectActionAuthorizationResponse(string action, string controllerName, JsonObject queryParameters, string area, bool disconnect = false, List<string> cookiesToRemove = null, AcrAuthInfo amrAuthInfo = null) : this(action, controllerName, queryParameters)
         {
             Area = area;
             Disconnect = disconnect;
@@ -29,6 +29,6 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         public string Area { get; private set; }
         public bool Disconnect { get; private set; }
         public List<string> CookiesToRemove { get; private set; }
-        public AmrAuthInfo AmrAuthInfo { get; private set; }
+        public AcrAuthInfo AmrAuthInfo { get; private set; }
     }
 }

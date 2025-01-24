@@ -16,9 +16,9 @@ public static class StandardEmailRegisterWorkflows
 {
     public static string workflowId = "d53b24b4-7a8f-4dd3-8fc9-7a3888ab8d93";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "standardEmailRegister")
         .AddEmailRegistration()
-        .Build();
+        .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddEmailRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {

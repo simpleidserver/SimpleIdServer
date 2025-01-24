@@ -69,7 +69,7 @@ namespace SimpleIdServer.IdServer.Sms.UI
         {
         }
 
-        protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
+        protected override bool TryGetLogin(AcrAuthInfo amr, out string login)
         {
             login = null;
             if (amr == null || !amr.Claims.Any(cl => cl.Key == JwtRegisteredClaimNames.PhoneNumber)) return false;

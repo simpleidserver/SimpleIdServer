@@ -32,6 +32,8 @@ public static class ServiceCollectionExtensions
         else services.Configure<FormBuilderOptions>(cb);
         services.AddTransient<IFormBuilderJsService, FormBuilderJsService>();
         services.AddTransient<INavigationHistoryService, NavigationHistoryService>();
+        services.AddTransient<IVersionedFormService,  VersionedFormService>();
+        services.AddTransient<IVersionedWorkflowService, VersionedWorkflowService>();
 
         services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();
@@ -46,6 +48,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFormElementDefinition, ImageDefinition>();
         services.AddTransient<IFormElementDefinition, BackButtonDefinition>();
 
+        services.AddTransient<IDateTimeHelper, DateTimeHelper>();
         services.AddTransient<ITranslationHelper, TranslationHelper>();
         services.AddTransient<IRenderFormElementsHelper, RenderFormElementsHelper>();
         services.AddTransient<ITransformerFactory, TransformerFactory>();

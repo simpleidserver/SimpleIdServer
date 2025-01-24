@@ -15,19 +15,19 @@ public static class StandardPwdAuthWorkflows
     public static string pwdWorkflowId = "241a7509-4c58-4f49-b1df-49011b2c9bcb";
     public static string confirmResetPwdWorkflowId = "e05d75d5-5df1-42d4-8c1e-884fc9a2ecff";
 
-    public static WorkflowRecord DefaultPwdWorkflow = WorkflowBuilder.New(pwdWorkflowId)
+    public static WorkflowRecord DefaultPwdWorkflow = WorkflowBuilder.New(pwdWorkflowId, "defaultPwdAuth")
         .AddPwdAuth()
-        .Build();
+        .Build(DateTime.UtcNow);
 
-    public static WorkflowRecord DefaultConfirmResetPwdWorkflow = WorkflowBuilder.New(confirmResetPwdWorkflowId)
+    public static WorkflowRecord DefaultConfirmResetPwdWorkflow = WorkflowBuilder.New(confirmResetPwdWorkflowId, "defaultConfirmReset")
         .AddConfirmResetPwd()
-        .Build();
+        .Build(DateTime.UtcNow);
 
-    public static WorkflowBuilder AddPwdAuth(this WorkflowBuilder builder)
+    public static WorkflowBuilder AddPwdAuth(this WorkflowBuilder builder, FormRecord nextStep = null)
     {
         builder.AddStep(StandardPwdAuthForms.PwdForm, new Coordinate(100, 100))
             .AddStep(StandardPwdAuthForms.ResetForm, new Coordinate(100, 100))
-            .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, nextStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

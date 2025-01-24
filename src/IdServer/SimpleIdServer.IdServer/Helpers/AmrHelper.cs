@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using Microsoft.Extensions.Options;
@@ -19,20 +20,24 @@ namespace SimpleIdServer.IdServer.Helpers;
 public interface IAmrHelper
 {
     Task<AcrResult> FetchDefaultAcr(string realm, IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken);
-    Task<AcrResult> GetSupportedAcr(string realm, IEnumerable<string> requestedAcrValues, CancellationToken cancellationToken);
+    Task<AcrResult> Get(string realm, List<string> names, CancellationToken cancellationToken);
     string FetchNextAmr(AcrResult acr, string currentAmr);
 }
 
 public class AcrResult
 {
-    public AcrResult(AuthenticationContextClassReference acr, List<string> allAmrs)
+    public AcrResult(AuthenticationContextClassReference acr, List<string> allAmrs, WorkflowRecord workflow, List<FormRecord> forms)
     {
         Acr = acr;
         AllAmrs = allAmrs;
+        Workflow = workflow;
+        Forms = forms;
     }
 
     public AuthenticationContextClassReference Acr { get; private set; }
     public List<string> AllAmrs { get; set; }
+    public WorkflowRecord Workflow { get; set; }
+    public List<FormRecord> Forms { get; set; }
 }
 
 public class AmrHelper : IAmrHelper
@@ -50,50 +55,39 @@ public class AmrHelper : IAmrHelper
         _options = options.Value;
     }
 
-    public async Task<AcrResult> FetchDefaultAcr(
-        string realm, 
-        IEnumerable<string> requestedAcrValues, 
-        IEnumerable<AuthorizedClaim> requestedClaims, 
-        Client client, 
-        CancellationToken cancellationToken)
+    public async Task<AcrResult> FetchDefaultAcr(string realm, IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken)
     {
-        var defaultAcr = await GetSupportedAcr(realm, requestedAcrValues, cancellationToken);
-        if (defaultAcr == null)
+        // 1. Fetch default ACR from the authorization request.
+        var defaultAcr = await Get(realm, requestedAcrValues.ToList(), cancellationToken);
+        if (defaultAcr != null) return defaultAcr;
+        // 2. Fetch default ACR from the requested claims.
+        var acrClaim = requestedClaims?.FirstOrDefault(r => r.Name == JwtRegisteredClaimNames.Acr);
+        if (acrClaim != null)
         {
-            var acrClaim = requestedClaims?.FirstOrDefault(r => r.Name == JwtRegisteredClaimNames.Acr);
-            if (acrClaim != null)
-            {
-                defaultAcr = await GetSupportedAcr(realm, acrClaim.Values, cancellationToken);
-                if (defaultAcr == null && acrClaim.IsEssential)
-                    throw new OAuthException(ErrorCodes.ACCESS_DENIED, Global.NoEssentialAcrIsSupported);
-            }
-
-            if (defaultAcr == null)
-            {
-                var acrs = new List<string>();
-                if(client != null && client.DefaultAcrValues != null)
-                    acrs.AddRange(client.DefaultAcrValues);
-                acrs.Add(_options.DefaultAcrValue);
-                defaultAcr = await GetSupportedAcr(realm, acrs, cancellationToken);
-            }
+            defaultAcr = await Get(realm, acrClaim.Values.ToList(), cancellationToken);
+            if (defaultAcr == null && acrClaim.IsEssential) throw new OAuthException(ErrorCodes.ACCESS_DENIED, Global.NoEssentialAcrIsSupported);
         }
 
-        return defaultAcr;
+        if (defaultAcr != null) return defaultAcr;
+        // 3. Fetch default ACR from the client.
+        var acrs = new List<string>();
+        if(client != null && client.DefaultAcrValues != null)
+            acrs.AddRange(client.DefaultAcrValues);
+        acrs.Add(_options.DefaultAcrValue);
+        return await Get(realm, acrs, cancellationToken);
     }
 
-    public async Task<AcrResult> GetSupportedAcr(string realm, IEnumerable<string> requestedAcrValues, CancellationToken cancellationToken)
+    public async Task<AcrResult> Get(string realm, List<string> names, CancellationToken cancellationToken)
     {
-        var acrs = await _authenticationContextClassReferenceRepository.GetByNames(realm, requestedAcrValues.ToList(), cancellationToken);
-        foreach (var acrValue in requestedAcrValues)
+        var acrs = await _authenticationContextClassReferenceRepository.GetByNames(realm, names, cancellationToken);
+        foreach (var name in names)
         {
-            var acr = acrs.FirstOrDefault(a => a.Name == acrValue);
-            if (acr != null)
-            {
-                var workflow = await _workflowStore.Get(acr.AuthenticationWorkflow, cancellationToken);
-                var allSteps = (await _formStore.GetAll(cancellationToken)).Where(f => f.ActAsStep);
-                var workflowAmrs = allSteps.Where(step => workflow.Steps.Any(s => s.FormRecordId == step.Id)).Select(s => s.Name).ToList();
-                return new AcrResult(acr, workflowAmrs);
-            }
+            var acr = acrs.FirstOrDefault(a => a.Name == name);
+            if (acr == null) continue;
+            var workflow = await _workflowStore.Get(acr.AuthenticationWorkflow, cancellationToken);
+            var forms = await _formStore.GetAll(cancellationToken);
+            var amrs = forms.Where(f => f.ActAsStep).Where(step => workflow.Steps.Any(s => s.FormRecordId == step.Id)).Select(s => s.Name).ToList();
+            return new AcrResult(acr, amrs, workflow, forms);
         }
 
         return null;

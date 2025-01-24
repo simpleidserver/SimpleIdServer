@@ -18,7 +18,6 @@ public abstract class BaseAuthenticateViewModel : IStepViewModel
     public string Realm { get; set; }
     public bool IsAuthInProgress { get; set; } = false;
     public ICollection<ExternalIdProvider> ExternalIdsProviders { get; set; } = new List<ExternalIdProvider>();
-    public string RegistrationWorkflowId { get; set; }
     public string StepId { get; set; }
     public string WorkflowId { get; set; }
     public string CurrentLink { get; set; }
@@ -26,9 +25,9 @@ public abstract class BaseAuthenticateViewModel : IStepViewModel
     public abstract List<string> Validate();
 }
 
-public record AmrAuthInfo
+public record AcrAuthInfo
 {
-    public AmrAuthInfo(string userId, string login, string email, string currentAcr, List<KeyValuePair<string, string>> claims)
+    public AcrAuthInfo(string userId, string login, string email, string currentAcr, List<KeyValuePair<string, string>> claims)
     {
         UserId = userId;
         Login = login;

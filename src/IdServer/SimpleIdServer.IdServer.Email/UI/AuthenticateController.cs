@@ -64,7 +64,7 @@ namespace SimpleIdServer.IdServer.Email.UI
 
         protected override string FormattedMessage => GetOptions()?.HttpBody;
 
-        protected override bool TryGetLogin(AmrAuthInfo amr, out string login)
+        protected override bool TryGetLogin(AcrAuthInfo amr, out string login)
         {
             login = null;
             if (amr == null || string.IsNullOrWhiteSpace(amr.Email)) return false;

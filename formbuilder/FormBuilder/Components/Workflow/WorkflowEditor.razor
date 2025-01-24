@@ -207,7 +207,7 @@
 
     private void HandleLinkDropped(WorkflowStep workflowStep)
     {
-        var clone = this.selectedLink.Clone();
+        var clone = this.selectedLink.Clone() as WorkflowLink;
         clone.TargetStepId = workflowStep.Id;
         Context.Definition.Workflow.AddLink(clone);
         selectedLink = null;

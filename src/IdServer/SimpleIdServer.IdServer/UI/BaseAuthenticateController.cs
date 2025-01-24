@@ -26,7 +26,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI;
 
-public class BaseAuthenticateController : BaseController
+public abstract class BaseAuthenticateController : BaseController
 {
     private readonly IClientRepository _clientRepository;
     private readonly IUserRepository _userRepository;
@@ -71,6 +71,7 @@ public class BaseAuthenticateController : BaseController
     protected IBusControl Bus => _busControl;
     protected IAuthenticationHelper AuthenticationHelper => _authenticationHelper;
     protected ITransactionBuilder TransactionBuilder { get; }
+    protected abstract string Amr { get; }
 
     protected JsonObject ExtractQuery(string returnUrl) => ExtractQueryFromUnprotectedUrl(Unprotect(returnUrl));
 
@@ -116,8 +117,8 @@ public class BaseAuthenticateController : BaseController
         var requestedClaims = query.GetClaimsFromAuthorizationRequest();
         var client = await _clientRepository.GetByClientId(realm, clientId, token);
         var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, token);
-        string amr;
-        if (acr == null || string.IsNullOrWhiteSpace(amr = _amrHelper.FetchNextAmr(acr, currentAmr)))
+        var nextAmr = acr == null ? null : WorkflowHelper.GetNextAmr(acr.Workflow, acr.Forms, Amr);
+        if (acr == null || WorkflowHelper.IsLastStep(nextAmr))
         {
             if(rememberLogin == null)
             {
@@ -135,12 +136,11 @@ public class BaseAuthenticateController : BaseController
             if (rememberLogin != null)
                 HttpContext.Response.Cookies.Append(Constants.DefaultRememberMeCookieName, rememberLogin.Value.ToString());
 
-            var allAmrs = acr.AllAmrs;
             var login = _authenticationHelper.GetLogin(user);
-            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAmrCookieName, JsonSerializer.Serialize(new AmrAuthInfo(user.Id, login, user.Email, acr.Acr.Name, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList())));
+            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAcrCookieName, JsonSerializer.Serialize(new AcrAuthInfo(user.Id, login, user.Email, acr.Acr.Name, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList())));
             _userRepository.Update(user);
             await transaction.Commit(token);
-            return RedirectToAction("Index", "Authenticate", new { area = amr, ReturnUrl = returnUrl });
+            return RedirectToAction("Index", "Authenticate", new { area = nextAmr, ReturnUrl = returnUrl });
         }
     }
 

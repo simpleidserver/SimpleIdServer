@@ -2,7 +2,7 @@
 
 namespace FormBuilder.Models;
 
-public class WorkflowRecord
+public class WorkflowRecord : BaseVersionRecord
 {
     public string Id { get; set; }
     public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
@@ -36,4 +36,22 @@ public class WorkflowRecord
 
     public List<WorkflowLink> GetLinks(WorkflowStep step)
         => Links.Where(l => l.IsLinked(step.Id)).ToList();
+
+    public override BaseVersionRecord NewDraft(DateTime currentDateTime)
+    {
+        var steps = Steps.Select(s => (WorkflowStep)s.Clone()).ToList();
+        var links = Links.Select(s => (WorkflowLink)s.Clone()).ToList();
+        steps.ForEach(s => s.Id = Guid.NewGuid().ToString());
+        links.ForEach(s => s.Id = Guid.NewGuid().ToString());
+        return new WorkflowRecord
+        {
+            Id = Guid.NewGuid().ToString(),
+            CorrelationId = CorrelationId,
+            Steps = steps,
+            Links = links,
+            UpdateDateTime = UpdateDateTime,
+            Status = RecordVersionStatus.Draft,
+            VersionNumber = VersionNumber + 1
+        };
+    }
 }
