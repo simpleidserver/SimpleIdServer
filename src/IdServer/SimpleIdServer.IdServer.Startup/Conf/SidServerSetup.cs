@@ -50,7 +50,9 @@ public class SidServerSetup
         });
         var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
-            cb.DefaultAuthenticationWorkflowId = StandardPwdAuthWorkflows.DefaultPwdWorkflow.Id;
+            cb.DefaultAuthenticationWorkflowId = DataSeeder.BuildComplexAuthenticationWorkflow().Id;
+            // .DefaultPwdWorkflow.Id;
+            // cb.DefaultAuthenticationWorkflowId = StandardPwdAuthWorkflows.DefaultPwdWorkflow.Id;
             if (!string.IsNullOrWhiteSpace(configuration.SessionCookieNamePrefix))
                 cb.SessionCookieName = configuration.SessionCookieNamePrefix;
             cb.Authority = configuration.Authority;

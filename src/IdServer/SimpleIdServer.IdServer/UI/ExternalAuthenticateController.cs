@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
@@ -48,11 +50,14 @@ namespace SimpleIdServer.IdServer.UI
             IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
             ITransactionBuilder transactionBuilder,
-            IBusControl busControl) : base(
+            IBusControl busControl,
+            IWorkflowStore workflowStore,
+            IAcrHelper acrHelper,
+            IFormStore formStore) : base(
                 clientRepository, 
                 userRepository, 
                 userSessionRepository, 
-                amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
+                amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, options)
         {
             _logger = logger;
             _authenticationSchemeProvider = authenticationSchemeProvider;

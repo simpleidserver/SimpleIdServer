@@ -56,8 +56,13 @@ public class WorkflowHelper : IWorkflowHelper
         var workflowStep = workflow.Steps.Single(s => s.FormRecordId == currentForm.Id);
         var stepLinks = workflow.Links.Where(l => l.SourceStepId == workflowStep.Id).Select(l => l.TargetStepId);
         var targetFormIds = workflow.Steps.Where(s => stepLinks.Contains(s.Id)).Select(s => s.FormRecordId);
-        return workflowForms.First(f => targetFormIds.Contains(f.Id) && f.ActAsStep).Name;
+        var result = workflowForms.FirstOrDefault(f => targetFormIds.Contains(f.Id) && f.ActAsStep)?.Name;
+        if (result != null) return result;
+        return FormBuilder.Constants.EmptyStep.Name;
     }
+
+    public static List<string> ExtractAmrs(WorkflowRecord workflow, List<FormRecord> forms)
+        => forms.Where(f => f.ActAsStep).Where(step => workflow.Steps.Any(s => s.FormRecordId == step.Id)).Select(s => s.Name).ToList();
 
     private static string GetTargetFormRecordId(WorkflowRecord workflow, string activeLink)
     {

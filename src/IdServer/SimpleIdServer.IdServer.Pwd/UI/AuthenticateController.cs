@@ -49,7 +49,8 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         IWorkflowStore workflowStore,
         IFormStore formStore,
         ILanguageRepository languageRepository,
-        IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, formBuilderOptions)
+        IAcrHelper acrHelper,
+        IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
     {
         _configuration = configuration;
     }

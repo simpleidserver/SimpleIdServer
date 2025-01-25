@@ -54,7 +54,8 @@ namespace SimpleIdServer.IdServer.UI
             IWorkflowStore workflowStore,
             IFormStore formStore,
             ILanguageRepository languageRepository,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, formBuilderOptions)
+            IAcrHelper acrHelper,
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
         {
             _notificationServices = notificationServices;
             _otpAuthenticators = otpAuthenticators;

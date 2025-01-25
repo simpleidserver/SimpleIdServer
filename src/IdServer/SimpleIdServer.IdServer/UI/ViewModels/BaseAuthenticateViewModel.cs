@@ -41,7 +41,4 @@ public record AcrAuthInfo
     public string Email { get; private set; }
     public List<KeyValuePair<string, string>> Claims { get; set; }
     public string CurrentAcr { get; set; }
-    public string WorkflowId { get; set; }
-    public string CurrentStepId { get; set; }
-    public string LastExecutedLinkId { get; set; }
 }

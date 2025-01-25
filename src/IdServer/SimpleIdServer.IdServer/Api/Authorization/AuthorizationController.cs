@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -12,6 +11,7 @@ using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using System;
@@ -21,7 +21,6 @@ using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,6 +35,7 @@ public class AuthorizationController : Controller
     private readonly IResponseModeHandler _responseModeHandler;
     private readonly IDataProtector _dataProtector;
     private readonly IBusControl _busControl;
+    private readonly IAcrHelper _acrHelper;
     private readonly IdServerHostOptions _options;
     private readonly CookieAuthenticationOptions _cookieAuthOptions;
 
@@ -45,6 +45,7 @@ public class AuthorizationController : Controller
         IResponseModeHandler responseModeHandler, 
         IDataProtectionProvider dataProtectionProvider, 
         IBusControl busControl,
+        IAcrHelper acrHelper,
         IOptions<IdServerHostOptions> options,
         IOptions<CookieAuthenticationOptions> cookieAuthOptions)
     {
@@ -53,6 +54,7 @@ public class AuthorizationController : Controller
         _responseModeHandler = responseModeHandler;
         _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         _busControl = busControl;
+        _acrHelper = acrHelper;
         _options = options.Value;
         _cookieAuthOptions = cookieAuthOptions.Value;
     }
@@ -105,7 +107,7 @@ public class AuthorizationController : Controller
 
                 if(redirectActionAuthorizationResponse.AmrAuthInfo != null)
                 {
-                    HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAcrCookieName, JsonSerializer.Serialize(redirectActionAuthorizationResponse.AmrAuthInfo));
+                    await _acrHelper.StoreAcr(redirectActionAuthorizationResponse.AmrAuthInfo, token);
                 }
 
                 var parameters = new List<KeyValuePair<string, string>>();

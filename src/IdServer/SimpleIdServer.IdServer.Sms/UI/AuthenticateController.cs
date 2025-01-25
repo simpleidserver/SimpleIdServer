@@ -54,7 +54,8 @@ namespace SimpleIdServer.IdServer.Sms.UI
             IWorkflowStore workflowStore,
             IFormStore formStore,
             ILanguageRepository languageRepository,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, formBuilderOptions)
+            IAcrHelper acrHelper,
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
         {
             _configuration = configuration;
         }

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
@@ -19,14 +21,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI;
 
-public abstract class BaseAuthenticateController : BaseController
+public class BaseAuthenticateController : BaseController
 {
     private readonly IClientRepository _clientRepository;
     private readonly IUserRepository _userRepository;
@@ -50,6 +51,9 @@ public abstract class BaseAuthenticateController : BaseController
         ITransactionBuilder transactionBuilder,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
+        IWorkflowStore workflowStore,
+        IFormStore formStore,
+        IAcrHelper acrHelper,
         IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
     {
         _clientRepository = clientRepository;
@@ -61,6 +65,9 @@ public abstract class BaseAuthenticateController : BaseController
         _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         _authenticationHelper = authenticationHelper;
         TransactionBuilder = transactionBuilder;
+        WorkflowStore = workflowStore;
+        FormStore = formStore;
+        AcrHelper = acrHelper;
         _options = options.Value;
     }
 
@@ -71,7 +78,9 @@ public abstract class BaseAuthenticateController : BaseController
     protected IBusControl Bus => _busControl;
     protected IAuthenticationHelper AuthenticationHelper => _authenticationHelper;
     protected ITransactionBuilder TransactionBuilder { get; }
-    protected abstract string Amr { get; }
+    protected IWorkflowStore WorkflowStore { get; }
+    protected IFormStore FormStore { get; }
+    protected IAcrHelper AcrHelper { get; }
 
     protected JsonObject ExtractQuery(string returnUrl) => ExtractQueryFromUnprotectedUrl(Unprotect(returnUrl));
 
@@ -103,22 +112,28 @@ public abstract class BaseAuthenticateController : BaseController
         }
     }
 
-    protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken token, bool? rememberLogin = null)
+    protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken cancellationToken, bool? rememberLogin = null)
     {
+        string nextAmr = null;
+        Client client = null;
+        var unprotectedUrl = returnUrl;
+        List<string> amrs = null;
         if (!IsProtected(returnUrl))
         {
-            return await Sign(realm, null, returnUrl, currentAmr, user, null, token, rememberLogin.Value);
+            var result = await GetNextAmrFromNormalAuthentication(currentAmr, cancellationToken);
+            nextAmr = result.nextAmr;
+            amrs = result.amrs;
+        }
+        else
+        {
+            unprotectedUrl = Unprotect(returnUrl);
+            var result = await GetNextAmrFormAuthorizationRequestAuthentication(realm, currentAmr, unprotectedUrl, cancellationToken);
+            nextAmr = result.nextAmr;
+            client = result.client;
+            amrs = result.amrs;
         }
 
-        var unprotectedUrl = Unprotect(returnUrl);
-        var query = ExtractQuery(returnUrl);
-        var acrValues = query.GetAcrValuesFromAuthorizationRequest();
-        var clientId = query.GetClientIdFromAuthorizationRequest();
-        var requestedClaims = query.GetClaimsFromAuthorizationRequest();
-        var client = await _clientRepository.GetByClientId(realm, clientId, token);
-        var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, token);
-        var nextAmr = acr == null ? null : WorkflowHelper.GetNextAmr(acr.Workflow, acr.Forms, Amr);
-        if (acr == null || WorkflowHelper.IsLastStep(nextAmr))
+        if (WorkflowHelper.IsLastStep(nextAmr))
         {
             if(rememberLogin == null)
             {
@@ -128,7 +143,7 @@ public abstract class BaseAuthenticateController : BaseController
                     rememberLogin = false;
             }
 
-            return await Sign(realm, acr, unprotectedUrl, currentAmr, user, client, token, rememberLogin.Value);
+            return await Sign(realm, amrs, unprotectedUrl, currentAmr, user, client, cancellationToken, rememberLogin.Value);
         }
 
         using (var transaction = TransactionBuilder.Build())
@@ -137,21 +152,21 @@ public abstract class BaseAuthenticateController : BaseController
                 HttpContext.Response.Cookies.Append(Constants.DefaultRememberMeCookieName, rememberLogin.Value.ToString());
 
             var login = _authenticationHelper.GetLogin(user);
-            HttpContext.Response.Cookies.Append(Constants.DefaultCurrentAcrCookieName, JsonSerializer.Serialize(new AcrAuthInfo(user.Id, login, user.Email, acr.Acr.Name, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList())));
+            await AcrHelper.StoreAcr(new AcrAuthInfo(user.Id, login, user.Email, nextAmr, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList()), cancellationToken);
             _userRepository.Update(user);
-            await transaction.Commit(token);
+            await transaction.Commit(cancellationToken);
             return RedirectToAction("Index", "Authenticate", new { area = nextAmr, ReturnUrl = returnUrl });
         }
     }
 
-    protected async Task<IActionResult> Sign(string realm, AcrResult acr, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)
+    protected async Task<IActionResult> Sign(string realm, List<string> amrs, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)
     {
         var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
         var claims = _userTransformer.Transform(user);
         await AddSession(realm, claims, user, client, token, rememberLogin);
         var offset = DateTimeOffset.UtcNow.AddSeconds(expirationTimeInSeconds);
-        if(acr != null)
-            claims.Add(new Claim(Constants.UserClaims.Amrs, string.Join(" ", acr.AllAmrs)));
+        if(amrs != null)
+            claims.Add(new Claim(Constants.UserClaims.Amrs, string.Join(" ", amrs)));
         var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
         if (rememberLogin)
@@ -214,6 +229,28 @@ public abstract class BaseAuthenticateController : BaseController
             var sub = claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             Response.Cookies.Append(_options.GetSessionCookieName(sub), session.SessionId, cookieOptions);
         }
+    }
+
+    private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication(string currentAmr, CancellationToken cancellationToken)
+    {
+        var workflow = await WorkflowStore.Get(Options.DefaultAuthenticationWorkflowId, cancellationToken);
+        var forms = await FormStore.GetAll(cancellationToken);
+        var nextAmr = WorkflowHelper.GetNextAmr(workflow, forms, currentAmr);
+        var amrs = WorkflowHelper.ExtractAmrs(workflow, forms);
+        return (nextAmr, amrs);
+    }
+
+    private async Task<(string nextAmr, Client client, List<string> amrs)> GetNextAmrFormAuthorizationRequestAuthentication(string realm, string currentAmr, string returnUrl, CancellationToken cancellationToken)
+    {
+        var unprotectedUrl = Unprotect(returnUrl);
+        var query = ExtractQuery(returnUrl);
+        var acrValues = query.GetAcrValuesFromAuthorizationRequest();
+        var clientId = query.GetClientIdFromAuthorizationRequest();
+        var requestedClaims = query.GetClaimsFromAuthorizationRequest();
+        var client = await _clientRepository.GetByClientId(realm, clientId, cancellationToken);
+        var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
+        var nextAmr = acr == null ? null : WorkflowHelper.GetNextAmr(acr.Workflow, acr.Forms, currentAmr);
+        return (nextAmr, client, acr.AllAmrs);
     }
 
     private double GetCookieExpirationTimeInSeconds(Client client)

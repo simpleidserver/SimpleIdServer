@@ -277,6 +277,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IRevokeTokenValidator, RevokeTokenValidator>();
             services.AddTransient<IPasswordGrantTypeValidator, PasswordGrantTypeValidator>();
             services.AddTransient<IGrantedTokenHelper, GrantedTokenHelper>();
+            services.AddTransient<IAcrHelper, AcrHelper>();
             services.AddTransient<ITokenExchangeValidator, TokenExchangeValidator>();
             services.AddTransient<IGrantTypeHandler, TokenExchangeHandler>();
             services.AddTransient<IGrantTypeHandler, ClientCredentialsHandler>();

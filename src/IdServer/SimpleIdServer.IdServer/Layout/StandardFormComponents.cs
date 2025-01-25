@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using FormBuilder.Builders;
 using FormBuilder.Components.FormElements.Anchor;
 using FormBuilder.Components.FormElements.Back;
 using FormBuilder.Components.FormElements.Button;
@@ -150,12 +149,29 @@ public static class StandardFormComponents
                 {
                     Condition = new LogicalParameter
                     {
-                        LeftExpression = new PresentParameter
+                        LeftExpression = new LogicalParameter
                         {
-                            Source = $"$.{nameof(AuthenticatePasswordViewModel.Login)}"
+                            LeftExpression = new PresentParameter
+                            {
+                                Source = $"$.{nameof(AuthenticatePasswordViewModel.Login)}"
+                            },
+                            RightExpression = new UserAuthenticatedParameter(),
+                            Operator = LogicalOperators.AND
                         },
-                        RightExpression = new UserAuthenticatedParameter(),
-                        Operator = LogicalOperators.AND
+                        RightExpression = new LogicalParameter
+                        {
+                            LeftExpression = new PresentParameter
+                            {
+                                Source = $"$.{nameof(AuthenticatePasswordViewModel.Login)}"
+                            },
+                            RightExpression = new ComparisonParameter
+                            {
+                                Operator = ComparisonOperators.EQ,
+                                Source = $"$.{nameof(AuthenticatePasswordViewModel.IsAuthInProgress)}",
+                                Value = "true"
+                            }
+                        },
+                        Operator = LogicalOperators.OR
                     },
                     PropertyName = nameof(FormInputFieldRecord.Disabled),
                     PropertyValue = "true"

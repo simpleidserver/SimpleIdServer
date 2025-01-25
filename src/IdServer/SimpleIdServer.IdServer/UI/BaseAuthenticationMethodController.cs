@@ -44,8 +44,6 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAntiforgery _antiforgery;
         private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
         private readonly ISessionManager _sessionManager;
-        private readonly IWorkflowStore _workflowStore;
-        private readonly IFormStore _formStore;
         private readonly ILanguageRepository _languageRepository;
         private readonly FormBuilderOptions _formBuilderOptions;
 
@@ -71,7 +69,8 @@ namespace SimpleIdServer.IdServer.UI
             IWorkflowStore workflowStore,
             IFormStore formStore,
             ILanguageRepository languageRepository,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, options)
+            IAcrHelper acrHelper,
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, options)
         {
             _configuration = configuration;
             _authenticationSchemeProvider = authenticationSchemeProvider;
@@ -79,14 +78,13 @@ namespace SimpleIdServer.IdServer.UI
             _antiforgery = antiforgery;
             _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
             _sessionManager = sessionManager;
-            _workflowStore = workflowStore;
-            _formStore = formStore;
             _languageRepository = languageRepository;
             _formBuilderOptions = formBuilderOptions.Value;
         }
 
         protected abstract bool IsExternalIdProvidersDisplayed { get; }
         protected IUserAuthenticationService UserAuthenticationService => _authenticationService;
+        protected abstract string Amr { get; }
 
         #region Get Authenticate View
 
@@ -97,10 +95,12 @@ namespace SimpleIdServer.IdServer.UI
 
             try
             {
+                prefix = prefix ?? Constants.DefaultRealm;
                 List<FormRecord> forms;
-                var viewModel = await BuildViewModel();
+                var acrInfo = await AcrHelper.GetAcr(cancellationToken);
+                string loginHint = null;
+                var viewModel = await BuildViewModel(acrInfo);
                 WorkflowRecord workflow = null;
-                var acrInfo = GetAcrInfo();
                 if (IsProtected(returnUrl))
                 {
                     var acrResult = await ParseRedirectUrl(viewModel, acrInfo);
@@ -110,8 +110,8 @@ namespace SimpleIdServer.IdServer.UI
                 else
                 {
                     viewModel.RememberLogin = false;
-                    workflow = await _workflowStore.Get(Options.DefaultAuthenticationWorkflowId, cancellationToken);
-                    forms = await _formStore.GetAll(cancellationToken);
+                    workflow = await WorkflowStore.Get(Options.DefaultAuthenticationWorkflowId, cancellationToken);
+                    forms = await FormStore.GetAll(cancellationToken);
                 }
 
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
@@ -126,11 +126,13 @@ namespace SimpleIdServer.IdServer.UI
                 return RedirectToAction("Index", "Errors", new { code = "invalid_request", ReturnUrl = $"{Request.Path}{Request.QueryString}", area = string.Empty });
             }
 
-            async Task<T> BuildViewModel()
+            async Task<T> BuildViewModel(AcrAuthInfo acrInfo)
             {
                 var viewModel = Activator.CreateInstance<T>();
                 var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
                 var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
+                if (acrInfo != null && !string.IsNullOrWhiteSpace(acrInfo.Login) && TryGetLogin(acrInfo, out string login))
+                    viewModel.Login = login;
                 viewModel.ReturnUrl = returnUrl;
                 viewModel.AuthUrl = UriHelper.GetDisplayUrl(Request);
                 viewModel.Realm = prefix;
@@ -139,6 +141,7 @@ namespace SimpleIdServer.IdServer.UI
                     AuthenticationScheme = e.Name,
                     DisplayName = e.DisplayName
                 }).ToList();
+                viewModel.IsAuthInProgress = acrInfo?.Login != null && !string.IsNullOrWhiteSpace(acrInfo?.Login);
                 EnrichViewModel(viewModel);
                 return viewModel;
             }
@@ -147,20 +150,14 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var query = ExtractQuery(returnUrl);
                 var clientId = query.GetClientIdFromAuthorizationRequest();
-                var str = prefix ?? Constants.DefaultRealm;
-                var client = await ClientRepository.GetByClientId(str, clientId, cancellationToken);
+                var client = await ClientRepository.GetByClientId(prefix, clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
-                var acr = await ResolveAcr(acrInfo, query, str, client, cancellationToken);
-                if (acrInfo != null && !string.IsNullOrWhiteSpace(acrInfo.Login) && TryGetLogin(acrInfo, out string login))
-                    loginHint = login;
-
-                viewModel.Realm = str;
+                var acr = await ResolveAcr(acrInfo, query, prefix, client, cancellationToken);
+                viewModel.Login = viewModel.Login ?? loginHint;
                 viewModel.ClientName = client.ClientName;
-                viewModel.Login = loginHint;
                 viewModel.LogoUri = client.LogoUri;
                 viewModel.TosUri = client.TosUri;
                 viewModel.PolicyUri = client.PolicyUri;
-                viewModel.IsAuthInProgress = acrInfo.Login != null && !string.IsNullOrWhiteSpace(acrInfo.Login);
                 return acr;
             }
         }
@@ -185,7 +182,7 @@ namespace SimpleIdServer.IdServer.UI
             // 3. Build workflow result
             var workflowResult = await BuildWorkflowViewModel();
             workflowResult.SetInput(viewModel);
-            var acrInfo = GetAcrInfo();
+            var acrInfo = await AcrHelper.GetAcr(token);
 
             // 4. Validate view model.
             var errors = viewModel.Validate();
@@ -293,9 +290,9 @@ namespace SimpleIdServer.IdServer.UI
 
             async Task<WorkflowViewModel> BuildWorkflowViewModel()
             {
-                var records = await _formStore.GetAll(token);
+                var records = await FormStore.GetAll(token);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-                var workflow = await _workflowStore.Get(viewModel.WorkflowId, token);
+                var workflow = await WorkflowStore.Get(viewModel.WorkflowId, token);
                 var workflowResult = await BuildViewModel(workflow, records, token);
                 return workflowResult;
             }
@@ -365,13 +362,6 @@ namespace SimpleIdServer.IdServer.UI
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
             var acr = await AmrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
             return acr;
-        }
-
-        protected AcrAuthInfo GetAcrInfo()
-        {
-            if (!HttpContext.Request.Cookies.ContainsKey(Constants.DefaultCurrentAcrCookieName)) return null;
-            var amr = JsonSerializer.Deserialize<AcrAuthInfo>(HttpContext.Request.Cookies[Constants.DefaultCurrentAcrCookieName]);
-            return amr;
         }
 
         protected UserLockingOptions GetOptions()

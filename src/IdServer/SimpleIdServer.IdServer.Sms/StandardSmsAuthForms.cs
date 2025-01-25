@@ -13,7 +13,7 @@ public static class StandardSmsAuthForms
 
 
     public static FormRecord SmsForm = OtpAuthFormLayoutBuilder.New("3781726f-07a0-48ad-8619-91323102d489", "smsAuth", Constants.AMR, LayoutTranslations.PhoneNumber)
-        .ConfigureAuthentication(smsAuthForm)
         .ConfigureSendConfirmationCode(smsSendConfirmationCode)
+        .ConfigureAuthentication(smsAuthForm)
         .Build();
 }
