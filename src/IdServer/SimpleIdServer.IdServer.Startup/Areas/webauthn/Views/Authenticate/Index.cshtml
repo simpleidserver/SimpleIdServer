@@ -105,6 +105,7 @@
 
                 $("#webauthForm").unbind("submit");
                 $("#webauthForm input[name='SessionId']").val(sessionId);
+                $("#webauthForm input[name='Login']").removeAttr('disabled');
                 $("#webauthForm").trigger("submit");
             }
 

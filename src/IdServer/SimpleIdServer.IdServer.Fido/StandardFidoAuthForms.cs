@@ -31,6 +31,8 @@ public static class StandardFidoAuthForms
             },
             Elements = new ObservableCollection<IFormElementRecord>
             {
+                // ReturnUrl.
+                StandardFormComponents.NewReturnUrl(),
                 // Realm
                 StandardFormComponents.NewRealm(),
                 // SessionId

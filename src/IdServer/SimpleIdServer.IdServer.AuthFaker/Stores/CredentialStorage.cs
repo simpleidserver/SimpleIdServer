@@ -11,7 +11,6 @@ public class CredentialStorage
 
     private CredentialStorage()
     {
-        _instance = new CredentialStorage();
         _path = Path.Combine(Directory.GetCurrentDirectory(), "credentialStore.json");
     }
 
@@ -22,7 +21,9 @@ public class CredentialStorage
     }
 
     public void Update(CredentialRecord record)
-        => File.WriteAllText(_path, JsonSerializer.Serialize(record));
+    {
+        File.WriteAllText(_path, JsonSerializer.Serialize(record));
+    }
 
     public CredentialRecord Get()
     {

@@ -13,7 +13,7 @@ public static class StandardEmailAuthForms
 
 
     public static FormRecord EmailForm = OtpAuthFormLayoutBuilder.New("dd0dc677-40fd-48fa-9246-2adca1a06db0", "emailAuth", Constants.AMR, LayoutTranslations.Email)
-        .ConfigureAuthentication(emailAuthForm)
         .ConfigureSendConfirmationCode(emailSendConfirmationCode)
+        .ConfigureAuthentication(emailAuthForm)
         .Build();
 }

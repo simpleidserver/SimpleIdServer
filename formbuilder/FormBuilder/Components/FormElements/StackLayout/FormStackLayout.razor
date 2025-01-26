@@ -24,7 +24,12 @@
                                     </EditForm>
                                     break;
                                 default:
-                                    <form style="@Value.CssStyle" @attributes=@Value.HtmlAttributes target="@GetTargetUrl()" method="post">
+                                    <form style="@Value.CssStyle" @attributes=@Value.HtmlAttributes action="@TargetUrl" method="post">
+                                        @foreach(var hiddenField in HiddenFields)
+                                        {
+                                            <input type="hidden" name="@hiddenField.Key" value="@hiddenField.Value" />
+                                        }
+
                                         <RadzenStack Orientation="Orientation.Vertical">
                                             @CustomRender
                                         </RadzenStack>

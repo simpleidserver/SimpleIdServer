@@ -67,6 +67,7 @@
                         await checkStatus(sessionId);
                     } else {
                         $("#generateQrCodeForm").unbind("submit");
+                        $("#generateQrCodeForm input[name='Login']").removeAttr('disabled');
                         $("#generateQrCodeForm input[name='SessionId']").val(sessionId);
                         $("#generateQrCodeForm").trigger("submit");
                     }

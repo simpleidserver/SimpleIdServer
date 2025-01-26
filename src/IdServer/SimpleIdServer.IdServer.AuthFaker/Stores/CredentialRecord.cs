@@ -1,10 +1,16 @@
 ﻿using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.AuthFaker.Stores;
 
 public class CredentialRecord
 {
+    public CredentialRecord()
+    {
+        
+    }
+
     public CredentialRecord(byte[] credentialId, X509Certificate2 certificate, ECDsa privateKey, uint sigCount, string rp, string login)
     {
         Id = Convert.ToBase64String(credentialId);
@@ -25,6 +31,7 @@ public class CredentialRecord
     public string Login { get; set; }
     public DateTime CreateDateTime { get; set; }
     public uint SigCount { get; set; }
+    [JsonIgnore]
     public X509Certificate2 Certificate
     {
         get
@@ -32,6 +39,7 @@ public class CredentialRecord
             return new X509Certificate2(Convert.FromBase64String(PublicKey));
         }
     }
+    [JsonIgnore]
     public ECDsa PrivateKey
     {
         get
@@ -42,6 +50,7 @@ public class CredentialRecord
             return ecdsa;
         }
     }
+    [JsonIgnore]
     public byte[] IdPayload
     {
         get

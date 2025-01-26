@@ -65,7 +65,7 @@ public class QrCodeFormLayoutBuilder
 
     public QrCodeFormLayoutBuilder ConfigureDisplayQrCode()
     {
-        var record = StandardFormComponents.NewGenerateQrCode();
+        var record = StandardFormComponents.NewScanQrCode();
         _record.Elements.Add(record);
         return this;
     }

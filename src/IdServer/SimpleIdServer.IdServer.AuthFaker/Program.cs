@@ -8,7 +8,7 @@ using System.Text.Json;
 var qrCode = QrCodeHelper.ReadQrCode(new Options
 {
     Url = "https://localhost:5001",
-    BrowserId = "738bd762-d172-442f-a914-cbd03ab26c97",
+    BrowserId = "9a89ba59-3f6e-4845-a38c-aadaf3409b1e",
 }).Result;
 if (qrCode.StartsWith("openid4vp://"))
 {

@@ -1,10 +1,14 @@
 ﻿convertFormToJSON = function (form) {
-    return $(form)
+    var result = $(form)
         .serializeArray()
         .reduce(function (json, { name, value }) {
             json[name] = value;
             return json;
         }, {});
+    $(form).find(":disabled").each((i, e) => {
+        result[e.name] = e.value;
+    });
+    return result;
 }
 
 coerceToArrayBuffer = function (thing, name) {

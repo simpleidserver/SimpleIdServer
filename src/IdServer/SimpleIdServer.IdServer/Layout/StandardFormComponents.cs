@@ -149,6 +149,7 @@ public static class StandardFormComponents
                 {
                     Condition = new LogicalParameter
                     {
+                        // User is authenticated.
                         LeftExpression = new LogicalParameter
                         {
                             LeftExpression = new PresentParameter
@@ -158,6 +159,7 @@ public static class StandardFormComponents
                             RightExpression = new UserAuthenticatedParameter(),
                             Operator = LogicalOperators.AND
                         },
+                        // Authentication is in progress.
                         RightExpression = new LogicalParameter
                         {
                             LeftExpression = new PresentParameter
@@ -169,7 +171,8 @@ public static class StandardFormComponents
                                 Operator = ComparisonOperators.EQ,
                                 Source = $"$.{nameof(AuthenticatePasswordViewModel.IsAuthInProgress)}",
                                 Value = "true"
-                            }
+                            },
+                            Operator = LogicalOperators.AND
                         },
                         Operator = LogicalOperators.OR
                     },

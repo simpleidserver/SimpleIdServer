@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using Org.BouncyCastle.Bcpg;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
@@ -114,6 +115,12 @@ namespace SimpleIdServer.IdServer.UI
                     forms = await FormStore.GetAll(cancellationToken);
                 }
 
+                if (IsFirstStep(workflow, forms))
+                    acrInfo = null;
+
+                if (acrInfo != null && !string.IsNullOrWhiteSpace(acrInfo.Login) && TryGetLogin(acrInfo, out string login))
+                    viewModel.Login = login;
+                viewModel.IsAuthInProgress = acrInfo?.Login != null && !string.IsNullOrWhiteSpace(acrInfo?.Login);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
                 var result = await this.BuildViewModel(workflow, forms, cancellationToken);
                 result.SetInput(viewModel);
@@ -131,8 +138,6 @@ namespace SimpleIdServer.IdServer.UI
                 var viewModel = Activator.CreateInstance<T>();
                 var schemes = await _authenticationSchemeProvider.GetAllSchemesAsync();
                 var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
-                if (acrInfo != null && !string.IsNullOrWhiteSpace(acrInfo.Login) && TryGetLogin(acrInfo, out string login))
-                    viewModel.Login = login;
                 viewModel.ReturnUrl = returnUrl;
                 viewModel.AuthUrl = UriHelper.GetDisplayUrl(Request);
                 viewModel.Realm = prefix;
@@ -141,7 +146,6 @@ namespace SimpleIdServer.IdServer.UI
                     AuthenticationScheme = e.Name,
                     DisplayName = e.DisplayName
                 }).ToList();
-                viewModel.IsAuthInProgress = acrInfo?.Login != null && !string.IsNullOrWhiteSpace(acrInfo?.Login);
                 EnrichViewModel(viewModel);
                 return viewModel;
             }
@@ -153,7 +157,7 @@ namespace SimpleIdServer.IdServer.UI
                 var client = await ClientRepository.GetByClientId(prefix, clientId, cancellationToken);
                 var loginHint = query.GetLoginHintFromAuthorizationRequest();
                 var acr = await ResolveAcr(acrInfo, query, prefix, client, cancellationToken);
-                viewModel.Login = viewModel.Login ?? loginHint;
+                viewModel.Login = loginHint;
                 viewModel.ClientName = client.ClientName;
                 viewModel.LogoUri = client.LogoUri;
                 viewModel.TosUri = client.TosUri;
@@ -182,7 +186,9 @@ namespace SimpleIdServer.IdServer.UI
             // 3. Build workflow result
             var workflowResult = await BuildWorkflowViewModel();
             workflowResult.SetInput(viewModel);
-            var acrInfo = await AcrHelper.GetAcr(token);
+            AcrAuthInfo acrInfo = null;
+            if(!IsFirstStep(workflowResult.Workflow, workflowResult.FormRecords))
+               acrInfo = await AcrHelper.GetAcr(token);
 
             // 4. Validate view model.
             var errors = viewModel.Validate();
@@ -319,6 +325,12 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         #endregion
+
+        private bool IsFirstStep(WorkflowRecord workflow, List<FormRecord> forms)
+        {
+            var firstStep = workflow.GetFirstStep();
+            return forms.Single(f => f.Id == firstStep.FormRecordId).Name == Amr;
+        }
 
         private async Task<WorkflowViewModel> BuildViewModel(WorkflowRecord workflow, List<FormRecord> records, CancellationToken cancellationToken)
         {

@@ -1,6 +1,7 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
+using FormBuilder.UIs;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json.Nodes;
 
@@ -16,18 +17,8 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public bool IsInteractableElementEnabled { get; set; }
-
-    public string GetTargetUrl()
-    {
-        var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);
-        var json = new JsonObject();
-        Value.ExtractJson(json);
-        var execution = Context.GetLinkExecutionFromElementAndCurrentStep(Value.Id);
-        execution.OutputData = json;
-        var act = WorkflowLinkActionFactory.Build(link.ActionType);
-        var res = act.GetRequest(link, execution, Context);
-        return res?.url;
-    }
+    public string TargetUrl { get; private set; }
+    public Dictionary<string, string> HiddenFields { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -36,6 +27,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
         {
             Value.Elements.CollectionChanged += HandleCollectionChanged;
             CustomRender = CreateComponent();
+            BuildHiddenFields();
         }
     }
 
@@ -62,5 +54,26 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     {
         CustomRender = CreateComponent();
         StateHasChanged();
+    }
+
+    private void BuildHiddenFields()
+    {
+        if (Value.FormType != FormTypes.HTML || !string.IsNullOrWhiteSpace(TargetUrl)) return;
+        var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);
+        var json = new JsonObject();
+        Value.ExtractJson(json);
+        var execution = Context.GetLinkExecutionFromElementAndCurrentStep(Value.Id);
+        execution.OutputData = json;
+        var act = WorkflowLinkActionFactory.Build(link.ActionType);
+        var res = act.GetRequest(link, execution, Context);
+        if (res == null) return;
+        TargetUrl = res.Value.url;
+        HiddenFields = new Dictionary<string, string>();
+        if (Context.Execution?.AntiforgeryToken != null && res.Value.json.ContainsKey(Context.Execution.AntiforgeryToken.FormField))
+            HiddenFields.Add(Context.Execution.AntiforgeryToken.FormField, Context.Execution.AntiforgeryToken.FormValue);
+
+        if(res.Value.json.ContainsKey(nameof(IStepViewModel.StepId))) HiddenFields.Add(nameof(IStepViewModel.StepId), res.Value.json[nameof(IStepViewModel.StepId)].ToString());
+        if (res.Value.json.ContainsKey(nameof(IStepViewModel.WorkflowId))) HiddenFields.Add(nameof(IStepViewModel.WorkflowId), res.Value.json[nameof(IStepViewModel.WorkflowId)].ToString());
+        if (res.Value.json.ContainsKey(nameof(IStepViewModel.CurrentLink))) HiddenFields.Add(nameof(IStepViewModel.CurrentLink), res.Value.json[nameof(IStepViewModel.CurrentLink)].ToString());
     }
 }
