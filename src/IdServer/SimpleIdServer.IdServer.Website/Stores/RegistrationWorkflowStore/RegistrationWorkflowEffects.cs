@@ -5,7 +5,6 @@ using Fluxor;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -92,8 +91,7 @@ public class RegistrationWorkflowEffects
         var jsonRequest = JsonSerializer.Serialize(new RegistrationWorkflowResult
         {
             Name = action.Name,
-            IsDefault = action.IsDefault,
-            Steps = action.Steps
+            IsDefault = action.IsDefault
         });
         var requestMessage = new HttpRequestMessage
         {
@@ -105,7 +103,7 @@ public class RegistrationWorkflowEffects
         try
         {
             httpResult.EnsureSuccessStatusCode();
-            dispatcher.Dispatch(new UpdateRegistrationWorkflowSuccessAction { Id = action.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps  });
+            dispatcher.Dispatch(new UpdateRegistrationWorkflowSuccessAction { Id = action.Id, IsDefault = action.IsDefault, Name = action.Name  });
         }
         catch
         {
@@ -123,8 +121,7 @@ public class RegistrationWorkflowEffects
         var jsonRequest = JsonSerializer.Serialize(new RegistrationWorkflowResult
         {
             Name = action.Name,
-            IsDefault = action.IsDefault,
-            Steps = action.Steps
+            IsDefault = action.IsDefault
         });
         var requestMessage = new HttpRequestMessage
         {
@@ -138,7 +135,7 @@ public class RegistrationWorkflowEffects
         {
             httpResult.EnsureSuccessStatusCode();
             var result = SidJsonSerializer.Deserialize<RegistrationWorkflowResult>(json);
-            dispatcher.Dispatch(new AddRegistrationWorkflowSuccessAction { Id = result.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps });
+            dispatcher.Dispatch(new AddRegistrationWorkflowSuccessAction { Id = result.Id, IsDefault = result.IsDefault, Name = result.Name });
         }
         catch
         {
@@ -200,7 +197,6 @@ public class UpdateRegistrationWorkflowAction
     public string Id { get; set; }
     public string Name { get; set; }
     public bool IsDefault { get; set; }
-    public List<string> Steps { get; set; }
 }
 
 public class UpdateRegistrationWorkflowSuccessAction
@@ -208,7 +204,6 @@ public class UpdateRegistrationWorkflowSuccessAction
     public string Id { get; set; }
     public string Name { get; set; }
     public bool IsDefault { get; set; }
-    public List<string> Steps { get; set; }
 }
 
 public class UpdateRegistrationWorkflowFailureAction
@@ -220,7 +215,6 @@ public class AddRegistrationWorkflowAction
 {
     public string Name { get; set; }
     public bool IsDefault { get; set; }
-    public List<string> Steps { get; set; }
 }
 
 public class AddRegistrationWorkflowSuccessAction
@@ -228,7 +222,6 @@ public class AddRegistrationWorkflowSuccessAction
     public string Id { get; set; }
     public string Name { get; set; }
     public bool IsDefault { get; set; }
-    public List<string> Steps { get; set; }
 }
 
 public class AddRegistrationWorkflowFailureAction

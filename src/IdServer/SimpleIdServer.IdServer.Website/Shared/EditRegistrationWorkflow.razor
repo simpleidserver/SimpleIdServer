@@ -26,15 +26,6 @@
                     <RadzenRequiredValidator Component="Name" Text="@Global.NameIsRequired" />
                 </Helper>
             </RadzenFormField>
-            <!-- Steps -->
-            <RadzenFormField Variant="Variant.Outlined">
-                <ChildContent>
-                    <RadzenDropDown @bind-Value=@editForm.Steps Chips=true Data=@AuthMethods Multiple=true AllowClear=true Placeholder="@Global.SelectOneOrMoreAuthMethods" class="w-100"></RadzenDropDown>
-                </ChildContent>
-                <Helper>
-                    @Global.SelectOneOrMoreAuthMethodsHelper
-                </Helper>
-            </RadzenFormField>
             <!-- Is Default -->
             <div class="mt-3">
                 <RadzenCheckBox Name="IsDefault" @bind-Value=editForm.IsDefault></RadzenCheckBox>
@@ -66,7 +57,6 @@
     class RegistrationWorkflowEditForm
     {
         public string Name { get; set; }
-        public List<string> Steps { get; set; }
         public bool IsDefault { get; set; }
     }
 
@@ -79,8 +69,7 @@
             {
                 editForm = new RegistrationWorkflowEditForm
                 {
-                    IsDefault = RegistrationWorkflow.IsDefault,
-                    Steps = RegistrationWorkflow.Steps
+                    IsDefault = RegistrationWorkflow.IsDefault
                 };
             }
         }
@@ -92,7 +81,7 @@
 
     async void Submit(RegistrationWorkflowEditForm ef)
     {
-        var result = new RegistrationWorkflowResult { Id = RegistrationWorkflow?.Id, Name = ef.Name, IsDefault = ef.IsDefault, Steps = ef.Steps };
+        var result = new RegistrationWorkflowResult { Id = RegistrationWorkflow?.Id, Name = ef.Name, IsDefault = ef.IsDefault };
         await Saved.InvokeAsync(result);
     }
 }

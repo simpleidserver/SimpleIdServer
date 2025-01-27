@@ -32,7 +32,7 @@
     void Save(RegistrationWorkflowResult registrationWorkflow)
     {
         isUpdating = true;
-        var act = new AddRegistrationWorkflowAction { IsDefault = registrationWorkflow.IsDefault, Name = registrationWorkflow.Name, Steps = registrationWorkflow.Steps };
+        var act = new AddRegistrationWorkflowAction { IsDefault = registrationWorkflow.IsDefault, Name = registrationWorkflow.Name };
         dispatcher.Dispatch(act);
     }
 }

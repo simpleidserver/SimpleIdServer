@@ -9,12 +9,10 @@ using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Org.BouncyCastle.Bcpg;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
@@ -30,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
@@ -185,10 +182,11 @@ namespace SimpleIdServer.IdServer.UI
 
             // 3. Build workflow result
             var workflowResult = await BuildWorkflowViewModel();
-            workflowResult.SetInput(viewModel);
             AcrAuthInfo acrInfo = null;
-            if(!IsFirstStep(workflowResult.Workflow, workflowResult.FormRecords))
-               acrInfo = await AcrHelper.GetAcr(token);
+            if (!IsFirstStep(workflowResult.Workflow, workflowResult.FormRecords))
+                acrInfo = await AcrHelper.GetAcr(token);
+            viewModel.IsAuthInProgress = acrInfo?.Login != null && !string.IsNullOrWhiteSpace(acrInfo?.Login);
+            workflowResult.SetInput(viewModel);
 
             // 4. Validate view model.
             var errors = viewModel.Validate();
@@ -275,7 +273,7 @@ namespace SimpleIdServer.IdServer.UI
                Amr,
                authenticationResult.AuthenticatedUser,
                token,
-               viewModel.RememberLogin);
+               acrInfo?.RememberLogin ?? viewModel.RememberLogin);
 
             async Task<IActionResult> CheckAntiforgery()
             {

@@ -18,4 +18,13 @@ public static class FormBuilderRegistrationExtensions
         else formBuilderRegistration.Services.AddDbContext<FormBuilderDbContext>(o => o.UseInMemoryDatabase("formBuilder"), lifetime);
         return formBuilderRegistration;
     }
+
+    public static FormBuilderRegistration UseInMemoryEF(this FormBuilderRegistration formBuilderRegistration, Action<FormBuilderInMemoryStoreBuilder> cb)
+    {
+        var result = formBuilderRegistration.UseEF(null);
+        var serviceProvider = formBuilderRegistration.Services.BuildServiceProvider();
+        var builder = new FormBuilderInMemoryStoreBuilder(serviceProvider);
+        cb(builder);
+        return result;
+    }
 }

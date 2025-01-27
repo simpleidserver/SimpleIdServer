@@ -109,7 +109,7 @@ public class RegistrationWorkflowReducers
         var registrationWorkflows = state.RegistrationWorkflows.ToList();
         if(action.IsDefault)
             registrationWorkflows.ForEach(r => r.RegistrationWorkflow.IsDefault = false);
-        registrationWorkflows.Add(new SelectableRegistrationWorkflow(new RegistrationWorkflowResult { CreateDateTime = DateTime.Now, Id = action.Id, IsDefault = action.IsDefault, Name = action.Name, Steps = action.Steps, UpdateDateTime = DateTime.Now }, false)
+        registrationWorkflows.Add(new SelectableRegistrationWorkflow(new RegistrationWorkflowResult { CreateDateTime = DateTime.Now, Id = action.Id, IsDefault = action.IsDefault, Name = action.Name, UpdateDateTime = DateTime.Now }, false)
         {
             IsNew = true
         });
@@ -155,7 +155,6 @@ public class RegistrationWorkflowReducers
         var registrationWorkflow = state.Value;
         registrationWorkflow.UpdateDateTime = DateTime.Now;
         registrationWorkflow.IsDefault = act.IsDefault;
-        registrationWorkflow.Steps = act.Steps;
         return state with
         {
             IsLoading = false,

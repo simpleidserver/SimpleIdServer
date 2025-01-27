@@ -152,7 +152,7 @@ public class BaseAuthenticateController : BaseController
                 HttpContext.Response.Cookies.Append(Constants.DefaultRememberMeCookieName, rememberLogin.Value.ToString());
 
             var login = _authenticationHelper.GetLogin(user);
-            await AcrHelper.StoreAcr(new AcrAuthInfo(user.Id, login, user.Email, nextAmr, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList()), cancellationToken);
+            await AcrHelper.StoreAcr(new AcrAuthInfo(user.Id, login, user.Email, nextAmr, user.OAuthUserClaims.Select(c => new KeyValuePair<string, string>(c.Name, c.Value)).ToList(), rememberLogin ?? false), cancellationToken);
             _userRepository.Update(user);
             await transaction.Commit(cancellationToken);
             return RedirectToAction("Index", "Authenticate", new { area = nextAmr, ReturnUrl = returnUrl });
