@@ -10,7 +10,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-
+using FormBuilder;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.JSInterop;
+using Moq;
 var builder = WebApplication.CreateBuilder(args);
 var p = GetKey(512);
 var s = new SymmetricSecurityKey(p)
@@ -18,6 +22,7 @@ var s = new SymmetricSecurityKey(p)
     KeyId = Guid.NewGuid().ToString()
 };
 
+builder.Services.AddSingleton(BuildProtectedSessionStorage());
 builder.Services.AddSIDIdentityServer()
     .UseInMemoryEFStore(o =>
     {
@@ -40,6 +45,7 @@ builder.Services.AddSIDIdentityServer()
     })
     .AddBackChannelAuthentication()
     .UseInMemoryMassTransit();
+builder.Services.AddFormBuilder().UseEF();
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
 var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));
 builder.Services.AddDidKey();
@@ -72,6 +78,14 @@ static byte[] GetKey(int keySize)
     var str = "abcdefghijklmnopqrstuvwxyz";
     var rnd = new Random();
     return Enumerable.Repeat(0, length).Select(_ => rnd.Next(0, str.Length)).Select(_ => Convert.ToByte(str[_])).ToArray();
+}
+
+static ProtectedSessionStorage BuildProtectedSessionStorage()
+{
+    var mockJsInterop = new Mock<IJSRuntime>();
+    var mockDataProtectionProvider = new Mock<IDataProtectionProvider>();
+    var obj = new ProtectedSessionStorage(mockJsInterop.Object, mockDataProtectionProvider.Object);
+    return obj;
 }
 
 public partial class Program { }

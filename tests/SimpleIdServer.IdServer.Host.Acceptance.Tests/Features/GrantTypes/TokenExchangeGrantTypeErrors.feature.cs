@@ -319,6 +319,9 @@ this.ScenarioInitialize(scenarioInfo);
                 table361.AddRow(new string[] {
                             "key",
                             "value"});
+                table361.AddRow(new string[] {
+                            "iss",
+                            "https://localhost:8080"});
 #line 59
  testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table361, "Given ");
 #line hidden
@@ -340,19 +343,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table362.AddRow(new string[] {
                             "subject_token_type",
                             "urn:ietf:params:oauth:token-type:access_token"});
-#line 63
+#line 64
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table362, "When ");
 #line hidden
-#line 71
+#line 72
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 72
+#line 73
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 73
+#line 74
  testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 74
+#line 75
  testRunner.And("JSON \'$.error_description\'=\'the subject cannot be extracted from the subject_toke" +
                         "n\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
@@ -368,7 +371,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("The parameter \'actor_subject_type\' is not recognized", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 76
+#line 77
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -384,7 +387,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table363.AddRow(new string[] {
                             "client_id",
                             "clientId"});
-#line 77
+                table363.AddRow(new string[] {
+                            "iss",
+                            "https://localhost:8080"});
+#line 78
  testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table363, "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table364 = new TechTalk.SpecFlow.Table(new string[] {
@@ -408,19 +414,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table364.AddRow(new string[] {
                             "actor_token_type",
                             "invalid"});
-#line 81
+#line 83
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table364, "When ");
 #line hidden
-#line 90
+#line 92
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 91
+#line 93
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 92
+#line 94
  testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 93
+#line 95
  testRunner.And("JSON \'$.error_description\'=\'the actor type invalid is not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

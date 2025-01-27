@@ -292,9 +292,10 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 	
 Scenario: Use 'urn:ietf:params:oauth:grant-type:uma-ticket' grant type to get an access token
 	Given build JWS id_token_hint and sign with the key 'keyid'
-	| Key   | Value           |
-	| sub   | user            |
-	| email | user@hotmail.fr |
+	| Key         | Value                  |
+	| sub         | user                   |
+	| email       | user@hotmail.fr        |
+	| iss         | http://localhost       |
 
 	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
@@ -404,8 +405,9 @@ Scenario: Use 'urn:openid:params:grant-type:ciba' grant type to get an identity 
 
 Scenario: Use 'urn:ietf:params:oauth:grant-type:pre-authorized_code' grant type to get an access token with authorization details
 	Given build access_token and sign with the key 'keyid'
-	| Key   | Value    |
-	| sub   | otpUser  |
+	| Key   | Value                  |
+	| sub   | otpUser                |
+	| iss   | https://localhost:8080 |
 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
@@ -581,8 +583,9 @@ Scenario: Use 'authorization_code' grant type to get an access token and use PAR
 
 Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and impersonation to get an access token
 	Given build access_token and sign with the key 'keyid'
-	| Key         | Value           |
-	| client_id   | fortyFourClient |
+	| Key         | Value                  |
+	| client_id   | fortyFourClient        |
+	| iss         | https://localhost:8080 |
 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                  | Value                                           |
@@ -600,8 +603,9 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and i
 
 Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and delegation to get an access token
 	Given build access_token and sign with the key 'keyid'
-	| Key         | Value           |
-	| client_id   | fortyFourClient |
+	| Key         | Value                  |
+	| client_id   | fortyFourClient        |
+	| iss         | https://localhost:8080 |
 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                  | Value                                           |
@@ -620,8 +624,9 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and d
 
 Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and delegation to get an access token with sub act
 	Given build access_token and sign with the key 'keyid'
-	| Key         | Value           |
-	| client_id   | fortyFourClient |
+	| Key         | Value                  |
+	| client_id   | fortyFourClient        |
+	| iss         | https://localhost:8080 |
 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                  | Value                                           |
@@ -651,8 +656,9 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and d
 
 Scenario: Use 'urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code' grant-type to get the pre-authorized code
 	Given build access_token and sign with the key 'keyid'
-	| Key   | Value    |
-	| sub   | otpUser  |
+	| Key   | Value                  |
+	| sub   | otpUser                |
+	| iss   | https://localhost:8080 | 
 	
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |

@@ -627,6 +627,9 @@ this.ScenarioInitialize(scenarioInfo);
                 table20.AddRow(new string[] {
                             "sub",
                             "otheruser"});
+                table20.AddRow(new string[] {
+                            "iss",
+                            "http://localhost"});
 #line 144
  testRunner.And("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table20, "And ");
 #line hidden
@@ -660,13 +663,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table21.AddRow(new string[] {
                             "id_token_hint",
                             "$id_token_hint$"});
-#line 148
+#line 149
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table21, "When ");
 #line hidden
-#line 160
+#line 161
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 161
+#line 162
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'subject contain" +
                         "ed in id_token_hint is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -682,7 +685,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Audience in the id_token_hint must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 163
+#line 164
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -692,7 +695,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 164
+#line 165
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
@@ -704,7 +707,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table22.AddRow(new string[] {
                             "aud",
                             "aud1 aud2"});
-#line 165
+                table22.AddRow(new string[] {
+                            "iss",
+                            "http://localhost"});
+#line 166
  testRunner.And("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table22, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
@@ -737,13 +743,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table23.AddRow(new string[] {
                             "id_token_hint",
                             "$id_token_hint$"});
-#line 170
+#line 172
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table23, "When ");
 #line hidden
-#line 182
+#line 184
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 183
+#line 185
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'audience contai" +
                         "ned in id_token_hint is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -759,7 +765,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Value of a sub essential claim must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 185
+#line 187
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -769,7 +775,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 186
+#line 188
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
@@ -802,13 +808,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table24.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"sub\": { \"essential\" : true, \"value\": \"invalid\" } } }"});
-#line 188
+#line 190
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table24, "When ");
 #line hidden
-#line 200
+#line 202
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 201
+#line 203
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'claims sub are " +
                         "invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -824,7 +830,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must be a valid JWT token", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 203
+#line 205
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -834,7 +840,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 204
+#line 206
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
@@ -867,13 +873,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table25.AddRow(new string[] {
                             "request",
                             "invalid"});
-#line 205
+#line 207
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table25, "When ");
 #line hidden
-#line 217
+#line 219
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 218
+#line 220
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'request paramet" +
                         "er is not a valid JWS token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -889,7 +895,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains response_type", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 220
+#line 222
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -899,7 +905,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 221
+#line 223
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
@@ -908,7 +914,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table26.AddRow(new string[] {
                             "claim",
                             "value"});
-#line 222
+#line 224
  testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
                         "d\'", ((string)(null)), table26, "And ");
 #line hidden
@@ -942,13 +948,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table27.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 226
+#line 228
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table27, "When ");
 #line hidden
-#line 238
+#line 240
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 239
+#line 241
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the response_ty" +
                         "pe claim is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -964,7 +970,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("request parameter must contains client_id", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 241
+#line 243
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -974,7 +980,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 242
+#line 244
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
@@ -983,7 +989,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table28.AddRow(new string[] {
                             "response_type",
                             "code"});
-#line 243
+#line 245
  testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
                         "d\'", ((string)(null)), table28, "And ");
 #line hidden
@@ -1017,13 +1023,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table29.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 247
+#line 249
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table29, "When ");
 #line hidden
-#line 259
+#line 261
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 260
+#line 262
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the client_id c" +
                         "laim is missing\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1042,7 +1048,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the response_type in the request parameter must be equals to the parameter passed" +
                     " in the HTTP request", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 262
+#line 264
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1052,7 +1058,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 263
+#line 265
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1064,7 +1070,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table30.AddRow(new string[] {
                             "client_id",
                             "clientId"});
-#line 264
+#line 266
  testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
                         "d\'", ((string)(null)), table30, "And ");
 #line hidden
@@ -1098,13 +1104,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table31.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 269
+#line 271
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table31, "When ");
 #line hidden
-#line 281
+#line 283
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 282
+#line 284
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the response_ty" +
                         "pe claim is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1123,7 +1129,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the client_id in the request parameter must be equals to the parameter passed in " +
                     "the HTTP request", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 284
+#line 286
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1133,7 +1139,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 285
+#line 287
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1145,7 +1151,7 @@ this.ScenarioInitialize(scenarioInfo);
                 table32.AddRow(new string[] {
                             "client_id",
                             "otherclientId"});
-#line 286
+#line 288
  testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
                         "d\'", ((string)(null)), table32, "And ");
 #line hidden
@@ -1179,13 +1185,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table33.AddRow(new string[] {
                             "request",
                             "$request$"});
-#line 291
+#line 293
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table33, "When ");
 #line hidden
-#line 303
+#line 305
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 304
+#line 306
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the client_id c" +
                         "laim is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1201,7 +1207,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("redirect_uri must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 306
+#line 308
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1211,7 +1217,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 307
+#line 309
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1241,16 +1247,16 @@ this.ScenarioInitialize(scenarioInfo);
                 table34.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-#line 309
+#line 311
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table34, "When ");
 #line hidden
-#line 320
+#line 322
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 322
+#line 324
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 323
+#line 325
  testRunner.Then("JSON \'error_description\'=\'redirect_uri uri is not correct\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1268,7 +1274,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("redirect to the login page when prompt is equals to login and the user is authent" +
                     "icated", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 325
+#line 327
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1278,7 +1284,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 326
+#line 328
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table35 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1308,10 +1314,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table35.AddRow(new string[] {
                             "prompt",
                             "login"});
-#line 328
+#line 330
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table35, "When ");
 #line hidden
-#line 339
+#line 341
  testRunner.Then("redirection url contains \'http://localhost/pwd/Authenticate\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1329,7 +1335,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("redirect to the account page when prompt is equals to select_account and the user" +
                     " is authenticated", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 341
+#line 343
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1339,7 +1345,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 342
+#line 344
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table36 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1369,10 +1375,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table36.AddRow(new string[] {
                             "prompt",
                             "select_account"});
-#line 344
+#line 346
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table36, "When ");
 #line hidden
-#line 355
+#line 357
  testRunner.Then("redirection url contains \'http://localhost/Accounts\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1390,7 +1396,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("redirect to the consent page when no consent has been given to the specified clai" +
                     "m", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 357
+#line 359
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1400,7 +1406,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 358
+#line 360
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table37 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1430,10 +1436,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table37.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"name\": { \"essential\" : true } } }"});
-#line 360
+#line 362
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table37, "When ");
 #line hidden
-#line 371
+#line 373
  testRunner.Then("redirection url contains \'http://localhost/Consents\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -1448,7 +1454,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the acr value passed in the claims parameter must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 373
+#line 375
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1458,7 +1464,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 374
+#line 376
  testRunner.When("disconnect the user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1489,13 +1495,13 @@ this.ScenarioInitialize(scenarioInfo);
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-#line 376
+#line 378
  testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table38, "And ");
 #line hidden
-#line 387
+#line 389
  testRunner.Then("redirection url contains the parameter value \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 388
+#line 390
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'no essential ac" +
                         "r is supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1514,7 +1520,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("resource parameter is required when the client is excepting to receive this param" +
                     "eter", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 390
+#line 392
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1524,7 +1530,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 391
+#line 393
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1555,13 +1561,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table39.AddRow(new string[] {
                             "scope",
                             "admin"});
-#line 393
+#line 395
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table39, "When ");
 #line hidden
-#line 404
+#line 406
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_target\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 405
+#line 407
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'missing paramet" +
                         "er resource\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1577,7 +1583,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("resource parameter must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 407
+#line 409
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1587,7 +1593,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 408
+#line 410
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1621,13 +1627,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table40.AddRow(new string[] {
                             "resource",
                             "sinvalid"});
-#line 410
+#line 412
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table40, "When ");
 #line hidden
-#line 422
+#line 424
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_target\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 423
+#line 425
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'following resou" +
                         "rces invalid,sinvalid doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1643,7 +1649,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("grant_management_action parameter must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 425
+#line 427
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1653,7 +1659,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 426
+#line 428
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1687,13 +1693,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table41.AddRow(new string[] {
                             "grant_management_action",
                             "invalid"});
-#line 428
+#line 430
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table41, "When ");
 #line hidden
-#line 440
+#line 442
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 441
+#line 443
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the grant_manag" +
                         "ement_action invalid is not valid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1709,7 +1715,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("grant_id cannot be specified when grant_management_action is equals to create", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 443
+#line 445
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1719,7 +1725,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 444
+#line 446
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table42 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1756,13 +1762,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table42.AddRow(new string[] {
                             "grant_id",
                             "id"});
-#line 446
+#line 448
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table42, "When ");
 #line hidden
-#line 459
+#line 461
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 460
+#line 462
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'grant_id cannot" +
                         " be specified because the grant_management_action is equals to create\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1778,7 +1784,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("grant_management_action must be specified when grant_id is present", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 463
+#line 465
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1788,7 +1794,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 464
+#line 466
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table43 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1822,13 +1828,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table43.AddRow(new string[] {
                             "grant_id",
                             "id"});
-#line 466
+#line 468
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table43, "When ");
 #line hidden
-#line 478
+#line 480
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 479
+#line 481
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'missing paramet" +
                         "er grant_management_action\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1844,7 +1850,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("grant_id must exists", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 481
+#line 483
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1854,7 +1860,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 482
+#line 484
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table44 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1891,13 +1897,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table44.AddRow(new string[] {
                             "grant_management_action",
                             "replace"});
-#line 484
+#line 486
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table44, "When ");
 #line hidden
-#line 497
+#line 499
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 498
+#line 500
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the grant inval" +
                         "id doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1913,7 +1919,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("only the same client can perform operations on the grant", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 500
+#line 502
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1923,7 +1929,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 501
+#line 503
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table45 = new TechTalk.SpecFlow.Table(new string[] {
@@ -1963,13 +1969,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table45.AddRow(new string[] {
                             "grant_id",
                             "consentId"});
-#line 503
+#line 505
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table45, "When ");
 #line hidden
-#line 517
+#line 519
  testRunner.Then("redirection url contains the parameter value \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 518
+#line 520
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the client fort" +
                         "yEightClient is not authorized to access to perform operations on the grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -1985,7 +1991,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization details type is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 520
+#line 522
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -1995,7 +2001,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 521
+#line 523
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2022,14 +2028,14 @@ this.ScenarioInitialize(scenarioInfo);
                 table46.AddRow(new string[] {
                             "authorization_details",
                             "{ \"actions\": [ \"write\" ] }"});
-#line 523
+#line 525
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table46, "When ");
 #line hidden
-#line 533
+#line 535
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_authorization_detai" +
                         "ls\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 534
+#line 536
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'the authorizati" +
                         "on_details type is required\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -2045,7 +2051,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("authorization details types must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 536
+#line 538
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -2055,7 +2061,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 537
+#line 539
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2089,14 +2095,14 @@ this.ScenarioInitialize(scenarioInfo);
                 table47.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"firstDetails\", \"test\": \"test\", \"creditorAccount\": { \"iban\": \"DE\" } }"});
-#line 539
+#line 541
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table47, "When ");
 #line hidden
-#line 551
+#line 553
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_authorization_detai" +
                         "ls\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 552
+#line 554
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'authorization d" +
                         "etails types firstDetails are not supported\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -2115,7 +2121,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("redirect to the consent page when no consent has been given to the specified auth" +
                     "orization_details", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 554
+#line 556
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -2125,7 +2131,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 555
+#line 557
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2152,10 +2158,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table48.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"firstDetails\", \"actions\": [ \"write\" ] }"});
-#line 557
+#line 559
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table48, "When ");
 #line hidden
-#line 567
+#line 569
  testRunner.Then("redirection url contains \'http://localhost/Consents\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -2173,7 +2179,7 @@ this.ScenarioInitialize(scenarioInfo);
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("credential_configuration_id is required when authorization_details type is equals" +
                     " to openid_credential", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 569
+#line 571
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -2183,7 +2189,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 570
+#line 572
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
@@ -2210,13 +2216,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table49.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\" }"});
-#line 572
+#line 574
  testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table49, "When ");
 #line hidden
-#line 582
+#line 584
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 583
+#line 585
  testRunner.Then("redirection url contains the parameter value \'error_description\'=\'missing paramet" +
                         "er credential_configuration_id\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden

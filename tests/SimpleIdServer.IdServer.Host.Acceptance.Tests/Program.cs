@@ -15,6 +15,8 @@ using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Host.Acceptance.Tests;
+using SimpleIdServer.IdServer.Host.Acceptance.Tests.Middlewares;
+using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using System;
 using System.Collections.Generic;
@@ -97,8 +99,8 @@ builder.Services.Remove(memoryDistribution);
 builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
 builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
 builder.Services.AddDidKey();
-var app = builder.Build()
-    .UseOpenidFederation()
+var app = builder.Build();
+app.UseOpenidFederation()
     .UseSID();
 app.Run();
 

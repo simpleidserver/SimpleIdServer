@@ -156,8 +156,9 @@ Scenario: claim_token must be a valid JWT
 
 Scenario: scope must be supported
 	Given build JWS id_token_hint and sign with the key 'keyid'
-	| Key | Value  |
-	| sub | random |
+	| Key       | Value             |
+	| sub       | random            |
+	| iss       | http://localhost  |
 
 	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
@@ -211,8 +212,9 @@ Scenario: scope must be supported
 
 Scenario: claim_token must contains the claims
 	Given build JWS id_token_hint and sign with the key 'keyid'
-	| Key | Value  |
-	| sub | user   |
+	| Key       | Value             |
+	| sub       | user              |
+	| iss       | http://localhost  |
 
 	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
@@ -271,9 +273,10 @@ Scenario: claim_token must contains the claims
 
 Scenario: User must be authorized
 	Given build JWS id_token_hint and sign with the key 'keyid'
-	| Key   | Value           |
-	| sub   | user1           |
-	| email | user@hotmail.fr |
+	| Key   | Value            |
+	| sub   | user1            |
+	| email | user@hotmail.fr  |
+	| iss   | http://localhost |
 
 	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |

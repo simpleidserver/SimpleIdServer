@@ -57,8 +57,9 @@ Scenario: Parameter 'requested_token_type' is not recognized
 
 Scenario: Subject cannot be extracted from the subject_token
 	Given build access_token and sign with the key 'keyid'
-	| Key   | Value |
-	| key   | value |
+	| Key   | Value                  |
+	| key   | value                  |
+	| iss   | https://localhost:8080 |
 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                  | Value                                           |
@@ -75,8 +76,9 @@ Scenario: Subject cannot be extracted from the subject_token
 
 Scenario: The parameter 'actor_subject_type' is not recognized
 	Given build access_token and sign with the key 'keyid'
-	| Key         | Value    |
-	| client_id   | clientId |
+	| Key         | Value                  |
+	| client_id   | clientId               |
+	| iss         | https://localhost:8080 |
 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                  | Value                                           |

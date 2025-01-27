@@ -528,6 +528,9 @@ this.ScenarioInitialize(scenarioInfo);
                 table374.AddRow(new string[] {
                             "client_id",
                             "client"});
+                table374.AddRow(new string[] {
+                            "iss",
+                            "https://localhost:8080"});
 #line 111
  testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table374, "Given ");
 #line hidden
@@ -552,19 +555,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table375.AddRow(new string[] {
                             "scope",
                             "Credential"});
-#line 116
+#line 117
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table375, "When ");
 #line hidden
-#line 125
+#line 126
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 126
+#line 127
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 127
+#line 128
  testRunner.And("JSON \'$.error\'=\'invalid_scope\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 128
+#line 129
  testRunner.And("JSON \'$.error_description\'=\'unknown scope Credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -579,7 +582,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("User must have an active OTP", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 130
+#line 131
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -595,7 +598,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table376.AddRow(new string[] {
                             "sub",
                             "user"});
-#line 131
+                table376.AddRow(new string[] {
+                            "iss",
+                            "https://localhost:8080"});
+#line 132
  testRunner.Given("build access_token and sign with the key \'keyid\'", ((string)(null)), table376, "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table377 = new TechTalk.SpecFlow.Table(new string[] {
@@ -619,19 +625,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table377.AddRow(new string[] {
                             "scope",
                             "UniversityCredential"});
-#line 135
+#line 137
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table377, "When ");
 #line hidden
-#line 144
+#line 146
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 145
+#line 147
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 146
+#line 148
  testRunner.And("JSON \'$.error\'=\'no_active_otp\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 147
+#line 149
  testRunner.And("JSON \'$.error_description\'=\'the user doesn\'t have an active OTP\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

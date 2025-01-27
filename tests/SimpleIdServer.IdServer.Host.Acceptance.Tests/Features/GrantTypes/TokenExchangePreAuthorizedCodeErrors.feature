@@ -109,9 +109,10 @@ Scenario: Subject cannot be extracted from the subject_token
 
 Scenario: Scopes must be supported
 	Given build access_token and sign with the key 'keyid'
-	| Key       | Value  |
-	| sub       | user   |
-	| client_id | client |
+	| Key       | Value                  |
+	| sub       | user                   |
+	| client_id | client                 |
+	| iss       | https://localhost:8080 |
 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
@@ -129,8 +130,9 @@ Scenario: Scopes must be supported
 
 Scenario: User must have an active OTP
 	Given build access_token and sign with the key 'keyid'
-	| Key   | Value |
-	| sub   | user  |
+	| Key       | Value                  |
+	| sub       | user                   |
+	| iss       | https://localhost:8080 |
 
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                 | Value                                                         |
