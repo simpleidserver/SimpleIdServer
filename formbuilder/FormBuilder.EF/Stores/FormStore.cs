@@ -22,6 +22,12 @@ public class FormStore : IFormStore
     public Task<List<FormRecord>> GetAll(CancellationToken cancellationToken)
         => _dbContext.Forms.ToListAsync(cancellationToken);
 
+    public Task<List<FormRecord>> GetByCategory(string realm, string category, CancellationToken cancellationToken)
+        => _dbContext.Forms.Where(f => f.Category == category && f.Realm == realm).ToListAsync(cancellationToken);
+
+    public Task<List<FormRecord>> GetByCorrelationids(List<string> correlationIds, CancellationToken cancellationToken)
+        => _dbContext.Forms.Where(f => correlationIds.Contains(f.CorrelationId)).ToListAsync(cancellationToken);
+
     public Task<FormRecord> GetLatestPublishedVersionByCorrelationId(string correlationId, CancellationToken cancellationToken)
     {
         return _dbContext.Forms.Where(f => f.Status == RecordVersionStatus.Published).OrderByDescending(f => f.VersionNumber).FirstOrDefaultAsync(f => f.CorrelationId == correlationId, cancellationToken);

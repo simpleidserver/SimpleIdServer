@@ -12,6 +12,7 @@ public abstract class BaseFormDataRecord : IFormElementRecord
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<ITransformationRule> Transformations { get; set; } = new List<ITransformationRule>();
     public string Id { get; set; }
+    public string CorrelationId { get; set; }
     public string CssStyle { get; set; }
 
     public void Apply(JsonNode node)

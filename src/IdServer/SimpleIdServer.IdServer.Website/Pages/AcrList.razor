@@ -1,0 +1,208 @@
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+@using Microsoft.AspNetCore.Http;
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
+@using SimpleIdServer.IdServer.Website.Infrastructures
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
+@inject DialogService dialogService
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+@inject IOptions<IdServerWebsiteOptions> Options;
+@inject IState<RealmsState> realmsState
+@inject IDispatcher dispatcher
+@inject IState<AcrsState> acrsState
+@inject IState<RegistrationWorkflowsState> registrationWorkflowsState
+@inject DefaultSecurityOptions securityOptions
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+<div>    
+    <div class="row">
+        <div class="col">
+            <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.AcrsTitle" TextStyle="TextStyle.DisplayH3" />
+            <p>
+                @Global.AcrsDescription
+            </p>
+        </div>
+        <div class="col-3">
+            <SidAuthorizeView Roles=@("/acrs/manage")>
+                <Authorized>
+                    <RadzenButton class="mb-1" Click="@(args => AddAcr())" Icon="add" Text="@Global.AddAcr" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                </Authorized>
+            </SidAuthorizeView>
+        </div>
+    </div>
+
+    <RadzenDataGrid @ref="acrsGrid"
+                    AllowFiltering="true"
+                    AllowColumnResize="true"
+                    AllowAlternatingRows="false"
+                    AllowSorting="true"
+                    PageSize="30"
+                    AllowPaging="true"
+                    PagerHorizontalAlign="HorizontalAlign.Left"
+                    ShowPagingSummary="true"
+                    IsLoading="@acrsState.Value.IsLoading"
+                    Count="@acrsState.Value.Count"
+                    Data="@acrsState.Value.Acrs"
+                    LoadData="@LoadData"
+                    RowRender="@RowRender"
+                    TItem="SelectableAcr"
+                    ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                </HeaderTemplate>
+                <Template Context="data">
+                    <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
+                <Template Context="data">
+                    @if (activeRealm == SimpleIdServer.IdServer.Constants.DefaultRealm)
+                    {
+                        <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@data.Value.Name</RadzenLink>
+                    }
+                    else
+                    {
+                        <RadzenText>@data.Value.Name</RadzenText>
+                    }
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="@Global.DisplayName" Width="80px" />
+            <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.RegistrationWorkflow" Width="80px">
+                <Template Context="data">                        
+                    <SidAuthorizeView Roles="/acrs/manage">
+                        <Authorized>
+                            <RadzenDropDown Data=@registrationWorkflowsState.Value.RegistrationWorkflows.Select(r => r.RegistrationWorkflow)
+                                            TextProperty="Name"
+                                            ValueProperty="Id"
+                                            TValue="string"
+                                            @bind-Value=@data.Value.RegistrationWorkflowId
+                                            Change=@((obj) => UpdateRegistrationWorkflow(obj, data)) />
+                        </Authorized>
+                        <NotAuthorized>
+                            <label>@(registrationWorkflowsState.Value.RegistrationWorkflows.Select(r => r.RegistrationWorkflow).FirstOrDefault(r => r.Id == data.Value.RegistrationWorkflowId)?.Name ?? string.Empty)</label>
+                        </NotAuthorized>
+                    </SidAuthorizeView>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+            <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <SidAuthorizeView Roles=@("/acrs/manage")>
+                        <Authorized>
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                        </Authorized>
+                    </SidAuthorizeView>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</div>
+
+@code {
+    RadzenDataGrid<SelectableAcr> acrsGrid;
+    bool selectAll = false;
+    string activeRealm;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<DeleteSelectedAcrsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedAcrsRemoved });
+                StateHasChanged();
+            });
+            if (!acrsState.Value.IsLoading && acrsGrid != null)
+                acrsGrid?.Reload();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        base.OnInitializedAsync();
+        activeRealm = await GetRealm();
+    }
+
+    void ToggleChanged(bool isSelected, SelectableAcr acr)
+    {
+        var act = new ToggleAcrSelectionAction { IsSelected = isSelected, Name = acr.Value.Name };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllAcrSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void ShowMoreContextMenu(SelectableAcr acr, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
+        }, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                var act = new DeleteSelectedAcrsAction { Ids = acrIds };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+
+    void LoadData(LoadDataArgs args)
+    {
+        var act = new GetAllAcrsAction();
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableAcr> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    async void AddAcr()
+    {
+        await dialogService.OpenAsync<AddAcrDialog>(Global.AddAcr, new Dictionary<string, object>(), new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+
+    string GetDemoUrl(SelectableAcr selectableAcr)
+    {
+        var realm = string.Empty;
+        if (!string.IsNullOrWhiteSpace(RealmContext.Instance()?.Realm)) realm = $"&realm={RealmContext.Instance()?.Realm}";
+        return $"/login?acrValues={selectableAcr.Value.Name}{realm}";
+    }
+
+    async Task<string> GetRealm()
+    {
+        var realmStr = !string.IsNullOrWhiteSpace(RealmContext.Instance()?.Realm) ? RealmContext.Instance()?.Realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+        return realmStr;
+    }
+
+    void UpdateRegistrationWorkflow(object data, SelectableAcr acr)
+    {
+        var act = new AssignWorkflowRegistrationAction { AcrId = acr.Value.Id, RegistrationWorkflowId = data.ToString() };
+        this.dispatcher.Dispatch(act);
+    }
+}

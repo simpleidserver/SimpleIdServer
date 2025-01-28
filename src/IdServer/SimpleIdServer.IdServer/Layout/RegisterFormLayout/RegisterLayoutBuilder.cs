@@ -22,7 +22,7 @@ public class RegisterLayoutBuilder
 
     protected FormRecord FormRecord { get; private set; }
 
-    public static RegisterLayoutBuilder New(string id, string correlationId, string name)
+    public static RegisterLayoutBuilder New(string id, string correlationId, string name, string realm = null)
     {
         var record = new FormRecord
         {
@@ -30,6 +30,8 @@ public class RegisterLayoutBuilder
             CorrelationId = correlationId,
             Name = name,
             ActAsStep = true,
+            Realm = realm ?? Constants.DefaultRealm,
+            Category = FormCategories.Registration,
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new RegisterLayoutBuilder(record);

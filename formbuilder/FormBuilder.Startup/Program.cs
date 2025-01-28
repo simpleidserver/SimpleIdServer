@@ -2,14 +2,11 @@ using FormBuilder;
 using FormBuilder.EF;
 using FormBuilder.Startup;
 using FormBuilder.Startup.Fakers;
+using FormBuilder.Startup.Workflows;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
-
-// TODO: https://learn.microsoft.com/en-us/aspnet/core/blazor/components/integration?view=aspnetcore-9.0
-
 const string cookieName = "XSFR-TOKEN";
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -18,6 +15,8 @@ builder.Services.AddFormBuilder()
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IFakerDataService, AuthViewModelFakeService>();
+builder.Services.AddTransient<IWorkflowLayoutService, MobileAuthWorkflowLayout>();
+builder.Services.AddTransient<IWorkflowLayoutService, PwdAuthWorkflowLayout>();
 builder.Services.Configure<FormBuilderStartupOptions>(cb => cb.AntiforgeryCookieName = cookieName);
 builder.Services.AddAntiforgery(c =>
 {
@@ -63,8 +62,8 @@ void SeedData(WebApplication application)
         using (var dbContext = scope.ServiceProvider.GetService<FormBuilderDbContext>())
         {
             var content = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "form.css"));
-            var allForms = FormBuilder.Startup.Constants.AllForms;
-            foreach(var form in allForms)
+            var allForms = AllForms.GetAllForms();
+            foreach (var form in allForms)
             {
                 form.AvailableStyles.Add(new FormBuilder.Models.FormStyle
                 {
@@ -75,7 +74,6 @@ void SeedData(WebApplication application)
             }
 
             dbContext.Forms.AddRange(allForms);
-            dbContext.Workflows.AddRange(FormBuilder.Startup.Constants.AllWorkflows);
             dbContext.SaveChanges();
         }
     }

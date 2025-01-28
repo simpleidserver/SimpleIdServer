@@ -1,13 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using FormBuilder.Models;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -110,6 +109,20 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
             await httpClient.SendAsync(requestMessage);
         }
 
+        [EffectMethod]
+        public async Task Handle(GetAllAuthenticationFormsAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var httpResult = await httpClient.SendAsync(new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/forms")
+            });
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var forms = SidJsonSerializer.Deserialize<List<FormRecord>>(json);
+            dispatcher.Dispatch(new GetAllAuthenticationFormsSuccessAction { AuthenticationForms = forms });
+        }
+
         private async Task<string> GetBaseUrl()
         {
             if(_options.IsReamEnabled)
@@ -174,5 +187,15 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
     {
         public string AcrId { get; set; }
         public string RegistrationWorkflowId { get; set; }
+    }
+
+    public class GetAllAuthenticationFormsAction
+    {
+
+    }
+
+    public class GetAllAuthenticationFormsSuccessAction
+    {
+        public List<FormRecord> AuthenticationForms { get; set; }
     }
 }

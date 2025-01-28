@@ -2,12 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using FormBuilder.Repositories;
+using FormBuilder.Stores;
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
@@ -24,8 +26,8 @@ public class RegistrationWorkflowsController : BaseController
 {
 	private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
     private readonly IWorkflowStore _workflowStore;
-    private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
     private readonly ITransactionBuilder _transactionBuilder;
+    private readonly IFormStore _formStore;
 
     public RegistrationWorkflowsController(
         IRegistrationWorkflowRepository registrationWorkflowRepository, 
@@ -33,12 +35,13 @@ public class RegistrationWorkflowsController : BaseController
         IWorkflowStore workflowStore,
         IJwtBuilder jwtBuilder, 
         IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
-        ITransactionBuilder transactionBuilder) : base(tokenRepository, jwtBuilder)
+        ITransactionBuilder transactionBuilder,
+        IFormStore formStore) : base(tokenRepository, jwtBuilder)
 	{
 		_registrationWorkflowRepository = registrationWorkflowRepository;
-        _authenticationMethodServices = authenticationMethodServices;
         _workflowStore = workflowStore;
         _transactionBuilder = transactionBuilder;
+        _formStore = formStore;
 	}
 
 	[HttpGet]
@@ -163,6 +166,15 @@ public class RegistrationWorkflowsController : BaseController
         {
             return BuildError(ex);
         }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetForms([FromRoute] string prefix, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        await CheckAccessToken(prefix, Constants.StandardScopes.Register.Name);
+        var forms = await _formStore.GetByCategory(prefix, FormCategories.Registration, cancellationToken);
+        return new OkObjectResult(forms);
     }
 
     private static RegistrationWorkflowResult Build(RegistrationWorkflow r) => new RegistrationWorkflowResult

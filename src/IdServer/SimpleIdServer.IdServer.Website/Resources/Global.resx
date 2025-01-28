@@ -1959,4 +1959,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="RefreshPage" xml:space="preserve">
     <value>Do-you want to refresh the page ?</value>
   </data>
+  <data name="Forms" xml:space="preserve">
+    <value>Forms</value>
+  </data>
 </root>

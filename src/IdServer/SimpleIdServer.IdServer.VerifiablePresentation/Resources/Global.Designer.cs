@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.VerifiablePresentation.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Forms.
+        /// </summary>
+        public static string Forms {
+            get {
+                return ResourceManager.GetString("Forms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the incoming request is not valid.
         /// </summary>
         public static string InvalidIncomingRequest {

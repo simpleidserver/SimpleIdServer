@@ -9,7 +9,7 @@ public class EditorController : Controller
     {
         var viewModel = new IndexEditorViewModel
         {
-            Record = Constants.LoginPwdAuthForm
+            // Record = Constants.LoginPwdAuthForm
         };
         return View(viewModel);
     }

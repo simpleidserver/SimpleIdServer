@@ -1,11 +1,12 @@
 ﻿using Bogus;
 using FormBuilder.Startup.Controllers.ViewModels;
+using FormBuilder.Startup.Workflows;
 
 namespace FormBuilder.Startup.Fakers;
 
 public class AuthViewModelFakeService : IFakerDataService
 {
-    public string FormRecordName => Constants.LoginPwdAuthForm.Name;
+    public string FormRecordName => PwdAuthForms.LoginPwdAuthForm.Name;
 
     public object Generate()
     {

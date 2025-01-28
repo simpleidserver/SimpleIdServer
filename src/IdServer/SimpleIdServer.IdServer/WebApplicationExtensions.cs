@@ -69,6 +69,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("registerClientAdd",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration,
                 defaults: new { controller = "Registration", action = "Add" });
+            webApplication.SidMapControllerRoute("getRegistrationForms",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/forms",
+                defaults: new { controller = "Registration", action = "GetForms" });
             webApplication.SidMapControllerRoute("registerClientGet",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Registration + "/{id?}",
                 defaults: new { controller = "Registration", action = "Get" });
@@ -322,6 +325,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("addAmr",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences,
                 defaults: new { controller = "AuthenticationClassReferences", action = "Add" });
+            webApplication.SidMapControllerRoute("getAllAuthForms",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/forms",
+                defaults: new { controller = "AuthenticationClassReferences", action = "GetAllForms" });
             webApplication.SidMapControllerRoute("deleteAmr",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}",
                 defaults: new { controller = "AuthenticationClassReferences", action = "Delete" });

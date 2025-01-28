@@ -8,6 +8,7 @@ public class TitleRecord : IFormElementRecord
 {
     public string Type => TitleDefinition.TYPE;
     public string Id { get; set; }
+    public string CorrelationId {  get; set; }
     public string CssStyle { get; set; }
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
     public TextStyle Style { get; set; } = TextStyle.H5;

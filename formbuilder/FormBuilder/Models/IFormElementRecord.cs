@@ -30,6 +30,7 @@ namespace FormBuilder.Models;
 public interface IFormElementRecord
 {
     string Id { get; set; }
+    string CorrelationId { get; set; }
     string Type { get; }
     List<LabelTranslation> Labels { get; set; }
     Dictionary<string, object> HtmlAttributes { get; set; }

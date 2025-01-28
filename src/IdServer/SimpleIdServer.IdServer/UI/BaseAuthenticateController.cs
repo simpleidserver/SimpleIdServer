@@ -240,10 +240,9 @@ public class BaseAuthenticateController : BaseController
         return (nextAmr, amrs);
     }
 
-    private async Task<(string nextAmr, Client client, List<string> amrs)> GetNextAmrFormAuthorizationRequestAuthentication(string realm, string currentAmr, string returnUrl, CancellationToken cancellationToken)
+    private async Task<(string nextAmr, Client client, List<string> amrs)> GetNextAmrFormAuthorizationRequestAuthentication(string realm, string currentAmr, string unprotectedUrl, CancellationToken cancellationToken)
     {
-        var unprotectedUrl = Unprotect(returnUrl);
-        var query = ExtractQuery(returnUrl);
+        var query = ExtractQueryFromUnprotectedUrl(unprotectedUrl);
         var acrValues = query.GetAcrValuesFromAuthorizationRequest();
         var clientId = query.GetClientIdFromAuthorizationRequest();
         var requestedClaims = query.GetClaimsFromAuthorizationRequest();

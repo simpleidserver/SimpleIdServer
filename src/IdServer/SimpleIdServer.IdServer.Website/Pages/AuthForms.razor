@@ -1,0 +1,58 @@
+﻿@using Fluxor.Blazor.Web.Components
+@using FormBuilder.Components
+@using FormBuilder.Models
+@using FormBuilder.Components.Form
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@inject NotificationService notificationService
+@inject IState<AcrsState> acrsState
+@inject IState<AuthenticationFormsState> authenticationFormsState
+@inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
+@inherits FluxorComponent
+
+<RadzenDataGrid AllowFiltering="true"
+        AllowColumnResize="true"
+        AllowAlternatingRows="false"
+        AllowSorting="true"
+        PageSize="30"
+        AllowPaging="true"
+        PagerHorizontalAlign="HorizontalAlign.Left"
+        ShowPagingSummary="true"
+        IsLoading="@authenticationFormsState.Value.IsLoading"
+        Count="@authenticationFormsState.Value.Count"
+        Data="@authenticationFormsState.Value.FormRecords"
+        LoadData="@LoadData"
+        TItem="FormRecord"
+        ColumnWidth="300px">
+    <Columns>
+        <!-- Name -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Name" Path="@(urlHelper.GetUrl($"/acrs/forms/{data.Id}"))" />
+            </Template>
+        </RadzenDataGridColumn>
+        <!-- Form -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
+            <Template Context="data">                
+                <FormViewer IsEditModeEnabled=false
+                    IsInteractableElementEnabled=false
+                    IsNavigationDisplayed=true
+                    Context=@BuildContext(data)></FormViewer>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    private void LoadData(LoadDataArgs args)
+    {
+        var act = new GetAllAuthenticationFormsAction();
+        dispatcher.Dispatch(act);
+    }
+
+    private WorkflowContext BuildContext(FormRecord formRecord)
+    {
+        return WorkflowContext.CreateOneStepWorkflow(formRecord);
+    }
+}

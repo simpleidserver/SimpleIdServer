@@ -6,6 +6,7 @@ namespace FormBuilder.Models;
 public abstract class BaseFormFieldRecord : IFormElementRecord
 {
     public string Id { get; set; }
+    public string CorrelationId { get; set; }
     public string Name { get; set; }
     public string CssStyle { get; set; }
     public abstract string Type { get; }

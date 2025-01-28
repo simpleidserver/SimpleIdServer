@@ -7,6 +7,7 @@ namespace FormBuilder.Models;
 public abstract class BaseFormLayoutRecord : IFormElementRecord
 {
     public string Id { get; set; }
+    public string CorrelationId { get; set; }
     public string CssStyle { get; set; } = "";
     public abstract string Type { get; }
     public ObservableCollection<IFormElementRecord> Elements { get; set; }

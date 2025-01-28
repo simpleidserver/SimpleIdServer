@@ -162,4 +162,7 @@
   <data name="VpNotReceived" xml:space="preserve">
     <value>the verifiable presentation is not received</value>
   </data>
+  <data name="Forms" xml:space="preserve">
+    <value>Forms</value>
+  </data>
 </root>
