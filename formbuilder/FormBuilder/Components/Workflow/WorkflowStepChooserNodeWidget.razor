@@ -1,0 +1,17 @@
+﻿@using Blazor.Diagrams.Components.Renderers
+
+<RadzenCard>
+    <RadzenButton Text="Choose step" Click="@HandleClick"></RadzenButton>
+</RadzenCard>
+
+@foreach (var port in Node.Ports)
+{
+    <PortRenderer @key="port" Port="port" />
+}
+
+@code {
+    [Parameter] public WorkflowStepChooserNode Node { get; set; }
+
+    private void HandleClick()
+        => Node.ActCb(Node);
+}

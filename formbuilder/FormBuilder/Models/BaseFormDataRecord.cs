@@ -25,4 +25,6 @@ public abstract class BaseFormDataRecord : IFormElementRecord
 
     }
     public IFormElementRecord GetChild(string id) => null;
+
+    public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
 }

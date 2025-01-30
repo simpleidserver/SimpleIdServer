@@ -37,5 +37,6 @@ public interface IFormElementRecord
     string CssStyle { get; set; }
     void ExtractJson(JsonObject json);
     IFormElementRecord GetChild(string id);
+    IFormElementRecord GetChildByCorrelationId(string correlationId);
     void Apply(JsonNode node);
 }

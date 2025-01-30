@@ -8,8 +8,8 @@ public class FormRecord : BaseVersionRecord
 {
     public string Id { get; set; }
     public string Name { get; set; }
-    public string Category { get; set; }
-    public string Realm { get; set; }
+    public string? Category { get; set; }
+    public string? Realm { get; set; }
     public bool ActAsStep { get; set; }
     public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();
     [JsonIgnore]
@@ -31,6 +31,19 @@ public class FormRecord : BaseVersionRecord
         {
             var child = elt.GetChild(id);
             if(child != null) return child;
+        }
+
+        return null;
+    }
+
+    public IFormElementRecord GetChildByCorrelationId(string correlationId)
+    {
+        var result = Elements.SingleOrDefault(e => e.CorrelationId == correlationId);
+        if (result != null) return result;
+        foreach(var elt in Elements)
+        {
+            var child = elt.GetChildByCorrelationId(correlationId);
+            if (child != null) return child;
         }
 
         return null;

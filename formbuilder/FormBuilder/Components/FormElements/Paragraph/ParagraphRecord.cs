@@ -22,4 +22,6 @@ public class ParagraphRecord : IFormElementRecord
     }
 
     public IFormElementRecord GetChild(string id) => null;
+
+    public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
 }

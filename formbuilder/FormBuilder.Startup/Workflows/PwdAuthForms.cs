@@ -25,12 +25,15 @@ public class PwdAuthForms
         Id = Guid.NewGuid().ToString(),
         Name = "pwd",
         CorrelationId = "pwd",
+        VersionNumber = 1,
+        Status = RecordVersionStatus.Published,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord
             {
                 Id = Guid.NewGuid().ToString(),
+                CorrelationId = Guid.NewGuid().ToString(),
                 Elements = new ObservableCollection<IFormElementRecord>
                 {
                     // Authentication form
@@ -99,6 +102,7 @@ public class PwdAuthForms
                     new DividerLayoutRecord
                     {
                         Id = Guid.NewGuid().ToString(),
+                        CorrelationId = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
                     },
                     // Forget my password
@@ -112,24 +116,28 @@ public class PwdAuthForms
                     new DividerLayoutRecord
                     {
                         Id = Guid.NewGuid().ToString(),
+                        CorrelationId = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
                     },
                     // Register
                     new FormAnchorRecord
                     {
                         Id = Guid.NewGuid().ToString(),
+                        CorrelationId = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
                     },
                     // Separator
                     new DividerLayoutRecord
                     {
                         Id = Guid.NewGuid().ToString(),
+                        CorrelationId = Guid.NewGuid().ToString(),
                         Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
                     },
                     // List all external identity providers.
                     new ListDataRecord
                     {
                         Id = Guid.NewGuid().ToString(),
+                        CorrelationId = Guid.NewGuid().ToString(),
                         FieldType = FormAnchorDefinition.TYPE,
                         Parameters = new Dictionary<string, object>
                         {
@@ -154,11 +162,14 @@ public class PwdAuthForms
         Id = "resetPwdId",
         Name = "resetPwd",
         CorrelationId = "resetPwd",
+        VersionNumber = 1,
+        Status = RecordVersionStatus.Published,
         Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord
             {
                 Id = Guid.NewGuid().ToString(),
+                CorrelationId = Guid.NewGuid().ToString(),
                 Elements = new ObservableCollection<IFormElementRecord>
                 {
                     new FormStackLayoutRecord
@@ -171,18 +182,21 @@ public class PwdAuthForms
                             new FormInputFieldRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
+                                CorrelationId = Guid.NewGuid().ToString(),
                                 Name = "Login",
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build()
                             },
                             new FormInputFieldRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
+                                CorrelationId = Guid.NewGuid().ToString(),
                                 Name = "Value",
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Email").Build()
                             },
                             new FormButtonRecord
                             {
                                 Id = Guid.NewGuid().ToString(),
+                                CorrelationId = Guid.NewGuid().ToString(),
                                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Send link").Build()
                             }
                         }

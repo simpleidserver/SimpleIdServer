@@ -1,340 +1,438 @@
-﻿@using FormBuilder.Components.Form
+﻿@using Blazor.Diagrams
+@using Blazor.Diagrams.Components
+@using Blazor.Diagrams.Components.Widgets
+@using Blazor.Diagrams.Core.Anchors
+@using Blazor.Diagrams.Core.Models
+@using Blazor.Diagrams.Core.PathGenerators
+@using Blazor.Diagrams.Core.Routers
+@using Blazor.Diagrams.Options
+@using FormBuilder.Components.Form
 @using FormBuilder.Components.Shared
 @using FormBuilder.Dialogs
 @using FormBuilder.Factories
 @using FormBuilder.Models
 @using System.Diagnostics
+@using FormBuilder.Models.Layout
 @using FormBuilder.Services
+@using PT = Blazor.Diagrams.Core.Geometry.Point;
+@using SZ = Blazor.Diagrams.Core.Geometry.Size;
 @inject IJSRuntime jsRuntime
 @inject IFormBuilderJsService formBuilderJsService
 @inject DialogService dialogService
 
+<!--
 <RadzenDialog />
 <MonacoCompletion Context="@Context" />
+-->
 
 <div class="header">
     <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
     <RadzenButton Icon="draft" Text="Json" Click="@(async() => await ViewJson())" />
 </div>
-<RadzenRow class="fullHeight workflowEditor">    
-    <RadzenColumn Size="2">        
-        <RadzenStack class="toolbar fullHeight">
-            <div class="category">
-                <RadzenText TextStyle="TextStyle.H6" class="title">Steps</RadzenText>
-                <ul class="elements">
-                    @foreach (var record in Context.Definition.Records)
-                    {
-                        var isDisabled = disabledFormRecords.Contains(record.Name);
-                        if(!isDisabled)
-                        {
-                            <li draggable="true" @ondragstart="@(async () => await HandleDragStart(record))">
-                                <div class="icon"></div><span class="text">@record.Name</span>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="disabled">
-                                <div class="icon"></div><span class="text">@record.Name</span>
-                            </li>
-                        }
-                    }
-                </ul>
-            </div>
-        </RadzenStack>
-    </RadzenColumn>
-    <RadzenColumn Size="10" @ref=_svgContainer>
-        <svg @ref="@svgRef" 
-            viewBox="@viewBox"
-            class="workflowDig"
-            @onmousedown="@((e) => HandleOnPanStart(e))"
-            @onmousemove="@(async (e) => await HandleOnPanMove(e))"
-            @onmouseup="@((e) => HandleOnPanLeave())"
-            @ondragover:preventDefault="true" 
-            @ondragover="@(async (e) => await HandleDragHover(e))" 
-            @ondrop="@(async (e) => await HandleDrop(e))" 
-            @onmousewheel="@HandleZoom" 
-            @onmousewheel:preventDefault=true 
-            @onmousewheel:stopPropagation=true>
-            @foreach (var step in Context.Definition.Workflow.Steps)
-            {
-                <WorkflowEditorStep Context="@Context" Step="@step" StepRemoved="HandleStepRemoved" SelectedStepChanged="@(async (e) => await HandleSelectedStepChanged(e))" SelectedStep="@selectedStep" SelectedLink="@selectedLink" WorkflowLinkChanged="@(async (item) => await HandleWorkflowLinkChanged(item))" LinkDropped="HandleLinkDropped"></WorkflowEditorStep>
-            }
 
-            @foreach (var link in Context.Definition.Workflow.Links)
-            {
-                var textInfoCoordinate = link.ComputeTextInfoCoordinate();
-                <foreignObject x="@Sanitize(textInfoCoordinate.X)" y="@Sanitize(textInfoCoordinate.Y)" width="100">
-                    <div class="linkInfo">
-                        <span><RadzenIcon Icon="delete" class="icon" @onclick="@(() => HandleRemoveLink(link))" /></span><span class="text">@link.ActionType</span>
-                    </div>
-                </foreignObject>
-                <path class="hitbox" @onclick="@(async (e) => await HandleEditWorkflowLink(link))" stroke-width="10" @onmousemove="@((e) => HandleOnHoverLink(link))" @onmouseleave="@((e) => HandleOnLeaveLink(link))" fill="none" d="@GetLinkCoordinate(link)"></path>
-                <path marker-end="@(link.IsHover ? "url(#headSelected)" : "url(#head)")" stroke-width="2" fill="none" stroke="@(link.IsHover ? "red" : "black")" d="@GetLinkCoordinate(link)"></path>
-            }
-            @if (selectedLink != null)
-            {
-                <path marker-end="url(#head)" stroke-width="2" fill="none" stroke="black" d="@GetLinkCoordinate(selectedLink)"></path>
-            }
-            <defs>
-                <marker id='head'
-                        orient="auto"
-                        markerWidth='3'
-                        markerHeight='4'
-                        refX='0.1'
-                        refY='2'>
-                    <path d='M0,0 V4 L2,2 Z' fill="black" />
-                </marker>
-                <marker id='headSelected'
-                        orient="auto"
-                        markerWidth='3'
-                        markerHeight='4'
-                        refX='0.1'
-                        refY='2'>
-                    <path d='M0,0 V4 L2,2 Z' fill="red" />
-                </marker>
-            </defs>
-        </svg>
-    </RadzenColumn>
-</RadzenRow>
+<div id="workflowEditor" @ref="diagramContainer" class="diagram-container">
+    <CascadingValue Value="Diagram" IsFixed="true">
+        <DiagramCanvas>
+            <Widgets>
+                <GridWidget Size="30" Mode="GridMode.Line" BackgroundColor="white" />
+                <NavigatorWidget Width="200" Height="120"
+                                 Class="border border-black bg-white absolute"
+                                 Style="bottom: 15px; right: 15px;" />
+            </Widgets>
+        </DiagramCanvas>
+    </CascadingValue>
+</div>
 
 @code {
-    [Parameter] public List<FormRecord> Records { get; set; }
-    private List<string> disabledFormRecords { get; set; }
+    [Parameter] public WorkflowRecord Workflow{ get; set; }
+    [Parameter] public List<FormRecord> Forms { get; set; }
+    [Parameter] public List<WorkflowLayout> WorkflowLayouts { get; set; }
     private WorkflowContext Context { get; set; }
-    private ElementReference _divRef;
-    private RadzenColumn _svgContainer;
-    private WorkflowStep selectedStep { get; set; }
-    private FormRecord selectedFormRecord;
-    private WorkflowLink selectedLink { get; set; }
+    private ElementReference diagramContainer;
     private ElementReference svgRef;
-    private Coordinate svgPosition;
-    private string viewBox { get; set; }
-    private string transform { get; set; } = "matrix(1 0 0 1 0 0)";
     private (double x, double y) previousMousePosition;
     private bool isMoving = false;
+    private bool isInitialized = false;
+
+    private double spaceBetweenNodePx = 50;
+    private double paddingTopPx = 50;
+    private SZ stepSize = new SZ(200, 100);
+
+    private BlazorDiagram Diagram = new BlazorDiagram(new BlazorDiagramOptions
+    {
+        AllowMultiSelection = true,
+        Zoom =
+        {
+            Enabled = true
+        },
+        Links =
+        {
+            DefaultRouter = new NormalRouter(),
+            DefaultPathGenerator = new SmoothPathGenerator()
+        }
+    });
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        if(firstRender)
+        if (firstRender && Forms != null && Workflow != null && Context == null)
         {
-            var svgSize = await formBuilderJsService.GetSize(_svgContainer.Element);
-            viewBox = $"0 0 {svgSize.width} {svgSize.height}";
-            Context.Definition.Records.Add(Constants.EmptyStep);
-            StateHasChanged();
-        }
-    }
-
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        if (Records != null && disabledFormRecords == null)
-        {
-            Context = WorkflowContext.CreateEmptyWorkflow(Records);
-            var activeSteps = Context.Definition.Workflow.Steps.Select(s => s.FormRecordId);
-            disabledFormRecords = Context.Definition.Records.Select(r => r.Name).Where(r => activeSteps.Contains(r)).ToList();
-        }
-    }
-
-    #region Drag & Drop UI element
-
-    private async Task HandleSelectedStepChanged(WorkflowStep step)
-    {
-        selectedStep = step;
-    }
-
-    private async Task HandleDragStart(FormRecord record)
-    {
-        selectedFormRecord = record;
-    }
-
-    private async Task HandleDragHover(DragEventArgs args)
-    {
-        if (await TryDragSelectedLink()) return;
-
-        async Task<bool> TryDragSelectedLink()
-        {
-            if (selectedLink == null || selectedLink.IsLinkHoverStep) return false;
-            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-            selectedLink.TargetCoordinate.X = pos.X;
-            selectedLink.TargetCoordinate.Y = pos.Y;
-            return true;
-        }
-    }
-
-    private async Task HandleDrop(DragEventArgs args)
-    {
-        isMoving = false;
-        if (TryDropSelectedLink()) return;
-        await TryDropFormRecord();
-        selectedStep = null;
-
-        bool TryDropSelectedLink()
-        {
-            if (selectedLink != null)
+            Context = WorkflowContext.CreateWorkflow(Workflow, Forms);
+            var options = new BlazorDiagramOptions
             {
-                selectedLink = null;
-                return true;
-            }
-
-            return false;
-        }
-
-        async Task<bool> TryDropFormRecord()
-        {
-            if (selectedFormRecord == null) return false;
-            var id = Guid.NewGuid().ToString();
-            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-            Context.Definition.Workflow.Steps.Add(new WorkflowStep
-            {
-                Id = id,
-                Coordinate = new Coordinate
+                AllowMultiSelection = true,
+                Zoom =
                 {
-                    X = pos.X,
-                    Y = pos.Y
+                    Enabled = false,
                 },
-                FormRecordId = selectedFormRecord.Id
-            });
-            disabledFormRecords.Add(selectedFormRecord.Id);
-            selectedFormRecord = null;
-            return true;
+                Links =
+                {
+                    DefaultRouter = new NormalRouter(),
+                    DefaultPathGenerator = new SmoothPathGenerator()
+                }
+            };
+            // Diagram = new BlazorDiagram(options);
+            if (Diagram.Container == null) Diagram.ContainerChanged += OnContainerChanged;
+            else Init();
+            Diagram.RegisterComponent<WorkflowStepNode, WorkflowStepNodeWidget>();
+            Diagram.RegisterComponent<WorkflowStepChooserNode, WorkflowStepChooserNodeWidget>();
         }
     }
 
-    #endregion
-
-    #region Drag & Drop Arrow
-
-    private void HandleLinkDropped(WorkflowStep workflowStep)
+    private void OnContainerChanged()
     {
-        var clone = this.selectedLink.Clone() as WorkflowLink;
-        clone.TargetStepId = workflowStep.Id;
-        Context.Definition.Workflow.AddLink(clone);
-        selectedLink = null;
+        if (isInitialized) return;
+        Init();
+        isInitialized = true;
     }
 
-    #endregion
-
-    #region Handle pan
-
-    private void HandleOnPanStart(MouseEventArgs args)
+    private void Init()
     {
-        var numbers = viewBox.Split(' ').Select(n => double.Parse(n)).ToArray();
-        var (x, y) = (numbers[0], numbers[1]);
-        previousMousePosition = (args.ClientX + x, args.ClientY + y);
-        isMoving = true;
-    }
-
-    private async Task HandleOnPanMove(MouseEventArgs args)
-    {
-        if (await TryMoveSelectedStep()) return;
-        if (TryMove()) return;
-
-        bool TryMove()
+        var firstStep = Context.GetFirstStep();
+        if(firstStep == null)
         {
-            if (!isMoving) return false;
-            var diffX = -(args.ClientX - previousMousePosition.x);
-            var diffY = -(args.ClientY - previousMousePosition.y);
-            var viewBoxInfo = GetViewBoxInfo();
-            viewBox = $"{Math.Round(diffX)} {Math.Round(diffY)} {viewBoxInfo.width} {viewBoxInfo.height}";
-            return true;
+            AddNode(Diagram.Container.Width / 2, paddingTopPx, new WorkflowStepChooserNode(AddRandomNode));
+            return;
         }
 
-        async Task<bool> TryMoveSelectedStep()
+        AddNode(firstStep);
+    }
+
+    private void AddNode(WorkflowStep newStep)
+        => AddNode(Diagram.Container.Width / 2, paddingTopPx, newStep);
+
+    private void AddNode(double startPosX, double startPosY, WorkflowStep newStep, WorkflowStepNode source = null, int index = 0)
+    {
+        var form = Context.Definition.Records.Single(r => r.Id == newStep.FormRecordId);
+        var node = new WorkflowStepNode(newStep, form);
+        AddNode(startPosX, startPosY, node, source, index);
+        var stepLinks = Context.Definition.Workflow.Links.Where(l => l.SourceStepId == newStep.Id).ToList();
+        var nbLinks = stepLinks.Count();
+        startPosY = startPosY + stepSize.Height + spaceBetweenNodePx;
+        startPosX = Diagram.Container.Width / 2 -
+            (stepLinks.Count() % 2 == 0 ?
+                (spaceBetweenNodePx + stepSize.Width) * (nbLinks / 2) :
+                ((spaceBetweenNodePx + stepSize.Width) * ((nbLinks - 1) / 2)) - (spaceBetweenNodePx / 2));
+        int i = 0;
+        foreach(var stepLink in stepLinks)
         {
-            if (selectedStep == null) return false;
-            var pos = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-            selectedStep.Coordinate.X = pos.X;
-            selectedStep.Coordinate.Y = pos.Y;
-            var links = Context.Definition.Workflow.GetLinks(selectedStep);
-            foreach (var link in links)
-                link.UpdateCoordinate(selectedStep);
-            return true;
+            var nextStep = Context.Definition.Workflow.Steps.SingleOrDefault(s => s.Id == stepLink.TargetStepId);
+            if (nextStep != null) AddNode(startPosX, startPosY, nextStep, node, i);
+            else AddNode(startPosX, startPosY, new WorkflowStepChooserNode(AddRandomNode), node, i);
+            i++;
         }
     }
 
-    private void HandleOnPanLeave()
+    private void AddNode<T>(double startPosX, double startPosY, T node, WorkflowStepNode source = null, int index = 0) where T : NodeModel
     {
-        ResetInteraction();
+        var posX = source == null ? startPosX : startPosX + (index * (source.Size.Width + spaceBetweenNodePx));
+        var posY = startPosY;
+        node.Position = new PT(posX, posY);
+        node.Size = stepSize;
+        Diagram.Nodes.Add(node);
     }
 
-    #endregion
-
-    #region Handle zoom
-
-    private async Task HandleZoom(WheelEventArgs args)
+    private void AddRandomNode(WorkflowStepChooserNode source)
     {
-        var scale = args.DeltaY / 1000;
-        scale = Math.Abs(scale) < .1 ? .1 * args.DeltaY / Math.Abs(args.DeltaY) : scale;
-        var pt = await formBuilderJsService.GetPointInSvgSpace(args.ClientX, args.ClientY, svgRef);
-        var viewBoxInfo = GetViewBoxInfo();
-        var xPropW = (pt.X - viewBoxInfo.x) / viewBoxInfo.width;
-        var yPropH = (pt.Y - viewBoxInfo.y) / viewBoxInfo.height;
-        var width2 = viewBoxInfo.width + viewBoxInfo.width * scale;
-        var height2 = viewBoxInfo.height + viewBoxInfo.height * scale;
-        var x2 = pt.X - xPropW * width2;
-        var y2 = pt.Y - yPropH *height2;
-        viewBox = $"{Math.Round(x2)} {Math.Round(y2)} {Math.Round(width2)} {Math.Round(height2)}";
-    }
-
-    #endregion
-
-    #region Handle relationships
-
-    private void HandleOnHoverLink(WorkflowLink link)
-    {
-        link.IsHover = true;
-    }
-
-    private void HandleOnLeaveLink(WorkflowLink link)
-    {
-        link.IsHover = false;
-    }
-
-    private Task HandleEditWorkflowLink(WorkflowLink link)
-    {
-        var opts = new DialogOptions
+        // 1. Generate and add a new step with its links.
+        var layout = WorkflowLayouts.First(l => l.Name == "pwd"); 
+        var formRecord = Forms.Single(r => r.CorrelationId == layout.SourceFormCorrelationId);
+        var newStep = new WorkflowStep
         {
-            Width = "1200px"
+            Id = Guid.NewGuid().ToString(),
+            FormRecordId = formRecord.Id
         };
-        return dialogService.OpenAsync<EditWorkflowLinkDialog>(string.Empty, new Dictionary<string, object>
+        var resolvedSteps = Forms.Where(f => layout.Links.Where(l => !string.IsNullOrWhiteSpace(l.TargetFormCorrelationId)).Select(l => l.TargetFormCorrelationId).Contains(f.CorrelationId))
+            .Select(f => new WorkflowStep
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    FormRecordId = f.Id,
+                }).ToList();
+        var links = layout.Links.Select(l =>
         {
-            { "WorkflowLink", link },
-            { "Context", Context }
-        }, opts);
+            var source = new WorkflowLinkSource
+            {
+                EltId = formRecord.GetChildByCorrelationId(l.EltCorrelationId).Id,
+            };
+            var form = Forms.SingleOrDefault(r => r.CorrelationId == l.TargetFormCorrelationId);
+            var targetStep = resolvedSteps.SingleOrDefault(s => s.FormRecordId == form?.Id);
+            var targetStepId = targetStep?.Id;
+            return new WorkflowLink
+            {
+                Id = Guid.NewGuid().ToString(),
+                SourceStepId = newStep.Id,
+                Source = source,
+                ActionType = l.ActionType,
+                ActionParameter = l.ActionParameter,
+                TargetStepId = targetStepId
+            };
+        });
+        Context.Definition.Workflow.Steps.Add(newStep);
+        Context.Definition.Workflow.Steps.AddRange(resolvedSteps);
+        Context.Definition.Workflow.Links.AddRange(links);
+        // 2. Add node to diagram.
+        AddNode(source.Position.X, source.Position.Y, newStep, null, 0);
+        Diagram.Nodes.Remove(source);
     }
 
-    private void HandleRemoveLink(WorkflowLink link)
+    private async Task Add(EmptyStep emptyStep)
     {
-        Context.Definition.Workflow.Links.Remove(link);
+        // var svgSize = await formBuilderJsService.GetSize(svgContainer);
+        // 1. TODO. Choose the type of workflow.
+        // var layout = WorkflowLayouts.First(l => l.Name == "pwd");
+        // var newStep = BuildStep(emptyStep, layout);
+        // var emptyLinks = layout.Links.Where(l => string.IsNullOrWhiteSpace(l.TargetFormCorrelationId)).ToList();
+        // var linksWithTarget = layout.Links.Where(l => !string.IsNullOrWhiteSpace(l.TargetFormCorrelationId)).ToList();
+        // var resolvedSteps = ResolveSteps(emptyStep, linksWithTarget, svgSize, emptyLinks.Count());
+        // var newEmptySteps = BuildEmptySteps(emptyLinks, svgSize, emptyStep);
+        // var formRecord = Records.Single(r => r.CorrelationId == layout.SourceFormCorrelationId);
+        // var linksToResolvedSteps = BuildLinksToResolvedSteps(linksWithTarget, formRecord, newStep, resolvedSteps);
+        // var linksToEmptySteps = BuildLinksToEmptySteps(emptyLinks, formRecord, newStep, newEmptySteps);
+        // emptySteps.Remove(emptyStep);
+        // emptySteps.AddRange(newEmptySteps);
+        // Context.Definition.Workflow.Steps.Add(newStep);
+        // Context.Definition.Workflow.Steps.AddRange(resolvedSteps);
+        // Context.Definition.Workflow.Links.AddRange(linksToEmptySteps);
+        // Context.Definition.Workflow.Links.AddRange(linksToResolvedSteps);
+        // StateHasChanged();
+        // 3. Build links.
+
+        /*
+        var links = layout.Links.Select(l =>
+        {
+        var sourceCoordinate = new Coordinate
+        {
+        X = newStep.Coordinate.X + stepSize.width,
+        Y = newStep.Coordinate.Y + stepSize.height / 2
+        };
+        return new WorkflowLink
+        {
+        Id = Guid.NewGuid().ToString(),
+        SourceStepId = sourceStepId,
+        Source = new WorkflowLinkSource
+        {
+        EltId = formRecord.GetChildByCorrelationId(l.EltCorrelationId).Id,
+        },
+        ActionType = l.ActionType,
+        ActionParameter = l.ActionParameter,
+        SourceCoordinate = sourceCoordinate,
+        TargetStepId = l.TargetFormCorrelationId,
+        TargetCoordinate = new Coordinate
+        {
+        X = 100,
+        Y = 100
+        }
+        };
+        }).ToList();
+        Context.Definition.Workflow.Steps.Add(newStep);
+        Context.Definition.Workflow.Links.AddRange(links);
+        RefreshEmptySteps();
+        */
     }
 
-    #endregion
+    // private WorkflowStep BuildStep(EmptyStep emptyStep, WorkflowLayout layout)
+    // {
+    //     var newStep = new WorkflowStep
+    //         {
+    //             Id = Guid.NewGuid().ToString(),
+    //             FormRecordId = Records.Single(r => r.CorrelationId == layout.SourceFormCorrelationId).Id,
+    //             Coordinate = new Coordinate
+    //             {
+    //                 X = emptyStep.Coordinate.X,
+    //                 Y = emptyStep.Coordinate.Y
+    //             }
+    //         };
+    //     return newStep;
+    // }
 
-    private void HandleStepRemoved(WorkflowStep step)
-    {
-        Context.Definition.Workflow.Steps.Remove(step);
-        disabledFormRecords.Remove(step.FormRecordId);
-        Context.Definition.Workflow.Links = Context.Definition.Workflow.Links.Where(l => !l.IsLinked(step.Id)).ToList();
-    }
+    // private List<WorkflowStep> ResolveSteps(EmptyStep emptyStep, List<WorkflowLinkLayout> linksWithTarget, Size svgSize, int nbEmptySteps)
+    // {
+    //     var spaceBetweenStepsXPx = svgSize.width * spaceBetweenStepsPer;
+    //     var spaceBetweenStepsYPx = svgSize.height * spaceBetweenStepsPer;
+    //     var minY = nbEmptySteps * (spaceBetweenStepsYPx + stepSize.height);
+    //     var result = new List<WorkflowStep>();
+    //     for (var i = 0; i < linksWithTarget.Count(); i++)
+    //     {
+    //         var link = linksWithTarget.ElementAt(i);
+    //         result.Add(new WorkflowStep
+    //         {
+    //             Id = Guid.NewGuid().ToString(),
+    //             FormRecordId = Records.Single(r => r.CorrelationId == link.TargetFormCorrelationId).Id,
+    //             Coordinate = new Coordinate
+    //             {
+    //                 X = spaceBetweenStepsXPx + emptyStep.Coordinate.X,
+    //                 Y = minY + (i * spaceBetweenStepsYPx + stepSize.height)
+    //             }
+    //         });
+    //     }
 
-    private async Task HandleWorkflowLinkChanged((FormEltEventArgs args, WorkflowStep step) item)
-    {
-        var args = item.args;
-        var parentStep = item.step;
-        var eltSize = await formBuilderJsService.GetSize(args.EltReference);
-        var coordinateRelativeToStep = await formBuilderJsService.GetOffsetPosition(args.EltReference);
-        var newCoordinate = parentStep.Coordinate + coordinateRelativeToStep;
-        ResetInteraction();
-        selectedLink = WorkflowLink.Create(parentStep.Id, args.Record, newCoordinate, eltSize, coordinateRelativeToStep);
-    }
+    //     return result;
+    // }
+
+    // private List<EmptyStep> BuildEmptySteps(List<WorkflowLinkLayout> emptyLinks, Size svgSize, EmptyStep emptyStep)
+    // {
+    //     var newEmptySteps = new List<EmptyStep>();
+    //     var spaceBetweenStepsXPx = svgSize.width * spaceBetweenStepsPer;
+    //     var spaceBetweenStepsYPx = svgSize.height * spaceBetweenStepsPer;
+    //     var minY = (svgSize.height / 2) - (
+    //         emptyLinks.Count() % 2 == 0 ?
+    //             (spaceBetweenStepsYPx + stepSize.height) * (emptyLinks.Count() / 2) :
+    //             ((spaceBetweenStepsYPx + stepSize.height) * ((emptyLinks.Count() - 1) / 2)) - (spaceBetweenStepsYPx / 2)
+    //     );
+    //     for (var i = 0; i < emptyLinks.Count(); i++)
+    //     {
+    //         newEmptySteps.Add(new EmptyStep
+    //         {
+    //             Coordinate = new Coordinate
+    //             {
+    //                 X = spaceBetweenStepsXPx + emptyStep.Coordinate.X,
+    //                 Y = minY + (i * (spaceBetweenStepsYPx + stepSize.height))
+    //             }
+    //         });
+    //     };
+
+    //     return newEmptySteps;
+    // }
+
+    // private List<WorkflowLink> BuildLinksToResolvedSteps(List<WorkflowLinkLayout> linksWithTarget, FormRecord record, WorkflowStep step, List<WorkflowStep> resolvedSteps)
+    // {
+    //     var sourceCoordinate = new Coordinate
+    //     {
+    //         X = step.Coordinate.X + stepSize.width,
+    //         Y = step.Coordinate.Y + stepSize.height / 2
+    //     };
+    //     return linksWithTarget.Select(l =>
+    //     {
+    //         var source = new WorkflowLinkSource
+    //         {
+    //             EltId = record.GetChildByCorrelationId(l.EltCorrelationId).Id,
+    //         };
+    //         var form = Records.Single(r => r.CorrelationId == l.TargetFormCorrelationId);
+    //         var targetStep = resolvedSteps.Single(s => s.FormRecordId == form.Id);
+    //         var targetStepId = targetStep.Id;
+    //         var targetCoordinate = new Coordinate
+    //         {
+    //             X = targetStep.Coordinate.X,
+    //             Y = targetStep.Coordinate.Y + stepSize.height / 2
+    //         };
+    //         return new WorkflowLink
+    //         {
+    //             Id = Guid.NewGuid().ToString(),
+    //             SourceStepId = step.Id,
+    //             Source = source,
+    //             ActionType = l.ActionType,
+    //             ActionParameter = l.ActionParameter,
+    //             SourceCoordinate = sourceCoordinate,
+    //             TargetStepId = targetStepId,
+    //             TargetCoordinate = targetCoordinate
+    //         };
+    //     }).ToList();
+    // }
+
+    // private List<WorkflowLink> BuildLinksToEmptySteps(List<WorkflowLinkLayout> emptyLinks, FormRecord record, WorkflowStep step, List<EmptyStep> emptySteps)
+    // {
+    //     var sourceCoordinate = new Coordinate
+    //     {
+    //         X = step.Coordinate.X + stepSize.width,
+    //         Y = step.Coordinate.Y + (stepSize.height / 2)
+    //     };
+    //     var result = new List<WorkflowLink>();
+    //     for(var i = 0; i < emptyLinks.Count(); i++)
+    //     {
+    //         var link = emptyLinks.ElementAt(i);
+    //         var source = new WorkflowLinkSource
+    //         {
+    //             EltId = record.GetChildByCorrelationId(link.EltCorrelationId).Id,
+    //         };
+    //         var emptyStepCoordinate = emptySteps.ElementAt(i).Coordinate;
+    //         var targetCoordinate = new Coordinate
+    //         {
+    //             X = emptyStepCoordinate.X,
+    //             Y = emptyStepCoordinate.Y + (stepSize.height / 2)
+    //         };
+    //         result.Add(new WorkflowLink
+    //         {
+    //             Id = Guid.NewGuid().ToString(),
+    //             SourceStepId = step.Id,
+    //             Source = source,
+    //             ActionType = link.ActionType,
+    //             ActionParameter = link.ActionParameter,
+    //             SourceCoordinate = sourceCoordinate,
+    //             TargetCoordinate = targetCoordinate
+    //         });
+    //     }
+
+    //     return result;
+    // }
+
+
+
+    // private async Task RefreshEmptySteps()
+    // {
+    //     var svgSize = await formBuilderJsService.GetSize(svgContainer);
+    //     var stepLinks = GetEmptyLinks();
+    //     emptySteps = new List<EmptyStep>();
+    //     if(!stepLinks.Any()) 
+    //     {
+    //         AddSingleEmptyStepInSvg(svgSize);
+    //         StateHasChanged();
+    //         return;
+    //     }
+
+    //     foreach(var stepLink in stepLinks)
+    //     {
+    //         emptySteps.Add(new EmptyStep
+    //         {
+    //             Coordinate = new Coordinate { X = 100, Y = 100 }
+    //         });
+    //     }
+    //     StateHasChanged();
+    // }
+
+    // private void AddSingleEmptyStepInSvg(Size svgSize)
+    // {
+    //     var centerX = stepSize.width;
+    //     var centerY = (svgSize.height / 2) - (stepSize.height / 2);
+    //     emptySteps.Add(new EmptyStep
+    //     {
+    //         Coordinate = new Coordinate { X = centerX, Y = centerY }
+    //     });
+    // }
+
+    // private void AddEmptySteps(Size svgSize)
+    // {
+
+    // }
+
+    private List<WorkflowLink> GetEmptyLinks()
+        => Context.Definition.Workflow.Links.Where(l => l.TargetStepId == null).ToList();
 
     private Task LaunchDebug()
     {
         var opts = new DialogOptions
-        {
-            Width = "1200px"
-        };
+            {
+                Width = "1200px"
+            };
         return dialogService.OpenAsync<DebugWorkflowDialog>(string.Empty, new Dictionary<string, object>
         {
             { nameof(DebugWorkflowDialog.Context), Context }
@@ -349,28 +447,11 @@
         });
     }
 
-    private string GetLinkCoordinate(WorkflowLink link)
-        => $"M{Sanitize(link.SourceCoordinate.X)} {Sanitize(link.SourceCoordinate.Y)} {Sanitize(link.TargetCoordinate.X)} {Sanitize(link.TargetCoordinate.Y)}";
-
-    private string Sanitize(double number) => number.ToString().Replace(',', '.');
-
     private FormRecord GetFormRecord(string name)
         => Context.Definition.Records.Single(t => t.Name == name);
 
-    private (double x, double y, double width, double height) GetViewBoxInfo()
-        => GetViewBoxInfo(viewBox);
-
-    private (double x, double y, double width, double height) GetViewBoxInfo(string vb)
+    private record EmptyStep
     {
-        var numbers = vb.Split(' ').Select(n => double.Parse(n)).ToArray();
-        return (numbers[0], numbers[1], numbers[2], numbers[3]);
-    }
-
-    private void ResetInteraction()
-    {
-        selectedLink = null;
-        selectedStep = null;
-        selectedFormRecord = null;
-        isMoving = false;
+        public Coordinate Coordinate { get; set; }
     }
 }

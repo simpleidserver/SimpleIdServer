@@ -27,4 +27,6 @@ public abstract class BaseFormLayoutRecord : IFormElementRecord
     }
 
     public IFormElementRecord GetChild(string id) => Elements.SingleOrDefault(e => e.Id == id);
+
+    public IFormElementRecord GetChildByCorrelationId(string correlationId) => Elements.SingleOrDefault(e => e.CorrelationId == correlationId);
 }

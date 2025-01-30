@@ -21,11 +21,15 @@ public class WorkflowController : Controller
         var formCorrelationIds = workflowLayouts.SelectMany(s => s.Links).Select(s => s.TargetFormCorrelationId).Distinct().ToList()
             .Concat(workflowLayouts.Select(s => s.SourceFormCorrelationId).Distinct().ToList())
             .ToList();
-        var forms = await _formStore.GetByCorrelationids(formCorrelationIds, cancellationToken);
+        var forms = await _formStore.GetLatestPublishedVersionByCorrelationids(formCorrelationIds, cancellationToken);
         var viewModel = new WorkflowIndexViewModel
         {
-            Records = forms,
-            WorkflowLayouts = workflowLayouts
+            Forms = forms,
+            WorkflowLayouts = workflowLayouts,
+            Workflow = new Models.WorkflowRecord
+            {
+                Id = Guid.NewGuid().ToString()
+            }
         };
         return View(viewModel);
     }

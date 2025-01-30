@@ -1,16 +1,14 @@
 ﻿namespace FormBuilder.Models;
 
-public class Size
+public record Size
 {
     public double width { get; set; }
     public double height { get; set; }
 
-    public Size Clone()
-    {
-        return new Size
-        {
-            width = width,
-            height = height
-        };
-    }
+    public Size Half()
+        => new Size { width = HalfWidth(), height = HalfHeight() };
+
+    public double HalfWidth() => width / 2;
+
+    public double HalfHeight() => height / 2;
 }

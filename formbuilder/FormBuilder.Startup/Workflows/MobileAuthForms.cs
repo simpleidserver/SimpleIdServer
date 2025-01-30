@@ -14,12 +14,16 @@ public class MobileAuthForms
     {
         Id = "mobileId",
         Name = "mobile",
+        CorrelationId = "mobileId",
         ActAsStep = true,
+        VersionNumber = 1,
+        Status = RecordVersionStatus.Published,
         Elements = new ObservableCollection<IFormElementRecord>
         {
             new FormStackLayoutRecord
             {
-                Id = mobileAuthFormId,
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = mobileAuthFormId,
                 IsFormEnabled = true,
                 FormType = FormTypes.HTML,
                 HtmlAttributes = new Dictionary<string, object>
@@ -31,6 +35,7 @@ public class MobileAuthForms
                      new FormButtonRecord
                      {
                          Id = Guid.NewGuid().ToString(),
+                         CorrelationId = "mobileAuthenticate",
                          Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
                      }
                 }

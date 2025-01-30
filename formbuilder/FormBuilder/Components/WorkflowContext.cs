@@ -61,6 +61,18 @@ public class WorkflowContext
         return result;
     }
 
+    public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> forms)
+    {
+        var result = new WorkflowContext
+        {
+            Definition = new WorkflowDefinition(workflow, forms),
+            Execution = new WorkflowExecution(),
+            FormEditorContext = new FormEditorContext(),
+            WorkflowEditorContext = new WorkflowEditorContext()
+        };
+        return result;
+    }
+
     public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> records, string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, JsonObject inputData, List<string> supportedLanguageCodes)
     {
         var result = new WorkflowContext

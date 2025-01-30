@@ -1,0 +1,20 @@
+﻿@using Blazor.Diagrams.Components.Renderers
+
+<RadzenCard>
+    <RadzenText TextStyle="TextStyle.Subtitle2">@Node.Form.Name</RadzenText>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+
+    </RadzenStack>
+</RadzenCard>
+
+
+<div>
+    @foreach(var port in Node.Ports)
+    {
+        <PortRenderer @key="port" Port="port"></PortRenderer>
+    }
+</div>
+
+@code {
+    [Parameter] public WorkflowStepNode Node { get; set; }
+}

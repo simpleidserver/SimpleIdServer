@@ -10,4 +10,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<component type="typeof(WorkflowEditor)" render-mode="ServerPrerendered" param-Records=@Model.Records />
+@section Header {
+    <link href="_content/Z.Blazor.Diagrams/style.min.css" rel="stylesheet" />
+    <link href="_content/Z.Blazor.Diagrams/default.styles.min.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <script src="_content/Z.Blazor.Diagrams/script.min.js"></script>
+}
+
+<component type="typeof(WorkflowEditor)" render-mode="ServerPrerendered" param-Forms=@Model.Forms param-Workflow=@Model.Workflow param-WorkflowLayouts="@Model.WorkflowLayouts" />

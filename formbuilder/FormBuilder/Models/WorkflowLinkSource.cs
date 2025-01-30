@@ -15,7 +15,7 @@ public class WorkflowLinkSource
         return new WorkflowLinkSource
         {
             EltId = EltId,
-            Size = Size.Clone(),
+            Size = new Size { width = Size.width, height = Size.height },
             CoordinateRelativeToStep = CoordinateRelativeToStep.Clone()
         };
     }
