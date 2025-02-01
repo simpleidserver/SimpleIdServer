@@ -1,7 +1,6 @@
 using FormBuilder;
 using FormBuilder.EF;
-using FormBuilder.Startup;
-using FormBuilder.Startup.Fakers;
+using FormBuilder.Startup.Config;
 using FormBuilder.Startup.Workflows;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,18 +9,13 @@ builder.Services.AddControllersWithViews();
 const string cookieName = "XSFR-TOKEN";
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddFormBuilder()
-    .UseEF();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IFakerDataService, AuthViewModelFakeService>();
-builder.Services.AddTransient<IWorkflowLayoutService, MobileAuthWorkflowLayout>();
-builder.Services.AddTransient<IWorkflowLayoutService, PwdAuthWorkflowLayout>();
-builder.Services.Configure<FormBuilderStartupOptions>(cb => cb.AntiforgeryCookieName = cookieName);
 builder.Services.AddAntiforgery(c =>
 {
     c.Cookie.Name = cookieName;
 });
+FormBuilderSetup.ConfigureFormBuilder(builder, cookieName);
 
 var app = builder.Build();
 

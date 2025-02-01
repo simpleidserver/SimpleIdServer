@@ -28,7 +28,8 @@ public class WorkflowController : Controller
             WorkflowLayouts = workflowLayouts,
             Workflow = new Models.WorkflowRecord
             {
-                Id = Guid.NewGuid().ToString()
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = Guid.NewGuid().ToString()
             }
         };
         return View(viewModel);

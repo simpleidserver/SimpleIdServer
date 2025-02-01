@@ -4,7 +4,7 @@ using FormBuilder.Startup.Workflows;
 
 namespace FormBuilder.Startup.Fakers;
 
-public class AuthViewModelFakeService : IFakerDataService
+public class PwdAuthFakerDataService : IFakerDataService
 {
     public string FormRecordName => PwdAuthForms.LoginPwdAuthForm.Name;
 
@@ -15,15 +15,6 @@ public class AuthViewModelFakeService : IFakerDataService
     }
 }
 
-public class ExternalIdProviderFaker : Faker<ExternalIdProviderViewModel>
-{
-    public ExternalIdProviderFaker()
-    {
-        RuleFor(c => c.AuthenticationScheme, f => f.Lorem.Word());
-        RuleFor(c => c.DisplayName, f => f.Lorem.Word());
-    }
-}
-
 public class AuthViewModelFaker : Faker<AuthViewModel>
 {
     public AuthViewModelFaker()
@@ -31,5 +22,14 @@ public class AuthViewModelFaker : Faker<AuthViewModel>
         RuleFor(v => v.ExternalIdProviders, f => f.Make(3, () => new ExternalIdProviderFaker().Generate()));
         RuleFor(v => v.Login, f => f.Lorem.Word());
         RuleFor(v => v.ReturnUrl, f => f.Lorem.Word());
+    }
+}
+
+public class ExternalIdProviderFaker : Faker<ExternalIdProviderViewModel>
+{
+    public ExternalIdProviderFaker()
+    {
+        RuleFor(c => c.AuthenticationScheme, f => f.Lorem.Word());
+        RuleFor(c => c.DisplayName, f => f.Lorem.Word());
     }
 }

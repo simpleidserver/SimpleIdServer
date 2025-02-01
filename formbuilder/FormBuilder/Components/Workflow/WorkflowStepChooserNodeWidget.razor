@@ -1,17 +1,24 @@
 ﻿@using Blazor.Diagrams.Components.Renderers
+@using FormBuilder.Models.Layout
 
-<RadzenCard>
-    <RadzenButton Text="Choose step" Click="@HandleClick"></RadzenButton>
-</RadzenCard>
-
-@foreach (var port in Node.Ports)
-{
-    <PortRenderer @key="port" Port="port" />
-}
+<div class="step-chooser">
+    <RadzenLabel>Choose step:</RadzenLabel>
+    <RadzenDropDown TValue="string" Value=@value Change="@HandleChange" Data=@Node.Records ValueProperty="Id" TextProperty="Name" />
+    @foreach (var port in Node.Ports)
+    {
+        <PortRenderer @key="port" Port="port" />
+    }
+</div>
 
 @code {
     [Parameter] public WorkflowStepChooserNode Node { get; set; }
+    private string value { get; set; }
 
-    private void HandleClick()
-        => Node.ActCb(Node);
+    private void HandleChange(object obj)
+    {
+        if (obj is not string str) return;
+        var selectedRecord = Node.Records.SingleOrDefault(r => r.Id == str);
+        if (selectedRecord is null) return;
+        Node.ActCb(Node, selectedRecord);
+    }
 }

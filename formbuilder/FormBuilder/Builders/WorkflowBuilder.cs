@@ -11,7 +11,7 @@ public class WorkflowBuilder
     {
         _workflow = workflow;
         _workflowLinks = new List<WorkflowLinkBuilder>();
-        AddStep(Constants.EmptyStep, new Coordinate(100, 100));
+        AddStep(Constants.EmptyStep);
     }
 
     public static WorkflowBuilder New(string id, string correlationId)
@@ -19,11 +19,10 @@ public class WorkflowBuilder
         return new WorkflowBuilder(new WorkflowRecord { Id = id, CorrelationId = id });
     }
 
-    public WorkflowBuilder AddStep(FormRecord record, Coordinate coordinate)
+    public WorkflowBuilder AddStep(FormRecord record)
     {
         _workflow.Steps.Add(new WorkflowStep
         {
-            Coordinate = coordinate,
             FormRecordId = record.Id,
             Id = Guid.NewGuid().ToString()
         });

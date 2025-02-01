@@ -5,20 +5,34 @@
 @using System.Text.Json
 
 <RadzenText>JSON</RadzenText>
-<StandaloneCodeEditor Id="my-editor-instance-id" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
-
+<StandaloneCodeEditor Id="my-editor-instance-id" @ref="editor" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
 
 @code {
     [Parameter] public WorkflowContext Context { get; set; }
+    private StandaloneCodeEditor editor;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        UpdateEditorContent();
+    }
 
     private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
     {
-        var json = JsonSerializer.Serialize(Context.Definition.Workflow, new JsonSerializerOptions { WriteIndented = true });
         return new StandaloneEditorConstructionOptions
         {
             AutomaticLayout = true,
             Language = "json",
-            Value = json
+            Value = JsonSerializer.Serialize(Context.Definition.Workflow, new JsonSerializerOptions { WriteIndented = true })
         };
+    }
+
+    private async void UpdateEditorContent()
+    {
+        if (editor != null)
+        {
+            var json = JsonSerializer.Serialize(Context.Definition.Workflow, new JsonSerializerOptions { WriteIndented = true });
+            await editor.SetValue(json);
+        }
     }
 }
