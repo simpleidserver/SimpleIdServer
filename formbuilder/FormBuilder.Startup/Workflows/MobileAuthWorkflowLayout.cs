@@ -22,6 +22,7 @@ public class MobileAuthWorkflowLayout : IWorkflowLayoutService
                 // Authenticate.
                 new WorkflowLinkLayout
                 {
+                    Description = "Authenticate",
                     EltCorrelationId = MobileAuthForms.mobileAuthFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter

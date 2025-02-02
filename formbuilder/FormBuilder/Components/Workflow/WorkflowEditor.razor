@@ -107,8 +107,7 @@
     private void Init()
     {
         var firstStep = Context.GetFirstStep();
-        var workflowFormsCorrelationId = Forms.Where(f => Workflow.Steps.Select(s => s.FormRecordId).Contains(f.Id)).Select(f => f.CorrelationId);
-        availableLayouts = WorkflowLayouts.Where(l => !workflowFormsCorrelationId.Contains(l.WorkflowCorrelationId)).ToList();
+        RefreshAvailableLayouts();
         if(firstStep == null)
         {
             AddNode((Diagram.Container.Width / 2) - (stepSize.Width / 2), paddingTopPx, new WorkflowStepChooserNode(AddNode, availableLayouts));
@@ -121,11 +120,11 @@
     private void AddNode(WorkflowStep newStep)
         => AddNode(Diagram.Container.Width / 2, paddingTopPx, newStep);
 
-    private NodeModel AddNode(double startPosX, double startPosY, WorkflowStep newStep, NodeModel source = null, int index = 0)
+    private NodeModel AddNode(double startPosX, double startPosY, WorkflowStep newStep, NodeModel source = null, int index = 0, string description = null)
     {
         var form = Context.Definition.Records.Single(r => r.Id == newStep.FormRecordId);
-        var node = new WorkflowStepNode(newStep, form);
-        if (source != null) AddLink(source, node);
+        var node = new WorkflowStepNode(newStep, form, EditNode);
+        if (source != null) AddLink(source, node, description);
         node.AddPort(PortAlignment.Bottom);
         AddNode(startPosX, startPosY, node, source, index);
         var stepLinks = Context.Definition.Workflow.Links.Where(l => l.SourceStepId == newStep.Id).ToList();
@@ -140,26 +139,28 @@
         {
             var nextStep = Context.Definition.Workflow.Steps.SingleOrDefault(s => s.Id == stepLink.TargetStepId);
             NodeModel childNode = null;
-            if (nextStep != null) childNode = AddNode(startPosX, startPosY, nextStep, node, i);
+            if (nextStep != null) childNode = AddNode(startPosX, startPosY, nextStep, node, i, stepLink.Description);
             else 
             {
                 childNode = new WorkflowStepChooserNode(AddNode, availableLayouts);
                 AddNode(startPosX, startPosY, childNode, node, i);
             }
 
-            AddLink(node, childNode);
+            AddLink(node, childNode, stepLink.Description);
             i++;
         }
 
         return node;
     }
 
-    private void AddLink(NodeModel sourceNode, NodeModel targetNode)
+    private void AddLink(NodeModel sourceNode, NodeModel targetNode, string description)
     {
         var sourceAnchor = new ShapeIntersectionAnchor(sourceNode);
         var topPort = targetNode.AddPort(PortAlignment.Top);
         var targetAnchor = new SinglePortAnchor(topPort);
-        Diagram.Links.Add(new LinkModel(sourceAnchor, targetAnchor));
+        var model = new LinkModel(sourceAnchor, targetAnchor);
+        model.Labels.Add(new LinkLabelModel(model, description));
+        Diagram.Links.Add(model);
     }
 
     private void AddNode<T>(double startPosX, double startPosY, T node, NodeModel source = null, int index = 0) where T : NodeModel
@@ -172,15 +173,69 @@
 
     private void AddNode(WorkflowStepChooserNode source, WorkflowStepChooserRecord record)
     {
-        var sourceModel = source.PortLinks.FirstOrDefault()?.Source?.Model as NodeModel;
+        var sourceLink = Diagram.Links.FirstOrDefault(l =>
+        {
+            var targetModel = l.Target?.Model as PortModel;
+            if (targetModel == null) return false;
+            return targetModel.Parent is NodeModel targetNodeModel && targetNodeModel.Id == source.Id;
+        });
+        var sourceModel = sourceLink?.Source?.Model as NodeModel;
         WorkflowStep newStep = null;
         // 1. Generate and add a new step with its links.
         if(!record.IsEndStep) newStep = AddWorkflowStep(record.WorkflowCorrelationId, sourceModel);
         else newStep = AddEndStep(sourceModel); 
         // 2. Add node to diagram.
         if (!record.IsEndStep) availableLayouts.Remove(availableLayouts.Single(l => l.WorkflowCorrelationId == record.WorkflowCorrelationId));
-        AddNode(source.Position.X, source.Position.Y, newStep, sourceModel, 0);
+        AddNode(source.Position.X, source.Position.Y, newStep, sourceModel, 0, description: sourceLink?.Labels?.FirstOrDefault()?.Content);
         Diagram.Nodes.Remove(source);
+    }
+
+    private void EditNode(WorkflowStepNode node)
+    {
+        var sourceLink = Diagram.Links.FirstOrDefault(l =>
+        {
+            var targetModel = l.Target?.Model as PortModel;
+            if (targetModel == null) return false;
+            return targetModel.Parent is NodeModel targetNodeModel && targetNodeModel.Id == node.Id;
+        });
+        var sourceNode = sourceLink?.Source?.Model as NodeModel;
+        // 1. Remove the current node and its links.
+        Remove(node);
+        // 2. Add the step chooser.
+        RefreshAvailableLayouts();
+        var newStep = new WorkflowStepChooserNode(AddNode, availableLayouts);
+        AddNode(node.Position.X, node.Position.Y, newStep, sourceNode);
+        if(sourceNode != null) AddLink(sourceNode, newStep, sourceLink.Labels.First().Content);
+    }
+
+    private void Remove(NodeModel node)
+    {
+        if (node is WorkflowStepNode workflowStepNode) Remove(workflowStepNode.Step);
+        var links = Diagram.Links.Where(l =>
+        {
+            var sourceModel = l.Source?.Model as NodeModel;
+            return sourceModel != null && sourceModel.Id == node.Id;
+        }).ToList();
+        var targetSteps = links.Select(l => (l.Target.Model as PortModel).Parent as NodeModel);
+        foreach (var targetStep in targetSteps)
+            Remove(targetStep);
+
+        foreach (var link in links)
+            Diagram.Links.Remove(link);
+
+        Diagram.Nodes.Remove(node);
+    }
+
+    private void Remove(WorkflowStep workflowStep)
+    {
+        var links = Context.Definition.Workflow.Links.Where(l => l.SourceStepId == workflowStep.Id).ToList();
+        var targetedStepIds = links.Select(l => l.TargetStepId);
+        var targetedSteps = Context.Definition.Workflow.Steps.Where(s => targetedStepIds.Contains(s.Id)).ToList();
+        foreach (var targetedStep in targetedSteps)
+            Remove(targetedStep);
+        foreach(var link in links)
+            Context.Definition.Workflow.Links.Remove(link);
+        Context.Definition.Workflow.Steps.Remove(workflowStep);
     }
 
     private WorkflowStep AddEndStep(NodeModel sourceNodeModel = null)
@@ -227,6 +282,7 @@
                 Source = source,
                 ActionType = l.ActionType,
                 ActionParameter = l.ActionParameter,
+                Description = l.Description,
                 TargetStepId = targetStepId
             };
         });
@@ -245,6 +301,12 @@
             var sourceLinks = Context.Definition.Workflow.Links.Where(l => l.SourceStepId == sourceWorkflowStepNode.Step.Id).ToList();
             sourceLinks.ForEach(l => l.TargetStepId = newStep.Id);
         }
+    }
+
+    private void RefreshAvailableLayouts()
+    {
+        var workflowFormsCorrelationId = Forms.Where(f => Workflow.Steps.Select(s => s.FormRecordId).Contains(f.Id)).Select(f => f.CorrelationId);
+        availableLayouts = WorkflowLayouts.Where(l => !workflowFormsCorrelationId.Contains(l.SourceFormCorrelationId)).ToList();
     }
 
     private List<WorkflowLink> GetEmptyLinks()

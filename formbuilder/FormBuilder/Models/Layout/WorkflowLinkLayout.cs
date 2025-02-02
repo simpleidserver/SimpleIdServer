@@ -6,4 +6,5 @@ public class WorkflowLinkLayout
     public string TargetFormCorrelationId { get; set; }
     public string ActionType { get; set; }
     public string? ActionParameter { get; set; }
+    public required string Description { get; set; }
 }
