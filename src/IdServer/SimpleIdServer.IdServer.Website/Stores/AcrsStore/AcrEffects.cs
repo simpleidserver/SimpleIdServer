@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using FormBuilder.Models;
+using FormBuilder.Models.Layout;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
 using SimpleIdServer.IdServer.Domains;
@@ -92,24 +93,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         }
 
         [EffectMethod]
-        public async Task Handle(AssignWorkflowRegistrationAction action, IDispatcher dispatcher)
-        {
-            var baseUrl = await GetBaseUrl();
-            var httpClient = await _websiteHttpClientFactory.Build();
-            var request = new AssignRegistrationWorkflowRequest
-            {
-                WorkflowId = action.RegistrationWorkflowId
-            };
-            var requestMessage = new HttpRequestMessage
-            {
-                RequestUri = new Uri($"{baseUrl}/{action.AcrId}/assign"),
-                Method = HttpMethod.Put,
-                Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
-            };
-            await httpClient.SendAsync(requestMessage);
-        }
-
-        [EffectMethod]
         public async Task Handle(GetAllAuthenticationFormsAction action, IDispatcher dispatcher)
         {
             var baseUrl = await GetBaseUrl();
@@ -121,6 +104,35 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
             var json = await httpResult.Content.ReadAsStringAsync();
             var forms = SidJsonSerializer.Deserialize<List<FormRecord>>(json);
             dispatcher.Dispatch(new GetAllAuthenticationFormsSuccessAction { AuthenticationForms = forms });
+        }
+
+        [EffectMethod]
+        public async Task Handle(GetAcrAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var httpResult = await httpClient.SendAsync(new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.Id}")
+            });
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var acr = SidJsonSerializer.Deserialize<AuthenticationContextClassReference>(json);
+            dispatcher.Dispatch(new GetAcrSuccessAction { Acr = acr });
+        }
+
+        [EffectMethod]
+        public async Task Handle(GetAllAuthenticationWorkflowLayoutsAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var httpResult = await httpClient.SendAsync(new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/workflowLayouts")
+            });
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var workflowLayouts = SidJsonSerializer.Deserialize<List<WorkflowLayout>>(json);
+            dispatcher.Dispatch(new GetAllAuthenticationWorkflowLayoutsSuccessAction { WorkflowLayouts = workflowLayouts });
+
         }
 
         private async Task<string> GetBaseUrl()
@@ -183,12 +195,6 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         public bool IsSelected { get; set; }
     }
 
-    public class AssignWorkflowRegistrationAction
-    {
-        public string AcrId { get; set; }
-        public string RegistrationWorkflowId { get; set; }
-    }
-
     public class GetAllAuthenticationFormsAction
     {
 
@@ -197,5 +203,25 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
     public class GetAllAuthenticationFormsSuccessAction
     {
         public List<FormRecord> AuthenticationForms { get; set; }
+    }
+
+    public class GetAcrAction
+    {
+        public string Id { get; set; }
+    }
+
+    public class GetAcrSuccessAction
+    {
+        public AuthenticationContextClassReference Acr { get; set; }
+    }
+
+    public class GetAllAuthenticationWorkflowLayoutsAction
+    {
+
+    }
+
+    public class GetAllAuthenticationWorkflowLayoutsSuccessAction
+    {
+        public List<WorkflowLayout> WorkflowLayouts { get; set; }
     }
 }

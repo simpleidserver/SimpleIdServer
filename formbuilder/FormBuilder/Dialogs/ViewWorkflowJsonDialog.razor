@@ -1,11 +1,16 @@
 ﻿@using BlazorMonaco.Editor
 @using FormBuilder.Components
 @using FormBuilder.Models
+@using Radzen
 @using Radzen.Blazor
 @using System.Text.Json
+@inject DialogService dialogService
 
-<RadzenText>JSON</RadzenText>
-<StandaloneCodeEditor OnDidInit="HandleOnDidInit" Id="my-editor-instance-id" @ref="editor" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
+<RadzenStack>    
+    <RadzenText>JSON</RadzenText>
+    <StandaloneCodeEditor OnDidInit="HandleOnDidInit" Id="my-editor-instance-id" @ref="editor" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
+    <RadzenButton Text="Update" Click="@(async() => await HandleUpdate())"></RadzenButton>
+</RadzenStack>
 
 @code {
     [Parameter] public WorkflowContext Context { get; set; }
@@ -25,5 +30,11 @@
             Language = "json",
             Value = "{}"
         };
+    }
+
+    private async Task HandleUpdate()
+    {
+        var json = await editor.GetValue();
+        dialogService.Close(json);
     }
 }

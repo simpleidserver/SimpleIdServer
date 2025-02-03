@@ -11,6 +11,5 @@ public class RegistrationWorkflowConfiguration : IEntityTypeConfiguration<Regist
     public void Configure(EntityTypeBuilder<RegistrationWorkflow> builder)
     {
         builder.HasKey(x => x.Id);
-        builder.HasMany(r => r.Acrs).WithOne(a => a.RegistrationWorkflow).HasForeignKey(a => a.RegistrationWorkflowId);
     }
 }

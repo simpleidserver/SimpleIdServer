@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
 using FormBuilder.Stores;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,7 +12,9 @@ using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -26,6 +29,7 @@ public class AuthenticationClassReferencesController : BaseController
     private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IFormStore _formStore;
+    private readonly IEnumerable<IWorkflowLayoutService> _workflowLayoutServices;
     private readonly ILogger<AuthenticationClassReferencesController> _logger;
 
     public AuthenticationClassReferencesController(
@@ -36,6 +40,7 @@ public class AuthenticationClassReferencesController : BaseController
         IJwtBuilder jwtBuilder,
         ITransactionBuilder transactionBuilder,
         IFormStore formStore,
+        IEnumerable<IWorkflowLayoutService> workflowLayoutServices,
         ILogger<AuthenticationClassReferencesController> logger) : base(tokenRepository, jwtBuilder)
     {
         _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
@@ -43,6 +48,7 @@ public class AuthenticationClassReferencesController : BaseController
         _registrationWorkflowRepository = registrationWorkflowRepository;
         _transactionBuilder = transactionBuilder;
         _formStore = formStore;
+        _workflowLayoutServices = workflowLayoutServices;
         _logger = logger;
     }
 
@@ -70,6 +76,40 @@ public class AuthenticationClassReferencesController : BaseController
         await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
         var result = await _formStore.GetByCategory(prefix, FormCategories.Authentication, cancellationToken);
         return new OkObjectResult(result);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllWorkflowLayouts([FromRoute] string prefix, CancellationToken cancellationToken)
+    {
+        try
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
+            var result = _workflowLayoutServices.Where(w => w.Category == FormCategories.Authentication).Select(w => w.Get());
+            return new OkObjectResult(result);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Get([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
+            var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
+            if (acr == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
+            return new OkObjectResult(acr);
+        }
+        catch(OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
     }
 
     [HttpPost]
@@ -150,49 +190,6 @@ public class AuthenticationClassReferencesController : BaseController
                 activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been removed");
                 return new NoContentResult();
             }
-        }
-    }
-
-    [HttpPut]
-    public async Task<IActionResult> AssignRegistrationWorkflow([FromRoute] string prefix, string id, [FromBody] AssignRegistrationWorkflowRequest request,  CancellationToken cancellationToken)
-    {
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Assign registration workflow to the ACR"))
-        {
-            prefix = prefix ?? Constants.DefaultRealm;
-            try
-            {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    await Validate();
-                    var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
-                    if (acr == null)
-                    {
-                        activity?.SetStatus(ActivityStatusCode.Error, "Authentication Class Reference doesn't exit");
-                        return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
-                    }
-
-                    acr.RegistrationWorkflowId = request.WorkflowId;
-                    acr.UpdateDateTime = DateTime.UtcNow;
-                    _authenticationContextClassReferenceRepository.Update(acr);
-                    await transaction.Commit(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Registration worklow is assigned to the ACR");
-                    return new NoContentResult();
-                }
-            }
-            catch(OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(ActivityStatusCode.Error, ex.ToString());
-                return BuildError(ex);
-            }
-        }
-
-        async Task Validate()
-        {
-            if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-            if (string.IsNullOrWhiteSpace(request.WorkflowId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthenticationContextClassReferenceNames.WorkflowId));
-            var registrationWorkflow = await _registrationWorkflowRepository.Get(prefix, request.WorkflowId, cancellationToken);
-            if (registrationWorkflow == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, Global.UnknownRegistrationWorkflow);
         }
     }
 }

@@ -10,6 +10,8 @@ namespace FormBuilder.Startup.Workflows;
 
 public class MobileAuthWorkflowLayout : IWorkflowLayoutService
 {
+    public string Category => "auth";
+
     public WorkflowLayout Get()
     {
         return new WorkflowLayout

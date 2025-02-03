@@ -19,7 +19,6 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
     {
         return _dbContext.Acrs
             .Include(a => a.Realms)
-            .Include(a => a.RegistrationWorkflow)
             .SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == realm) && a.Id == id, cancellationToken);
     }
 
@@ -27,7 +26,6 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
     {
         return _dbContext.Acrs
             .Include(a => a.Realms)
-            .Include(a => a.RegistrationWorkflow)
             .SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == realm) && a.AuthenticationWorkflow == workflowId, cancellationToken);
     }
 
@@ -35,7 +33,6 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
     {
         return _dbContext.Acrs
             .Include(a => a.Realms)
-            .Include(a => a.RegistrationWorkflow)
             .SingleOrDefaultAsync(a => a.Realms.Any(r => r.Name == realm) && a.Name == name, cancellationToken);
     }
 
@@ -43,7 +40,6 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
     {
         return _dbContext.Acrs
             .Include(a => a.Realms)
-            .Include(a => a.RegistrationWorkflow)
             .Where(a => names.Contains(a.Name))
             .ToListAsync(cancellationToken);
     }
@@ -52,7 +48,6 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
     {
         return _dbContext.Acrs
             .Include(a => a.Realms)
-            .Include(a => a.RegistrationWorkflow)
             .Where(a => names.Contains(a.Name) && a.Realms.Any(r => r.Name == realm))
             .ToListAsync(cancellationToken);
     }
@@ -68,7 +63,6 @@ public class AuthenticationContextClassReferenceRepository : IAuthenticationCont
     {
         return _dbContext.Acrs
             .Include(a => a.Realms)
-            .Include(a => a.RegistrationWorkflow)
             .Where(a => a.Realms.Any(r => r.Name == realm))
             .OrderBy(a => a.Name)
             .ToListAsync(cancellationToken);

@@ -1,0 +1,63 @@
+﻿@page "/acrs/workflows/{id}"
+@using FormBuilder.Components.Workflow
+@using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore
+@inject IState<AcrState> acrState
+@inject IState<AuthenticationWorkflowLayoutsState> authenticationWorkflowLayoutsState
+@inject IState<AuthenticationFormsState> authenticationFormsState
+@inject IState<WorkflowState> workflowState
+@inject IDispatcher dispatcher
+
+<SidAuthorizeView Roles=@("/acrs/manage,/acrs/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl($"/acrs/workflows")" Text="@Global.AcrsTitle" />
+            <RadzenBreadCrumbItem Text="@acrState.Value.Acr.Name" />
+        </RadzenBreadCrumb>
+        @if(!authenticationFormsState.Value.IsLoading && !authenticationWorkflowLayoutsState.Value.IsLoading && !workflowState.Value.IsLoading)
+        {            
+            <WorkflowEditor Forms=@authenticationFormsState.Value.FormRecords 
+                Workflow=@workflowState.Value.Value 
+                WorkflowLayouts=@authenticationWorkflowLayoutsState.Value.Values
+                PublishedEvt=@HandlePublish
+                SavedEvt=@HandleSave></WorkflowEditor>
+        }
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
+@code {
+    [Parameter] public string? id { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<GetAcrSuccessAction>((act) =>
+            {
+                dispatcher.Dispatch(new GetWorkflowAction { Id = act.Acr.AuthenticationWorkflow });
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        dispatcher.Dispatch(new GetAcrAction { Id = id });
+        dispatcher.Dispatch(new GetAllAuthenticationWorkflowLayoutsAction());
+        dispatcher.Dispatch(new GetAllAuthenticationFormsAction());
+    }
+
+    private void HandlePublish(WorkflowActionState state)
+    {
+
+    }
+
+    private void HandleSave(WorkflowActionState state)
+    {
+
+    }
+}

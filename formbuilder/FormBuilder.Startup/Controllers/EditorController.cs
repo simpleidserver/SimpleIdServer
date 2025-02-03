@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Startup.Controllers.ViewModels;
+using FormBuilder.Startup.Workflows;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FormBuilder.Startup.Controllers;
@@ -9,7 +10,7 @@ public class EditorController : Controller
     {
         var viewModel = new IndexEditorViewModel
         {
-            // Record = Constants.LoginPwdAuthForm
+            Record = PwdAuthForms.LoginPwdAuthForm
         };
         return View(viewModel);
     }

@@ -170,7 +170,8 @@ public class IdServerConfiguration
         ScimScope,
         IdProviderAdministratorScope,
         AppProviderAdministratorScope,
-        SimpleIdServer.IdServer.Constants.StandardScopes.Acrs
+        SimpleIdServer.IdServer.Constants.StandardScopes.Acrs,
+        SimpleIdServer.IdServer.Constants.StandardScopes.Workflows
     };
 
     public static ICollection<User> Users => new List<User>
@@ -231,7 +232,8 @@ public class IdServerConfiguration
                 SimpleIdServer.IdServer.Constants.StandardScopes.OpenIdScope, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Profile, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning,
-                SimpleIdServer.IdServer.Constants.StandardScopes.Users, 
+                SimpleIdServer.IdServer.Constants.StandardScopes.Users,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Workflows,
                 SimpleIdServer.IdServer.Constants.StandardScopes.Acrs,
                 SimpleIdServer.Configuration.Constants.ConfigurationsScope, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.AuthenticationSchemeProviders, 

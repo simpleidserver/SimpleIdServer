@@ -16,6 +16,7 @@
 @using FormBuilder.Services
 @using PT = Blazor.Diagrams.Core.Geometry.Point;
 @using SZ = Blazor.Diagrams.Core.Geometry.Size;
+@using System.Text.Json
 @inject IJSRuntime jsRuntime
 @inject IFormBuilderJsService formBuilderJsService
 @inject DialogService dialogService
@@ -24,33 +25,50 @@
 <MonacoCompletion Context="@Context" />
 
 <div class="header">
-    <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
-    <RadzenButton Icon="draft" Text="Json" Click="@(async() => await ViewJson())" />
+    <RadzenButton Icon="play_arrow" ButtonStyle="ButtonStyle.Secondary" Text="Debug"  Click="@(async () => await LaunchDebug())" />
+    <RadzenButton Icon="draft" ButtonStyle="ButtonStyle.Secondary" Text="Json" Click="@(async() => await ViewJson())" />
+    <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
+    <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
 </div>
 
-<div id="workflowEditor" @ref="diagramContainer" class="diagram-container">
-    <CascadingValue Value="Diagram" IsFixed="true">
-        <DiagramCanvas>
-            <Widgets>
-                <GridWidget Size="30" Mode="GridMode.Line" BackgroundColor="white" />
-                <NavigatorWidget Width="200" Height="120" Class="border border-black bg-white absolute" Style="bottom: 15px; right: 15px;" />
-            </Widgets>
-        </DiagramCanvas>
-    </CascadingValue>
-</div>
+<RadzenRow>
+    <RadzenColumn Size="10">
+        <div id="workflowEditor" @ref="diagramContainer" class="diagram-container">
+            <CascadingValue Value="Diagram" IsFixed="true">
+                <DiagramCanvas>
+                    <Widgets>
+                        <GridWidget Size="30" Mode="GridMode.Line" BackgroundColor="white" />
+                        <NavigatorWidget Width="200" Height="120" Class="border border-black bg-white absolute" Style="bottom: 15px; right: 15px;" />
+                    </Widgets>
+                </DiagramCanvas>
+            </CascadingValue>
+        </div>
+    </RadzenColumn>
+    <RadzenColumn Size="2">
+        <RadzenCard Variant="Variant.Filled">
+            <RadzenText TextStyle="TextStyle.Subtitle2">Status : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Enum.GetName(typeof(RecordVersionStatus), Workflow.Status)" /></RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle2">Version : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Workflow.VersionNumber.ToString()" /></RadzenText>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
 
 @code {
     [Parameter] public WorkflowRecord Workflow{ get; set; }
     [Parameter] public List<FormRecord> Forms { get; set; }
     [Parameter] public List<WorkflowLayout> WorkflowLayouts { get; set; }
+    [Parameter] public EventCallback<WorkflowActionState> PublishedEvt { get; set; }
+    [Parameter] public EventCallback<WorkflowActionState> SavedEvt { get; set; }
     private WorkflowContext Context { get; set; }
     private ElementReference diagramContainer;
     private ElementReference svgRef;
     private (double x, double y) previousMousePosition;
     private bool isMoving = false;
     private bool isInitialized = false;
+    private bool isSaveDisabled = false;
+    private bool isPublishDisabled = false;
 
-    private double spaceBetweenNodePx = 50;
+    private double spaceBetweenNodeXPx = 50;
+    private double spaceBetweenNodeYPx = 150;
     private double paddingTopPx = 50;
     private SZ stepSize = new SZ(200, 70);
     private SZ endStepSize = new SZ(100, 100);
@@ -129,11 +147,13 @@
         AddNode(startPosX, startPosY, node, source, index);
         var stepLinks = Context.Definition.Workflow.Links.Where(l => l.SourceStepId == newStep.Id).ToList();
         var nbLinks = stepLinks.Count();
-        startPosY = startPosY + stepSize.Height + spaceBetweenNodePx;
-        startPosX = startPosX -
-            (stepLinks.Count() % 2 == 0 ?
-                (spaceBetweenNodePx + stepSize.Width) * (nbLinks / 2) :
-                ((spaceBetweenNodePx + stepSize.Width) * ((nbLinks - 1) / 2)) - (spaceBetweenNodePx / 2));
+        startPosY = startPosY + spaceBetweenNodeYPx;
+        startPosX = (stepLinks.Count() == 1) ? startPosX : (
+            (stepLinks.Count() % 2 == 0 ? 
+                (startPosX + (stepSize.Width / 2) - ((spaceBetweenNodeXPx + stepSize.Width) * (nbLinks / 2))) :
+                (startPosX - (spaceBetweenNodeXPx + stepSize.Width) * (nbLinks / 2))
+            )
+        );
         int i = 0;
         foreach(var stepLink in stepLinks)
         {
@@ -165,7 +185,7 @@
 
     private void AddNode<T>(double startPosX, double startPosY, T node, NodeModel source = null, int index = 0) where T : NodeModel
     {
-        var posX = source == null ? startPosX : startPosX + (index * (stepSize.Width + spaceBetweenNodePx));
+        var posX = source == null ? startPosX : startPosX + (index * (stepSize.Width + spaceBetweenNodeXPx));
         var posY = startPosY;
         node.Position = new PT(posX, posY);
         Diagram.Nodes.Add(node);
@@ -312,24 +332,56 @@
     private List<WorkflowLink> GetEmptyLinks()
         => Context.Definition.Workflow.Links.Where(l => l.TargetStepId == null).ToList();
 
-    private Task LaunchDebug()
+    private async Task LaunchDebug()
     {
         var opts = new DialogOptions
-            {
-                Width = "1200px"
-            };
-        return dialogService.OpenAsync<DebugWorkflowDialog>(string.Empty, new Dictionary<string, object>
+        {
+            Width = "1200px"
+        };
+        await dialogService.OpenAsync<DebugWorkflowDialog>("Debug", new Dictionary<string, object>
         {
             { nameof(DebugWorkflowDialog.Context), Context }
         }, opts);
     }
 
-    private Task ViewJson()
+    private async Task ViewJson()
     {
-        return dialogService.OpenAsync<ViewWorkflowJsonDialog>("", new Dictionary<string, object>
+        var dialogResult = await dialogService.OpenAsync<ViewWorkflowJsonDialog>("Json", new Dictionary<string, object>
         {
             { nameof(ViewWorkflowJsonDialog.Context), Context }
         });
+        if(!string.IsNullOrWhiteSpace(dialogResult))
+        {
+            var workflow = JsonSerializer.Deserialize<WorkflowRecord>(dialogResult);
+            CleanDiagram();
+            Context = WorkflowContext.CreateWorkflow(workflow, Forms);
+            Init();
+        }
+    }
+
+    private async Task Save()
+    {
+        isSaveDisabled = true;
+        await SavedEvt.InvokeAsync(new WorkflowActionState(() => {
+            isSaveDisabled = false;
+        }));
+    }
+
+    private async Task Publish()
+    {
+        isPublishDisabled = true;
+        await PublishedEvt.InvokeAsync(new WorkflowActionState(() =>
+        {
+            isPublishDisabled = false;
+        }));
+    }
+
+    private void CleanDiagram()
+    {
+        foreach (var record in Diagram.Nodes.ToList())
+            Diagram.Nodes.Remove(record);
+        foreach (var link in Diagram.Links.ToList())
+            Diagram.Links.Remove(link);
     }
 
     private FormRecord GetFormRecord(string name)

@@ -10,7 +10,6 @@ public class WorkflowLink : ICloneable
     public string TargetStepId { get; set; }
     public string ActionType { get; set; }
     public string? ActionParameter { get; set; }
-    [JsonIgnore]
     public string Description { get; set; }
     [JsonIgnore]
     public bool IsLinkHoverStep { get; set; }

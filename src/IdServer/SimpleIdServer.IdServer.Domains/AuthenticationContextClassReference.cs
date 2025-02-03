@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains.DTOs;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
@@ -25,10 +24,6 @@ namespace SimpleIdServer.IdServer.Domains
         public DateTime CreateDateTime { get; set; }
         [JsonPropertyName(AuthenticationContextClassReferenceNames.UpdateDateTime)]
         public DateTime UpdateDateTime { get; set; }
-        [JsonPropertyName(AuthenticationContextClassReferenceNames.WorkflowId)]
-        public string? RegistrationWorkflowId { get; set; }
-        [JsonPropertyName(AuthenticationContextClassReferenceNames.RegistrationWorkflow)]
-        public RegistrationWorkflow? RegistrationWorkflow { get; set; }
         [JsonPropertyName(AuthenticationContextClassReferenceNames.AuthenticationWorkflow)]
         public string? AuthenticationWorkflow { get; set; }
         [JsonIgnore]

@@ -235,44 +235,30 @@
     padding: 5px;
 }
 
+g.diagram-link path:not(.selection-helper) {
+    stroke-dasharray: 5;
+    animation: dash .5s linear infinite;
+}
+
 .step-chooser {
     width: 200px;
     height: 70px;
+}
+
+.step-selected {
+    width: 200px;
+    height: 25px;
 }
 
 .step-selected, final-step {
     display: relative;
 }
 
-.step-selected {
-    width: 150px;
-    height: 25px;
+@keyframes dash {
+    to {
+        stroke-dashoffset: -10;
+    }
 }
-
-.final-step {
-
-}
-/*
-.diagram-port {
-    position: absolute;
-    width: 30px;
-    height: 20px;
-    background-color: black;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.diagram-port.top {
-    border-top-left-radius: 50%;
-    border-top-right-radius: 50%;
-    top: -10px;
-}
-
-.diagram-port.bottom {
-    border-bottom-left-radius: 50%;
-    border-bottom-right-radius: 50%;
-    bottom: -30px;
-}*/
 
 /*Hitbox*/
 .hitbox {

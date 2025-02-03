@@ -125,6 +125,7 @@ namespace SimpleIdServer.IdServer
             public const string Groups = "groups";
             public const string Languages = "languages";
             public const string ErrorMessages = "errormessages";
+            public const string Workflows = "workflows";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -677,6 +678,20 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "acrs",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope Workflows = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "workflows",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

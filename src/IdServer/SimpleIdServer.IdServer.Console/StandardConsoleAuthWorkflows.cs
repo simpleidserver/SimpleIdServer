@@ -22,7 +22,7 @@ public static class StandardConsoleAuthWorkflows
 
     public static WorkflowBuilder AddConsoleAuth(this WorkflowBuilder builder)
     {
-        builder.AddStep(StandardConsoleAuthForms.ConsoleForm, new Coordinate(100, 100))
+        builder.AddStep(StandardConsoleAuthForms.ConsoleForm)
             .AddLinkHttpRequestAction(StandardConsoleAuthForms.ConsoleForm, Constants.EmptyStep, StandardConsoleAuthForms.consoleSendConfirmationCode, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,

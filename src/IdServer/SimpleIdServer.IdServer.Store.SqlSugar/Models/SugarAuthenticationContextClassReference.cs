@@ -34,7 +34,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 CreateDateTime = record.CreateDateTime,
                 DisplayName = record.DisplayName,
                 Name = record.Name,
-                RegistrationWorkflowId = record.RegistrationWorkflowId,
                 UpdateDateTime = record.UpdateDateTime,
                 Realms = record.Realms.Select(r => new SugarRealm
                 {
@@ -52,10 +51,8 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 DisplayName = DisplayName,
                 CreateDateTime = CreateDateTime,
                 UpdateDateTime = UpdateDateTime,
-                RegistrationWorkflowId = RegistrationWorkflowId,
                 Realms = Realms == null ? new List<Realm>() : Realms.Select(r => r.ToDomain()).ToList(),
-                Clients = Clients == null ? new List<Client>() : Clients.Select(c => c.ToDomain()).ToList(),
-                RegistrationWorkflow = RegistrationWorkflow?.ToDomain()
+                Clients = Clients == null ? new List<Client>() : Clients.Select(c => c.ToDomain()).ToList()
             };
         }
     }

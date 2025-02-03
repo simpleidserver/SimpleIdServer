@@ -24,7 +24,7 @@ public record AuthenticationFormsState
         FormRecords = formRecords;
     }
 
-    public bool IsLoading { get; set; }
+    public bool IsLoading { get; set; } = true;
     public List<FormRecord> FormRecords { get; set; }
     public int Count
     {

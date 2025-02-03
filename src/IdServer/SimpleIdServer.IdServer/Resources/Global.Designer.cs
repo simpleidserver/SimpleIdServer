@@ -1024,6 +1024,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Demo.
+        /// </summary>
+        public static string Demo {
+            get {
+                return ResourceManager.GetString("Demo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à there is a mismatch between the dpop_jkt and the DPoP proof.
         /// </summary>
         public static string DpopJktMismatch {

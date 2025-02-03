@@ -328,12 +328,15 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("getAllAuthForms",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/forms",
                 defaults: new { controller = "AuthenticationClassReferences", action = "GetAllForms" });
+            webApplication.SidMapControllerRoute("getWorkflowLayouts",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/workflowLayouts",
+                defaults: new { controller = "AuthenticationClassReferences", action = "GetAllWorkflowLayouts" });
             webApplication.SidMapControllerRoute("deleteAmr",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}",
                 defaults: new { controller = "AuthenticationClassReferences", action = "Delete" });
-            webApplication.SidMapControllerRoute("assignRegistrationWorkflow",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}/assign",
-                defaults: new { controller = "AuthenticationClassReferences", action = "AssignRegistrationWorkflow" });
+            webApplication.SidMapControllerRoute("getAcr",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.AuthenticationClassReferences + "/{id}",
+                defaults: new { controller = "AuthenticationClassReferences", action = "Get" });
 
 
             webApplication.SidMapControllerRoute("searchIdProviders",
@@ -402,6 +405,10 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("updateRegistrationWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
                 defaults: new { controller = "RegistrationWorkflows", action = "Update" });
+
+            webApplication.SidMapControllerRoute("getWorkflow",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Workflows + "/{id}",
+                defaults: new { controller = "Workflows", action = "Get" });
 
             webApplication.SidMapControllerRoute("addApiResource",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources,

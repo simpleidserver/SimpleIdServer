@@ -104,6 +104,23 @@ public static class AcrReducers
 
     #endregion
 
+    #region AcrState
+
+    [ReducerMethod]
+    public static AcrState ReduceGetAcrAction(AcrState state, GetAcrAction action) => new(true, null);
+
+    [ReducerMethod]
+    public static AcrState ReduceGetAcrSuccessAction(AcrState state, GetAcrSuccessAction action)
+    {
+        return state with
+        {
+            IsLoading = false,
+            Acr = action.Acr
+        };
+    }
+
+    #endregion
+
     #region UpdateAcrState
 
     [ReducerMethod]
@@ -164,6 +181,26 @@ public static class AcrReducers
         {
             IsLoading = false,
             FormRecords = action.AuthenticationForms
+        };
+    }
+
+    #endregion
+
+    #region AuthenticationWorkflowLayoutsState
+
+    [ReducerMethod]
+    public static AuthenticationWorkflowLayoutsState ReduceGetAllAuthenticationWorkflowLayoutsAction(AuthenticationWorkflowLayoutsState state, GetAllAuthenticationWorkflowLayoutsAction action) => new AuthenticationWorkflowLayoutsState
+    {
+        IsLoading = true
+    };
+
+    [ReducerMethod]
+    public static AuthenticationWorkflowLayoutsState ReduceGetAllAuthenticationWorkflowLayoutsSuccessAction(AuthenticationWorkflowLayoutsState state, GetAllAuthenticationWorkflowLayoutsSuccessAction action)
+    {
+        return state with
+        {
+            IsLoading = false,
+            Values = action.WorkflowLayouts
         };
     }
 

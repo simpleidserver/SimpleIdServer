@@ -1146,4 +1146,7 @@
   <data name="PasswordIsUpdated" xml:space="preserve">
     <value>The password is updated</value>
   </data>
+  <data name="Demo" xml:space="preserve">
+    <value>Demo</value>
+  </data>
 </root>

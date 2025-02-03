@@ -12,9 +12,7 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -109,8 +107,6 @@ public class RealmsController : BaseController
                     var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
                     var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
                     var acrs = await _authenticationContextClassReferenceRepository.GetAll(Constants.DefaultRealm, cancellationToken);
-                    var registrationMethods = acrs.Select(c => c.RegistrationWorkflowId).Where(c => !string.IsNullOrWhiteSpace(c)).Distinct().ToList();
-                    var registrationWorkflows = await _registrationWorkflowRepository.GetByIds(Constants.DefaultRealm, registrationMethods, cancellationToken);
                     _realmRepository.Add(realm);
                     foreach (var user in users)
                     {
@@ -148,38 +144,14 @@ public class RealmsController : BaseController
                         _fileSerializedKeyStore.Update(key);
                     }
 
-                    var registrationWorkflowIds = new Dictionary<string, string>();
-                    foreach (var registrationWorkflow in registrationWorkflows)
-                    {
-                        var id = Guid.NewGuid().ToString();
-                        registrationWorkflowIds.Add(registrationWorkflow.Id, id);
-                        _registrationWorkflowRepository.Add(new RegistrationWorkflow
-                        {
-                            Id = id,
-                            RealmName = realm.Name,
-                            Name = registrationWorkflow.Name,
-                            CreateDateTime = DateTime.UtcNow,
-                            IsDefault = registrationWorkflow.IsDefault,
-                            UpdateDateTime = registrationWorkflow.UpdateDateTime,
-                            WorkflowId = registrationWorkflow.WorkflowId
-                        });
-                    }
-
                     foreach (var acr in acrs)
                     {
-                        string registrationWorkflowId = null;
-                        if(!string.IsNullOrWhiteSpace(acr.RegistrationWorkflowId) && registrationWorkflowIds.ContainsKey(acr.RegistrationWorkflowId))
-                        {
-                            registrationWorkflowId = registrationWorkflowIds[acr.RegistrationWorkflowId];
-                        }
-
                         realm.AuthenticationContextClassReferences.Add(new AuthenticationContextClassReference
                         {
                             CreateDateTime = DateTime.UtcNow,
                             DisplayName = acr.DisplayName,
                             Id = Guid.NewGuid().ToString(),
                             Name = acr.Name,
-                            RegistrationWorkflowId = registrationWorkflowId,
                             UpdateDateTime = DateTime.UtcNow
                         });
                     }
