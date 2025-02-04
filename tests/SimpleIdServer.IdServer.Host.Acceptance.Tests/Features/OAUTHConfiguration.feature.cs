@@ -98,12 +98,12 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-                TechTalk.SpecFlow.Table table436 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table437 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
 #line 5
  testRunner.When("execute HTTP GET request \'https://localhost:8080/.well-known/oauth-authorization-" +
-                        "server\'", ((string)(null)), table436, "When ");
+                        "server\'", ((string)(null)), table437, "When ");
 #line hidden
 #line 7
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -185,15 +185,12 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[3]\'=\'client_secret_post\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 34
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[4]\'=\'pkce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[4]\'=\'tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 35
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[5]\'=\'tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[5]\'=\'self_signed_tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 36
- testRunner.And("JSON \'$.token_endpoint_auth_methods_supported[6]\'=\'self_signed_tls_client_auth\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 37
  testRunner.And("JSON \'$.token_endpoint_auth_signing_alg_values_supported[0]\'=\'RS256\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

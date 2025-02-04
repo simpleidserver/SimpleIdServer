@@ -218,8 +218,8 @@ namespace SimpleIdServer.IdServer.UI
 
         private double GetCookieExpirationTimeInSeconds(Client client)
         {
-            var expirationTimeInSeconds = client == null || client.TokenExpirationTimeInSeconds == null ?
-               _options.DefaultTokenExpirationTimeInSeconds : client.TokenExpirationTimeInSeconds.Value;
+            var expirationTimeInSeconds = client == null || client.UserCookieExpirationTimeInSeconds == null ?
+               _options.DefaultTokenExpirationTimeInSeconds : client.UserCookieExpirationTimeInSeconds.Value;
             return expirationTimeInSeconds;
         }
     }

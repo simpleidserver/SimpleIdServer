@@ -63,6 +63,10 @@ namespace SimpleIdServer.IdServer.Options
         /// </summary>
         public double DefaultTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
+        /// Default expiration time of the user cookie.
+        /// </summary>
+        public double DefaultUserCookieExpirationTimeInSeconds { get; set; } = 60 * 30;
+        /// <summary>
         /// Default Refresh Token Expiration Time in seconds.
         /// </summary>
         public double DefaultRefreshTokenExpirationTimeInSeconds { get; set; } = 60 * 30;

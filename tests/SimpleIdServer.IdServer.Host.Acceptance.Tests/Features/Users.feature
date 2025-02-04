@@ -12,7 +12,7 @@ Scenario: create a user
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	And execute HTTP POST JSON request 'https://localhost:8080/users'
+	And execute HTTP POST JSON request 'http://localhost/users'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |	
 	| name            | newUser               |
@@ -33,7 +33,7 @@ Scenario: get a user
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP POST JSON request 'https://localhost:8080/users'
+	When execute HTTP POST JSON request 'http://localhost/users'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |	
 	| name            | newuser2              |
@@ -41,7 +41,7 @@ Scenario: get a user
 	And extract JSON from body
 	And extract parameter 'id' from JSON body	
 	
-	When execute HTTP GET request 'https://localhost:8080/users/$id$'
+	When execute HTTP GET request 'http://localhost/users/$id$'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |	
 
@@ -59,7 +59,7 @@ Scenario: remove a user
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP POST JSON request 'https://localhost:8080/users'
+	When execute HTTP POST JSON request 'http://localhost/users'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |	
 	| name            | newuser3              |
@@ -67,7 +67,7 @@ Scenario: remove a user
 	And extract JSON from body
 	And extract parameter 'id' from JSON body	
 	
-	When execute HTTP DELETE request 'https://localhost:8080/users/$id$'
+	When execute HTTP DELETE request 'http://localhost/users/$id$'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |	
 

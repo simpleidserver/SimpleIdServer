@@ -402,7 +402,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
             };
             foreach(var kvp in headers)
                 httpRequestMessage.Headers.Add(kvp.Key, kvp.Value);
-            httpRequestMessage.Headers.Add("Cookie", $"{CookieAuthenticationDefaults.CookiePrefix}Session=sessionId");
+            httpRequestMessage.Headers.Add("Cookie", $"{CookieAuthenticationDefaults.CookiePrefix}Session-user=sessionId");
             var httpResponseMessage = await _factory.CreateClient().SendAsync(httpRequestMessage).ConfigureAwait(false);
             _scenarioContext.Set(httpResponseMessage, "httpResponseMessage");
         }

@@ -112,8 +112,9 @@ Scenario: Scopes must be supported
 	| Key       | Value  |
 	| sub       | user   |
 	| client_id | client |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
 	| client_id           | seventyTwoClient                                              |
@@ -131,8 +132,9 @@ Scenario: User must have an active OTP
 	Given build access_token and sign with the key 'keyid'
 	| Key   | Value |
 	| sub   | user  |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
 	| client_id           | seventyTwoClient                                              |

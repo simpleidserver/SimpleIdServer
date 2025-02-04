@@ -330,6 +330,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.IsDPOPNonceRequired = act.IsDPoPNonceRequired;
             client.DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds;
             client.TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds;
+            client.UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds;
             return state with
             {
                 Client = client

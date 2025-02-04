@@ -3,7 +3,6 @@
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
@@ -15,6 +14,8 @@ namespace SimpleIdServer.IdServer.Domains
     {
         [JsonPropertyName(OAuthClientParameters.Id)]
         public string Id { get; set; }
+        [JsonPropertyName(OAuthClientParameters.IsPublic)]
+        public bool IsPublic { get; set; }
         /// <summary>
         /// Client identifier.
         /// </summary>
@@ -196,6 +197,12 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.TokenExpirationTimeInSeconds)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? TokenExpirationTimeInSeconds { get; set; }
+        /// <summary>
+        /// Expiration time of the user cookie in seconds.
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.UserCookieExpirationTimeInSeconds)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public double? UserCookieExpirationTimeInSeconds { get; set; }
         /// <summary>
         /// Lifetime in seconds of the c_nonce.
         /// </summary>

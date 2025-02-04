@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
@@ -833,6 +833,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_nonce_required");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_public");
+
                     b.Property<bool>("IsRedirectUrlCaseSensitive")
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_redirect_url_casesensitive");
@@ -985,6 +989,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
+
+                    b.Property<double?>("UserCookieExpirationTimeInSeconds")
+                        .HasColumnType("REAL")
+                        .HasAnnotation("Relational:JsonPropertyName", "user_cookie_expirationtime_seconds");
 
                     b.Property<string>("UserInfoEncryptedResponseAlg")
                         .HasColumnType("TEXT")

@@ -1312,6 +1312,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Expiration time of the cookie.
+        /// </summary>
+        public static string CookieExpirationTime {
+            get {
+                return ResourceManager.GetString("CookieExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the expiration time of the user&apos;s cookie in milliseconds (ms).
+        /// </summary>
+        public static string CookieExpirationTimeTooltip {
+            get {
+                return ResourceManager.GetString("CookieExpirationTimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Counter.
         /// </summary>
         public static string Counter {
@@ -3299,6 +3317,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ProtocolIsRequired {
             get {
                 return ResourceManager.GetString("ProtocolIsRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Public.
+        /// </summary>
+        public static string PublicClient {
+            get {
+                return ResourceManager.GetString("PublicClient", resourceCulture);
             }
         }
         

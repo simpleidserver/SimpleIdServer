@@ -190,6 +190,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
+                IsPublic = true,
                 ClientType = ClientTypes.MOBILE,
                 RedirectionUrls = redirectUrls,
                 CreateDateTime = DateTime.UtcNow,
@@ -199,7 +200,6 @@ namespace SimpleIdServer.IdServer.Builders
             if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
-            client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return new MobileClientBuilder(client);
         }
 
@@ -222,12 +222,12 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientType = ClientTypes.SPA,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
+                IsPublic = true,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
             if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
-            client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
             return new UserAgentClientBuilder(client);
         }
     }

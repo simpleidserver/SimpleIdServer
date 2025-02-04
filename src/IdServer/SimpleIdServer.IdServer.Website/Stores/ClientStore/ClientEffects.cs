@@ -691,7 +691,8 @@ public class ClientEffects
             DPOPBoundAccessTokens = act.IsDPoPRequired,
             DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
             IsDPOPNonceRequired = act.IsDPoPNonceRequired,
-            TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds
+            TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds,
+            UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds
         };
         var requestMessage = new HttpRequestMessage
         {
@@ -714,7 +715,8 @@ public class ClientEffects
                 DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
                 IsDPoPNonceRequired = act.IsDPoPNonceRequired,
                 IsDPoPRequired = act.IsDPoPRequired,
-                TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds
+                TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds,
+                UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds
             });
         }
         catch
@@ -1249,6 +1251,7 @@ public class UpdateAdvancedClientSettingsAction
     public bool IsDPoPNonceRequired { get; set; } = false;
     public double DPOPNonceLifetimeInSeconds { get; set; }
     public double TokenExpirationTimeInSeconds { get; set; }
+    public double UserCookieExpirationTimeInSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsSuccessAction
@@ -1262,6 +1265,7 @@ public class UpdateAdvancedClientSettingsSuccessAction
     public double DPOPNonceLifetimeInSeconds { get; set; }
     public double TokenExpirationTimeInSeconds { get; set; }
     public string? TokenSignedResponseAlg { get; set;  }
+    public double UserCookieExpirationTimeInSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsFailureAction

@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -846,6 +846,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("bit")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_nonce_required");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("bit")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_public");
+
                     b.Property<bool>("IsRedirectUrlCaseSensitive")
                         .HasColumnType("bit")
                         .HasAnnotation("Relational:JsonPropertyName", "is_redirect_url_casesensitive");
@@ -998,6 +1002,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
+
+                    b.Property<double?>("UserCookieExpirationTimeInSeconds")
+                        .HasColumnType("float")
+                        .HasAnnotation("Relational:JsonPropertyName", "user_cookie_expirationtime_seconds");
 
                     b.Property<string>("UserInfoEncryptedResponseAlg")
                         .HasColumnType("nvarchar(max)")

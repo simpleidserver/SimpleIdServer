@@ -5,6 +5,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
     public class OAuthClientParameters
     {
         public const string Id = "id";
+        public const string IsPublic = "is_public";
         public const string ClientId = "client_id";
         public const string ClientType = "client_type";
         public const string ClientSecret = "client_secret";
@@ -94,5 +95,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string ExpirationDateTime = "expiration_datetime";
         public const string ClientRegistrationTypesSupported = "client_registration_types_supported";
         public const string Realms = "realms";
+        public const string UserCookieExpirationTimeInSeconds = "user_cookie_expirationtime_seconds";
     }
 }

@@ -2,7 +2,7 @@
 	Check errors returned by acrs API
 	
 Scenario: name parameter is required
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
 	| client_id     | sixtyTwoClient     |
 	| client_secret | password           |
@@ -23,7 +23,7 @@ Scenario: name parameter is required
 	Then JSON 'error_description'='missing parameter name'
 	
 Scenario: amrs parameter is required
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
 	| client_id     | sixtyTwoClient     |
 	| client_secret | password           |
@@ -45,7 +45,7 @@ Scenario: amrs parameter is required
 	Then JSON 'error_description'='missing parameter amrs'
 
 Scenario: amr must be supported
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
 	| client_id     | sixtyTwoClient     |
 	| client_secret | password           |
@@ -68,7 +68,7 @@ Scenario: amr must be supported
 	Then JSON 'error_description'='the authentication method references name are not supported'
 
 Scenario: acr must be unique
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
 	| client_id     | sixtyTwoClient     |
 	| client_secret | password           |
@@ -91,7 +91,7 @@ Scenario: acr must be unique
 	Then JSON 'error_description'='an acr with the same name already exists'
 
 Scenario: cannot remove unknown acr
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
 	| client_id     | sixtyTwoClient     |
 	| client_secret | password           |
