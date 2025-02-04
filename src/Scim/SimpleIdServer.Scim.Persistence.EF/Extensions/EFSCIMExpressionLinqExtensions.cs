@@ -45,17 +45,12 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             if (filteredAttrs != null)
             {
                 filteredAttrs = filteredAttrs.Where(a => a.RepresentationId == id);
-                SCIMRepresentation result = null;
-                if(!string.IsNullOrWhiteSpace(realm))
-                    result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType && r.RealmName == realm, cancellationToken);
-                else
-                    result = await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType, cancellationToken);
-                if (result == null) return null;
+                var result = await GetRepresentation(representations, id, resourceType, realm, cancellationToken);
                 result.FlatAttributes = filteredAttrs.ToList();
                 return result;
             }
-            
-            return await representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType, cancellationToken);
+
+            return await GetRepresentation(representations, id, resourceType, realm, cancellationToken);
         }
 
         public static async Task<SearchSCIMRepresentationsResponse> BuildResult(
@@ -118,6 +113,13 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 
             var reps = await representations.ToListAsync(cancellationToken);
             return new SearchSCIMRepresentationsResponse(total, reps);
+        }
+
+        private static Task<SCIMRepresentation> GetRepresentation(IQueryable<SCIMRepresentation> representations, string id, string resourceType,string realm, CancellationToken cancellationToken)
+        {
+            if (!string.IsNullOrWhiteSpace(realm))
+                return representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType && r.RealmName == realm, cancellationToken);
+            return representations.FirstOrDefaultAsync(r => r.Id == id && r.ResourceType == resourceType, cancellationToken);
         }
 
         #endregion
