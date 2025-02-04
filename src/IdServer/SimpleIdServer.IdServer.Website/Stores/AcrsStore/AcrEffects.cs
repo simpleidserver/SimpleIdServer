@@ -4,7 +4,6 @@ using Fluxor;
 using FormBuilder.Models;
 using FormBuilder.Models.Layout;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Helpers;
@@ -102,7 +101,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
                 RequestUri = new Uri($"{baseUrl}/forms")
             });
             var json = await httpResult.Content.ReadAsStringAsync();
-            var forms = SidJsonSerializer.Deserialize<List<FormRecord>>(json);
+            var settings = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            var forms = JsonSerializer.Deserialize<List<FormRecord>>(json, settings);
             dispatcher.Dispatch(new GetAllAuthenticationFormsSuccessAction { AuthenticationForms = forms });
         }
 

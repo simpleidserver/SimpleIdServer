@@ -21,7 +21,7 @@ public static class StandardPwdRegistrationWorkflows
 
     public static WorkflowBuilder AddPwdRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
-        builder.AddStep(StandardPwdRegisterForms.PwdForm, new Coordinate(100, 100))
+        builder.AddStep(StandardPwdRegisterForms.PwdForm)
             .AddLinkHttpRequestAction(StandardPwdRegisterForms.PwdForm, nextStep ?? Constants.EmptyStep, StandardPwdRegisterForms.pwdRegisterFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,

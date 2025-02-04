@@ -26,7 +26,7 @@ public static class StandardFidoRegistrationWorkflows
 
     public static WorkflowBuilder AddWebauthnRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
-        builder.AddStep(StandardFidoRegisterForms.WebauthnForm, new Coordinate(100, 100))
+        builder.AddStep(StandardFidoRegisterForms.WebauthnForm)
                 .AddLinkHttpRequestAction(StandardFidoRegisterForms.WebauthnForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
                 {
                     Method = HttpMethods.POST,
@@ -59,7 +59,7 @@ public static class StandardFidoRegistrationWorkflows
 
     public static WorkflowBuilder AddMobileRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
-        builder.AddStep(StandardFidoRegisterForms.MobileForm, new Coordinate(100, 100))
+        builder.AddStep(StandardFidoRegisterForms.MobileForm)
             .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, new WorkflowLinkHttpRequestParameter())
             .AddTransformedLinkUrlAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileBackButtonId, "{returnUrl}", new List<ITransformerParameters>
              {

@@ -20,7 +20,7 @@ public static class StandardVpRegistrationWorkflows
 
     public static WorkflowBuilder AddVpRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
-        builder.AddStep(StandardVpRegisterForms.VpForm, new Coordinate(100, 100))
+        builder.AddStep(StandardVpRegisterForms.VpForm)
             .AddLinkAction(StandardVpRegisterForms.VpForm, nextStep ?? Constants.EmptyStep, StandardVpRegisterForms.vpRegistrationFormId)
             .AddTransformedLinkUrlAction(StandardVpRegisterForms.VpForm, nextStep ?? Constants.EmptyStep, StandardVpRegisterForms.backBtnId, "{returnUrl}", new List<ITransformerParameters>
             {

@@ -6,6 +6,7 @@ namespace FormBuilder.Models;
 
 public class FormRecord : BaseVersionRecord
 {
+    [JsonPropertyName("id")]
     public string Id { get; set; }
     public string Name { get; set; }
     public string? Category { get; set; }

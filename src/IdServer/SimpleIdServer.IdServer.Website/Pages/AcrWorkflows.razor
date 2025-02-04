@@ -9,6 +9,7 @@
 @using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
 @inject IUrlHelper urlHelper
 @inject DialogService dialogService
+@inject NavigationManager navigationManager
 @inject ContextMenuService contextMenuService
 @inject NotificationService notificationService
 @inject IOptions<IdServerWebsiteOptions> Options;
@@ -22,7 +23,7 @@
 <div>    
     <div class="row">
         <div class="col">
-            <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.AcrsTitle" TextStyle="TextStyle.DisplayH3" />
+            <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.AcrWorkflowsTitle" TextStyle="TextStyle.DisplayH3" />
             <p>
                 @Global.AcrsDescription
             </p>
@@ -64,11 +65,6 @@
             <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
                 <Template Context="data">
                     <RadzenLink Path="@urlHelper.GetUrl($"/acrs/workflows/{data.Value.Id}")" Target="_blank">@data.Value.Name</RadzenLink>
-
-                    @if (activeRealm == SimpleIdServer.IdServer.Constants.DefaultRealm)
-                    {
-                        <RadzenLink Path="@GetDemoUrl(data)" Target="_blank">@Global.Demo</RadzenLink>
-                    }
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="@Global.DisplayName" Width="80px" />
@@ -128,7 +124,8 @@
     {
         contextMenuService.Open(args, new List<ContextMenuItem>
         {
-            new ContextMenuItem { Text = Global.Delete, Value = 1 }
+            new ContextMenuItem { Text = Global.Delete, Value = 1 },
+            new ContextMenuItem { Text = Global.Demo, Value = 2 }
         }, (a) =>
         {
             if (a.Value.Equals(1))
@@ -137,6 +134,11 @@
                 var act = new DeleteSelectedAcrsAction { Ids = acrIds };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();
+            }
+            else if(a.Value.Equals(2)) 
+            {
+                var url = GetDemoUrl(acr);
+                navigationManager.NavigateTo(url);
             }
         });
     }

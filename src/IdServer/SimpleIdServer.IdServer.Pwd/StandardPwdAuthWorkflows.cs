@@ -25,8 +25,8 @@ public static class StandardPwdAuthWorkflows
 
     public static WorkflowBuilder AddPwdAuth(this WorkflowBuilder builder, FormRecord nextStep = null)
     {
-        builder.AddStep(StandardPwdAuthForms.PwdForm, new Coordinate(100, 100))
-            .AddStep(StandardPwdAuthForms.ResetForm, new Coordinate(100, 100))
+        builder.AddStep(StandardPwdAuthForms.PwdForm)
+            .AddStep(StandardPwdAuthForms.ResetForm)
             .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, nextStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdAuthFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
@@ -114,7 +114,7 @@ public static class StandardPwdAuthWorkflows
 
     public static WorkflowBuilder AddConfirmResetPwd(this WorkflowBuilder builder)
     {
-        builder.AddStep(StandardPwdAuthForms.ConfirmResetForm, new Coordinate(100, 100));
+        builder.AddStep(StandardPwdAuthForms.ConfirmResetForm);
         builder.AddLinkHttpRequestAction(StandardPwdAuthForms.ConfirmResetForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.confirmResetPwdFormId, new WorkflowLinkHttpRequestParameter
         {
             Method = HttpMethods.POST,

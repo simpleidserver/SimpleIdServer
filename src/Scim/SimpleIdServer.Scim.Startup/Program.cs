@@ -3,7 +3,6 @@
 using AspNetCore.Authentication.ApiKey;
 using Azure.Storage.Blobs;
 using MassTransit;
-using MassTransit.AzureStorage.MessageData;
 using MassTransit.MessageData;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +14,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using SimpleIdServer.Scim.Domains;
-using SimpleIdServer.Scim.ExternalEvents;
 using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;

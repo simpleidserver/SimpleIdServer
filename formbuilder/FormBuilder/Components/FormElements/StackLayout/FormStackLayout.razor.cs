@@ -59,7 +59,9 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     private void BuildHiddenFields()
     {
         if (Value.FormType != FormTypes.HTML || !string.IsNullOrWhiteSpace(TargetUrl)) return;
+        HiddenFields = new Dictionary<string, string>();
         var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);
+        if (link == null) return;
         var json = new JsonObject();
         Value.ExtractJson(json);
         var execution = Context.GetLinkExecutionFromElementAndCurrentStep(Value.Id);
@@ -68,7 +70,6 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
         var res = act.GetRequest(link, execution, Context);
         if (res == null) return;
         TargetUrl = res.Value.url;
-        HiddenFields = new Dictionary<string, string>();
         if (Context.Execution?.AntiforgeryToken != null && res.Value.json.ContainsKey(Context.Execution.AntiforgeryToken.FormField))
             HiddenFields.Add(Context.Execution.AntiforgeryToken.FormField, Context.Execution.AntiforgeryToken.FormValue);
 

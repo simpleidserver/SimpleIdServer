@@ -21,7 +21,7 @@ public static class StandardOtpAuthWorkflows
 
     public static WorkflowBuilder AddOtpAuth(this WorkflowBuilder builder)
     {
-        builder.AddStep(StandardOtpAuthForms.OtpForm, new Coordinate(100, 100))
+        builder.AddStep(StandardOtpAuthForms.OtpForm)
             .AddLinkHttpRequestAction(StandardOtpAuthForms.OtpForm, Constants.EmptyStep, StandardOtpAuthForms.otpCodeFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,

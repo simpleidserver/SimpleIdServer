@@ -26,7 +26,7 @@ public static class StandardFidoAuthWorkflows
 
     public static WorkflowBuilder AddWebauthnAuth(this WorkflowBuilder builder)
     {
-        builder.AddStep(StandardFidoAuthForms.WebauthnForm, new Coordinate(100, 100))
+        builder.AddStep(StandardFidoAuthForms.WebauthnForm)
             .AddLinkHttpRequestAction(StandardFidoAuthForms.WebauthnForm, FormBuilder.Constants.EmptyStep, StandardFidoAuthForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
@@ -50,7 +50,7 @@ public static class StandardFidoAuthWorkflows
 
     public static WorkflowBuilder AddMobileAuth(this WorkflowBuilder builder)
     {
-        builder.AddStep(StandardFidoAuthForms.MobileForm, new Coordinate(100, 100))
+        builder.AddStep(StandardFidoAuthForms.MobileForm)
             .AddLinkHttpRequestAction(StandardFidoAuthForms.MobileForm, FormBuilder.Constants.EmptyStep, StandardFidoAuthForms.mobileFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,

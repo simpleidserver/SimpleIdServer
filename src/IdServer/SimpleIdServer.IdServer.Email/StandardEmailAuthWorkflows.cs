@@ -21,7 +21,7 @@ public static class StandardEmailAuthWorkflows
 
     public static WorkflowBuilder AddEmailAuth(this WorkflowBuilder builder)
     {
-        builder.AddStep(StandardEmailAuthForms.EmailForm, new Coordinate(100, 100))
+        builder.AddStep(StandardEmailAuthForms.EmailForm)
             .AddLinkHttpRequestAction(StandardEmailAuthForms.EmailForm, Constants.EmptyStep, StandardEmailAuthForms.emailSendConfirmationCode, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,

@@ -35,6 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
                     rdt.Name = "SimpleIdServer";
                 });
             });
+            services.AddFormBuilderUi();
             services.AddHttpContextAccessor();
             services.AddTransient<IUserSessionResitory, UserSessionRepository>();
             services.AddTransient<IUrlHelper, UrlHelper>();

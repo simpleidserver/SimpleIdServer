@@ -5,17 +5,11 @@
 
 <SidAuthorizeView Roles=@("/acrs/manage,/acrs/view")>
     <Authorized>
-        <RadzenBreadCrumb>
-            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl($"/acrs/{action}")" Text="@Global.AcrsTitle" />
-        </RadzenBreadCrumb>
-
-        <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.AcrsTitle" TextStyle="TextStyle.DisplayH3" />
-        
         <RadzenCard>
             <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
                 <Tabs>
                     <RadzenTabsItem Text="@Global.AcrsTitle">
-                        <AcrList></AcrList>
+                        <AcrWorkflows></AcrWorkflows>
                     </RadzenTabsItem>
                     <RadzenTabsItem Text="@Global.Forms">
                         <AuthForms></AuthForms>

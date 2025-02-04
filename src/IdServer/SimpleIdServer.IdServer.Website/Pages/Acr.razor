@@ -2,11 +2,14 @@
 @using FormBuilder.Components.Workflow
 @using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore
+@using SimpleIdServer.IdServer.Website.Resources
+@inject IUrlHelper urlHelper
 @inject IState<AcrState> acrState
 @inject IState<AuthenticationWorkflowLayoutsState> authenticationWorkflowLayoutsState
 @inject IState<AuthenticationFormsState> authenticationFormsState
 @inject IState<WorkflowState> workflowState
 @inject IDispatcher dispatcher
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
 
 <SidAuthorizeView Roles=@("/acrs/manage,/acrs/view")>
     <Authorized>

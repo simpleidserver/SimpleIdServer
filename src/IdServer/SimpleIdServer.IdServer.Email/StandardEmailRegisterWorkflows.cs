@@ -22,7 +22,7 @@ public static class StandardEmailRegisterWorkflows
 
     public static WorkflowBuilder AddEmailRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
-        builder.AddStep(StandardEmailRegistrationForms.EmailForm, new Coordinate(100, 100))
+        builder.AddStep(StandardEmailRegistrationForms.EmailForm)
             .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, Constants.EmptyStep, StandardEmailRegistrationForms.emailSendConfirmationCodeFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,

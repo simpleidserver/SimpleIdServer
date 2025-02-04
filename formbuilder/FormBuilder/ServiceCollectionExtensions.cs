@@ -28,12 +28,18 @@ public static class ServiceCollectionExtensions
 {
     public static FormBuilderRegistration AddFormBuilder(this IServiceCollection services, Action<FormBuilderOptions> cb = null)
     {
+        services.AddFormBuilderUi(cb);
+        services.AddTransient<IVersionedFormService, VersionedFormService>();
+        services.AddTransient<IVersionedWorkflowService, VersionedWorkflowService>();
+        return new FormBuilderRegistration(services);
+    }
+
+    public static void AddFormBuilderUi(this IServiceCollection services, Action<FormBuilderOptions> cb = null)
+    {
         if (cb == null) services.Configure<FormBuilderOptions>((c) => { });
         else services.Configure<FormBuilderOptions>(cb);
         services.AddTransient<IFormBuilderJsService, FormBuilderJsService>();
         services.AddTransient<INavigationHistoryService, NavigationHistoryService>();
-        services.AddTransient<IVersionedFormService,  VersionedFormService>();
-        services.AddTransient<IVersionedWorkflowService, VersionedWorkflowService>();
 
         services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();
@@ -99,6 +105,5 @@ public static class ServiceCollectionExtensions
 
         services.AddHttpContextAccessor();
         services.AddHttpClient();
-        return new FormBuilderRegistration(services);
     }
 }

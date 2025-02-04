@@ -126,7 +126,7 @@ public class WorkflowContext
     public WorkflowStepLinkExecution GetLinkExecutionFromElementAndCurrentStep(string eltId)
     {
         var stepExecution = GetCurrentStepExecution();
-        return stepExecution.Links.SingleOrDefault(l => l.EltId == eltId);
+        return stepExecution?.Links?.SingleOrDefault(l => l.EltId == eltId);
     }
 
     public WorkflowStepLinkExecution GetLinkExecution(string id)

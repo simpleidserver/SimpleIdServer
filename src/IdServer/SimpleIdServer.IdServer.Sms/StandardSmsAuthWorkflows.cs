@@ -22,7 +22,7 @@ public static class StandardSmsAuthWorkflows
 
     public static WorkflowBuilder AddSmsAuth(this WorkflowBuilder builder)
     {
-        builder.AddStep(StandardSmsAuthForms.SmsForm, new Coordinate(100, 100))
+        builder.AddStep(StandardSmsAuthForms.SmsForm)
             .AddLinkHttpRequestAction(StandardSmsAuthForms.SmsForm, Constants.EmptyStep, StandardSmsAuthForms.smsSendConfirmationCode, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,

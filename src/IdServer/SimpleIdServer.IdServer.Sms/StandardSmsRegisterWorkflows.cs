@@ -22,7 +22,7 @@ public static class StandardSmsRegisterWorkflows
 
     public static WorkflowBuilder AddSmsRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
-        builder.AddStep(StandardSmsRegisterForms.SmsForm, new Coordinate(100, 100))
+        builder.AddStep(StandardSmsRegisterForms.SmsForm)
             .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, Constants.EmptyStep, StandardSmsRegisterForms.smsSendConfirmationCodeFormId, new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
