@@ -5,11 +5,19 @@ namespace FormBuilder.Models;
 public class WorkflowRecord : BaseVersionRecord
 {
     public string Id { get; set; }
+    public string? Realm { get; set; }
     public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
     public List<WorkflowLink> Links { get; set; } = new List<WorkflowLink>();
 
     public WorkflowStep GetStep(string id)
         => Steps.SingleOrDefault(s => s.FormRecordId == id);
+
+    public void Update(List<WorkflowStep> steps, List<WorkflowLink> links, DateTime currentDateTime)
+    {
+        Steps = steps;
+        Links = links;
+        UpdateDateTime = currentDateTime;
+    }
 
     public WorkflowStep GetFirstStep()
     {

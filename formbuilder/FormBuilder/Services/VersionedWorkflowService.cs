@@ -7,6 +7,7 @@ namespace FormBuilder.Services;
 public interface IVersionedWorkflowService
 {
     Task<WorkflowRecord> GetLatestPublishedRecord(string correlationId, CancellationToken cancellationToken);
+    Task<WorkflowRecord> Publish(WorkflowRecord record, CancellationToken cancellationToken);
 }
 
 public class VersionedWorkflowService : BaseGenericVersionedRecordService<WorkflowRecord>, IVersionedWorkflowService

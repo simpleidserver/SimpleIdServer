@@ -171,7 +171,8 @@ public class IdServerConfiguration
         IdProviderAdministratorScope,
         AppProviderAdministratorScope,
         SimpleIdServer.IdServer.Constants.StandardScopes.Acrs,
-        SimpleIdServer.IdServer.Constants.StandardScopes.Workflows
+        SimpleIdServer.IdServer.Constants.StandardScopes.Workflows,
+        SimpleIdServer.IdServer.Constants.StandardScopes.Forms
     };
 
     public static ICollection<User> Users => new List<User>
@@ -247,6 +248,7 @@ public class IdServerConfiguration
                 SimpleIdServer.IdServer.Constants.StandardScopes.Realms, 
                 SimpleIdServer.IdServer.Constants.StandardScopes.Groups,
                 SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole,
+                SimpleIdServer.IdServer.Constants.StandardScopes.Forms,
                 SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
         ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
             SimpleIdServer.IdServer.Constants.StandardScopes.Provisioning, 

@@ -2572,6 +2572,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The form {0} doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownForm {
+            get {
+                return ResourceManager.GetString("UnknownForm", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the grant {0} doesn&apos;t exist.
         /// </summary>
         public static string UnknownGrant {

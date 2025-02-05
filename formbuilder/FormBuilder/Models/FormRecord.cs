@@ -24,6 +24,12 @@ public class FormRecord : BaseVersionRecord
         }
     }
 
+    public void Update(List<IFormElementRecord> elements, DateTime dateTime)
+    {
+        UpdateDateTime = dateTime;
+        Elements = new ObservableCollection<IFormElementRecord>(elements);
+    }
+
     public IFormElementRecord GetChild(string id)
     {
         var result = Elements.SingleOrDefault(e => e.Id == id);

@@ -409,6 +409,12 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("getWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Workflows + "/{id}",
                 defaults: new { controller = "Workflows", action = "Get" });
+            webApplication.SidMapControllerRoute("updateWorkflow",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Workflows + "/{id}",
+                defaults: new { controller = "Workflows", action = "Update" });
+            webApplication.SidMapControllerRoute("publishWorkflow",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Workflows + "/{id}/publish",
+                defaults: new { controller = "Workflows", action = "Publish" });
 
             webApplication.SidMapControllerRoute("addApiResource",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources,
@@ -570,6 +576,17 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("deleteRealm",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Realms + "/{id}",
                 defaults: new { controller = "Realms", action = "Delete" });
+
+
+            webApplication.SidMapControllerRoute("getForm",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Forms + "/{id}",
+                defaults: new { controller = "Forms", action = "Get" });
+            webApplication.SidMapControllerRoute("updateForm",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Forms + "/{id}",
+                defaults: new { controller = "Forms", action = "Update" });
+            webApplication.SidMapControllerRoute("publishForm",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Forms + "/{id}/publish",
+                defaults: new { controller = "Forms", action = "Publish" });
 
             webApplication.SidMapControllerRoute("getAllLanguages",
                 pattern: Constants.EndPoints.Languages,

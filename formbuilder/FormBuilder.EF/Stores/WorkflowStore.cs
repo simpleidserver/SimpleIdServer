@@ -24,7 +24,12 @@ public class WorkflowStore : IWorkflowStore
 
     public Task<WorkflowRecord> GetLatestPublishedRecord(string correlationId, CancellationToken cancellationToken)
     {
-        return _dbContext.Workflows.Where(w => w.Status == RecordVersionStatus.Published).OrderByDescending(w => w.VersionNumber).FirstOrDefaultAsync(cancellationToken);
+        return _dbContext.Workflows.Where(w => w.Status == RecordVersionStatus.Published && w.CorrelationId == correlationId).OrderByDescending(w => w.VersionNumber).FirstOrDefaultAsync(cancellationToken);
+    }
+
+    public Task<WorkflowRecord> GetLatestPublishedRecord(string realm, string correlationId, CancellationToken cancellationToken)
+    {
+        return _dbContext.Workflows.Where(w => w.Status == RecordVersionStatus.Published && w.CorrelationId == correlationId && w.Realm == realm).OrderByDescending(w => w.VersionNumber).FirstOrDefaultAsync(cancellationToken);
     }
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)

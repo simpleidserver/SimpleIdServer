@@ -1149,4 +1149,7 @@
   <data name="Demo" xml:space="preserve">
     <value>Demo</value>
   </data>
+  <data name="UnknownForm" xml:space="preserve">
+    <value>The form {0} doesn't exist</value>
+  </data>
 </root>
