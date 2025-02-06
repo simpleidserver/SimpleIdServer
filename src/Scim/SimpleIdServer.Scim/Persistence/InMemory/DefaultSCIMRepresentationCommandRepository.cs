@@ -75,10 +75,10 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
             return Task.FromResult(result);
         }
         
-        public Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
+        public Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, List<string> values, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             var parentIds = _attributes
-                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && values.Contains(a.ValueString) || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
                 .Select(r => r.ParentAttributeId)
                 .Distinct()
                 .ToList();

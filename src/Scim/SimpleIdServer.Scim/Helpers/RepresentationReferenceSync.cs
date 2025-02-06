@@ -1,5 +1,6 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http.HttpResults;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -66,10 +68,10 @@ namespace SimpleIdServer.Scim.Helpers
                     if (targetAttributeValue != null)
                     {
                         result = new RepresentationSyncResult();
-                        var paginatedResult = await _scimRepresentationCommandRepository.FindGraphAttributes(idsToBeRemoved, newSourceScimRepresentation.Id, targetAttributeValue.Id);
+                        var paginatedResult = await _scimRepresentationCommandRepository.FindGraphAttributes(idsToBeRemoved, new List<string> { newSourceScimRepresentation.Id }, targetAttributeValue.Id);
                         result.RemoveReferenceAttributes(paginatedResult);
 
-                        var referencedAttrLst = SCIMRepresentation.BuildHierarchicalAttributes(await _scimRepresentationCommandRepository.FindGraphAttributes(newIds, newSourceScimRepresentation.Id, targetAttributeValue.Id));
+                        var referencedAttrLst = SCIMRepresentation.BuildHierarchicalAttributes(await _scimRepresentationCommandRepository.FindGraphAttributes(newIds, new List<string> { newSourceScimRepresentation.Id }, targetAttributeValue.Id));
                         // Change indirect to direct.
                         foreach (var referencedAttr in referencedAttrLst)
                         {
@@ -138,15 +140,18 @@ namespace SimpleIdServer.Scim.Helpers
         protected async Task<List<RepresentationSyncResult>> SyncIndirectReferences(SCIMRepresentation newSourceScimRepresentation, List<RepresentationModified> allAdded, List<RepresentationModified> allRemoved, SCIMAttributeMapping propagatedAttribute, SCIMAttributeMapping selfReferenceAttribute, List<SCIMSchema> mappedSchemas, List<RepresentationSyncResult> sync, bool updateAllReference)
         {
             // Update 'indirect' references.
+            var result = new RepresentationSyncResult();
             var references = new List<RepresentationSyncResult>();
+            List<SCIMRepresentation> allParents = null, allSelfChildren = null;
+            SCIMSchema targetSchema, sourceSchema;
+            SCIMSchemaAttribute parentAttr, valueAttr;
             if (propagatedAttribute != null && selfReferenceAttribute != null) 
             {
-                var result = new RepresentationSyncResult();
-                var sourceSchema = mappedSchemas.First(s => s.ResourceType == propagatedAttribute.SourceResourceType && s.Attributes.Any(a => a.Id == propagatedAttribute.SourceAttributeId));
-                var targetSchema = mappedSchemas.First(s => s.ResourceType == propagatedAttribute.TargetResourceType && s.Attributes.Any(a => a.Id == propagatedAttribute.TargetAttributeId));
-                var parentAttr = targetSchema.GetAttributeById(propagatedAttribute.TargetAttributeId);
+                sourceSchema = mappedSchemas.First(s => s.ResourceType == propagatedAttribute.SourceResourceType && s.Attributes.Any(a => a.Id == propagatedAttribute.SourceAttributeId));
+                targetSchema = mappedSchemas.First(s => s.ResourceType == propagatedAttribute.TargetResourceType && s.Attributes.Any(a => a.Id == propagatedAttribute.TargetAttributeId));
+                parentAttr = targetSchema.GetAttributeById(propagatedAttribute.TargetAttributeId);
                 var selfParentAttr = sourceSchema.GetAttributeById(selfReferenceAttribute.SourceAttributeId);
-                var valueAttr = targetSchema.GetChildren(parentAttr).Single(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
+                valueAttr = targetSchema.GetChildren(parentAttr).Single(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
                 var displayAttr = targetSchema.GetChildren(parentAttr).Single(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Display);
                 var selfValueAttr = sourceSchema.GetChildren(selfParentAttr).Single(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
                 var addedDirectChildrenIds = allAdded.Where(r => r.IsDirect).Select(r => r.Id).ToList();
@@ -154,7 +159,6 @@ namespace SimpleIdServer.Scim.Helpers
                 var addedIndirectChildrenIds = allAdded.Where(r => !r.IsDirect).Select(r => r.Id).ToList();
                 var removedIndirectChildrenIds = allRemoved.Where(r => !r.IsDirect).Select(r => r.Id).ToList();
 
-                List<SCIMRepresentation> allParents = null, allSelfChildren = null; ;
                 if(updateAllReference)
                 {
                     var propagatedChildren = await _scimRepresentationCommandRepository.FindGraphAttributes(newSourceScimRepresentation.Id, valueAttr.Id);
@@ -181,7 +185,7 @@ namespace SimpleIdServer.Scim.Helpers
 
                 // If at least one parent has a reference to the child then add indirect reference to the child.
                 // Otherwise remove all the indirect references.
-                if (removedDirectChildrenIds.Any())
+                if(removedDirectChildrenIds.Any())
                 {
                     result = new RepresentationSyncResult();
                     allParents ??= await GetParents(new List<SCIMRepresentation> { newSourceScimRepresentation }, selfReferenceAttribute);
@@ -192,7 +196,7 @@ namespace SimpleIdServer.Scim.Helpers
                     foreach (var removedDirectChild in removedDirectChildrenIds)
                     {
                         var referencedParentIds = targets.Where(t => t.RepresentationId == removedDirectChild && t.SchemaAttributeId == valueAttr.Id).Select(t => t.ValueString);
-                        if(referencedParentIds.Any(i => allSelfIds.Contains(i)))
+                        if (referencedParentIds.Any(i => allSelfIds.Contains(i)))
                             result.AddReferenceAttributes(BuildScimRepresentationAttribute(removedDirectChild, propagatedAttribute.TargetAttributeId, newSourceScimRepresentation, Mode.PROPAGATE_INHERITANCE, newSourceScimRepresentation.ResourceType, targetSchema, false));
                         else
                         {
@@ -214,6 +218,8 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     // Refactor this part in order to improve the performance.
                     result = new RepresentationSyncResult();
+                    allParents ??= await GetParents(new List<SCIMRepresentation> { newSourceScimRepresentation }, selfReferenceAttribute);
+                    var allParentIds = allParents.Select(p => p.Id).ToList();
                     var fullPath = $"{selfReferenceAttribute.SourceAttributeSelector}.{SCIMConstants.StandardSCIMReferenceProperties.Value}";
                     var existingChildrenIds = (await _scimRepresentationCommandRepository.FindAttributesByAproximativeFullPath(newSourceScimRepresentation.Id, fullPath, CancellationToken.None)).Select(f => f.ValueString);
                     var allIds = new List<string>();
@@ -231,7 +237,7 @@ namespace SimpleIdServer.Scim.Helpers
                     foreach (var indirectChild in indirectChildren)
                     {
                         var allChld = await GetChildren(new List<SCIMRepresentation> { indirectChild }, selfReferenceAttribute);
-                        foreach (var children in await ResolvePropagatedChildren(newSourceScimRepresentation.Id, indirectChild, selfReferenceAttribute, valueAttr, allChld))
+                        foreach (var children in await ResolvePropagatedChildren(newSourceScimRepresentation.Id, indirectChild, selfReferenceAttribute, valueAttr, allChld, allParentIds))
                         {
                             if (addedIndirectChildrenIds.Contains(indirectChild.Id))
                             {
@@ -248,7 +254,7 @@ namespace SimpleIdServer.Scim.Helpers
                                 foreach (var representationId in representationIds)
                                 {
                                     bool atLeastOneParent = false;
-                                    SCIMRepresentationAttribute attrToRemove = null;
+                                    var attrToRemoveLst = new List<SCIMRepresentationAttribute>();
                                     var parentAttrs = children.Where(c => c.SchemaAttributeId == propagatedAttribute.TargetAttributeId && c.RepresentationId == representationId);
                                     foreach (var pa in parentAttrs)
                                     {
@@ -259,14 +265,17 @@ namespace SimpleIdServer.Scim.Helpers
                                             break;
                                         }
 
-                                        if (subAttrs.Any(a => a.SchemaAttributeId == valueAttr.Id && a.ValueString == newSourceScimRepresentation.Id))
-                                            attrToRemove = pa;
+                                        if (subAttrs.Any(a => a.SchemaAttributeId == valueAttr.Id && (a.ValueString == newSourceScimRepresentation.Id || allParentIds.Contains(a.ValueString))))
+                                            attrToRemoveLst.Add(pa);
                                     }
 
-                                    if (!atLeastOneParent && attrToRemove != null)
+                                    if (!atLeastOneParent && attrToRemoveLst.Any())
                                     {
-                                        result.RemoveReferenceAttributes(children.Where(a => a.ParentAttributeId == attrToRemove.Id).ToList());
-                                        result.RemoveReferenceAttributes(new List<SCIMRepresentationAttribute> { attrToRemove });
+                                        foreach (var attrToRemove in attrToRemoveLst)
+                                        {
+                                            result.RemoveReferenceAttributes(children.Where(a => a.ParentAttributeId == attrToRemove.Id).ToList());
+                                            result.RemoveReferenceAttributes(new List<SCIMRepresentationAttribute> { attrToRemove });
+                                        }
                                     }
                                 }
                             }
@@ -298,7 +307,7 @@ namespace SimpleIdServer.Scim.Helpers
         {
             var fullPath = $"{selfReferenceAttribute.SourceAttributeSelector}.{SCIMConstants.StandardSCIMReferenceProperties.Value}";
             var parents = await _scimRepresentationCommandRepository.FindAttributesByExactFullPathAndValues(fullPath, ids, CancellationToken.None);
-            var newParents = parents.Where(p => !representationIds.Contains(p.RepresentationId));
+            var newParents = parents.Where(p => !representationIds.Contains(p.RepresentationId)).ToList();
             if (!newParents.Any()) return;
             foreach (var parent in newParents)
                 representationIds.Add(parent.RepresentationId);
@@ -318,19 +327,25 @@ namespace SimpleIdServer.Scim.Helpers
             await ResolveChildrenIds(newChildren.Select(p => p.ValueString).ToList(), selfReferenceAttribute, representationIds);
         }
 
-        protected virtual async Task<List<List<SCIMRepresentationAttribute>>> ResolvePropagatedChildren(string sourceRepresentationId, SCIMRepresentation scimRepresentation, SCIMAttributeMapping selfReferenceAttribute, SCIMSchemaAttribute targetAttributeId, List<SCIMRepresentation> allChildren)
+        protected virtual async Task<List<List<SCIMRepresentationAttribute>>> ResolvePropagatedChildren(string sourceRepresentationId, SCIMRepresentation scimRepresentation, SCIMAttributeMapping selfReferenceAttribute, SCIMSchemaAttribute targetAttributeId, List<SCIMRepresentation> allChildren, List<string> parentIds)
         {
             var fullPath = $"{selfReferenceAttribute.SourceAttributeSelector}.{SCIMConstants.StandardSCIMReferenceProperties.Value}";
             var attrs = await _scimRepresentationCommandRepository.FindAttributesByExactFullPathAndRepresentationIds(fullPath, new List<string> { scimRepresentation.Id }, CancellationToken.None);
             var childrenIds = attrs.Select(f => f.ValueString).ToList();
+            var ids = new List<string>
+            {
+                scimRepresentation.Id
+            };
+            ids.AddRange(parentIds);
             var children = new List<List<SCIMRepresentationAttribute>>
             {
-                await _scimRepresentationCommandRepository.FindGraphAttributes(childrenIds, scimRepresentation.Id, targetAttributeId.Id, sourceRepresentationId: sourceRepresentationId)
+                await _scimRepresentationCommandRepository.FindGraphAttributes(childrenIds, ids, targetAttributeId.Id, sourceRepresentationId: sourceRepresentationId)
             };
 
             foreach (var child in allChildren.Where(c => childrenIds.Contains(c.Id) && c.ResourceType == selfReferenceAttribute.SourceResourceType)) 
             {
-                children.AddRange(await ResolvePropagatedChildren(sourceRepresentationId, child, selfReferenceAttribute, targetAttributeId, allChildren));
+                allChildren = await GetChildren(new List<SCIMRepresentation> { child }, selfReferenceAttribute);
+                children.AddRange(await ResolvePropagatedChildren(sourceRepresentationId, child, selfReferenceAttribute, targetAttributeId, allChildren, parentIds));
             }
 
             return children;

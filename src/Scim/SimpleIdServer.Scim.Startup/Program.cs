@@ -177,6 +177,9 @@ public class Program
                             o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                         });
                         break;
+                    case StorageTypes.INMEMORY:
+                        options.UseInMemoryDatabase(conf.ConnectionString);
+                        break;
                 }
             }, options =>
             {
@@ -311,7 +314,8 @@ public class Program
         {
             using (var context = scope.ServiceProvider.GetService<SimpleIdServer.Scim.Persistence.EF.SCIMDbContext>())
             {
-                context.Database.Migrate();
+                var isInMemory = context.Database.IsInMemory();
+                if (!isInMemory) context.Database.Migrate();
                 var basePath = Path.Combine(builder.Environment.ContentRootPath, "Schemas");
                 var userSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
                 var eidUserSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMResourceTypes.User);
