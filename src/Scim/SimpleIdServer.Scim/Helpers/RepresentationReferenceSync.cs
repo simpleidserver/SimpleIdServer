@@ -221,6 +221,7 @@ namespace SimpleIdServer.Scim.Helpers
                     allParents ??= await GetParents(new List<SCIMRepresentation> { newSourceScimRepresentation }, selfReferenceAttribute);
                     var allParentIds = allParents.Select(p => p.Id).ToList();
                     var fullPath = $"{selfReferenceAttribute.SourceAttributeSelector}.{SCIMConstants.StandardSCIMReferenceProperties.Value}";
+                    var allParentAttributes = await _scimRepresentationCommandRepository.FindAttributesByExactFullPathAndValues(fullPath, new List<string> { newSourceScimRepresentation.Id }, CancellationToken.None);
                     var existingChildrenIds = (await _scimRepresentationCommandRepository.FindAttributesByAproximativeFullPath(newSourceScimRepresentation.Id, fullPath, CancellationToken.None)).Select(f => f.ValueString);
                     var allIds = new List<string>();
                     allIds.AddRange(addedIndirectChildrenIds);
@@ -253,7 +254,6 @@ namespace SimpleIdServer.Scim.Helpers
                                 var representationIds = children.Select(c => c.RepresentationId).Distinct();
                                 foreach (var representationId in representationIds)
                                 {
-                                    bool atLeastOneParent = false;
                                     var attrToRemoveLst = new List<SCIMRepresentationAttribute>();
                                     var parentAttrs = children.Where(c => c.SchemaAttributeId == propagatedAttribute.TargetAttributeId && c.RepresentationId == representationId);
                                     foreach (var pa in parentAttrs)
@@ -261,15 +261,16 @@ namespace SimpleIdServer.Scim.Helpers
                                         var subAttrs = children.Where(c => c.ParentAttributeId == pa.Id).ToList();
                                         if (subAttrs.Any(a => a.SchemaAttributeId == valueAttr.Id && notRemovedChldIds.Contains(a.ValueString)))
                                         {
-                                            atLeastOneParent = true;
                                             break;
                                         }
 
                                         if (subAttrs.Any(a => a.SchemaAttributeId == valueAttr.Id && (a.ValueString == newSourceScimRepresentation.Id || allParentIds.Contains(a.ValueString))))
                                             attrToRemoveLst.Add(pa);
+                                        var parentAttribute = allParentAttributes.FirstOrDefault(p => subAttrs.Any(a => a.SchemaAttributeId == valueAttr.Id && a.ValueString == p.RepresentationId));
+                                        if (parentAttribute != null) attrToRemoveLst.Add(parentAttribute);
                                     }
 
-                                    if (!atLeastOneParent && attrToRemoveLst.Any())
+                                    if (attrToRemoveLst.Any())
                                     {
                                         foreach (var attrToRemove in attrToRemoveLst)
                                         {
