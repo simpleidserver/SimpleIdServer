@@ -1,9 +1,7 @@
 ﻿@using Fluxor.Blazor.Web.Components
-@using FormBuilder.Components
-@using FormBuilder.Models
-@using FormBuilder.Components.Form
 @using SimpleIdServer.IdServer.Website.Resources
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using FormBuilder.Models
 @inject NotificationService notificationService
 @inject IState<AcrsState> acrsState
 @inject IState<AuthenticationFormsState> authenticationFormsState
@@ -31,16 +29,21 @@
         <!-- Name -->
         <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
             <Template Context="data">
-                <RadzenLink Text="@data.Name" Path="@(urlHelper.GetUrl($"/acrs/forms/{data.Id}"))" />
+                <RadzenLink Text="@data.Name" Path="@(urlHelper.GetUrl($"/acrs/forms/{data.CorrelationId}"))" />
             </Template>
         </RadzenDataGridColumn>
-        <!-- Form -->
-        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
-            <Template Context="data">                
-                <FormViewer IsEditModeEnabled=false
-                    IsInteractableElementEnabled=false
-                    IsNavigationDisplayed=true
-                    Context=@BuildContext(data)></FormViewer>
+        <!-- Update datetime -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Name" Property="UpdateDateTime" Width="80px" />
+        <!-- Version -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Version" Width="80px">
+            <Template Context="data">
+                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Variant="Variant.Outlined">@data.VersionNumber</RadzenBadge>
+            </Template>
+        </RadzenDataGridColumn>
+        <!-- Status -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Status" Width="80px">
+            <Template Context="data">
+                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Variant="Variant.Filled">@Enum.GetName(typeof(RecordVersionStatus), data.Status)</RadzenBadge>
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -51,10 +54,5 @@
     {
         var act = new GetAllAuthenticationFormsAction();
         dispatcher.Dispatch(act);
-    }
-
-    private WorkflowContext BuildContext(FormRecord formRecord)
-    {
-        return WorkflowContext.CreateOneStepWorkflow(formRecord);
     }
 }

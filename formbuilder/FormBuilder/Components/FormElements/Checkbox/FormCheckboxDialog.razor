@@ -3,10 +3,6 @@
 @inject DialogService dialogService
 
 <RadzenStack>
-    <!-- Name -->
-    <RadzenFormField Variant="Variant.Outlined" Text="Name" class="fullWidth">
-        <RadzenTextBox @bind-Value="@CopyRecord.Name"></RadzenTextBox>
-    </RadzenFormField>
     <EditLabelsComponent Labels="@CopyRecord.Labels" />
     <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
 </RadzenStack>
@@ -27,9 +23,7 @@
 
     private void HandleSave()
     {
-        Record.Transformations = CopyRecord.Transformations;
         Record.Labels = CopyRecord.Labels;
-        Record.Name = CopyRecord.Name;
         dialogService.Close();
     }
 }

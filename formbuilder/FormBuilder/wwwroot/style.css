@@ -101,9 +101,14 @@
 
 .dropZone.active,
 .interactableElement .zone:hover,
-.stepElement.isActive{
-    border: 1px dashed green;
-    background-color: rgba(226, 255, 226, 0.5);
+.stepElement.isActive {
+        border: 1px dashed green;
+        background-color: rgba(226, 255, 226, 0.5);
+}
+
+.isInvolved {
+    background-color: #80808026;
+    border: 1px dashed gray;
 }
 
 

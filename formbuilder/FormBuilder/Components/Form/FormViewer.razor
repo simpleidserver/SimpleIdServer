@@ -8,76 +8,65 @@
 @inject IRenderFormElementsHelper renderFormsElementsHelper
 @implements IDisposable
 
-@if (!IsInteractableElementEnabled)
-{
-    <div class="form">
-        <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
-            @{
-                if(Context.Definition.Workflow != null && Context.Definition.Records != null)
-                {
-                    var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep);
-                    var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => formsActingAsStep.FirstOrDefault(st => st.Id == s.FormRecordId)).Where(s => s != null).Select(s => s.Name);
-                    var currentFormRecord = Context.GetCurrentFormRecord();
-                    if (IsNavigationDisplayed)
-                    {
-                        <RadzenSteps ShowStepsButtons="false">
-                            <Steps>
-                                @foreach (var stepName in workflowFormsActingAsStep)
-                                {
-                                    <RadzenStepsItem Text="@stepName" Disabled="@(stepName != currentFormRecord.Name)" Selected="@(stepName == currentFormRecord.Name)"></RadzenStepsItem>
-                                }
-                            </Steps>
-                        </RadzenSteps>
-                    }
-                }
-            }
-
-            @if (Context.Execution != null)
+<div class="form">
+    <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
+        @{
+            if (Context.Definition.Workflow != null && Context.Definition.Records != null)
             {
-                if(Context.Execution.ErrorMessages != null)
+                var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep);
+                var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => formsActingAsStep.FirstOrDefault(st => st.Id == s.FormRecordId)).Where(s => s != null).Select(s => s.Name);
+                var currentFormRecord = Context.GetCurrentFormRecord();
+                if (IsNavigationDisplayed)
                 {
-                    @foreach (var errorMessage in Context.Execution.ErrorMessages)
-                    {
-                        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
-                            @errorMessage
-                        </RadzenAlert>
-                    }
-                }
-
-                if(Context.Execution.SuccessMessages != null)
-                {
-                    @foreach (var successMessage in Context.Execution.SuccessMessages)
-                    {
-                        <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
-                            @successMessage
-                        </RadzenAlert>
-                    }
+                    <RadzenSteps ShowStepsButtons="false">
+                        <Steps>
+                            @foreach (var stepName in workflowFormsActingAsStep)
+                            {
+                                <RadzenStepsItem Text="@stepName" Disabled="@(stepName != currentFormRecord.Name)" Selected="@(stepName == currentFormRecord.Name)"></RadzenStepsItem>
+                            }
+                        </Steps>
+                    </RadzenSteps>
                 }
             }
+        }
 
-            @if (Form?.Elements != null)
+        @if (Context.Execution != null)
+        {
+            if (Context.Execution.ErrorMessages != null)
             {
-                @CustomRender
+                @foreach (var errorMessage in Context.Execution.ErrorMessages)
+                {
+                    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                        @errorMessage
+                    </RadzenAlert>
+                }
             }
-        </div>
+
+            if (Context.Execution.SuccessMessages != null)
+            {
+                @foreach (var successMessage in Context.Execution.SuccessMessages)
+                {
+                    <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+                        @successMessage
+                    </RadzenAlert>
+                }
+            }
+        }
+
+        @if (Form?.Elements != null)
+        {
+            @CustomRender
+        }
     </div>
-}
-else
-{
-    @if (Form?.Elements != null)
-    {
-        @CustomRender
-    }
-}
+</div>
 
 @code {
     private RenderFragment? CustomRender { get; set; }
     [Inject] public IRuleEngine RuleEngine { get; set; }
     [Inject] public IJSRuntime jsRuntime { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
-    [Parameter] public bool IsInteractableElementEnabled { get; set; }
     [Parameter] public bool IsNavigationDisplayed { get; set; }
-    [Parameter] public WorkflowContext Context { get; set; }   
+    [Parameter] public WorkflowContext Context { get; set; }
     private FormRecord Form { get; set; } = null;
 
     public void Dispose()
@@ -104,7 +93,7 @@ else
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Form.Elements, Context, IsEditModeEnabled, IsInteractableElementEnabled);
+        renderFormsElementsHelper.Render(builder, Form.Elements, Context, IsEditModeEnabled);
     };
 
     private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)

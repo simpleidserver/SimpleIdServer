@@ -3164,5 +3164,14 @@ namespace SimpleIdServer.IdServer.Resources {
                 return ResourceManager.GetString("UserWithSameLoginAlreadyExists", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Version.
+        /// </summary>
+        public static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
+            }
+        }
     }
 }

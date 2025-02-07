@@ -10,7 +10,6 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public FormAnchorRecord Value { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
-    [Parameter] public bool IsInteractableElementEnabled { get; set; }
     [Parameter] public WorkflowContext Context { get; set; }
     [Inject] private IWorkflowLinkActionFactory WorkflowLinkActionFactory { get; set; }
     public JsonNode InputData

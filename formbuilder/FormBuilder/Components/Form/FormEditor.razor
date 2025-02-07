@@ -5,6 +5,7 @@
 @using FormBuilder.Models
 @using System.Text.Json.Nodes
 @using System.Text.Json
+@using FormBuilder.Models.Layout
 @inject DialogService dialogService
 @inject IEnumerable<IFormElementDefinition> definitions
 @inject IJSRuntime jsRuntime
@@ -16,7 +17,10 @@
 <div class="header">
     <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
     <RadzenButton Icon="draft" Text="Json" Click="@(async() => await ViewJson())" />
+    <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
+    <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
 </div>
+
 <RadzenRow class="fullHeight">
     <RadzenColumn Size="2">
         <RadzenStack class="toolbar fullHeight">
@@ -70,14 +74,19 @@
 
 @code {
     [Parameter] public FormRecord Form { get; set; }
+    [Parameter] public WorkflowLayout WorkflowLayout { get; set;}
+    [Parameter] public EventCallback<ActionState> PublishedEvt { get; set; }
+    [Parameter] public EventCallback<ActionState> SavedEvt { get; set; }
     WorkflowContext context = null;
+    private bool isSaveDisabled = false;
+    private bool isPublishDisabled = false;
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
         if (Form != null && context == null) 
         {
-            context = WorkflowContext.CreateOneStepWorkflow(Form);
+            context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout);
         }
     }
 
@@ -112,5 +121,23 @@
         {
             { nameof(EditFormCssStyleDialog.FormId), Form.Id }
         });
+    }
+
+    private async Task Save()
+    {
+        isSaveDisabled = true;
+        await SavedEvt.InvokeAsync(new ActionState(() =>
+        {
+            isSaveDisabled = false;
+        }));
+    }
+
+    private async Task Publish()
+    {
+        isPublishDisabled = true;
+        await PublishedEvt.InvokeAsync(new ActionState(() =>
+        {
+            isPublishDisabled = false;
+        }));
     }
 }

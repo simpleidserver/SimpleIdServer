@@ -6,15 +6,21 @@
 
 @if(IsEditModeEnabled)
 {
-    <div class="draggableElement" draggable="true" @ondragstart="@(() => HandleDragStart())">
+    <div class="@ClassName" draggable="true" @ondragstart="@(() => HandleDragStart())">
         <div class="info">
             @Record.GetType().Name
         </div>
         <div class="toolbox">
             <ul>
                 <li>
-                    <RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="(async (e) => await HandleViewSettings())" />
-                    <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" />
+                    @if (!IsViewSettingsDisabled)
+                    {
+                        <RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="(async (e) => await HandleViewSettings())" />
+                    }
+                    @if (!IsInvolved)
+                    {
+                        <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" />
+                    }
                 </li>
             </ul>
         </div>
@@ -34,10 +40,27 @@ else
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public TRecord Record { get; set; }
+    [Parameter] public bool IsViewSettingsDisabled { get; set; } = false;
 
     private void HandleDragStart()
     {
         Context.FormEditorContext.SelectInstance(Record, HandleCurrentEltDropped);
+    }
+
+    public string ClassName
+    {
+        get
+        {
+            return $"draggableElement" + (IsInvolved ? " isInvolved" : string.Empty);
+        }
+    }
+
+    public bool IsInvolved
+    {
+        get
+        {
+            return Context.FormEditorContext.IsEltInvolvedInWorkflow(Record, Context.GetCurrentFormRecord());
+        }
     }
 
     private void HandleEltDroppedTop() => HandleEltDropped(false);

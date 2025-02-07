@@ -16,7 +16,6 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
-    [Parameter] public bool IsInteractableElementEnabled { get; set; }
     public string TargetUrl { get; private set; }
     public Dictionary<string, string> HiddenFields { get; set; }
 
@@ -47,7 +46,7 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled, IsInteractableElementEnabled);
+        renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled);
     };
 
     private void HandleCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

@@ -1,52 +1,47 @@
 ﻿@using FormBuilder.Components.Drag
 @using FormBuilder.Components.Form
-@using FormBuilder.Components.Interactable
 @using FormBuilder.Helpers
 
 
-<InteractableElement Record="@Value" TRecord="FormStackLayoutRecord" Context=@Context IsInteractableElementEnabled="@(IsInteractableElementEnabled && Value.IsFormEnabled)">
+<EditableLayoutContainerElement Context="@Context" Record="@Value" TRecord="FormStackLayoutRecord" ParentContext="@ParentContext" IsEditModeEnabled="@IsEditModeEnabled">
     <Children>
-        <EditableLayoutContainerElement Record="@Value" TRecord="FormStackLayoutRecord" TDialog="FormStackLayoutDialog" ParentContext="@ParentContext" IsEditModeEnabled="@IsEditModeEnabled">
-            <Children>
-                @if(!Value.IsNotVisible) 
+        @if(!Value.IsNotVisible) 
+        {
+            if (Value.Elements != null)
+            {
+                if(Value.IsFormEnabled)
                 {
-                    if (Value.Elements != null)
+                    switch(Value.FormType)
                     {
-                        if(Value.IsFormEnabled)
-                        {
-                            switch(Value.FormType)
-                            {
-                                case FormTypes.BLAZOR:
-                                    <EditForm style="@Value.CssStyle" Attributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
-                                        <RadzenStack Orientation="Orientation.Vertical">
-                                            @CustomRender
-                                        </RadzenStack>
-                                    </EditForm>
-                                    break;
-                                default:
-                                    <form style="@Value.CssStyle" @attributes=@Value.HtmlAttributes action="@TargetUrl" method="post">
-                                        @foreach(var hiddenField in HiddenFields)
-                                        {
-                                            <input type="hidden" name="@hiddenField.Key" value="@hiddenField.Value" />
-                                        }
+                        case FormTypes.BLAZOR:
+                            <EditForm style="@Value.CssStyle" Attributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    @CustomRender
+                                </RadzenStack>
+                            </EditForm>
+                            break;
+                        default:
+                            <form style="@Value.CssStyle" @attributes=@Value.HtmlAttributes action="@TargetUrl" method="post">
+                                @foreach(var hiddenField in HiddenFields)
+                                {
+                                    <input type="hidden" name="@hiddenField.Key" value="@hiddenField.Value" />
+                                }
 
-                                        <RadzenStack Orientation="Orientation.Vertical">
-                                            @CustomRender
-                                        </RadzenStack>
-                                    </form>
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            <RadzenStack Attributes=@Value.HtmlAttributes Style="@Value.CssStyle" Orientation="Orientation.Vertical">
-                                @CustomRender
-                            </RadzenStack>
-                        }
+                                <RadzenStack Orientation="Orientation.Vertical">
+                                    @CustomRender
+                                </RadzenStack>
+                            </form>
+                            break;
                     }
-
                 }
-            </Children>
-        </EditableLayoutContainerElement>
+                else
+                {
+                    <RadzenStack Attributes=@Value.HtmlAttributes Style="@Value.CssStyle" Orientation="Orientation.Vertical">
+                        @CustomRender
+                    </RadzenStack>
+                }
+            }
+
+        }
     </Children>
-</InteractableElement>
+</EditableLayoutContainerElement>

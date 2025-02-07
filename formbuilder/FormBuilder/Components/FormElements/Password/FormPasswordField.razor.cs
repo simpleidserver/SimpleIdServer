@@ -10,7 +10,6 @@ public partial class FormPasswordField : IGenericFormElement<FormPasswordFieldRe
     [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
-    [Parameter] public bool IsInteractableElementEnabled { get; set; }
     public JsonNode InputData
     {
         get

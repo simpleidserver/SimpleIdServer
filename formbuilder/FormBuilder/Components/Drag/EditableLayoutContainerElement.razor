@@ -1,17 +1,19 @@
 ﻿@using FormBuilder.Models
-@typeparam TDialog where TDialog : ComponentBase
 @typeparam TRecord where TRecord : IFormElementRecord
 @inject DialogService dialogService
 
 @if (IsEditModeEnabled)
 {
-    <div class="editableLayoutContainer">
-        <div class="toolbox">
-            <ul>
-                <li><RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="(async (e) => await HandleViewSettings())" /></li>
-                <li><RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" /></li>
-            </ul>
-        </div>
+    <div class="@ClassName">
+        @if (!IsInvolved)
+        {
+            <div class="toolbox">
+                <ul>
+                    <li><RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" /></li>
+                </ul>
+            </div>
+        }
+
         @Children
     </div>
 }
@@ -22,17 +24,25 @@ else
 
 @code {
     [Parameter] public RenderFragment Children { get; set; }
+    [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public TRecord Record { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
 
-    private async Task HandleViewSettings()
+    public string ClassName
     {
-        var dic = new Dictionary<string, object>
+        get
         {
-            { "Record", Record }
-        };
-        await dialogService.OpenAsync<TDialog>(string.Empty, dic);
+            return $"editableLayoutContainer" + (IsInvolved ? " isInvolved" : string.Empty);
+        }
+    }
+
+    public bool IsInvolved
+    {
+        get
+        {
+            return Context.FormEditorContext.IsEltInvolvedInWorkflow(Record, Context.GetCurrentFormRecord());
+        }
     }
 
     private void HandleRemove()

@@ -8,9 +8,11 @@ public class EditorController : Controller
 {
     public IActionResult Index()
     {
+        var workflowLayout = new PwdAuthWorkflowLayout().Get();
         var viewModel = new IndexEditorViewModel
         {
-            Record = PwdAuthForms.LoginPwdAuthForm
+            Record = PwdAuthForms.LoginPwdAuthForm,
+            WorkflowLayout = workflowLayout
         };
         return View(viewModel);
     }

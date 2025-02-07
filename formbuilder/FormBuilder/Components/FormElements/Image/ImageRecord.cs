@@ -24,7 +24,10 @@ public class ImageRecord : IFormElementRecord
 
     public void ExtractJson(JsonObject json) { }
 
-    public IFormElementRecord GetChild(string id) => null;
+    public List<IFormElementRecord> GetChildrenBranch(string id)
+    {
+        return new List<IFormElementRecord>();
+    }
 
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
 }

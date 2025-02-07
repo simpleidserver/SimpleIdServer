@@ -17,8 +17,8 @@ namespace FormBuilder.Startup.Workflows;
 
 public class PwdAuthForms
 {
-    public static string authPwdFormId = Guid.NewGuid().ToString();
-    public static string forgetMyPasswordId = Guid.NewGuid().ToString();
+    public static string authPwdFormId = "pwdAuth";
+    public static string forgetMyPasswordId = "forgetMyPwd";
 
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {

@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Models;
+using FormBuilder.Models.Layout;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -12,7 +13,6 @@ public class WorkflowContext
     public WorkflowDefinition Definition { get; private set; }
     public WorkflowExecution Execution { get; private set; }
     public FormEditorContext FormEditorContext { get; private set; }
-    public WorkflowEditorContext WorkflowEditorContext { get; private set; }
     public List<string> FilteredJsonPath { get; set; } = new List<string>();
 
     public static WorkflowContext CreateEmptyWorkflow(List<FormRecord> records)
@@ -21,12 +21,11 @@ public class WorkflowContext
         {
             Definition = new WorkflowDefinition(new WorkflowRecord(), records),
             Execution = new WorkflowExecution(),
-            FormEditorContext = new FormEditorContext(),
-            WorkflowEditorContext = new WorkflowEditorContext()
+            FormEditorContext = new FormEditorContext(null)
         };
     }
 
-    public static WorkflowContext CreateOneStepWorkflow(FormRecord form)
+    public static WorkflowContext CreateOneStepWorkflow(FormRecord form, WorkflowLayout layout = null)
     {
         var currentStepId = Guid.NewGuid().ToString();
         var workflow = new WorkflowRecord
@@ -48,8 +47,7 @@ public class WorkflowContext
         {
             Definition = new WorkflowDefinition(workflow, records),
             Execution = new WorkflowExecution(currentStepId),
-            FormEditorContext = new FormEditorContext(),
-            WorkflowEditorContext = new WorkflowEditorContext()
+            FormEditorContext = new FormEditorContext(layout)
         };
         return result;
     }
@@ -67,8 +65,7 @@ public class WorkflowContext
         {
             Definition = new WorkflowDefinition(workflow, forms),
             Execution = new WorkflowExecution(),
-            FormEditorContext = new FormEditorContext(),
-            WorkflowEditorContext = new WorkflowEditorContext()
+            FormEditorContext = new FormEditorContext(null)
         };
         return result;
     }
@@ -79,8 +76,7 @@ public class WorkflowContext
         {
             Definition = new WorkflowDefinition(workflow, records),
             Execution = new WorkflowExecution(currentStepId, errorMessages, successMessages, antiforgeryTokenRecord, supportedLanguageCodes),
-            FormEditorContext = new FormEditorContext(),
-            WorkflowEditorContext = new WorkflowEditorContext()
+            FormEditorContext = new FormEditorContext(null)
         };
         InitializeWorkflowExecution(result, inputData);
         return result;
@@ -172,8 +168,7 @@ public class WorkflowContext
     {
         var result = new WorkflowContext
         {
-            WorkflowEditorContext = new WorkflowEditorContext(),
-            FormEditorContext = new FormEditorContext(),
+            FormEditorContext = new FormEditorContext(null),
             Definition = Definition,
             Execution = new WorkflowExecution
             {
@@ -189,8 +184,7 @@ public class WorkflowContext
     {
         return new WorkflowContext
         {
-            WorkflowEditorContext = new WorkflowEditorContext(),
-            FormEditorContext = new FormEditorContext(),
+            FormEditorContext = new FormEditorContext(null),
             Definition = Definition,
             Execution= new WorkflowExecution(stepId)
         };
@@ -200,8 +194,7 @@ public class WorkflowContext
     {
         var result = new WorkflowContext
         {
-            WorkflowEditorContext = new WorkflowEditorContext(),
-            FormEditorContext = new FormEditorContext(),
+            FormEditorContext = new FormEditorContext(null),
             Definition = Definition,
             Execution = new WorkflowExecution()
         };
@@ -214,8 +207,7 @@ public class WorkflowContext
     {
         var result = new WorkflowContext
         {
-            WorkflowEditorContext = new WorkflowEditorContext(),
-            FormEditorContext = new FormEditorContext(),
+            FormEditorContext = new FormEditorContext(null),
             Definition = Definition,
             Execution = new WorkflowExecution { CurrentStepId = Execution.CurrentStepId }
         };
@@ -305,10 +297,16 @@ public class WorkflowDefinition
 
 public class FormEditorContext
 {
+    private readonly WorkflowLayout _workflowLayout;
     private Action _droppedCallback;
     public SelectionTypes SelectionType { get; private set; }
     public IFormElementRecord SelectedEltInstance { get; private set; }
     public IFormElementDefinition SelectedEltDefinition { get; private set; }
+
+    public FormEditorContext(WorkflowLayout workflowLayout)
+    {
+        _workflowLayout = workflowLayout;
+    }
 
     public void SelectInstance(IFormElementRecord selectedEltInstance, Action droppedCallback)
     {
@@ -330,34 +328,26 @@ public class FormEditorContext
         SelectedEltInstance = null;
         if (_droppedCallback != null) _droppedCallback();
     }
+
+    public bool IsEltInvolvedInWorkflow<TRecord>(TRecord record, FormRecord currentForm) where TRecord : IFormElementRecord
+    {
+        if (_workflowLayout == null) return false;
+        var children = currentForm.GetChildrenBranch(record.Id);
+        var correlationIds = _workflowLayout.Links.Select(l => l.EltCorrelationId);
+        foreach (var child in children) 
+        {
+            if (correlationIds.Contains(child.CorrelationId)) return true;
+            if (child.Id == record.Id) return false;
+        }
+
+        return false;
+    }
 }
 
 public enum SelectionTypes
 {
     DEFINITION = 0,
     RECORD = 1
-}
-
-public class WorkflowEditorContext
-{
-    public event EventHandler<FormEltEventArgs> WorkflowLinkChanged;
-
-    public void StartDragElt(ElementReference eltReference, IFormElementRecord record)
-    {
-        WorkflowLinkChanged(this, new FormEltEventArgs(eltReference, record));
-    }
-}
-
-public class FormEltEventArgs : EventArgs
-{
-    public FormEltEventArgs(ElementReference eltReference, IFormElementRecord record)
-    {
-        EltReference = eltReference;
-        Record = record;
-    }
-
-    public ElementReference EltReference { get; private set; }
-    public IFormElementRecord Record { get; private set; }
 }
 
 public class WorkflowExecutionContext

@@ -24,6 +24,7 @@ public class OtpRegisterLayoutBuilder : RegisterLayoutBuilder
             Id = id,
             CorrelationId = correlationId,
             Name = name,
+            UpdateDateTime = DateTime.UtcNow,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()
         };

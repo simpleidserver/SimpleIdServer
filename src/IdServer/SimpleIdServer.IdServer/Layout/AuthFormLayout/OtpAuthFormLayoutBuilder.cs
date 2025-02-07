@@ -26,6 +26,7 @@ public class OtpAuthFormLayoutBuilder
         {
             Id = id,
             CorrelationId = correlationId,
+            UpdateDateTime = DateTime.UtcNow,
             Name = name,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()

@@ -14,7 +14,6 @@ namespace FormBuilder.Components.FormElements.ListData
         [Parameter] public ListDataRecord Value { get; set; }
         [Parameter] public bool IsEditModeEnabled { get; set; }
         [Parameter] public ParentEltContext ParentContext { get; set; }
-        [Parameter] public bool IsInteractableElementEnabled { get; set; }
 
         protected override void OnParametersSet()
         {
@@ -33,7 +32,7 @@ namespace FormBuilder.Components.FormElements.ListData
                 {
                     record
                 };
-                renderFormsElementsHelper.Render(builder, col, Context, IsEditModeEnabled, IsInteractableElementEnabled);
+                renderFormsElementsHelper.Render(builder, col, Context, IsEditModeEnabled);
             }
         };
     }

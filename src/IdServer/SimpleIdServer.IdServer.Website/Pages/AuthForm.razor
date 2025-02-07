@@ -1,8 +1,48 @@
 ﻿@page "/acrs/forms/{id}"
+@using Fluxor.Blazor.Web.Components
+@using FormBuilder.Helpers
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.FormStore
+@using FormBuilder.Components.Form
+@inject IState<FormState> formState
+@inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
+@inject IUriProvider uriProvider
+@inherits FluxorComponent
 
-<!-- TODO -->
+<link rel="stylesheet" href="@(uriProvider.GetActiveFormCssUrl(id))" />
+
+<SidAuthorizeView Roles=@("/acrs/manage,/acrs/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/acrs/forms")" Text="@Global.Forms" />
+            <RadzenBreadCrumbItem Text="@formState.Value.Form?.Name" />
+        </RadzenBreadCrumb>
+
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@formState.Value.Form?.Name" TextStyle="TextStyle.DisplayH3" />
+
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@formState.Value.IsLoading>
+            @if(formState.Value.Form != null)
+            {
+                <FormEditor Form=@formState.Value.Form></FormEditor>
+            }
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
 
 @code {
     [Parameter]
     public string id { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(!string.IsNullOrWhiteSpace(id))
+        {
+            dispatcher.Dispatch(new GetFormAction { Id = id });
+        }
+    }
 }

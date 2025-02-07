@@ -8,5 +8,4 @@ public interface IGenericFormElement<T> where T : IFormElementRecord
     ParentEltContext ParentContext { get; set; }
     WorkflowContext Context { get; set; }
     bool IsEditModeEnabled { get; set; }
-    bool IsInteractableElementEnabled { get; set; }
 }

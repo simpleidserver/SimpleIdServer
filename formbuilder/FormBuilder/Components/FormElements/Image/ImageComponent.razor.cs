@@ -9,5 +9,4 @@ public partial class ImageComponent : IGenericFormElement<ImageRecord>
     [Parameter] public ParentEltContext ParentContext { get; set; }
     [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
-    [Parameter] public bool IsInteractableElementEnabled { get; set; }
 }

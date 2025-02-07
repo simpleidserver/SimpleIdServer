@@ -16,7 +16,7 @@
             <StandaloneCodeEditor @ref=editor OnDidInit="HandleOnDidInit" OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
         </RadzenStepsItem>
         <RadzenStepsItem Text="Viewer" Disabled="@(input == null)">
-            <FormViewer Context="@context" IsEditModeEnabled="false" IsInteractableElementEnabled="false"></FormViewer>
+            <FormViewer Context="@context" IsEditModeEnabled="false"></FormViewer>
         </RadzenStepsItem>
     </Steps>
 </RadzenSteps>

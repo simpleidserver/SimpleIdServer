@@ -1965,4 +1965,13 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="Demo" xml:space="preserve">
     <value>Demo</value>
   </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="AcrFormsTitle" xml:space="preserve">
+    <value>Authentication forms</value>
+  </data>
+  <data name="AcrWorkflowsTitle" xml:space="preserve">
+    <value>Authentication workflows</value>
+  </data>
 </root>

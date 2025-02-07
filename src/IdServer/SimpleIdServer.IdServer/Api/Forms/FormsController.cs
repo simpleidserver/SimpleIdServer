@@ -42,7 +42,7 @@ public class FormsController : BaseController
         {
             prefix = prefix ?? Constants.DefaultRealm;
             await CheckAccessToken(prefix, Constants.StandardScopes.Forms.Name);
-            var form = await _formStore.GetLatestPublishedVersionByCorrelationId(prefix, id, cancellationToken);
+            var form = await _formStore.GetLatestVersionByCorrelationId(prefix, id, cancellationToken);
             if (form == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownForm, id));
             return new OkObjectResult(form);
         }
@@ -60,7 +60,7 @@ public class FormsController : BaseController
         {
             prefix = prefix ?? Constants.DefaultRealm;
             await CheckAccessToken(prefix, Constants.StandardScopes.Forms.Name);
-            var existingForm = await _formStore.GetLatestPublishedVersionByCorrelationId(prefix, id, cancellationToken);
+            var existingForm = await _formStore.GetLatestVersionByCorrelationId(prefix, id, cancellationToken);
             if (existingForm == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownForm, id));
             existingForm.Update(form.Elements.ToList(), _dateTimeHelper.GetCurrent());
             await _formStore.SaveChanges(cancellationToken);
@@ -80,7 +80,7 @@ public class FormsController : BaseController
         {
             prefix = prefix ?? Constants.DefaultRealm;
             await CheckAccessToken(prefix, Constants.StandardScopes.Forms.Name);
-            var existingForm = await _formStore.GetLatestPublishedVersionByCorrelationId(prefix, id, cancellationToken);
+            var existingForm = await _formStore.GetLatestVersionByCorrelationId(prefix, id, cancellationToken);
             if (existingForm == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownForm, id));
             var newForm = await _versionedFormService.Publish(existingForm, cancellationToken);
             return new OkObjectResult(newForm);

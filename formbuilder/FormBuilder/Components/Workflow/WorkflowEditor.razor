@@ -56,8 +56,8 @@
     [Parameter] public WorkflowRecord Workflow{ get; set; }
     [Parameter] public List<FormRecord> Forms { get; set; }
     [Parameter] public List<WorkflowLayout> WorkflowLayouts { get; set; }
-    [Parameter] public EventCallback<WorkflowActionState> PublishedEvt { get; set; }
-    [Parameter] public EventCallback<WorkflowActionState> SavedEvt { get; set; }
+    [Parameter] public EventCallback<ActionState> PublishedEvt { get; set; }
+    [Parameter] public EventCallback<ActionState> SavedEvt { get; set; }
     private WorkflowContext Context { get; set; }
     private ElementReference diagramContainer;
     private ElementReference svgRef;
@@ -362,7 +362,8 @@
     private async Task Save()
     {
         isSaveDisabled = true;
-        await SavedEvt.InvokeAsync(new WorkflowActionState(() => {
+        await SavedEvt.InvokeAsync(new ActionState(() =>
+        {
             isSaveDisabled = false;
         }));
     }
@@ -370,7 +371,7 @@
     private async Task Publish()
     {
         isPublishDisabled = true;
-        await PublishedEvt.InvokeAsync(new WorkflowActionState(() =>
+        await PublishedEvt.InvokeAsync(new ActionState(() =>
         {
             isPublishDisabled = false;
         }));

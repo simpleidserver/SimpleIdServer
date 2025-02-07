@@ -28,6 +28,7 @@ public class QrCodeFormLayoutBuilder
             Id = id,
             CorrelationId = correlationId,
             Name = name,
+            UpdateDateTime = DateTime.UtcNow,
             ActAsStep = true,
             Elements = new ObservableCollection<IFormElementRecord>()
         };

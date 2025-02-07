@@ -22,7 +22,11 @@ public class TitleRecord : IFormElementRecord
     {
     }
 
-    public IFormElementRecord GetChild(string id) => null;
+
+    public List<IFormElementRecord> GetChildrenBranch(string id)
+    {
+        return new List<IFormElementRecord>();
+    }
 
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
 }

@@ -1152,4 +1152,7 @@
   <data name="UnknownForm" xml:space="preserve">
     <value>The form {0} doesn't exist</value>
   </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+  </data>
 </root>

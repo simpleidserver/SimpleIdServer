@@ -115,6 +115,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication forms.
+        /// </summary>
+        public static string AcrFormsTitle {
+            get {
+                return ResourceManager.GetString("AcrFormsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à ACR stands for Authentication Context Class Reference. It is used to enhance the user&apos;s level of assurance before accessing any sensitive information..
         /// </summary>
         public static string AcrsDescription {
@@ -129,6 +138,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string AcrsTitle {
             get {
                 return ResourceManager.GetString("AcrsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authentication workflows.
+        /// </summary>
+        public static string AcrWorkflowsTitle {
+            get {
+                return ResourceManager.GetString("AcrWorkflowsTitle", resourceCulture);
             }
         }
         
@@ -5436,6 +5454,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ValueRequired {
             get {
                 return ResourceManager.GetString("ValueRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Version.
+        /// </summary>
+        public static string Version {
+            get {
+                return ResourceManager.GetString("Version", resourceCulture);
             }
         }
         

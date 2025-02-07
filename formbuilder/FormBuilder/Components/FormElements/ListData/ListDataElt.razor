@@ -1,21 +1,16 @@
 ﻿@using FormBuilder.Components.Drag
-@using FormBuilder.Components.Interactable
 
-<InteractableElement Record="@Value" TRecord="ListDataRecord" Context=@Context IsInteractableElementEnabled="@IsInteractableElementEnabled">
+<DraggableFormElement IsViewSettingsDisabled=true IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="EmptyDialog" TRecord="ListDataRecord" Record="@Value">
     <Children>
-        <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="ListDataDialog" TRecord="ListDataRecord" Record="@Value">
-            <Children>
-                <RadzenStack Orientation="Orientation.Vertical">
-                    @if (IsEditModeEnabled || IsInteractableElementEnabled)
-                    {
-                        <span>Configure the list of data</span>
-                    }
-                    else
-                    {
-                        @CustomRender
-                    }
-                </RadzenStack>
-            </Children>
-        </DraggableFormElement>
+        <RadzenStack Orientation="Orientation.Vertical">
+            @if (IsEditModeEnabled)
+            {
+                <span>Configure the list of data</span>
+            }
+            else
+            {
+                @CustomRender
+            }
+        </RadzenStack>
     </Children>
-</InteractableElement>
+</DraggableFormElement>

@@ -28,6 +28,7 @@ public class RegisterLayoutBuilder
         {
             Id = id,
             CorrelationId = correlationId,
+            UpdateDateTime = DateTime.UtcNow,
             Name = name,
             ActAsStep = true,
             Realm = realm ?? Constants.DefaultRealm,

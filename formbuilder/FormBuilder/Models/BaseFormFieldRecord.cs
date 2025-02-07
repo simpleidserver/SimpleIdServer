@@ -15,6 +15,10 @@ public abstract class BaseFormFieldRecord : IFormElementRecord
     public List<ITransformationRule> Transformations { get; set; }
     public abstract void Apply(JsonNode node);
     public abstract void ExtractJson(JsonObject json);
-    public IFormElementRecord GetChild(string id) => null;
+
+    public List<IFormElementRecord> GetChildrenBranch(string id)
+    {
+        return new List<IFormElementRecord>();
+    }
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
 }

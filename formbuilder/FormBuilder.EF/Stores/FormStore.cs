@@ -35,9 +35,14 @@ public class FormStore : IFormStore
     {
         return _dbContext.Forms.Where(f => f.Status == RecordVersionStatus.Published).OrderByDescending(f => f.VersionNumber).FirstOrDefaultAsync(f => f.CorrelationId == correlationId, cancellationToken);
     }
+
     public Task<FormRecord> GetLatestPublishedVersionByCorrelationId(string realm, string correlationId, CancellationToken cancellationToken)
     {
         return _dbContext.Forms.Where(f => f.Status == RecordVersionStatus.Published).OrderByDescending(f => f.VersionNumber).FirstOrDefaultAsync(f => f.CorrelationId == correlationId && f.Realm == realm, cancellationToken);
+    }
+    public Task<FormRecord> GetLatestVersionByCorrelationId(string realm, string correlationId, CancellationToken cancellationToken)
+    {
+        return _dbContext.Forms.OrderByDescending(f => f.VersionNumber).FirstOrDefaultAsync(f => f.CorrelationId == correlationId && f.Realm == realm, cancellationToken);
     }
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
