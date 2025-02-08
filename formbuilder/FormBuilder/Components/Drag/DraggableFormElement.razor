@@ -6,7 +6,7 @@
 
 @if(IsEditModeEnabled)
 {
-    <div class="@ClassName" draggable="true" @ondragstart="@(() => HandleDragStart())">
+    <div class="draggableElement" @attributes="DraggableElementsAttributes" @ondragstart="@(() => HandleDragStart())">
         <div class="info">
             @Record.GetType().Name
         </div>
@@ -17,16 +17,31 @@
                     {
                         <RadzenButton Icon="settings" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="(async (e) => await HandleViewSettings())" />
                     }
-                    @if (!IsInvolved)
+
+                    @if (!IsBlocked)
                     {
                         <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.ExtraSmall" Click="@HandleRemove" />
                     }
                 </li>
             </ul>
         </div>
-        <DropZoneComponent ClassName="top" Dropped="@HandleEltDroppedTop"></DropZoneComponent>
-        @Children
-        <DropZoneComponent ClassName="bottom" Dropped="@HandleEltDroppedBottom"></DropZoneComponent>
+        @if (IsDropZoneEnabled)
+        {
+            <DropZoneComponent ClassName="top" Dropped="@HandleEltDroppedTop"></DropZoneComponent>
+            @Children
+            <DropZoneComponent ClassName="bottom" Dropped="@HandleEltDroppedBottom"></DropZoneComponent>
+        }
+        else
+        {
+            @Children
+        }
+
+        @if (IsOverlayDisplayed)
+        {
+            <div class="overlay">
+                <RadzenIcon Icon="lock" />
+            </div>
+        }
     </div>
 }
 else 
@@ -42,25 +57,62 @@ else
     [Parameter] public TRecord Record { get; set; }
     [Parameter] public bool IsViewSettingsDisabled { get; set; } = false;
 
-    private void HandleDragStart()
+    public Dictionary<string, object> DraggableElementsAttributes
     {
-        Context.FormEditorContext.SelectInstance(Record, HandleCurrentEltDropped);
+        get
+        {
+            if (IsDraggedEnabled)
+            {
+                return new Dictionary<string, object> { { "draggable", "true" } };
+            }
+
+            return new Dictionary<string, object>();
+        }
+    }
+
+    public bool IsDropZoneEnabled
+    {
+        get
+        {
+            return !ParentContext.IsParentBlocked;
+        }
+    }
+
+    public bool IsBlocked
+    {
+        get
+        {
+            return ParentContext.IsParentBlocked || Context.FormEditorContext.IsEltInvolvedInWorkflow(Record);
+        }
+    }
+
+    public bool IsOverlayDisplayed
+    {
+        get
+        {
+            return !ParentContext.IsParentBlocked && Context.FormEditorContext.IsEltInvolvedInWorkflow(Record);
+        }
+    }
+
+    public bool IsDraggedEnabled
+    {
+        get
+        {
+            return !ParentContext.IsParentBlocked;
+        }
     }
 
     public string ClassName
     {
         get
         {
-            return $"draggableElement" + (IsInvolved ? " isInvolved" : string.Empty);
+            return $"draggableElement" + (IsBlocked ? " isInvolved" : string.Empty);
         }
     }
 
-    public bool IsInvolved
+    private void HandleDragStart()
     {
-        get
-        {
-            return Context.FormEditorContext.IsEltInvolvedInWorkflow(Record, Context.GetCurrentFormRecord());
-        }
+        Context.FormEditorContext.SelectInstance(Record, HandleCurrentEltDropped);
     }
 
     private void HandleEltDroppedTop() => HandleEltDropped(false);
@@ -76,9 +128,12 @@ else
             case SelectionTypes.DEFINITION:
                 var def = Context.FormEditorContext.SelectedEltDefinition;
                 eltRecord = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
+                eltRecord.Id = Guid.NewGuid().ToString();
+                eltRecord.CorrelationId = Guid.NewGuid().ToString();
                 break;
             case SelectionTypes.RECORD:
                 eltRecord = Context.FormEditorContext.SelectedEltInstance;
+                if (eltRecord == null) return;
                 if (eltRecord == (IFormElementRecord)Record) return;
                 var existingEltIndex = ParentContext.Elements.IndexOf(eltRecord);
                 if(existingEltIndex != -1 && projectedEltIndex > existingEltIndex)
@@ -91,7 +146,11 @@ else
         Context.FormEditorContext.DropElement();
         projectedEltIndex = isBottom ? projectedEltIndex + 1 : projectedEltIndex;
         if (projectedEltIndex >= ParentContext.Elements.Count()) ParentContext.Elements.Add(eltRecord);
-        else ParentContext.Elements.Insert(projectedEltIndex, eltRecord);
+        else 
+        {
+            ParentContext.Elements.Remove(eltRecord);
+            ParentContext.Elements.Insert(projectedEltIndex, eltRecord);
+        }
     }
 
     private void HandleCurrentEltDropped()

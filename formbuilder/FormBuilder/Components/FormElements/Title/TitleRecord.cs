@@ -1,6 +1,7 @@
 ﻿using FormBuilder.Models;
 using Radzen.Blazor;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
 
 namespace FormBuilder.Components.FormElements.Title;
 
@@ -22,11 +23,7 @@ public class TitleRecord : IFormElementRecord
     {
     }
 
-
-    public List<IFormElementRecord> GetChildrenBranch(string id)
-    {
-        return new List<IFormElementRecord>();
-    }
-
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
+
+    public IFormElementRecord GetChild(string id) => null;
 }

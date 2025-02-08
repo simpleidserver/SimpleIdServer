@@ -26,24 +26,7 @@ public abstract class BaseFormLayoutRecord : IFormElementRecord
             elt.ExtractJson(json);
     }
 
-    public List<IFormElementRecord> GetChildrenBranch(string id)
-    {
-        var filtered = Elements.SingleOrDefault(e => e.Id == id);
-        if (filtered != null) return new List<IFormElementRecord> { this, filtered };
-        var result = new List<IFormElementRecord>();
-        foreach(var elt in Elements)
-        {
-            var children = elt.GetChildrenBranch(id);
-            if(children.Any())
-            {
-                result.Add(this);
-                result.AddRange(children);
-                return result;
-            }
-        }
-
-        return result;
-    }
-
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => Elements.SingleOrDefault(e => e.CorrelationId == correlationId);
+
+    public IFormElementRecord GetChild(string id) => Elements.SingleOrDefault(e => e.Id == id);
 }

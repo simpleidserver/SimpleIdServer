@@ -18,12 +18,16 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
     [Parameter] public ParentEltContext ParentContext { get; set; }
     public string TargetUrl { get; private set; }
     public Dictionary<string, string> HiddenFields { get; set; }
+    private int currentLevel { get; set; }
+    private bool isBlocked {  get; set; }
 
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (Value != null)
         {
+            currentLevel = ParentContext.ParentLevel + 1;
+            isBlocked = Context.FormEditorContext.IsEltInvolvedInWorkflow(Value);
             Value.Elements.CollectionChanged += HandleCollectionChanged;
             CustomRender = CreateComponent();
             BuildHiddenFields();
@@ -46,11 +50,12 @@ public partial class FormStackLayout : IGenericFormElement<FormStackLayoutRecord
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Value.Elements, Context, IsEditModeEnabled);
+        renderFormsElementsHelper.Render(builder, isBlocked, currentLevel, Value.Elements, Context, IsEditModeEnabled);
     };
 
     private void HandleCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        var workflow = Context.Definition;
         CustomRender = CreateComponent();
         StateHasChanged();
     }

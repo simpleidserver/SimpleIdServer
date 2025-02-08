@@ -329,18 +329,11 @@ public class FormEditorContext
         if (_droppedCallback != null) _droppedCallback();
     }
 
-    public bool IsEltInvolvedInWorkflow<TRecord>(TRecord record, FormRecord currentForm) where TRecord : IFormElementRecord
+    public bool IsEltInvolvedInWorkflow<TRecord>(TRecord record) where TRecord : IFormElementRecord
     {
         if (_workflowLayout == null) return false;
-        var children = currentForm.GetChildrenBranch(record.Id);
-        var correlationIds = _workflowLayout.Links.Select(l => l.EltCorrelationId);
-        foreach (var child in children) 
-        {
-            if (correlationIds.Contains(child.CorrelationId)) return true;
-            if (child.Id == record.Id) return false;
-        }
-
-        return false;
+        var workflowCorrelationIds = _workflowLayout.Links.Select(l => l.EltCorrelationId);
+        return workflowCorrelationIds.Contains(record.CorrelationId);
     }
 }
 

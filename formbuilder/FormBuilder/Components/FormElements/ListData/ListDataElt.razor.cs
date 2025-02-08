@@ -26,13 +26,15 @@ namespace FormBuilder.Components.FormElements.ListData
 
         private RenderFragment CreateComponent() => builder =>
         {
-            foreach(var record in Value.Elements)
+            var currentLevel = ParentContext.ParentLevel + 1;
+            var isBlocked = Context.FormEditorContext.IsEltInvolvedInWorkflow(Value);
+            foreach (var record in Value.Elements)
             {
                 var col = new ObservableCollection<IFormElementRecord>
                 {
                     record
                 };
-                renderFormsElementsHelper.Render(builder, col, Context, IsEditModeEnabled);
+                renderFormsElementsHelper.Render(builder, isBlocked, currentLevel, col, Context, IsEditModeEnabled);
             }
         };
     }

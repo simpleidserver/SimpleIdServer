@@ -36,7 +36,7 @@ public interface IFormElementRecord
     Dictionary<string, object> HtmlAttributes { get; set; }
     string CssStyle { get; set; }
     void ExtractJson(JsonObject json);
-    List<IFormElementRecord> GetChildrenBranch(string id);
+    IFormElementRecord GetChild(string id);
     IFormElementRecord GetChildByCorrelationId(string correlationId);
     void Apply(JsonNode node);
 }

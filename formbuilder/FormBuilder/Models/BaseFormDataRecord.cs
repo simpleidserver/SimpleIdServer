@@ -25,10 +25,7 @@ public abstract class BaseFormDataRecord : IFormElementRecord
 
     }
 
-    public List<IFormElementRecord> GetChildrenBranch(string id)
-    {
-        return new List<IFormElementRecord>();
-    }
-
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
+
+    public IFormElementRecord GetChild(string id) => null;
 }

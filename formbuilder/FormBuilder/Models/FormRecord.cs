@@ -30,28 +30,17 @@ public class FormRecord : BaseVersionRecord
         Elements = new ObservableCollection<IFormElementRecord>(elements);
     }
 
-    public List<IFormElementRecord> GetChildrenBranch(string id)
-    {
-        var filtered = Elements.SingleOrDefault(e => e.Id == id);
-        if (filtered != null) return new List<IFormElementRecord>();
-        foreach(var elt in Elements)
-        {
-            var children = elt.GetChildrenBranch(id);
-            if(children.Any())
-            {
-                var result = new List<IFormElementRecord>();
-                result.AddRange(children);
-                return result;
-            }
-        }
-
-        return new List<IFormElementRecord>();
-    }
-
     public IFormElementRecord GetChild(string id)
     {
-        var children = GetChildrenBranch(id);
-        return children.FirstOrDefault(c => c.Id == id);
+        var result = Elements.SingleOrDefault(e => e.Id == id);
+        if (result != null) return result;
+        foreach (var elt in Elements)
+        {
+            var child = elt.GetChild(id);
+            if (child != null) return child;
+        }
+
+        return null;
     }
 
     public IFormElementRecord GetChildByCorrelationId(string correlationId)

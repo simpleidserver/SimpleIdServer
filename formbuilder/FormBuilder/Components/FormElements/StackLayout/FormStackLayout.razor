@@ -3,7 +3,7 @@
 @using FormBuilder.Helpers
 
 
-<EditableLayoutContainerElement Context="@Context" Record="@Value" TRecord="FormStackLayoutRecord" ParentContext="@ParentContext" IsEditModeEnabled="@IsEditModeEnabled">
+<DraggableFormElement TDialog="EmptyDialog" Context="@Context" Record="@Value" TRecord="FormStackLayoutRecord" ParentContext="@ParentContext" IsViewSettingsDisabled="true" IsEditModeEnabled="@IsEditModeEnabled">
     <Children>
         @if(!Value.IsNotVisible) 
         {
@@ -44,4 +44,4 @@
 
         }
     </Children>
-</EditableLayoutContainerElement>
+</DraggableFormElement>

@@ -16,9 +16,7 @@ public abstract class BaseFormFieldRecord : IFormElementRecord
     public abstract void Apply(JsonNode node);
     public abstract void ExtractJson(JsonObject json);
 
-    public List<IFormElementRecord> GetChildrenBranch(string id)
-    {
-        return new List<IFormElementRecord>();
-    }
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
+
+    public IFormElementRecord GetChild(string id) => null;
 }

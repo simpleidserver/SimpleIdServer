@@ -2,6 +2,10 @@
     height: 100%;
 }
 
+.form-content.editor .draggableElement {
+    padding: 10px;
+}
+
 /* Drop zone */
 .editableLayoutContainer, .draggableElement {
     border: 1px solid transparent;
@@ -13,7 +17,7 @@
 }
 
 .draggableElement:hover > .toolbox,
-.editableLayoutContainer:hover > .toolbox{
+.editableLayoutContainer:hover > .toolbox {
     display: block;
     z-index: 2;
 }
@@ -25,6 +29,17 @@
 
 .draggableElement {
     cursor: move;
+    position: relative;
+}
+
+.draggableElement .overlay {
+    background-color: #80808026;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
+    right: 0px;
+    left: 0px;
+    pointer-events: none;
 }
 
 .stepElement {
@@ -102,13 +117,8 @@
 .dropZone.active,
 .interactableElement .zone:hover,
 .stepElement.isActive {
-        border: 1px dashed green;
-        background-color: rgba(226, 255, 226, 0.5);
-}
-
-.isInvolved {
-    background-color: #80808026;
-    border: 1px dashed gray;
+    border: 1px dashed green;
+    background-color: rgba(226, 255, 226, 0.5);
 }
 
 
@@ -168,7 +178,7 @@
 }
 
 .toolbar li > .icon,
-.workflowEditor .toolbox li {    
+.workflowEditor .toolbox li {
     background-color: #F1F1F1;
 }
 
@@ -180,9 +190,13 @@
 }
 
 /* Toolbox */
+.toolbox .rz-button {
+    pointer-events: auto !important;
+}
+
 .toolbox {
     display: block;
-    z-index: 2;
+    z-index: 10;
 }
 
 .toolbox {
@@ -208,7 +222,7 @@
     display: inline-block;
 }
 
-.toolbox .move {    
+.toolbox .move {
     cursor: move;
 }
 
@@ -294,7 +308,7 @@ g.diagram-link path:not(.selection-helper) {
 
 .jsonPathEditor {
     height: 40px;
-    padding-top:10px;
+    padding-top: 10px;
     padding-left: 5px;
 }
 

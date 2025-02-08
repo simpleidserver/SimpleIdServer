@@ -18,6 +18,13 @@ public partial class FormInputField : IGenericFormElement<FormInputFieldRecord>
             return linkExecution?.InputData;
         }
     }
+    public bool IsViewSettingsDisabled
+    {
+        get
+        {
+            return Value?.FormType == FormInputTypes.HIDDEN;
+        }
+    }
 
     protected override void OnParametersSet()
     {

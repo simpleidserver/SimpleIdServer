@@ -1,5 +1,6 @@
 ﻿using FormBuilder.Models;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
 
 namespace FormBuilder.Components.FormElements.Paragraph;
 
@@ -21,10 +22,7 @@ public class ParagraphRecord : IFormElementRecord
     {
     }
 
-    public List<IFormElementRecord> GetChildrenBranch(string id)
-    {
-        return new List<IFormElementRecord>();
-    }
-
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
+
+    public IFormElementRecord GetChild(string id) => null;
 }

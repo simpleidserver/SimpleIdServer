@@ -9,7 +9,7 @@
 @implements IDisposable
 
 <div class="form">
-    <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "")}")">
+    <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "editor")}")">
         @{
             if (Context.Definition.Workflow != null && Context.Definition.Records != null)
             {
@@ -55,7 +55,9 @@
 
         @if (Form?.Elements != null)
         {
-            @CustomRender
+            <RadzenStack>
+                @CustomRender
+            </RadzenStack>
         }
     </div>
 </div>
@@ -93,7 +95,7 @@
 
     private RenderFragment CreateComponent() => builder =>
     {
-        renderFormsElementsHelper.Render(builder, Form.Elements, Context, IsEditModeEnabled);
+        renderFormsElementsHelper.Render(builder, false, 0, Form.Elements, Context, IsEditModeEnabled);
     };
 
     private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)

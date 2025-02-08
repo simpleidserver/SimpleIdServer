@@ -2,6 +2,7 @@
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
 using System.Text.Json.Nodes;
+using System.Xml.Linq;
 
 namespace FormBuilder.Components.FormElements.Image;
 
@@ -24,10 +25,7 @@ public class ImageRecord : IFormElementRecord
 
     public void ExtractJson(JsonObject json) { }
 
-    public List<IFormElementRecord> GetChildrenBranch(string id)
-    {
-        return new List<IFormElementRecord>();
-    }
-
     public IFormElementRecord GetChildByCorrelationId(string correlationId) => null;
+
+    public IFormElementRecord GetChild(string id) => null;
 }
