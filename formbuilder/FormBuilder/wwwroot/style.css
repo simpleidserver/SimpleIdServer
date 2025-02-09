@@ -138,13 +138,23 @@
     z-index: 2;
 }
 
+/* Panel */
+.panel-header {
+    background-color: #ececec;
+    padding: 10px;
+    border-bottom: 1px solid gray;
+}
+
+.panel-content, .toolbar {
+    padding: 20px;
+}
+
 /*Editor toolbar */
 .toolbar {
     border-right: 1px solid #F1F1F1;
     -webkit-box-shadow: 5px 10px 5px 0px rgba(222,222,222,1);
     -moz-box-shadow: 5px 10px 5px 0px rgba(222,222,222,1);
     box-shadow: 5px 10px 5px 0px rgba(222,222,222,1);
-    padding: 20px;
 }
 
 .toolbar ul.elements {
@@ -299,7 +309,7 @@ g.diagram-link path:not(.selection-helper) {
 }
 
 .jsonEditor, .cssEditor {
-    height: 400px;
+    height: 600px;
 }
 
 .httpRequestEditor {

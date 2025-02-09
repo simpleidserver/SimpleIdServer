@@ -3,37 +3,32 @@
 @using FormBuilder.Helpers
 @using System.Text.Json
 @using System.Text
+@using FormBuilder.Services
+@using static BlazorMonaco.Editor.Global
 
 <RadzenStack>
     <StandaloneCodeEditor @ref=editor OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="cssEditor" />
-    <RadzenButton Text="Save" Click="@(async () => await HandleSave())" ButtonType="ButtonType.Button" class="fullWidth"></RadzenButton>
+    <RadzenButton Text="Save" Disabled="@isDisabled" Click="@(async () => await HandleSave())" ButtonStyle="ButtonStyle.Primary" class="fullWidth"></RadzenButton>
 </RadzenStack>
 
 @code {
-    private string cssContent { get; set; }
     private StandaloneCodeEditor editor;
+    private bool isDisabled { get; set; }
     [Parameter] public string FormId { get; set; }
+    [Parameter] public string Css { get; set; }
+    [Parameter] public EventCallback<ActionState> CssSavedEvt { get; set; }
     [Inject] public IUriProvider uriProvider { get; set; }
+    [Inject] public IJSRuntime jSRuntime { get; set; }
     [Inject] public DialogService dialogService { get; set; }
     [Inject] public NotificationService notificationService { get; set; }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-        if (!string.IsNullOrWhiteSpace(FormId))
-        {
-            var url = uriProvider.GetActiveFormCssUrl(FormId);
-            using(var httpClient = new HttpClient())
-            {
-                cssContent = await httpClient.GetStringAsync(url);
-                await editor.SetValue(cssContent);
-            }
-        }
-    }
+    [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
 
     private async Task HandleOnEditorContentChanged()
     {
-        cssContent = await editor.GetValue();
+        Css = await editor.GetValue();
+        var diagnostics = await BlazorMonaco.Editor.Global.GetModelMarkers(jSRuntime, new GetModelMarkersFilter { Owner = "css" });
+        if (diagnostics.Any()) return;
+        await formBuilderJsService.RefreshCss(Css);
     }
 
     private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
@@ -42,24 +37,27 @@
         {
             AutomaticLayout = true,
             Language = "css",
-            Value = ""
+            Value = Css
         };
     }
 
     private async Task HandleSave()
     {
+        isDisabled = true;
         using(var httpClient = new HttpClient())
         {
             var url = uriProvider.GetActiveFormCssUrl(FormId);
             var requestMessage = new HttpRequestMessage
             {
-                Content = new StringContent(JsonSerializer.Serialize(new UpdateFormStyleCommand { Content = cssContent }), Encoding.UTF8, "application/json"),
+                Content = new StringContent(JsonSerializer.Serialize(new UpdateFormStyleCommand { Content = Css }), Encoding.UTF8, "application/json"),
                 Method = HttpMethod.Put,
                 RequestUri = new Uri(url)
             };
             await httpClient.SendAsync(requestMessage);
-            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated, please refer your browser", Duration = 4000 });
+            await formBuilderJsService.RefreshCss(Css);
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated" });
             dialogService.Close();
+            isDisabled = false;
         }
     }
 }

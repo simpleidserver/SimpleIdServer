@@ -40,3 +40,14 @@ FormBuilder.submitForm = function (url, json, method) {
     const tmpForm = document.getElementById("tmpForm");
     tmpForm.submit();
 }
+
+FormBuilder.refreshCss = function (cssContent) {
+    var styleElement = document.getElementById('dynamic-style');
+    if (!styleElement) {
+        styleElement = document.createElement('style');
+        styleElement.id = 'dynamic-style';
+        document.head.appendChild(styleElement);
+    }
+
+    styleElement.innerHTML = cssContent;
+};

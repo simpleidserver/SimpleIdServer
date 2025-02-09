@@ -9,5 +9,12 @@ public class ActionState
         _act = act;
     }
 
+    public ActionState(Action act, string value) : this(act)
+    {
+        Value = value;
+    }
+
+    public string Value { get; private set; }
+
     public void Finish() => _act();
 }

@@ -1,0 +1,40 @@
+﻿@using BlazorMonaco.Editor
+@using FormBuilder.Models
+@using Radzen.Blazor
+@using System.Text.Json
+
+<RadzenStack>
+    <StandaloneCodeEditor @ref=editor OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
+    <RadzenButton Text="Save" class="fullWidth"></RadzenButton>
+</RadzenStack>
+
+
+@code {
+    private string _json;
+    private StandaloneCodeEditor editor;
+    [Parameter] public string Json { get; set; }
+
+    private async Task HandleOnEditorContentChanged()
+    {
+        Json = await editor.GetValue();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if(editor != null) 
+        {
+            await editor.SetValue(Json);
+        }
+    }
+
+    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "json",
+            Value = Json
+        };
+    }
+}

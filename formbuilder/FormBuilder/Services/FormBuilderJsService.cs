@@ -17,6 +17,7 @@ public interface IFormBuilderJsService
     Task Navigate(string url);
     Task NavigateForce(string url);
     Task SubmitForm(string url, JsonObject data, HttpMethods method);
+    Task RefreshCss(string href);
 }
 
 public class FormBuilderJsService : IFormBuilderJsService
@@ -70,5 +71,10 @@ public class FormBuilderJsService : IFormBuilderJsService
     public async Task SubmitForm(string url, JsonObject data, HttpMethods method)
     {
         await _jsRuntime.InvokeVoidAsync("FormBuilder.submitForm", url, data, _httpMethodToName[method]);
+    }
+
+    public async Task RefreshCss(string css)
+    {
+        await _jsRuntime.InvokeVoidAsync("FormBuilder.refreshCss", css);
     }
 }

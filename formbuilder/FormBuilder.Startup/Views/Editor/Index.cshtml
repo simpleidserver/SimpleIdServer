@@ -8,7 +8,6 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var path = uriProvider.GetActiveFormCssUrl(Model.Record.Id);
 }
 
 <component type="typeof(FormEditor)" 
@@ -17,5 +16,4 @@
     param-WorkflowLayout="@Model.WorkflowLayout"/>
 
 @section Header {
-    <link rel="stylesheet" href="@path" />
 }

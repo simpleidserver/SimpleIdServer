@@ -6,36 +6,47 @@
 @using System.Text.Json.Nodes
 @using System.Text.Json
 @using FormBuilder.Models.Layout
+@using FormBuilder.Panels
+@using System.Collections.Specialized
+@using FormBuilder.Services
 @inject DialogService dialogService
 @inject IEnumerable<IFormElementDefinition> definitions
 @inject IJSRuntime jsRuntime
+
 
 <RadzenDialog />
 <RadzenNotification />
 <MonacoCompletion Context="@context" />
 
-<div class="header">
-    <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" />
-    <RadzenButton Icon="draft" Text="Json" Click="@(async() => await ViewJson())" />
-    <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
-    <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
-</div>
+@if(context != null)
+{    
+    <div class="header">
+        <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Icon="draft" Text="Json" Click="@(() => SwitchPanel(FormPanelTypes.JSON))" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Icon="css" Text="Css" Click="@(() => SwitchPanel(FormPanelTypes.CSS))" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
+        <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
 
-<RadzenRow class="fullHeight">
-    <RadzenColumn Size="2">
-        <RadzenStack class="toolbar fullHeight">
-            <div class="category">
-                <RadzenText TextStyle="TextStyle.H6" class="title">Elements</RadzenText>
-                <ul class="elements">
-                    @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.ELEMENT))
-                    {
-                        <li draggable="true" @ondragstart="@(() => HandleDragStart(def))">
-                            <div class="icon"><RadzenIcon Icon="@def.Icon" class="icon" /></div><span class="text">@def.Type</span>
-                        </li>
-                    }
-                </ul>
+    </div>
+    <RadzenSplitter>
+        <!-- Toolbox -->
+        <RadzenSplitterPane Size="20%">
+            <div class="panel-header">
+                <RadzenText TextStyle="TextStyle.H6" class="title">Toolbox</RadzenText>
             </div>
-            <div class="category">
+            <RadzenStack class="toolbar fullHeight">
+                <div class="category">
+                    <RadzenText TextStyle="TextStyle.H6" class="title">Elements</RadzenText>
+                    <ul class="elements">
+                        @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.ELEMENT))
+                        {
+                            <li draggable="true" @ondragstart="@(() => HandleDragStart(def))">
+                                <div class="icon"><RadzenIcon Icon="@def.Icon" class="icon" /></div><span class="text">@def.Type</span>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <div class="category">
                     <RadzenText TextStyle="TextStyle.H6" class="title">Layout</RadzenText>
                     <ul class="elements">
                         @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.LAYOUT))
@@ -46,7 +57,7 @@
                         }
                     </ul>
                 </div>
-            <div class="category">
+                <div class="category">
                     <RadzenText TextStyle="TextStyle.H6" class="title">Data</RadzenText>
                     <ul class="elements">
                         @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.DATA))
@@ -56,44 +67,93 @@
                             </li>
                         }
                     </ul>
-            </div
-            <div class="category">
-                <RadzenText TextStyle="TextStyle.H6" class="title">Style</RadzenText>
-                <ul class="elements">                    
-                    <li @onclick="@(async (e) => await HandleEditCss())" class="clickable">
-                        <div class="icon"><RadzenIcon Icon="css" class="icon" /></div><span class="text">CSS</span>
-                    </li>
-                </ul>
+                </div>
+            </RadzenStack>
+        </RadzenSplitterPane>
+        <!-- Editor -->
+        <RadzenSplitterPane Size="60%">
+            <FormViewer IsEditModeEnabled="true" Context="@context" />
+        </RadzenSplitterPane>
+        <!-- Properties -->
+        <RadzenSplitterPane Size="20%">
+            <!-- Version -->
+            <div class="panel-header">
+                <RadzenRow>
+                    <RadzenColumn Size="11">
+                        <RadzenText TextStyle="TextStyle.H6" class="title">Version</RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
             </div>
-        </RadzenStack>
-    </RadzenColumn>
-    <RadzenColumn Size="10">
-        <FormViewer IsEditModeEnabled="true" Context="@context" />
-    </RadzenColumn>
-</RadzenRow>
+            <div class="panel-content">
+                <RadzenText TextStyle="TextStyle.Subtitle2">Status : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Enum.GetName(typeof(RecordVersionStatus), Form.Status)" /></RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle2">Version : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Form.VersionNumber.ToString()" /></RadzenText>
+            </div>
+            <!-- Property panel -->
+            <div class="panel-header">
+                <RadzenRow>
+                    <RadzenColumn Size="11">
+                        <RadzenText TextStyle="TextStyle.H6" class="title">Properties</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="1">
+                        <RadzenIcon Icon="fullscreen" class="clickable" Click="@(async () => await FullScreen())" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </div>
+            <div class="panel-content">
+                @if (panelType == FormPanelTypes.CSS)
+                {
+                    <CssPanelComponent Css="@Css" FormId="@Form.Id"></CssPanelComponent>
+                }
+
+                @if (panelType == FormPanelTypes.JSON)
+                {
+                    <JsonPanelComponent Json="@SerializedForm"></JsonPanelComponent>   
+                }
+            </div>
+        </RadzenSplitterPane>
+    </RadzenSplitter>
+}
 
 @code {
     [Parameter] public FormRecord Form { get; set; }
     [Parameter] public WorkflowLayout WorkflowLayout { get; set;}
     [Parameter] public EventCallback<ActionState> PublishedEvt { get; set; }
     [Parameter] public EventCallback<ActionState> SavedEvt { get; set; }
+    [Inject] public IUriProvider uriProvider { get; set; }
+    [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
     WorkflowContext context = null;
     private bool isSaveDisabled = false;
     private bool isPublishDisabled = false;
+    private FormPanelTypes? panelType = null;
+    private string SerializedForm { get; set; }
+    private string Css { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    public void Dispose()
     {
-        await base.OnParametersSetAsync();
-        if (Form != null && context == null) 
+        if (Form != null) Form.Elements.CollectionChanged -= HandleChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (Form != null && context == null)
         {
             context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout);
+            Serialize();
+            await LoadCss();
+            Form.Elements.CollectionChanged += HandleChanged;
+            StateHasChanged();
         }
     }
 
-    private void HandleDragStart(IFormElementDefinition def)
+    private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)
     {
-        context.FormEditorContext.SelectDefinition(def);
+        Serialize();
+        StateHasChanged();
     }
+
+    private void HandleDragStart(IFormElementDefinition def)
+        => context.FormEditorContext.SelectDefinition(def);
 
     private Task LaunchDebug()
     {
@@ -107,21 +167,8 @@
         }, opts);
     }
 
-    private Task ViewJson()
-    {
-        return dialogService.OpenAsync<ViewFormJsonDialog>("", new Dictionary<string, object>
-        {
-            { nameof(ViewFormJsonDialog.Form), Form }
-        });
-    }
-
-    private Task HandleEditCss()
-    {
-        return dialogService.OpenAsync<EditFormCssStyleDialog>("", new Dictionary<string, object>
-        {
-            { nameof(EditFormCssStyleDialog.FormId), Form.Id }
-        });
-    }
+    private void SwitchPanel(FormPanelTypes type)
+        => panelType = type;
 
     private async Task Save()
     {
@@ -139,5 +186,24 @@
         {
             isPublishDisabled = false;
         }));
+    }
+
+    private async Task FullScreen()
+    {
+
+    }
+
+    private void Serialize() 
+        => SerializedForm = Form == null ? "{}" : JsonSerializer.Serialize(Form, new JsonSerializerOptions { WriteIndented = true });
+
+    private async Task LoadCss()
+    {
+        var url = uriProvider.GetActiveFormCssUrl(Form.Id);
+        using (var httpClient = new HttpClient())
+        {
+            Css = await httpClient.GetStringAsync(url);
+        }
+
+        await formBuilderJsService.RefreshCss(Css);
     }
 }
