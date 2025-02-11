@@ -1,4 +1,3 @@
-using FormBuilder;
 using FormBuilder.EF;
 using FormBuilder.Startup.Config;
 using FormBuilder.Startup.Workflows;
@@ -68,6 +67,7 @@ void SeedData(WebApplication application)
             }
 
             dbContext.Forms.AddRange(allForms);
+            dbContext.Workflows.Add(AuthWorkflows.AuthWorkflow);
             dbContext.SaveChanges();
         }
     }

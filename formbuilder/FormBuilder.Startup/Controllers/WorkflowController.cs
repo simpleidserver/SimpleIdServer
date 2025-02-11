@@ -1,4 +1,5 @@
-﻿using FormBuilder.Startup.Controllers.ViewModels;
+﻿using FormBuilder.Repositories;
+using FormBuilder.Startup.Controllers.ViewModels;
 using FormBuilder.Stores;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,11 +8,13 @@ namespace FormBuilder.Startup.Controllers;
 public class WorkflowController : Controller
 {
     private readonly IEnumerable<IWorkflowLayoutService> _workflowLayoutServices;
+    private readonly IWorkflowStore _workflowStore;
     private readonly IFormStore _formStore;
 
-    public WorkflowController(IEnumerable<IWorkflowLayoutService> workflowLayoutServices, IFormStore formStore)
+    public WorkflowController(IEnumerable<IWorkflowLayoutService> workflowLayoutServices, IWorkflowStore workflowStore, IFormStore formStore)
     {
         _workflowLayoutServices = workflowLayoutServices;
+        _workflowStore = workflowStore;
         _formStore = formStore;
     }
 
@@ -22,15 +25,12 @@ public class WorkflowController : Controller
             .Concat(workflowLayouts.Select(s => s.SourceFormCorrelationId).Distinct().ToList())
             .ToList();
         var forms = await _formStore.GetLatestPublishedVersionByCorrelationids(formCorrelationIds, cancellationToken);
+        var workflow = await _workflowStore.GetLatest(Constants.DefaultRealm, "pwdMobile", cancellationToken);
         var viewModel = new WorkflowIndexViewModel
         {
             Forms = forms,
             WorkflowLayouts = workflowLayouts,
-            Workflow = new Models.WorkflowRecord
-            {
-                Id = Guid.NewGuid().ToString(),
-                CorrelationId = Guid.NewGuid().ToString()
-            }
+            Workflow = workflow
         };
         return View(viewModel);
     }

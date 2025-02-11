@@ -25,7 +25,8 @@ public class PwdAuthForms
         Id = Guid.NewGuid().ToString(),
         Name = "pwd",
         CorrelationId = "pwd",
-        VersionNumber = 1,
+        Realm = Constants.DefaultRealm,
+        VersionNumber = 0,
         Status = RecordVersionStatus.Published,
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>

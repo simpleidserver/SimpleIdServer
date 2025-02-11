@@ -7,14 +7,22 @@ public class WorkflowLink : ICloneable
     public string Id { get; set; }
     public WorkflowLinkSource Source { get; set; }
     public string SourceStepId { get; set; }
-    public string TargetStepId { get; set; }
-    public string ActionType { get; set; }
+    public string? TargetStepId { get; set; }
+    public string? ActionType { get; set; }
     public string? ActionParameter { get; set; }
     public string? Description { get; set; }
     [JsonIgnore]
     public bool IsLinkHoverStep { get; set; }
     [JsonIgnore]
     public bool IsHover { get; set; }
+
+    public void Update(WorkflowLink link)
+    {
+        TargetStepId = link.TargetStepId;
+        ActionType = link.ActionType;
+        ActionParameter = link.ActionParameter;
+        Description = link.ActionType;
+    }
 
     public object Clone()
     {
@@ -25,7 +33,8 @@ public class WorkflowLink : ICloneable
             TargetStepId = TargetStepId,
             SourceStepId = SourceStepId,
             ActionType = ActionType,
-            ActionParameter = ActionParameter
+            ActionParameter = ActionParameter,
+            Description = Description
         };
     }
 

@@ -76,6 +76,13 @@
         if (Form != null) Form.Elements.CollectionChanged -= HandleChanged;
     }
 
+    public void Set(WorkflowContext context)
+    {
+        Context = context;
+        Init();
+        StateHasChanged();
+    }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();

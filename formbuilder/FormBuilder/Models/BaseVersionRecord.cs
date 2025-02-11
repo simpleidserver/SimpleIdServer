@@ -12,7 +12,6 @@ public abstract class BaseVersionRecord
     public void Publish(DateTime currentDateTime)
     {
         Status = RecordVersionStatus.Published;
-        VersionNumber++;
         UpdateDateTime = currentDateTime;
     }
 }

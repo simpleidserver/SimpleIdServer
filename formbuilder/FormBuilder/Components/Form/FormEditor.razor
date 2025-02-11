@@ -6,7 +6,6 @@
 @using System.Text.Json.Nodes
 @using System.Text.Json
 @using FormBuilder.Models.Layout
-@using FormBuilder.Panels
 @using System.Collections.Specialized
 @using FormBuilder.Services
 @inject DialogService dialogService
@@ -72,17 +71,13 @@
         </RadzenSplitterPane>
         <!-- Editor -->
         <RadzenSplitterPane Size="60%">
-            <FormViewer IsEditModeEnabled="true" Context="@context" />
+            <FormViewer @ref=formViewer IsEditModeEnabled="true" Context="@context" />
         </RadzenSplitterPane>
         <!-- Properties -->
         <RadzenSplitterPane Size="20%">
             <!-- Version -->
             <div class="panel-header">
-                <RadzenRow>
-                    <RadzenColumn Size="11">
-                        <RadzenText TextStyle="TextStyle.H6" class="title">Version</RadzenText>
-                    </RadzenColumn>
-                </RadzenRow>
+                <RadzenText TextStyle="TextStyle.H6" class="title">Version</RadzenText>
             </div>
             <div class="panel-content">
                 <RadzenText TextStyle="TextStyle.Subtitle2">Status : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Enum.GetName(typeof(RecordVersionStatus), Form.Status)" /></RadzenText>
@@ -90,14 +85,7 @@
             </div>
             <!-- Property panel -->
             <div class="panel-header">
-                <RadzenRow>
-                    <RadzenColumn Size="11">
-                        <RadzenText TextStyle="TextStyle.H6" class="title">Properties</RadzenText>
-                    </RadzenColumn>
-                    <RadzenColumn Size="1">
-                        <RadzenIcon Icon="fullscreen" class="clickable" Click="@(async () => await FullScreen())" />
-                    </RadzenColumn>
-                </RadzenRow>
+                <RadzenText TextStyle="TextStyle.H6" class="title">Properties</RadzenText>
             </div>
             <div class="panel-content">
                 @if (panelType == FormPanelTypes.CSS)
@@ -107,7 +95,7 @@
 
                 @if (panelType == FormPanelTypes.JSON)
                 {
-                    <JsonPanelComponent Json="@SerializedForm"></JsonPanelComponent>   
+                    <JsonPanelComponent @ref=jsonPanelComponent Json="@SerializedForm" JsonChanged="HandleJsonChanged"></JsonPanelComponent>   
                 }
             </div>
         </RadzenSplitterPane>
@@ -117,11 +105,13 @@
 @code {
     [Parameter] public FormRecord Form { get; set; }
     [Parameter] public WorkflowLayout WorkflowLayout { get; set;}
-    [Parameter] public EventCallback<ActionState> PublishedEvt { get; set; }
-    [Parameter] public EventCallback<ActionState> SavedEvt { get; set; }
+    [Inject] public IFormBuilderApiService formBuilderApiService { get; set; }
     [Inject] public IUriProvider uriProvider { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
+    [Inject] public NotificationService notificationService { get; set; }
     WorkflowContext context = null;
+    JsonPanelComponent jsonPanelComponent = null;
+    FormViewer formViewer = null;
     private bool isSaveDisabled = false;
     private bool isPublishDisabled = false;
     private FormPanelTypes? panelType = null;
@@ -147,9 +137,12 @@
     }
 
     private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)
+        => RefreshJson();
+
+    private void HandleJsonChanged(string json)
     {
-        Serialize();
-        StateHasChanged();
+        var form = JsonSerializer.Deserialize<FormRecord>(json);
+        RefreshForm(form);
     }
 
     private void HandleDragStart(IFormElementDefinition def)
@@ -173,24 +166,18 @@
     private async Task Save()
     {
         isSaveDisabled = true;
-        await SavedEvt.InvokeAsync(new ActionState(() =>
-        {
-            isSaveDisabled = false;
-        }));
+        await formBuilderApiService.UpdateForm(Form, CancellationToken.None);
+        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The form is updated" });
+        isSaveDisabled = false;
     }
 
     private async Task Publish()
     {
         isPublishDisabled = true;
-        await PublishedEvt.InvokeAsync(new ActionState(() =>
-        {
-            isPublishDisabled = false;
-        }));
-    }
-
-    private async Task FullScreen()
-    {
-
+        var publishedForm = await formBuilderApiService.PublishForm(Form.Id, CancellationToken.None);
+        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The form is published" });
+        RefreshForm(publishedForm);
+        isPublishDisabled = false;
     }
 
     private void Serialize() 
@@ -205,5 +192,22 @@
         }
 
         await formBuilderJsService.RefreshCss(Css);
+    }
+
+    private void RefreshForm(FormRecord form)
+    {
+        Form.Elements.CollectionChanged -= HandleChanged;
+        Form = form;
+        context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout);
+        formViewer.Set(context);
+        RefreshJson();
+        Form.Elements.CollectionChanged += HandleChanged;
+    }
+
+    private void RefreshJson() 
+    {
+        Serialize();
+        if (jsonPanelComponent == null) return;
+        jsonPanelComponent.Refresh(SerializedForm);
     }
 }

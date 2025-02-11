@@ -16,7 +16,7 @@ public class MobileAuthForms
         Name = "mobile",
         CorrelationId = "mobileId",
         ActAsStep = true,
-        VersionNumber = 1,
+        VersionNumber = 0,
         Status = RecordVersionStatus.Published,
         Elements = new ObservableCollection<IFormElementRecord>
         {

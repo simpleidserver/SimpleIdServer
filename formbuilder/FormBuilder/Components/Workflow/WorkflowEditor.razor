@@ -22,17 +22,19 @@
 @inject DialogService dialogService
 
 <RadzenDialog />
+<RadzenNotification />
 <MonacoCompletion Context="@Context" />
 
 <div class="header">
     <RadzenButton Icon="play_arrow" ButtonStyle="ButtonStyle.Secondary" Text="Debug"  Click="@(async () => await LaunchDebug())" />
-    <RadzenButton Icon="draft" ButtonStyle="ButtonStyle.Secondary" Text="Json" Click="@(async() => await ViewJson())" />
+    <RadzenButton Icon="draft" ButtonStyle="ButtonStyle.Secondary" Text="Json" Click="@(() => ViewJson())" />
     <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
     <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
 </div>
 
-<RadzenRow>
-    <RadzenColumn Size="10">
+<RadzenSplitter>
+    <!-- Workflow -->
+    <RadzenSplitterPane Size="80%">
         <div id="workflowEditor" @ref="diagramContainer" class="diagram-container">
             <CascadingValue Value="Diagram" IsFixed="true">
                 <DiagramCanvas>
@@ -43,21 +45,38 @@
                 </DiagramCanvas>
             </CascadingValue>
         </div>
-    </RadzenColumn>
-    <RadzenColumn Size="2">
-        <RadzenCard Variant="Variant.Filled">
+    </RadzenSplitterPane>
+    <!-- Properties -->
+    <RadzenSplitterPane Size="20%">
+        <!-- Version -->
+        <div class="panel-header">
+            <RadzenText TextStyle="TextStyle.H6" class="title">Version</RadzenText>
+        </div>
+        <div class="panel-content">
             <RadzenText TextStyle="TextStyle.Subtitle2">Status : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Enum.GetName(typeof(RecordVersionStatus), Workflow.Status)" /></RadzenText>
             <RadzenText TextStyle="TextStyle.Subtitle2">Version : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Workflow.VersionNumber.ToString()" /></RadzenText>
-        </RadzenCard>
-    </RadzenColumn>
-</RadzenRow>
+        </div>
+        <!-- Property panel -->
+        <div class="panel-header">
+            <RadzenText TextStyle="TextStyle.H6" class="title">Properties</RadzenText>
+        </div>
+        <div class="panel-content">
+            @if (panelType == FormPanelTypes.JSON)
+            {
+                <JsonPanelComponent @ref=jsonPanelComponent Json="@SerializedWorkflow" JsonChanged="HandleJsonChanged"></JsonPanelComponent>
+            }
+        </div>
+    </RadzenSplitterPane>
+</RadzenSplitter>
 
 @code {
-    [Parameter] public WorkflowRecord Workflow{ get; set; }
+    [Parameter] public WorkflowRecord Workflow { get; set; }
     [Parameter] public List<FormRecord> Forms { get; set; }
     [Parameter] public List<WorkflowLayout> WorkflowLayouts { get; set; }
-    [Parameter] public EventCallback<ActionState> PublishedEvt { get; set; }
-    [Parameter] public EventCallback<ActionState> SavedEvt { get; set; }
+
+    [Inject] public IFormBuilderApiService formBuilderApiService { get; set; }
+    [Inject] public NotificationService notificationService { get; set; }
+
     private WorkflowContext Context { get; set; }
     private ElementReference diagramContainer;
     private ElementReference svgRef;
@@ -66,6 +85,9 @@
     private bool isInitialized = false;
     private bool isSaveDisabled = false;
     private bool isPublishDisabled = false;
+    private FormPanelTypes? panelType = null;
+    private JsonPanelComponent jsonPanelComponent;
+    private string SerializedWorkflow;
 
     private double spaceBetweenNodeXPx = 50;
     private double spaceBetweenNodeYPx = 150;
@@ -110,9 +132,16 @@
             };
             if (Diagram.Container == null) Diagram.ContainerChanged += OnContainerChanged;
             else Init();
+            RefreshJson();
             Diagram.RegisterComponent<WorkflowStepNode, WorkflowStepNodeWidget>();
             Diagram.RegisterComponent<WorkflowStepChooserNode, WorkflowStepChooserNodeWidget>();
         }
+    }
+
+    private void HandleJsonChanged(string json)
+    {
+        var workflow = JsonSerializer.Deserialize<WorkflowRecord>(json);
+        Refresh(workflow);
     }
 
     private void OnContainerChanged()
@@ -208,6 +237,7 @@
         if (!record.IsEndStep) availableLayouts.Remove(availableLayouts.Single(l => l.WorkflowCorrelationId == record.WorkflowCorrelationId));
         AddNode(source.Position.X, source.Position.Y, newStep, sourceModel, 0, description: sourceLink?.Labels?.FirstOrDefault()?.Content);
         Diagram.Nodes.Remove(source);
+        RefreshJson();
     }
 
     private void EditNode(WorkflowStepNode node)
@@ -226,6 +256,7 @@
         var newStep = new WorkflowStepChooserNode(AddNode, availableLayouts);
         AddNode(node.Position.X, node.Position.Y, newStep, sourceNode);
         if(sourceNode != null) AddLink(sourceNode, newStep, sourceLink.Labels.First().Content);
+        RefreshJson();
     }
 
     private void Remove(NodeModel node)
@@ -344,37 +375,44 @@
         }, opts);
     }
 
-    private async Task ViewJson()
-    {
-        var dialogResult = await dialogService.OpenAsync<ViewWorkflowJsonDialog>("Json", new Dictionary<string, object>
-        {
-            { nameof(ViewWorkflowJsonDialog.Context), Context }
-        });
-        if(!string.IsNullOrWhiteSpace(dialogResult))
-        {
-            var workflow = JsonSerializer.Deserialize<WorkflowRecord>(dialogResult);
-            CleanDiagram();
-            Context = WorkflowContext.CreateWorkflow(workflow, Forms);
-            Init();
-        }
-    }
-
     private async Task Save()
     {
         isSaveDisabled = true;
-        await SavedEvt.InvokeAsync(new ActionState(() =>
-        {
-            isSaveDisabled = false;
-        }));
+        await formBuilderApiService.UpdateWorkflow(Context.Definition.Workflow, CancellationToken.None);
+        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The workflow is saved" });
+        isSaveDisabled = false;
     }
 
     private async Task Publish()
     {
         isPublishDisabled = true;
-        await PublishedEvt.InvokeAsync(new ActionState(() =>
-        {
-            isPublishDisabled = false;
-        }));
+        var workflow = await formBuilderApiService.PublishWorkflow(Context.Definition.Workflow.Id, CancellationToken.None);
+        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The workflow is published" });
+        Refresh(workflow);
+        isPublishDisabled = false;
+    }
+
+    private void ViewJson()
+    {
+        Serialize();
+        panelType = FormPanelTypes.JSON;
+    }
+
+    private void RefreshJson()
+    {
+        Serialize();
+        if (jsonPanelComponent != null) jsonPanelComponent.Refresh(SerializedWorkflow);
+    }
+
+    private void Serialize()
+        => SerializedWorkflow = JsonSerializer.Serialize(Context.Definition.Workflow, new JsonSerializerOptions { WriteIndented = true });
+
+    private void Refresh(WorkflowRecord workflow)
+    {
+        CleanDiagram();
+        Context = WorkflowContext.CreateWorkflow(workflow, Forms);
+        Workflow = workflow;
+        Init();
     }
 
     private void CleanDiagram()

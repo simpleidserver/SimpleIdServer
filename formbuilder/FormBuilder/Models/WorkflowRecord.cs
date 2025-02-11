@@ -14,8 +14,14 @@ public class WorkflowRecord : BaseVersionRecord
 
     public void Update(List<WorkflowStep> steps, List<WorkflowLink> links, DateTime currentDateTime)
     {
-        Steps = steps;
-        Links = links;
+        var unknownSteps = steps.Where(s => !Steps.Any(es => es.Id == s.Id)).ToList();
+        Steps = Steps.Where(es => steps.Any(s => s.Id == es.Id)).ToList();
+        Steps.AddRange(unknownSteps);
+
+        var unknownLinks = links.Where(l => !Links.Any(el => el.Id == l.Id)).ToList();
+        Links = Links.Where(el => links.Any(l => l.Id == el.Id)).ToList();
+        foreach (var link in Links) link.Update(links.Single(l => l.Id == link.Id));
+        Links.AddRange(unknownLinks);
         UpdateDateTime = currentDateTime;
     }
 
@@ -49,14 +55,24 @@ public class WorkflowRecord : BaseVersionRecord
     {
         var steps = Steps.Select(s => (WorkflowStep)s.Clone()).ToList();
         var links = Links.Select(s => (WorkflowLink)s.Clone()).ToList();
-        steps.ForEach(s => s.Id = Guid.NewGuid().ToString());
         links.ForEach(s => s.Id = Guid.NewGuid().ToString());
+        steps.ForEach(s =>
+        {
+            var newId = Guid.NewGuid().ToString();
+            foreach (var l in links.Where(l => l.SourceStepId == s.Id))
+                l.SourceStepId = newId;
+            foreach (var l in links.Where(l => l.TargetStepId == s.Id))
+                l.TargetStepId = newId;
+
+            s.Id = newId;
+        });
         return new WorkflowRecord
         {
             Id = Guid.NewGuid().ToString(),
             CorrelationId = CorrelationId,
             Steps = steps,
             Links = links,
+            Realm = Realm,
             UpdateDateTime = UpdateDateTime,
             Status = RecordVersionStatus.Draft,
             VersionNumber = VersionNumber + 1

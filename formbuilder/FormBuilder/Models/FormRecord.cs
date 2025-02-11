@@ -71,6 +71,7 @@ public class FormRecord : BaseVersionRecord
             AvailableStyles = availableStyles, 
             UpdateDateTime = currentDateTime,
             Status = RecordVersionStatus.Draft,
+            Realm = Realm,
             VersionNumber = VersionNumber + 1,
             Elements = new ObservableCollection<IFormElementRecord>(clonedElements)
         };

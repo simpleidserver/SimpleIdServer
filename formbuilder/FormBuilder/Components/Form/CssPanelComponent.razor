@@ -16,12 +16,12 @@
     private bool isDisabled { get; set; }
     [Parameter] public string FormId { get; set; }
     [Parameter] public string Css { get; set; }
-    [Parameter] public EventCallback<ActionState> CssSavedEvt { get; set; }
     [Inject] public IUriProvider uriProvider { get; set; }
     [Inject] public IJSRuntime jSRuntime { get; set; }
     [Inject] public DialogService dialogService { get; set; }
     [Inject] public NotificationService notificationService { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
+    [Inject] public IFormBuilderApiService formBuilderApiService { get; set; }
 
     private async Task HandleOnEditorContentChanged()
     {
@@ -44,20 +44,10 @@
     private async Task HandleSave()
     {
         isDisabled = true;
-        using(var httpClient = new HttpClient())
-        {
-            var url = uriProvider.GetActiveFormCssUrl(FormId);
-            var requestMessage = new HttpRequestMessage
-            {
-                Content = new StringContent(JsonSerializer.Serialize(new UpdateFormStyleCommand { Content = Css }), Encoding.UTF8, "application/json"),
-                Method = HttpMethod.Put,
-                RequestUri = new Uri(url)
-            };
-            await httpClient.SendAsync(requestMessage);
-            await formBuilderJsService.RefreshCss(Css);
-            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated" });
-            dialogService.Close();
-            isDisabled = false;
-        }
+        await formBuilderApiService.UpdateCss(FormId, Css, CancellationToken.None);
+        await formBuilderJsService.RefreshCss(Css);
+        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated" });
+        dialogService.Close();
+        isDisabled = false;
     }
 }

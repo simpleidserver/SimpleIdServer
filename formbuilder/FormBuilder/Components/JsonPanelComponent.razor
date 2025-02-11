@@ -1,22 +1,38 @@
 ﻿@using BlazorMonaco.Editor
 @using FormBuilder.Models
+@using FormBuilder.Services
 @using Radzen.Blazor
 @using System.Text.Json
+@using System.Text.Json.Nodes
 
 <RadzenStack>
     <StandaloneCodeEditor @ref=editor OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="jsonEditor" />
-    <RadzenButton Text="Save" class="fullWidth"></RadzenButton>
 </RadzenStack>
 
 
 @code {
+    private bool _isContentUpdated = false;
     private string _json;
     private StandaloneCodeEditor editor;
+    private bool isDisabled { get; set; }
     [Parameter] public string Json { get; set; }
+    [Parameter] public EventCallback<string> JsonChanged { get; set; }
+
+    public void Refresh(string json)
+    {
+        _isContentUpdated = true;
+        Json = json;
+        Task.Run(async () => await editor.SetValue(json));
+        _isContentUpdated = false;
+    }
 
     private async Task HandleOnEditorContentChanged()
     {
-        Json = await editor.GetValue();
+        if (_isContentUpdated) return;
+        var value = await editor.GetValue();
+        if (value == Json) return;
+        Json = value;
+        if (IsValidJson()) await JsonChanged.InvokeAsync(Json);
     }
 
     protected override async Task OnParametersSetAsync()
@@ -24,7 +40,7 @@
         await base.OnParametersSetAsync();
         if(editor != null) 
         {
-            await editor.SetValue(Json);
+            // Refresh(Json);
         }
     }
 
@@ -36,5 +52,17 @@
             Language = "json",
             Value = Json
         };
+    }
+
+    private bool IsValidJson()
+    {
+        try
+        {
+            return JsonObject.Parse(Json).AsObject() is not null;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }
