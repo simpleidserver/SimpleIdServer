@@ -37,7 +37,7 @@ public class UriProvider : IUriProvider
     public string GetWorkflowPublishUrl(string id)
         => $"{GetAbsoluteUriWithVirtualPath()}/workflows/{id}/publish";
 
-    public string GetAbsoluteUriWithVirtualPath()
+    public virtual string GetAbsoluteUriWithVirtualPath()
     {
         var requestMessage = _httpContextAccessor.HttpContext.Request;
         var host = requestMessage.Host.Value;

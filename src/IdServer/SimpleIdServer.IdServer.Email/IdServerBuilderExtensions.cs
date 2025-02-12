@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Email;
@@ -24,6 +25,8 @@ namespace Microsoft.Extensions.DependencyInjection
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, EmailAuthenticationMethodService>();
             idServerBuilder.Services.AddTransient<IUserEmailAuthenticationService, UserEmailAuthenticationService>();
             idServerBuilder.Services.AddTransient<IResetPasswordService, UserEmailResetPasswordService>();
+            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailAuthWorkflowLayout>();
+            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailRegisterWorkflowLayout>();
             return idServerBuilder;
         }
     }

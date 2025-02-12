@@ -3,6 +3,8 @@
 @using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore
 @using SimpleIdServer.IdServer.Website.Resources
+@using FormBuilder.Components
+@using FormBuilder.Models
 @inject IUrlHelper urlHelper
 @inject IState<AcrState> acrState
 @inject IState<AuthenticationWorkflowLayoutsState> authenticationWorkflowLayoutsState
@@ -22,8 +24,8 @@
             <WorkflowEditor Forms=@authenticationFormsState.Value.FormRecords 
                 Workflow=@workflowState.Value.Value 
                 WorkflowLayouts=@authenticationWorkflowLayoutsState.Value.Values
-                PublishedEvt=@HandlePublish
-                SavedEvt=@HandleSave></WorkflowEditor>
+                Published=@HandlePublish
+                Saved=@HandleSave></WorkflowEditor>
         }
     </Authorized>
     <NotAuthorized>
@@ -54,12 +56,12 @@
         dispatcher.Dispatch(new GetAllAuthenticationFormsAction());
     }
 
-    private void HandlePublish(WorkflowActionState state)
+    private void HandleSave(ActionState<WorkflowRecord, bool> state)
     {
 
     }
 
-    private void HandleSave(WorkflowActionState state)
+    private void HandlePublish(ActionState<WorkflowRecord, WorkflowRecord> state)
     {
 
     }

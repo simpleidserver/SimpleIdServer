@@ -587,6 +587,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("publishForm",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Forms + "/{id}/publish",
                 defaults: new { controller = "Forms", action = "Publish" });
+            webApplication.SidMapControllerRoute("updateCss",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Forms + "/{id}/css",
+                defaults: new { controller = "Forms", action = "UpdateCss" });
 
             webApplication.SidMapControllerRoute("getAllLanguages",
                 pattern: Constants.EndPoints.Languages,

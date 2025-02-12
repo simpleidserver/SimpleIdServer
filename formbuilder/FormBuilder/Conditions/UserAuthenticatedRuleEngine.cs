@@ -17,6 +17,6 @@ public class UserAuthenticatedRuleEngine : GenericConditionRule<UserAuthenticate
     protected override bool EvaluateInternal(JsonObject input, UserAuthenticatedParameter parameter, IEnumerable<IConditionRuleEngine> conditionRuleEngines)
     {
         var httpContext = _httpContextAccessor.HttpContext;
-        return httpContext.User.Identity.IsAuthenticated;
+        return httpContext.User?.Identity?.IsAuthenticated ?? false;
     }
 }

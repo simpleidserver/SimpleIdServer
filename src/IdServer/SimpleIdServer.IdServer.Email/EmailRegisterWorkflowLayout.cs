@@ -6,74 +6,95 @@ using FormBuilder.Models.Layout;
 using FormBuilder.Models.Rules;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
-using SimpleIdServer.IdServer.Console.UI.ViewModels;
+using SimpleIdServer.IdServer.Email.UI.ViewModels;
 using SimpleIdServer.IdServer.Layout;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Console;
+namespace SimpleIdServer.IdServer.Email;
 
-public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
+public class EmailRegisterWorkflowLayout : IWorkflowLayoutService
 {
-    public string Category => FormCategories.Authentication;
+    public string Category => FormCategories.Registration;
 
     public WorkflowLayout Get()
     {
         return new WorkflowLayout
         {
-            WorkflowCorrelationId = "consoleAuthWorkflow",
-            SourceFormCorrelationId = StandardConsoleAuthForms.ConsoleForm.CorrelationId,
+            WorkflowCorrelationId = "emailRegistrationWorkflow",
+            SourceFormCorrelationId = StandardEmailRegistrationForms.EmailForm.CorrelationId,
             Links = new List<WorkflowLinkLayout>
             {
                 // Confirmation code.
                 new WorkflowLinkLayout
                 {
                     Description = "Confirmation code",
-                    EltCorrelationId = StandardConsoleAuthForms.consoleSendConfirmationCode,
+                    EltCorrelationId = StandardEmailRegistrationForms.emailSendConfirmationCodeFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
-                    ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
+                    ActionParameter = JsonSerializer.Serialize( new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
                         IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/" + Constants.AMR + "/Authenticate",
+                        Target = "/{realm}/" + SimpleIdServer.IdServer.Email.Constants.AMR + "/Register",
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters()
                             {
                                 Rules = new ObservableCollection<MappingRule>
                                 {
-                                    new MappingRule { Source = $"$.{nameof(AuthenticateConsoleViewModel.Realm)}", Target = "realm" }
+                                    new MappingRule { Source = $"$.{nameof(RegisterEmailViewModel.Realm)}", Target = "realm" }
                                 }
                             },
                             new RelativeUrlTransformerParameters()
                         }
                     })
                 },
-                // Authenticate
+                // Register
                 new WorkflowLinkLayout
                 {
-                    Description = "Authenticate",
-                    EltCorrelationId = StandardConsoleAuthForms.consoleAuthForm,
+                    Description = "Register",
+                    EltCorrelationId = StandardEmailRegistrationForms.emailRegisterFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
                         IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/" + Constants.AMR + "/Authenticate",
+                        Target = "/{realm}/" + SimpleIdServer.IdServer.Email.Constants.AMR + "/Register",
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters()
                             {
                                 Rules = new ObservableCollection<MappingRule>
                                 {
-                                    new MappingRule { Source = $"$.{nameof(AuthenticateConsoleViewModel.Realm)}", Target = "realm" }
+                                    new MappingRule { Source = $"$.{nameof(RegisterEmailViewModel.Realm)}", Target = "realm" }
                                 }
                             },
                             new RelativeUrlTransformerParameters()
                         }
                     })
                 },
-
+                // Back
+                new WorkflowLinkLayout
+                {
+                    Description = "Back",
+                    EltCorrelationId = StandardEmailRegistrationForms.backButtonId,
+                    ActionType = WorkflowLinkUrlTransformerAction.ActionType,
+                    ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter 
+                    { 
+                        Url = "{returnUrl}", 
+                        Transformers = new List<ITransformerParameters>
+                        {
+                            new RegexTransformerParameters
+                            {
+                                Rules = new ObservableCollection<MappingRule>
+                                {
+                                    new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
+                                }
+                            }
+                        }
+                    })
+                }
             }
         };
     }

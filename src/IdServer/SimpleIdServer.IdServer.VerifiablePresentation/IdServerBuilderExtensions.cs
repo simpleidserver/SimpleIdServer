@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.VerifiablePresentation;
@@ -20,6 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, VpAuthenticationMethodService>();
             idServerBuilder.Services.AddDid();
+            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, VpRegisterWorkflowLayout>();
             return idServerBuilder;
         }
     }

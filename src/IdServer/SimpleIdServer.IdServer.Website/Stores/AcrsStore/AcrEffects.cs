@@ -133,7 +133,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
                 RequestUri = new Uri($"{baseUrl}/workflowLayouts")
             });
             var json = await httpResult.Content.ReadAsStringAsync();
-            var workflowLayouts = SidJsonSerializer.Deserialize<List<WorkflowLayout>>(json);
+            var settings = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+            var workflowLayouts = JsonSerializer.Deserialize<List<WorkflowLayout>>(json, settings);
             dispatcher.Dispatch(new GetAllAuthenticationWorkflowLayoutsSuccessAction { WorkflowLayouts = workflowLayouts });
 
         }

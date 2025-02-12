@@ -26,7 +26,6 @@ public class AuthenticationClassReferencesController : BaseController
 {
     private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
     private readonly IRealmRepository _realmRepository;
-    private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IFormStore _formStore;
     private readonly IEnumerable<IWorkflowLayoutService> _workflowLayoutServices;
@@ -35,7 +34,6 @@ public class AuthenticationClassReferencesController : BaseController
     public AuthenticationClassReferencesController(
         IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, 
         IRealmRepository realmRepository,
-        IRegistrationWorkflowRepository registrationWorkflowRepository,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
         ITransactionBuilder transactionBuilder,
@@ -45,7 +43,6 @@ public class AuthenticationClassReferencesController : BaseController
     {
         _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
         _realmRepository = realmRepository;
-        _registrationWorkflowRepository = registrationWorkflowRepository;
         _transactionBuilder = transactionBuilder;
         _formStore = formStore;
         _workflowLayoutServices = workflowLayoutServices;

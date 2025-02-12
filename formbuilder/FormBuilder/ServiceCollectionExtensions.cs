@@ -54,8 +54,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFormElementDefinition, ImageDefinition>();
         services.AddTransient<IFormElementDefinition, BackButtonDefinition>();
 
-        services.AddTransient<IFormBuilderApiService, FormBuilderApiService>();
-
         services.AddTransient<IDateTimeHelper, DateTimeHelper>();
         services.AddTransient<ITranslationHelper, TranslationHelper>();
         services.AddTransient<IRenderFormElementsHelper, RenderFormElementsHelper>();

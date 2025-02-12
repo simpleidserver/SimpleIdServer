@@ -27,6 +27,7 @@ public class AuthLayoutBuilder
             ActAsStep = actAsStep,
             UpdateDateTime = DateTime.UtcNow,
             Category = FormCategories.Authentication,
+            Status = RecordVersionStatus.Published,
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new AuthLayoutBuilder(record);

@@ -67,6 +67,7 @@ public class FormRecord : BaseVersionRecord
             Id = Guid.NewGuid().ToString(),
             CorrelationId = CorrelationId,
             Name = Name,
+            Category = Category,
             ActAsStep = ActAsStep,
             AvailableStyles = availableStyles, 
             UpdateDateTime = currentDateTime,

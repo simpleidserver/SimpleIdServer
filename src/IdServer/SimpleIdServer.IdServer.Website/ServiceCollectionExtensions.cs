@@ -2,12 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using Fluxor.Blazor.Web.ReduxDevTools;
+using FormBuilder.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
 using SimpleIdServer.IdServer.Options;
@@ -35,10 +37,12 @@ namespace Microsoft.Extensions.DependencyInjection
                     rdt.Name = "SimpleIdServer";
                 });
             });
+            services.RemoveAll<IUriProvider>();
             services.AddFormBuilderUi();
             services.AddHttpContextAccessor();
             services.AddTransient<IUserSessionResitory, UserSessionRepository>();
             services.AddTransient<IUrlHelper, UrlHelper>();
+            services.AddTransient<IUriProvider, SidAdmUriProvider>();
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<IGroupService, GroupEffects>();
             services.AddScoped<DialogService>();

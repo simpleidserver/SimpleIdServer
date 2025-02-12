@@ -6,74 +6,70 @@ using FormBuilder.Models.Layout;
 using FormBuilder.Models.Rules;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
-using SimpleIdServer.IdServer.Console.UI.ViewModels;
 using SimpleIdServer.IdServer.Layout;
+using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Console;
+namespace SimpleIdServer.IdServer.Pwd;
 
-public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
+public class PwdRegisterWorkflowLayout : IWorkflowLayoutService
 {
-    public string Category => FormCategories.Authentication;
+    public string Category => FormCategories.Registration;
 
     public WorkflowLayout Get()
     {
         return new WorkflowLayout
         {
-            WorkflowCorrelationId = "consoleAuthWorkflow",
-            SourceFormCorrelationId = StandardConsoleAuthForms.ConsoleForm.CorrelationId,
+            WorkflowCorrelationId = "registerPwdWorkflow",
+            SourceFormCorrelationId = "pwdRegister",
             Links = new List<WorkflowLinkLayout>
             {
-                // Confirmation code.
+                // Register
                 new WorkflowLinkLayout
                 {
-                    Description = "Confirmation code",
-                    EltCorrelationId = StandardConsoleAuthForms.consoleSendConfirmationCode,
+                    Description = "Register",
+                    EltCorrelationId = StandardPwdRegisterForms.pwdRegisterFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
                         IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/" + Constants.AMR + "/Authenticate",
+                        Target = "/{realm}/pwd/Register",
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters()
                             {
                                 Rules = new ObservableCollection<MappingRule>
                                 {
-                                    new MappingRule { Source = $"$.{nameof(AuthenticateConsoleViewModel.Realm)}", Target = "realm" }
+                                    new MappingRule { Source = "$.Realm", Target = "realm" }
                                 }
                             },
                             new RelativeUrlTransformerParameters()
                         }
                     })
                 },
-                // Authenticate
+                // Back
                 new WorkflowLinkLayout
                 {
-                    Description = "Authenticate",
-                    EltCorrelationId = StandardConsoleAuthForms.consoleAuthForm,
-                    ActionType = WorkflowLinkHttpRequestAction.ActionType,
-                    ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
+                    Description = "Back",
+                    EltCorrelationId = StandardPwdRegisterForms.backBtnId,
+                    ActionType = WorkflowLinkUrlTransformerAction.ActionType,
+                    ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter
                     {
-                        Method = HttpMethods.POST,
-                        IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/" + Constants.AMR + "/Authenticate",
+                        Url = "{returnUrl}",
                         Transformers = new List<ITransformerParameters>
                         {
-                            new RegexTransformerParameters()
+                            new RegexTransformerParameters
                             {
                                 Rules = new ObservableCollection<MappingRule>
                                 {
-                                    new MappingRule { Source = $"$.{nameof(AuthenticateConsoleViewModel.Realm)}", Target = "realm" }
+                                    new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
                                 }
-                            },
-                            new RelativeUrlTransformerParameters()
+                            }
                         }
                     })
-                },
-
+                }
             }
         };
     }

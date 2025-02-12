@@ -91,4 +91,24 @@ public class FormsController : BaseController
             return BuildError(ex);
         }
     }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateCss([FromRoute] string prefix, string id, [FromBody] UpdateCssStyleCommand cmd, CancellationToken cancellationToken)
+    {
+        try
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            await CheckAccessToken(prefix, Constants.StandardScopes.Forms.Name);
+            var existingForm = await _formStore.GetLatestVersionByCorrelationId(prefix, id, cancellationToken);
+            if (existingForm == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownForm, id));
+            existingForm.ActiveStyle.Content = cmd.Css;
+            await _formStore.SaveChanges(cancellationToken);
+            return new NoContentResult();
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
 }

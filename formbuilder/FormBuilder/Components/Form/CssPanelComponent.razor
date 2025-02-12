@@ -14,14 +14,14 @@
 @code {
     private StandaloneCodeEditor editor;
     private bool isDisabled { get; set; }
+
     [Parameter] public string FormId { get; set; }
     [Parameter] public string Css { get; set; }
-    [Inject] public IUriProvider uriProvider { get; set; }
+    [Parameter] public EventCallback<ActionState<string, bool>> CssSaved { get; set; }
+
     [Inject] public IJSRuntime jSRuntime { get; set; }
-    [Inject] public DialogService dialogService { get; set; }
     [Inject] public NotificationService notificationService { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
-    [Inject] public IFormBuilderApiService formBuilderApiService { get; set; }
 
     private async Task HandleOnEditorContentChanged()
     {
@@ -44,10 +44,10 @@
     private async Task HandleSave()
     {
         isDisabled = true;
-        await formBuilderApiService.UpdateCss(FormId, Css, CancellationToken.None);
-        await formBuilderJsService.RefreshCss(Css);
-        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated" });
-        dialogService.Close();
-        isDisabled = false;
+        await CssSaved.InvokeAsync(new ActionState<string, bool>(async (b) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated" });
+            isDisabled = false;
+        }, Css));
     }
 }

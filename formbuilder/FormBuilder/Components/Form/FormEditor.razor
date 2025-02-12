@@ -12,9 +12,6 @@
 @inject IEnumerable<IFormElementDefinition> definitions
 @inject IJSRuntime jsRuntime
 
-
-<RadzenDialog />
-<RadzenNotification />
 <MonacoCompletion Context="@context" />
 
 @if(context != null)
@@ -90,7 +87,7 @@
             <div class="panel-content">
                 @if (panelType == FormPanelTypes.CSS)
                 {
-                    <CssPanelComponent Css="@Css" FormId="@Form.Id"></CssPanelComponent>
+                    <CssPanelComponent CssSaved="@(async(act) => await HandleSaveCss(act))" Css="@Css" FormId="@Form.Id"></CssPanelComponent>
                 }
 
                 @if (panelType == FormPanelTypes.JSON)
@@ -104,11 +101,15 @@
 
 @code {
     [Parameter] public FormRecord Form { get; set; }
-    [Parameter] public WorkflowLayout WorkflowLayout { get; set;}
-    [Inject] public IFormBuilderApiService formBuilderApiService { get; set; }
+    [Parameter] public WorkflowLayout WorkflowLayout { get; set; }
+    [Parameter] public EventCallback<ActionState<FormRecord, bool>> Saved { get; set; }
+    [Parameter] public EventCallback<ActionState<FormRecord, FormRecord>> Published { get; set; }
+    [Parameter] public EventCallback<ActionState<string, bool>> CssSaved { get; set; }
+
     [Inject] public IUriProvider uriProvider { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
     [Inject] public NotificationService notificationService { get; set; }
+
     WorkflowContext context = null;
     JsonPanelComponent jsonPanelComponent = null;
     FormViewer formViewer = null;
@@ -123,10 +124,10 @@
         if (Form != null) Form.Elements.CollectionChanged -= HandleChanged;
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected async override Task OnParametersSetAsync()
     {
-        await base.OnAfterRenderAsync(firstRender);
-        if (Form != null && context == null)
+        await base.OnParametersSetAsync();
+        if(Form != null)
         {
             context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout);
             Serialize();
@@ -137,7 +138,7 @@
     }
 
     private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)
-        => RefreshJson();
+    => RefreshJson();
 
     private void HandleJsonChanged(string json)
     {
@@ -147,6 +148,11 @@
 
     private void HandleDragStart(IFormElementDefinition def)
         => context.FormEditorContext.SelectDefinition(def);
+
+    private async Task HandleSaveCss(ActionState<string, bool> actionState)
+    {
+        await CssSaved.InvokeAsync(actionState);
+    }
 
     private Task LaunchDebug()
     {
@@ -166,18 +172,22 @@
     private async Task Save()
     {
         isSaveDisabled = true;
-        await formBuilderApiService.UpdateForm(Form, CancellationToken.None);
-        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The form is updated" });
-        isSaveDisabled = false;
+        await Saved.InvokeAsync(new ActionState<FormRecord, bool>((b) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The form is updated" });
+            isSaveDisabled = false;
+        }, Form));
     }
 
     private async Task Publish()
     {
         isPublishDisabled = true;
-        var publishedForm = await formBuilderApiService.PublishForm(Form.Id, CancellationToken.None);
-        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The form is published" });
-        RefreshForm(publishedForm);
-        isPublishDisabled = false;
+        await Published.InvokeAsync(new ActionState<FormRecord, FormRecord>((publishedForm) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The form is published" });
+            // RefreshForm(publishedForm);
+            isPublishDisabled = false;
+        }, Form));
     }
 
     private void Serialize() 
@@ -188,10 +198,13 @@
         var url = uriProvider.GetActiveFormCssUrl(Form.Id);
         using (var httpClient = new HttpClient())
         {
-            Css = await httpClient.GetStringAsync(url);
+            try
+            {
+                Css = await httpClient.GetStringAsync(url);
+                await formBuilderJsService.RefreshCss(Css);
+            }
+            catch { }
         }
-
-        await formBuilderJsService.RefreshCss(Css);
     }
 
     private void RefreshForm(FormRecord form)

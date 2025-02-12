@@ -4,8 +4,8 @@
 using Fluxor;
 using FormBuilder.Models;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Api.Forms;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 using System.Text;
 using System.Text.Json;
 
@@ -83,6 +83,30 @@ public class FormEffects
         });
     }
 
+    [EffectMethod]
+    public async Task Handle(UpdateFormCssAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var cmd = new UpdateCssStyleCommand
+        {
+            Css = action.Css
+        };
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{action.Id}/css"),
+            Method = HttpMethod.Put,
+            Content = new StringContent(JsonSerializer.Serialize(cmd), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        await httpResult.Content.ReadAsStringAsync();
+        dispatcher.Dispatch(new UpdateFormCssSuccessAction
+        {
+            Id = action.Id,
+            Css = action.Css
+        });
+    }
+
     private async Task<string> GetBaseUrl()
     {
         if (_configuration.IsReamEnabled)
@@ -125,4 +149,16 @@ public class PublishFormAction
 public class PublishFormSuccessAction
 {
     public FormRecord Form { get; set; }
+}
+
+public class UpdateFormCssAction
+{
+    public string Id { get; set; }
+    public string Css { get; set; }
+}
+
+public class UpdateFormCssSuccessAction
+{
+    public string Id { get; set; }
+    public string Css { get; set; }
 }

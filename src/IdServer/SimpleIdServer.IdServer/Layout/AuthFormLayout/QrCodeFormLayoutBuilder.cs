@@ -27,6 +27,7 @@ public class QrCodeFormLayoutBuilder
         {
             Id = id,
             CorrelationId = correlationId,
+            Status = RecordVersionStatus.Published,
             Name = name,
             UpdateDateTime = DateTime.UtcNow,
             ActAsStep = true,

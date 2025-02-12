@@ -1,6 +1,7 @@
 ﻿using FormBuilder.Models;
 using FormBuilder.Stores;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Dynamic.Core;
 
 namespace FormBuilder.EF.Stores;
 
@@ -26,7 +27,7 @@ public class FormStore : IFormStore
         => _dbContext.Forms.ToListAsync(cancellationToken);
 
     public Task<List<FormRecord>> GetByCategory(string realm, string category, CancellationToken cancellationToken)
-        => _dbContext.Forms.Where(f => f.Category == category && f.Realm == realm).ToListAsync(cancellationToken);
+        => _dbContext.Forms.Where(f => f.Category == category && f.Realm == realm).OrderByDescending(f => f.VersionNumber).GroupBy(f => f.CorrelationId).Select(f => f.First()).ToListAsync(cancellationToken);
 
     public Task<List<FormRecord>> GetLatestPublishedVersionByCorrelationids(List<string> correlationIds, CancellationToken cancellationToken)
         => _dbContext.Forms.OrderByDescending(f => f.VersionNumber).Where(f => correlationIds.Contains(f.CorrelationId) && f.Status == RecordVersionStatus.Published).GroupBy(f => f.CorrelationId).Select(s => s.First()).ToListAsync(cancellationToken);
@@ -42,7 +43,9 @@ public class FormStore : IFormStore
     }
     public Task<FormRecord> GetLatestVersionByCorrelationId(string realm, string correlationId, CancellationToken cancellationToken)
     {
-        return _dbContext.Forms.OrderByDescending(f => f.VersionNumber).FirstOrDefaultAsync(f => f.CorrelationId == correlationId && f.Realm == realm, cancellationToken);
+        return _dbContext.Forms
+            .Include(f => f.AvailableStyles)
+            .OrderByDescending(f => f.VersionNumber).FirstOrDefaultAsync(f => f.CorrelationId == correlationId && f.Realm == realm, cancellationToken);
     }
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)

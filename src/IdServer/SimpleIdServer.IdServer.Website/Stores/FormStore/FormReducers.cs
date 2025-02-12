@@ -10,23 +10,31 @@ public static class FormReducers
     #region FormState
 
     [ReducerMethod]
-    public static FormState ReduceGetFormAction(FormState state, GetFormAction act) => new FormState
+    public static FormState ReduceGetFormAction(FormState state, GetFormAction act)
     {
-        IsLoading = true
-    
-    };
+        return state with
+        {
+            IsLoading = true
+        };
+    }
     
     [ReducerMethod]
-    public static FormState ReduceUpdateFormAction(FormState state, UpdateFormAction act) => new FormState
+    public static FormState ReduceUpdateFormAction(FormState state, UpdateFormAction act)
     {
-        IsLoading = true
-    };
+        return state with
+        {
+            IsLoading = true
+        };
+    }
 
     [ReducerMethod]
-    public static FormState ReducePublishFormAction(FormState state, PublishFormAction act) => new FormState
+    public static FormState ReducePublishFormAction(FormState state, PublishFormAction act)
     {
-        IsLoading = true
-    };
+        return state with
+        {
+            IsLoading = true
+        };
+    }
 
     [ReducerMethod]
     public static FormState ReduceGetFormSuccessAction(FormState state, GetFormSuccessAction act)

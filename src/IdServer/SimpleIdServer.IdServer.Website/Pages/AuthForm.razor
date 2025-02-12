@@ -3,8 +3,13 @@
 @using FormBuilder.Helpers
 @using SimpleIdServer.IdServer.Website.Resources
 @using SimpleIdServer.IdServer.Website.Stores.FormStore
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore
 @using FormBuilder.Components.Form
+@using FormBuilder.Components
+@using FormBuilder.Models.Layout
+@using FormBuilder.Models
 @inject IState<FormState> formState
+@inject IState<AuthenticationWorkflowLayoutsState> authenticationWorkflowLayoutsState
 @inject IDispatcher dispatcher
 @inject IUrlHelper urlHelper
 @inject IUriProvider uriProvider
@@ -21,10 +26,14 @@
 
         <RadzenText class="mt-3 mb-3 no-margin" Text="@formState.Value.Form?.Name" TextStyle="TextStyle.DisplayH3" />
 
-        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@formState.Value.IsLoading>
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@IsLoading>
             @if(formState.Value.Form != null)
             {
-                <FormEditor Form=@formState.Value.Form></FormEditor>
+                <FormEditor Form=@formState.Value.Form 
+                    Saved=@HandleSave
+                    Published=@HandlePublish
+                    WorkflowLayout=@Layout
+                    CssSaved=@HandleUpdateCss></FormEditor>
             }
         </RadzenCardLoader>
     </Authorized>
@@ -36,6 +45,25 @@
 @code {
     [Parameter]
     public string id { get; set; }
+    private ActionState<FormRecord, bool> _updateForm;
+    private ActionState<FormRecord, FormRecord> _publishForm;
+    private ActionState<string, bool> _udpateCss;
+
+    private bool IsLoading 
+    {
+        get
+        {
+            return authenticationWorkflowLayoutsState.Value.IsLoading || formState.Value.IsLoading;
+        }
+    }
+
+    public WorkflowLayout Layout
+    {
+        get
+        {
+            return authenticationWorkflowLayoutsState.Value.Values?.SingleOrDefault(l => l.SourceFormCorrelationId == formState.Value.Form.CorrelationId);
+        }
+    }
 
     protected override void OnParametersSet()
     {
@@ -43,6 +71,48 @@
         if(!string.IsNullOrWhiteSpace(id))
         {
             dispatcher.Dispatch(new GetFormAction { Id = id });
+            dispatcher.Dispatch(new GetAllAuthenticationWorkflowLayoutsAction());
+    }
+    }
+    
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<UpdateFormSuccessAction>((act) =>
+            {
+                _updateForm.Callback(true);
+                StateHasChanged();
+            });
+            SubscribeToAction<PublishFormSuccessAction>((act) =>
+            {
+                _publishForm.Callback(act.Form);
+                StateHasChanged();
+            });
+            SubscribeToAction<UpdateFormCssSuccessAction>((act) =>
+            {
+                _udpateCss.Callback(true);
+                StateHasChanged();
+            });
         }
+    }
+
+    private void HandleSave(ActionState<FormRecord, bool> state)
+    {
+        _updateForm = state;
+        dispatcher.Dispatch(new UpdateFormAction { Id = formState.Value.Form.CorrelationId, Form = formState.Value.Form });
+    }
+
+    private void HandlePublish(ActionState<FormRecord, FormRecord> state)
+    {
+        _publishForm = state;
+        dispatcher.Dispatch(new PublishFormAction { Id = formState.Value.Form.CorrelationId });
+    }
+
+    private void HandleUpdateCss(ActionState<string, bool> state)
+    {
+        _udpateCss = state;
+        dispatcher.Dispatch(new UpdateFormCssAction { Id = formState.Value.Form.CorrelationId, Css = state.Content });
     }
 }

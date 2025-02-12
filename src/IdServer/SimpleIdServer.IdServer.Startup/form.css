@@ -5,8 +5,7 @@
     --from-bg-color: white;
     --from-shadow: 0 12px 40px rgba(0,0,0,0.12);
     --from-radius: 5px;
-    --divider-bg: #eee;
-    --divider-color: #6c757d;
+    --divider-bg: gray;
 }
 
 .form {
@@ -29,7 +28,7 @@
     padding: 10px;
 }
 
-
+/* Divider */
 .divider {
     display: flex;
     align-items: center;
@@ -48,4 +47,12 @@
     margin-top: 0px;
     margin-bottom: 0px;
     color: var(--divider-color);
+}
+
+.picture-container {
+    text-align: center;
+}
+
+.picture-container .picture {
+    width: 150px;
 }

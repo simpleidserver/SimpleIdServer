@@ -3,4 +3,14 @@
 => ajouter un panel de configuration pour JSON - WORKFLOW		:	DONE
 => pouvoir mettre à jour le workflow							:	DONE
 => pouvoir publier le workflow									:	DONE
-=> pouvoir éditer le formulaire dans l'application blazor		:	TODO
+=> pouvoir éditer le formulaire dans l'application blazor		:	DONE
+=> pouvoir sauvegarder un formulaire dans SID					:	DONE
+=> pouvoir publier un formulaire dans SID						:	DONE
+=> pouvoir sauvegarder le style CSS d'un formulaire dans SID	:	DONE
+=> passer tous les layous										:	DONE
+=> créer tous les layouts										:	DONE
+=> pouvoir enregister le workflow dans SID						:	TODO
+=> pouvoir publier un workflow dans SID							:	TODO
+=> dupliquer tous les workflows & forms quand realm est créé	:	TODO
+
+90f488c8-c2e6-485f-9825-3b04eca8db07

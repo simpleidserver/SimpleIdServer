@@ -6,14 +6,14 @@ using FormBuilder.Models.Layout;
 using FormBuilder.Models.Rules;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
-using SimpleIdServer.IdServer.Console.UI.ViewModels;
 using SimpleIdServer.IdServer.Layout;
+using SimpleIdServer.IdServer.Sms.UI.ViewModels;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 
-namespace SimpleIdServer.IdServer.Console;
+namespace SimpleIdServer.IdServer.Sms;
 
-public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
+public class SmsAuthWorkflowLayout : IWorkflowLayoutService
 {
     public string Category => FormCategories.Authentication;
 
@@ -21,28 +21,28 @@ public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
-            WorkflowCorrelationId = "consoleAuthWorkflow",
-            SourceFormCorrelationId = StandardConsoleAuthForms.ConsoleForm.CorrelationId,
+            WorkflowCorrelationId = "smsAuthWorkflow",
+            SourceFormCorrelationId = StandardSmsAuthForms.SmsForm.CorrelationId,
             Links = new List<WorkflowLinkLayout>
             {
                 // Confirmation code.
                 new WorkflowLinkLayout
                 {
                     Description = "Confirmation code",
-                    EltCorrelationId = StandardConsoleAuthForms.consoleSendConfirmationCode,
+                    EltCorrelationId = StandardSmsAuthForms.smsSendConfirmationCode,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
                         IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/" + Constants.AMR + "/Authenticate",
+                        Target = "/{realm}/" + SimpleIdServer.IdServer.Sms.Constants.AMR + "/Authenticate",
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters()
                             {
                                 Rules = new ObservableCollection<MappingRule>
                                 {
-                                    new MappingRule { Source = $"$.{nameof(AuthenticateConsoleViewModel.Realm)}", Target = "realm" }
+                                    new MappingRule { Source = $"$.{nameof(AuthenticateSmsViewModel.Realm)}", Target = "realm" }
                                 }
                             },
                             new RelativeUrlTransformerParameters()
@@ -53,27 +53,26 @@ public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Authenticate",
-                    EltCorrelationId = StandardConsoleAuthForms.consoleAuthForm,
+                    EltCorrelationId = StandardSmsAuthForms.smsAuthForm,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
                         IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/" + Constants.AMR + "/Authenticate",
+                        Target = "/{realm}/" + SimpleIdServer.IdServer.Sms.Constants.AMR + "/Authenticate",
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters()
                             {
                                 Rules = new ObservableCollection<MappingRule>
                                 {
-                                    new MappingRule { Source = $"$.{nameof(AuthenticateConsoleViewModel.Realm)}", Target = "realm" }
+                                    new MappingRule { Source = $"$.{nameof(AuthenticateSmsViewModel.Realm)}", Target = "realm" }
                                 }
                             },
                             new RelativeUrlTransformerParameters()
                         }
                     })
-                },
-
+                }
             }
         };
     }

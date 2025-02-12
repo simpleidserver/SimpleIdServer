@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Otp;
 using SimpleIdServer.IdServer.Otp.Services;
@@ -20,6 +21,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, OtpAuthenticationMethodService>();
         idServerBuilder.Services.AddTransient<IOtpAuthenticationService, OtpAuthenticationService>();
         idServerBuilder.Services.AddTransient<IUserAuthenticationService, OtpAuthenticationService>();
+        idServerBuilder.Services.AddTransient<IWorkflowLayoutService, OtpAuthWorkflowLayout>();
         return idServerBuilder;
     }
 }

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Pwd.Services;
@@ -21,6 +22,9 @@ namespace Microsoft.Extensions.DependencyInjection
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, PwdAuthenticationMethodService>();
             idServerBuilder.Services.AddTransient<IPasswordAuthenticationService, PasswordAuthenticationService>();
             idServerBuilder.Services.AddTransient<IUserAuthenticationService, PasswordAuthenticationService>();
+            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdAuthWorkflowLayout>();
+            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ResetPwdWorkflowLayout>();
+            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdRegisterWorkflowLayout>();
             return idServerBuilder;
         }
     }

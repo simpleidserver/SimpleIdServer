@@ -73,8 +73,9 @@
     [Parameter] public WorkflowRecord Workflow { get; set; }
     [Parameter] public List<FormRecord> Forms { get; set; }
     [Parameter] public List<WorkflowLayout> WorkflowLayouts { get; set; }
+    [Parameter] public EventCallback<ActionState<WorkflowRecord, bool>> Saved { get; set; }
+    [Parameter] public EventCallback<ActionState<WorkflowRecord, WorkflowRecord>> Published { get; set; }
 
-    [Inject] public IFormBuilderApiService formBuilderApiService { get; set; }
     [Inject] public NotificationService notificationService { get; set; }
 
     private WorkflowContext Context { get; set; }
@@ -378,18 +379,22 @@
     private async Task Save()
     {
         isSaveDisabled = true;
-        await formBuilderApiService.UpdateWorkflow(Context.Definition.Workflow, CancellationToken.None);
-        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The workflow is saved" });
-        isSaveDisabled = false;
+        await Saved.InvokeAsync(new ActionState<WorkflowRecord, bool>((b) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The workflow is saved" });
+            isSaveDisabled = false;
+        }, Workflow));
     }
 
     private async Task Publish()
     {
         isPublishDisabled = true;
-        var workflow = await formBuilderApiService.PublishWorkflow(Context.Definition.Workflow.Id, CancellationToken.None);
-        notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The workflow is published" });
-        Refresh(workflow);
-        isPublishDisabled = false;
+        await Published.InvokeAsync(new ActionState<WorkflowRecord, WorkflowRecord>((w) =>
+        {
+            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The workflow is published" });
+            Refresh(w);
+            isPublishDisabled = false;
+        }, Workflow));
     }
 
     private void ViewJson()

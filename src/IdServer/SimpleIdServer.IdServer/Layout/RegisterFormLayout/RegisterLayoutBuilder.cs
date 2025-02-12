@@ -30,6 +30,7 @@ public class RegisterLayoutBuilder
             CorrelationId = correlationId,
             UpdateDateTime = DateTime.UtcNow,
             Name = name,
+            Status = RecordVersionStatus.Published,
             ActAsStep = true,
             Realm = realm ?? Constants.DefaultRealm,
             Category = FormCategories.Registration,

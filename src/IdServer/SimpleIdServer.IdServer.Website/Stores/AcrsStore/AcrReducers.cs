@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
 using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+using SimpleIdServer.IdServer.Website.Stores.FormStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore;
 
@@ -181,6 +182,20 @@ public static class AcrReducers
         {
             IsLoading = false,
             FormRecords = action.AuthenticationForms
+        };
+    }
+
+    [ReducerMethod]
+    public static AuthenticationFormsState ReducePublishFormSuccessAction(AuthenticationFormsState state, PublishFormSuccessAction action)
+    {
+        var formRecords = state.FormRecords;
+        if (formRecords == null) return state;
+        var formRecord = formRecords.SingleOrDefault(r => r.CorrelationId == action.Form.CorrelationId);
+        formRecord.VersionNumber++;
+        return state with
+        {
+            IsLoading = false,
+            FormRecords = formRecords
         };
     }
 

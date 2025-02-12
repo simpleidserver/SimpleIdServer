@@ -3,6 +3,7 @@
 
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Models;
+using MassTransit;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,9 +27,12 @@ public class OtpAuthFormLayoutBuilder
         {
             Id = id,
             CorrelationId = correlationId,
+            Status = RecordVersionStatus.Published,
             UpdateDateTime = DateTime.UtcNow,
             Name = name,
             ActAsStep = true,
+            Realm = Constants.DefaultRealm,
+            Category = FormCategories.Authentication,
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new OtpAuthFormLayoutBuilder(record, loginTranslations);
@@ -39,6 +43,7 @@ public class OtpAuthFormLayoutBuilder
         var authForm = new FormStackLayoutRecord
         {
              Id = id,
+             CorrelationId = id,
              IsFormEnabled = true,
              Elements = new ObservableCollection<IFormElementRecord>
              {
@@ -65,6 +70,7 @@ public class OtpAuthFormLayoutBuilder
         var sendConfirmationCode = new FormStackLayoutRecord
         {
             Id = id,
+            CorrelationId = id,
             IsFormEnabled = true,
             Elements = new ObservableCollection<IFormElementRecord>
             {
