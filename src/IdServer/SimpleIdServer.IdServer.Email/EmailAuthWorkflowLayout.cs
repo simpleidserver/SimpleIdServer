@@ -22,6 +22,7 @@ public class EmailAuthWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "email",
             WorkflowCorrelationId = "emailAuthWorkflow",
             SourceFormCorrelationId = StandardEmailAuthForms.EmailForm.CorrelationId,
             Links = new List<WorkflowLinkLayout>

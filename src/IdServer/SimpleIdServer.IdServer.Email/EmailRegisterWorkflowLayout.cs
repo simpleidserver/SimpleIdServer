@@ -22,6 +22,7 @@ public class EmailRegisterWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "email",
             WorkflowCorrelationId = "emailRegistrationWorkflow",
             SourceFormCorrelationId = StandardEmailRegistrationForms.EmailForm.CorrelationId,
             Links = new List<WorkflowLinkLayout>

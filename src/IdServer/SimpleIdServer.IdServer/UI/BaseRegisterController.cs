@@ -125,13 +125,14 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
 
     protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProgress, TViewModel viewModel, string prefix, CancellationToken cancellationToken)
     {
+        prefix = prefix ?? Constants.DefaultRealm;
         var tokenSet = Antiforgery.GetAndStoreTokens(HttpContext);
         var records = await FormStore.GetAll(CancellationToken.None);
-        var workflow = await WorkflowStore.Get(registrationProgress.WorkflowId, CancellationToken.None);
-        var workflowFormIds = workflow.Steps.Select(s => s.FormRecordId);
+        var workflow = await WorkflowStore.Get(prefix, registrationProgress.WorkflowId, CancellationToken.None);
+        var workflowFormIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
         var filteredRecords = records.Where(r => workflowFormIds.Contains(r.Id));
         var record = filteredRecords.Single(r => r.Name == Amr);
-        var step = workflow.GetStep(record.Id);
+        var step = workflow.GetStep(record.CorrelationId);
         var languages = await LanguageRepository.GetAll(cancellationToken);
         var result = new SidWorkflowViewModel
         {
@@ -156,7 +157,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
     private string GetNextAmr(WorkflowViewModel result, TViewModel viewModel)
     {
         var nextStepId = result.GetNextStepId(viewModel);
-        var formRecord = result.FormRecords.Single(rec => rec.Id == result.Workflow.Steps.Single(r => r.Id == nextStepId).FormRecordId);
+        var formRecord = result.FormRecords.Single(rec => rec.Id == result.Workflow.Steps.Single(r => r.Id == nextStepId).FormRecordCorrelationId);
         return formRecord.Name;
     }
 

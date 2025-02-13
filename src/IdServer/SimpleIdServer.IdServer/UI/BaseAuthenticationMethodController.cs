@@ -108,7 +108,7 @@ namespace SimpleIdServer.IdServer.UI
                 else
                 {
                     viewModel.RememberLogin = false;
-                    workflow = await WorkflowStore.Get(Options.DefaultAuthenticationWorkflowId, cancellationToken);
+                    workflow = await WorkflowStore.Get(prefix, Options.DefaultAuthenticationWorkflowId, cancellationToken);
                     forms = await FormStore.GetAll(cancellationToken);
                 }
 
@@ -296,7 +296,7 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var records = await FormStore.GetAll(token);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-                var workflow = await WorkflowStore.Get(viewModel.WorkflowId, token);
+                var workflow = await WorkflowStore.Get(prefix, viewModel.WorkflowId, token);
                 var workflowResult = await BuildViewModel(workflow, records, token);
                 return workflowResult;
             }
@@ -327,16 +327,16 @@ namespace SimpleIdServer.IdServer.UI
         private bool IsFirstStep(WorkflowRecord workflow, List<FormRecord> forms)
         {
             var firstStep = workflow.GetFirstStep();
-            return forms.Single(f => f.Id == firstStep.FormRecordId).Name == Amr;
+            return forms.Single(f => f.CorrelationId == firstStep.FormRecordCorrelationId).Name == Amr;
         }
 
         private async Task<WorkflowViewModel> BuildViewModel(WorkflowRecord workflow, List<FormRecord> records, CancellationToken cancellationToken)
         {
             var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-            var workflowStepFormIds = workflow.Steps.Select(s => s.FormRecordId);
-            var filteredRecords = records.Where(r => workflowStepFormIds.Contains(r.Id)).ToList();
+            var workflowStepFormIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
+            var filteredRecords = records.Where(r => workflowStepFormIds.Contains(r.CorrelationId)).ToList();
             var record = filteredRecords.Single(r => r.Name == Amr);
-            var step = workflow.GetStep(record.Id);
+            var step = workflow.GetStep(record.CorrelationId);
             var languages = await _languageRepository.GetAll(cancellationToken);
             var result = new SidWorkflowViewModel
             {

@@ -37,6 +37,7 @@ public static class StandardFormComponents
         return new FormAnchorRecord
         {
             Id = id,
+            CorrelationId = id,
             Labels = LayoutTranslations.Back,
             ActAsButton = true
         };
@@ -282,6 +283,7 @@ public static class StandardFormComponents
         return new FormAnchorRecord
         {
             Id = id,
+            CorrelationId = id,
             Labels = translations
         };
     }

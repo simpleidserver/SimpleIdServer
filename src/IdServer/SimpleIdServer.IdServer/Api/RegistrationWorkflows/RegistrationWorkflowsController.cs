@@ -94,7 +94,7 @@ public class RegistrationWorkflowsController : BaseController
                 await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
                 if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
                 if (request.WorkflowId == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.WorkflowId));
-                var existingWorkflow = await _workflowStore.Get(request.WorkflowId, cancellationToken);
+                var existingWorkflow = await _workflowStore.Get(prefix, request.WorkflowId, cancellationToken);
                 if (existingWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownWorkflow, request.WorkflowId));
                 var existingRegistrationWorkflow = await _registrationWorkflowRepository.GetByName(prefix, request.Name, cancellationToken);
                 if (existingRegistrationWorkflow != null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.RegistrationWorkflowExists);
@@ -142,7 +142,7 @@ public class RegistrationWorkflowsController : BaseController
                 await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
                 if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
                 if (request.WorkflowId == null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.WorkflowId));
-                var existingWorkflow = await _workflowStore.Get(request.WorkflowId, cancellationToken);
+                var existingWorkflow = await _workflowStore.Get(prefix, request.WorkflowId, cancellationToken);
                 if (existingWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownWorkflow, request.WorkflowId));
                 var existingRegistrationWorkflow = await _registrationWorkflowRepository.Get(prefix, id, cancellationToken);
                 if (existingRegistrationWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownRegistrationWorkflow, id));

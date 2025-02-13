@@ -35,7 +35,7 @@ public class WorkflowContext
                 new WorkflowStep
                 {
                     Id = currentStepId,
-                    FormRecordId = form.Id
+                    FormRecordCorrelationId = form.CorrelationId
                 }
             }
         };
@@ -88,7 +88,7 @@ public class WorkflowContext
     {
         var currentStep = GetCurrentStepDefinition();
         if (currentStep == null) return null;
-        return Definition.Records.Single(r => r.Id == currentStep.FormRecordId);
+        return Definition.Records.Single(r => r.CorrelationId == currentStep.FormRecordCorrelationId);
     }
 
     public IFormElementRecord GetFormRecord(string eltId)
@@ -360,7 +360,7 @@ public class WorkflowExecutionContext
                 new WorkflowStep
                 {
                     Id = currentStepId,
-                    FormRecordId = formRecord.Id
+                    FormRecordCorrelationId = formRecord.CorrelationId
                 }
             }
         };
@@ -416,7 +416,7 @@ public class WorkflowExecutionContext
     public FormRecord GetCurrentRecord()
     {
         var currentStep = GetCurrentStep();
-        return Records.Single(r => r.Id == currentStep.FormRecordId);
+        return Records.Single(r => r.CorrelationId == currentStep.FormRecordCorrelationId);
     }
 
     public void SetStepOutput(JsonObject output)

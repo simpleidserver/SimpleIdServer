@@ -40,7 +40,7 @@ public class RegisterController : BaseWorkflowController
 
     private async Task<WorkflowViewModel> BuildViewModel(string stepName, RegisterViewModel viewModel, CancellationToken cancellationToken)
     {
-        var result = await Get(_workflowId, stepName, cancellationToken);
+        var result = await Get("master", _workflowId, stepName, cancellationToken);
         result.SetInput(viewModel);
         return result;
     }

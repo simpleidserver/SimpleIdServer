@@ -31,6 +31,7 @@ public static class StandardVpRegisterForms
                 new ListDataRecord
                 {
                     Id = vpRegistrationFormId,
+                    CorrelationId = vpRegistrationFormId,
                     FieldType = FormStackLayoutDefinition.TYPE,
                     Transformations = new List<ITransformationRule>
                     {

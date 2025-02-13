@@ -79,13 +79,14 @@ public class DataSeeder
         BuildComplexRegistrationWorkflow()
     };
     
-    public static WorkflowRecord BuildComplexRegistrationWorkflow() => WorkflowBuilder.New("327dfdc9-3fa3-4b90-bfa8-670147fb4703", "complexRegistrationWorkflow")
+    public static WorkflowRecord BuildComplexRegistrationWorkflow() => WorkflowBuilder.New("327dfdc9-3fa3-4b90-bfa8-670147fb4703")
           .AddPwdRegistration(StandardFidoRegisterForms.MobileForm)
           .AddMobileRegistration()
           .Build(DateTime.UtcNow);
 
-    public static WorkflowRecord BuildComplexAuthenticationWorkflow() => WorkflowBuilder.New("059f49b2-f76a-4b5a-8ecc-cf64abdf9b39", "complexAuthWorkflow")
-        .AddPwdAuth(StandardConsoleAuthForms.ConsoleForm)
+    public static WorkflowRecord BuildComplexAuthenticationWorkflow() => WorkflowBuilder.New("059f49b2-f76a-4b5a-8ecc-cf64abdf9b39")
+        .AddPwdAuth(StandardConsoleAuthForms.ConsoleForm, StandardPwdAuthForms.ResetForm)
+        .AddResetPwd()
         .AddConsoleAuth()
         .Build(DateTime.UtcNow);
 

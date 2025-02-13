@@ -14,7 +14,7 @@ namespace SimpleIdServer.IdServer.Helpers;
 
 public interface IWorkflowHelper
 {
-    Task<string> GetNextAmr(string workflowId, string amr, CancellationToken cancellationToken);
+    Task<string> GetNextAmr(string realm, string workflowId, string amr, CancellationToken cancellationToken);
 }
 
 public class WorkflowHelper : IWorkflowHelper
@@ -34,39 +34,39 @@ public class WorkflowHelper : IWorkflowHelper
     public static string GetNextAmr<TViewModel>(WorkflowRecord workflow, List<FormRecord> records, string activeLink)
     {
         var targetFormRecordId = GetTargetFormRecordId(workflow, activeLink);
-        var formRecord = records.Single(rec => rec.Id == targetFormRecordId);
+        var formRecord = records.Single(rec => rec.CorrelationId == targetFormRecordId);
         return formRecord.Name;
     }
 
     public static bool IsLastStep(string stepName)
         => stepName == FormBuilder.Constants.EmptyStep.Name;
 
-    public async Task<string> GetNextAmr(string workflowId, string amr, CancellationToken cancellationToken)
+    public async Task<string> GetNextAmr(string realm, string workflowId, string amr, CancellationToken cancellationToken)
     {
-        var workflow = await _workflowStore.Get(workflowId, cancellationToken);
+        var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
         var forms = await _formStore.GetAll(cancellationToken);
         return GetNextAmr(workflow, forms, amr);
     }
 
     public static string GetNextAmr(WorkflowRecord workflow, List<FormRecord> forms, string amr)
     {
-        var workflowFormIds = workflow.Steps.Select(r => r.FormRecordId);
-        var workflowForms = forms.Where(f => workflowFormIds.Contains(f.Id));
+        var workflowFormIds = workflow.Steps.Select(r => r.FormRecordCorrelationId);
+        var workflowForms = forms.Where(f => workflowFormIds.Contains(f.CorrelationId));
         var currentForm = workflowForms.Single(f => f.Name == amr);
-        var workflowStep = workflow.Steps.Single(s => s.FormRecordId == currentForm.Id);
+        var workflowStep = workflow.Steps.Single(s => s.FormRecordCorrelationId == currentForm.CorrelationId);
         var stepLinks = workflow.Links.Where(l => l.SourceStepId == workflowStep.Id).Select(l => l.TargetStepId);
-        var targetFormIds = workflow.Steps.Where(s => stepLinks.Contains(s.Id)).Select(s => s.FormRecordId);
-        var result = workflowForms.FirstOrDefault(f => targetFormIds.Contains(f.Id) && f.ActAsStep)?.Name;
+        var targetFormIds = workflow.Steps.Where(s => stepLinks.Contains(s.Id)).Select(s => s.FormRecordCorrelationId);
+        var result = workflowForms.FirstOrDefault(f => targetFormIds.Contains(f.CorrelationId) && f.ActAsStep)?.Name;
         if (result != null) return result;
         return FormBuilder.Constants.EmptyStep.Name;
     }
 
     public static List<string> ExtractAmrs(WorkflowRecord workflow, List<FormRecord> forms)
-        => forms.Where(f => f.ActAsStep).Where(step => workflow.Steps.Any(s => s.FormRecordId == step.Id)).Select(s => s.Name).ToList();
+        => forms.Where(f => f.ActAsStep).Where(step => workflow.Steps.Any(s => s.FormRecordCorrelationId == step.CorrelationId)).Select(s => s.Name).ToList();
 
     private static string GetTargetFormRecordId(WorkflowRecord workflow, string activeLink)
     {
         var link = workflow.Links.Single(l => l.Id == activeLink);
-        return workflow.Steps.Single(r => r.Id == link.TargetStepId).FormRecordId;
+        return workflow.Steps.Single(r => r.Id == link.TargetStepId).FormRecordCorrelationId;
     }
 }

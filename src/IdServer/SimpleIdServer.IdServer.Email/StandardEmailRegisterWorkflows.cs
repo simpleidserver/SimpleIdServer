@@ -16,14 +16,14 @@ public static class StandardEmailRegisterWorkflows
 {
     public static string workflowId = "d53b24b4-7a8f-4dd3-8fc9-7a3888ab8d93";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "standardEmailRegister")
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
         .AddEmailRegistration()
         .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddEmailRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardEmailRegistrationForms.EmailForm)
-            .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, Constants.EmptyStep, StandardEmailRegistrationForms.emailSendConfirmationCodeFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, Constants.EmptyStep, StandardEmailRegistrationForms.emailSendConfirmationCodeFormId, "Confirmation code", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -40,7 +40,7 @@ public static class StandardEmailRegisterWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-            .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, nextStep ?? Constants.EmptyStep, StandardEmailRegistrationForms.emailRegisterFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, nextStep ?? Constants.EmptyStep, StandardEmailRegistrationForms.emailRegisterFormId, "Register", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -57,7 +57,7 @@ public static class StandardEmailRegisterWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-             .AddTransformedLinkUrlAction(StandardEmailRegistrationForms.EmailForm, nextStep ?? Constants.EmptyStep, StandardEmailRegistrationForms.backButtonId, "{returnUrl}", new List<ITransformerParameters>
+             .AddTransformedLinkUrlAction(StandardEmailRegistrationForms.EmailForm, nextStep ?? Constants.EmptyStep, StandardEmailRegistrationForms.backButtonId, "Back", "{returnUrl}", new List<ITransformerParameters>
              {
                  new RegexTransformerParameters
                  {

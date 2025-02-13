@@ -14,7 +14,7 @@
             if (Context.Definition.Workflow != null && Context.Definition.Records != null)
             {
                 var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep);
-                var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => formsActingAsStep.FirstOrDefault(st => st.Id == s.FormRecordId)).Where(s => s != null).Select(s => s.Name);
+                var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => formsActingAsStep.FirstOrDefault(st => st.CorrelationId == s.FormRecordCorrelationId)).Where(s => s != null).Select(s => s.Name);
                 var currentFormRecord = Context.GetCurrentFormRecord();
                 if (IsNavigationDisplayed)
                 {

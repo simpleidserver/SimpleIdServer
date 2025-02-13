@@ -3,7 +3,6 @@
 using FormBuilder.Helpers;
 using FormBuilder.Models;
 using FormBuilder.Repositories;
-using FormBuilder.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Exceptions;
@@ -21,14 +20,12 @@ public class WorkflowsController : BaseController
     private readonly ILogger<WorkflowsController> _logger;
     private readonly IWorkflowStore _workflowStore;
     private readonly IDateTimeHelper _dateTimeHelper;
-    private readonly IVersionedWorkflowService _versionedWorkflowService;
 
-    public WorkflowsController(ILogger<WorkflowsController> logger, IWorkflowStore workflowStore, IDateTimeHelper dateTimeHelper, IVersionedWorkflowService versionedWorkflowService, ITokenRepository tokenRepository, IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
+    public WorkflowsController(ILogger<WorkflowsController> logger, IWorkflowStore workflowStore, IDateTimeHelper dateTimeHelper, ITokenRepository tokenRepository, IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
     {
         _logger = logger;
         _workflowStore = workflowStore;
         _dateTimeHelper = dateTimeHelper;
-        _versionedWorkflowService = versionedWorkflowService;
     }
 
     [HttpGet]
@@ -38,7 +35,7 @@ public class WorkflowsController : BaseController
         {
             prefix = prefix ?? Constants.DefaultRealm;
             await CheckAccessToken(prefix, Constants.StandardScopes.Workflows.Name);
-            var workflow = await _workflowStore.GetLatestPublishedRecord(prefix, id, cancellationToken);
+            var workflow = await _workflowStore.Get(prefix, id, cancellationToken);
             if (workflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_WORKFLOW, string.Format(Global.UnknownWorkflow, id));
             return new OkObjectResult(workflow);
         }
@@ -56,30 +53,11 @@ public class WorkflowsController : BaseController
         {
             prefix = prefix ?? Constants.DefaultRealm;
             await CheckAccessToken(prefix, Constants.StandardScopes.Workflows.Name);
-            var workflow = await _workflowStore.GetLatestPublishedRecord(prefix, id, cancellationToken);
+            var workflow = await _workflowStore.Get(prefix, id, cancellationToken);
             if (workflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_WORKFLOW, string.Format(Global.UnknownWorkflow, id));
             workflow.Update(record.Steps, record.Links, _dateTimeHelper.GetCurrent());
             await _workflowStore.SaveChanges(cancellationToken);
             return new NoContentResult();
-        }
-        catch (OAuthException ex)
-        {
-            _logger.LogError(ex.ToString());
-            return BuildError(ex);
-        }
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Publish([FromRoute] string prefix, string id, CancellationToken cancellationToken)
-    {
-        try
-        {
-            prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.StandardScopes.Workflows.Name);
-            var workflow = await _workflowStore.GetLatestPublishedRecord(prefix, id, cancellationToken);
-            if (workflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_WORKFLOW, string.Format(Global.UnknownWorkflow, id));
-            var publishedVersion = await _versionedWorkflowService.Publish(workflow, cancellationToken);
-            return new OkObjectResult(publishedVersion);
         }
         catch (OAuthException ex)
         {

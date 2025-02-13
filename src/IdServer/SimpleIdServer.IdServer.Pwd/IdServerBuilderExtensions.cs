@@ -23,8 +23,9 @@ namespace Microsoft.Extensions.DependencyInjection
             idServerBuilder.Services.AddTransient<IPasswordAuthenticationService, PasswordAuthenticationService>();
             idServerBuilder.Services.AddTransient<IUserAuthenticationService, PasswordAuthenticationService>();
             idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdAuthWorkflowLayout>();
-            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ResetPwdWorkflowLayout>();
+            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ConfirmResetPwdWorkflowLayout>();
             idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdRegisterWorkflowLayout>();
+            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ResetPwdWorkflowLayout>();
             return idServerBuilder;
         }
     }

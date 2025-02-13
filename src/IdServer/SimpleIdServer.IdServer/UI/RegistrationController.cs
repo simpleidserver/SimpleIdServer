@@ -51,12 +51,12 @@ public class RegistrationController : BaseController
 		if (string.IsNullOrWhiteSpace(workflowName)) registrationWorkflow = await _registrationWorkflowRepository.GetDefault(prefix, CancellationToken.None);
 		else registrationWorkflow = await _registrationWorkflowRepository.GetByName(prefix, workflowName, CancellationToken.None);
 		if(registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
-		var workflow = await _workflowStore.Get(registrationWorkflow.WorkflowId, CancellationToken.None);
+		var workflow = await _workflowStore.Get(prefix, registrationWorkflow.WorkflowId, CancellationToken.None);
 		if(workflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownWorkflow, registrationWorkflow.WorkflowId));
 		var cookieName = _options.GetRegistrationCookieName();
 		var allForms = await _formStore.GetAll(CancellationToken.None);
 		var registrationProgressId = Guid.NewGuid().ToString();
-		var workflowSteps = workflow.Steps.Select(s => allForms.Single(f => f.Id == s.FormRecordId)).Where(s => s.ActAsStep);
+		var workflowSteps = workflow.Steps.Select(s => allForms.Single(f => f.CorrelationId == s.FormRecordCorrelationId)).Where(s => s.ActAsStep);
 		var amr = workflowSteps.First().Name;
         var registrationProgress = new UserRegistrationProgress 
 		{ 

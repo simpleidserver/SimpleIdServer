@@ -13,27 +13,14 @@ public class WorkflowStore : IWorkflowStore
         _dbContext = dbContext;
     }
 
-    public void Add(WorkflowRecord record)
-        => _dbContext.Workflows.Add(record);
-
-    public Task<WorkflowRecord> Get(string id, CancellationToken cancellationToken)
+    public Task<WorkflowRecord> Get(string realm, string id, CancellationToken cancellationToken)
         => _dbContext.Workflows
             .Include(w => w.Links)
             .Include(w => w.Steps)
-            .SingleOrDefaultAsync(w => w.Id == id, cancellationToken);
+            .SingleOrDefaultAsync(w => w.Id == id && w.Realm == realm, cancellationToken);
 
-    public Task<WorkflowRecord> GetLatest(string realm, string correlationId, CancellationToken cancellationToken)
-        => _dbContext.Workflows.Include(w => w.Links).Include(w => w.Steps).OrderByDescending(w => w.VersionNumber).FirstOrDefaultAsync(w => w.Realm == realm && w.CorrelationId == correlationId, cancellationToken);
-
-    public Task<WorkflowRecord> GetLatestPublishedRecord(string correlationId, CancellationToken cancellationToken)
-    {
-        return _dbContext.Workflows.Include(w => w.Links).Include(w => w.Steps).Where(w => w.Status == RecordVersionStatus.Published && w.CorrelationId == correlationId).OrderByDescending(w => w.VersionNumber).FirstOrDefaultAsync(cancellationToken);
-    }
-
-    public Task<WorkflowRecord> GetLatestPublishedRecord(string realm, string correlationId, CancellationToken cancellationToken)
-    {
-        return _dbContext.Workflows.Include(w => w.Links).Include(w => w.Steps).Where(w => w.Status == RecordVersionStatus.Published && w.CorrelationId == correlationId && w.Realm == realm).OrderByDescending(w => w.VersionNumber).FirstOrDefaultAsync(cancellationToken);
-    }
+    public void Add(WorkflowRecord record)
+        => _dbContext.Workflows.Add(record);
 
     public Task<int> SaveChanges(CancellationToken cancellationToken)
         => _dbContext.SaveChangesAsync(cancellationToken);

@@ -9,8 +9,12 @@
 => pouvoir sauvegarder le style CSS d'un formulaire dans SID	:	DONE
 => passer tous les layous										:	DONE
 => créer tous les layouts										:	DONE
+
+=> pouvoir éditer un workflow dans SID							:	TODO
+=> lorsqu'un ACR est créé alors créer un workflow vide			:	TODO
 => pouvoir enregister le workflow dans SID						:	TODO
-=> pouvoir publier un workflow dans SID							:	TODO
 => dupliquer tous les workflows & forms quand realm est créé	:	TODO
+
+
 
 90f488c8-c2e6-485f-9825-3b04eca8db07

@@ -120,7 +120,7 @@ public class BaseAuthenticateController : BaseController
         List<string> amrs = null;
         if (!IsProtected(returnUrl))
         {
-            var result = await GetNextAmrFromNormalAuthentication(currentAmr, cancellationToken);
+            var result = await GetNextAmrFromNormalAuthentication(realm, currentAmr, cancellationToken);
             nextAmr = result.nextAmr;
             amrs = result.amrs;
         }
@@ -231,9 +231,9 @@ public class BaseAuthenticateController : BaseController
         }
     }
 
-    private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication(string currentAmr, CancellationToken cancellationToken)
+    private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication(string realm, string currentAmr, CancellationToken cancellationToken)
     {
-        var workflow = await WorkflowStore.Get(Options.DefaultAuthenticationWorkflowId, cancellationToken);
+        var workflow = await WorkflowStore.Get(realm, Options.DefaultAuthenticationWorkflowId, cancellationToken);
         var forms = await FormStore.GetAll(cancellationToken);
         var nextAmr = WorkflowHelper.GetNextAmr(workflow, forms, currentAmr);
         var amrs = WorkflowHelper.ExtractAmrs(workflow, forms);

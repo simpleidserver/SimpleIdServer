@@ -15,7 +15,7 @@
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
-    var path = uriProvider.GetActiveFormCssUrl(step?.FormRecordId);
+    var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "mobile" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "mobile" });
     var vm = JsonSerializer.Deserialize<AuthenticateMobileViewModel>(Model.Input.ToString());

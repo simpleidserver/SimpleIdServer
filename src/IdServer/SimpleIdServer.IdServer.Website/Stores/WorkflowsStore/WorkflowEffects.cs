@@ -33,7 +33,11 @@ public class WorkflowEffects
             RequestUri = new Uri($"{workflowsUrl}/{action.Id}")
         });
         var json = await httpResult.Content.ReadAsStringAsync();
-        var workflowRecord = SidJsonSerializer.Deserialize<WorkflowRecord>(json);
+        var settings = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+        var workflowRecord = JsonSerializer.Deserialize<WorkflowRecord>(json, settings);
         dispatcher.Dispatch(new GetWorkflowSuccessAction { Workflow = workflowRecord });
     }
 
@@ -50,25 +54,6 @@ public class WorkflowEffects
         });
         await httpResult.Content.ReadAsStringAsync();
         dispatcher.Dispatch(new UpdateWorkflowSuccessAction());
-    }
-
-
-    [EffectMethod]
-    public async Task Handle(PublishWorkflowAction action, IDispatcher dispatcher)
-    {
-        var workflowsUrl = await GetBaseUrl();
-        var httpClient = await _websiteHttpClientFactory.Build();
-        var httpResult = await httpClient.SendAsync(new HttpRequestMessage
-        {
-            RequestUri = new Uri($"{workflowsUrl}/{action.Id}/publish"),
-            Method = HttpMethod.Post
-        });
-        var json = await httpResult.Content.ReadAsStringAsync();
-        var workflow = JsonSerializer.Deserialize<WorkflowRecord>(json, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-        dispatcher.Dispatch(new PublishWorkflowSuccessAction { Workflow = workflow });
     }
 
 
@@ -104,14 +89,4 @@ public class UpdateWorkflowAction
 public class UpdateWorkflowSuccessAction
 {
 
-}
-
-public class PublishWorkflowAction
-{
-    public string Id { get; set; }
-}
-
-public class PublishWorkflowSuccessAction
-{
-    public WorkflowRecord Workflow { get; set; }
 }

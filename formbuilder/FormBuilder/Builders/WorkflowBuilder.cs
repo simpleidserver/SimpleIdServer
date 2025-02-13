@@ -14,24 +14,24 @@ public class WorkflowBuilder
         AddStep(Constants.EmptyStep);
     }
 
-    public static WorkflowBuilder New(string id, string correlationId)
+    public static WorkflowBuilder New(string id)
     {
-        return new WorkflowBuilder(new WorkflowRecord { Id = id, CorrelationId = id });
+        return new WorkflowBuilder(new WorkflowRecord { Id = id, Realm = "master" });
     }
 
     public WorkflowBuilder AddStep(FormRecord record)
     {
         _workflow.Steps.Add(new WorkflowStep
         {
-            FormRecordId = record.Id,
+            FormRecordCorrelationId = record.CorrelationId,
             Id = Guid.NewGuid().ToString()
         });
         return this;
     }
 
-    public WorkflowBuilder AddLink(FormRecord sourceForm, FormRecord targetForm, string eltId, Action<WorkflowLink> cb = null)
+    public WorkflowBuilder AddLink(FormRecord sourceForm, FormRecord targetForm, string eltId, string description, Action<WorkflowLink> cb = null)
     {
-        _workflowLinks.Add(new WorkflowLinkBuilder(sourceForm, targetForm, eltId, cb));
+        _workflowLinks.Add(new WorkflowLinkBuilder(sourceForm, targetForm, eltId, description, cb));
         return this;
     }
 
@@ -39,8 +39,8 @@ public class WorkflowBuilder
     {
         foreach(var link in _workflowLinks)
         {
-            var sourceStep = _workflow.GetStep(link.SourceForm.Id);
-            var targetStep = _workflow.GetStep(link.TargetForm.Id);
+            var sourceStep = _workflow.GetStep(link.SourceForm.CorrelationId);
+            var targetStep = _workflow.GetStep(link.TargetForm.CorrelationId);
             var workflowLink = new WorkflowLink
             {
                 Id = Guid.NewGuid().ToString(),
@@ -49,29 +49,31 @@ public class WorkflowBuilder
                     EltId = link.EltId
                 },
                 SourceStepId = sourceStep.Id,
-                TargetStepId = targetStep.Id
+                TargetStepId = targetStep.Id,
+                Description = link.Description
             };
             _workflow.Links.Add(workflowLink);
             if (link.Cb != null) link.Cb(workflowLink);
         }
 
-        _workflow.Publish(currentDateTime);
         return _workflow;
     }
 
     private record WorkflowLinkBuilder
     {
-        public WorkflowLinkBuilder(FormRecord sourceForm, FormRecord targetForm, string eltId, Action<WorkflowLink> cb)
+        public WorkflowLinkBuilder(FormRecord sourceForm, FormRecord targetForm, string eltId, string description, Action<WorkflowLink> cb)
         {
             SourceForm = sourceForm;
             TargetForm = targetForm;
             EltId = eltId;
+            Description = description;
             Cb = cb;
         }
 
         public FormRecord SourceForm { get; private set; }
         public FormRecord TargetForm { get; private set; }
         public string EltId { get; private set; }
+        public string Description { get; private set; }
         public Action<WorkflowLink> Cb { get; private set; }
     }
 }

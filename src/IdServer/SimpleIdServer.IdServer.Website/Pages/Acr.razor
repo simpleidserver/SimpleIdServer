@@ -17,14 +17,13 @@
     <Authorized>
         <RadzenBreadCrumb>
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl($"/acrs/workflows")" Text="@Global.AcrsTitle" />
-            <RadzenBreadCrumbItem Text="@acrState.Value.Acr.Name" />
+            <RadzenBreadCrumbItem Text="@acrState.Value.Acr?.Name" />
         </RadzenBreadCrumb>
-        @if(!authenticationFormsState.Value.IsLoading && !authenticationWorkflowLayoutsState.Value.IsLoading && !workflowState.Value.IsLoading)
+        @if (!IsLoading)
         {            
             <WorkflowEditor Forms=@authenticationFormsState.Value.FormRecords 
                 Workflow=@workflowState.Value.Value 
                 WorkflowLayouts=@authenticationWorkflowLayoutsState.Value.Values
-                Published=@HandlePublish
                 Saved=@HandleSave></WorkflowEditor>
         }
     </Authorized>
@@ -35,6 +34,15 @@
 
 @code {
     [Parameter] public string? id { get; set; }
+    private ActionState<WorkflowRecord, bool> _saveWorkflow;
+
+    public bool IsLoading
+    {
+        get
+        {
+            return authenticationFormsState.Value.IsLoading || authenticationWorkflowLayoutsState.Value.IsLoading || workflowState.Value.IsLoading;
+        }
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -44,6 +52,10 @@
             SubscribeToAction<GetAcrSuccessAction>((act) =>
             {
                 dispatcher.Dispatch(new GetWorkflowAction { Id = act.Acr.AuthenticationWorkflow });
+            });
+            SubscribeToAction<UpdateWorkflowSuccessAction>((act) => {                
+                _saveWorkflow.Callback(true);
+                StateHasChanged();
             });
         }
     }
@@ -58,11 +70,7 @@
 
     private void HandleSave(ActionState<WorkflowRecord, bool> state)
     {
-
-    }
-
-    private void HandlePublish(ActionState<WorkflowRecord, WorkflowRecord> state)
-    {
-
+        _saveWorkflow = state;
+        dispatcher.Dispatch(new UpdateWorkflowAction { Id = id, Workflow = state.Content });
     }
 }

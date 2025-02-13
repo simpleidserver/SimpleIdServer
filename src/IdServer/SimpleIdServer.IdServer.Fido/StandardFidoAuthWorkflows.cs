@@ -16,18 +16,18 @@ public static class StandardFidoAuthWorkflows
     public static string webauthnWorkflowId = "a725b543-1403-4aab-8329-25b89f07cb48";
     public static string mobileWorkflowId = "1f0a3398-aeb2-42c8-b6e6-ea03396f1a87";
 
-    public static WorkflowRecord DefaultWebauthnWorkflow = WorkflowBuilder.New(webauthnWorkflowId, "defaultWebauthnAuth")
+    public static WorkflowRecord DefaultWebauthnWorkflow = WorkflowBuilder.New(webauthnWorkflowId)
         .AddWebauthnAuth()
         .Build(DateTime.UtcNow);
 
-    public static WorkflowRecord DefaultMobileWorkflow = WorkflowBuilder.New(mobileWorkflowId, "defaultMobileAuth")
+    public static WorkflowRecord DefaultMobileWorkflow = WorkflowBuilder.New(mobileWorkflowId)
         .AddMobileAuth()
         .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddWebauthnAuth(this WorkflowBuilder builder)
     {
         builder.AddStep(StandardFidoAuthForms.WebauthnForm)
-            .AddLinkHttpRequestAction(StandardFidoAuthForms.WebauthnForm, FormBuilder.Constants.EmptyStep, StandardFidoAuthForms.webauthnFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardFidoAuthForms.WebauthnForm, FormBuilder.Constants.EmptyStep, StandardFidoAuthForms.webauthnFormId, "Authenticate", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -51,7 +51,7 @@ public static class StandardFidoAuthWorkflows
     public static WorkflowBuilder AddMobileAuth(this WorkflowBuilder builder)
     {
         builder.AddStep(StandardFidoAuthForms.MobileForm)
-            .AddLinkHttpRequestAction(StandardFidoAuthForms.MobileForm, FormBuilder.Constants.EmptyStep, StandardFidoAuthForms.mobileFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardFidoAuthForms.MobileForm, FormBuilder.Constants.EmptyStep, StandardFidoAuthForms.mobileFormId, "Authenticate", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

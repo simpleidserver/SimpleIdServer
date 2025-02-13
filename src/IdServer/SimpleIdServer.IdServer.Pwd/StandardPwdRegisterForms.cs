@@ -18,6 +18,7 @@ public static class StandardPwdRegisterForms
         .AddElement(new FormStackLayoutRecord
         {
             Id = pwdRegisterFormId,
+            CorrelationId = pwdRegisterFormId,
             IsFormEnabled = true,
             Transformations = StandardRegisterFormComponents.BuildConditionUseToDisplayRegistrationForm(),
             Elements = new ObservableCollection<IFormElementRecord>

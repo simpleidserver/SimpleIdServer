@@ -21,7 +21,8 @@ public class ResetPwdWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
-            WorkflowCorrelationId = "resetPwdWorkflow",
+            Name = "resetPwd",
+            WorkflowCorrelationId = "resetPwd",
             SourceFormCorrelationId = "resetPwd",
             Links = new List<WorkflowLinkLayout>
             {
@@ -29,45 +30,24 @@ public class ResetPwdWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Reset",
-                    EltCorrelationId = StandardPwdAuthForms.confirmResetPwdFormId,
+                    EltCorrelationId = StandardPwdAuthForms.pwdResetFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
                         IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/pwd/Reset/Confirm",
+                        Target = "/{realm}/pwd/Reset",
                         Transformers = new List<ITransformerParameters>
-                        {
-                            new RegexTransformerParameters()
                             {
-                                Rules = new ObservableCollection<MappingRule>
+                                new RegexTransformerParameters()
                                 {
-                                    new MappingRule { Source = "$.Realm", Target = "realm" }
-                                }
-                            },
-                            new RelativeUrlTransformerParameters()
-                        }
-                    })
-                },
-                // Back
-                new WorkflowLinkLayout
-                {
-                    Description = "Back",
-                    EltCorrelationId = StandardPwdAuthForms.confirmResetPwdBackId,
-                    ActionType = WorkflowLinkUrlTransformerAction.ActionType,
-                    ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter
-                    {
-                        Url = "{returnUrl}",
-                        Transformers = new List<ITransformerParameters>
-                        {
-                            new RegexTransformerParameters
-                            {
-                                Rules = new ObservableCollection<MappingRule>
-                                {
-                                    new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" }
-                                }
+                                    Rules = new ObservableCollection<MappingRule>
+                                    {
+                                        new MappingRule { Source = "$.Realm", Target = "realm" }
+                                    }
+                                },
+                                new RelativeUrlTransformerParameters()
                             }
-                        }
                     })
                 }
             }

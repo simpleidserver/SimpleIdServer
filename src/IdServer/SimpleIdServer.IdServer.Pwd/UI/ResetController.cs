@@ -99,7 +99,7 @@ public class ResetController : BaseController
             StepId = vm.StepId,
             CurrentLink = vm.CurrentLink
         };
-        var result = await BuildWorkflowViewModel(vm, cancellationToken);
+        var result = await BuildWorkflowViewModel(prefix, vm, cancellationToken);
         result.SetInput(viewModel);
         result.MoveNextStep(vm);
         return View(result);
@@ -110,7 +110,7 @@ public class ResetController : BaseController
     public async Task<IActionResult> Index([FromRoute] string prefix, ResetPasswordViewModel viewModel, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        var result = await BuildWorkflowViewModel(viewModel, cancellationToken);
+        var result = await BuildWorkflowViewModel(prefix, viewModel, cancellationToken);
         result.StayCurrentStep(viewModel);
         result.SetInput(viewModel);
         viewModel.Realm = prefix;
@@ -212,7 +212,7 @@ public class ResetController : BaseController
             ReturnUrl = returnUrl,
             Realm = prefix
         };
-        var result = await BuildWorkflowViewModel(options.ConfirmResetPasswordWorkflowId, cancellationToken);
+        var result = await BuildWorkflowViewModel(prefix, options.ConfirmResetPasswordWorkflowId, cancellationToken);
         result.SetInput(viewModel);
         return View(result);
     }
@@ -224,7 +224,7 @@ public class ResetController : BaseController
         using (var transaction = _transactionBuilder.Build())
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            var result = await BuildWorkflowViewModel(viewModel, cancellationToken);
+            var result = await BuildWorkflowViewModel(prefix, viewModel, cancellationToken);
             var errors = viewModel.Validate(ModelState);
             if (errors.Any())
             {
@@ -272,13 +272,13 @@ public class ResetController : BaseController
         return section.Get<IdServerPasswordOptions>();
     }
 
-    private Task<WorkflowViewModel> BuildWorkflowViewModel(IStepViewModel viewModel, CancellationToken cancellationToken)
-        => BuildWorkflowViewModel(viewModel.WorkflowId, cancellationToken);
+    private Task<WorkflowViewModel> BuildWorkflowViewModel(string realm, IStepViewModel viewModel, CancellationToken cancellationToken)
+        => BuildWorkflowViewModel(realm, viewModel.WorkflowId, cancellationToken);
 
-    private async Task<WorkflowViewModel> BuildWorkflowViewModel(string workflowId, CancellationToken cancellationToken)
+    private async Task<WorkflowViewModel> BuildWorkflowViewModel(string realm, string workflowId, CancellationToken cancellationToken)
     {
         var records = await _formStore.GetAll(cancellationToken);
-        var workflow = await _workflowStore.Get(workflowId, cancellationToken);
+        var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         var languages = await _languageRepository.GetAll(cancellationToken);
         return new SidWorkflowViewModel

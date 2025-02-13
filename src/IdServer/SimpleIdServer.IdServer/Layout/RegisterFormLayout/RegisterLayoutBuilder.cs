@@ -50,6 +50,7 @@ public class RegisterLayoutBuilder
         var elt = new FormStackLayoutRecord
         {
             Id = Guid.NewGuid().ToString(),
+            CorrelationId = id,
             IsFormEnabled = false,
             Transformations = BuildConditionUseToDisplayBackForm(),
             Elements = new ObservableCollection<IFormElementRecord>

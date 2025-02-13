@@ -16,14 +16,14 @@ public static class StandardSmsRegisterWorkflows
 {
     public static string workflowId = "0ba03d04-2990-4153-8484-0cb8092959cd";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "defaultStandardSmsRegister")
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
         .AddSmsRegistration()
         .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddSmsRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardSmsRegisterForms.SmsForm)
-            .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, Constants.EmptyStep, StandardSmsRegisterForms.smsSendConfirmationCodeFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, Constants.EmptyStep, StandardSmsRegisterForms.smsSendConfirmationCodeFormId, "Confirmation code", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -40,7 +40,7 @@ public static class StandardSmsRegisterWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-            .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, nextStep ?? Constants.EmptyStep, StandardSmsRegisterForms.smsRegisterFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, nextStep ?? Constants.EmptyStep, StandardSmsRegisterForms.smsRegisterFormId, "Register", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -57,7 +57,7 @@ public static class StandardSmsRegisterWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-            .AddTransformedLinkUrlAction(StandardSmsRegisterForms.SmsForm, nextStep ?? Constants.EmptyStep, StandardSmsRegisterForms.backButtonId, "{returnUrl}", new List<ITransformerParameters>
+            .AddTransformedLinkUrlAction(StandardSmsRegisterForms.SmsForm, nextStep ?? Constants.EmptyStep, StandardSmsRegisterForms.backButtonId, "Back", "{returnUrl}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
                 {

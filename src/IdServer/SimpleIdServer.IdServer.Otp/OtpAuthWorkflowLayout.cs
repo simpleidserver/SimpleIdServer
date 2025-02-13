@@ -21,6 +21,7 @@ public class OtpAuthWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "otp",
             WorkflowCorrelationId = "otpAuthWorkflow",
             SourceFormCorrelationId = "otpAuth",
             Links = new List<WorkflowLinkLayout>

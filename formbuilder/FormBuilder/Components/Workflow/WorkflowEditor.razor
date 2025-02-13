@@ -29,7 +29,6 @@
     <RadzenButton Icon="play_arrow" ButtonStyle="ButtonStyle.Secondary" Text="Debug"  Click="@(async () => await LaunchDebug())" />
     <RadzenButton Icon="draft" ButtonStyle="ButtonStyle.Secondary" Text="Json" Click="@(() => ViewJson())" />
     <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
-    <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
 </div>
 
 <RadzenSplitter>
@@ -48,14 +47,6 @@
     </RadzenSplitterPane>
     <!-- Properties -->
     <RadzenSplitterPane Size="20%">
-        <!-- Version -->
-        <div class="panel-header">
-            <RadzenText TextStyle="TextStyle.H6" class="title">Version</RadzenText>
-        </div>
-        <div class="panel-content">
-            <RadzenText TextStyle="TextStyle.Subtitle2">Status : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Enum.GetName(typeof(RecordVersionStatus), Workflow.Status)" /></RadzenText>
-            <RadzenText TextStyle="TextStyle.Subtitle2">Version : <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@Workflow.VersionNumber.ToString()" /></RadzenText>
-        </div>
         <!-- Property panel -->
         <div class="panel-header">
             <RadzenText TextStyle="TextStyle.H6" class="title">Properties</RadzenText>
@@ -74,7 +65,6 @@
     [Parameter] public List<FormRecord> Forms { get; set; }
     [Parameter] public List<WorkflowLayout> WorkflowLayouts { get; set; }
     [Parameter] public EventCallback<ActionState<WorkflowRecord, bool>> Saved { get; set; }
-    [Parameter] public EventCallback<ActionState<WorkflowRecord, WorkflowRecord>> Published { get; set; }
 
     [Inject] public NotificationService notificationService { get; set; }
 
@@ -85,10 +75,10 @@
     private bool isMoving = false;
     private bool isInitialized = false;
     private bool isSaveDisabled = false;
-    private bool isPublishDisabled = false;
     private FormPanelTypes? panelType = null;
     private JsonPanelComponent jsonPanelComponent;
     private string SerializedWorkflow;
+    private List<WorkflowStepChooserNode> stepChooserNodes = new List<WorkflowStepChooserNode>();
 
     private double spaceBetweenNodeXPx = 50;
     private double spaceBetweenNodeYPx = 150;
@@ -158,7 +148,9 @@
         RefreshAvailableLayouts();
         if(firstStep == null)
         {
-            AddNode((Diagram.Container.Width / 2) - (stepSize.Width / 2), paddingTopPx, new WorkflowStepChooserNode(AddNode, availableLayouts));
+            var record = new WorkflowStepChooserNode(AddNode, availableLayouts);
+            stepChooserNodes.Add(record);
+            AddNode((Diagram.Container.Width / 2) - (stepSize.Width / 2), paddingTopPx, record);
             return;
         }
 
@@ -170,7 +162,7 @@
 
     private NodeModel AddNode(double startPosX, double startPosY, WorkflowStep newStep, NodeModel source = null, int index = 0, string description = null)
     {
-        var form = Context.Definition.Records.Single(r => r.Id == newStep.FormRecordId);
+        var form = Context.Definition.Records.Single(r => r.CorrelationId == newStep.FormRecordCorrelationId);
         var node = new WorkflowStepNode(newStep, form, EditNode);
         if (source != null) AddLink(source, node, description);
         node.AddPort(PortAlignment.Bottom);
@@ -192,7 +184,9 @@
             if (nextStep != null) childNode = AddNode(startPosX, startPosY, nextStep, node, i, stepLink.Description);
             else 
             {
-                childNode = new WorkflowStepChooserNode(AddNode, availableLayouts);
+                var record = new WorkflowStepChooserNode(AddNode, availableLayouts);
+                stepChooserNodes.Add(record);
+                childNode = record;
                 AddNode(startPosX, startPosY, childNode, node, i);
             }
 
@@ -235,7 +229,15 @@
         if(!record.IsEndStep) newStep = AddWorkflowStep(record.WorkflowCorrelationId, sourceModel);
         else newStep = AddEndStep(sourceModel); 
         // 2. Add node to diagram.
-        if (!record.IsEndStep) availableLayouts.Remove(availableLayouts.Single(l => l.WorkflowCorrelationId == record.WorkflowCorrelationId));
+        if (!record.IsEndStep) 
+        {
+            availableLayouts.Remove(availableLayouts.Single(l => l.WorkflowCorrelationId == record.WorkflowCorrelationId));
+            foreach (var node in stepChooserNodes)
+            {
+                node.Refresh(availableLayouts);
+            }
+        }
+
         AddNode(source.Position.X, source.Position.Y, newStep, sourceModel, 0, description: sourceLink?.Labels?.FirstOrDefault()?.Content);
         Diagram.Nodes.Remove(source);
         RefreshJson();
@@ -253,8 +255,9 @@
         // 1. Remove the current node and its links.
         Remove(node);
         // 2. Add the step chooser.
-        RefreshAvailableLayouts();
         var newStep = new WorkflowStepChooserNode(AddNode, availableLayouts);
+        stepChooserNodes.Add(newStep);
+        RefreshAvailableLayouts();
         AddNode(node.Position.X, node.Position.Y, newStep, sourceNode);
         if(sourceNode != null) AddLink(sourceNode, newStep, sourceLink.Labels.First().Content);
         RefreshJson();
@@ -296,7 +299,7 @@
         var newStep = new WorkflowStep
         {
             Id = Guid.NewGuid().ToString(),
-            FormRecordId = formRecord.Id
+            FormRecordCorrelationId = formRecord.CorrelationId
         };
         UpdateLink(newStep, sourceNodeModel);
         Context.Definition.Workflow.Steps.Add(newStep);
@@ -310,13 +313,13 @@
         var newStep = new WorkflowStep
         {
             Id = Guid.NewGuid().ToString(),
-            FormRecordId = formRecord.Id
+            FormRecordCorrelationId = formRecord.CorrelationId
         };
         var resolvedSteps = Forms.Where(f => layout.Links.Where(l => !string.IsNullOrWhiteSpace(l.TargetFormCorrelationId)).Select(l => l.TargetFormCorrelationId).Contains(f.CorrelationId))
             .Select(f => new WorkflowStep
                 {
                     Id = Guid.NewGuid().ToString(),
-                    FormRecordId = f.Id,
+                    FormRecordCorrelationId = f.CorrelationId,
                 }).ToList();
         var links = layout.Links.Select(l =>
         {
@@ -325,7 +328,7 @@
                 EltId = formRecord.GetChildByCorrelationId(l.EltCorrelationId).Id,
             };
             var form = Forms.SingleOrDefault(r => r.CorrelationId == l.TargetFormCorrelationId);
-            var targetStep = resolvedSteps.SingleOrDefault(s => s.FormRecordId == form?.Id);
+            var targetStep = resolvedSteps.SingleOrDefault(s => s.FormRecordCorrelationId == form?.CorrelationId);
             var targetStepId = targetStep?.Id;
             return new WorkflowLink
             {
@@ -357,8 +360,12 @@
 
     private void RefreshAvailableLayouts()
     {
-        var workflowFormsCorrelationId = Forms.Where(f => Workflow.Steps.Select(s => s.FormRecordId).Contains(f.Id)).Select(f => f.CorrelationId);
+        var workflowFormsCorrelationId = Workflow.Steps.Select(s => s.FormRecordCorrelationId);
         availableLayouts = WorkflowLayouts.Where(l => !workflowFormsCorrelationId.Contains(l.SourceFormCorrelationId)).ToList();
+        foreach (var node in stepChooserNodes) 
+        {
+            node.Refresh(availableLayouts);
+        }
     }
 
     private List<WorkflowLink> GetEmptyLinks()
@@ -383,17 +390,6 @@
         {
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The workflow is saved" });
             isSaveDisabled = false;
-        }, Workflow));
-    }
-
-    private async Task Publish()
-    {
-        isPublishDisabled = true;
-        await Published.InvokeAsync(new ActionState<WorkflowRecord, WorkflowRecord>((w) =>
-        {
-            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The workflow is published" });
-            Refresh(w);
-            isPublishDisabled = false;
         }, Workflow));
     }
 

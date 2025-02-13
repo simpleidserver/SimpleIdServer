@@ -64,7 +64,7 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAcr" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
                 <Template Context="data">
-                    <RadzenLink Path="@urlHelper.GetUrl($"/acrs/workflows/{data.Value.Id}")" Target="_blank">@data.Value.Name</RadzenLink>
+                    <RadzenLink Path="@urlHelper.GetUrl($"/acrs/workflows/{data.Value.Id}")">@data.Value.Name</RadzenLink>
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="false" Sortable="false" Title="@Global.DisplayName" Width="80px" />

@@ -25,7 +25,7 @@ public class WorkflowController : Controller
             .Concat(workflowLayouts.Select(s => s.SourceFormCorrelationId).Distinct().ToList())
             .ToList();
         var forms = await _formStore.GetLatestPublishedVersionByCorrelationids(formCorrelationIds, cancellationToken);
-        var workflow = await _workflowStore.GetLatest(Constants.DefaultRealm, "pwdMobile", cancellationToken);
+        var workflow = await _workflowStore.Get(Constants.DefaultRealm, "workflow", cancellationToken);
         var viewModel = new WorkflowIndexViewModel
         {
             Forms = forms,

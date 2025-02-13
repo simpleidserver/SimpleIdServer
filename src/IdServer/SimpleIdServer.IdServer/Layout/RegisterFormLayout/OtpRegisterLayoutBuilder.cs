@@ -37,6 +37,7 @@ public class OtpRegisterLayoutBuilder : RegisterLayoutBuilder
         var elt = new FormStackLayoutRecord
         {
             Id = id,
+            CorrelationId = id,
             IsFormEnabled = true,
             Transformations = StandardRegisterFormComponents.BuildConditionUseToDisplayRegistrationForm(),
             Elements = new ObservableCollection<IFormElementRecord>
@@ -62,6 +63,7 @@ public class OtpRegisterLayoutBuilder : RegisterLayoutBuilder
         var elt = new FormStackLayoutRecord
         {
             Id = id,
+            CorrelationId = id,
             IsFormEnabled = true,
             Transformations = StandardRegisterFormComponents.BuildConditionUseToDisplayRegistrationForm(),
             Elements = new ObservableCollection<IFormElementRecord>

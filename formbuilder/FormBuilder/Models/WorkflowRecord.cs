@@ -2,15 +2,16 @@
 
 namespace FormBuilder.Models;
 
-public class WorkflowRecord : BaseVersionRecord
+public class WorkflowRecord
 {
     public string Id { get; set; }
     public string? Realm { get; set; }
+    public DateTime UpdateDateTime { get; set; }
     public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
     public List<WorkflowLink> Links { get; set; } = new List<WorkflowLink>();
 
     public WorkflowStep GetStep(string id)
-        => Steps.SingleOrDefault(s => s.FormRecordId == id);
+        => Steps.SingleOrDefault(s => s.FormRecordCorrelationId == id);
 
     public void Update(List<WorkflowStep> steps, List<WorkflowLink> links, DateTime currentDateTime)
     {
@@ -44,38 +45,10 @@ public class WorkflowRecord : BaseVersionRecord
     public (FormRecord form, IFormElementRecord formElt) GetElementRecord(WorkflowLink workflowLink, List<FormRecord> forms)
     {
         var workflowStep = Steps.Single(f => f.Id == workflowLink.SourceStepId);
-        var form = forms.Single(f => f.Id == workflowStep.FormRecordId);
+        var form = forms.Single(f => f.CorrelationId == workflowStep.FormRecordCorrelationId);
         return (form, form.GetChild(workflowLink.Source.EltId));
     }
 
     public List<WorkflowLink> GetLinks(WorkflowStep step)
         => Links.Where(l => l.IsLinked(step.Id)).ToList();
-
-    public override BaseVersionRecord NewDraft(DateTime currentDateTime)
-    {
-        var steps = Steps.Select(s => (WorkflowStep)s.Clone()).ToList();
-        var links = Links.Select(s => (WorkflowLink)s.Clone()).ToList();
-        links.ForEach(s => s.Id = Guid.NewGuid().ToString());
-        steps.ForEach(s =>
-        {
-            var newId = Guid.NewGuid().ToString();
-            foreach (var l in links.Where(l => l.SourceStepId == s.Id))
-                l.SourceStepId = newId;
-            foreach (var l in links.Where(l => l.TargetStepId == s.Id))
-                l.TargetStepId = newId;
-
-            s.Id = newId;
-        });
-        return new WorkflowRecord
-        {
-            Id = Guid.NewGuid().ToString(),
-            CorrelationId = CorrelationId,
-            Steps = steps,
-            Links = links,
-            Realm = Realm,
-            UpdateDateTime = UpdateDateTime,
-            Status = RecordVersionStatus.Draft,
-            VersionNumber = VersionNumber + 1
-        };
-    }
 }

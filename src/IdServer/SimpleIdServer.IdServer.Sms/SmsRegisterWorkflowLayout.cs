@@ -22,6 +22,7 @@ public class SmsRegisterWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "smsRegister",
             WorkflowCorrelationId = "smsRegistrationWorkflow",
             SourceFormCorrelationId = StandardSmsRegisterForms.SmsForm.CorrelationId,
             Links = new List<WorkflowLinkLayout>

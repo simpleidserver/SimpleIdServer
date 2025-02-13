@@ -41,6 +41,7 @@ public class QrCodeFormLayoutBuilder
         var authForm = new FormStackLayoutRecord
         {
             Id = id,
+            CorrelationId = id,
             IsFormEnabled = true,
             FormType = FormTypes.HTML,
             HtmlAttributes = new Dictionary<string, object>

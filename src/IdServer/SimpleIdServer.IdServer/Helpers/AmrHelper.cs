@@ -84,7 +84,7 @@ public class AmrHelper : IAmrHelper
         {
             var acr = acrs.FirstOrDefault(a => a.Name == name);
             if (acr == null) continue;
-            var workflow = await _workflowStore.Get(acr.AuthenticationWorkflow, cancellationToken);
+            var workflow = await _workflowStore.Get(realm, acr.AuthenticationWorkflow, cancellationToken);
             var forms = await _formStore.GetAll(cancellationToken);
             var amrs = WorkflowHelper.ExtractAmrs(workflow, forms);
             return new AcrResult(acr, amrs, workflow, forms);

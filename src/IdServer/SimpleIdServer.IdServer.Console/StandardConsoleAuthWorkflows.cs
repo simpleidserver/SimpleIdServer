@@ -16,14 +16,14 @@ public static class StandardConsoleAuthWorkflows
 {
     public static string workflowId = "e7593fa9-5a73-41a3-bfb5-e489fabbe17a";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "standardConsoleAuth")
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
         .AddConsoleAuth()
         .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddConsoleAuth(this WorkflowBuilder builder)
     {
         builder.AddStep(StandardConsoleAuthForms.ConsoleForm)
-            .AddLinkHttpRequestAction(StandardConsoleAuthForms.ConsoleForm, Constants.EmptyStep, StandardConsoleAuthForms.consoleSendConfirmationCode, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardConsoleAuthForms.ConsoleForm, Constants.EmptyStep, StandardConsoleAuthForms.consoleSendConfirmationCode, "Confirmation code", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -40,7 +40,7 @@ public static class StandardConsoleAuthWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-            .AddLinkHttpRequestAction(StandardConsoleAuthForms.ConsoleForm, Constants.EmptyStep, StandardConsoleAuthForms.consoleAuthForm, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardConsoleAuthForms.ConsoleForm, Constants.EmptyStep, StandardConsoleAuthForms.consoleAuthForm, "Authenticate", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

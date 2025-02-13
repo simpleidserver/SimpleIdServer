@@ -14,9 +14,17 @@ public class FormsController : Controller
     }
 
     [HttpGet("{id}/styles/active")]
-    public async Task<IActionResult> ActiveStyle(string id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetActiveStyle(string id, CancellationToken cancellationToken)
     {
         var form = await _formStore.Get(id, cancellationToken);
+        if (form == null || form.ActiveStyle == null) return new NoContentResult();
+        return Content(form.ActiveStyle.Content, "text/css");
+    }
+
+    [HttpGet("last/{correlationId}/styles/active")]
+    public async Task<IActionResult> GetLastActiveStyle(string correlationId, CancellationToken cancellationToken)
+    {
+        var form = await _formStore.GetLatestPublishedVersionByCorrelationId(correlationId, cancellationToken);
         if (form == null || form.ActiveStyle == null) return new NoContentResult();
         return Content(form.ActiveStyle.Content, "text/css");
     }

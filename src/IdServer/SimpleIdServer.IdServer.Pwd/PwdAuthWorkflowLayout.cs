@@ -20,6 +20,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "pwd",
             WorkflowCorrelationId = "pwdAuthWorkflow",
             SourceFormCorrelationId = "pwdAuth",
             Links = new List<WorkflowLinkLayout>
@@ -122,30 +123,6 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                         {
                             new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
                         },
-                    })
-                },
-                // Reset
-                new WorkflowLinkLayout
-                {
-                    Description = "Reset",
-                    EltCorrelationId = StandardPwdAuthForms.pwdResetFormId,
-                    ActionType = WorkflowLinkHttpRequestAction.ActionType,
-                    ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
-                    {
-                        Method = HttpMethods.POST,
-                        IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/pwd/Reset",
-                        Transformers = new List<ITransformerParameters>
-                        {
-                            new RegexTransformerParameters()
-                            {
-                                Rules = new ObservableCollection<MappingRule>
-                                {
-                                    new MappingRule { Source = "$.Realm", Target = "realm" }
-                                }
-                            },
-                            new RelativeUrlTransformerParameters()
-                        }
                     })
                 }
             }

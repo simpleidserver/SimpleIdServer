@@ -21,6 +21,7 @@ public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "console",
             WorkflowCorrelationId = "consoleAuthWorkflow",
             SourceFormCorrelationId = StandardConsoleAuthForms.ConsoleForm.CorrelationId,
             Links = new List<WorkflowLinkLayout>

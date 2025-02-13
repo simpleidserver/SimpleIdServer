@@ -21,6 +21,7 @@ public class SmsAuthWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "sms",
             WorkflowCorrelationId = "smsAuthWorkflow",
             SourceFormCorrelationId = StandardSmsAuthForms.SmsForm.CorrelationId,
             Links = new List<WorkflowLinkLayout>

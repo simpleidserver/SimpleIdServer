@@ -24,6 +24,7 @@ public class StandardPwdAuthForms
     public static string pwdAuthExternalIdProviderId = "58cf59f1-e63c-48e3-a0f3-00b0c3d2d38c";
 
     public static string pwdResetFormId = "8bf5ba00-a9b3-476b-8469-abe123abc797";
+
     public static string confirmResetPwdFormId = "e42e4c7f-90e8-455d-be48-fbfbc5424f0f";
     public static string confirmResetPwdBackId = "a355339a-d3fb-4a83-90b2-c781c6f0dda4";
 
@@ -37,6 +38,7 @@ public class StandardPwdAuthForms
                 new FormStackLayoutRecord
                 {
                     Id = pwdAuthFormId,
+                    CorrelationId = pwdAuthFormId,
                     IsFormEnabled = true,
                     Elements = new ObservableCollection<IFormElementRecord>
                     {
@@ -68,6 +70,7 @@ public class StandardPwdAuthForms
                 new ListDataRecord
                 {
                     Id = pwdAuthExternalIdProviderId,
+                    CorrelationId = pwdAuthExternalIdProviderId,
                     FieldType = FormAnchorDefinition.TYPE,
                     Parameters = new Dictionary<string, object>
                     {
@@ -100,6 +103,7 @@ public class StandardPwdAuthForms
                 new FormStackLayoutRecord
                 {
                     Id = pwdResetFormId,
+                    CorrelationId = pwdResetFormId,
                     IsFormEnabled = true,
                     Elements = new ObservableCollection<IFormElementRecord>
                     {

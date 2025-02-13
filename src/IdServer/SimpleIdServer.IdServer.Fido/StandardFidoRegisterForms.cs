@@ -20,6 +20,7 @@ public class StandardFidoRegisterForms
         .AddElement(new FormStackLayoutRecord
         {
             Id = webauthnFormId,
+            CorrelationId = webauthnFormId,
             IsFormEnabled = true,
             FormType = FormTypes.HTML,
             HtmlAttributes = new Dictionary<string, object>
@@ -45,6 +46,7 @@ public class StandardFidoRegisterForms
         .AddElement(new FormStackLayoutRecord
         {
             Id = mobileFormId,
+            CorrelationId = mobileFormId,
             IsFormEnabled = true,
             FormType = FormTypes.HTML,
             HtmlAttributes = new Dictionary<string, object>

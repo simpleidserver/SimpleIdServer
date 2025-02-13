@@ -30,7 +30,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddFormBuilderUi(cb);
         services.AddTransient<IVersionedFormService, VersionedFormService>();
-        services.AddTransient<IVersionedWorkflowService, VersionedWorkflowService>();
         return new FormBuilderRegistration(services);
     }
 

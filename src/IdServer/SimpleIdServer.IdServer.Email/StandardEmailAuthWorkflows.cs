@@ -15,14 +15,14 @@ public static class StandardEmailAuthWorkflows
 {
     public static string workflowId = "62cb8fcc-34b6-4af9-8d54-db1c98827a08";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "standardEmailAuth")
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
         .AddEmailAuth()
         .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddEmailAuth(this WorkflowBuilder builder)
     {
         builder.AddStep(StandardEmailAuthForms.EmailForm)
-            .AddLinkHttpRequestAction(StandardEmailAuthForms.EmailForm, Constants.EmptyStep, StandardEmailAuthForms.emailSendConfirmationCode, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardEmailAuthForms.EmailForm, Constants.EmptyStep, StandardEmailAuthForms.emailSendConfirmationCode, "Confirmation code", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -39,7 +39,7 @@ public static class StandardEmailAuthWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-            .AddLinkHttpRequestAction(StandardEmailAuthForms.EmailForm, Constants.EmptyStep, StandardEmailAuthForms.emailAuthForm, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardEmailAuthForms.EmailForm, Constants.EmptyStep, StandardEmailAuthForms.emailAuthForm, "Authenticate" , new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

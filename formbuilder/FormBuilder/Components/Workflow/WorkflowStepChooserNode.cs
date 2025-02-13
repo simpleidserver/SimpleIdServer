@@ -8,12 +8,17 @@ public class WorkflowStepChooserNode : NodeModel
     public WorkflowStepChooserNode(Action<WorkflowStepChooserNode, WorkflowStepChooserRecord> act, List<WorkflowLayout> workflowLayouts)
     {
         ActCb = act;
-        Records = workflowLayouts.Select(l => new WorkflowStepChooserRecord(l)).ToList();
-        Records.Add(WorkflowStepChooserRecord.NewEndStep());
+        Refresh(workflowLayouts);
     }
 
     public Action<WorkflowStepChooserNode, WorkflowStepChooserRecord> ActCb { get; private set; }
     public List<WorkflowStepChooserRecord> Records { get; set; }
+
+    public void Refresh(List<WorkflowLayout> workflowLayouts)
+    {
+        Records = workflowLayouts.Select(l => new WorkflowStepChooserRecord(l)).ToList();
+        Records.Add(WorkflowStepChooserRecord.NewEndStep());
+    }
 }
 
 public class WorkflowStepChooserRecord

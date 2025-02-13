@@ -21,9 +21,9 @@ public class BaseWorkflowController : Controller
         _options = options.Value;
     }
 
-    protected async Task<WorkflowViewModel> Get(string workflowId, string stepId, CancellationToken cancellationToken)
+    protected async Task<WorkflowViewModel> Get(string realm, string workflowId, string stepId, CancellationToken cancellationToken)
     {
-        var workflow = await _workflowStore.Get(workflowId, cancellationToken);
+        var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
         var records = await _formStore.GetAll(cancellationToken);
         var step = workflow.GetStep(stepId);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);

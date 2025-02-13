@@ -23,6 +23,7 @@ public static class StandardFidoAuthForms
         .AddElement(new FormStackLayoutRecord
         {
             Id = webauthnFormId,
+            CorrelationId = webauthnFormId,
             IsFormEnabled = true,
             FormType = FormTypes.HTML,
             HtmlAttributes = new Dictionary<string, object>

@@ -3,6 +3,7 @@
 @using System.Text.Json.Nodes
 @using FormBuilder.Helpers
 @using FormBuilder.Models
+@using Radzen.Blazor
 @inject IUriProvider uriProvider
 @model FormBuilder.Startup.Controllers.ViewModels.IndexEditorViewModel
 
@@ -10,6 +11,10 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<component type="typeof(RadzenDialog)"
+           render-mode="ServerPrerendered" />
+<component type="typeof(RadzenNotification)"
+           render-mode="ServerPrerendered" />
 <component type="typeof(FormEditor)" 
     render-mode="ServerPrerendered"
     param-Form="@Model.Record"

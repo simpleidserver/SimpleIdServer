@@ -50,7 +50,7 @@ public class AuthController : BaseWorkflowController
 
     private async Task<WorkflowViewModel> BuildViewModel(string stepName, CancellationToken cancellationToken)
     {
-        var viewModel = await Get(_workflowId, stepName, cancellationToken);
+        var viewModel = await Get("master", _workflowId, stepName, cancellationToken);
         var authViewModel = new AuthViewModel
         {
             // Login = "hello",

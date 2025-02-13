@@ -21,6 +21,7 @@ public class WebauthRegisterWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "webauthn",
             WorkflowCorrelationId = "webauthnRegisterWorkflow",
             SourceFormCorrelationId = "webauthnRegister",
             Links = new List<WorkflowLinkLayout>

@@ -195,7 +195,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
             async Task<IActionResult> HandleWorkflowRegistration()
             {
-                var nextAmr = await _workflowHelper.GetNextAmr(registrationProgress.WorkflowId, sessionRecord.CredentialType, cancellationToken);
+                var nextAmr = await _workflowHelper.GetNextAmr(prefix, registrationProgress.WorkflowId, sessionRecord.CredentialType, cancellationToken);
                 if (WorkflowHelper.IsLastStep(nextAmr))
                 {
                     if(isNewUser)
@@ -272,7 +272,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             string nextRegistrationRedirectUrl = null;
             var registrationProgress = await GetRegistrationProgress();
             string nextAmr = null;
-            if (registrationProgress != null) nextAmr = await _workflowHelper.GetNextAmr(registrationProgress.WorkflowId, request.CredentialType, cancellationToken);
+            if (registrationProgress != null) nextAmr = await _workflowHelper.GetNextAmr(prefix, registrationProgress.WorkflowId, request.CredentialType, cancellationToken);
             if (registrationProgress != null && !WorkflowHelper.IsLastStep(nextAmr))
             {
                 nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{nextAmr}/register";

@@ -3,12 +3,12 @@
 public class WorkflowStep : ICloneable
 {
     public string Id { get; set; }
-    public string FormRecordId { get; set; }
+    public string FormRecordCorrelationId { get; set; }
     public bool IsEmptyStep
     {
         get
         {
-            return FormRecordId == Constants.EmptyStep.CorrelationId;
+            return FormRecordCorrelationId == Constants.EmptyStep.CorrelationId;
         }
     }
 
@@ -17,7 +17,7 @@ public class WorkflowStep : ICloneable
         return new WorkflowStep
         {
             Id = Id,
-            FormRecordId = FormRecordId
+            FormRecordCorrelationId = FormRecordCorrelationId
         };
     }
 }

@@ -412,9 +412,6 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("updateWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Workflows + "/{id}",
                 defaults: new { controller = "Workflows", action = "Update" });
-            webApplication.SidMapControllerRoute("publishWorkflow",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Workflows + "/{id}/publish",
-                defaults: new { controller = "Workflows", action = "Publish" });
 
             webApplication.SidMapControllerRoute("addApiResource",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.ApiResources,

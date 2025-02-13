@@ -13,7 +13,7 @@
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
-    var path = uriProvider.GetActiveFormCssUrl(step?.FormRecordId);
+    var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
 }
 
 <component type="typeof(WorkflowViewer)"

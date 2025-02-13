@@ -21,6 +21,7 @@ internal class VpRegisterWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "vp",
             WorkflowCorrelationId = "vpRegistrationWorkflow",
             SourceFormCorrelationId = "vpRegister",
             Links = new List<WorkflowLinkLayout>

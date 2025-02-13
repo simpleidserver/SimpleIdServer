@@ -5,6 +5,7 @@ namespace FormBuilder.Helpers;
 public interface IUriProvider
 {
     string GetActiveFormCssUrl(string id);
+    string GetActiveLastFormCssUrl(string correlationId);
     string GetFormUrl(string id);
     string GetFormPublishUrl(string id);
     string GetWorkflowUrl(string id);
@@ -24,6 +25,9 @@ public class UriProvider : IUriProvider
 
     public string GetActiveFormCssUrl(string id)
         => $"{GetAbsoluteUriWithVirtualPath()}/forms/{id}/styles/active";
+
+    public string GetActiveLastFormCssUrl(string correlationId)
+        => $"{GetAbsoluteUriWithVirtualPath()}/forms/last/{correlationId}/styles/active";
 
     public string GetFormUrl(string id)
         => $"{GetAbsoluteUriWithVirtualPath()}/forms/{id}";

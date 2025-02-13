@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 using FormBuilder;
 using FormBuilder.Link;
 using FormBuilder.Models.Layout;
@@ -7,36 +8,35 @@ using FormBuilder.Models.Rules;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
 using SimpleIdServer.IdServer.Layout;
-using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Pwd;
 
-public class PwdRegisterWorkflowLayout : IWorkflowLayoutService
+public class ConfirmResetPwdWorkflowLayout : IWorkflowLayoutService
 {
-    public string Category => FormCategories.Registration;
+    public string Category => FormCategories.Authentication;
 
     public WorkflowLayout Get()
     {
         return new WorkflowLayout
         {
-            Name = "pwdRegister",
-            WorkflowCorrelationId = "registerPwdWorkflow",
-            SourceFormCorrelationId = "pwdRegister",
+            Name = "confirmResetPwd",
+            WorkflowCorrelationId = "confirmResetPwd",
+            SourceFormCorrelationId = "confirmResetPwd",
             Links = new List<WorkflowLinkLayout>
             {
-                // Register
+                // Reset
                 new WorkflowLinkLayout
                 {
-                    Description = "Register",
-                    EltCorrelationId = StandardPwdRegisterForms.pwdRegisterFormId,
+                    Description = "Reset",
+                    EltCorrelationId = StandardPwdAuthForms.confirmResetPwdFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
                         IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/pwd/Register",
+                        Target = "/{realm}/pwd/Reset/Confirm",
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters()
@@ -54,7 +54,7 @@ public class PwdRegisterWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Back",
-                    EltCorrelationId = StandardPwdRegisterForms.backBtnId,
+                    EltCorrelationId = StandardPwdAuthForms.confirmResetPwdBackId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter
                     {
@@ -65,7 +65,7 @@ public class PwdRegisterWorkflowLayout : IWorkflowLayoutService
                             {
                                 Rules = new ObservableCollection<MappingRule>
                                 {
-                                    new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
+                                    new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" }
                                 }
                             }
                         }

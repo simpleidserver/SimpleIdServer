@@ -22,6 +22,7 @@ public class MobileAuthWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "mobile",
             WorkflowCorrelationId = "mobileAuthWorkflow",
             SourceFormCorrelationId = "mobileAuth",
             Links = new List<WorkflowLinkLayout>

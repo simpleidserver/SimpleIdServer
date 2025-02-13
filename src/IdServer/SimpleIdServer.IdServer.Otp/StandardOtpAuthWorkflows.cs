@@ -15,14 +15,14 @@ public static class StandardOtpAuthWorkflows
 {
     public static string workflowId = "cd3a77fe-4462-4896-8d3c-4d0f77e1942b";
 
-    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId, "otpAuth")
+    public static WorkflowRecord DefaultWorkflow = WorkflowBuilder.New(workflowId)
         .AddOtpAuth()
         .Build(DateTime.UtcNow);
 
     public static WorkflowBuilder AddOtpAuth(this WorkflowBuilder builder)
     {
         builder.AddStep(StandardOtpAuthForms.OtpForm)
-            .AddLinkHttpRequestAction(StandardOtpAuthForms.OtpForm, Constants.EmptyStep, StandardOtpAuthForms.otpCodeFormId, new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardOtpAuthForms.OtpForm, Constants.EmptyStep, StandardOtpAuthForms.otpCodeFormId, "Authenticate", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

@@ -27,16 +27,6 @@ public class WorkflowReducers
         };
     }
 
-
-    [ReducerMethod]
-    public static WorkflowState ReducePublishWorkflowAction(WorkflowState state, PublishWorkflowAction action)
-    {
-        return state with
-        {
-            IsLoading = true
-        };
-    }
-
     [ReducerMethod]
     public static WorkflowState ReduceGetWorkflowSuccessAction(WorkflowState state, GetWorkflowSuccessAction action)
     {
@@ -53,16 +43,6 @@ public class WorkflowReducers
         return state with
         {
             IsLoading = false
-        };
-    }
-
-    [ReducerMethod]
-    public static WorkflowState ReducePublishWorkflowSuccessAction(WorkflowState state, PublishWorkflowSuccessAction action)
-    {
-        return state with
-        {
-            IsLoading = false,
-            Value = action.Workflow
         };
     }
 

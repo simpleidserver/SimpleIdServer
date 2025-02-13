@@ -21,6 +21,7 @@ public class MobileRegisterWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
+            Name = "mobile",
             WorkflowCorrelationId = "mobileRegisterWorkflow",
             SourceFormCorrelationId = "mobileRegister",
             Links = new List<WorkflowLinkLayout>
