@@ -32,6 +32,7 @@ public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
                     Description = "Confirmation code",
                     EltCorrelationId = StandardConsoleAuthForms.consoleSendConfirmationCode,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,

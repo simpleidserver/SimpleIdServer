@@ -30,6 +30,7 @@ public class SmsAuthWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Confirmation code",
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     EltCorrelationId = StandardSmsAuthForms.smsSendConfirmationCode,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter

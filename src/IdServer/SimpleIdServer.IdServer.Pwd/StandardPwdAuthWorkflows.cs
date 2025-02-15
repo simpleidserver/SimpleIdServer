@@ -70,7 +70,7 @@ public static class StandardPwdAuthWorkflows
 
                 new RelativeUrlTransformerParameters()
             })
-            .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdForgetBtnId, "Forget", new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, resetStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdForgetBtnId, "Forget", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.GET,
                 Target = "/{realm}/pwd/Reset",
@@ -91,23 +91,6 @@ public static class StandardPwdAuthWorkflows
                 {
                     new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
                 },
-            })
-            .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, resetStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdResetFormId, "Reset", new WorkflowLinkHttpRequestParameter
-            {
-                Method = HttpMethods.POST,
-                IsAntiforgeryEnabled = true,
-                Target = "/{realm}/pwd/Reset",
-                Transformers = new List<ITransformerParameters>
-                {
-                    new RegexTransformerParameters()
-                    {
-                        Rules = new ObservableCollection<MappingRule>
-                        {
-                            new MappingRule { Source = "$.Realm", Target = "realm" }
-                        }
-                    },
-                    new RelativeUrlTransformerParameters()
-                }
             });
         return builder;
     }

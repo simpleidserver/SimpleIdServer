@@ -78,6 +78,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                 {
                     Description = "Register",
                     EltCorrelationId = StandardPwdAuthForms.pwdRegisterBtnId,
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter
                     {
@@ -101,6 +102,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                 {
                     Description = "Forget",
                     EltCorrelationId = StandardPwdAuthForms.pwdForgetBtnId,
+                    TargetFormCorrelationId = StandardPwdAuthForms.ResetForm.CorrelationId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {

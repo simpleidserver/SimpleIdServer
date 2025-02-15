@@ -36,6 +36,7 @@ internal class VpRegisterWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     Description = "Back",
                     EltCorrelationId = StandardVpRegisterForms.backBtnId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,

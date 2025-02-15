@@ -53,6 +53,7 @@ public class WebauthRegisterWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     Description = "Back",
                     EltCorrelationId = StandardFidoRegisterForms.webauthnBackButtonId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,

@@ -31,6 +31,7 @@ public class EmailRegisterWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Confirmation code",
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     EltCorrelationId = StandardEmailRegistrationForms.emailSendConfirmationCodeFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize( new WorkflowLinkHttpRequestParameter
@@ -79,6 +80,7 @@ public class EmailRegisterWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Back",
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     EltCorrelationId = StandardEmailRegistrationForms.backButtonId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter 

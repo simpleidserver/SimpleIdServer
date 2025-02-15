@@ -126,10 +126,11 @@ public class StandardPwdAuthForms
             }
         }).Build();
 
-    public static FormRecord ConfirmResetForm = AuthLayoutBuilder.New("595f4393-ef11-4e59-bae9-3033f945239c", "confirmResetPwd", "confirmResetPwd")
+    public static FormRecord ConfirmResetForm = AuthLayoutBuilder.New("595f4393-ef11-4e59-bae9-3033f945239c", "confirmResetPwd", "confirmResetPwd", false)
         .AddElement(new FormStackLayoutRecord
         {
             Id = confirmResetPwdFormId,
+            CorrelationId = confirmResetPwdFormId,
             IsFormEnabled = true,
             Transformations = new List<ITransformationRule>
             {
@@ -213,6 +214,7 @@ public class StandardPwdAuthForms
                 new FormAnchorRecord
                 {
                     Id = confirmResetPwdBackId,
+                    CorrelationId = confirmResetPwdBackId,
                     ActAsButton = true,
                     Labels = LayoutTranslations.Back
                 }

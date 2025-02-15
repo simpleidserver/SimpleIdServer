@@ -31,6 +31,7 @@ public class ResetPwdWorkflowLayout : IWorkflowLayoutService
                 {
                     Description = "Reset",
                     EltCorrelationId = StandardPwdAuthForms.pwdResetFormId,
+                    TargetFormCorrelationId = StandardPwdAuthForms.ConfirmResetForm.CorrelationId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {

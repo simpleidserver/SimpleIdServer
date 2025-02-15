@@ -8,8 +8,8 @@ using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Conditions;
-using FormBuilder.Models.Rules;
 using FormBuilder.Models;
+using FormBuilder.Models.Rules;
 using FormBuilder.Rules;
 using System.Collections.ObjectModel;
 
@@ -17,8 +17,10 @@ namespace FormBuilder.Startup.Workflows;
 
 public class PwdAuthForms
 {
-    public static string authPwdFormId = "pwdAuth";
-    public static string forgetMyPasswordId = "forgetMyPwd";
+    public static string authPwdFormId = "pwdAuthId";
+    public static string authPwdFormCorrelationId = "pwdAuthCorrelationId";
+    public static string forgetMyPasswordId = "forgetMyPwdId";
+    public static string forgetMyPasswordCorrelationId = "forgetMyPwdCorrelationId";
 
     public static FormRecord LoginPwdAuthForm = new FormRecord
     {
@@ -34,8 +36,8 @@ public class PwdAuthForms
             // Authentication form
             new FormStackLayoutRecord
             {
-                Id = Guid.NewGuid().ToString(),
-                CorrelationId = authPwdFormId,
+                Id = authPwdFormId,
+                CorrelationId = authPwdFormCorrelationId,
                 IsFormEnabled = true,
                 Elements = new ObservableCollection<IFormElementRecord>
                 {
@@ -103,8 +105,8 @@ public class PwdAuthForms
             // Forget my password
             new FormAnchorRecord
             {
-                Id = Guid.NewGuid().ToString(),
-                CorrelationId = forgetMyPasswordId,
+                Id = forgetMyPasswordId,
+                CorrelationId = forgetMyPasswordCorrelationId,
                 Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
             },
             // Separator

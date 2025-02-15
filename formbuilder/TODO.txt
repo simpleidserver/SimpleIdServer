@@ -2,18 +2,34 @@
 => pouvoir publier un formulaire								:	DONE
 => ajouter un panel de configuration pour JSON - WORKFLOW		:	DONE
 => pouvoir mettre à jour le workflow							:	DONE
-=> pouvoir publier le workflow									:	DONE
-=> pouvoir éditer le formulaire dans l'application blazor		:	DONE
-=> pouvoir sauvegarder un formulaire dans SID					:	DONE
-=> pouvoir publier un formulaire dans SID						:	DONE
-=> pouvoir sauvegarder le style CSS d'un formulaire dans SID	:	DONE
-=> passer tous les layous										:	DONE
-=> créer tous les layouts										:	DONE
+=> pouvoir publier le workflow													:	DONE
+=> pouvoir éditer le formulaire dans l'application blazor						:	DONE
+=> pouvoir sauvegarder un formulaire dans SID									:	DONE
+=> pouvoir publier un formulaire dans SID										:	DONE
+=> pouvoir sauvegarder le style CSS d'un formulaire dans SID					:	DONE
+=> passer tous les layous														:	DONE
+=> créer tous les layouts														:	DONE
 
-=> pouvoir éditer un workflow dans SID							:	TODO
+=> afficher un workflow complet pour PWD										:	DONE
+=> afficher correctement les étapes												:	DONE
+=> vérifier si le debug fonctionne encore avec changement sur EltCorrelationId	:	DONE
+=> ne pas afficher tous les autres layouts										:	DONE
+=> forcer l'étape : pwd => resetPwd => resetPwdConfirm							:	DONE
+=> => changer l'icône : rond vide quand éditable								:	DONE
+=> => rond plein quand non éditable												:	DONE
+=> => ajouter lock quand non éditable											:	DONE
+=> => 
+
+=> pouvoir enregistrer un workflow dans SID										:	TODO
+=> utiliser VS code copilot										:	TODO
+=> imposer les prochaines étapes dans le workflow				:	TODO
+=> => authentification
+=> => mandatory : RESET, RESET PWD !!!
 => lorsqu'un ACR est créé alors créer un workflow vide			:	TODO
 => pouvoir enregister le workflow dans SID						:	TODO
 => dupliquer tous les workflows & forms quand realm est créé	:	TODO
+
+=> vérifier comment imposer les conditions vers le prochain workflow		:	TODO
 
 
 

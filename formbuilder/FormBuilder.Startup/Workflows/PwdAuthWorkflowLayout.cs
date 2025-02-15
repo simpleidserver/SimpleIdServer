@@ -25,7 +25,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Authenticate",
-                    EltCorrelationId = PwdAuthForms.authPwdFormId,
+                    EltCorrelationId = PwdAuthForms.authPwdFormCorrelationId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
@@ -49,7 +49,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Forget my password",
-                    EltCorrelationId = PwdAuthForms.forgetMyPasswordId,
+                    EltCorrelationId = PwdAuthForms.forgetMyPasswordCorrelationId,
                     TargetFormCorrelationId = "resetPwd",
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter

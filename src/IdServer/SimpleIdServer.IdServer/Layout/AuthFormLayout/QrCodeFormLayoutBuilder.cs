@@ -21,7 +21,7 @@ public class QrCodeFormLayoutBuilder
         _loginTranslations = loginTranslations;
     }
 
-    public static QrCodeFormLayoutBuilder New(string id, string correlationId, string name, List<LabelTranslation> loginTranslations)
+    public static QrCodeFormLayoutBuilder New(string id, string correlationId, string name, List<LabelTranslation> loginTranslations, string realm = null)
     {
         var record = new FormRecord
         {
@@ -31,6 +31,8 @@ public class QrCodeFormLayoutBuilder
             Name = name,
             UpdateDateTime = DateTime.UtcNow,
             ActAsStep = true,
+            Realm = realm ?? Constants.DefaultRealm,
+            Category = FormCategories.Authentication,
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new QrCodeFormLayoutBuilder(record, loginTranslations);

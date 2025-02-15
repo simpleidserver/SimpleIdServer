@@ -33,6 +33,7 @@ public class EmailAuthWorkflowLayout : IWorkflowLayoutService
                     Description = "Confirmation code",
                     EltCorrelationId = StandardEmailAuthForms.emailSendConfirmationCode,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,

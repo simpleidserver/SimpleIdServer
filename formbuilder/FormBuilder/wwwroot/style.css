@@ -279,8 +279,23 @@ g.diagram-link path:not(.selection-helper) {
     height: 25px;
 }
 
+.step-selected.blocked {
+    background-color: #ececec !important;
+}
+
 .step-selected, final-step {
     display: relative;
+}
+
+.final-step .lck {
+    font-family: var(--rz-icon-font-family);
+    font-size: 16pt;
+}
+
+.step-selected > .blocked-overlay {
+    position: absolute;
+    top: 5px;
+    right: 5px;
 }
 
 @keyframes dash {

@@ -9,6 +9,7 @@ namespace FormBuilder.Startup.Workflows;
 public class MobileAuthForms
 {
     public static string mobileAuthFormId = "mobileAuthFormId";
+    public static string mobileAuthFormCorrelationId = "mobileAuthFormCorrelationId";
 
     public static FormRecord MobileAuthForm = new FormRecord
     {
@@ -22,8 +23,8 @@ public class MobileAuthForms
         {
             new FormStackLayoutRecord
             {
-                Id = Guid.NewGuid().ToString(),
-                CorrelationId = mobileAuthFormId,
+                Id = mobileAuthFormId,
+                CorrelationId = mobileAuthFormCorrelationId,
                 IsFormEnabled = true,
                 FormType = FormTypes.HTML,
                 HtmlAttributes = new Dictionary<string, object>

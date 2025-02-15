@@ -37,6 +37,7 @@ public class MobileRegisterWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     Description = "Back",
                     EltCorrelationId = StandardFidoRegisterForms.mobileBackButtonId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,

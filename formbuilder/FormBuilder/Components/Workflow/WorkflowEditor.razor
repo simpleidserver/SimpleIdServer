@@ -183,10 +183,11 @@
         {
             var nextStep = Context.Definition.Workflow.Steps.SingleOrDefault(s => s.Id == stepLink.TargetStepId);
             isBlocked = false;
-            var lnk = workflowLayout?.Links.SingleOrDefault(l => l.EltCorrelationId == stepLink.Source.EltId);
-            if (lnk != null)
+            if(workflowLayout != null)
             {
-                isBlocked = !string.IsNullOrWhiteSpace(lnk.TargetFormCorrelationId);
+                var elt = form.GetChild(stepLink.Source.EltId);
+                var lnk = workflowLayout.Links.SingleOrDefault(l => l.EltCorrelationId == elt.CorrelationId);
+                if(lnk != null) isBlocked = !string.IsNullOrWhiteSpace(lnk.TargetFormCorrelationId);
             }
 
             if (nextStep != null) AddNode(startPosX, startPosY, nextStep, node, i, stepLink.Description, isBlocked);
@@ -323,17 +324,26 @@
             Id = Guid.NewGuid().ToString(),
             FormRecordCorrelationId = formRecord.CorrelationId
         };
+        var existingStep = Workflow.Steps.SingleOrDefault(s => s.FormRecordCorrelationId == formRecord.CorrelationId);
+        if (existingStep != null) newStep = existingStep;
+        var isStepExists = existingStep != null;
         var resolvedSteps = Forms.Where(f => layout.Links.Where(l => !string.IsNullOrWhiteSpace(l.TargetFormCorrelationId)).Select(l => l.TargetFormCorrelationId).Contains(f.CorrelationId))
-            .Select(f => new WorkflowStep
+            .Select(f =>
+            {
+                var existingStep = Workflow.Steps.SingleOrDefault(s => s.FormRecordCorrelationId == f.CorrelationId);
+                if (existingStep != null) return existingStep;
+                return new WorkflowStep
                 {
                     Id = Guid.NewGuid().ToString(),
                     FormRecordCorrelationId = f.CorrelationId,
-                }).ToList();
+                };
+            }).ToList();
         var links = layout.Links.Select(l =>
         {
+            var eltId = formRecord.GetChildByCorrelationId(l.EltCorrelationId).Id;
             var source = new WorkflowLinkSource
             {
-                EltId = l.EltCorrelationId
+                EltId = eltId
             };
             var form = Forms.SingleOrDefault(r => r.CorrelationId == l.TargetFormCorrelationId);
             var targetStep = resolvedSteps.SingleOrDefault(s => s.FormRecordCorrelationId == form?.CorrelationId);
@@ -349,10 +359,12 @@
                 TargetStepId = targetStepId
             };
         });
-        Context.Definition.Workflow.Steps.Add(newStep);
-        Context.Definition.Workflow.Steps.AddRange(resolvedSteps);
+        if(!isStepExists) Context.Definition.Workflow.Steps.Add(newStep);
+        Context.Definition.Workflow.Steps.AddRange(resolvedSteps.Where(s => !Workflow.Steps.Any(ws => ws.FormRecordCorrelationId == s.FormRecordCorrelationId)));
         Context.Definition.Workflow.Links.AddRange(links);
         UpdateLink(newStep, sourceNodeModel);
+        var resolvedLayouts = WorkflowLayouts.Where(l => l.SourceFormCorrelationId != FormBuilder.Constants.EmptyStep.CorrelationId && resolvedSteps.Any(s => s.FormRecordCorrelationId == l.SourceFormCorrelationId));
+        foreach(var resolvedLayout in resolvedLayouts) AddWorkflowStep(resolvedLayout.WorkflowCorrelationId, sourceNodeModel);
         return newStep;
     }
 
