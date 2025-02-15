@@ -86,7 +86,8 @@ public class DataSeeder
 
     public static WorkflowRecord BuildComplexAuthenticationWorkflow() => WorkflowBuilder.New("059f49b2-f76a-4b5a-8ecc-cf64abdf9b39")
         .AddPwdAuth(StandardConsoleAuthForms.ConsoleForm, StandardPwdAuthForms.ResetForm)
-        .AddResetPwd()
+        .AddResetPwd(StandardPwdAuthForms.ConfirmResetForm)
+        .AddConfirmResetPwd()
         .AddConsoleAuth()
         .Build(DateTime.UtcNow);
 
@@ -431,7 +432,7 @@ public class DataSeeder
             var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
             var iapSilver = SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver;
             firstLevelAssurance.AuthenticationWorkflow = StandardPwdAuthWorkflows.pwdWorkflowId;
-            iapSilver.AuthenticationWorkflow = StandardPwdAuthWorkflows.pwdWorkflowId;
+            iapSilver.AuthenticationWorkflow = "059f49b2-f76a-4b5a-8ecc-cf64abdf9b39"; // StandardPwdAuthWorkflows.pwdWorkflowId;
             dbContext.Acrs.Add(firstLevelAssurance);
             dbContext.Acrs.Add(iapSilver);
             dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference

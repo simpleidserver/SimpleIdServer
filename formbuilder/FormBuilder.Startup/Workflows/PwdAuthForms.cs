@@ -31,123 +31,123 @@ public class PwdAuthForms
         ActAsStep = true,
         Elements = new ObservableCollection<IFormElementRecord>
         {
-        // Authentication form
-        new FormStackLayoutRecord
-        {
-            Id = Guid.NewGuid().ToString(),
-            CorrelationId = authPwdFormId,
-            IsFormEnabled = true,
-            Elements = new ObservableCollection<IFormElementRecord>
+            // Authentication form
+            new FormStackLayoutRecord
             {
-                new FormInputFieldRecord
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = authPwdFormId,
+                IsFormEnabled = true,
+                Elements = new ObservableCollection<IFormElementRecord>
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "ReturnUrl",
-                    FormType = FormInputTypes.HIDDEN,
-                    Transformations = new List<ITransformationRule>
+                    new FormInputFieldRecord
                     {
-                        new IncomingTokensTransformationRule
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "ReturnUrl",
+                        FormType = FormInputTypes.HIDDEN,
+                        Transformations = new List<ITransformationRule>
                         {
-                            Source = "$.ReturnUrl"
+                            new IncomingTokensTransformationRule
+                            {
+                                Source = "$.ReturnUrl"
+                            }
                         }
-                    }
-                },
-                new FormInputFieldRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "Login",
-                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build(),
-                    Transformations = new List<ITransformationRule>
+                    },
+                    new FormInputFieldRecord
                     {
-                        new IncomingTokensTransformationRule
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Login",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Login").Build(),
+                        Transformations = new List<ITransformationRule>
                         {
-                            Source = "$.Login"
-                        },
-                        new PropertyTransformationRule
-                        {
-                            Condition = new PresentParameter
+                            new IncomingTokensTransformationRule
                             {
                                 Source = "$.Login"
                             },
-                            PropertyName = "Disabled",
-                            PropertyValue = "true"
+                            new PropertyTransformationRule
+                            {
+                                Condition = new PresentParameter
+                                {
+                                    Source = "$.Login"
+                                },
+                                PropertyName = "Disabled",
+                                PropertyValue = "true"
+                            }
                         }
+                    },
+                    new FormPasswordFieldRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Password",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
+                    },
+                    new FormCheckboxRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "RememberLogin",
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").Build()
+                    },
+                    new FormButtonRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
                     }
-                },
-                new FormPasswordFieldRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "Password",
-                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Password").Build()
-                },
-                new FormCheckboxRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Name = "RememberLogin",
-                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").Build()
-                },
-                new FormButtonRecord
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Labels = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").Build()
                 }
-            }
-        },
-        // Separator
-        new DividerLayoutRecord
-        {
-            Id = Guid.NewGuid().ToString(),
-            CorrelationId = Guid.NewGuid().ToString(),
-            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
-        },
-        // Forget my password
-        new FormAnchorRecord
-        {
-            Id = Guid.NewGuid().ToString(),
-            CorrelationId = forgetMyPasswordId,
-            Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
-        },
-        // Separator
-        new DividerLayoutRecord
-        {
-            Id = Guid.NewGuid().ToString(),
-            CorrelationId = Guid.NewGuid().ToString(),
-            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
-        },
-        // Register
-        new FormAnchorRecord
-        {
-            Id = Guid.NewGuid().ToString(),
-            CorrelationId = Guid.NewGuid().ToString(),
-            Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
-        },
-        // Separator
-        new DividerLayoutRecord
-        {
-            Id = Guid.NewGuid().ToString(),
-            CorrelationId = Guid.NewGuid().ToString(),
-            Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
-        },
-        // List all external identity providers.
-        new ListDataRecord
-        {
-            Id = Guid.NewGuid().ToString(),
-            CorrelationId = Guid.NewGuid().ToString(),
-            FieldType = FormAnchorDefinition.TYPE,
-            Parameters = new Dictionary<string, object>
-            {
-                { nameof(FormAnchorRecord.ActAsButton), true }
             },
-            RepetitionRule = new IncomingTokensRepetitionRule
+            // Separator
+            new DividerLayoutRecord
             {
-                Path = "$.ExternalIdProviders[*]",
-                LabelMappingRules = new List<Rules.LabelMappingRule>
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = Guid.NewGuid().ToString(),
+                Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+            },
+            // Forget my password
+            new FormAnchorRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = forgetMyPasswordId,
+                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").Build()
+            },
+            // Separator
+            new DividerLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = Guid.NewGuid().ToString(),
+                Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+            },
+            // Register
+            new FormAnchorRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = Guid.NewGuid().ToString(),
+                Labels = LabelTranslationBuilder.New().AddTranslation("en", "Register").Build()
+            },
+            // Separator
+            new DividerLayoutRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = Guid.NewGuid().ToString(),
+                Labels = LabelTranslationBuilder.New().AddTranslation("en", "OR").Build()
+            },
+            // List all external identity providers.
+            new ListDataRecord
+            {
+                Id = Guid.NewGuid().ToString(),
+                CorrelationId = Guid.NewGuid().ToString(),
+                FieldType = FormAnchorDefinition.TYPE,
+                Parameters = new Dictionary<string, object>
                 {
-                    new Rules.LabelMappingRule { Language = "en", Source = "$.DisplayName" }
+                    { nameof(FormAnchorRecord.ActAsButton), true }
+                },
+                RepetitionRule = new IncomingTokensRepetitionRule
+                {
+                    Path = "$.ExternalIdProviders[*]",
+                    LabelMappingRules = new List<Rules.LabelMappingRule>
+                    {
+                        new Rules.LabelMappingRule { Language = "en", Source = "$.DisplayName" }
+                    }
                 }
             }
         }
-    }
     };
 
     public static FormRecord ResetPwdForm = new FormRecord
@@ -155,7 +155,8 @@ public class PwdAuthForms
         Id = "resetPwdId",
         Name = "resetPwd",
         CorrelationId = "resetPwd",
-        VersionNumber = 1,
+        VersionNumber = 0,
+        Realm = Constants.DefaultRealm,
         Status = RecordVersionStatus.Published,
         Elements = new ObservableCollection<IFormElementRecord>
         {

@@ -92,7 +92,7 @@ public static class StandardPwdAuthWorkflows
                     new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
                 },
             })
-            .AddLinkHttpRequestAction(StandardPwdAuthForms.ResetForm, resetStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdResetFormId, "Reset", new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, resetStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdResetFormId, "Reset", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
@@ -112,10 +112,10 @@ public static class StandardPwdAuthWorkflows
         return builder;
     }
 
-    public static WorkflowBuilder AddResetPwd(this WorkflowBuilder builder)
+    public static WorkflowBuilder AddResetPwd(this WorkflowBuilder builder, FormRecord nextStep = null)
     {
         builder.AddStep(StandardPwdAuthForms.ResetForm)
-            .AddLinkHttpRequestAction(StandardPwdAuthForms.ResetForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdResetFormId, "Reset", new WorkflowLinkHttpRequestParameter
+            .AddLinkHttpRequestAction(StandardPwdAuthForms.ResetForm, nextStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdResetFormId, "Reset", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,

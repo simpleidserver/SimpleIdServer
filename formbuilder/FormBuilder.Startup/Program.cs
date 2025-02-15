@@ -67,6 +67,7 @@ void SeedData(WebApplication application)
             }
 
             dbContext.Forms.AddRange(allForms);
+            dbContext.Workflows.Add(AuthWorkflows.SampleWorkflow);
             dbContext.Workflows.Add(AuthWorkflows.AuthWorkflow);
             dbContext.SaveChanges();
         }
