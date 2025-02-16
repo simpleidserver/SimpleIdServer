@@ -1,7 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Hangfire;
+using FormBuilder.Helpers;
+using FormBuilder.Models;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,7 +15,9 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -32,9 +37,9 @@ public class RealmsController : BaseController
     private readonly IGroupRepository _groupRepository;
     private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
     private readonly ITransactionBuilder _transactionBuilder;
-    private readonly IUserSessionResitory _userSessionRepository;
-    private readonly IRecurringJobManager _recurringJobManager;
-    private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
+    private readonly IFormStore _formStore;
+    private readonly IWorkflowStore _workflowStore;
+    private readonly IDateTimeHelper _dateTimeHelper;
     private readonly ILogger<RealmsController> _logger;
 
     public RealmsController(
@@ -47,11 +52,11 @@ public class RealmsController : BaseController
         IGroupRepository groupRepository,
         IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
         ITransactionBuilder transactionBuilder,
-        IUserSessionResitory userSessionRepository,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
-        IRecurringJobManager recurringJobManager,
-        IRegistrationWorkflowRepository registrationWorkflowRepository,
+        IFormStore formStore,
+        IWorkflowStore workflowStore,
+        IDateTimeHelper dateTimeHelper,
         ILogger<RealmsController> logger) : base(tokenRepository, jwtBuilder)
     {
         _busControl = busControl;
@@ -62,10 +67,10 @@ public class RealmsController : BaseController
         _fileSerializedKeyStore = fileSerializedKeyStore;
         _groupRepository = groupRepository;
         _transactionBuilder = transactionBuilder;
-        _userSessionRepository = userSessionRepository;
-        _recurringJobManager = recurringJobManager;
         _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
-        _registrationWorkflowRepository = registrationWorkflowRepository;
+        _formStore = formStore;
+        _workflowStore = workflowStore;
+        _dateTimeHelper = dateTimeHelper;
         _logger = logger;
     }
 
@@ -99,6 +104,8 @@ public class RealmsController : BaseController
                     await CheckAccessToken(prefix, Constants.StandardScopes.Realms.Name);
                     var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
                     if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
+                    var clonedForms = new List<FormRecord>();
+                    var clonedWorkflows = new List<WorkflowRecord>();
                     var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                     var administratorRole = RealmRoleBuilder.BuildAdministrativeRole(realm);
                     var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
@@ -107,6 +114,10 @@ public class RealmsController : BaseController
                     var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
                     var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
                     var acrs = await _authenticationContextClassReferenceRepository.GetAll(Constants.DefaultRealm, cancellationToken);
+                    var forms = await _formStore.GetAll(prefix, cancellationToken);
+                    var workflows = await _workflowStore.GetAll(prefix, cancellationToken);
+                    var transformationResult = Transform(workflows, forms, prefix);
+
                     _realmRepository.Add(realm);
                     foreach (var user in users)
                     {
@@ -144,6 +155,16 @@ public class RealmsController : BaseController
                         _fileSerializedKeyStore.Update(key);
                     }
 
+                    foreach(var form in forms)
+                    {
+                        _formStore.Add(form);
+                    }
+
+                    foreach(var workflow in workflows)
+                    {
+                        _workflowStore.Add(workflow);
+                    }
+
                     foreach (var acr in acrs)
                     {
                         realm.AuthenticationContextClassReferences.Add(new AuthenticationContextClassReference
@@ -152,10 +173,13 @@ public class RealmsController : BaseController
                             DisplayName = acr.DisplayName,
                             Id = Guid.NewGuid().ToString(),
                             Name = acr.Name,
-                            UpdateDateTime = DateTime.UtcNow
+                            UpdateDateTime = DateTime.UtcNow,
+                            AuthenticationWorkflow = string.IsNullOrWhiteSpace(acr.AuthenticationWorkflow) ? null : transformationResult.MappingWorkflowOldToNewIds[acr.AuthenticationWorkflow]
                         });
                     }
 
+                    await _formStore.SaveChanges(cancellationToken);
+                    await _workflowStore.SaveChanges(cancellationToken);
                     await transaction.Commit(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, $"Realm {request.Name} is added");
                     return new ContentResult
@@ -205,5 +229,63 @@ public class RealmsController : BaseController
                 return BuildError(ex);
             }
         }
+    }
+
+    private TransformationResult Transform(List<WorkflowRecord> workflows, List<FormRecord> forms, string newRealm)
+    {
+        var result = new TransformationResult();
+        var currentDateTime = _dateTimeHelper.GetCurrent();
+        foreach(var workflow in workflows.Select(w => w.Clone() as WorkflowRecord).ToList())
+        {
+            var newId = Guid.NewGuid().ToString();
+            result.MappingWorkflowOldToNewIds.Add(workflow.Id, newId);
+            var correlationIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
+            workflow.Id = newId;
+            workflow.UpdateDateTime = currentDateTime;
+            workflow.Realm = newRealm;
+            foreach(var step in workflow.Steps)
+            {
+                var newStepId = Guid.NewGuid().ToString();
+                var filteredLinks = workflow.Links.Where(l => l.SourceStepId == step.Id || l.TargetStepId == step.Id);
+                foreach (var link in filteredLinks)
+                {
+                    if(link.SourceStepId == step.Id) link.SourceStepId = newStepId;
+                    else link.TargetStepId = newStepId;
+                }
+
+                step.Id = newStepId;
+            }
+
+            result.Workflows.Add(workflow);
+        }
+
+        var allSteps = result.Workflows.SelectMany(w => w.Steps);
+        foreach (var form in forms.Select(w => w.Clone() as FormRecord).ToList())
+        {
+            var newCorrelationId = Guid.NewGuid().ToString();
+            var filteredSteps = allSteps.Where(s => s.FormRecordCorrelationId == form.CorrelationId);
+            foreach(var filteredStep in filteredSteps) filteredStep.FormRecordCorrelationId = newCorrelationId;
+            form.CorrelationId = newCorrelationId;
+            form.Id = Guid.NewGuid().ToString();
+            form.Status = RecordVersionStatus.Published;
+            form.VersionNumber = 0;
+            form.Realm = newRealm;
+            form.UpdateDateTime = currentDateTime;
+            form.AvailableStyles.ForEach(s =>
+            {
+                s.Id = Guid.NewGuid().ToString();
+            });
+            result.Forms.Add(form);
+        }
+
+
+        return result;
+    }
+
+    private class TransformationResult
+    {
+        public List<WorkflowRecord> Workflows { get; set; } = new List<WorkflowRecord>();
+        public List<FormRecord> Forms { get; set; } = new List<FormRecord>();
+        public Dictionary<string, string> MappingWorkflowOldToNewIds { get; set; } = new Dictionary<string, string>();
     }
 }

@@ -32,6 +32,9 @@ namespace SimpleIdServer.IdServer.Startup.Conf;
 
 public class DataSeeder
 {
+    public static string completePwdAuthWorkflowId = "059f49b2-f76a-4b5a-8ecc-cf64abdf9b39";
+    private static string pwdEmailAuthWorkflowId = "ddeb825e-5012-4e7a-8441-d3eec73083c2";
+
     private static List<FormRecord> allAuthForms = new List<FormRecord>
     {
         StandardConsoleAuthForms.ConsoleForm,
@@ -65,7 +68,8 @@ public class DataSeeder
         StandardPwdAuthWorkflows.DefaultPwdWorkflow,
         StandardPwdAuthWorkflows.DefaultConfirmResetPwdWorkflow,
         StandardSmsAuthWorkflows.DefaultWorkflow,
-        BuildComplexAuthenticationWorkflow()
+        BuildCompletePwdAuthWorkflow(),
+        BuildPwdEmailAuthWorkflow()
     };
 
     public static List<WorkflowRecord> allRegistrationWorkflows = new List<WorkflowRecord>
@@ -84,11 +88,17 @@ public class DataSeeder
           .AddMobileRegistration()
           .Build(DateTime.UtcNow);
 
-    public static WorkflowRecord BuildComplexAuthenticationWorkflow() => WorkflowBuilder.New("059f49b2-f76a-4b5a-8ecc-cf64abdf9b39")
-        .AddPwdAuth(StandardConsoleAuthForms.ConsoleForm, StandardPwdAuthForms.ResetForm)
+    public static WorkflowRecord BuildCompletePwdAuthWorkflow() => WorkflowBuilder.New(completePwdAuthWorkflowId)
+        .AddPwdAuth(resetStep: StandardPwdAuthForms.ResetForm)
         .AddResetPwd(StandardPwdAuthForms.ConfirmResetForm)
         .AddConfirmResetPwd()
-        .AddConsoleAuth()
+        .Build(DateTime.UtcNow);
+
+    public static WorkflowRecord BuildPwdEmailAuthWorkflow() => WorkflowBuilder.New(pwdEmailAuthWorkflowId)
+        .AddPwdAuth(StandardEmailAuthForms.EmailForm, StandardPwdAuthForms.ResetForm)
+        .AddEmailAuth()
+        .AddResetPwd(StandardPwdAuthForms.ConfirmResetForm)
+        .AddConfirmResetPwd()
         .Build(DateTime.UtcNow);
 
     public static void SeedData(WebApplication webApplication, string scimBaseUrl)
@@ -431,8 +441,8 @@ public class DataSeeder
         {
             var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
             var iapSilver = SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver;
-            firstLevelAssurance.AuthenticationWorkflow = StandardPwdAuthWorkflows.pwdWorkflowId;
-            iapSilver.AuthenticationWorkflow = "059f49b2-f76a-4b5a-8ecc-cf64abdf9b39"; // StandardPwdAuthWorkflows.pwdWorkflowId;
+            firstLevelAssurance.AuthenticationWorkflow = completePwdAuthWorkflowId;
+            iapSilver.AuthenticationWorkflow = completePwdAuthWorkflowId;
             dbContext.Acrs.Add(firstLevelAssurance);
             dbContext.Acrs.Add(iapSilver);
             dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
@@ -441,10 +451,11 @@ public class DataSeeder
                 Name = "email",
                 DisplayName = "Email authentication",
                 UpdateDateTime = DateTime.UtcNow,
+                AuthenticationWorkflow = StandardEmailAuthWorkflows.DefaultWorkflow.Id,
                 Realms = new List<Realm>
-                    {
-                        SimpleIdServer.IdServer.Constants.StandardRealms.Master
-                    }
+                {
+                    SimpleIdServer.IdServer.Constants.StandardRealms.Master
+                }
             });
             dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
             {
@@ -452,10 +463,11 @@ public class DataSeeder
                 Name = "sms",
                 DisplayName = "Sms authentication",
                 UpdateDateTime = DateTime.UtcNow,
+                AuthenticationWorkflow = StandardSmsAuthWorkflows.DefaultWorkflow.Id,
                 Realms = new List<Realm>
-                    {
-                        SimpleIdServer.IdServer.Constants.StandardRealms.Master
-                    }
+                {
+                    SimpleIdServer.IdServer.Constants.StandardRealms.Master
+                }
             });
             dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
             {
@@ -463,6 +475,7 @@ public class DataSeeder
                 Name = "pwd-email",
                 DisplayName = "Password and email authentication",
                 UpdateDateTime = DateTime.UtcNow,
+                AuthenticationWorkflow = pwdEmailAuthWorkflowId,
                 Realms = new List<Realm>
                     {
                         SimpleIdServer.IdServer.Constants.StandardRealms.Master

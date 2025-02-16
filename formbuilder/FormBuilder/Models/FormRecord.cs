@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace FormBuilder.Models;
 
-public class FormRecord : BaseVersionRecord
+public class FormRecord : BaseVersionRecord, ICloneable
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }
@@ -22,6 +22,24 @@ public class FormRecord : BaseVersionRecord
         {
             return AvailableStyles.SingleOrDefault(s => s.IsActive);
         }
+    }
+
+    public object Clone()
+    {
+        return new FormRecord
+        {
+            Id = Id,
+            ActAsStep = ActAsStep,
+            Category = Category,
+            CorrelationId = CorrelationId,
+            Name = Name,
+            Realm = Realm,
+            Status = Status,
+            UpdateDateTime = UpdateDateTime,
+            VersionNumber = VersionNumber,
+            AvailableStyles = AvailableStyles.Select(a => a.Clone() as FormStyle).ToList(),
+            Elements = Elements
+        };
     }
 
     public void Update(List<IFormElementRecord> elements, DateTime dateTime)

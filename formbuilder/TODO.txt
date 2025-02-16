@@ -1,7 +1,7 @@
-=> pouvoir mettre à jour la définition JSON du formulaire		:	DONE
-=> pouvoir publier un formulaire								:	DONE
-=> ajouter un panel de configuration pour JSON - WORKFLOW		:	DONE
-=> pouvoir mettre à jour le workflow							:	DONE
+=> pouvoir mettre à jour la définition JSON du formulaire						:	DONE
+=> pouvoir publier un formulaire												:	DONE
+=> ajouter un panel de configuration pour JSON - WORKFLOW						:	DONE
+=> pouvoir mettre à jour le workflow											:	DONE
 => pouvoir publier le workflow													:	DONE
 => pouvoir éditer le formulaire dans l'application blazor						:	DONE
 => pouvoir sauvegarder un formulaire dans SID									:	DONE
@@ -20,14 +20,12 @@
 => => ajouter lock quand non éditable											:	DONE
 => => 
 
-=> pouvoir enregistrer un workflow dans SID										:	TODO
+=> pouvoir enregistrer un workflow dans SID										:	OK
+=> lorsqu'un ACR est créé alors créer un workflow vide							:	OK
+=> dupliquer tous les workflows & forms quand realm est créé					:	IN PROGRESS
+=> vérifier si le workflow fonctionne correctement sur SID						:	TODO
+
 => utiliser VS code copilot										:	TODO
-=> imposer les prochaines étapes dans le workflow				:	TODO
-=> => authentification
-=> => mandatory : RESET, RESET PWD !!!
-=> lorsqu'un ACR est créé alors créer un workflow vide			:	TODO
-=> pouvoir enregister le workflow dans SID						:	TODO
-=> dupliquer tous les workflows & forms quand realm est créé	:	TODO
 
 => vérifier comment imposer les conditions vers le prochain workflow		:	TODO
 

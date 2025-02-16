@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
 using FormBuilder;
-using FormBuilder.Builders;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
@@ -50,9 +49,7 @@ public class SidServerSetup
         });
         var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
         {
-            cb.DefaultAuthenticationWorkflowId = DataSeeder.BuildComplexAuthenticationWorkflow().Id;
-            // .DefaultPwdWorkflow.Id;
-            // cb.DefaultAuthenticationWorkflowId = StandardPwdAuthWorkflows.DefaultPwdWorkflow.Id;
+            cb.DefaultAuthenticationWorkflowId = DataSeeder.completePwdAuthWorkflowId;
             if (!string.IsNullOrWhiteSpace(configuration.SessionCookieNamePrefix))
                 cb.SessionCookieName = configuration.SessionCookieNamePrefix;
             cb.Authority = configuration.Authority;

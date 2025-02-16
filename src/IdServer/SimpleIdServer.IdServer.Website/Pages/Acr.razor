@@ -19,13 +19,18 @@
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl($"/acrs/workflows")" Text="@Global.AcrsTitle" />
             <RadzenBreadCrumbItem Text="@acrState.Value.Acr?.Name" />
         </RadzenBreadCrumb>
-        @if (!IsLoading)
-        {            
-            <WorkflowEditor Forms=@authenticationFormsState.Value.FormRecords 
-                Workflow=@workflowState.Value.Value 
-                WorkflowLayouts=@authenticationWorkflowLayoutsState.Value.Values
-                Saved=@HandleSave></WorkflowEditor>
-        }
+
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@acrState.Value.Acr?.Name" TextStyle="TextStyle.DisplayH3" />
+
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@IsLoading>
+            @if(!IsLoading)
+            {
+                <WorkflowEditor Forms=@authenticationFormsState.Value.FormRecords 
+                    Workflow=@workflowState.Value.Value 
+                    WorkflowLayouts=@authenticationWorkflowLayoutsState.Value.Values
+                    Saved=@HandleSave></WorkflowEditor>
+            }
+        </RadzenCardLoader>
     </Authorized>
     <NotAuthorized>
         @Global.NotAuthorized
@@ -71,6 +76,6 @@
     private void HandleSave(ActionState<WorkflowRecord, bool> state)
     {
         _saveWorkflow = state;
-        dispatcher.Dispatch(new UpdateWorkflowAction { Id = id, Workflow = state.Content });
+        dispatcher.Dispatch(new UpdateWorkflowAction { Id = state.Content.Id, Workflow = state.Content });
     }
 }

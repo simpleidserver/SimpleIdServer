@@ -23,6 +23,9 @@ public class FormStore : IFormStore
     public Task<FormRecord> Get(string realm, string id, CancellationToken cancellationToken)
         => _dbContext.Forms.Include(f => f.AvailableStyles).SingleOrDefaultAsync(f => f.Id == id && f.Realm == realm, cancellationToken);
 
+    public Task<List<FormRecord>> GetAll(string realm, CancellationToken cancellationToken)
+        => _dbContext.Forms.Include(f => f.AvailableStyles).Where(f => f.Realm == realm).ToListAsync(cancellationToken);
+
     public Task<List<FormRecord>> GetAll(CancellationToken cancellationToken)
         => _dbContext.Forms.ToListAsync(cancellationToken);
 

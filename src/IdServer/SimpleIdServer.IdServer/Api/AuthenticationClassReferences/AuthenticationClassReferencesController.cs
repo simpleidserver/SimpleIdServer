@@ -1,6 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder;
+using FormBuilder.Helpers;
+using FormBuilder.Models;
+using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -25,26 +28,32 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
 public class AuthenticationClassReferencesController : BaseController
 {
     private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
+    private readonly IWorkflowStore _workflowStore;
     private readonly IRealmRepository _realmRepository;
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IFormStore _formStore;
+    private readonly IDateTimeHelper _dateTimeHelper;
     private readonly IEnumerable<IWorkflowLayoutService> _workflowLayoutServices;
     private readonly ILogger<AuthenticationClassReferencesController> _logger;
 
     public AuthenticationClassReferencesController(
         IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository, 
+        IWorkflowStore workflowStore,
         IRealmRepository realmRepository,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
         ITransactionBuilder transactionBuilder,
         IFormStore formStore,
+        IDateTimeHelper dateTimeHelper,
         IEnumerable<IWorkflowLayoutService> workflowLayoutServices,
         ILogger<AuthenticationClassReferencesController> logger) : base(tokenRepository, jwtBuilder)
     {
         _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
+        _workflowStore = workflowStore;
         _realmRepository = realmRepository;
         _transactionBuilder = transactionBuilder;
         _formStore = formStore;
+        _dateTimeHelper = dateTimeHelper;
         _workflowLayoutServices = workflowLayoutServices;
         _logger = logger;
     }
@@ -120,7 +129,7 @@ public class AuthenticationClassReferencesController : BaseController
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
                     await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
-                    // await Validate();
+                    await Validate();
                     var realm = await _realmRepository.Get(prefix, cancellationToken);
                     var record = new AuthenticationContextClassReference
                     {
@@ -131,6 +140,17 @@ public class AuthenticationClassReferencesController : BaseController
                         UpdateDateTime = DateTime.UtcNow
                     };
                     record.Realms.Add(realm);
+                    var workflow = new WorkflowRecord
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Realm = prefix,
+                        UpdateDateTime = _dateTimeHelper.GetCurrent(),
+                        Links = new List<WorkflowLink>(),
+                        Steps = new List<WorkflowStep>()
+                    };
+                    record.AuthenticationWorkflow = workflow.Id;
+                    _workflowStore.Add(workflow);
+                    await _workflowStore.SaveChanges(cancellationToken);
                     _authenticationContextClassReferenceRepository.Add(record);
                     await transaction.Commit(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been added");
@@ -150,20 +170,13 @@ public class AuthenticationClassReferencesController : BaseController
             }
         }
 
-        /*
         async Task Validate()
         {
             if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
             if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthenticationContextClassReferenceNames.Name));
-            // if (request.AuthenticationMethodReferences == null || !request.AuthenticationMethodReferences.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthenticationContextClassReferenceNames.AuthenticationMethodReferences));
-            var supportedAmrs = _authMethodServices.Select(a => a.Amr);
-            // var unsupportedAmrs = request.AuthenticationMethodReferences.Where(a => !supportedAmrs.Contains(a));
-            if (unsupportedAmrs.Any()) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedAmrs, string.Join(",", unsupportedAmrs)));
-            var existingAcr = await _authenticationContextClassReferenceRepository
-                .GetByName(prefix, request.Name, cancellationToken);
+            var existingAcr = await _authenticationContextClassReferenceRepository.GetByName(prefix, request.Name, cancellationToken);
             if (existingAcr != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.AcrWithSameNameExists);
         }
-        */
     }
 
     [HttpDelete]
@@ -183,6 +196,16 @@ public class AuthenticationClassReferencesController : BaseController
                 }
 
                 _authenticationContextClassReferenceRepository.Delete(acr);
+                if (!string.IsNullOrWhiteSpace(acr.AuthenticationWorkflow))
+                {
+                    var workflow = await _workflowStore.Get(prefix, acr.AuthenticationWorkflow, cancellationToken);
+                    if(workflow != null)
+                    {
+                        _workflowStore.Delete(workflow);
+                        await _workflowStore.SaveChanges(cancellationToken);
+                    }
+                }
+
                 await transaction.Commit(cancellationToken);
                 activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been removed");
                 return new NoContentResult();

@@ -1,4 +1,5 @@
 ﻿using Blazor.Diagrams.Core.Models;
+using FormBuilder.Models;
 using FormBuilder.Models.Layout;
 
 namespace FormBuilder.Components.Workflow;
@@ -11,8 +12,15 @@ public class WorkflowStepChooserNode : NodeModel
         Refresh(workflowLayouts);
     }
 
+    public WorkflowStepChooserNode(Action<WorkflowStepChooserNode, WorkflowStepChooserRecord> act, List<WorkflowLayout> workflowLayouts, WorkflowLink link) : this(act, workflowLayouts)
+    {
+        Link = link;
+    }
+
+
     public Action<WorkflowStepChooserNode, WorkflowStepChooserRecord> ActCb { get; private set; }
     public List<WorkflowStepChooserRecord> Records { get; set; }
+    public WorkflowLink Link { get; set; }
 
     public void Refresh(List<WorkflowLayout> workflowLayouts)
     {

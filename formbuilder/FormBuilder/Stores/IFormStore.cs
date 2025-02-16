@@ -6,6 +6,7 @@ public interface IFormStore
 {
     Task<FormRecord> Get(string id, CancellationToken cancellationToken);
     Task<FormRecord> Get(string realm, string id, CancellationToken cancellationToken);
+    Task<List<FormRecord>> GetAll(string realm, CancellationToken cancellationToken);
     Task<List<FormRecord>> GetAll(CancellationToken cancellationToken);
     Task<FormRecord> GetLatestPublishedVersionByCorrelationId(string correlationId, CancellationToken cancellationToken);
     Task<FormRecord> GetLatestPublishedVersionByCorrelationId(string realm, string correlationId, CancellationToken cancellationToken);

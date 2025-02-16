@@ -22,7 +22,6 @@
 @inject DialogService dialogService
 
 <RadzenDialog />
-<RadzenNotification />
 <MonacoCompletion Context="@Context" />
 
 <div class="header">
@@ -193,7 +192,7 @@
             if (nextStep != null) AddNode(startPosX, startPosY, nextStep, node, i, stepLink.Description, isBlocked);
             else 
             {
-                var record = new WorkflowStepChooserNode(AddNode, availableLayouts);
+                var record = new WorkflowStepChooserNode(AddNode, availableLayouts, stepLink);
                 stepChooserNodes.Add(record);
                 AddNode(startPosX, startPosY, record, node, i);
                 AddLink(node, record, stepLink.Description);
@@ -235,7 +234,7 @@
         var sourceModel = sourceLink?.Source?.Model as NodeModel;
         WorkflowStep newStep = null;
         // 1. Generate and add a new step with its links.
-        if(!record.IsEndStep) newStep = AddWorkflowStep(record.WorkflowCorrelationId, sourceModel);
+        if(!record.IsEndStep) newStep = AddWorkflowStep(record.WorkflowCorrelationId, sourceModel, source.Link);
         else newStep = AddEndStep(sourceModel); 
         // 2. Add node to diagram.
         if (!record.IsEndStep) 
@@ -315,7 +314,7 @@
         return newStep;
     }
 
-    private WorkflowStep AddWorkflowStep(string correlationId, NodeModel sourceNodeModel = null)
+    private WorkflowStep AddWorkflowStep(string correlationId, NodeModel sourceNodeModel = null, WorkflowLink sourceLink = null)
     {
         var layout = WorkflowLayouts.Single(l => l.WorkflowCorrelationId == correlationId);
         var formRecord = Forms.Single(r => r.CorrelationId == layout.SourceFormCorrelationId);
@@ -362,19 +361,22 @@
         if(!isStepExists) Context.Definition.Workflow.Steps.Add(newStep);
         Context.Definition.Workflow.Steps.AddRange(resolvedSteps.Where(s => !Workflow.Steps.Any(ws => ws.FormRecordCorrelationId == s.FormRecordCorrelationId)));
         Context.Definition.Workflow.Links.AddRange(links);
-        UpdateLink(newStep, sourceNodeModel);
+        UpdateLink(newStep, sourceNodeModel, sourceLink);
         var resolvedLayouts = WorkflowLayouts.Where(l => l.SourceFormCorrelationId != FormBuilder.Constants.EmptyStep.CorrelationId && resolvedSteps.Any(s => s.FormRecordCorrelationId == l.SourceFormCorrelationId));
         foreach(var resolvedLayout in resolvedLayouts) AddWorkflowStep(resolvedLayout.WorkflowCorrelationId, sourceNodeModel);
         return newStep;
     }
 
-    private void UpdateLink(WorkflowStep newStep, NodeModel sourceNodeModel)
+    private void UpdateLink(WorkflowStep newStep, NodeModel sourceNodeModel, WorkflowLink sourceLink = null)
     {
         var sourceWorkflowStepNode = sourceNodeModel as WorkflowStepNode;
-        if (sourceWorkflowStepNode != null)
+        if (sourceWorkflowStepNode != null && sourceLink != null)
         {
-            var sourceLinks = Context.Definition.Workflow.Links.Where(l => l.SourceStepId == sourceWorkflowStepNode.Step.Id).ToList();
-            sourceLinks.ForEach(l => l.TargetStepId = newStep.Id);
+            var link = Context.Definition.Workflow.Links.SingleOrDefault(l => l.Id == sourceLink.Id);
+            if(link != null) 
+            {
+                link.TargetStepId = newStep.Id;
+            }
         }
     }
 
