@@ -14,6 +14,7 @@ public class WorkflowEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
+    private readonly IRealmStore _realmStore;
 
     public WorkflowEffects(
         IWebsiteHttpClientFactory websiteHttpClientFactory,
@@ -61,7 +62,7 @@ public class WorkflowEffects
     {
         if (_options.IsReamEnabled)
         {
-            var realm = RealmContext.Instance()?.Realm;
+            var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/workflows";
         }

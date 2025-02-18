@@ -8,7 +8,9 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -25,6 +27,7 @@ public class RegistrationController : BaseController
 	private readonly IDistributedCache _distributedCache;
 	private readonly IWorkflowStore _workflowStore;
 	private readonly IFormStore _formStore;
+	private readonly IRealmStore _realmStore;
 	private readonly IdServerHostOptions _options;
 
 	public RegistrationController(
@@ -32,6 +35,7 @@ public class RegistrationController : BaseController
 		IDistributedCache distributedCache,
         IWorkflowStore workflowStore,
 		IFormStore formStore,
+		IRealmStore realmStore,
         ITokenRepository tokenRepository,
 		IJwtBuilder jwtBuilder,
 		IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
@@ -40,6 +44,7 @@ public class RegistrationController : BaseController
 		_distributedCache = distributedCache;
 		_workflowStore = workflowStore;
         _formStore = formStore;
+		_realmStore = realmStore;
         _options = options.Value;
 	}
 
@@ -53,8 +58,8 @@ public class RegistrationController : BaseController
 		if(registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
 		var workflow = await _workflowStore.Get(prefix, registrationWorkflow.WorkflowId, CancellationToken.None);
 		if(workflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownWorkflow, registrationWorkflow.WorkflowId));
-		var cookieName = _options.GetRegistrationCookieName();
-		var allForms = await _formStore.GetAll(CancellationToken.None);
+		var cookieName = _options.GetRegistrationCookieName(_realmStore.Realm);
+		var allForms = await _formStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Registration, CancellationToken.None);
 		var registrationProgressId = Guid.NewGuid().ToString();
 		var workflowSteps = workflow.Steps.Select(s => allForms.Single(f => f.CorrelationId == s.FormRecordCorrelationId)).Where(s => s.ActAsStep);
 		var amr = workflowSteps.First().Name;

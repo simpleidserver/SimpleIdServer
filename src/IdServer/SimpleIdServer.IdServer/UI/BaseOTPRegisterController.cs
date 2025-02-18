@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
@@ -30,7 +31,6 @@ namespace SimpleIdServer.IdServer.UI;
 public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegisterController<TViewModel> where TOptions : IOTPRegisterOptions
     where TViewModel : OTPRegisterViewModel
 {
-    private readonly FormBuilderOptions _formBuilderOptions;
     private readonly IUserRepository _userRepository;
     private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
     private readonly IConfiguration _configuration;
@@ -52,7 +52,8 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         IWorkflowStore workflowStore,
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
-        ILanguageRepository languageRepository) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository)
+        ILanguageRepository languageRepository,
+        IRealmStore realmStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore)
     {
         _logger = logger;
         _userRepository = userRepository;

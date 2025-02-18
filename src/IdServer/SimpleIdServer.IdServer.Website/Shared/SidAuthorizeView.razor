@@ -1,5 +1,6 @@
 ﻿@using System.Security.Claims
 @using Microsoft.Extensions.Options
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Website
 @inject IOptions<IdServerWebsiteOptions> options
 
@@ -17,6 +18,7 @@ else if (NotAuthorized != null)
     [Parameter] public RenderFragment NotAuthorized { get; set; }
     [Parameter] public string Roles { get; set; }
     [Parameter] public bool IsRealmEnabled { get; set;} = true;
+    [Inject] private IRealmStore RealmStore { get; set; }
     [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
     public bool isAuthorized { get; set; }
 
@@ -28,7 +30,7 @@ else if (NotAuthorized != null)
             var user = authState.User;
             var roles = IsRealmEnabled ? Roles.Split(',').Select(r =>
             {
-                var realm = !options.Value.IsReamEnabled ? SimpleIdServer.IdServer.Constants.DefaultRealm : SimpleIdServer.IdServer.Helpers.RealmContext.Instance().Realm;
+                var realm = !options.Value.IsReamEnabled ? SimpleIdServer.IdServer.Constants.DefaultRealm : RealmStore.Realm;
                 return $"{realm}{r}";
             }) : Roles.Split(',');
             isAuthorized = user.Claims.Any(c => c.Type == ClaimTypes.Role && roles.Contains(c.Value));

@@ -1,12 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Statistics;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
-using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
 {
@@ -14,13 +11,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
+        private readonly IRealmStore _realmStore;
 
         public StatisticEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options)
+            IOptions<IdServerWebsiteOptions> options,
+            IRealmStore realmStore)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
+            _realmStore = realmStore;
         }
 
         [EffectMethod]
@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
         {
             if (_options.IsReamEnabled)
             {
-                var realm = RealmContext.Instance()?.Realm;
+                var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/stats";
             }

@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
-using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.Website;
@@ -45,6 +45,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IUriProvider, SidAdmUriProvider>();
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<IGroupService, GroupEffects>();
+            services.AddScoped<IRealmStore, RealmStore>();
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
             services.AddScoped<ContextMenuService>();

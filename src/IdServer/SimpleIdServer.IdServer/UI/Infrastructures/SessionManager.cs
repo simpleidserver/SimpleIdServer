@@ -47,6 +47,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly IRealmStore _realmStore;
 
         public SessionManager(
             IOptionsMonitor<IdServerHostOptions> options, 
@@ -54,7 +55,8 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
             IClientRepository clientRepository,
             IUserSessionResitory userSessionRepository,
             ITransactionBuilder transactionBuilder,
-            IRecurringJobManager recurringJobManager)
+            IRecurringJobManager recurringJobManager,
+            IRealmStore realmStore)
         {
             _options = options.CurrentValue;
             _ticketDataFormat = new TicketDataFormat(dataProtectionProvider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", CookieAuthenticationDefaults.AuthenticationScheme, "v2"));
@@ -62,6 +64,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
             _userSessionRepository = userSessionRepository;
             _transactionBuilder = transactionBuilder;
             _recurringJobManager = recurringJobManager;
+            _realmStore = realmStore;
         }
 
         public AuthenticationTicket FetchTicket(HttpContext context, string name)
@@ -73,7 +76,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
 
         public IEnumerable<AuthenticationTicket> FetchTickets(HttpContext context)
         {
-            var filteredCookies = context.Request.Cookies.Where(c => c.Key.StartsWith($"{IdServerCookieAuthenticationHandler.GetCookieName(COOKIE_NAME)}-"));
+            var filteredCookies = context.Request.Cookies.Where(c => c.Key.StartsWith($"{IdServerCookieAuthenticationHandler.GetCookieName(_realmStore.Realm, COOKIE_NAME)}-"));
             var result = new List<AuthenticationTicket>();
             foreach (var filterCookie in filteredCookies)
             {
@@ -111,7 +114,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
         public async Task<RevokeSessionResult> Revoke(HttpRequest request, string user, string realm, CancellationToken cancellationToken)
         {
             realm = realm ?? Constants.DefaultRealm;
-            var sessionCookieName = _options.GetSessionCookieName(user);
+            var sessionCookieName = _options.GetSessionCookieName(_realmStore.Realm, user);
             var kvp = request.Cookies.SingleOrDefault(c => c.Key == sessionCookieName);
             IEnumerable<string> frontChannelLogouts = new List<string>();
             if (!string.IsNullOrWhiteSpace(kvp.Key))
@@ -142,7 +145,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },

@@ -24,7 +24,7 @@ public class BaseWorkflowController : Controller
     protected async Task<WorkflowViewModel> Get(string realm, string workflowId, string stepId, CancellationToken cancellationToken)
     {
         var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
-        var records = await _formStore.GetAll(cancellationToken);
+        var records = await _formStore.GetAll(realm, cancellationToken);
         var step = workflow.GetStep(stepId);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         return new WorkflowViewModel

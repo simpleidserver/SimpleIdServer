@@ -19,8 +19,8 @@ namespace SimpleIdServer.IdServer.Helpers;
 
 public interface IAmrHelper
 {
-    Task<AcrResult> FetchDefaultAcr(string realm, IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken);
-    Task<AcrResult> Get(string realm, List<string> names, CancellationToken cancellationToken);
+    Task<AcrResult> FetchDefaultAcr(string realm, string category, IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken);
+    Task<AcrResult> Get(string realm, string category, List<string> names, CancellationToken cancellationToken);
     string FetchNextAmr(AcrResult acr, string currentAmr);
 }
 
@@ -55,16 +55,16 @@ public class AmrHelper : IAmrHelper
         _options = options.Value;
     }
 
-    public async Task<AcrResult> FetchDefaultAcr(string realm, IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken)
+    public async Task<AcrResult> FetchDefaultAcr(string realm, string category, IEnumerable<string> requestedAcrValues, IEnumerable<AuthorizedClaim> requestedClaims, Client client, CancellationToken cancellationToken)
     {
         // 1. Fetch default ACR from the authorization request.
-        var defaultAcr = await Get(realm, requestedAcrValues.ToList(), cancellationToken);
+        var defaultAcr = await Get(realm, category, requestedAcrValues.ToList(), cancellationToken);
         if (defaultAcr != null) return defaultAcr;
         // 2. Fetch default ACR from the requested claims.
         var acrClaim = requestedClaims?.FirstOrDefault(r => r.Name == JwtRegisteredClaimNames.Acr);
         if (acrClaim != null)
         {
-            defaultAcr = await Get(realm, acrClaim.Values.ToList(), cancellationToken);
+            defaultAcr = await Get(realm, category, acrClaim.Values.ToList(), cancellationToken);
             if (defaultAcr == null && acrClaim.IsEssential) throw new OAuthException(ErrorCodes.ACCESS_DENIED, Global.NoEssentialAcrIsSupported);
         }
 
@@ -74,10 +74,10 @@ public class AmrHelper : IAmrHelper
         if(client != null && client.DefaultAcrValues != null)
             acrs.AddRange(client.DefaultAcrValues);
         acrs.Add(_options.DefaultAcrValue);
-        return await Get(realm, acrs, cancellationToken);
+        return await Get(realm, category, acrs, cancellationToken);
     }
 
-    public async Task<AcrResult> Get(string realm, List<string> names, CancellationToken cancellationToken)
+    public async Task<AcrResult> Get(string realm, string category, List<string> names, CancellationToken cancellationToken)
     {
         var acrs = await _authenticationContextClassReferenceRepository.GetByNames(realm, names, cancellationToken);
         foreach (var name in names)
@@ -85,7 +85,7 @@ public class AmrHelper : IAmrHelper
             var acr = acrs.FirstOrDefault(a => a.Name == name);
             if (acr == null) continue;
             var workflow = await _workflowStore.Get(realm, acr.AuthenticationWorkflow, cancellationToken);
-            var forms = await _formStore.GetAll(cancellationToken);
+            var forms = await _formStore.GetLatestPublishedVersionByCategory(realm, category, cancellationToken);
             var amrs = WorkflowHelper.ExtractAmrs(workflow, forms);
             return new AcrResult(acr, amrs, workflow, forms);
         }

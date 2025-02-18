@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
+using MassTransit.Transports;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
@@ -21,13 +22,16 @@ public class GroupEffects : IGroupService
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
+    private readonly IRealmStore _realmStore;
 
     public GroupEffects(
         IWebsiteHttpClientFactory websiteHttpClientFactory, 
-        IOptions<IdServerWebsiteOptions> options) 
+        IOptions<IdServerWebsiteOptions> options,
+        IRealmStore realmStore) 
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
+        _realmStore = realmStore;
     }
 
     public async Task<GetGroupResult> Get(string id)
@@ -201,7 +205,7 @@ public class GroupEffects : IGroupService
     {
         if (_options.IsReamEnabled)
         {
-            var realm = RealmContext.Instance()?.Realm;
+            var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/groups";
         }

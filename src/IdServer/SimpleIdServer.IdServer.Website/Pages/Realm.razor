@@ -30,7 +30,7 @@
         <SidAuthorizeView Roles="SIDS-manager/administrator" IsRealmEnabled=false>
             <Authorized>
                 <RadzenButton Icon="add_circle" Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.AddRealm" />
-                @if (RealmContext.Instance()?.Realm != SimpleIdServer.IdServer.Constants.DefaultRealm)
+                @if (realmStore.Realm != SimpleIdServer.IdServer.Constants.DefaultRealm)
                 {
                     <RadzenButton Class="rz-ml-1" Icon="delete" Click=@(async (args) => await DeleteCurrentRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.RemoveRealm" />
                 }
@@ -71,6 +71,7 @@
 
     [Parameter]
     public string? action { get; set; } = null;
+    [Inject] private IRealmStore realmStore { get; set; }
 
     protected override void OnParametersSet()
     {
@@ -109,7 +110,7 @@
     {
         await dialogService.OpenAsync<SelectRealmDialog>(Global.SelectRealm, new Dictionary<string, object>
         {
-            { "activeRealm", RealmContext.Instance().Realm }
+            { "activeRealm", realmStore.Realm }
         }, new DialogOptions
         {
             Width = "700px",

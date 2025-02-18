@@ -17,6 +17,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -109,7 +110,7 @@ namespace SimpleIdServer.IdServer.UI
                 {
                     viewModel.RememberLogin = false;
                     workflow = await WorkflowStore.Get(prefix, Options.DefaultAuthenticationWorkflowId, cancellationToken);
-                    forms = await FormStore.GetAll(cancellationToken);
+                    forms = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Authentication, cancellationToken);
                 }
 
                 if (IsFirstStep(workflow, forms))
@@ -294,7 +295,7 @@ namespace SimpleIdServer.IdServer.UI
 
             async Task<WorkflowViewModel> BuildWorkflowViewModel()
             {
-                var records = await FormStore.GetAll(token);
+                var records = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Authentication, token);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
                 var workflow = await WorkflowStore.Get(prefix, viewModel.WorkflowId, token);
                 var workflowResult = await BuildViewModel(workflow, records, token);
@@ -367,10 +368,10 @@ namespace SimpleIdServer.IdServer.UI
 
         protected async Task<AcrResult> ResolveAcr(AcrAuthInfo acrInfo, JsonObject query, string realm, Client client, CancellationToken cancellationToken)
         {
-            if (acrInfo != null) return await AmrHelper.Get(realm, new List<string> { acrInfo.CurrentAcr }, cancellationToken);
+            if (acrInfo != null) return await AmrHelper.Get(realm, FormCategories.Authentication, new List<string> { acrInfo.CurrentAcr }, cancellationToken);
             var acrValues = query.GetAcrValuesFromAuthorizationRequest();
             var requestedClaims = query.GetClaimsFromAuthorizationRequest();
-            var acr = await AmrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
+            var acr = await AmrHelper.FetchDefaultAcr(realm, FormCategories.Authentication, acrValues, requestedClaims, client, cancellationToken);
             return acr;
         }
 

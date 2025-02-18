@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Helpers;
@@ -22,10 +23,12 @@ namespace SimpleIdServer.IdServer.Website
         private readonly IdServerWebsiteOptions _idServerWebsiteOptions;
         private readonly HttpClient _httpClient;
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
+        private readonly IServiceProvider _serviceProvider;
         private ConcurrentDictionary<string, GetAccessTokenResult> _accessTokens = new ConcurrentDictionary<string, GetAccessTokenResult>();
 
-        public WebsiteHttpClientFactory(DefaultSecurityOptions securityOptions, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
+        public WebsiteHttpClientFactory(IServiceProvider serviceProvider, DefaultSecurityOptions securityOptions, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
         {
+            _serviceProvider = serviceProvider;
             _securityOptions = securityOptions;
             _idServerWebsiteOptions = idServerWebsiteOptions.Value;
             var handler = new HttpClientHandler
@@ -63,8 +66,14 @@ namespace SimpleIdServer.IdServer.Website
         private async Task<GetAccessTokenResult> GetAccessToken(string currentRealm = null)
         {
             var realm = currentRealm;
-            if(string.IsNullOrWhiteSpace(realm))
-                realm = _idServerWebsiteOptions.IsReamEnabled ? (RealmContext.Instance()?.Realm ?? Constants.DefaultRealm) : string.Empty;
+            if (string.IsNullOrWhiteSpace(realm))
+            {
+                if (_idServerWebsiteOptions.IsReamEnabled)
+                {
+                    if (_serviceProvider.CreateScope().ServiceProvider.GetService(typeof(IRealmStore)) is IRealmStore _realmStore) realm = _realmStore.Realm ?? Constants.DefaultRealm;
+                }
+                else realm = string.Empty;
+            }
 
             GetAccessTokenResult accessToken = null;
             if(_accessTokens.ContainsKey(realm))

@@ -101,7 +101,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             {
                 var login = _authenticationHelper.GetLogin(context.User);
                 var amrAuthInfo = new AcrAuthInfo(context.User.Id, login, context.User.Email, ex.Acr, new List<KeyValuePair<string, string>>(), false);
-                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(context.Request.UserSubject), Constants.DefaultCurrentAcrCookieName }, amrAuthInfo);
+                return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(context.Realm, context.Request.UserSubject), Constants.DefaultCurrentAcrCookieName }, amrAuthInfo);
             }
         }
 
@@ -200,7 +200,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
         protected async Task<UserSession> GetActiveSession(HandlerContext context, CancellationToken cancellationToken)
         {
-            var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(context.Request.UserSubject));
+            var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(context.Realm, context.Request.UserSubject));
             if (string.IsNullOrWhiteSpace(kvp.Value)) return null;
             var userSession = await _userSessionRepository.GetById(kvp.Value, context.Realm, cancellationToken);
             if (userSession == null) return null;

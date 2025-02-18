@@ -7,7 +7,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using System;
@@ -104,13 +103,14 @@ namespace SimpleIdServer.IdServer.UI.AuthProviders
             using (var scope = _serviceProvider.CreateScope())
             {
                 var authenticationSchemeProviderRepository = scope.ServiceProvider.GetRequiredService<IAuthenticationSchemeProviderRepository>();
+                var realmStore = scope.ServiceProvider.GetRequiredService<IRealmStore>();
                 var currentDateTime = DateTime.UtcNow;
                 var authenticationSchemeProviders = _cachedAuthenticationProviders;
                 if (_nextExpirationTime == null ||
                     _nextExpirationTime.Value <= currentDateTime ||
                     _options.CacheExternalAuthProvidersInSeconds == null)
                 {
-                    var realm = RealmContext.Instance().Realm;
+                    var realm = realmStore.Realm;
                     realm = realm ?? Constants.DefaultRealm;
                     authenticationSchemeProviders = await authenticationSchemeProviderRepository.GetAll(realm, CancellationToken.None);
                     if (_options.CacheExternalAuthProvidersInSeconds != null)

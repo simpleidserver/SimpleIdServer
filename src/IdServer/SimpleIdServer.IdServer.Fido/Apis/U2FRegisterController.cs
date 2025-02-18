@@ -15,6 +15,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.DTOs;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -34,6 +35,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
         private readonly IWorkflowHelper _workflowHelper;
+        private readonly IRealmStore _realmStore;
         private readonly IdServerHostOptions _idServerHostOptions;
 
         public U2FRegisterController(
@@ -47,6 +49,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             IWorkflowHelper workflowHelper,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
+            IRealmStore realmStore,
             IOptions<IdServerHostOptions> idServerHostOptions) : base(tokenRepository, jwtBuilder)
         {
             _configuration = configuration;
@@ -57,6 +60,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _transactionBuilder = transactionBuilder;
             _authenticationMethodServices = authenticationMethodServices;
             _workflowHelper = workflowHelper;
+            _realmStore = realmStore;
             _idServerHostOptions = idServerHostOptions.Value;
         }
 
@@ -195,7 +199,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
             async Task<IActionResult> HandleWorkflowRegistration()
             {
-                var nextAmr = await _workflowHelper.GetNextAmr(prefix, registrationProgress.WorkflowId, sessionRecord.CredentialType, cancellationToken);
+                var nextAmr = await _workflowHelper.GetNextAmr(prefix, FormCategories.Registration, registrationProgress.WorkflowId, sessionRecord.CredentialType, cancellationToken);
                 if (WorkflowHelper.IsLastStep(nextAmr))
                 {
                     if(isNewUser)
@@ -229,7 +233,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
         protected async Task<(BeginU2FRegisterResult, ContentResult)> CommonBegin(string prefix, BeginU2FRegisterRequest request, CancellationToken cancellationToken)
         {
-            var cookieName = _idServerHostOptions.GetRegistrationCookieName();
+            var cookieName = _idServerHostOptions.GetRegistrationCookieName(_realmStore.Realm);
             var cookieValue = string.Empty;
             if(Request.Cookies.ContainsKey(cookieName)) cookieValue = Request.Cookies[cookieName];
             var fidoOptions = GetOptions(request.CredentialType);
@@ -272,7 +276,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             string nextRegistrationRedirectUrl = null;
             var registrationProgress = await GetRegistrationProgress();
             string nextAmr = null;
-            if (registrationProgress != null) nextAmr = await _workflowHelper.GetNextAmr(prefix, registrationProgress.WorkflowId, request.CredentialType, cancellationToken);
+            if (registrationProgress != null) nextAmr = await _workflowHelper.GetNextAmr(prefix, FormCategories.Registration, registrationProgress.WorkflowId, request.CredentialType, cancellationToken);
             if (registrationProgress != null && !WorkflowHelper.IsLastStep(nextAmr))
             {
                 nextRegistrationRedirectUrl = $"{issuer}/{prefix}/{nextAmr}/register";
@@ -328,7 +332,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private async Task<UserRegistrationProgress> GetRegistrationProgress(RegistrationSessionRecord sessionRecord = null)
         {
             var cookieValue = string.Empty;
-            var cookieName = _idServerHostOptions.GetRegistrationCookieName();
+            var cookieName = _idServerHostOptions.GetRegistrationCookieName(_realmStore.Realm);
             if (!Request.Cookies.ContainsKey(cookieName))
             {
                 if (sessionRecord == null || string.IsNullOrWhiteSpace(sessionRecord.RegistrationCookieKey)) return null;

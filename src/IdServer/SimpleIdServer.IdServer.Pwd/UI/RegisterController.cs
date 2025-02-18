@@ -34,7 +34,8 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         IAntiforgery antiforgery,
         IFormStore formStore,
         IWorkflowStore workflowStore,
-        ILanguageRepository languageRepository) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository)
+        ILanguageRepository languageRepository,
+        IRealmStore realmStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore)
     {
     }
 

@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
@@ -81,6 +82,7 @@ public class BaseAuthenticateController : BaseController
     protected IWorkflowStore WorkflowStore { get; }
     protected IFormStore FormStore { get; }
     protected IAcrHelper AcrHelper { get; }
+    protected IRealmStore RealmStore { get; }
 
     protected JsonObject ExtractQuery(string returnUrl) => ExtractQueryFromUnprotectedUrl(Unprotect(returnUrl));
 
@@ -227,14 +229,14 @@ public class BaseAuthenticateController : BaseController
             }
 
             var sub = claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            Response.Cookies.Append(_options.GetSessionCookieName(sub), session.SessionId, cookieOptions);
+            Response.Cookies.Append(_options.GetSessionCookieName(realm, sub), session.SessionId, cookieOptions);
         }
     }
 
     private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication(string realm, string currentAmr, CancellationToken cancellationToken)
     {
         var workflow = await WorkflowStore.Get(realm, Options.DefaultAuthenticationWorkflowId, cancellationToken);
-        var forms = await FormStore.GetAll(cancellationToken);
+        var forms = await FormStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
         var nextAmr = WorkflowHelper.GetNextAmr(workflow, forms, currentAmr);
         var amrs = WorkflowHelper.ExtractAmrs(workflow, forms);
         return (nextAmr, amrs);
@@ -247,7 +249,7 @@ public class BaseAuthenticateController : BaseController
         var clientId = query.GetClientIdFromAuthorizationRequest();
         var requestedClaims = query.GetClaimsFromAuthorizationRequest();
         var client = await _clientRepository.GetByClientId(realm, clientId, cancellationToken);
-        var acr = await _amrHelper.FetchDefaultAcr(realm, acrValues, requestedClaims, client, cancellationToken);
+        var acr = await _amrHelper.FetchDefaultAcr(realm, FormCategories.Authentication, acrValues, requestedClaims, client, cancellationToken);
         var nextAmr = acr == null ? null : WorkflowHelper.GetNextAmr(acr.Workflow, acr.Forms, currentAmr);
         return (nextAmr, client, acr.AllAmrs);
     }

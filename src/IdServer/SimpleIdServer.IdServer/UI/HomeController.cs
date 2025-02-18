@@ -52,6 +52,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly ISessionManager _sessionManager;
         private readonly ILanguageRepository _languageRepository;
+        private readonly IRealmStore _realmStore;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -70,6 +71,7 @@ namespace SimpleIdServer.IdServer.UI
             ITransactionBuilder transactionBuilder,
             ISessionManager sessionManager,
             ILanguageRepository languageRepository,
+            IRealmStore realmStore,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -88,6 +90,7 @@ namespace SimpleIdServer.IdServer.UI
             _transactionBuilder = transactionBuilder;
             _sessionManager = sessionManager;
             _languageRepository = languageRepository;
+            _realmStore = realmStore;
             _logger = logger;
         }
 
@@ -317,7 +320,7 @@ namespace SimpleIdServer.IdServer.UI
         public async virtual Task<IActionResult> RegisterCredential([FromRoute] string prefix, string name, string redirectUrl)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            var cookieName = _options.GetRegistrationCookieName();
+            var cookieName = _options.GetRegistrationCookieName(_realmStore.Realm);
             if (Request.Cookies.ContainsKey(cookieName)) Response.Cookies.Delete(cookieName);
             var registrationProgress = new UserRegistrationProgress
             {
@@ -478,7 +481,7 @@ namespace SimpleIdServer.IdServer.UI
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },

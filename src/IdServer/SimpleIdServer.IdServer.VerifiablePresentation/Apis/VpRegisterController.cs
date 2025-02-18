@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
@@ -24,6 +25,7 @@ public class VpRegisterController : BaseController
     private readonly IUserRepository _userRepository;
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IWorkflowHelper _workflowHelper;
+    private readonly IRealmStore _realmStore;
     private readonly IdServerHostOptions _idServerHostOptions;
     private readonly ILogger<VpRegisterController> _logger;
 
@@ -32,6 +34,7 @@ public class VpRegisterController : BaseController
         IUserRepository userRepository,
         ITransactionBuilder transactionBuilder,
         IWorkflowHelper workflowHelper,
+        IRealmStore realmStore,
         Microsoft.Extensions.Options.IOptions<IdServerHostOptions> idServerHostOptions,
         ILogger<VpRegisterController> logger,
         ITokenRepository tokenRepository,
@@ -41,6 +44,7 @@ public class VpRegisterController : BaseController
         _userRepository = userRepository;
         _transactionBuilder = transactionBuilder;
         _workflowHelper = workflowHelper;
+        _realmStore = realmStore;
         _idServerHostOptions = idServerHostOptions.Value;
         _logger = logger;
     }
@@ -102,7 +106,7 @@ public class VpRegisterController : BaseController
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            var nextAmr = await _workflowHelper.GetNextAmr(prefix, registrationProgress.WorkflowId, amr, cancellationToken);
+            var nextAmr = await _workflowHelper.GetNextAmr(prefix, FormCategories.Registration, registrationProgress.WorkflowId, amr, cancellationToken);
             if (WorkflowHelper.IsLastStep(nextAmr))
             {
                 user.Realms.Add(new Domains.RealmUser
@@ -127,7 +131,7 @@ public class VpRegisterController : BaseController
 
     private async Task<UserRegistrationProgress> GetRegistrationProgress()
     {
-        var cookieName = _idServerHostOptions.GetRegistrationCookieName();
+        var cookieName = _idServerHostOptions.GetRegistrationCookieName(_realmStore.Realm);
         if (!Request.Cookies.ContainsKey(cookieName)) return null;
         var cookieValue = Request.Cookies[cookieName];
         var json = await _distributedCache.GetStringAsync(cookieValue);

@@ -99,6 +99,7 @@
     string activeRealm;
     string userName { get; set; }
     @inject AuthenticationStateProvider GetAuthenticationStateAsync
+    @inject IRealmStore realmStore
 
     public string CurrentLanguage
     {
@@ -124,7 +125,7 @@
         base.OnAfterRender(firstRender);
         if(firstRender)
         {
-            this.activeRealm = RealmContext.Instance()?.Realm;
+            this.activeRealm = realmStore.Realm;
             SubscribeToAction<GetAllConfigurationDefinitionsSuccessAction>((act) =>
             {
                 isLoading = false;

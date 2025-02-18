@@ -22,7 +22,11 @@
 
 => pouvoir enregistrer un workflow dans SID										:	OK
 => lorsqu'un ACR est créé alors créer un workflow vide							:	OK
-=> dupliquer tous les workflows & forms quand realm est créé					:	IN PROGRESS
+=> dupliquer tous les workflows & forms quand realm est créé					:	OK
+=> pouvoir changer la langue													:	OK
+=> Le realm est NULL / vide pourquoi ???										:	TODO
+=> quand on clique plusieurs fois comprendre pourquoi le formulaire est NULL dans le backend		:	TODO (toujorus même problème avec AT)
+=> comprendre pourquoi l'issuer de l'access token n'est pas valide				:	TODO
 => vérifier si le workflow fonctionne correctement sur SID						:	TODO
 
 => utiliser VS code copilot										:	TODO
@@ -31,4 +35,11 @@
 
 
 
-90f488c8-c2e6-485f-9825-3b04eca8db07
+
+        public IdServerBuilder EnableConfigurableAuthentication()
+        {
+            _serviceCollection.AddScoped<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+            _serviceCollection.AddScoped<ISIDAuthenticationSchemeProvider>(x => x.GetService<IAuthenticationSchemeProvider>() as ISIDAuthenticationSchemeProvider);
+            _serviceCollection.AddScoped<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
+            return this;
+        }

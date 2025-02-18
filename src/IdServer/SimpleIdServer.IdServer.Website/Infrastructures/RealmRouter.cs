@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using MassTransit.Configuration;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,6 +30,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
     [Inject] IServiceProvider ServiceProvider { get; set; }
     [Inject] private IScrollToLocationHash ScrollToLocationHash { get; set; }
     [Inject] private INavigationInterception NavigationInterception { get; set; }
+    [Inject] private IRealmStore RealmStore { get; set; }
     [Parameter] public Assembly AppAssembly { get; set; }
     [Parameter] public RenderFragment<RouteData> Found { get; set; }
     [Parameter] public RenderFragment NotFound { get; set; }
@@ -168,7 +168,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
     {
         if (Options.Value.IsReamEnabled)
         {
-            var realm = RealmContext.Instance()?.Realm;
+            var realm = RealmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{Options.Value.IdServerBaseUrl}/{realmStr}/realms";
         }

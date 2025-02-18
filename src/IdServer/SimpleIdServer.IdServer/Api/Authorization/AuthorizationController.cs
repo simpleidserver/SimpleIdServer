@@ -36,6 +36,7 @@ public class AuthorizationController : Controller
     private readonly IDataProtector _dataProtector;
     private readonly IBusControl _busControl;
     private readonly IAcrHelper _acrHelper;
+    private readonly IRealmStore _realmStore;
     private readonly IdServerHostOptions _options;
     private readonly CookieAuthenticationOptions _cookieAuthOptions;
 
@@ -46,6 +47,7 @@ public class AuthorizationController : Controller
         IDataProtectionProvider dataProtectionProvider, 
         IBusControl busControl,
         IAcrHelper acrHelper,
+        IRealmStore realmStore,
         IOptions<IdServerHostOptions> options,
         IOptions<CookieAuthenticationOptions> cookieAuthOptions)
     {
@@ -55,6 +57,7 @@ public class AuthorizationController : Controller
         _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         _busControl = busControl;
         _acrHelper = acrHelper;
+        _realmStore = realmStore;
         _options = options.Value;
         _cookieAuthOptions = cookieAuthOptions.Value;
     }
@@ -102,7 +105,7 @@ public class AuthorizationController : Controller
                         }
                     }
 
-                    Response.Cookies.Delete(IdServerCookieAuthenticationHandler.GetCookieName(_cookieAuthOptions.Cookie.Name));
+                    Response.Cookies.Delete(IdServerCookieAuthenticationHandler.GetCookieName(_realmStore.Realm, _cookieAuthOptions.Cookie.Name));
                 }
 
                 if(redirectActionAuthorizationResponse.AmrAuthInfo != null)

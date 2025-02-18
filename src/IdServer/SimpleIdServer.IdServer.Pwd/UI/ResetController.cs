@@ -15,6 +15,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Resources;
@@ -277,7 +278,7 @@ public class ResetController : BaseController
 
     private async Task<WorkflowViewModel> BuildWorkflowViewModel(string realm, string workflowId, CancellationToken cancellationToken)
     {
-        var records = await _formStore.GetAll(cancellationToken);
+        var records = await _formStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
         var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         var languages = await _languageRepository.GetAll(cancellationToken);

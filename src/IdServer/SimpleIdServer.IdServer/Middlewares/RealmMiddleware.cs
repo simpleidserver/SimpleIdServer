@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,9 +27,9 @@ namespace SimpleIdServer.IdServer.Middlewares
             _serviceProvider = serviceProvider;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext context, IRealmStore realmStore)
         {
-            RealmContext.Instance().Realm = null;
+            realmStore.Realm = null;
             using (var scope = _serviceProvider.CreateScope())
             {
                 var realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
@@ -52,14 +53,13 @@ namespace SimpleIdServer.IdServer.Middlewares
                             }
                         }
                     }
-                    else
-                        realm = prefix;
+                    else realm = prefix;
                 }
 
                 if (string.IsNullOrWhiteSpace(realm) && !realmCookie.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(realmCookie.Value))
                     realm = realmCookie.Value;
 
-                RealmContext.Instance().Realm = realm;
+                realmStore.Realm = realm;
             }
 
             await _next.Invoke(context);

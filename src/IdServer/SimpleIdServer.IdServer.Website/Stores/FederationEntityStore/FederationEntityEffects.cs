@@ -5,7 +5,6 @@ using Fluxor;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Federation.Apis.FederationEntity;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.OpenidFederation.Domains;
 using System.Text;
 using System.Text.Json;
@@ -17,13 +16,16 @@ public class FederationEntityEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
+    private readonly IRealmStore _realmStore;
 
     public FederationEntityEffects(
         IWebsiteHttpClientFactory websiteHttpClientFactory, 
-        IOptions<IdServerWebsiteOptions> options)
+        IOptions<IdServerWebsiteOptions> options,
+        IRealmStore realmStore)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
+        _realmStore = realmStore;
     }
 
     [EffectMethod]
@@ -102,7 +104,7 @@ public class FederationEntityEffects
     {
         if (_options.IsReamEnabled)
         {
-            var realm = RealmContext.Instance()?.Realm;
+            var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/federationentities";
         }

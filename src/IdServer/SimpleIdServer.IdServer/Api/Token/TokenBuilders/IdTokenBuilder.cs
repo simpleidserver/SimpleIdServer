@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Options;
 using System;
 using System.Collections.Generic;
@@ -86,7 +87,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
             if (!string.IsNullOrWhiteSpace(nonce))
                 claims.Add(JwtRegisteredClaimNames.Nonce, nonce);
 
-            var acrResult = await _amrHelper.FetchDefaultAcr(currentContext.Realm, acrValues, requestedClaims, openidClient, cancellationToken);
+            var acrResult = await _amrHelper.FetchDefaultAcr(currentContext.Realm, FormCategories.Authentication, acrValues, requestedClaims, openidClient, cancellationToken);
             if (acrResult != null)
             {
                 claims.Add(JwtRegisteredClaimNames.Amr, acrResult.AllAmrs);

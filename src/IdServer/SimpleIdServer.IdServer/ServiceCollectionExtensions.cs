@@ -121,10 +121,11 @@ namespace Microsoft.Extensions.DependencyInjection
                         {
                             var nameIdentifier = ctx.Principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                             var ticket = new AuthenticationTicket(ctx.Principal, ctx.Properties, ctx.Scheme.Name);
+                            var realmStore = ctx.HttpContext.RequestServices.GetRequiredService<IRealmStore>();
                             var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
                             ctx.Options.CookieManager.AppendResponseCookie(
                                 ctx.HttpContext,
-                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
+                                $"{IdServerCookieAuthenticationHandler.GetCookieName(realmStore.Realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
                                 cookieValue,
                                 ctx.CookieOptions);
                         }
@@ -141,10 +142,13 @@ namespace Microsoft.Extensions.DependencyInjection
                         }
 
                         if(!string.IsNullOrWhiteSpace(nameIdentifier))
+                        {
+                            var realmStore = ctx.HttpContext.RequestServices.GetRequiredService<IRealmStore>();
                             ctx.Options.CookieManager.DeleteCookie(
                                     ctx.HttpContext,
-                                    $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
+                                    $"{IdServerCookieAuthenticationHandler.GetCookieName(realmStore.Realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
                                     ctx.CookieOptions);
+                        }
                         return Task.CompletedTask;
                     };
                 });
@@ -370,6 +374,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddLib(this IServiceCollection services)
         {
             services.AddTransient<IHttpClientFactory, HttpClientFactory>();
+            services.AddScoped<IRealmStore, RealmStore>();
             return services;
         }
 

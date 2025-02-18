@@ -122,7 +122,7 @@ namespace SimpleIdServer.IdServer.Jwt
             var handler = new JsonWebTokenHandler();
             if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(Global.InvalidJwt);
             var jsonWebToken = handler.ReadJsonWebToken(jwt);
-            var issuer = HandlerContext.GetIssuer(_httpContextAccessor.HttpContext.Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+            var issuer = HandlerContext.GetIssuer(realm, _httpContextAccessor.HttpContext.Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
             if (jsonWebToken.Issuer != issuer) return ReadJsonWebTokenResult.BuildError(Global.BadAccessTokenIssuer);
             JsonWebToken encJwt = null;
             if(jsonWebToken.IsEncrypted)

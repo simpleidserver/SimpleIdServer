@@ -116,7 +116,7 @@ public class RealmsController : BaseController
                     var acrs = await _authenticationContextClassReferenceRepository.GetAll(Constants.DefaultRealm, cancellationToken);
                     var forms = await _formStore.GetAll(prefix, cancellationToken);
                     var workflows = await _workflowStore.GetAll(prefix, cancellationToken);
-                    var transformationResult = Transform(workflows, forms, prefix);
+                    var transformationResult = Transform(workflows, forms, request.Name);
 
                     _realmRepository.Add(realm);
                     foreach (var user in users)
@@ -155,12 +155,12 @@ public class RealmsController : BaseController
                         _fileSerializedKeyStore.Update(key);
                     }
 
-                    foreach(var form in forms)
+                    foreach(var form in transformationResult.Forms)
                     {
                         _formStore.Add(form);
                     }
 
-                    foreach(var workflow in workflows)
+                    foreach(var workflow in transformationResult.Workflows)
                     {
                         _workflowStore.Add(workflow);
                     }
@@ -243,7 +243,8 @@ public class RealmsController : BaseController
             workflow.Id = newId;
             workflow.UpdateDateTime = currentDateTime;
             workflow.Realm = newRealm;
-            foreach(var step in workflow.Steps)
+            workflow.Links.ForEach(l => l.Id = Guid.NewGuid().ToString());
+            foreach (var step in workflow.Steps)
             {
                 var newStepId = Guid.NewGuid().ToString();
                 var filteredLinks = workflow.Links.Where(l => l.SourceStepId == step.Id || l.TargetStepId == step.Id);

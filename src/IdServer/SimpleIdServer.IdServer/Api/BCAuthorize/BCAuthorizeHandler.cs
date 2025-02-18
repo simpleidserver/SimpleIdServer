@@ -7,6 +7,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
@@ -80,7 +81,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
 
                     var bindingMessage = context.Request.RequestData.GetBindingMessage();
                     var acrLst = context.Request.RequestData.GetAcrValuesFromAuthorizationRequest();
-                    var acrResult = await _amrHelper.FetchDefaultAcr(context.Realm, acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
+                    var acrResult = await _amrHelper.FetchDefaultAcr(context.Realm, FormCategories.Authentication, acrLst, new List<AuthorizedClaim>(), context.Client, cancellationToken);
                     var amr = acrResult.AllAmrs.First();
                     await _bcNotificationService.Notify(context, new BCNotificationMessage
                     {

@@ -14,7 +14,7 @@ namespace SimpleIdServer.IdServer.Helpers;
 
 public interface IWorkflowHelper
 {
-    Task<string> GetNextAmr(string realm, string workflowId, string amr, CancellationToken cancellationToken);
+    Task<string> GetNextAmr(string realm, string category, string workflowId, string amr, CancellationToken cancellationToken);
 }
 
 public class WorkflowHelper : IWorkflowHelper
@@ -41,10 +41,10 @@ public class WorkflowHelper : IWorkflowHelper
     public static bool IsLastStep(string stepName)
         => stepName == FormBuilder.Constants.EmptyStep.Name;
 
-    public async Task<string> GetNextAmr(string realm, string workflowId, string amr, CancellationToken cancellationToken)
+    public async Task<string> GetNextAmr(string realm, string category, string workflowId, string amr, CancellationToken cancellationToken)
     {
         var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
-        var forms = await _formStore.GetAll(cancellationToken);
+        var forms = await _formStore.GetLatestPublishedVersionByCategory(realm, category, cancellationToken);
         return GetNextAmr(workflow, forms, amr);
     }
 

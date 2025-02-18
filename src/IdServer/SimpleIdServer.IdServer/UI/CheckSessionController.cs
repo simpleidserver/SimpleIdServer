@@ -43,6 +43,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IRecurringJobManager _recurringJobManager;
         private readonly ITransactionBuilder _transactionBuilder;
+        private readonly IRealmStore _realmStore;
 
         public CheckSessionController(
             IOptions<IdServerHostOptions> options,
@@ -54,7 +55,8 @@ namespace SimpleIdServer.IdServer.UI
             IRecurringJobManager reccuringJobManager,
             ITransactionBuilder transactionBuilder,
             ITokenRepository tokenRepository,
-            IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
+            IJwtBuilder jwtBuilder,
+            IRealmStore realmStore) : base(tokenRepository, jwtBuilder)
         {
             _options = options.Value;
             _languageRepository = languageRepository;
@@ -64,6 +66,7 @@ namespace SimpleIdServer.IdServer.UI
             _authenticationHelper = authenticationHelper;
             _recurringJobManager = reccuringJobManager;
             _transactionBuilder = transactionBuilder;
+            _realmStore = realmStore;
         }
 
         [HttpGet]
@@ -71,7 +74,7 @@ namespace SimpleIdServer.IdServer.UI
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var userId = User.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
-            var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName(userId));
+            var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName(_realmStore.Realm, userId));
             var activeSessionUrl = $"{issuer}/{Constants.EndPoints.ActiveSession}";
             if (!string.IsNullOrWhiteSpace(prefix)) activeSessionUrl = $"{issuer}/{prefix}/{Constants.EndPoints.ActiveSession}";
             newHtml = newHtml.Replace("{activeSessionUrl}", activeSessionUrl);
@@ -89,7 +92,7 @@ namespace SimpleIdServer.IdServer.UI
             prefix = prefix ?? Constants.DefaultRealm;
             if (!User.Identity.IsAuthenticated) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, Global.UserNotAuthenticated);
             var userId = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(userId));
+            var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(_realmStore.Realm, userId));
             if (string.IsNullOrWhiteSpace(kvp.Value)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.MissingSessionId);
             var user = await _userRepository.GetBySubject(userId, prefix, cancellationToken);
             if (user == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.UNKNOWN_USER, Global.UserNotAuthenticated);
@@ -112,7 +115,7 @@ namespace SimpleIdServer.IdServer.UI
                 var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                 if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
                 {
-                    Response.Cookies.Delete(_options.GetSessionCookieName(subject));
+                    Response.Cookies.Delete(_options.GetSessionCookieName(_realmStore.Realm, subject));
                     await HttpContext.SignOutAsync();
                     return new ContentResult
                     {
@@ -138,7 +141,7 @@ namespace SimpleIdServer.IdServer.UI
                     url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
                 }
 
-                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(subject));
+                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(_realmStore.Realm, subject));
                 var userSession = await _userSessionRepository.GetById(kvp.Value, prefix, cancellationToken);
                 IEnumerable<string> frontChannelLogouts = new List<string>();
                 if (userSession != null && userSession.State == UserSessionStates.Active)
@@ -186,7 +189,7 @@ namespace SimpleIdServer.IdServer.UI
             {
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(subject));
+                var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(_realmStore.Realm, subject));
                 if(string.IsNullOrWhiteSpace(kvp.Value))
                 {
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoSessionId);
@@ -209,7 +212,7 @@ namespace SimpleIdServer.IdServer.UI
                     }
                 }
 
-                Response.Cookies.Delete(_options.GetSessionCookieName(subject));
+                Response.Cookies.Delete(_options.GetSessionCookieName(_realmStore.Realm, subject));
                 await HttpContext.SignOutAsync();
                 if (!string.IsNullOrWhiteSpace(state))
                 {
@@ -232,7 +235,7 @@ namespace SimpleIdServer.IdServer.UI
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },
@@ -283,7 +286,7 @@ namespace SimpleIdServer.IdServer.UI
             string GetIssuer()
             {
                 var request = Request.GetAbsoluteUriWithVirtualPath();
-                return HandlerContext.GetIssuer(request, _options.UseRealm);
+                return HandlerContext.GetIssuer(_realmStore.Realm, request, _options.UseRealm);
             }
         }
 

@@ -28,20 +28,21 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
     public RegisterController(
         ILogger<BaseOTPRegisterController<IdServerEmailOptions, RegisterEmailViewModel>> logger,
         IOptions<FormBuilderOptions> formOptions,
-        IAuthenticationHelper authenticationHelper, 
-        IOptions<IdServerHostOptions> options, 
-        IDistributedCache distributedCache, 
-        IUserRepository userRepository, 
+        IAuthenticationHelper authenticationHelper,
+        IOptions<IdServerHostOptions> options,
+        IDistributedCache distributedCache,
+        IUserRepository userRepository,
         ITransactionBuilder transactionBuilder,
-        IEnumerable<IOTPAuthenticator> otpAuthenticators, 
-        IConfiguration configuration, 
+        IEnumerable<IOTPAuthenticator> otpAuthenticators,
+        IConfiguration configuration,
         IEmailUserNotificationService userNotificationService,
         ITokenRepository tokenRepository,
         IAntiforgery antiforgery,
         IFormStore formStore,
         IWorkflowStore workflowStore,
         IJwtBuilder jwtBuilder,
-        ILanguageRepository languageRepository) : base(logger, options, formOptions, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, antiforgery, formStore, workflowStore, tokenRepository, jwtBuilder, languageRepository)
+        ILanguageRepository languageRepository,
+        IRealmStore realmStore) : base(logger, options, formOptions, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, antiforgery, formStore, workflowStore, tokenRepository, jwtBuilder, languageRepository, realmStore)
     {
         _authenticationHelper = authenticationHelper;
     }

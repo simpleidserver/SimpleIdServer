@@ -1,23 +1,28 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Middlewares;
+using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.WsFederation.Auth
 {
     public class IdServerWsFederationConfigurationManager : BaseIdServerConfigurationManager<WsFederationConfiguration>
     {
-        public IdServerWsFederationConfigurationManager(string metadataAddress, IConfigurationRetriever<WsFederationConfiguration> configRetriever, IDocumentRetriever documentRetriever) : base(metadataAddress, configRetriever, documentRetriever)
+        private readonly IServiceProvider _serviceProvider;
+
+        public IdServerWsFederationConfigurationManager(IServiceProvider serviceProvider, string metadataAddress, IConfigurationRetriever<WsFederationConfiguration> configRetriever, IDocumentRetriever documentRetriever) : base(metadataAddress, configRetriever, documentRetriever)
         {
+            _serviceProvider = serviceProvider;
         }
 
         protected override string GetAddress()
         {
+            var realmStore = _serviceProvider.GetRequiredService<IRealmStore>();
             var address = MetadataAddress;
-            var realm = RealmContext.Instance().Realm;
+            var realm = realmStore.Realm;
             if (string.IsNullOrWhiteSpace(realm))
                 return address;
 

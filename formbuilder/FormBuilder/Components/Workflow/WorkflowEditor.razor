@@ -184,7 +184,7 @@
             isBlocked = false;
             if(workflowLayout != null)
             {
-                var elt = form.GetChild(stepLink.Source.EltId);
+                var elt = form.GetChildByCorrelationId(stepLink.Source.EltId);
                 var lnk = workflowLayout.Links.SingleOrDefault(l => l.EltCorrelationId == elt.CorrelationId);
                 if(lnk != null) isBlocked = !string.IsNullOrWhiteSpace(lnk.TargetFormCorrelationId);
             }

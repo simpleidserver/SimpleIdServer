@@ -46,7 +46,7 @@ public class RealmMiddleware
         _websiteHttpClientFactory = websiteHttpClientFactory;
     }
 
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, IRealmStore realmStore)
     {
         var path = context.Request.Path.Value;
         if(_excludedFileExtensions.Any(r => path.EndsWith(r)) 
@@ -79,7 +79,7 @@ public class RealmMiddleware
             return;
         }
 
-        RealmContext.Instance().Realm = currentRealm;
+        realmStore.Realm = currentRealm;
         await _next.Invoke(context);
     }
 

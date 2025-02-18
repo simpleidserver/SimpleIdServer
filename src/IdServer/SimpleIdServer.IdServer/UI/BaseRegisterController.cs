@@ -11,7 +11,9 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -36,7 +38,8 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         IAntiforgery antiforgery,
         IFormStore formStore,
         IWorkflowStore workflowStore,
-        ILanguageRepository languageRepository) : base(tokenRepository, jwtBuilder)
+        ILanguageRepository languageRepository,
+        IRealmStore realmStore) : base(tokenRepository, jwtBuilder)
     {
         Options = options.Value;
         FormOptions = formOptions.Value;
@@ -47,6 +50,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         FormStore = formStore;
         WorkflowStore = workflowStore;
         LanguageRepository = languageRepository;
+        RealmStore = realmStore;
     }
 
     protected IdServerHostOptions Options { get; }
@@ -59,10 +63,11 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
     protected IWorkflowStore WorkflowStore { get; }
     protected ILanguageRepository LanguageRepository { get; }
     protected abstract string Amr { get; }
+    private IRealmStore RealmStore { get; }
 
     protected async Task<UserRegistrationProgress> GetRegistrationProgress()
     {
-        var cookieName = Options.GetRegistrationCookieName();
+        var cookieName = Options.GetRegistrationCookieName(RealmStore.Realm);
         if (!Request.Cookies.ContainsKey(cookieName)) return null;
         var cookieValue = Request.Cookies[cookieName];
         var json = await DistributedCache.GetStringAsync(cookieValue);
@@ -127,7 +132,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
     {
         prefix = prefix ?? Constants.DefaultRealm;
         var tokenSet = Antiforgery.GetAndStoreTokens(HttpContext);
-        var records = await FormStore.GetAll(CancellationToken.None);
+        var records = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Registration, CancellationToken.None);
         var workflow = await WorkflowStore.Get(prefix, registrationProgress.WorkflowId, CancellationToken.None);
         var workflowFormIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
         var filteredRecords = records.Where(r => workflowFormIds.Contains(r.Id));

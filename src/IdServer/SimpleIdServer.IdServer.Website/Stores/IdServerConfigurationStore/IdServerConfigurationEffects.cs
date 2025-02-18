@@ -13,13 +13,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
     {
         private readonly IWebsiteHttpClientFactory _httpClientFactory;
         private readonly IdServerWebsiteOptions _options;
+        private readonly IRealmStore _realmStore;
 
         public IdServerConfigurationEffects(
             IWebsiteHttpClientFactory httpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options)
+            IOptions<IdServerWebsiteOptions> options,
+            IRealmStore realmStore)
         {
             _httpClientFactory = httpClientFactory;
             _options = options.Value;
+            _realmStore = realmStore;
         }
 
         [EffectMethod]
@@ -44,7 +47,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
         {
             if(_options.IsReamEnabled)
             {
-                var realm = RealmContext.Instance()?.Realm;
+                var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}";
             }
