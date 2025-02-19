@@ -940,7 +940,6 @@ namespace SimpleIdServer.IdServer
         public const string LDAPDistinguishedName = "LDAP_DISTINGUISHEDNAME";
         public const string DefaultNotificationMode = "console";
         public const string DefaultRealm = "master";
-        public const string DefaultRealmCookieName = "CurrentRealm";
         public const string DefaultCurrentAcrCookieName = "currentAmr";
         public const string DefaultRememberMeCookieName = "RememberMe";
         public const string Prefix = "prefix";

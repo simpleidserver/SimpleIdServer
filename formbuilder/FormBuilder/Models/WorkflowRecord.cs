@@ -10,6 +10,15 @@ public class WorkflowRecord : ICloneable
     public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
     public List<WorkflowLink> Links { get; set; } = new List<WorkflowLink>();
 
+    public int ComputeLevel(WorkflowStep step)
+    {
+        if (step.FormRecordCorrelationId == Constants.EmptyStep.CorrelationId) return 999;
+        var link = Links.SingleOrDefault(l => l.TargetStepId == step.Id);
+        if (link == null) return 0;
+        var parentStep = Steps.Single(s => s.Id == link.SourceStepId);
+        return ComputeLevel(parentStep) + 1;
+    }
+
     public object Clone()
     {
         return new WorkflowRecord

@@ -3,7 +3,6 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
@@ -15,22 +14,18 @@ namespace SimpleIdServer.IdServer.Website.Infrastructures;
 
 public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
 {
-    string _baseUri;
     string _locationAbsolute;
     bool _navigationInterceptionEnabled;
     private RenderHandle _renderHandle;
     private Dictionary<Type, Dictionary<string, string>> _routeableComponents;
-    internal static IServiceProvider _serviceProvider;
     private CancellationTokenSource _onNavigateCts;
     private Task _previousOnNavigateTask = Task.CompletedTask;
-    private IRoutingStateProvider? RoutingStateProvider { get; set; }
 
     [Inject] private IOptions<IdServerWebsiteOptions> Options { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] IServiceProvider ServiceProvider { get; set; }
-    [Inject] private IScrollToLocationHash ScrollToLocationHash { get; set; }
     [Inject] private INavigationInterception NavigationInterception { get; set; }
     [Inject] private IRealmStore RealmStore { get; set; }
+    [Inject] private IWebsiteHttpClientFactory WebsiteHttpClientFactory { get; set; }
     [Parameter] public Assembly AppAssembly { get; set; }
     [Parameter] public RenderFragment<RouteData> Found { get; set; }
     [Parameter] public RenderFragment NotFound { get; set; }
@@ -42,10 +37,8 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
     {
         _renderHandle = renderHandle;
         _routeableComponents = GetRouteableComponents();
-        _baseUri = NavigationManager.BaseUri;
         _locationAbsolute = NavigationManager.Uri;
         NavigationManager.LocationChanged += OnLocationChanged;
-        RoutingStateProvider = ServiceProvider.GetService<IRoutingStateProvider>();
     }
 
     public async Task SetParametersAsync(ParameterView parameters)
@@ -119,19 +112,18 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         }
 
 
-        var options = _serviceProvider.GetRequiredService<IOptions<IdServerWebsiteOptions>>();
         var routeParameters = new Dictionary<string, object>();
         Type handlerContext = null;
         var relativePath = NavigationManager.ToBaseRelativePath(_locationAbsolute);
         string pathWithoutRealm = locationPath;
-        if (!options.Value.IsReamEnabled)
+        if (!Options.Value.IsReamEnabled)
         {
             if (!pathWithoutRealm.StartsWith("/"))
                 pathWithoutRealm = $"/{locationPath}";
         }
         else
         {
-            var realms = await GetRealms(options);
+            var realms = await GetRealms(Options);
             var realm = string.IsNullOrWhiteSpace(locationPath) ? Constants.DefaultRealm : locationPath.Split("/").First();
             if (realms.Any(r => r.Name == realm))
                 pathWithoutRealm = locationPath.Replace(realm, string.Empty);
@@ -178,9 +170,8 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
 
     private async Task<IEnumerable<Realm>> GetRealms(IOptions<IdServerWebsiteOptions> options)
     {
-        var httpClientFactory = _serviceProvider.GetRequiredService<IWebsiteHttpClientFactory>();
         var url = await GetBaseUrl();
-        var httpClient = await httpClientFactory.Build();
+        var httpClient = await WebsiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
             RequestUri = new Uri(url),

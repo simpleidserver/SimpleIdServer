@@ -47,7 +47,11 @@ public class RegexTransformer : GenericTransformer<RegexTransformerParameters>
                 result = result.Replace(matchValue, json[key].ToString());
         }
 
-        result = result.Replace("//", "/");
+        if(!Uri.TryCreate(result, UriKind.RelativeOrAbsolute, out var Url))
+        {
+            result = result.Replace("//", "/");
+        }
+
         return result;
     }
 

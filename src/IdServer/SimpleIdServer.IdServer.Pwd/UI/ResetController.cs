@@ -23,6 +23,7 @@ using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
+using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
 
 namespace SimpleIdServer.IdServer.Pwd.UI;
 
@@ -282,6 +283,7 @@ public class ResetController : BaseController
         var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         var languages = await _languageRepository.GetAll(cancellationToken);
+        var amrs = WorkflowHelper.ExtractAmrs(workflow, records);
         return new SidWorkflowViewModel
         {
             Workflow = workflow,
@@ -294,7 +296,7 @@ public class ResetController : BaseController
                 FormField = tokenSet.FormFieldName,
                 FormValue = tokenSet.RequestToken
             },
-            CurrentStepId = workflow.Steps.First().Id
+            CurrentStepId = workflow.Steps.OrderBy(s => workflow.ComputeLevel(s)).First().Id
         };
     }
 }

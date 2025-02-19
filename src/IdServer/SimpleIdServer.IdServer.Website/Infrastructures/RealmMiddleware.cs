@@ -32,24 +32,21 @@ public class RealmMiddleware
     private readonly RequestDelegate _next;
     private readonly IdServerWebsiteOptions _options;
     private readonly ILogger<RealmMiddleware> _logger;
-    private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
 
     public RealmMiddleware(
         RequestDelegate next, 
         IOptions<IdServerWebsiteOptions> options, 
-        ILogger<RealmMiddleware> logger,
-        IWebsiteHttpClientFactory websiteHttpClientFactory)
+        ILogger<RealmMiddleware> logger)
     {
         _next = next;
         _options = options.Value;
         _logger = logger;
-        _websiteHttpClientFactory = websiteHttpClientFactory;
     }
 
-    public async Task InvokeAsync(HttpContext context, IRealmStore realmStore)
+    public async Task InvokeAsync(HttpContext context, IRealmStore realmStore, IWebsiteHttpClientFactory websiteHttpClientFactory)
     {
         var path = context.Request.Path.Value;
-        if(_excludedFileExtensions.Any(r => path.EndsWith(r)) 
+        if (_excludedFileExtensions.Any(r => path.EndsWith(r)) 
             || _excludedRoutes.Any(r => path.StartsWith(r))
             || !_options.IsReamEnabled)
         {
@@ -71,7 +68,7 @@ public class RealmMiddleware
         }
 
         var currentRealm = splitted.First();
-        var existingRealms = await GetRealms(currentRealm);
+        var existingRealms = await GetRealms(currentRealm, websiteHttpClientFactory);
         if(!existingRealms.Any(r => r.Name == currentRealm))
         {
             EnsureCookiesAreRemoved(context, currentRealm);
@@ -80,6 +77,9 @@ public class RealmMiddleware
         }
 
         realmStore.Realm = currentRealm;
+        context.Response.Cookies.Append(
+            CookieRealmStore.DefaultRealmCookieName,
+            currentRealm);
         await _next.Invoke(context);
     }
 
@@ -98,12 +98,12 @@ public class RealmMiddleware
         context.Response.StatusCode = (int)HttpStatusCode.NotFound;
     }
 
-    private async Task<IEnumerable<Realm>> GetRealms(string currentRealm)
+    private async Task<IEnumerable<Realm>> GetRealms(string currentRealm, IWebsiteHttpClientFactory websiteHttpClientFactory)
     {
         try
         {
             var url = await GetBaseUrl(currentRealm);
-            var httpClient = await _websiteHttpClientFactory.Build(currentRealm);
+            var httpClient = await websiteHttpClientFactory.Build(currentRealm);
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(url),

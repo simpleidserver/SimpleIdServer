@@ -21,7 +21,7 @@ public class WorkflowLink : ICloneable
         TargetStepId = link.TargetStepId;
         ActionType = link.ActionType;
         ActionParameter = link.ActionParameter;
-        Description = link.ActionType;
+        Description = link.Description;
     }
 
     public object Clone()

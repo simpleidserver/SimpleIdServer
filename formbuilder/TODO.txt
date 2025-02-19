@@ -24,22 +24,14 @@
 => lorsqu'un ACR est créé alors créer un workflow vide							:	OK
 => dupliquer tous les workflows & forms quand realm est créé					:	OK
 => pouvoir changer la langue													:	OK
-=> Le realm est NULL / vide pourquoi ???										:	TODO
-=> quand on clique plusieurs fois comprendre pourquoi le formulaire est NULL dans le backend		:	TODO (toujorus même problème avec AT)
-=> comprendre pourquoi l'issuer de l'access token n'est pas valide				:	TODO
-=> vérifier si le workflow fonctionne correctement sur SID						:	TODO
+=> Le realm est NULL / vide pourquoi ???										:	OK
+=> quand on clique plusieurs fois comprendre pourquoi le formulaire est NULL dans le backend		:	OK (toujorus même problème avec AT)
+=> comprendre pourquoi l'issuer de l'access token n'est pas valide				:	OK
+=> vérifier si le workflow fonctionne correctement sur SID						:	OK
+=> pouvoir reset mdp															:	OK
+=> le lien de redirection ne fonctionne pas quand on clique sur back			:	OK
 
-=> utiliser VS code copilot										:	TODO
+=> vérifier si l'authentification externe fonctionne encore						:	TODO
 
-=> vérifier comment imposer les conditions vers le prochain workflow		:	TODO
-
-
-
-
-        public IdServerBuilder EnableConfigurableAuthentication()
-        {
-            _serviceCollection.AddScoped<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-            _serviceCollection.AddScoped<ISIDAuthenticationSchemeProvider>(x => x.GetService<IAuthenticationSchemeProvider>() as ISIDAuthenticationSchemeProvider);
-            _serviceCollection.AddScoped<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
-            return this;
-        }
+administrator
+adm@email.com

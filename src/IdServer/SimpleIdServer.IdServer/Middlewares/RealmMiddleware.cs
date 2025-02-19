@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.Middlewares
                 var realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
                 var routeValues = context.Request.RouteValues;
                 string realm = string.Empty;
-                var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == Constants.DefaultRealmCookieName);
+                var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == CookieRealmStore.DefaultRealmCookieName);
                 if (routeValues.ContainsKey(Constants.Prefix))
                 {
                     var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
@@ -48,7 +48,7 @@ namespace SimpleIdServer.IdServer.Middlewares
                             if (!string.IsNullOrWhiteSpace(realm))
                             {
                                 context.Response.Cookies.Append(
-                                    Constants.DefaultRealmCookieName,
+                                    CookieRealmStore.DefaultRealmCookieName,
                                     realm);
                             }
                         }

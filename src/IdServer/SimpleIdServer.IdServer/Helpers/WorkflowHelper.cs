@@ -62,7 +62,13 @@ public class WorkflowHelper : IWorkflowHelper
     }
 
     public static List<string> ExtractAmrs(WorkflowRecord workflow, List<FormRecord> forms)
-        => forms.Where(f => f.ActAsStep).Where(step => workflow.Steps.Any(s => s.FormRecordCorrelationId == step.CorrelationId)).Select(s => s.Name).ToList();
+    {
+        var names = forms.Where(f => f.ActAsStep && workflow.Steps.Any(s => s.FormRecordCorrelationId == f.CorrelationId))
+            .OrderBy(f => workflow.ComputeLevel(workflow.Steps.Single(s => s.FormRecordCorrelationId == f.CorrelationId)))
+            .Select(f => f.Name)
+            .ToList();
+        return names;
+    }
 
     private static string GetTargetFormRecordId(WorkflowRecord workflow, string activeLink)
     {

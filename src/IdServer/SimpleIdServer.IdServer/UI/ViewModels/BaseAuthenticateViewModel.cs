@@ -27,12 +27,13 @@ public abstract class BaseAuthenticateViewModel : IStepViewModel
 
 public record AcrAuthInfo
 {
-    public AcrAuthInfo(string userId, string login, string email, string currentAcr, List<KeyValuePair<string, string>> claims, bool rememberLogin)
+    public AcrAuthInfo(string userId, string login, string email, string currentAcr, string currentAmr, List<KeyValuePair<string, string>> claims, bool rememberLogin)
     {
         UserId = userId;
         Login = login;
         Email = email;
         CurrentAcr = currentAcr;
+        CurrentAmr = currentAmr;
         Claims = claims;
         RememberLogin = rememberLogin;
     }
@@ -42,5 +43,6 @@ public record AcrAuthInfo
     public string Email { get; private set; }
     public List<KeyValuePair<string, string>> Claims { get; set; }
     public string CurrentAcr { get; set; }
+    public string CurrentAmr { get; set; }
     public bool RememberLogin { get; set; }
 }

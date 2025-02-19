@@ -9,7 +9,6 @@ public static class ServiceProviderExtensions
 {
     public static IServiceProvider AddSIDWebsite(this IServiceProvider serviceProvider)
     {
-        RealmRouter._serviceProvider = serviceProvider;
         return serviceProvider;
     }
 }

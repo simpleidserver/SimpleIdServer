@@ -159,10 +159,10 @@
     private void AddNode(WorkflowStep newStep)
         => AddNode(Diagram.Container.Width / 2, paddingTopPx, newStep);
 
-    private NodeModel AddNode(double startPosX, double startPosY, WorkflowStep newStep, NodeModel source = null, int index = 0, string description = null, bool isBlocked = false)
+    private NodeModel AddNode(double startPosX, double startPosY, WorkflowStep newStep, NodeModel source = null, int index = 0, string description = null, bool isBlocked = false, WorkflowLink link = null)
     {
         var form = Context.Definition.Records.Single(r => r.CorrelationId == newStep.FormRecordCorrelationId);
-        var node = new WorkflowStepNode(newStep, form, isBlocked, EditNode);
+        var node = new WorkflowStepNode(newStep, form, isBlocked, EditNode, link);
         if (source != null) AddLink(source, node, description);
         node.AddPort(PortAlignment.Bottom);
         var pt = AddNode(startPosX, startPosY, node, source, index);
@@ -189,7 +189,7 @@
                 if(lnk != null) isBlocked = !string.IsNullOrWhiteSpace(lnk.TargetFormCorrelationId);
             }
 
-            if (nextStep != null) AddNode(startPosX, startPosY, nextStep, node, i, stepLink.Description, isBlocked);
+            if (nextStep != null) AddNode(startPosX, startPosY, nextStep, node, i, stepLink.Description, isBlocked, stepLink);
             else 
             {
                 var record = new WorkflowStepChooserNode(AddNode, availableLayouts, stepLink);
@@ -235,7 +235,7 @@
         WorkflowStep newStep = null;
         // 1. Generate and add a new step with its links.
         if(!record.IsEndStep) newStep = AddWorkflowStep(record.WorkflowCorrelationId, sourceModel, source.Link);
-        else newStep = AddEndStep(sourceModel); 
+        else newStep = AddEndStep(sourceModel, source.Link); 
         // 2. Add node to diagram.
         if (!record.IsEndStep) 
         {
@@ -246,7 +246,7 @@
             }
         }
 
-        AddNode(source.Position.X, source.Position.Y, newStep, sourceModel, 0, description: sourceLink?.Labels?.FirstOrDefault()?.Content);
+        AddNode(source.Position.X, source.Position.Y, newStep, sourceModel, 0, description: sourceLink?.Labels?.FirstOrDefault()?.Content, link: source.Link);
         Diagram.Nodes.Remove(source);
         RefreshJson();
     }
@@ -263,7 +263,7 @@
         // 1. Remove the current node and its links.
         Remove(node);
         // 2. Add the step chooser.
-        var newStep = new WorkflowStepChooserNode(AddNode, availableLayouts);
+        var newStep = new WorkflowStepChooserNode(AddNode, availableLayouts, node.Link);
         stepChooserNodes.Add(newStep);
         RefreshAvailableLayouts();
         AddNode(node.Position.X, node.Position.Y, newStep, sourceNode);
@@ -301,7 +301,7 @@
         Context.Definition.Workflow.Steps.Remove(workflowStep);
     }
 
-    private WorkflowStep AddEndStep(NodeModel sourceNodeModel = null)
+    private WorkflowStep AddEndStep(NodeModel sourceNodeModel = null, WorkflowLink link = null)
     {
         var formRecord = Forms.Single(r => r.CorrelationId == Constants.EmptyStep.CorrelationId);
         var newStep = new WorkflowStep
@@ -309,8 +309,10 @@
             Id = Guid.NewGuid().ToString(),
             FormRecordCorrelationId = formRecord.CorrelationId
         };
-        UpdateLink(newStep, sourceNodeModel);
-        Context.Definition.Workflow.Steps.Add(newStep);
+        var existingStep = Workflow.Steps.SingleOrDefault(s => s.FormRecordCorrelationId == formRecord.CorrelationId);
+        if (existingStep != null) newStep = existingStep;
+        UpdateLink(newStep, sourceNodeModel, link);
+        if (existingStep == null) Context.Definition.Workflow.Steps.Add(newStep);
         return newStep;
     }
 
@@ -339,7 +341,7 @@
             }).ToList();
         var links = layout.Links.Select(l =>
         {
-            var eltId = formRecord.GetChildByCorrelationId(l.EltCorrelationId).Id;
+            var eltId = formRecord.GetChildByCorrelationId(l.EltCorrelationId).CorrelationId;
             var source = new WorkflowLinkSource
             {
                 EltId = eltId

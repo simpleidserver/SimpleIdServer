@@ -100,7 +100,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             catch(OAuthAuthenticatedUserAmrMissingException ex)
             {
                 var login = _authenticationHelper.GetLogin(context.User);
-                var amrAuthInfo = new AcrAuthInfo(context.User.Id, login, context.User.Email, ex.Acr, new List<KeyValuePair<string, string>>(), false);
+                var amrAuthInfo = new AcrAuthInfo(context.User.Id, login, context.User.Email, ex.Acr, ex.Amr, new List<KeyValuePair<string, string>>(), false);
                 return new RedirectActionAuthorizationResponse("Index", "Authenticate", context.Request.OriginalRequestData, ex.Amr, false, new List<string> { _options.GetSessionCookieName(context.Realm, context.Request.UserSubject), Constants.DefaultCurrentAcrCookieName }, amrAuthInfo);
             }
         }

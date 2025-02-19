@@ -8,7 +8,6 @@ using System;
 
 namespace SimpleIdServer.IdServer.Auth
 {
-
     public class IdServerOpenIdConfigurationManager : BaseIdServerConfigurationManager<OpenIdConnectConfiguration>
     {
         private readonly IServiceProvider _serviceProvider;

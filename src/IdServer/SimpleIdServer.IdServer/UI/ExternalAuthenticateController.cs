@@ -28,7 +28,6 @@ namespace SimpleIdServer.IdServer.UI
         public const string SCHEME_NAME = "scheme";
         public const string RETURN_URL_NAME = "returnUrl";
         private readonly ILogger<ExternalAuthenticateController> _logger;
-        private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IUserTransformer _userTransformer;
         private readonly IAuthenticationSchemeProviderRepository _authenticationSchemeProviderRepository;
         private readonly IAuthenticationHelper _authenticationHelper;
@@ -42,7 +41,6 @@ namespace SimpleIdServer.IdServer.UI
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
             ILogger<ExternalAuthenticateController> logger,
-            IAuthenticationSchemeProvider authenticationSchemeProvider,
             IUserTransformer userTransformer,
             IAuthenticationSchemeProviderRepository authenticationSchemeProviderRepository,
             ITokenRepository tokenRepository,
@@ -60,7 +58,6 @@ namespace SimpleIdServer.IdServer.UI
                 amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, options)
         {
             _logger = logger;
-            _authenticationSchemeProvider = authenticationSchemeProvider;
             _userTransformer = userTransformer;
             _authenticationSchemeProviderRepository = authenticationSchemeProviderRepository;
             _authenticationHelper = authenticationHelper;

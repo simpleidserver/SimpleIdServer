@@ -18,10 +18,12 @@ public class WorkflowEffects
 
     public WorkflowEffects(
         IWebsiteHttpClientFactory websiteHttpClientFactory,
-        IOptions<IdServerWebsiteOptions> options)
+        IOptions<IdServerWebsiteOptions> options,
+        IRealmStore realmStore)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
+        _realmStore = realmStore;
     }
 
     [EffectMethod]
