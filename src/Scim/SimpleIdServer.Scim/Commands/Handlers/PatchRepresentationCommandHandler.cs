@@ -62,6 +62,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var oldDisplayName = existingRepresentation.DisplayName;
             var patchResult = await _representationHelper.Apply(existingRepresentation, patchRepresentationCommand.PatchRepresentation.Operations, attributeMappings, _options.IgnoreUnsupportedCanonicalValues, CancellationToken.None);
             var patchResultLst = patchResult.Patches.Where(p => p.Attr != null).ToList();
+            _representationHelper.CheckMutability(patchResultLst);
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
             if (!patchResult.Patches.Any()) return GenericResult<PatchRepresentationResult>.Ok(PatchRepresentationResult.NoPatch());
             existingRepresentation.SetUpdated(DateTime.UtcNow, _representationVersionBuilder.Build(existingRepresentation));

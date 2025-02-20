@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
@@ -53,7 +54,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
             _serializerDataContractResolver = serializerDataContractResolver;
             _serviceProvider = serviceProvider;
             _logger = logger;
-            _scimSchemaQueryRepository = (ISCIMSchemaQueryRepository)serviceProvider.GetService(typeof(ISCIMSchemaQueryRepository));
+            _scimSchemaQueryRepository = serviceProvider.CreateScope().ServiceProvider.GetService<ISCIMSchemaQueryRepository>();
         }
 
         public OpenApiSchema GenerateSchema(
@@ -512,7 +513,7 @@ namespace SimpleIdServer.Scim.Swashbuckle
             ApplyFilters(schema, dataContractType, schemaRepository);
             if (controllerType != null)
             {
-                var controller = (BaseApiController)_serviceProvider.GetService(controllerType);
+                var controller = (BaseApiController)_serviceProvider.CreateScope().ServiceProvider.GetService(controllerType);
                 var scimSchema = _scimSchemaQueryRepository.FindRootSCIMSchemaByResourceType(controller.ResourceType).Result;
                 if (scimSchema != null)
                 {
