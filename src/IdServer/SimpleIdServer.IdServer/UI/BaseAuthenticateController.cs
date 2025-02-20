@@ -114,11 +114,12 @@ public class BaseAuthenticateController : BaseController
         }
     }
 
-    protected async Task<IActionResult> Authenticate(string realm, string returnUrl, string currentAmr, User user, CancellationToken cancellationToken, bool? rememberLogin = null)
+    protected async Task<IActionResult> Authenticate<T>(string realm, T viewModel, string currentAmr, User user, CancellationToken cancellationToken, bool? rememberLogin = null) where T : ISidStepViewModel
     {
         string nextAmr = null;
         Client client = null;
-        var unprotectedUrl = returnUrl;
+        var returnUrl = viewModel.ReturnUrl;
+        var unprotectedUrl = viewModel.ReturnUrl;
         List<string> amrs = null;
         string currentAcr = null;
         if (!IsProtected(returnUrl))
@@ -130,7 +131,7 @@ public class BaseAuthenticateController : BaseController
         else
         {
             unprotectedUrl = Unprotect(returnUrl);
-            var result = await GetNextAmrFormAuthorizationRequestAuthentication(realm, currentAmr, unprotectedUrl, cancellationToken);
+            var result = await GetNextAmrFormAuthorizationRequestAuthentication(realm, currentAmr, unprotectedUrl, viewModel, cancellationToken);
             nextAmr = result.nextAmr;
             client = result.client;
             amrs = result.acr.AllAmrs;
@@ -237,6 +238,7 @@ public class BaseAuthenticateController : BaseController
 
     private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication(string realm, string currentAmr, CancellationToken cancellationToken)
     {
+        // TODO : Toujours utiliser le lien !!!
         var workflow = await WorkflowStore.Get(realm, Options.DefaultAuthenticationWorkflowId, cancellationToken);
         var forms = await FormStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
         var nextAmr = WorkflowHelper.GetNextAmr(workflow, forms, currentAmr);
@@ -244,7 +246,7 @@ public class BaseAuthenticateController : BaseController
         return (nextAmr, amrs);
     }
 
-    private async Task<(string nextAmr, Client client, AcrResult acr)> GetNextAmrFormAuthorizationRequestAuthentication(string realm, string currentAmr, string unprotectedUrl, CancellationToken cancellationToken)
+    private async Task<(string nextAmr, Client client, AcrResult acr)> GetNextAmrFormAuthorizationRequestAuthentication<T>(string realm, string currentAmr, string unprotectedUrl, T viewModel, CancellationToken cancellationToken)  where T : ISidStepViewModel
     {
         var query = ExtractQueryFromUnprotectedUrl(unprotectedUrl);
         var acrValues = query.GetAcrValuesFromAuthorizationRequest();
@@ -252,7 +254,7 @@ public class BaseAuthenticateController : BaseController
         var requestedClaims = query.GetClaimsFromAuthorizationRequest();
         var client = await _clientRepository.GetByClientId(realm, clientId, cancellationToken);
         var acr = await _amrHelper.FetchDefaultAcr(realm, FormCategories.Authentication, acrValues, requestedClaims, client, cancellationToken);
-        var nextAmr = acr == null ? null : WorkflowHelper.GetNextAmr(acr.Workflow, acr.Forms, currentAmr);
+        var nextAmr = acr == null ? null : WorkflowHelper.GetNextAmr<T>(acr.Workflow, acr.Forms, viewModel.CurrentLink);
         return (nextAmr, client, acr);
     }
 

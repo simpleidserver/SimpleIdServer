@@ -28,12 +28,13 @@ public class WorkflowHelper : IWorkflowHelper
         _workflowStore = workflowStore;
     }
 
-    public static string GetNextAmr<TViewModel>(WorkflowViewModel result, TViewModel viewModel) where TViewModel : IRegisterViewModel
+    public static string GetNextAmr<TViewModel>(WorkflowViewModel result, TViewModel viewModel) where TViewModel : ISidStepViewModel
         => GetNextAmr<TViewModel>(result.Workflow, result.FormRecords, viewModel.CurrentLink);
 
     public static string GetNextAmr<TViewModel>(WorkflowRecord workflow, List<FormRecord> records, string activeLink)
     {
         var targetFormRecordId = GetTargetFormRecordId(workflow, activeLink);
+        if (targetFormRecordId == FormBuilder.Constants.EmptyStep.CorrelationId) return FormBuilder.Constants.EmptyStep.Name;
         var formRecord = records.Single(rec => rec.CorrelationId == targetFormRecordId);
         return formRecord.Name;
     }

@@ -25,13 +25,18 @@ public class ListDataDefinition : GenericFormElementDefinition<ListDataRecord>
     protected override void ProtectedInit(ListDataRecord record, WorkflowContext context, List<IFormElementDefinition> definitions)
     {
         if (record.RepetitionRule == null) return;
+        var link = context.Definition.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
         var inputData = context.GetCurrentStepInputData();
+        if (!inputData.ContainsKey("LayoutCurrentLink"))
+        {
+            inputData.Add("LayoutCurrentLink", link.Id);
+        }
+
         var result = _repetitionRuleEngineFactory.Transform(context.Execution.SupportedLanguageCodes, definitions, record.FieldType, inputData, record.RepetitionRule, record.Parameters);
         ApplyChildren(record, result, definitions, context);
         ApplyTransformations(record, result);
         ApplyHtmlAttributes(record, result);
         var tmp = new ObservableCollection<IFormElementRecord>();
-        var link = context.Definition.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
         result.ForEach(r =>
         {
             var executionContext = context.GetCurrentStepExecution();

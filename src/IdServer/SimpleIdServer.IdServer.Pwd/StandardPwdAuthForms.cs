@@ -83,7 +83,8 @@ public class StandardPwdAuthForms
                         AdditionalInputTokensComingFromStepSource = new List<MappingRule>
                         {
                             new MappingRule { Source = $"$.{nameof(BaseAuthenticateViewModel.Realm)}", Target = "Realm" },
-                            new MappingRule { Source = $"$.{nameof(BaseAuthenticateViewModel.ReturnUrl)}", Target = "ReturnUrl" }
+                            new MappingRule { Source = $"$.{nameof(BaseAuthenticateViewModel.ReturnUrl)}", Target = "ReturnUrl" },
+                            new MappingRule { Source = $"$.LayoutCurrentLink", Target = "CurrentLink" }
                         },
                         LabelMappingRules = new List<LabelMappingRule>
                         {

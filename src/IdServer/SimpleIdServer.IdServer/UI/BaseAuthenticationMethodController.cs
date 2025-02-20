@@ -270,7 +270,7 @@ namespace SimpleIdServer.IdServer.UI
 
             authenticationResult.AuthenticatedUser.ResetLoginAttempt();
             return await Authenticate(prefix,
-               viewModel.ReturnUrl,
+               viewModel,
                Amr,
                authenticationResult.AuthenticatedUser,
                token,

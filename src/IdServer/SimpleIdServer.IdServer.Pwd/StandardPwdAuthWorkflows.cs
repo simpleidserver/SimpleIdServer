@@ -44,7 +44,7 @@ public static class StandardPwdAuthWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             })
-            .AddTransformedLinkUrlAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdAuthExternalIdProviderId, "External auth", "/{realm}/ExternalAuthenticate/Login?scheme={scheme}&returnUrl={returnUrl}", new List<ITransformerParameters>
+            .AddTransformedLinkUrlAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdAuthExternalIdProviderId, "External auth", "/{realm}/ExternalAuthenticate/Login?scheme={scheme}&returnUrl={returnUrl}&currentLink={currentLink}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
                 {
@@ -52,6 +52,7 @@ public static class StandardPwdAuthWorkflows
                     {
                         new MappingRule { Source = "$.AuthenticationScheme", Target = "scheme" },
                         new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" },
+                        new MappingRule { Source = "$.CurrentLink", Target = "currentLink" },
                         new MappingRule { Source = "$.Realm", Target = "realm" }
                     }
                 },
