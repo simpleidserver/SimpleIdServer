@@ -16,7 +16,7 @@ Scenario: Claims are returned in JSON format (HTTP GET)
 
 	And extract parameter 'code' from redirect url
 	
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key           | Value        			|
 	| client_id     | thirtySevenClient     |
 	| client_secret | password     			|
@@ -55,7 +55,7 @@ Scenario: Claims are returned in JSON format (HTTP POST)
 
 	And extract parameter 'code' from redirect url
 	
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key           | Value        			|
 	| client_id     | thirtySevenClient     |
 	| client_secret | password     			|
@@ -94,7 +94,7 @@ Scenario: Claims are returned in JWS token
 
 	And extract parameter 'code' from redirect url
 	
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key           | Value        			|
 	| client_id     | thirtyEightClient     |
 	| client_secret | password     			|
@@ -134,7 +134,7 @@ Scenario: Claims are returned in JWE token
 
 	And extract parameter 'code' from redirect url
 	
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key           | Value        			|
 	| client_id     | thirtyNineClient      |
 	| client_secret | password     			|
@@ -173,7 +173,7 @@ Scenario: Essential claims 'name' and 'email' are returned by the userinfo endpo
 
 	And extract parameter 'code' from redirect url
 	
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key           | Value        			|
 	| client_id     | fortyClient           |
 	| client_secret | password     			|

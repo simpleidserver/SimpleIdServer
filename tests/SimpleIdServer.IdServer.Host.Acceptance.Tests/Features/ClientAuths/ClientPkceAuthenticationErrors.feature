@@ -42,7 +42,7 @@ Scenario: Error is returned when code doesn't exist
 
 Scenario: Error is returned when code_verifier is invalid
 	Given authenticate a user
-	When execute HTTP GET request 'https://localhost:8080/authorization'
+	When execute HTTP GET request 'http://localhost/authorization'
 	| Key                   | Value                 |
 	| response_type         | code                  |
 	| client_id             | nineClient            |
@@ -55,7 +55,7 @@ Scenario: Error is returned when code_verifier is invalid
 
 	And extract parameter 'code' from redirect url
 
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key                   | Value              |
 	| grant_type            | client_credentials |
 	| scope                 | scope              |

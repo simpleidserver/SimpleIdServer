@@ -374,7 +374,7 @@ namespace Microsoft.Extensions.DependencyInjection
         private static IServiceCollection AddLib(this IServiceCollection services)
         {
             services.AddTransient<IHttpClientFactory, HttpClientFactory>();
-            services.AddRealmStore(false);
+            services.AddScoped<IRealmStore, RealmStore>();
             return services;
         }
 

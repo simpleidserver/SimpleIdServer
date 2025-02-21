@@ -101,17 +101,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 5
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table11.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table11.AddRow(new string[] {
+                table7.AddRow(new string[] {
                             "request_uri",
                             "urn:ietf:params:oauth:request_uri:invalid"});
 #line 6
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table11, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table7, "When ");
 #line hidden
 #line 11
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -150,14 +150,14 @@ this.ScenarioInitialize(scenarioInfo);
 #line 18
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table12.AddRow(new string[] {
+                table8.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
 #line 19
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table12, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table8, "When ");
 #line hidden
 #line 23
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -196,17 +196,17 @@ this.ScenarioInitialize(scenarioInfo);
 #line 30
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table13.AddRow(new string[] {
+                table9.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table13.AddRow(new string[] {
+                table9.AddRow(new string[] {
                             "response_type",
                             "invalid"});
 #line 31
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table13, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table9, "When ");
 #line hidden
 #line 36
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -245,35 +245,35 @@ this.ScenarioInitialize(scenarioInfo);
 #line 43
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table14.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table14.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table14.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "state",
                             "state"});
-                table14.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table14.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "scope",
                             "openid email role"});
-                table14.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8081"});
-                table14.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table14.AddRow(new string[] {
+                table10.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 44
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table14, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table10, "When ");
 #line hidden
 #line 55
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -315,32 +315,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 63
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table11 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table15.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table15.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table15.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "state",
                             "state"});
-                table15.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table15.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8081"});
-                table15.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table15.AddRow(new string[] {
+                table11.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 64
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table15, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table11, "When ");
 #line hidden
 #line 74
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -374,35 +374,35 @@ this.ScenarioInitialize(scenarioInfo);
 #line 78
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table12 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table16.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table16.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "client_id",
                             "fortyClient"});
-                table16.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "state",
                             "state"});
-                table16.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table16.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table16.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "scope",
                             "scope1"});
-                table16.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table16.AddRow(new string[] {
+                table12.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 79
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table16, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table12, "When ");
 #line hidden
 #line 90
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -436,32 +436,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 94
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table13 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table17.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "response_type",
                             "code id_token"});
-                table17.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table17.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "state",
                             "state"});
-                table17.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table17.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table17.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table17.AddRow(new string[] {
+                table13.AddRow(new string[] {
                             "display",
                             "popup"});
 #line 95
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table17, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table13, "When ");
 #line hidden
 #line 105
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -495,32 +495,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 109
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table14 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table18.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table18.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table18.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "state",
                             "state"});
-                table18.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table18.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table18.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "display",
                             "popup"});
-                table18.AddRow(new string[] {
+                table14.AddRow(new string[] {
                             "nonce",
                             "nonce"});
 #line 110
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table18, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table14, "When ");
 #line hidden
 #line 120
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -556,38 +556,38 @@ this.ScenarioInitialize(scenarioInfo);
 #line 126
  testRunner.When("disconnect the user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table15 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "state",
                             "state"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "display",
                             "popup"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table19.AddRow(new string[] {
+                table15.AddRow(new string[] {
                             "prompt",
                             "none"});
 #line 127
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table19, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table15, "When ");
 #line hidden
 #line 139
  testRunner.Then("redirection url contains the parameter value \'error\'=\'login_required\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -621,50 +621,50 @@ this.ScenarioInitialize(scenarioInfo);
 #line 143
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table16 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table20.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "sub",
                             "otheruser"});
-                table20.AddRow(new string[] {
+                table16.AddRow(new string[] {
                             "iss",
                             "http://localhost"});
 #line 144
- testRunner.And("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table20, "And ");
+ testRunner.And("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table16, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table17 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "state",
                             "state"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "display",
                             "popup"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table21.AddRow(new string[] {
+                table17.AddRow(new string[] {
                             "id_token_hint",
                             "$id_token_hint$"});
 #line 149
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table21, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table17, "When ");
 #line hidden
 #line 161
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -698,53 +698,53 @@ this.ScenarioInitialize(scenarioInfo);
 #line 165
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table18 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table22.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "sub",
                             "user"});
-                table22.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "aud",
                             "aud1 aud2"});
-                table22.AddRow(new string[] {
+                table18.AddRow(new string[] {
                             "iss",
                             "http://localhost"});
 #line 166
- testRunner.And("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table22, "And ");
+ testRunner.And("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table18, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table19 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "state",
                             "state"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "display",
                             "popup"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table23.AddRow(new string[] {
+                table19.AddRow(new string[] {
                             "id_token_hint",
                             "$id_token_hint$"});
 #line 172
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table23, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table19, "When ");
 #line hidden
 #line 184
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -778,38 +778,38 @@ this.ScenarioInitialize(scenarioInfo);
 #line 188
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table20 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "state",
                             "state"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "display",
                             "popup"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table24.AddRow(new string[] {
+                table20.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"sub\": { \"essential\" : true, \"value\": \"invalid\" } } }"});
 #line 190
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table24, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table20, "When ");
 #line hidden
 #line 202
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -843,38 +843,38 @@ this.ScenarioInitialize(scenarioInfo);
 #line 206
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table21 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "state",
                             "state"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "display",
                             "popup"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table25.AddRow(new string[] {
+                table21.AddRow(new string[] {
                             "request",
                             "invalid"});
 #line 207
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table25, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table21, "When ");
 #line hidden
 #line 219
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -908,48 +908,48 @@ this.ScenarioInitialize(scenarioInfo);
 #line 223
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table22 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table26.AddRow(new string[] {
+                table22.AddRow(new string[] {
                             "claim",
                             "value"});
 #line 224
  testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
-                        "d\'", ((string)(null)), table26, "And ");
+                        "d\'", ((string)(null)), table22, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table23 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "state",
                             "state"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "display",
                             "popup"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table27.AddRow(new string[] {
+                table23.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 228
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table27, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table23, "When ");
 #line hidden
 #line 240
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -983,48 +983,48 @@ this.ScenarioInitialize(scenarioInfo);
 #line 244
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table24 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table28.AddRow(new string[] {
+                table24.AddRow(new string[] {
                             "response_type",
                             "code"});
 #line 245
  testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
-                        "d\'", ((string)(null)), table28, "And ");
+                        "d\'", ((string)(null)), table24, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table25 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "state",
                             "state"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "display",
                             "popup"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table29.AddRow(new string[] {
+                table25.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 249
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table29, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table25, "When ");
 #line hidden
 #line 261
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1061,51 +1061,51 @@ this.ScenarioInitialize(scenarioInfo);
 #line 265
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table26 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table30.AddRow(new string[] {
+                table26.AddRow(new string[] {
                             "response_type",
                             "code id_token"});
-                table30.AddRow(new string[] {
+                table26.AddRow(new string[] {
                             "client_id",
                             "clientId"});
 #line 266
  testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
-                        "d\'", ((string)(null)), table30, "And ");
+                        "d\'", ((string)(null)), table26, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table27 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "state",
                             "state"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "display",
                             "popup"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table31.AddRow(new string[] {
+                table27.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 271
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table31, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table27, "When ");
 #line hidden
 #line 283
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1142,51 +1142,51 @@ this.ScenarioInitialize(scenarioInfo);
 #line 287
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table28 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table32.AddRow(new string[] {
+                table28.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table32.AddRow(new string[] {
+                table28.AddRow(new string[] {
                             "client_id",
                             "otherclientId"});
 #line 288
  testRunner.And("build JWS request object for client \'thirtyOneClient\' and sign with the key \'keyI" +
-                        "d\'", ((string)(null)), table32, "And ");
+                        "d\'", ((string)(null)), table28, "And ");
 #line hidden
-                TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table29 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "state",
                             "state"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "display",
                             "popup"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table33.AddRow(new string[] {
+                table29.AddRow(new string[] {
                             "request",
                             "$request$"});
 #line 293
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table33, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table29, "When ");
 #line hidden
 #line 305
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request_object\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1220,35 +1220,35 @@ this.ScenarioInitialize(scenarioInfo);
 #line 309
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table30 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table34.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table34.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table34.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "state",
                             "state"});
-                table34.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table34.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "scope",
                             "openid email"});
-                table34.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "redirect_uri",
                             "uri"});
-                table34.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "display",
                             "popup"});
-                table34.AddRow(new string[] {
+                table30.AddRow(new string[] {
                             "nonce",
                             "nonce"});
 #line 311
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table34, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table30, "When ");
 #line hidden
 #line 322
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -1287,35 +1287,35 @@ this.ScenarioInitialize(scenarioInfo);
 #line 328
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table35 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table31 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table35.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table35.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table35.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "state",
                             "state"});
-                table35.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table35.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "scope",
                             "openid"});
-                table35.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table35.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table35.AddRow(new string[] {
+                table31.AddRow(new string[] {
                             "prompt",
                             "login"});
 #line 330
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table35, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table31, "When ");
 #line hidden
 #line 341
  testRunner.Then("redirection url contains \'http://localhost/pwd/Authenticate\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1348,35 +1348,35 @@ this.ScenarioInitialize(scenarioInfo);
 #line 344
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table36 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table32 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table36.AddRow(new string[] {
+                table32.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table36.AddRow(new string[] {
+                table32.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table36.AddRow(new string[] {
+                table32.AddRow(new string[] {
                             "state",
                             "state"});
-                table36.AddRow(new string[] {
+                table32.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table36.AddRow(new string[] {
+                table32.AddRow(new string[] {
                             "scope",
                             "openid"});
-                table36.AddRow(new string[] {
+                table32.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table36.AddRow(new string[] {
+                table32.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table36.AddRow(new string[] {
+                table32.AddRow(new string[] {
                             "prompt",
                             "select_account"});
 #line 346
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table36, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table32, "When ");
 #line hidden
 #line 357
  testRunner.Then("redirection url contains \'http://localhost/Accounts\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1409,35 +1409,35 @@ this.ScenarioInitialize(scenarioInfo);
 #line 360
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table37 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table33 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table37.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table37.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table37.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "state",
                             "state"});
-                table37.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table37.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "scope",
                             "openid"});
-                table37.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table37.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table37.AddRow(new string[] {
+                table33.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"name\": { \"essential\" : true } } }"});
 #line 362
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table37, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table33, "When ");
 #line hidden
 #line 373
  testRunner.Then("redirection url contains \'http://localhost/Consents\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1467,36 +1467,36 @@ this.ScenarioInitialize(scenarioInfo);
 #line 376
  testRunner.When("disconnect the user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "When ");
 #line hidden
-                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table34 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table38.AddRow(new string[] {
+                table34.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table38.AddRow(new string[] {
+                table34.AddRow(new string[] {
                             "client_id",
                             "thirtyOneClient"});
-                table38.AddRow(new string[] {
+                table34.AddRow(new string[] {
                             "state",
                             "state"});
-                table38.AddRow(new string[] {
+                table34.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table38.AddRow(new string[] {
+                table34.AddRow(new string[] {
                             "scope",
                             "openid"});
-                table38.AddRow(new string[] {
+                table34.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table38.AddRow(new string[] {
+                table34.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table38.AddRow(new string[] {
+                table34.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
 #line 378
- testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table38, "And ");
+ testRunner.And("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table34, "And ");
 #line hidden
 #line 389
  testRunner.Then("redirection url contains the parameter value \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1533,36 +1533,36 @@ this.ScenarioInitialize(scenarioInfo);
 #line 393
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table35 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table39.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table39.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table39.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "state",
                             "state"});
-                table39.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table39.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table39.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table39.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table39.AddRow(new string[] {
+                table35.AddRow(new string[] {
                             "scope",
                             "admin"});
 #line 395
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table39, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table35, "When ");
 #line hidden
 #line 406
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_target\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1596,39 +1596,39 @@ this.ScenarioInitialize(scenarioInfo);
 #line 410
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table36 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "state",
                             "state"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "resource",
                             "invalid"});
-                table40.AddRow(new string[] {
+                table36.AddRow(new string[] {
                             "resource",
                             "sinvalid"});
 #line 412
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table40, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table36, "When ");
 #line hidden
 #line 424
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_target\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1662,39 +1662,39 @@ this.ScenarioInitialize(scenarioInfo);
 #line 428
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table37 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "state",
                             "state"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table41.AddRow(new string[] {
+                table37.AddRow(new string[] {
                             "grant_management_action",
                             "invalid"});
 #line 430
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table41, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table37, "When ");
 #line hidden
 #line 442
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1728,42 +1728,42 @@ this.ScenarioInitialize(scenarioInfo);
 #line 446
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table42 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table38 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "state",
                             "state"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "grant_management_action",
                             "create"});
-                table42.AddRow(new string[] {
+                table38.AddRow(new string[] {
                             "grant_id",
                             "id"});
 #line 448
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table42, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table38, "When ");
 #line hidden
 #line 461
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1797,39 +1797,39 @@ this.ScenarioInitialize(scenarioInfo);
 #line 466
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table43 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table39 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "state",
                             "state"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table43.AddRow(new string[] {
+                table39.AddRow(new string[] {
                             "grant_id",
                             "id"});
 #line 468
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table43, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table39, "When ");
 #line hidden
 #line 480
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1863,42 +1863,42 @@ this.ScenarioInitialize(scenarioInfo);
 #line 484
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table44 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table40 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "client_id",
                             "fortySixClient"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "state",
                             "state"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "grant_id",
                             "invalid"});
-                table44.AddRow(new string[] {
+                table40.AddRow(new string[] {
                             "grant_management_action",
                             "replace"});
 #line 486
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table44, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table40, "When ");
 #line hidden
 #line 499
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -1932,45 +1932,45 @@ this.ScenarioInitialize(scenarioInfo);
 #line 503
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table45 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table41 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "client_id",
                             "fortyEightClient"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "state",
                             "state"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "grant_management_action",
                             "replace"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "scope",
                             "grant_management_query"});
-                table45.AddRow(new string[] {
+                table41.AddRow(new string[] {
                             "grant_id",
                             "consentId"});
 #line 505
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table45, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table41, "When ");
 #line hidden
 #line 519
  testRunner.Then("redirection url contains the parameter value \'error\'=\'access_denied\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -2004,32 +2004,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 523
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table46 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table42 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table46.AddRow(new string[] {
+                table42.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table46.AddRow(new string[] {
+                table42.AddRow(new string[] {
                             "client_id",
                             "fiftyFiveClient"});
-                table46.AddRow(new string[] {
+                table42.AddRow(new string[] {
                             "state",
                             "state"});
-                table46.AddRow(new string[] {
+                table42.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table46.AddRow(new string[] {
+                table42.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table46.AddRow(new string[] {
+                table42.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table46.AddRow(new string[] {
+                table42.AddRow(new string[] {
                             "authorization_details",
                             "{ \"actions\": [ \"write\" ] }"});
 #line 525
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table46, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table42, "When ");
 #line hidden
 #line 535
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_authorization_detai" +
@@ -2064,39 +2064,39 @@ this.ScenarioInitialize(scenarioInfo);
 #line 539
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table47 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table43 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "response_type",
                             "code"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "client_id",
                             "fortySevenClient"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "state",
                             "state"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "claims",
                             "{ \"id_token\": { \"acr\": { \"essential\" : true, \"value\": \"urn:openbanking:psd2:ca\" }" +
                                 " } }"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "resource",
                             "https://cal.example.com"});
-                table47.AddRow(new string[] {
+                table43.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"firstDetails\", \"test\": \"test\", \"creditorAccount\": { \"iban\": \"DE\" } }"});
 #line 541
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table47, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table43, "When ");
 #line hidden
 #line 553
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_authorization_detai" +
@@ -2134,32 +2134,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 557
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table48 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table44 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table48.AddRow(new string[] {
+                table44.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table48.AddRow(new string[] {
+                table44.AddRow(new string[] {
                             "client_id",
                             "fiftyFiveClient"});
-                table48.AddRow(new string[] {
+                table44.AddRow(new string[] {
                             "state",
                             "state"});
-                table48.AddRow(new string[] {
+                table44.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table48.AddRow(new string[] {
+                table44.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table48.AddRow(new string[] {
+                table44.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table48.AddRow(new string[] {
+                table44.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"firstDetails\", \"actions\": [ \"write\" ] }"});
 #line 559
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table48, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table44, "When ");
 #line hidden
 #line 569
  testRunner.Then("redirection url contains \'http://localhost/Consents\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
@@ -2192,32 +2192,32 @@ this.ScenarioInitialize(scenarioInfo);
 #line 572
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
-                TechTalk.SpecFlow.Table table49 = new TechTalk.SpecFlow.Table(new string[] {
+                TechTalk.SpecFlow.Table table45 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
-                table49.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "response_type",
                             "code token"});
-                table49.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "client_id",
                             "fiftyEightClient"});
-                table49.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "state",
                             "state"});
-                table49.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "response_mode",
                             "query"});
-                table49.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "redirect_uri",
                             "http://localhost:8080"});
-                table49.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-                table49.AddRow(new string[] {
+                table45.AddRow(new string[] {
                             "authorization_details",
                             "{ \"type\" : \"openid_credential\" }"});
 #line 574
- testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table49, "When ");
+ testRunner.When("execute HTTP GET request \'http://localhost/authorization\'", ((string)(null)), table45, "When ");
 #line hidden
 #line 584
  testRunner.Then("redirection url contains the parameter value \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");

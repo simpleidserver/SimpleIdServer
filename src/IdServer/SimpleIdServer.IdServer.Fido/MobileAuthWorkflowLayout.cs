@@ -33,6 +33,7 @@ public class MobileAuthWorkflowLayout : IWorkflowLayoutService
                     Description = "Authenticate",
                     EltCorrelationId = StandardFidoAuthForms.mobileFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
+                    IsMainLink = true,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,

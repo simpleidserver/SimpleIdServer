@@ -30,6 +30,7 @@ public class ConfirmResetPwdWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Reset",
+                    IsMainLink = true,
                     TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     EltCorrelationId = StandardPwdAuthForms.confirmResetPwdFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,

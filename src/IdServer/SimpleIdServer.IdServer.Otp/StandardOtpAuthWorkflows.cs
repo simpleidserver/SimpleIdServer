@@ -38,7 +38,7 @@ public static class StandardOtpAuthWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            });
+            }, true);
         return builder;
     }
 }

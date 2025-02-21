@@ -31,6 +31,7 @@ public class PwdRegisterWorkflowLayout : IWorkflowLayoutService
                 {
                     Description = "Register",
                     EltCorrelationId = StandardPwdRegisterForms.pwdRegisterFormId,
+                    IsMainLink = true,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {

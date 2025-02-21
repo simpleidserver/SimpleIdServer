@@ -77,7 +77,6 @@
     private FormPanelTypes? panelType = null;
     private JsonPanelComponent jsonPanelComponent;
     private string SerializedWorkflow;
-    private List<WorkflowStepChooserNode> stepChooserNodes = new List<WorkflowStepChooserNode>();
 
     private double spaceBetweenNodeXPx = 50;
     private double spaceBetweenNodeYPx = 150;
@@ -148,7 +147,6 @@
         if(firstStep == null)
         {
             var record = new WorkflowStepChooserNode(AddNode, availableLayouts);
-            stepChooserNodes.Add(record);
             AddNode((Diagram.Container.Width / 2) - (stepSize.Width / 2), paddingTopPx, record);
             return;
         }
@@ -193,7 +191,6 @@
             else 
             {
                 var record = new WorkflowStepChooserNode(AddNode, availableLayouts, stepLink);
-                stepChooserNodes.Add(record);
                 AddNode(startPosX, startPosY, record, node, i);
                 AddLink(node, record, stepLink.Description);
             }
@@ -237,15 +234,6 @@
         if(!record.IsEndStep) newStep = AddWorkflowStep(record.WorkflowCorrelationId, sourceModel, source.Link);
         else newStep = AddEndStep(sourceModel, source.Link); 
         // 2. Add node to diagram.
-        if (!record.IsEndStep) 
-        {
-            availableLayouts.Remove(availableLayouts.Single(l => l.WorkflowCorrelationId == record.WorkflowCorrelationId));
-            foreach (var node in stepChooserNodes)
-            {
-                node.Refresh(availableLayouts);
-            }
-        }
-
         AddNode(source.Position.X, source.Position.Y, newStep, sourceModel, 0, description: sourceLink?.Labels?.FirstOrDefault()?.Content, link: source.Link);
         Diagram.Nodes.Remove(source);
         RefreshJson();
@@ -264,8 +252,7 @@
         Remove(node);
         // 2. Add the step chooser.
         var newStep = new WorkflowStepChooserNode(AddNode, availableLayouts, node.Link);
-        stepChooserNodes.Add(newStep);
-        RefreshAvailableLayouts();
+        // RefreshAvailableLayouts();
         AddNode(node.Position.X, node.Position.Y, newStep, sourceNode);
         if(sourceNode != null) AddLink(sourceNode, newStep, sourceLink.Labels.First().Content);
         RefreshJson();
@@ -309,10 +296,8 @@
             Id = Guid.NewGuid().ToString(),
             FormRecordCorrelationId = formRecord.CorrelationId
         };
-        var existingStep = Workflow.Steps.SingleOrDefault(s => s.FormRecordCorrelationId == formRecord.CorrelationId);
-        if (existingStep != null) newStep = existingStep;
         UpdateLink(newStep, sourceNodeModel, link);
-        if (existingStep == null) Context.Definition.Workflow.Steps.Add(newStep);
+        Context.Definition.Workflow.Steps.Add(newStep);
         return newStep;
     }
 
@@ -325,14 +310,18 @@
             Id = Guid.NewGuid().ToString(),
             FormRecordCorrelationId = formRecord.CorrelationId
         };
-        var existingStep = Workflow.Steps.SingleOrDefault(s => s.FormRecordCorrelationId == formRecord.CorrelationId);
-        if (existingStep != null) newStep = existingStep;
-        var isStepExists = existingStep != null;
+        Context.Definition.Workflow.Steps.Add(newStep);
+        AddWorkflowStepChildren(correlationId, newStep, sourceNodeModel, sourceLink);
+        return newStep;
+    }
+
+    private void AddWorkflowStepChildren(string correlationId, WorkflowStep newStep, NodeModel sourceNodeModel = null, WorkflowLink sourceLink = null)
+    {
+        var layout = WorkflowLayouts.Single(l => l.WorkflowCorrelationId == correlationId);
+        var formRecord = Forms.Single(r => r.CorrelationId == layout.SourceFormCorrelationId);
         var resolvedSteps = Forms.Where(f => layout.Links.Where(l => !string.IsNullOrWhiteSpace(l.TargetFormCorrelationId)).Select(l => l.TargetFormCorrelationId).Contains(f.CorrelationId))
             .Select(f =>
             {
-                var existingStep = Workflow.Steps.SingleOrDefault(s => s.FormRecordCorrelationId == f.CorrelationId);
-                if (existingStep != null) return existingStep;
                 return new WorkflowStep
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -343,9 +332,9 @@
         {
             var eltId = formRecord.GetChildByCorrelationId(l.EltCorrelationId).CorrelationId;
             var source = new WorkflowLinkSource
-            {
-                EltId = eltId
-            };
+                {
+                    EltId = eltId
+                };
             var form = Forms.SingleOrDefault(r => r.CorrelationId == l.TargetFormCorrelationId);
             var targetStep = resolvedSteps.SingleOrDefault(s => s.FormRecordCorrelationId == form?.CorrelationId);
             var targetStepId = targetStep?.Id;
@@ -357,16 +346,19 @@
                 ActionType = l.ActionType,
                 ActionParameter = l.ActionParameter,
                 Description = l.Description,
-                TargetStepId = targetStepId
+                TargetStepId = targetStepId,
+                IsMainLink = l.IsMainLink
             };
         });
-        if(!isStepExists) Context.Definition.Workflow.Steps.Add(newStep);
-        Context.Definition.Workflow.Steps.AddRange(resolvedSteps.Where(s => !Workflow.Steps.Any(ws => ws.FormRecordCorrelationId == s.FormRecordCorrelationId)));
+        Context.Definition.Workflow.Steps.AddRange(resolvedSteps);
         Context.Definition.Workflow.Links.AddRange(links);
         UpdateLink(newStep, sourceNodeModel, sourceLink);
         var resolvedLayouts = WorkflowLayouts.Where(l => l.SourceFormCorrelationId != FormBuilder.Constants.EmptyStep.CorrelationId && resolvedSteps.Any(s => s.FormRecordCorrelationId == l.SourceFormCorrelationId));
-        foreach(var resolvedLayout in resolvedLayouts) AddWorkflowStep(resolvedLayout.WorkflowCorrelationId, sourceNodeModel);
-        return newStep;
+        foreach(var resolvedStep in resolvedSteps.Where(s => s.FormRecordCorrelationId != FormBuilder.Constants.EmptyStep.CorrelationId))
+        {
+            var resolvedLayout = WorkflowLayouts.Single(l => l.SourceFormCorrelationId == resolvedStep.FormRecordCorrelationId);
+            AddWorkflowStepChildren(resolvedLayout.WorkflowCorrelationId, resolvedStep, sourceNodeModel);   
+        }
     }
 
     private void UpdateLink(WorkflowStep newStep, NodeModel sourceNodeModel, WorkflowLink sourceLink = null)
@@ -384,16 +376,11 @@
 
     private void RefreshAvailableLayouts()
     {
-        var workflowFormsCorrelationId = Workflow.Steps.Select(s => s.FormRecordCorrelationId);        
         availableLayouts = WorkflowLayouts.Where(l =>
         {
             var form = Forms.Single(r => r.CorrelationId == l.SourceFormCorrelationId);
-            return !workflowFormsCorrelationId.Contains(l.SourceFormCorrelationId) && form.ActAsStep;
+            return form.ActAsStep;
         }).ToList();
-        foreach (var node in stepChooserNodes) 
-        {
-            node.Refresh(availableLayouts);
-        }
     }
 
     private List<WorkflowLink> GetEmptyLinks()

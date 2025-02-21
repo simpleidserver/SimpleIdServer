@@ -56,6 +56,7 @@ public class EmailRegisterWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Register",
+                    IsMainLink = true,
                     EltCorrelationId = StandardEmailRegistrationForms.emailRegisterFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter

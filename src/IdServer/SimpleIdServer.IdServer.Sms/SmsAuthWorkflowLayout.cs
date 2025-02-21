@@ -57,6 +57,7 @@ public class SmsAuthWorkflowLayout : IWorkflowLayoutService
                     Description = "Authenticate",
                     EltCorrelationId = StandardSmsAuthForms.smsAuthForm,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
+                    IsMainLink = true,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,

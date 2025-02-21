@@ -64,10 +64,13 @@ public class WorkflowHelper : IWorkflowHelper
 
     public static List<string> ExtractAmrs(WorkflowRecord workflow, List<FormRecord> forms)
     {
-        var names = forms.Where(f => f.ActAsStep && workflow.Steps.Any(s => s.FormRecordCorrelationId == f.CorrelationId))
-            .OrderBy(f => workflow.ComputeLevel(workflow.Steps.Single(s => s.FormRecordCorrelationId == f.CorrelationId)))
-            .Select(f => f.Name)
-            .ToList();
+        var rootStep = workflow.GetFirstStep();
+        var formCorrelationIds = new List<string>
+        {
+          rootStep.FormRecordCorrelationId
+        };
+        formCorrelationIds.AddRange(workflow.GetAllChildrenMainLinks(rootStep.Id).Select(r => r.FormRecordCorrelationId));
+        var names = formCorrelationIds.Select(id => forms.Single(f => f.CorrelationId == id)).Where(f => f.ActAsStep).Select(f => f.Name).ToList();
         return names;
     }
 

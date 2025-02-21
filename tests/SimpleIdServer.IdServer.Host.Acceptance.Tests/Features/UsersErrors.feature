@@ -48,7 +48,7 @@ Scenario: name is required
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP POST JSON request 'https://localhost:8080/users'
+	When execute HTTP POST JSON request 'http://localhost/users'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |	
 
@@ -68,7 +68,7 @@ Scenario: name must be unique
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP POST JSON request 'https://localhost:8080/users'
+	When execute HTTP POST JSON request 'http://localhost/users'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |	
 	| name            | user                  |
@@ -89,7 +89,7 @@ Scenario: get an unknown user
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP GET request 'https://localhost:8080/users/id'
+	When execute HTTP GET request 'http://localhost/users/id'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |		
 	
@@ -106,7 +106,7 @@ Scenario: remove an unknown user
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP DELETE request 'https://localhost:8080/users/id'
+	When execute HTTP DELETE request 'http://localhost/users/id'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |		
 	
@@ -123,7 +123,7 @@ Scenario: cannot update credential when user doesn't exist
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body	
 	
-	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials/cred'
+	When execute HTTP PUT JSON request 'http://localhost/users/id/credentials/cred'
 	| Key             | Value                 |
 	| Authorization   | Bearer $access_token$ |		
 	| type            | pwd                   |

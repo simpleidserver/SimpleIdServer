@@ -10,6 +10,41 @@ public class WorkflowRecord : ICloneable
     public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
     public List<WorkflowLink> Links { get; set; } = new List<WorkflowLink>();
 
+    public List<WorkflowStep> GetAllChildrenMainLinks(string stepId)
+    {
+        var result = new List<WorkflowStep>();
+        var link = Links.SingleOrDefault(l => l.SourceStepId == stepId && l.IsMainLink);
+        if (link != null)
+        {
+            var targetStep = Steps.Single(s => s.Id == link.TargetStepId);
+            if(!targetStep.IsEmptyStep)
+            {
+                result.Add(targetStep);
+                result.AddRange(GetAllChildrenMainLinks(link.TargetStepId));
+            }
+        }
+
+        return result;
+    }
+
+    public List<WorkflowStep> GetAllParentMainLinks(string stepId)
+    {
+        var result = new List<WorkflowStep>();
+        var link = Links.SingleOrDefault(l => l.TargetStepId == stepId);
+        if (link != null)
+        {
+            var sourceStep = Steps.Single(s => s.Id == link.SourceStepId);
+            if (!sourceStep.IsEmptyStep)
+            {
+                result.Add(sourceStep);
+                result.AddRange(GetAllParentMainLinks(link.SourceStepId));
+            }
+        }
+
+        result.Reverse();
+        return result;
+    }
+
     public int ComputeLevel(WorkflowStep step)
     {
         if (step.FormRecordCorrelationId == Constants.EmptyStep.CorrelationId) return 999;

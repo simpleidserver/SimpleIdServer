@@ -32,6 +32,7 @@ public class OtpAuthWorkflowLayout : IWorkflowLayoutService
                     Description = "Authenticate",
                     EltCorrelationId = StandardOtpAuthForms.otpCodeFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
+                    IsMainLink = true,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,

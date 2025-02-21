@@ -124,7 +124,7 @@ public class BaseAuthenticateController : BaseController
         string currentAcr = null;
         if (!IsProtected(returnUrl))
         {
-            var result = await GetNextAmrFromNormalAuthentication(realm, currentAmr, cancellationToken);
+            var result = await GetNextAmrFromNormalAuthentication(realm, viewModel, cancellationToken);
             nextAmr = result.nextAmr;
             amrs = result.amrs;
         }
@@ -236,12 +236,11 @@ public class BaseAuthenticateController : BaseController
         }
     }
 
-    private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication(string realm, string currentAmr, CancellationToken cancellationToken)
+    private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication<T>(string realm, T viewModel, CancellationToken cancellationToken) where T : ISidStepViewModel
     {
-        // TODO : Toujours utiliser le lien !!!
         var workflow = await WorkflowStore.Get(realm, Options.DefaultAuthenticationWorkflowId, cancellationToken);
         var forms = await FormStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
-        var nextAmr = WorkflowHelper.GetNextAmr(workflow, forms, currentAmr);
+        var nextAmr = WorkflowHelper.GetNextAmr<T>(workflow, forms, viewModel.CurrentLink);
         var amrs = WorkflowHelper.ExtractAmrs(workflow, forms);
         return (nextAmr, amrs);
     }

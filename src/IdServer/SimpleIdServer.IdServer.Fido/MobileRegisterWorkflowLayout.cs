@@ -30,6 +30,7 @@ public class MobileRegisterWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Register",
+                    IsMainLink = true,
                     EltCorrelationId = StandardFidoRegisterForms.mobileFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = "{}"

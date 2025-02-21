@@ -30,8 +30,19 @@
 => vérifier si le workflow fonctionne correctement sur SID						:	OK
 => pouvoir reset mdp															:	OK
 => le lien de redirection ne fonctionne pas quand on clique sur back			:	OK
+=> vérifier si l'authentification externe fonctionne encore						:	OK
 
-=> vérifier si l'authentification externe fonctionne encore						:	TODO
+=> retourner 404 dans realmmiddleware quand il n'est pas trouvé					:	OK
+=> comprendre pourquoi parfois les étapes suivantes du workflow sont effacées	:	OK
+=> corriger tous les tests unitaires											:	OK
+=> pour l'authentification externe, afficher le workflow spécifique				:	OK
+
+
+=> vérifier toutes les méthodes d'authentification
+=> vérifier si authentification avec nouveau realm fonctionne
+=> vérifier si l'on passe acr_values alors l'authentification fonctionne
+=> vérifier si l'authentification avec processus normal fonctionne 
+
 
 administrator
 adm@email.com

@@ -44,7 +44,7 @@ public static class StandardFidoAuthWorkflows
                     new RelativeUrlTransformerParameters()
 
                 }
-            });
+            }, true);
         return builder;
     }
 
@@ -68,7 +68,7 @@ public static class StandardFidoAuthWorkflows
                     new RelativeUrlTransformerParameters()
 
                 }
-            });
+            }, true);
         return builder;
     }
 }

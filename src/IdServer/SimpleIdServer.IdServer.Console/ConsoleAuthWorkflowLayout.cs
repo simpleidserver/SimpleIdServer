@@ -55,6 +55,7 @@ public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Authenticate",
+                    IsMainLink = true,
                     EltCorrelationId = StandardConsoleAuthForms.consoleAuthForm,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter

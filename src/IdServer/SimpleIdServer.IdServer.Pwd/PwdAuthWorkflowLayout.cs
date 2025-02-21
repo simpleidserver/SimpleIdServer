@@ -31,6 +31,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                     Description = "Authenticate",
                     EltCorrelationId = StandardPwdAuthForms.pwdAuthFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
+                    IsMainLink = true,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
@@ -57,7 +58,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter 
                     { 
-                        Url = "/{realm}/ExternalAuthenticate/Login?scheme={scheme}&returnUrl={returnUrl}", 
+                        Url = "/{realm}/ExternalAuthenticate/Login?scheme={scheme}&returnUrl={returnUrl}&currentLink={currentLink}", 
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters
@@ -66,7 +67,8 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                                 {
                                     new MappingRule { Source = "$.AuthenticationScheme", Target = "scheme" },
                                     new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" },
-                                    new MappingRule { Source = "$.Realm", Target = "realm" }
+                                    new MappingRule { Source = "$.Realm", Target = "realm" },
+                                    new MappingRule { Source = "$.CurrentLink", Target = "currentLink" },
                                 }
                             },
                             new RelativeUrlTransformerParameters()

@@ -38,7 +38,7 @@ public static class StandardEmailAuthWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, false)
             .AddLinkHttpRequestAction(StandardEmailAuthForms.EmailForm, Constants.EmptyStep, StandardEmailAuthForms.emailAuthForm, "Authenticate" , new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
@@ -55,7 +55,7 @@ public static class StandardEmailAuthWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            });
+            }, true);
         return builder;
     }
 }

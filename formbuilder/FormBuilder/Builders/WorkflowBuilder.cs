@@ -29,9 +29,9 @@ public class WorkflowBuilder
         return this;
     }
 
-    public WorkflowBuilder AddLink(FormRecord sourceForm, FormRecord targetForm, string eltId, string description, Action<WorkflowLink> cb = null)
+    public WorkflowBuilder AddLink(FormRecord sourceForm, FormRecord targetForm, string eltId, string description, bool isMainLink, Action<WorkflowLink> cb = null)
     {
-        _workflowLinks.Add(new WorkflowLinkBuilder(sourceForm, targetForm, eltId, description, cb));
+        _workflowLinks.Add(new WorkflowLinkBuilder(sourceForm, targetForm, eltId, description, isMainLink, cb));
         return this;
     }
 
@@ -50,7 +50,8 @@ public class WorkflowBuilder
                 },
                 SourceStepId = sourceStep.Id,
                 TargetStepId = targetStep.Id,
-                Description = link.Description
+                Description = link.Description,
+                IsMainLink = link.IsMainLink
             };
             _workflow.Links.Add(workflowLink);
             if (link.Cb != null) link.Cb(workflowLink);
@@ -61,12 +62,13 @@ public class WorkflowBuilder
 
     private record WorkflowLinkBuilder
     {
-        public WorkflowLinkBuilder(FormRecord sourceForm, FormRecord targetForm, string eltId, string description, Action<WorkflowLink> cb)
+        public WorkflowLinkBuilder(FormRecord sourceForm, FormRecord targetForm, string eltId, string description, bool isMainLink, Action<WorkflowLink> cb)
         {
             SourceForm = sourceForm;
             TargetForm = targetForm;
             EltId = eltId;
             Description = description;
+            IsMainLink = isMainLink;
             Cb = cb;
         }
 
@@ -74,6 +76,7 @@ public class WorkflowBuilder
         public FormRecord TargetForm { get; private set; }
         public string EltId { get; private set; }
         public string Description { get; private set; }
+        public bool IsMainLink { get; private set; }
         public Action<WorkflowLink> Cb { get; private set; }
     }
 }

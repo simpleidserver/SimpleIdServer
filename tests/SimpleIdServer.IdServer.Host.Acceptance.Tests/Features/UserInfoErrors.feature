@@ -50,8 +50,9 @@ Scenario: access token must be a JWT
 
 Scenario: user must exists
 	Given build access_token and sign with the key 'keyid'
-	| Key | Value   |
-	| sub | unknown |
+	| Key | Value            |
+	| sub | unknown          |
+	| iss | http://localhost |
 
 	When execute HTTP GET request 'http://localhost/userinfo'
 	| Key           | Value                 |
@@ -61,9 +62,10 @@ Scenario: user must exists
 
 Scenario: client identifier presents in the access token must be valid
 	Given build access_token and sign with the key 'keyid'
-	| Key       | Value   |
-	| sub       | user    |
-	| client_id | invalid |	
+	| Key       | Value            |
+	| sub       | user             |
+	| client_id | invalid          |	
+	| iss       | http://localhost |
 
 	When execute HTTP GET request 'http://localhost/userinfo'
 	| Key           | Value                 |
@@ -76,10 +78,11 @@ Scenario: client identifier presents in the access token must be valid
 
 Scenario: consent must be confirmed by the end-user
 	Given build access_token and sign with the key 'keyid'
-	| Key       | Value       |
-	| sub       | user        |
-	| client_id | thirdClient |	
-	| scope     | profile     |
+	| Key       | Value            |
+	| sub       | user             |
+	| client_id | thirdClient      |	
+	| scope     | profile          |
+	| iss       | http://localhost |
 
 	When execute HTTP GET request 'http://localhost/userinfo'
 	| Key           | Value                 |
@@ -105,7 +108,7 @@ Scenario: rejected access token cannot be used
 
 	And extract parameter 'code' from redirect url
 	
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key           | Value        			|
 	| client_id     | thirtySevenClient     |
 	| client_secret | password     			|
@@ -116,7 +119,7 @@ Scenario: rejected access token cannot be used
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body
 	
-	And execute HTTP POST request 'https://localhost:8080/token/revoke'
+	And execute HTTP POST request 'http://localhost/token/revoke'
 	| Key           | Value             |
 	| token         | $access_token$    |
 	| client_id     | thirtySevenClient |

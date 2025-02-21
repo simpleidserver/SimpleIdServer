@@ -56,6 +56,7 @@ public class SmsRegisterWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Register",
+                    IsMainLink = true,
                     EltCorrelationId = StandardSmsRegisterForms.smsRegisterFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter

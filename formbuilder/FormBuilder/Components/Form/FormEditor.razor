@@ -22,7 +22,6 @@
         <RadzenButton Icon="css" Text="Css" Click="@(() => SwitchPanel(FormPanelTypes.CSS))" ButtonStyle="ButtonStyle.Secondary" />
         <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
         <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
-
     </div>
     <RadzenSplitter>
         <!-- Toolbox -->

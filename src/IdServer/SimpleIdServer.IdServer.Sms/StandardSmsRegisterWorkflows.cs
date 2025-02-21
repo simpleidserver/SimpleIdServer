@@ -39,7 +39,7 @@ public static class StandardSmsRegisterWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, false)
             .AddLinkHttpRequestAction(StandardSmsRegisterForms.SmsForm, nextStep ?? Constants.EmptyStep, StandardSmsRegisterForms.smsRegisterFormId, "Register", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
@@ -56,7 +56,7 @@ public static class StandardSmsRegisterWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, true)
             .AddTransformedLinkUrlAction(StandardSmsRegisterForms.SmsForm, nextStep ?? Constants.EmptyStep, StandardSmsRegisterForms.backButtonId, "Back", "{returnUrl}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
@@ -66,7 +66,7 @@ public static class StandardSmsRegisterWorkflows
                         new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
                     }
                 }
-            });
+            }, false);
         return builder;
     }
 }

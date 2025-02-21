@@ -114,7 +114,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "grant_type",
                             "client_credentials"});
 #line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table1, "When ");
+ testRunner.When("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table1, "When ");
 #line hidden
 #line 12
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -147,14 +147,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="amrs parameter is required")]
+        [Xunit.SkippableFactAttribute(DisplayName="acr must be unique")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthenticationClassReferencesErrors")]
-        [Xunit.TraitAttribute("Description", "amrs parameter is required")]
-        public void AmrsParameterIsRequired()
+        [Xunit.TraitAttribute("Description", "acr must be unique")]
+        public void AcrMustBeUnique()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("amrs parameter is required", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("acr must be unique", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 25
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -181,7 +181,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "grant_type",
                             "client_credentials"});
 #line 26
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table3, "When ");
+ testRunner.When("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table3, "When ");
 #line hidden
 #line 33
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
@@ -197,35 +197,38 @@ this.ScenarioInitialize(scenarioInfo);
                             "Bearer $accessToken$"});
                 table4.AddRow(new string[] {
                             "name",
-                            "name"});
+                            "sid-load-01"});
+                table4.AddRow(new string[] {
+                            "amrs",
+                            "[\"pwd\"]"});
 #line 36
  testRunner.When("execute HTTP POST JSON request \'http://localhost/acrs\'", ((string)(null)), table4, "When ");
 #line hidden
-#line 41
+#line 42
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 43
+#line 44
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 44
+#line 45
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 45
- testRunner.Then("JSON \'error_description\'=\'missing parameter amrs\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 46
+ testRunner.Then("JSON \'error_description\'=\'an acr with the same name already exists\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="amr must be supported")]
+        [Xunit.SkippableFactAttribute(DisplayName="cannot remove unknown acr")]
         [Xunit.TraitAttribute("FeatureTitle", "AuthenticationClassReferencesErrors")]
-        [Xunit.TraitAttribute("Description", "amr must be supported")]
-        public void AmrMustBeSupported()
+        [Xunit.TraitAttribute("Description", "cannot remove unknown acr")]
+        public void CannotRemoveUnknownAcr()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("amr must be supported", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 47
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot remove unknown acr", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 48
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -250,13 +253,13 @@ this.ScenarioInitialize(scenarioInfo);
                 table5.AddRow(new string[] {
                             "grant_type",
                             "client_credentials"});
-#line 48
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table5, "When ");
-#line hidden
-#line 55
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 49
+ testRunner.When("execute HTTP POST request \'http://localhost/token\'", ((string)(null)), table5, "When ");
 #line hidden
 #line 56
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 57
  testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
@@ -265,166 +268,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table6.AddRow(new string[] {
                             "Authorization",
                             "Bearer $accessToken$"});
-                table6.AddRow(new string[] {
-                            "name",
-                            "name"});
-                table6.AddRow(new string[] {
-                            "amrs",
-                            "[\"name\"]"});
-#line 58
- testRunner.When("execute HTTP POST JSON request \'http://localhost/acrs\'", ((string)(null)), table6, "When ");
+#line 59
+ testRunner.When("execute HTTP DELETE request \'http://localhost/acrs/id\'", ((string)(null)), table6, "When ");
 #line hidden
-#line 64
+#line 63
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 66
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 67
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 68
- testRunner.Then("JSON \'error_description\'=\'the authentication method references name are not suppo" +
-                        "rted\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="acr must be unique")]
-        [Xunit.TraitAttribute("FeatureTitle", "AuthenticationClassReferencesErrors")]
-        [Xunit.TraitAttribute("Description", "acr must be unique")]
-        public void AcrMustBeUnique()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("acr must be unique", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 70
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table7.AddRow(new string[] {
-                            "client_id",
-                            "sixtyTwoClient"});
-                table7.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table7.AddRow(new string[] {
-                            "scope",
-                            "acrs"});
-                table7.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-#line 71
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table7, "When ");
-#line hidden
-#line 78
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 79
- testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table8.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer $accessToken$"});
-                table8.AddRow(new string[] {
-                            "name",
-                            "sid-load-01"});
-                table8.AddRow(new string[] {
-                            "amrs",
-                            "[\"pwd\"]"});
-#line 81
- testRunner.When("execute HTTP POST JSON request \'http://localhost/acrs\'", ((string)(null)), table8, "When ");
-#line hidden
-#line 87
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 89
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 90
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 91
- testRunner.Then("JSON \'error_description\'=\'an acr with the same name already exists\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="cannot remove unknown acr")]
-        [Xunit.TraitAttribute("FeatureTitle", "AuthenticationClassReferencesErrors")]
-        [Xunit.TraitAttribute("Description", "cannot remove unknown acr")]
-        public void CannotRemoveUnknownAcr()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("cannot remove unknown acr", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 93
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table9 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table9.AddRow(new string[] {
-                            "client_id",
-                            "sixtyTwoClient"});
-                table9.AddRow(new string[] {
-                            "client_secret",
-                            "password"});
-                table9.AddRow(new string[] {
-                            "scope",
-                            "acrs"});
-                table9.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-#line 94
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table9, "When ");
-#line hidden
-#line 101
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 102
- testRunner.And("extract parameter \'$.access_token\' from JSON body into \'accessToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-                TechTalk.SpecFlow.Table table10 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table10.AddRow(new string[] {
-                            "Authorization",
-                            "Bearer $accessToken$"});
-#line 104
- testRunner.When("execute HTTP DELETE request \'http://localhost/acrs/id\'", ((string)(null)), table10, "When ");
-#line hidden
-#line 108
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 110
+#line 65
  testRunner.Then("HTTP status code equals to \'404\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 111
+#line 66
  testRunner.Then("JSON \'error\'=\'unknown_acr\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 112
+#line 67
  testRunner.Then("JSON \'error_description\'=\'the acr id doesn\'t exist\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

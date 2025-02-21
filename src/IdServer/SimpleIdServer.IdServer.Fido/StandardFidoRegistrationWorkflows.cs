@@ -43,7 +43,7 @@ public static class StandardFidoRegistrationWorkflows
                         },
                         new RelativeUrlTransformerParameters()
                     }
-                })
+                }, true)
                 .AddTransformedLinkUrlAction(StandardFidoRegisterForms.WebauthnForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.webauthnBackButtonId, "Back", "{returnUrl}", new List<ITransformerParameters>
                 {
                     new RegexTransformerParameters
@@ -53,14 +53,14 @@ public static class StandardFidoRegistrationWorkflows
                             new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
                         }
                     }
-                });
+                }, false);
         return builder;
     }
 
     public static WorkflowBuilder AddMobileRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardFidoRegisterForms.MobileForm)
-            .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, "Register", new WorkflowLinkHttpRequestParameter())
+            .AddLinkHttpRequestAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileFormId, "Register", new WorkflowLinkHttpRequestParameter(), true)
             .AddTransformedLinkUrlAction(StandardFidoRegisterForms.MobileForm, nextStep ?? Constants.EmptyStep, StandardFidoRegisterForms.mobileBackButtonId, "Back", "{returnUrl}", new List<ITransformerParameters>
              {
                  new RegexTransformerParameters
@@ -70,7 +70,7 @@ public static class StandardFidoRegistrationWorkflows
                          new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
                      }
                  }
-             });
+             }, false);
         return builder;
     }
 }

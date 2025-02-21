@@ -21,7 +21,7 @@ public static class StandardVpRegistrationWorkflows
     public static WorkflowBuilder AddVpRegistration(this WorkflowBuilder builder, FormRecord? nextStep = null)
     {
         builder.AddStep(StandardVpRegisterForms.VpForm)
-            .AddLinkAction(StandardVpRegisterForms.VpForm, nextStep ?? Constants.EmptyStep, StandardVpRegisterForms.vpRegistrationFormId, "Choose VP")
+            .AddLinkAction(StandardVpRegisterForms.VpForm, nextStep ?? Constants.EmptyStep, StandardVpRegisterForms.vpRegistrationFormId, "Choose VP", false)
             .AddTransformedLinkUrlAction(StandardVpRegisterForms.VpForm, nextStep ?? Constants.EmptyStep, StandardVpRegisterForms.backBtnId, "Register", "{returnUrl}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
@@ -31,7 +31,7 @@ public static class StandardVpRegistrationWorkflows
                         new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
                     }
                 }
-            });
+            }, true);
         return builder;
     }
 }

@@ -38,7 +38,7 @@ public static class StandardPwdRegistrationWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, true)
             .AddTransformedLinkUrlAction(StandardPwdRegisterForms.PwdForm, nextStep ?? Constants.EmptyStep, StandardPwdRegisterForms.backBtnId, "Back", "{returnUrl}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
@@ -48,7 +48,7 @@ public static class StandardPwdRegistrationWorkflows
                         new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
                     }
                 }
-            });
+            }, false);
         return builder;
     }
 }

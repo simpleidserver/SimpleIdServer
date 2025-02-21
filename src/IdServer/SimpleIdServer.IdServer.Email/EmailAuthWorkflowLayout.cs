@@ -58,6 +58,7 @@ public class EmailAuthWorkflowLayout : IWorkflowLayoutService
                     Description = "Authenticate",
                     EltCorrelationId = StandardEmailAuthForms.emailAuthForm,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
+                    IsMainLink = true,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,

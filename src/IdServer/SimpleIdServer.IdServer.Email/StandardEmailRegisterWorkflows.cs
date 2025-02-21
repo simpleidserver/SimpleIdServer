@@ -39,7 +39,7 @@ public static class StandardEmailRegisterWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, false)
             .AddLinkHttpRequestAction(StandardEmailRegistrationForms.EmailForm, nextStep ?? Constants.EmptyStep, StandardEmailRegistrationForms.emailRegisterFormId, "Register", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
@@ -56,7 +56,7 @@ public static class StandardEmailRegisterWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, true)
              .AddTransformedLinkUrlAction(StandardEmailRegistrationForms.EmailForm, nextStep ?? Constants.EmptyStep, StandardEmailRegistrationForms.backButtonId, "Back", "{returnUrl}", new List<ITransformerParameters>
              {
                  new RegexTransformerParameters
@@ -66,7 +66,7 @@ public static class StandardEmailRegisterWorkflows
                          new MappingRule { Source = $"$.{nameof(IRegisterViewModel.ReturnUrl)}", Target = "returnUrl" }
                      }
                  }
-             });
+             }, false);
         return builder;
     }
 }

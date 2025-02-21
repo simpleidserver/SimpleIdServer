@@ -30,6 +30,7 @@ internal class VpRegisterWorkflowLayout : IWorkflowLayoutService
                 new WorkflowLinkLayout
                 {
                     Description = "Choose vp",
+                    IsMainLink = true,
                     EltCorrelationId = StandardVpRegisterForms.vpRegistrationFormId,
                     ActionType = WorkflowLinkAction.ActionType
                 },

@@ -43,7 +43,7 @@ public static class StandardPwdAuthWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, true)
             .AddTransformedLinkUrlAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdAuthExternalIdProviderId, "External auth", "/{realm}/ExternalAuthenticate/Login?scheme={scheme}&returnUrl={returnUrl}&currentLink={currentLink}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
@@ -57,7 +57,7 @@ public static class StandardPwdAuthWorkflows
                     }
                 },
                 new RelativeUrlTransformerParameters()
-            })
+            }, false)
             .AddTransformedLinkUrlAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdRegisterBtnId, "Register", "/{realm}/Registration?workflowName=pwd&returnUrl={returnUrl}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
@@ -70,7 +70,7 @@ public static class StandardPwdAuthWorkflows
                 },
 
                 new RelativeUrlTransformerParameters()
-            })
+            }, false)
             .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, resetStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdForgetBtnId, "Forget", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.GET,
@@ -92,7 +92,7 @@ public static class StandardPwdAuthWorkflows
                 {
                     new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
                 },
-            });
+            }, false);
         return builder;
     }
 
@@ -115,7 +115,7 @@ public static class StandardPwdAuthWorkflows
                         },
                         new RelativeUrlTransformerParameters()
                     }
-            });
+            }, true);
         return builder;
     }
 
@@ -138,7 +138,7 @@ public static class StandardPwdAuthWorkflows
                 },
                 new RelativeUrlTransformerParameters()
             }
-        })
+        }, true)
         .AddTransformedLinkUrlAction(StandardPwdAuthForms.ConfirmResetForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.confirmResetPwdBackId, "Back", "{returnUrl}", new List<ITransformerParameters>
         {
             new RegexTransformerParameters
@@ -148,7 +148,7 @@ public static class StandardPwdAuthWorkflows
                     new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" }
                 }
             }
-        });
+        }, false);
         return builder;
     }
 }

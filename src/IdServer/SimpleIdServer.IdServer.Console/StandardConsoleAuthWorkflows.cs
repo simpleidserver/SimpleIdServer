@@ -39,7 +39,7 @@ public static class StandardConsoleAuthWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, false)
             .AddLinkHttpRequestAction(StandardConsoleAuthForms.ConsoleForm, Constants.EmptyStep, StandardConsoleAuthForms.consoleAuthForm, "Authenticate", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
@@ -56,7 +56,7 @@ public static class StandardConsoleAuthWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            });
+            }, true);
         return builder;
     }
 }

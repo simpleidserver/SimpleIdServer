@@ -39,7 +39,7 @@ public static class StandardSmsAuthWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            })
+            }, false)
             .AddLinkHttpRequestAction(StandardSmsAuthForms.SmsForm, Constants.EmptyStep, StandardSmsAuthForms.smsAuthForm, "Authenticate", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.POST,
@@ -56,7 +56,7 @@ public static class StandardSmsAuthWorkflows
                     },
                     new RelativeUrlTransformerParameters()
                 }
-            });
+            }, true);
         return builder;
     }
 }

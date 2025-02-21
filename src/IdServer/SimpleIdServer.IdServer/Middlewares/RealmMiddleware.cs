@@ -2,67 +2,76 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Middlewares
+namespace SimpleIdServer.IdServer.Middlewares;
+
+public class RealmMiddleware
 {
-    public class RealmMiddleware
+    private readonly RequestDelegate _next;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly string _realmCookieName = "IdServerRealm";
+    private static List<string> _includedPathLst = new List<string>
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<RealmMiddleware> _logger;
-        private readonly IServiceProvider _serviceProvider;
+        "/signin-"
+    };
 
-        public RealmMiddleware(RequestDelegate next, ILogger<RealmMiddleware> logger, IServiceProvider serviceProvider)
-        {
-            _next = next;
-            _logger = logger;
-            _serviceProvider = serviceProvider;
-        }
+    public RealmMiddleware(RequestDelegate next, IServiceProvider serviceProvider)
+    {
+        _next = next;
+        _serviceProvider = serviceProvider;
+    }
 
-        public async Task InvokeAsync(HttpContext context, IRealmStore realmStore)
+    public async Task InvokeAsync(HttpContext context, IRealmStore realmStore)
+    {
+        realmStore.Realm = null;
+        using (var scope = _serviceProvider.CreateScope())
         {
-            realmStore.Realm = null;
-            using (var scope = _serviceProvider.CreateScope())
+            var realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
+            var routeValues = context.Request.RouteValues;
+            var realm = string.Empty;
+            var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == _realmCookieName);
+            if (routeValues.ContainsKey(Constants.Prefix))
             {
-                var realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
-                var routeValues = context.Request.RouteValues;
-                string realm = string.Empty;
-                var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == CookieRealmStore.DefaultRealmCookieName);
-                if (routeValues.ContainsKey(Constants.Prefix))
+                var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
+                if (realmCookie.Value != prefix)
                 {
-                    var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
-                    if (realmCookie.Value != prefix)
+                    var existingRealm = await realmRepository.Get(prefix, CancellationToken.None);
+                    if (existingRealm != null)
                     {
-                        var existingRealm = await realmRepository.Get(prefix, CancellationToken.None);
-                        if (existingRealm != null)
+                        realm = prefix;
+                        if (!string.IsNullOrWhiteSpace(realm))
                         {
-                            realm = prefix;
-                            if (!string.IsNullOrWhiteSpace(realm))
-                            {
-                                context.Response.Cookies.Append(
-                                    CookieRealmStore.DefaultRealmCookieName,
-                                    realm);
-                            }
+                            context.Response.Cookies.Append(
+                                _realmCookieName,
+                                realm);
                         }
                     }
-                    else realm = prefix;
+                    else if (context.Request.Path.HasValue && !_includedPathLst.Any(p => context.Request.Path.Value.StartsWith(p)))
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                        return;
+                    }
                 }
-
-                if (string.IsNullOrWhiteSpace(realm) && !realmCookie.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(realmCookie.Value))
-                    realm = realmCookie.Value;
-
-                realmStore.Realm = realm;
+                else
+                {
+                    realm = prefix;
+                }
             }
 
-            await _next.Invoke(context);
+            if (string.IsNullOrWhiteSpace(realm) && !realmCookie.Equals(default(KeyValuePair<string, string>)) && !string.IsNullOrWhiteSpace(realmCookie.Value))
+                realm = realmCookie.Value;
+
+            realmStore.Realm = realm;
         }
+
+        await _next.Invoke(context);
     }
 }
