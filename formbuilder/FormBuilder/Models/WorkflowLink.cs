@@ -35,7 +35,8 @@ public class WorkflowLink : ICloneable
             SourceStepId = SourceStepId,
             ActionType = ActionType,
             ActionParameter = ActionParameter,
-            Description = Description
+            Description = Description,
+            IsMainLink = IsMainLink
         };
     }
 

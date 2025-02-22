@@ -263,10 +263,6 @@ public class RealmsController : BaseController
         var allSteps = result.Workflows.SelectMany(w => w.Steps);
         foreach (var form in forms.Select(w => w.Clone() as FormRecord).ToList())
         {
-            var newCorrelationId = Guid.NewGuid().ToString();
-            var filteredSteps = allSteps.Where(s => s.FormRecordCorrelationId == form.CorrelationId);
-            foreach(var filteredStep in filteredSteps) filteredStep.FormRecordCorrelationId = newCorrelationId;
-            form.CorrelationId = newCorrelationId;
             form.Id = Guid.NewGuid().ToString();
             form.Status = RecordVersionStatus.Published;
             form.VersionNumber = 0;

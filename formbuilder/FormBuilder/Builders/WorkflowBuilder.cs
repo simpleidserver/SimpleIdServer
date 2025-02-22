@@ -11,7 +11,6 @@ public class WorkflowBuilder
     {
         _workflow = workflow;
         _workflowLinks = new List<WorkflowLinkBuilder>();
-        AddStep(Constants.EmptyStep);
     }
 
     public static WorkflowBuilder New(string id)
@@ -40,7 +39,21 @@ public class WorkflowBuilder
         foreach(var link in _workflowLinks)
         {
             var sourceStep = _workflow.GetStep(link.SourceForm.CorrelationId);
-            var targetStep = _workflow.GetStep(link.TargetForm.CorrelationId);
+            WorkflowStep targetStep = null;
+            if(link.TargetForm.CorrelationId == FormBuilder.Constants.EmptyStep.CorrelationId)
+            {
+                targetStep = new WorkflowStep
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    FormRecordCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId
+                };
+                _workflow.Steps.Add(targetStep);
+            }
+            else
+            {
+                targetStep = _workflow.GetStep(link.TargetForm.CorrelationId);
+            }
+
             var workflowLink = new WorkflowLink
             {
                 Id = Guid.NewGuid().ToString(),

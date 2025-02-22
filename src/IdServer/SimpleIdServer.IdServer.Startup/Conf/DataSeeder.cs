@@ -133,6 +133,7 @@ public class DataSeeder
             SeedPresentationDefinitions(dbContext);
             SeedFederationEntities(dbContext);
             SeedAcrs(dbContext);
+            SeedConfigurations(dbContext);
             MigrationService.EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
         }

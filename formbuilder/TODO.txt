@@ -18,7 +18,6 @@
 => => changer l'icône : rond vide quand éditable								:	DONE
 => => rond plein quand non éditable												:	DONE
 => => ajouter lock quand non éditable											:	DONE
-=> => 
 
 => pouvoir enregistrer un workflow dans SID										:	OK
 => lorsqu'un ACR est créé alors créer un workflow vide							:	OK
@@ -37,11 +36,25 @@
 => corriger tous les tests unitaires											:	OK
 => pour l'authentification externe, afficher le workflow spécifique				:	OK
 
+=> vérifier toutes les méthodes d'authentification								:	OK
+=> => pwd 			:	OK
+=> => email			:	OK
+=> => sms			:	OK
 
-=> vérifier toutes les méthodes d'authentification
-=> vérifier si authentification avec nouveau realm fonctionne
+=> vérifier si authentification avec nouveau realm fonctionne								:	OK
+=> vérifier si on peut afficher le workflow dans un nouveau realm							:	OK
+=> ne pas afficher toutes les auth externes	(problème car le realm n'est pas connu...)		:	OK
+=> vérifier pourquoi les propriétés ne sont pas affichées pour l'authentification externe	:	OK
+=> vérifier si l'authentification avec processus normal fonctionne 							: 	OK
+=> l'url de la démo sur le site web ne fonctionne pas										:	TODO
+=> tout tester sans realm																	:	TODO
+
+pwd-email
+sid-load-01
+sms
+
+
 => vérifier si l'on passe acr_values alors l'authentification fonctionne
-=> vérifier si l'authentification avec processus normal fonctionne 
 
 
 administrator

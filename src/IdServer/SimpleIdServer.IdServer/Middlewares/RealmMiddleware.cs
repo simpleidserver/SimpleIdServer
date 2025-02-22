@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,6 @@ public class RealmMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly IServiceProvider _serviceProvider;
-    private readonly string _realmCookieName = "IdServerRealm";
     private static List<string> _includedPathLst = new List<string>
     {
         "/signin-"
@@ -37,7 +37,7 @@ public class RealmMiddleware
             var realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
             var routeValues = context.Request.RouteValues;
             var realm = string.Empty;
-            var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == _realmCookieName);
+            var realmCookie = context.Request.Cookies.FirstOrDefault(c => c.Key == CookieRealmStore.DefaultRealmCookieName);
             if (routeValues.ContainsKey(Constants.Prefix))
             {
                 var prefix = routeValues.First(v => v.Key == Constants.Prefix).Value?.ToString();
@@ -50,7 +50,7 @@ public class RealmMiddleware
                         if (!string.IsNullOrWhiteSpace(realm))
                         {
                             context.Response.Cookies.Append(
-                                _realmCookieName,
+                                CookieRealmStore.DefaultRealmCookieName,
                                 realm);
                         }
                     }
