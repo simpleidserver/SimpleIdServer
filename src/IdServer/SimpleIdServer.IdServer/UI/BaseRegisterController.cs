@@ -153,7 +153,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
                 FormValue = tokenSet.RequestToken
             }
         };
-        viewModel.Realm = prefix;
+        viewModel.Realm = Options.UseRealm ? prefix : null;
         return result;
     }
 

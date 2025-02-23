@@ -106,6 +106,7 @@ public class AuthenticationClassReferencesController : BaseController
     {
         try
         {
+            prefix = prefix ?? Constants.DefaultRealm;
             await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
             var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
             if (acr == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
