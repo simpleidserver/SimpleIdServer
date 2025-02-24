@@ -200,24 +200,4 @@ public static class AcrReducers
     }
 
     #endregion
-
-    #region AuthenticationWorkflowLayoutsState
-
-    [ReducerMethod]
-    public static AuthenticationWorkflowLayoutsState ReduceGetAllAuthenticationWorkflowLayoutsAction(AuthenticationWorkflowLayoutsState state, GetAllAuthenticationWorkflowLayoutsAction action) => new AuthenticationWorkflowLayoutsState
-    {
-        IsLoading = true
-    };
-
-    [ReducerMethod]
-    public static AuthenticationWorkflowLayoutsState ReduceGetAllAuthenticationWorkflowLayoutsSuccessAction(AuthenticationWorkflowLayoutsState state, GetAllAuthenticationWorkflowLayoutsSuccessAction action)
-    {
-        return state with
-        {
-            IsLoading = false,
-            Values = action.WorkflowLayouts
-        };
-    }
-
-    #endregion
 }

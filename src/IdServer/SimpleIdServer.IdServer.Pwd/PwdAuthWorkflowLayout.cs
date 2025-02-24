@@ -84,7 +84,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter
                     {
-                        Url = "/{realm}/Registration?workflowName=pwd&returnUrl={returnUrl}",
+                        Url = "/{realm}/Registration?workflowName=pwd&redirectUrl={returnUrl}",
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters
@@ -92,7 +92,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                                 Rules = new ObservableCollection<MappingRule>
                                 {
                                     new MappingRule { Source = "$.Realm", Target = "realm" },
-                                    new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" }
+                                    new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
                                 }
                             },
                             new RelativeUrlTransformerParameters()
@@ -116,17 +116,13 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                             {
                                 Rules = new ObservableCollection<MappingRule>
                                 {
-                                    new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" },
+                                    new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" },
                                     new MappingRule { Source = "$.Realm", Target = "realm" }
                                 }
                             },
                             new RelativeUrlTransformerParameters()
                         },
-                        IsCustomParametersEnabled = true,
-                        Rules = new ObservableCollection<MappingRule>
-                        {
-                            new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
-                        },
+                        IsCustomParametersEnabled = true
                     })
                 }
             }

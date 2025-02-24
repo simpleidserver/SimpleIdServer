@@ -3,34 +3,33 @@
 using Fluxor;
 using SimpleIdServer.IdServer.Domains;
 
-namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
+namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+
+[FeatureState]
+public record AcrsState
 {
-    [FeatureState]
-    public record AcrsState
+    public AcrsState() { }
+
+    public AcrsState(bool isLoading, IEnumerable<AuthenticationContextClassReference> apiResources)
     {
-        public AcrsState() { }
-
-        public AcrsState(bool isLoading, IEnumerable<AuthenticationContextClassReference> apiResources)
-        {
-            Acrs = apiResources.Select(c => new SelectableAcr(c));
-            Count = apiResources.Count();
-            IsLoading = isLoading;
-        }
-
-        public IEnumerable<SelectableAcr>? Acrs { get; set; } = null;
-        public int Count { get; set; } = 0;
-        public bool IsLoading { get; set; } = false;
+        Acrs = apiResources.Select(c => new SelectableAcr(c));
+        Count = apiResources.Count();
+        IsLoading = isLoading;
     }
 
-    public class SelectableAcr
-    {
-        public SelectableAcr(AuthenticationContextClassReference acr)
-        {
-            Value = acr;
-        }
+    public IEnumerable<SelectableAcr>? Acrs { get; set; } = null;
+    public int Count { get; set; } = 0;
+    public bool IsLoading { get; set; } = false;
+}
 
-        public bool IsSelected { get; set; } = false;
-        public bool IsNew { get; set; } = false;
-        public AuthenticationContextClassReference Value { get; set; }
+public class SelectableAcr
+{
+    public SelectableAcr(AuthenticationContextClassReference acr)
+    {
+        Value = acr;
     }
+
+    public bool IsSelected { get; set; } = false;
+    public bool IsNew { get; set; } = false;
+    public AuthenticationContextClassReference Value { get; set; }
 }

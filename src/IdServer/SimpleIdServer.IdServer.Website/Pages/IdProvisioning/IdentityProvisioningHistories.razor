@@ -1,0 +1,176 @@
+﻿@using SimpleIdServer.IdServer.Api.Provisioning;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject TooltipService tooltipService
+@inject IDispatcher dispatcher
+@inject IState<UserState> userState
+@inject IState<RealmsState> realmsState
+@inject IState<UpdateUserState> updateUserState
+@inject DialogService dialogService
+@inject ContextMenuService contextMenuService
+@inject NotificationService notificationService
+
+<p class="text-muted">@Global.ExecutionHistory</p>
+
+@if(IdentityProvisioning != null)
+{
+    <RadzenDataGrid
+                AllowFiltering="false"
+                AllowColumnResize="true"
+                AllowAlternatingRows="true"
+                AllowSorting="false"
+                PageSize="30"
+                AllowPaging="false"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="false"
+                Data="@IdentityProvisioning.Processes.OrderByDescending(p => p.CreateDateTime)"
+                TItem="IdentityProvisioningProcessResult"
+                ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn Title="@Global.Workflow" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <div style="display: flex; justify-content: center">
+                            <ul class="stateDig">
+                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Id], data, true) )" class=@(data.IsExported ? "node finished" : "node active")>
+                                    <div @ref=extractedElements[data.Id] class="title">@Global.Extracted</div>
+                                </li>
+                                <li @ref=importedElements[data.Id] @onmouseenter="@( _ => ShowStep(importedElements[data.Id], data, false) )" class="@(data.IsImported ? "finished" : (data.StartImportDateTime != null ? "active" : ""))">
+                                    <div class="title">@Global.Imported</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Title="@Global.StartExport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartExportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.EndExport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndExportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.StartImport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="StartImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.EndImport" FormatString="{0:dd/M/yyyy HH:mm:ss}" Property="EndImportDateTime" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center" />
+                <RadzenDataGridColumn Title="@Global.Errors" TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        @if(data.Errors != null && data.Errors.Any())
+                        {
+                            <p>
+                            <b>@string.Format(Global.RelaunchErrors, data.Errors.Count())</b>
+                                <RadzenButton Variant="Variant.Flat" Click=@(args => RelaunchErrors(data)) Icon="refresh" ButtonStyle="ButtonStyle.Primary" />
+                                <RadzenButton Variant="Variant.Flat" Click=@(args => ViewErrors(data)) Icon="visibility" ButtonStyle="ButtonStyle.Light" />
+                            </p>                            
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="IdentityProvisioningProcessResult" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        @if(data.IsExported && data.StartImportDateTime == null)
+                        {
+                            <SidAuthorizeView Roles=@("/automaticidprovisioning/manage")>
+                                <Authorized>
+                                    <RadzenButton Click=@(args => Import(data)) Icon="launch" MouseEnter="@(args => ShowTooltip(args, Global.ImportUsersAndGroupsTooltip))" />
+                                </Authorized>
+                            </SidAuthorizeView>
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+    </RadzenDataGrid>
+}
+
+@code {
+    Dictionary<string, ElementReference?> extractedElements = new Dictionary<string, ElementReference?>();
+    Dictionary<string, ElementReference?> importedElements = new Dictionary<string, ElementReference?>();
+
+    [Parameter]
+    public IdentityProvisioningResult IdentityProvisioning { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<LaunchIdentityProvisioningImportSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.ProcessImportStarted });
+                StateHasChanged();
+            });
+            SubscribeToAction<LaunchIdentityProvisioningImportFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (IdentityProvisioning == null) return;
+        extractedElements = new Dictionary<string, ElementReference?>();
+        importedElements = new Dictionary<string, ElementReference?>();
+        if (IdentityProvisioning.Processes != null)
+        {
+            foreach (var process in IdentityProvisioning.Processes)
+            {
+                extractedElements.Add(process.Id, null);
+                importedElements.Add(process.Id, null);
+            }
+        }
+    }
+
+
+    void Import(IdentityProvisioningProcessResult process)
+    {
+        if (!process.IsExported) return;
+        var act = new LaunchIdentityProvisioningImportAction { InstanceId = IdentityProvisioning.Id, ProcessId = process.Id };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
+
+    void ShowStep(ElementReference? elementReference, IdentityProvisioningProcessResult process, bool isExtracted = true)
+    {
+        if (elementReference == null) return;
+        if (process == null) return;
+        string message = string.Empty;
+        if (isExtracted)
+        {
+            message = $"Users {process.NbExtractedUsers}, Groups {process.NbExtractedGroups}, Filtered {process.NbFilteredRepresentations}, Page {process.NbExtractedPages} / {process.TotalPageToExtract}";
+        }
+        else
+        {
+            if (process.StartImportDateTime == null) message = "Import didn't start";
+            else
+            {
+                message = $"Users {process.NbImportedUsers}, Groups {process.NbImportedGroups}, Page {process.NbImportedPages} / {process.TotalPageToImport}";
+            }
+        }
+
+        tooltipService.Open(elementReference.Value, message);
+    }
+
+    void ShowTooltip(ElementReference eltRef, string msg)
+    {
+        tooltipService.Open(eltRef, msg, null);
+    }
+
+    void RelaunchErrors(IdentityProvisioningProcessResult process)
+    {
+        var act = new RelaunchIdentityProvisioningErrorsAction
+        {
+            ExternalId = process.Id
+        };
+        dispatcher.Dispatch(act);
+    }
+
+    async Task ViewErrors(IdentityProvisioningProcessResult process)
+    {
+        var dic = new Dictionary<string, object> { { "IdentityProvisioningProcess", process } };
+        await dialogService.OpenAsync<IdentityProvisioningErrorsDialog>(Global.Errors, dic, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

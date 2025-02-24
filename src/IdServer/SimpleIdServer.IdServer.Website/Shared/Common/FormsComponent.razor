@@ -1,0 +1,62 @@
+﻿@using Fluxor.Blazor.Web.Components
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using FormBuilder.Models
+@inject NotificationService notificationService
+@inject IUrlHelper urlHelper
+@inherits FluxorComponent
+
+<RadzenDataGrid AllowFiltering="true"
+AllowColumnResize="true"
+AllowAlternatingRows="false"
+AllowSorting="true"
+PageSize="30"
+AllowPaging="true"
+PagerHorizontalAlign="HorizontalAlign.Left"
+ShowPagingSummary="true"
+IsLoading="@IsLoading"
+Count="@Count"
+Data="@Forms"
+LoadData="@LoadData"
+TItem="FormRecord"
+ColumnWidth="300px">
+    <Columns>
+        <!-- Name -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Name" Path="@(urlHelper.GetUrl($"/{EntitiesName}/forms/{data.CorrelationId}"))" />
+            </Template>
+        </RadzenDataGridColumn>
+        <!-- Update datetime -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Name" Property="UpdateDateTime" Width="80px" />
+        <!-- Version -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Version" Width="80px">
+            <Template Context="data">
+                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Variant="Variant.Outlined">@data.VersionNumber</RadzenBadge>
+            </Template>
+        </RadzenDataGridColumn>
+        <!-- Status -->
+        <RadzenDataGridColumn TItem="FormRecord" Filterable="false" Sortable="false" Title="@Global.Status" Width="80px">
+            <Template Context="data">
+                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Variant="Variant.Filled">@Enum.GetName(typeof(RecordVersionStatus), data.Status)</RadzenBadge>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public int Count { get; set; }
+    [Parameter]
+    public bool IsLoading { get; set; }
+    [Parameter]
+    public List<FormRecord> Forms { get; set; }
+    [Parameter]
+    public string EntitiesName { get; set; }
+    [Parameter]
+    public EventCallback<LoadDataArgs> Load { get; set; }
+
+
+    private Task LoadData(LoadDataArgs args)
+        => Load.InvokeAsync(args);
+}

@@ -1,0 +1,142 @@
+﻿@using SimpleIdServer.IdServer.Api.Provisioning;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IState<SearchIdentityProvisioningMappingRuleState> searchIdentityProvisioningMappingRulesState
+@inject ContextMenuService contextMenuService
+@inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
+@inject DialogService dialogService
+
+<SidAuthorizeView Roles=@($"/automaticidprovisioning/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddMappingRule())" Icon="add" Text="@Global.AddMappingRule" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                FilterMode="FilterMode.Simple"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                AllowSorting="true"
+                AllowPaging="false"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@searchIdentityProvisioningMappingRulesState.Value.IsLoading"
+                Count="@searchIdentityProvisioningMappingRulesState.Value.Count"
+                Data="@searchIdentityProvisioningMappingRulesState.Value.MappingRules"
+                RowRender="@RowRender"
+                TItem="SelectableIdentityProvisioningMappingRule"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="@Global.From" Width="80px">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.From" Path="@(urlHelper.GetUrl($"/identityprovisioning/{IdProvisioning?.Id}/mappingrules/{data.Value.Id}"))" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="@Global.To" Width="80px">
+            <Template Context="data">
+                @GetValue(data)
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
+            <Template Context="data">
+                <RadzenBadge IsPill=true Text="@Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)" BadgeStyle="BadgeStyle.Primary"></RadzenBadge>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Title="@Global.Usage" Width="80px">
+            <Template Context="data">
+                <RadzenBadge IsPill=true Text="@Enum.GetName(typeof(IdentityProvisioningMappingUsage), data.Value.Usage)" BadgeStyle="BadgeStyle.Primary"></RadzenBadge>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableIdentityProvisioningMappingRule" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <SidAuthorizeView Roles=@($"/automaticidprovisioning/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public IdentityProvisioningResult IdProvisioning { get; set; }
+    bool selectAll = false;
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new SelectAllIdentityProvisioningMappingRulesAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleChanged(bool isSelected, SelectableIdentityProvisioningMappingRule mappingRule)
+    {
+        var act = new SelectIdentityProvisioningMappingRuleAction { IsSelected = isSelected, Id = mappingRule.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableIdentityProvisioningMappingRule> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void ShowMoreContextMenu(SelectableIdentityProvisioningMappingRule idProvisioning, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
+        }, (a) =>
+    {
+    if(a.Value.Equals(1))
+    {                
+        var mappingRuleIds = searchIdentityProvisioningMappingRulesState.Value.MappingRules?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+        var act = new RemoveSelectedIdentityProvisioningMappingRulesAction { MappingRuleIds = mappingRuleIds, Id = IdProvisioning.Id };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
+    });
+    }
+
+    async void AddMappingRule()
+    {
+        await dialogService.OpenAsync<AddIdProvisioningMapperDialog>(Global.AddMappingRule, new Dictionary<string, object> { { "IdProvisioningId", IdProvisioning.Id } }, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });        
+    }
+
+    string GetValue(SelectableIdentityProvisioningMappingRule rule)
+    {
+        switch(rule.Value.MapperType)
+        {
+            case MappingRuleTypes.USERATTRIBUTE:
+                return rule.Value.TargetUserAttribute;
+            case MappingRuleTypes.USERPROPERTY:
+                return rule.Value.TargetUserProperty;
+        }
+
+        return string.Empty;
+    }
+}

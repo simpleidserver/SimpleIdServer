@@ -1,0 +1,154 @@
+﻿@page "/identityprovisioning/{id}/{action}"
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
+@using SimpleIdServer.IdServer.Website.Resources
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject NotificationService notificationService
+@inject NavigationManager navigationManager
+@inject DialogService dialogService
+@layout MainLayout
+@inject IUrlHelper urlHelper
+@inject IState<IdentityProvisioningState> identityProvisioningState
+@inject IDispatcher dispatcher
+
+<SidAuthorizeView Roles=@("/automaticidprovisioning/manage,/automaticidprovisioning/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/identityprovisioning")" Text="@Global.IdentityProvisioning" />
+            <RadzenBreadCrumbItem Text="@Global.IdentityProvisioningDetails" />
+        </RadzenBreadCrumb>
+
+        <RadzenText class="mt-3 mb-3" Text="@identityProvisioningState.Value.IdentityProvisioning?.Name" TextStyle="TextStyle.DisplayH3" />
+
+        <div>
+            <SidAuthorizeView Roles=@("/automaticidprovisioning/manage")>
+                <Authorized>
+                    <RadzenButton class="mb-1" Click="@(args => ExtractUsers())" Icon="launch" Text="@Global.Launch" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+                    <RadzenButton class="mb-1" Click="@(args => TestIdentityProvisioning())" Icon="launch" Text="@Global.TryExtractUsers" ButtonStyle="ButtonStyle.Secondary" Disabled=@isTesting Size="ButtonSize.Medium"></RadzenButton>
+                </Authorized>
+            </SidAuthorizeView>
+        </div>
+
+        <RadzenCardLoader IsLoading=@identityProvisioningState.Value.IsLoading Variant="Variant.Filled">
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.Details">
+                        <IdentityProvisioningDetails IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningDetails>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Properties">
+                        <IdentityProvisioningProperties IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningProperties>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.MappingRules">
+                        <IdentityProvisioningMappingRules IdProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningMappingRules>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Histories">
+                        <IdentityProvisioningHistories IdentityProvisioning="@identityProvisioningState.Value.IdentityProvisioning"></IdentityProvisioningHistories>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
+@code {
+    Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    {
+        { "details", 0 },
+        { "properties", 1 },
+        { "mappingrules", 2 },
+        { "histories", 3 }
+    };
+    [Parameter]
+    public string id { get; set; } = null!;
+
+    [Parameter]
+    public string? action { get; set; } = null;
+
+    bool isTesting { get; set; } = false;
+
+    int selectedIndex = 0;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<GetIdentityProvisioningFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            SubscribeToAction<TestIdentityProvisioningFailureAction>((act) =>
+            {
+                isTesting = false;
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            SubscribeToAction<LaunchIdentityProvisioningSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdentityProvisioningLaunched });
+                StateHasChanged();
+            });
+            SubscribeToAction<UpdateIdProvisioningDetailsSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.IdProvisioningDetailsUpdated });
+                StateHasChanged();
+            });
+            SubscribeToAction<RemoveSelectedIdentityProvisioningMappingRulesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdentityProvisioningMappingRulesRemoved });
+                StateHasChanged();
+            });
+            SubscribeToAction<LaunchIdentityProvisioningFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            SubscribeToAction<TestIdentityProvisioningSuccessAction>((act) =>
+            {
+                isTesting = false;
+                dialogService.OpenAsync<TestConnectionResultDialog>(Global.ExtractionResult, new Dictionary<string, object>
+                {
+                    { "ConnectionResult", act.ConnectionResult }
+                }, new DialogOptions
+                {
+                    Width = "900px",
+                    Height = "512px",
+                    Resizable = true,
+                    Draggable = true
+                });
+                StateHasChanged();
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(id)) return;
+        if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
+            selectedIndex = mappingActionNameToIndex[action];
+        dispatcher.Dispatch(new GetIdentityProvisioningAction { Id = id });
+    }
+
+    void OnChange(int index)
+    {
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/identityprovisioning/{id}/{rec.Key}"));
+    }
+
+    void ExtractUsers()
+    {
+        dispatcher.Dispatch(new LaunchIdentityProvisioningAction { Id = identityProvisioningState.Value.IdentityProvisioning.Id, Name = identityProvisioningState.Value.IdentityProvisioning.Name });
+    }
+
+    void TestIdentityProvisioning()
+    {
+        isTesting = true;
+        dispatcher.Dispatch(new TestIdentityProvisioningAction { Id = identityProvisioningState.Value.IdentityProvisioning.Id });
+    }
+}

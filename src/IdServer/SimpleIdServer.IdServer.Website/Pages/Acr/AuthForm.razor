@@ -1,0 +1,42 @@
+﻿@page "/acrs/forms/{id}"
+@using Fluxor.Blazor.Web.Components
+@using FormBuilder.Helpers
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Shared.Common
+@using SimpleIdServer.IdServer.Website.Stores.FormStore
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore
+@using FormBuilder.Components.Form
+@using FormBuilder.Components
+@using FormBuilder.Models.Layout
+@using FormBuilder.Models
+@inject IState<FormState> formState
+@inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
+@inherits FluxorComponent
+
+<SidAuthorizeView Roles=@("/acrs/manage,/acrs/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/acrs/forms")" Text="@Global.Forms" />
+            <RadzenBreadCrumbItem Text="@formState.Value.Form?.Name" />
+        </RadzenBreadCrumb>
+        <FormEditorComponent Id="@id"></FormEditorComponent>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(!string.IsNullOrWhiteSpace(id))
+        {
+            dispatcher.Dispatch(new GetAllAuthenticationWorkflowLayoutsAction());
+        }
+    }
+}

@@ -1,0 +1,164 @@
+﻿@using Fluxor.Blazor.Web.Components;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
+@using System.Security.Cryptography.X509Certificates;
+@inject IState<SearchCertificateClientsState> searchCertificateClientsState
+@inherits FluxorComponent
+@inject IDispatcher dispatcher
+@inject IJSRuntime JS
+@inject NotificationService notificationService
+@inject DialogService dialogService
+@inject ContextMenuService contextMenuService
+
+<SidAuthorizeView Roles=@("/certificateauthorities/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddCertificateClient())" Icon="add" Text="@Global.AddClientCertificate" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
+
+<RadzenDataGrid @ref="caGrid"
+                AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@searchCertificateClientsState.Value.IsLoading"
+                Count="@searchCertificateClientsState.Value.Count"
+                Data="@searchCertificateClientsState.Value.ClientCertificates"
+                RowRender="@RowRender"
+                TItem="SelectableClientCertificate"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableClientCertificate" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.Name" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.StartDatetime" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientCertificate" Property="Value.EndDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.EndDatetime" Width="80px" SortOrder="SortOrder.Descending" />
+        <RadzenDataGridColumn TItem="SelectableClientCertificate" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <SidAuthorizeView Roles=@("/certificateauthorities/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+
+@code {
+    bool selectAll = false;
+    RadzenDataGrid<SelectableClientCertificate> caGrid;
+
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.CertificateAuthority CertificateAuthority { get; set; }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<RemoveSelectedClientCertificatesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientCertificatesRemoved });
+                StateHasChanged();
+            });
+            SubscribeToAction<AddClientCertificateFailureAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableClientCertificate> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    void ToggleChanged(bool isSelected, SelectableClientCertificate ca)
+    {
+        var act = new ToggleClientCertificateSelectionAction { IsSelected = isSelected, Id = ca.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllClientCertificatesSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (CertificateAuthority == null) return;
+    }
+
+    void ShowMoreContextMenu(SelectableClientCertificate certificateAuthority, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = Global.Delete, Value = 1 },
+            new ContextMenuItem { Text = Global.Download, Value = 2 },
+            new ContextMenuItem { Text = Global.View, Value = 3 }
+        }, async (a) =>
+    {
+    if (a.Value.Equals(1))
+    {
+        var caIds = searchCertificateClientsState.Value?.ClientCertificates.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+        var act = new RemoveSelectedClientCertificatesAction { CertificateClientIds = caIds, CertificateAuthorityId = CertificateAuthority.Id };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
+
+    if (a.Value.Equals(2))
+    {
+        var memoryStream = new MemoryStream(certificateAuthority.Certificate.Export(X509ContentType.Pkcs12));
+        var fileName = $"{certificateAuthority.Value.Name}.pfx";
+        using var streamRef = new DotNetStreamReference(stream: memoryStream);
+        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
+    }
+
+    if (a.Value.Equals(3))
+    {
+        var dic = new Dictionary<string, object> { { "ClientCertificate", certificateAuthority.Value } };
+        await dialogService.OpenAsync<ViewClientCertificateDialog>(Global.ClientCertificate, dic, new DialogOptions
+                {
+                    Width = "700px",
+                    Height = "512px",
+                    Resizable = true,
+                    Draggable = true
+                });
+    }
+        });
+    }
+
+    async void AddCertificateClient()
+    {
+        var dic = new Dictionary<string, object> { { "CertificateAuthorityId", CertificateAuthority.Id } };
+        await dialogService.OpenAsync<AddClientCertificate>(Global.AddClientCertificate, dic, new DialogOptions
+            {
+                Width = "700px",
+                Height = "512px",
+                Resizable = true,
+                Draggable = true
+            });
+    }
+}

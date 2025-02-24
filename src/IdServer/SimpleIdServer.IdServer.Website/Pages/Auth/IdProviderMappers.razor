@@ -1,0 +1,139 @@
+﻿@using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.IdProviderStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject ContextMenuService contextMenuService
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject IUrlHelper urlHelper
+@inject NotificationService notificationService
+@inject IState<IdProviderMappersState> idProviderMappersState
+
+@if(IdProvider != null)
+{
+    <SidAuthorizeView Roles=@("/authentication/manage")>
+        <Authorized>
+            <RadzenButton class="mb-1" Click="@(args => AddIdProviderMapper())" Icon="add" Text="@Global.AddMapper" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+        </Authorized>
+    </SidAuthorizeView>
+
+    <RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@idProviderMappersState.Value.IsLoading"
+                Count="@idProviderMappersState.Value.Count"
+                Data="@idProviderMappersState.Value.Mappers"
+                RowRender="@RowRender"
+                TItem="SelectableAuthenticationSchemeProviderMapper"
+                ColumnWidth="300px">
+        <Columns>
+            <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+                <HeaderTemplate>
+                    <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+                </HeaderTemplate>
+                <Template Context="data">
+                    <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="@Global.Name" Width="80px">
+                <Template Context="data">
+                    <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/authentications/idproviders/{IdProvider.Name}/mappers/{data.Value.Id}"))" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
+                <Template Context="data">
+                    <RadzenBadge Text=@(Enum.GetName(typeof(MappingRuleTypes), data.Value.MapperType)) IsPill="true" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="SelectableAuthenticationSchemeProviderMapper" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
+                <Template Context="data">
+                    <SidAuthorizeView Roles=@("/authentication/manage")>
+                        <Authorized>
+                            <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                        </Authorized>
+                    </SidAuthorizeView>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>    
+}
+
+@code {
+    [Parameter]
+    public AuthenticationSchemeProviderResult IdProvider { get; set; }
+    bool selectAll = false;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<RemoveSelectedAuthenticationSchemeProviderMappersSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedIdProviderMappersRemoved });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void ShowMoreContextMenu(SelectableAuthenticationSchemeProviderMapper mapper, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
+        }, (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                var mapperIds = idProviderMappersState.Value.Mappers?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
+                var act = new RemoveSelectedAuthenticationSchemeProviderMappersAction { Name = IdProvider.Name, MapperIds = mapperIds };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+        });
+    }
+
+    void ToggleChanged(bool isSelected, SelectableAuthenticationSchemeProviderMapper mapper)
+    {
+        var act = new ToggleAuthenticationSchemeProviderMapperAction { IsSelected = isSelected, MapperId = mapper.Value.Id };
+        dispatcher.Dispatch(act);
+    }
+
+    void ToggleAll(bool isSelected)
+    {
+        var act = new ToggleAllAuthenticationSchemeProviderSelectionAction { IsSelected = isSelected };
+        dispatcher.Dispatch(act);
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableAuthenticationSchemeProviderMapper> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+
+    async void AddIdProviderMapper()
+    {
+        await dialogService.OpenAsync<AddIdProviderMapperDialog>(Global.AddMapper, new Dictionary<string, object>
+        {
+            { "IdProviderName", IdProvider.Name }
+        }, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+}

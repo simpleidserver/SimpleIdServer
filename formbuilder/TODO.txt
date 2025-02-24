@@ -1,61 +1,14 @@
-=> pouvoir mettre à jour la définition JSON du formulaire						:	DONE
-=> pouvoir publier un formulaire												:	DONE
-=> ajouter un panel de configuration pour JSON - WORKFLOW						:	DONE
-=> pouvoir mettre à jour le workflow											:	DONE
-=> pouvoir publier le workflow													:	DONE
-=> pouvoir éditer le formulaire dans l'application blazor						:	DONE
-=> pouvoir sauvegarder un formulaire dans SID									:	DONE
-=> pouvoir publier un formulaire dans SID										:	DONE
-=> pouvoir sauvegarder le style CSS d'un formulaire dans SID					:	DONE
-=> passer tous les layous														:	DONE
-=> créer tous les layouts														:	DONE
+Ajouter toutes les UIS pour registration workflows
 
-=> afficher un workflow complet pour PWD										:	DONE
-=> afficher correctement les étapes												:	DONE
-=> vérifier si le debug fonctionne encore avec changement sur EltCorrelationId	:	DONE
-=> ne pas afficher tous les autres layouts										:	DONE
-=> forcer l'étape : pwd => resetPwd => resetPwdConfirm							:	DONE
-=> => changer l'icône : rond vide quand éditable								:	DONE
-=> => rond plein quand non éditable												:	DONE
-=> => ajouter lock quand non éditable											:	DONE
+Release 5.0.2
 
-=> pouvoir enregistrer un workflow dans SID										:	OK
-=> lorsqu'un ACR est créé alors créer un workflow vide							:	OK
-=> dupliquer tous les workflows & forms quand realm est créé					:	OK
-=> pouvoir changer la langue													:	OK
-=> Le realm est NULL / vide pourquoi ???										:	OK
-=> quand on clique plusieurs fois comprendre pourquoi le formulaire est NULL dans le backend		:	OK (toujorus même problème avec AT)
-=> comprendre pourquoi l'issuer de l'access token n'est pas valide				:	OK
-=> vérifier si le workflow fonctionne correctement sur SID						:	OK
-=> pouvoir reset mdp															:	OK
-=> le lien de redirection ne fonctionne pas quand on clique sur back			:	OK
-=> vérifier si l'authentification externe fonctionne encore						:	OK
+=> télécharger docker
+=> transférer les fichiers azure
+=> déployer la version 5.0.2
 
-=> retourner 404 dans realmmiddleware quand il n'est pas trouvé					:	OK
-=> comprendre pourquoi parfois les étapes suivantes du workflow sont effacées	:	OK
-=> corriger tous les tests unitaires											:	OK
-=> pour l'authentification externe, afficher le workflow spécifique				:	OK
+=> Finir pour les workflows d'enregistrement					:	TODO
+=> => afficher le btn back quand enregistré avec pwd			:	OK
+=> => 
 
-=> vérifier toutes les méthodes d'authentification								:	OK
-=> => pwd 			:	OK
-=> => email			:	OK
-=> => sms			:	OK
-
-=> vérifier si authentification avec nouveau realm fonctionne								:	OK
-=> vérifier si on peut afficher le workflow dans un nouveau realm							:	OK
-=> ne pas afficher toutes les auth externes	(problème car le realm n'est pas connu...)		:	OK
-=> vérifier pourquoi les propriétés ne sont pas affichées pour l'authentification externe	:	OK
-=> vérifier si l'authentification avec processus normal fonctionne 							: 	OK
-=> l'url de la démo sur le site web ne fonctionne pas										:	TODO
-=> tout tester sans realm																	:	TODO
-
-pwd-email
-sid-load-01
-sms
-
-
-=> vérifier si l'on passe acr_values alors l'authentification fonctionne
-
-
-administrator
-adm@email.com
+=> Développer outil pour migrer de la version 5.0.3 vers 6.0.0	:	TODO
+=> 

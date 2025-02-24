@@ -135,7 +135,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         var records = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Registration, CancellationToken.None);
         var workflow = await WorkflowStore.Get(prefix, registrationProgress.WorkflowId, CancellationToken.None);
         var workflowFormIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
-        var filteredRecords = records.Where(r => workflowFormIds.Contains(r.Id));
+        var filteredRecords = records.Where(r => workflowFormIds.Contains(r.CorrelationId));
         var record = filteredRecords.Single(r => r.Name == Amr);
         var step = workflow.GetStep(record.CorrelationId);
         var languages = await LanguageRepository.GetAll(cancellationToken);
@@ -162,7 +162,13 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
     private string GetNextAmr(WorkflowViewModel result, TViewModel viewModel)
     {
         var nextStepId = result.GetNextStepId(viewModel);
-        var formRecord = result.FormRecords.Single(rec => rec.Id == result.Workflow.Steps.Single(r => r.Id == nextStepId).FormRecordCorrelationId);
+        var nextStep = result.Workflow.Steps.Single(r => r.Id == nextStepId);
+        if (nextStep.IsEmptyStep)
+        {
+            return FormBuilder.Constants.EmptyStep.Name;
+        }
+
+        var formRecord = result.FormRecords.Single(rec => rec.CorrelationId == nextStep.FormRecordCorrelationId);
         return formRecord.Name;
     }
 

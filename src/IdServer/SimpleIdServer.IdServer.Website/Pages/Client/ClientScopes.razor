@@ -1,0 +1,148 @@
+﻿@using SimpleIdServer.IdServer.Api.Token.Handlers;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.ClientStore;
+@using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+@using SimpleIdServer.IdServer.Website.Stores.UserStore;
+@using SimpleIdServer.IdServer.WsFederation
+@using SimpleIdServer.IdServer.WsFederation.Extensions;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject IState<ClientScopesState> clientScopesState
+@inject ContextMenuService contextMenuService
+@inject TooltipService tooltipService
+@inject NotificationService notificationService
+@inject IUrlHelper urlHelper
+
+
+<SidAuthorizeView Roles=@("/clients/manage")>
+    <Authorized>
+        <RadzenButton class="mb-1" Click="@(args => AddScope())" Icon="add" Text="@Global.AddClientScope" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Medium"></RadzenButton>
+    </Authorized>
+</SidAuthorizeView>
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@clientScopesState.Value.IsLoading"
+                Count="@clientScopesState.Value.Count"
+                Data="@clientScopesState.Value.Scopes"
+                RowRender="@RowRender"
+                TItem="SelectableClientScope"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <RadzenCheckBox @bind-Value=@selectAll Change="@(args => ToggleAll(args))" TValue="bool" />
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px" SortOrder="SortOrder.Ascending">
+            <Template Context="data">
+                <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/scopes/{data.Value.Id}/settings"))" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
+            <Template Context="data">
+                @if (data.Value.Type == ScopeTypes.IDENTITY)
+                {
+                    <RadzenBadge Text="Identity Resource" IsPill="true" />
+                }
+                else
+                {
+                    <RadzenBadge Text="API Resource" IsPill="true" />
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="SelectableClientScope" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientScope" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <SidAuthorizeView Roles=@("/clients/manage")>
+                    <Authorized>
+                        <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                    </Authorized>
+                </SidAuthorizeView>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    [Parameter]
+    public SimpleIdServer.IdServer.Domains.Client Client { get; set; }
+
+    bool selectAll;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<RemoveSelectedClientScopesSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedClientScopesRemoved });
+                StateHasChanged();
+            });
+        }
+    }
+
+    void ToggleAll(bool isChecked)
+    {
+        dispatcher.Dispatch(new ToggleAllClientScopeSelectionAction { IsSelected = isChecked });
+    }
+
+    void ToggleChanged(bool isChecked, SelectableClientScope client)
+    {
+        dispatcher.Dispatch(new ToggleClientScopeSelectionAction { ClientId = Client.ClientId, ScopeName = client.Value.Name, IsSelected = isChecked });
+    }
+
+    void RowRender(RowRenderEventArgs<SelectableClientScope> row)
+    {
+        const string className = "class";
+        if (row.Data.IsNew)
+            row.Attributes.Add(className, "new");
+        else if (row.Data.IsSelected)
+            row.Attributes.Add(className, "active");
+        else if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+    async void AddScope()
+    {
+        await dialogService.OpenAsync<AddClientScopeDialog>(Global.AddClientScope, new Dictionary<string, object>
+        {
+            { "Client", Client }
+        }, new DialogOptions
+        {
+            Width = "900px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+
+    void ShowMoreContextMenu(SelectableClientScope scope, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = Global.Delete, Value = 1 }
+        }, (a) =>
+    {
+        if (a.Value.Equals(1))
+        {
+            var scopeNames = clientScopesState.Value.Scopes.Where(s => s.IsSelected).Select(s => s.Value.Name).ToList();
+            var act = new RemoveSelectedClientScopesAction { Id = Client.Id, ScopeNames = scopeNames, ClientId = Client.ClientId };
+            dispatcher.Dispatch(act);
+            contextMenuService.Close();
+        }
+    });
+    }
+}

@@ -50,7 +50,8 @@ public class RegexTransformer : GenericTransformer<RegexTransformerParameters>
         Uri uri;
         if(Uri.TryCreate(result, UriKind.Relative, out uri))
         {
-            result = uri.OriginalString.Replace("//", "/");
+            var splitted = uri.OriginalString.Split('?');
+            result = $"{splitted.First().Replace("//", "/")}{(splitted.Length > 1 ? $"?{string.Join('?', splitted.Skip(1))}" : string.Empty)}";
         }
         else if (Uri.TryCreate(result, UriKind.Absolute, out uri))
         {

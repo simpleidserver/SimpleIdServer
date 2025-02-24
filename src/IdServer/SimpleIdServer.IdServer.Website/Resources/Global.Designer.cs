@@ -3528,6 +3528,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Forms.
+        /// </summary>
+        public static string RegistrationFormsTitle {
+            get {
+                return ResourceManager.GetString("RegistrationFormsTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Registration methods.
         /// </summary>
         public static string RegistrationMethods {

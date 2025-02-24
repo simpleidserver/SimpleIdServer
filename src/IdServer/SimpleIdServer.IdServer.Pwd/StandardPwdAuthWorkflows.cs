@@ -58,14 +58,14 @@ public static class StandardPwdAuthWorkflows
                 },
                 new RelativeUrlTransformerParameters()
             }, false)
-            .AddTransformedLinkUrlAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdRegisterBtnId, "Register", "/{realm}/Registration?workflowName=pwd&returnUrl={returnUrl}", new List<ITransformerParameters>
+            .AddTransformedLinkUrlAction(StandardPwdAuthForms.PwdForm, FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdRegisterBtnId, "Register", "/{realm}/Registration?workflowName=pwd&redirectUrl={returnUrl}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
                 {
                     Rules = new ObservableCollection<MappingRule>
                     {
                         new MappingRule { Source = "$.Realm", Target = "realm" },
-                        new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" }
+                        new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
                     }
                 },
 
@@ -81,17 +81,13 @@ public static class StandardPwdAuthWorkflows
                     {
                         Rules = new ObservableCollection<MappingRule>
                         {
-                            new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" },
+                            new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" },
                             new MappingRule { Source = "$.Realm", Target = "realm" }
                         }
                     },
                     new RelativeUrlTransformerParameters()
                 },
-                IsCustomParametersEnabled = true,
-                Rules = new ObservableCollection<MappingRule>
-                {
-                    new MappingRule { Source = "$.AuthUrl", Target = "returnUrl" }
-                },
+                IsCustomParametersEnabled = true
             }, false);
         return builder;
     }

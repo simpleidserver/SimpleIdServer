@@ -1,9 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols.Configuration;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
@@ -28,6 +31,8 @@ public class RegistrationWorkflowsController : BaseController
     private readonly IWorkflowStore _workflowStore;
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IFormStore _formStore;
+    private readonly IEnumerable<IWorkflowLayoutService> _workflowLayoutServices;
+    private readonly ILogger<RegistrationWorkflowsController> _logger;
 
     public RegistrationWorkflowsController(
         IRegistrationWorkflowRepository registrationWorkflowRepository, 
@@ -36,12 +41,16 @@ public class RegistrationWorkflowsController : BaseController
         IJwtBuilder jwtBuilder, 
         IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
         ITransactionBuilder transactionBuilder,
-        IFormStore formStore) : base(tokenRepository, jwtBuilder)
+        IFormStore formStore,
+        IEnumerable<IWorkflowLayoutService> workflowLayoutServices,
+        ILogger<RegistrationWorkflowsController> logger) : base(tokenRepository, jwtBuilder)
 	{
 		_registrationWorkflowRepository = registrationWorkflowRepository;
         _workflowStore = workflowStore;
         _transactionBuilder = transactionBuilder;
         _formStore = formStore;
+        _workflowLayoutServices = workflowLayoutServices;
+        _logger = logger;
 	}
 
 	[HttpGet]
@@ -166,6 +175,32 @@ public class RegistrationWorkflowsController : BaseController
         {
             return BuildError(ex);
         }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllWorkflowLayouts([FromRoute] string prefix, CancellationToken cancellationToken)
+    {
+        try
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
+            var result = _workflowLayoutServices.Where(w => w.Category == FormCategories.Registration).Select(w => w.Get());
+            return new OkObjectResult(result);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllForms([FromRoute] string prefix, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
+        var result = await _formStore.GetByCategory(prefix, FormCategories.Registration, cancellationToken);
+        return new OkObjectResult(result);
     }
 
     [HttpGet]

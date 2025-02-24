@@ -1,0 +1,129 @@
+﻿@page "/realm/{action}"
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
+@using SimpleIdServer.IdServer.Website.Infrastructures
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using SimpleIdServer.IdServer.Website.Stores.StatisticStore;
+@inject IOptions<IdServerWebsiteOptions> Options;
+@inject IState<RealmsState> realmsState
+@inject IState<StatisticsState> statisticsState
+@inject IDispatcher dispatcher
+@inject DialogService dialogService
+@inject IUrlHelper urlHelper
+@inject NavigationManager navigationManager
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+<style>
+    .red {
+        color: red;
+    }
+
+    .green {
+        color: green;
+    }
+</style>
+
+@if(Options.Value.IsReamEnabled)
+{
+    <div class="mb-1">
+        <SidAuthorizeView Roles="SIDS-manager/administrator" IsRealmEnabled=false>
+            <Authorized>
+                <RadzenButton Icon="add_circle" Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.AddRealm" />
+                @if (realmStore.Realm != SimpleIdServer.IdServer.Constants.DefaultRealm)
+                {
+                    <RadzenButton Class="rz-ml-1" Icon="delete" Click=@(async (args) => await DeleteCurrentRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.RemoveRealm" />
+                }
+            </Authorized>
+        </SidAuthorizeView>
+        <RadzenButton Icon="check_circle" Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.ChooseRealm" />
+    </div>    
+}
+
+<SidAuthorizeView Roles=@($"/realms/manage,/realms/view")>
+    <Authorized>
+        <RadzenCard>
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.Details">
+                        <RealmDetails></RealmDetails>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Roles">
+                        <RealmRoles></RealmRoles>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCard>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
+@code {
+    private Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    {
+        { "overview", 0 },
+        { "roles", 1 }
+    };
+
+    int selectedIndex = 0;
+
+    [Parameter]
+    public string? action { get; set; } = null;
+    [Inject] private IRealmStore realmStore { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (string.IsNullOrWhiteSpace(action)) action = "overview";
+        selectedIndex = mappingActionNameToIndex[action];
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<DeleteCurrentRealmSuccessAction>(async (act) =>
+            {
+                await dialogService.Confirm(Global.RefreshPage, Global.RealmRemoved, new ConfirmOptions { OkButtonText = Global.Yes });
+                navigationManager.NavigateTo(navigationManager.Uri, true);
+            });
+        }
+    }
+
+
+    void AddRealm()
+    {
+        navigationManager.NavigateTo(urlHelper.GetUrl("/addrealm"));
+    }
+
+    async Task DeleteCurrentRealm()
+    {
+        var confirmationResult = await dialogService.Confirm(Global.DoYouWantToDeleteRealm, Global.Delete, new ConfirmOptions { OkButtonText = Global.Yes, CancelButtonText = Global.No });
+        if (confirmationResult == null || !confirmationResult.Value) return;
+        dispatcher.Dispatch(new DeleteCurrentRealmAction());
+    }
+
+    async void ChooseRealm()
+    {
+        await dialogService.OpenAsync<SelectRealmDialog>(Global.SelectRealm, new Dictionary<string, object>
+        {
+            { "activeRealm", realmStore.Realm }
+        }, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+
+    void OnChange(int index)
+    {
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/realm/{rec.Key}"));
+    }
+}

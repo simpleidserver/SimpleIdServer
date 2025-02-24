@@ -172,4 +172,20 @@ public class RegistrationWorkflowReducers
     }
 
     #endregion
+
+    #region RegistrationFormsState
+
+    [ReducerMethod]
+    public static RegistrationFormsState ReduceGetAllRegistrationFormsAction(RegistrationFormsState state, GetAllRegistrationFormsAction action) => new(true);
+
+    [ReducerMethod]
+    public static RegistrationFormsState ReduceGetAllRegistrationFormsSuccessAction(RegistrationFormsState state, GetAllRegistrationFormsSuccessAction action)
+    {
+        return state with
+        {
+            IsLoading = false,
+            FormRecords = action.RegistrationForms
+        };
+    }
+    #endregion
 }

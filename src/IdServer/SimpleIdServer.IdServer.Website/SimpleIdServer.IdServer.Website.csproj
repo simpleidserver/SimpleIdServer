@@ -29,7 +29,7 @@
 	  </Compile>
 	</ItemGroup>
 	<ItemGroup>
-	  <Content Update="Pages\ClientAdvanced.razor">
+	  <Content Update="Pages\Client\ClientAdvanced.razor">
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	  </Content>
 	</ItemGroup>

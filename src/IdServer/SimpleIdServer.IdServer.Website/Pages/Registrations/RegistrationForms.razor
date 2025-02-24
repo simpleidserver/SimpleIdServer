@@ -1,0 +1,25 @@
+﻿@using Fluxor.Blazor.Web.Components
+@using FormBuilder.Models
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Shared.Common
+@using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore
+@inject IState<RegistrationFormsState> registrationFormsState
+@inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
+@inherits FluxorComponent
+
+<RadzenText class="mt-3 mb-3 no-margin" Text="@Global.RegistrationFormsTitle" TextStyle="TextStyle.DisplayH3" />
+
+<FormsComponent Count="@registrationFormsState.Value.Count"
+                IsLoading="@registrationFormsState.Value.IsLoading"
+                Forms="@registrationFormsState.Value.FormRecords"
+                Load="@LoadData"
+                EntitiesName="registrations" />
+
+@code {
+    private void LoadData(LoadDataArgs args)
+    {
+        var act = new GetAllRegistrationFormsAction();
+        dispatcher.Dispatch(act);
+    }
+}

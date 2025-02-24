@@ -1,0 +1,24 @@
+﻿@using Fluxor.Blazor.Web.Components
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Shared.Common
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using FormBuilder.Models
+@inject IState<AuthenticationFormsState> authenticationFormsState
+@inject IDispatcher dispatcher
+@inherits FluxorComponent
+
+<RadzenText class="mt-3 mb-3 no-margin" Text="@Global.AcrFormsTitle" TextStyle="TextStyle.DisplayH3" />
+
+<FormsComponent Count="@authenticationFormsState.Value.Count" 
+                IsLoading=@authenticationFormsState.Value.IsLoading
+                Forms="@authenticationFormsState.Value.FormRecords"
+                Load="@LoadData"
+                EntitiesName="acrs"></FormsComponent>
+
+@code {
+    private void LoadData(LoadDataArgs args)
+    {
+        var act = new GetAllAuthenticationFormsAction();
+        dispatcher.Dispatch(act);
+    }
+}

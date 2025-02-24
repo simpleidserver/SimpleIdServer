@@ -1,0 +1,81 @@
+﻿@page "/acrs/workflows/{id}"
+@using FormBuilder.Components.Workflow
+@using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore
+@using SimpleIdServer.IdServer.Website.Resources
+@using FormBuilder.Components
+@using FormBuilder.Models
+@inject IUrlHelper urlHelper
+@inject IState<AcrState> acrState
+@inject IState<WorkflowLayoutListState> workflowLayoutListState
+@inject IState<AuthenticationFormsState> authenticationFormsState
+@inject IState<WorkflowState> workflowState
+@inject IDispatcher dispatcher
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+<SidAuthorizeView Roles=@("/acrs/manage,/acrs/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl($"/acrs/workflows")" Text="@Global.AcrsTitle" />
+            <RadzenBreadCrumbItem Text="@acrState.Value.Acr?.Name" />
+        </RadzenBreadCrumb>
+
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@acrState.Value.Acr?.Name" TextStyle="TextStyle.DisplayH3" />
+
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@IsLoading>
+            @if(!IsLoading)
+            {
+                <WorkflowEditor Forms=@authenticationFormsState.Value.FormRecords 
+                    Workflow=@workflowState.Value.Value 
+                    WorkflowLayouts=@workflowLayoutListState.Value.Values
+                    Saved=@HandleSave></WorkflowEditor>
+            }
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
+@code {
+    [Parameter] public string? id { get; set; }
+    private ActionState<WorkflowRecord, bool> _saveWorkflow;
+
+    public bool IsLoading
+    {
+        get
+        {
+            return authenticationFormsState.Value.IsLoading || workflowLayoutListState.Value.IsLoading || workflowState.Value.IsLoading;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<GetAcrSuccessAction>((act) =>
+            {
+                dispatcher.Dispatch(new GetWorkflowAction { Id = act.Acr.AuthenticationWorkflow });
+            });
+            SubscribeToAction<UpdateWorkflowSuccessAction>((act) => {                
+                _saveWorkflow.Callback(true);
+                StateHasChanged();
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        dispatcher.Dispatch(new GetAcrAction { Id = id });
+        dispatcher.Dispatch(new GetAllAuthenticationWorkflowLayoutsAction());
+        dispatcher.Dispatch(new GetAllAuthenticationFormsAction());
+    }
+
+    private void HandleSave(ActionState<WorkflowRecord, bool> state)
+    {
+        _saveWorkflow = state;
+        dispatcher.Dispatch(new UpdateWorkflowAction { Id = state.Content.Id, Workflow = state.Content });
+    }
+}

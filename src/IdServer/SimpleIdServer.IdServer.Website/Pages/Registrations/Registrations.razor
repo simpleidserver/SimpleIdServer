@@ -1,0 +1,50 @@
+﻿@page "/registrations/{action}"
+@using SimpleIdServer.IdServer.Website.Resources
+@inject IUrlHelper urlHelper
+@inject NavigationManager navigationManager
+
+<SidAuthorizeView Roles=@("/manualidprovisioning/manage,/manualidprovisioning/view")>
+    <Authorized>
+        <RadzenCard>
+            <RadzenTabs Change=@OnChange @bind-SelectedIndex="selectedIndex">
+                <Tabs>
+                    <RadzenTabsItem Text="@Global.RegistrationWorkflows">
+                        <RegistrationWorkflows></RegistrationWorkflows>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="@Global.Forms">
+                        <RegistrationForms></RegistrationForms>
+                    </RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenCard>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
+@code {
+    Dictionary<string, int> mappingActionNameToIndex = new Dictionary<string, int>
+    {
+        { "workflows", 0 },
+        { "forms", 1 }
+    };
+
+    int selectedIndex = 0;
+    [Parameter]
+    public string? action { get; set; } = null;
+
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (!string.IsNullOrWhiteSpace(action) && mappingActionNameToIndex.ContainsKey(action))
+            selectedIndex = mappingActionNameToIndex[action];
+    }
+
+    void OnChange(int index)
+    {
+        var rec = mappingActionNameToIndex.Single(kvp => kvp.Value == index);
+        navigationManager.NavigateTo(urlHelper.GetUrl($"/registrations/{rec.Key}"));
+    }
+}

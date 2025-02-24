@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
+using FormBuilder.Models;
+using FormBuilder.Models.Layout;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
 using SimpleIdServer.IdServer.Helpers;
@@ -147,6 +149,44 @@ public class RegistrationWorkflowEffects
         }
     }
 
+    [EffectMethod]
+    public async Task Handle(GetAllRegistrationWorkflowLayoutsAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var httpResult = await httpClient.SendAsync(new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/workflowLayouts")
+        });
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var settings = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+        var workflowLayouts = JsonSerializer.Deserialize<List<WorkflowLayout>>(json, settings);
+        dispatcher.Dispatch(new GetAllRegistrationWorkflowLayoutsSuccessAction { WorkflowLayouts = workflowLayouts });
+    }
+
+    [EffectMethod]
+    public async Task Handle(GetAllRegistrationFormsAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var httpResult = await httpClient.SendAsync(new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri($"{baseUrl}/forms")
+        });
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var settings = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+        var forms = JsonSerializer.Deserialize<List<FormRecord>>(json, settings);
+        dispatcher.Dispatch(new GetAllRegistrationFormsSuccessAction { RegistrationForms = forms });
+
+    }
+
     private async Task<string> GetBaseUrl()
     {
         if(_options.IsReamEnabled)
@@ -241,4 +281,24 @@ public class ToggleRegistrationWorkflowAction
 public class ToggleAllRegistrationWorkflowAction
 {
     public bool IsSelected { get; set; }
+}
+
+public class GetAllRegistrationFormsAction
+{
+
+}
+
+public class GetAllRegistrationFormsSuccessAction
+{
+    public List<FormRecord> RegistrationForms { get; set; }
+}
+
+public class GetAllRegistrationWorkflowLayoutsAction
+{
+
+}
+
+public class GetAllRegistrationWorkflowLayoutsSuccessAction
+{
+    public List<WorkflowLayout> WorkflowLayouts { get; set; }
 }
