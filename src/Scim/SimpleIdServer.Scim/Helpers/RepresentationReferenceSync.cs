@@ -1,6 +1,5 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Http.HttpResults;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -11,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -31,7 +29,7 @@ namespace SimpleIdServer.Scim.Helpers
 			_scimSchemaCommandRepository = scimSchemaCommandRepository;
 		}
 
-        public async Task<List<RepresentationSyncResult>> Sync(string resourceType, SCIMRepresentation newSourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, string location, SCIMSchema schema, bool updateAllReference = false)
+        public async Task<List<RepresentationSyncResult>> Sync(string resourceType, SCIMRepresentation newSourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, string location, SCIMSchema schema, bool updateAllReference = false, bool isRepresentationRemoved = false)
         {
             var result = new RepresentationSyncResult();
             var attributeMappingLst = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(resourceType);
@@ -110,20 +108,26 @@ namespace SimpleIdServer.Scim.Helpers
                 }
 
                 // Update indirect references : GROUP => GROUP
-                /*
-                if(newIds.Any())
-                    foreach(var attributeMapping in kvp.Where(a => a.IsSelf))
+                foreach (var attributeMapping in kvp.Where(a => a.IsSelf))
+                {
+                    var sourceAttribute = schema.GetAttributeById(attributeMapping.SourceAttributeId);
+                    // Update the type.
+                    var referencedRepresentations = (await _scimRepresentationCommandRepository.FindRepresentations(newIds)).Where(r => r.ResourceType == attributeMapping.TargetResourceType);
+                    foreach (var referencedRepresentation in referencedRepresentations)
                     {
-                        var sourceAttribute = schema.GetAttributeById(attributeMapping.SourceAttributeId);
-                        var referencedRepresentations = await _scimRepresentationCommandRepository.FindRepresentations(newIds);
-                        foreach (var newId in newIds)
-                        {
-                            var referencedRepresentation = referencedRepresentations.Single(r => r.Id == newId);
-                            var attr = BuildScimRepresentationAttribute(newId, attributeMapping.TargetAttributeId, newSourceScimRepresentation, mode, newSourceScimRepresentation.ResourceType, schema);
-                            result.AddReferenceAttributes(attr);
-                            UpdateScimRepresentation(result, patchOperations, referencedRepresentation, schema, sourceAttribute);
-                        }
-                    }*/
+                        UpdateScimRepresentation(result, patchOperations, referencedRepresentation, schema, sourceAttribute);
+                    }
+
+                    // Remove the reference.
+                    if(isRepresentationRemoved)
+                    {
+                        var targetSchema = mappedSchemas.First(s => s.ResourceType == attributeMapping.TargetResourceType && s.Attributes.Any(a => a.Id == attributeMapping.SourceAttributeId));
+                        var targetAttribute = targetSchema.GetAttributeById(attributeMapping.SourceAttributeId);
+                        var targetAttributeValue = targetSchema.GetChildren(targetAttribute).Single(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
+                        var paginatedResult = await _scimRepresentationCommandRepository.FindGraphAttributes(newSourceScimRepresentation.Id, targetAttributeValue.Id);
+                        result.RemoveReferenceAttributes(paginatedResult);
+                    }
+                }
             }
 
             var syncIndirectReferences = await SyncIndirectReferences(newSourceScimRepresentation, allAdded, allRemoved, propagatedAttribute, selfReferenceAttribute, mappedSchemas, sync, updateAllReference);

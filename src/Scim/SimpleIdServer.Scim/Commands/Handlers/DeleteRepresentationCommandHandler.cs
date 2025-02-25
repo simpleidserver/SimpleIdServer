@@ -45,7 +45,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 Operation = SCIMPatchOperations.REMOVE,
                 Path = a.FullPath
             }).ToList();
-            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, pathOperations, request.Location, schema, true);
+            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, pathOperations, request.Location, schema, true, true);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
