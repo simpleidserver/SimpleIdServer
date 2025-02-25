@@ -11,4 +11,5 @@ public class UserRegistrationProgress
     public string Realm { get; set; }
     public User User { get; set; } = null;
     public string RedirectUrl { get; set; } = null;
+    public bool UpdateOneCredential { get; set; }
 }

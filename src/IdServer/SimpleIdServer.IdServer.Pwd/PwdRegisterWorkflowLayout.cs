@@ -57,6 +57,7 @@ public class PwdRegisterWorkflowLayout : IWorkflowLayoutService
                     Description = "Back",
                     EltCorrelationId = StandardPwdRegisterForms.backBtnId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
+                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter
                     {
                         Url = "{returnUrl}",

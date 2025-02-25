@@ -1,7 +1,6 @@
 ﻿using HtmlAgilityPack;
 using PuppeteerSharp;
 using System.Drawing;
-using ZXing;
 using ZXing.Windows.Compatibility;
 
 namespace SimpleIdServer.IdServer.AuthFaker;

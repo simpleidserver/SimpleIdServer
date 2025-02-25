@@ -1,9 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder;
+using FormBuilder.Builders;
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
-using MassTransit.Configuration;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
@@ -59,6 +60,11 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
     {
         user.Email = viewModel.Value;
         user.EmailVerified = true;
+    }
+
+    protected override WorkflowRecord BuildNewUpdateCredentialWorkflow()
+    {
+        return StandardEmailRegisterWorkflows.DefaultWorkflow;
     }
 
     protected override async Task<bool> IsUserExists(string value, string prefix)

@@ -106,8 +106,13 @@ public class VpRegisterController : BaseController
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            var nextAmr = await _workflowHelper.GetNextAmr(prefix, FormCategories.Registration, registrationProgress.WorkflowId, amr, cancellationToken);
-            if (WorkflowHelper.IsLastStep(nextAmr))
+            var nextAmr = !registrationProgress.UpdateOneCredential ? 
+                await _workflowHelper.GetNextAmr(prefix, FormCategories.Registration, registrationProgress.WorkflowId, amr, cancellationToken) : 
+                string.Empty;
+            if (
+                (!string.IsNullOrWhiteSpace(nextAmr) && WorkflowHelper.IsLastStep(nextAmr)) ||
+                (registrationProgress.UpdateOneCredential)
+            )
             {
                 user.Realms.Add(new Domains.RealmUser
                 {

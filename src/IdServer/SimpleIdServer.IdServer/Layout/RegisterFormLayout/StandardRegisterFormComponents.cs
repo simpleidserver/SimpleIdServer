@@ -32,11 +32,21 @@ public class StandardRegisterFormComponents
                  {
                      Condition = new LogicalParameter
                      {
-                         LeftExpression = new PresentParameter
+                         LeftExpression = new LogicalParameter
                          {
-                            Source = $"$.{nameof(OTPRegisterViewModel.Value)}"
+                             LeftExpression = new PresentParameter
+                             {
+                                Source = $"$.{nameof(OTPRegisterViewModel.Value)}"
+                             },
+                             RightExpression = new UserAuthenticatedParameter(),
+                             Operator = LogicalOperators.AND
                          },
-                         RightExpression = new UserAuthenticatedParameter(),
+                         RightExpression = new ComparisonParameter
+                         {
+                             Source = $"$.{nameof(OTPRegisterViewModel.UpdateOneCredential)}",
+                             Value = "false",
+                             Operator = ComparisonOperators.EQ
+                         },
                          Operator = LogicalOperators.AND
                      },
                      PropertyName = nameof(FormInputFieldRecord.Disabled),

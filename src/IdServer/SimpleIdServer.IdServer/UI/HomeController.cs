@@ -326,7 +326,8 @@ namespace SimpleIdServer.IdServer.UI
             {
                 RegistrationProgressId = Guid.NewGuid().ToString(),
                 Realm = prefix,
-                RedirectUrl = redirectUrl
+                RedirectUrl = redirectUrl,
+                UpdateOneCredential = true
             };
             Response.Cookies.Append(cookieName, registrationProgress.RegistrationProgressId, new CookieOptions
             {

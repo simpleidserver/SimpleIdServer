@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder;
+using FormBuilder.Builders;
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using Microsoft.AspNetCore.Antiforgery;
@@ -149,5 +151,10 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         });
         user.Name = viewModel.Login;
         if (Options.IsEmailUsedDuringAuthentication) user.Email = viewModel.Login;
+    }
+
+    protected override WorkflowRecord BuildNewUpdateCredentialWorkflow()
+    {
+        return StandardPwdRegistrationWorkflows.DefaultWorkflow;
     }
 }

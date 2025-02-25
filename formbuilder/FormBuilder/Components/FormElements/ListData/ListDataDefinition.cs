@@ -24,9 +24,9 @@ public class ListDataDefinition : GenericFormElementDefinition<ListDataRecord>
 
     protected override void ProtectedInit(ListDataRecord record, WorkflowContext context, List<IFormElementDefinition> definitions)
     {
-        if (record.RepetitionRule == null) return;
-        var link = context.Definition.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
         var inputData = context.GetCurrentStepInputData();
+        if (record.RepetitionRule == null || inputData == null) return;
+        var link = context.Definition.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
         if (!inputData.ContainsKey("LayoutCurrentLink"))
         {
             inputData.Add("LayoutCurrentLink", link.Id);

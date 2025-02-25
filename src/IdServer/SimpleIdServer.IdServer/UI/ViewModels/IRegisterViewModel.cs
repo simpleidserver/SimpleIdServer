@@ -6,4 +6,5 @@ public interface IRegisterViewModel : ISidStepViewModel
 {
     bool IsUpdated { get; set; }
     bool IsCreated { get; set; }
+    bool UpdateOneCredential { get; set; }
 }

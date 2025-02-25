@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder;
+using FormBuilder.Builders;
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using FormBuilder.UIs;
@@ -47,8 +49,9 @@ public class RegisterController : BaseRegisterController<RegisterWebauthnViewMod
     public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null, CancellationToken cancellationToken = default(CancellationToken))
     {
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
+        var newPrefix = prefix;
         if (!string.IsNullOrWhiteSpace(prefix))
-            prefix = $"{prefix}/";
+            newPrefix = $"{prefix}/";
         var isAuthenticated = User.Identity.IsAuthenticated;
         var userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
@@ -64,13 +67,18 @@ public class RegisterController : BaseRegisterController<RegisterWebauthnViewMod
         var vm = new RegisterWebauthnViewModel
         {
             Login = login,
-            BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginRegister}",
-            EndRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.EndRegister}",
+            BeginRegisterUrl = $"{issuer}/{newPrefix}{Constants.EndPoints.BeginRegister}",
+            EndRegisterUrl = $"{issuer}/{newPrefix}{Constants.EndPoints.EndRegister}",
             ReturnUrl = userRegistrationProgress?.RedirectUrl ?? redirectUrl
         };
         var result = await BuildViewModel(userRegistrationProgress, vm, prefix, cancellationToken);
         result.SetInput(vm);
         return View(result);
+    }
+
+    protected override WorkflowRecord BuildNewUpdateCredentialWorkflow()
+    {
+        return StandardFidoRegistrationWorkflows.WebauthnWorkflow;
     }
 
     protected override void EnrichUser(User user, RegisterWebauthnViewModel viewModel) { }

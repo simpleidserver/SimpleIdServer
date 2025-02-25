@@ -1,4 +1,6 @@
 ﻿using FormBuilder;
+using FormBuilder.Builders;
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using Microsoft.AspNetCore.Antiforgery;
@@ -66,13 +68,14 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             }
             else login = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            var newPrefix = prefix;
             if (!string.IsNullOrWhiteSpace(prefix))
-                prefix = $"{prefix}/";
+                newPrefix = $"{prefix}/";
             var viewModel = new RegisterMobileViewModel
             {
                 Login = login,
-                BeginRegisterUrl = $"{issuer}/{prefix}{Constants.EndPoints.BeginQRCodeRegister}",
-                RegisterStatusUrl = $"{issuer}/{prefix}{Constants.EndPoints.RegisterStatus}",
+                BeginRegisterUrl = $"{issuer}/{newPrefix}{Constants.EndPoints.BeginQRCodeRegister}",
+                RegisterStatusUrl = $"{issuer}/{newPrefix}{Constants.EndPoints.RegisterStatus}",
                 IsDeveloperModeEnabled = fidoOptions.IsDeveloperModeEnabled,
                 ReturnUrl = userRegistrationProgress?.RedirectUrl
             };
@@ -83,6 +86,11 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
 
         protected override void EnrichUser(User user, RegisterMobileViewModel viewModel)
         {
+        }
+
+        protected override WorkflowRecord BuildNewUpdateCredentialWorkflow()
+        {
+            return StandardFidoRegistrationWorkflows.MobileWorkflow;
         }
 
         private MobileOptions GetOptions()

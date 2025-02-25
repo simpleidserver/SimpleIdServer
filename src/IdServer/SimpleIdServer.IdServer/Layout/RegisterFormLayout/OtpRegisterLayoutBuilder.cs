@@ -27,6 +27,8 @@ public class OtpRegisterLayoutBuilder : RegisterLayoutBuilder
             Name = name,
             UpdateDateTime = DateTime.UtcNow,
             ActAsStep = true,
+            Category = FormCategories.Registration,
+            Realm = Constants.DefaultRealm,
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new OtpRegisterLayoutBuilder(record, valueTranslations);

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder;
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using FormBuilder.UIs;
@@ -132,8 +133,17 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
     {
         prefix = prefix ?? Constants.DefaultRealm;
         var tokenSet = Antiforgery.GetAndStoreTokens(HttpContext);
-        var records = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Registration, CancellationToken.None);
-        var workflow = await WorkflowStore.Get(prefix, registrationProgress.WorkflowId, CancellationToken.None);
+        var records = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Registration, cancellationToken);
+        WorkflowRecord workflow = null;
+        if(registrationProgress.UpdateOneCredential)
+        {
+            workflow = BuildNewUpdateCredentialWorkflow();
+        }
+        else
+        {
+            workflow = await WorkflowStore.Get(prefix, registrationProgress.WorkflowId, cancellationToken);
+        }
+
         var workflowFormIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
         var filteredRecords = records.Where(r => workflowFormIds.Contains(r.CorrelationId));
         var record = filteredRecords.Single(r => r.Name == Amr);
@@ -154,10 +164,13 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             }
         };
         viewModel.Realm = Options.UseRealm ? prefix : null;
+        viewModel.UpdateOneCredential = registrationProgress.UpdateOneCredential;
         return result;
     }
 
     protected abstract void EnrichUser(User user, TViewModel viewModel);
+
+    protected abstract WorkflowRecord BuildNewUpdateCredentialWorkflow();
 
     private string GetNextAmr(WorkflowViewModel result, TViewModel viewModel)
     {

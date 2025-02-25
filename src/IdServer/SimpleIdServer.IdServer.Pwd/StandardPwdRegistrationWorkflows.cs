@@ -39,7 +39,7 @@ public static class StandardPwdRegistrationWorkflows
                     new RelativeUrlTransformerParameters()
                 }
             }, true)
-            .AddTransformedLinkUrlAction(StandardPwdRegisterForms.PwdForm, nextStep ?? Constants.EmptyStep, StandardPwdRegisterForms.backBtnId, "Back", "{returnUrl}", new List<ITransformerParameters>
+            .AddTransformedLinkUrlAction(StandardPwdRegisterForms.PwdForm, Constants.EmptyStep, StandardPwdRegisterForms.backBtnId, "Back", "{returnUrl}", new List<ITransformerParameters>
             {
                 new RegexTransformerParameters
                 {

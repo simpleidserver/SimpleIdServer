@@ -396,6 +396,9 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("getAllRegistrationForms",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/forms",
                 defaults: new { controller = "RegistrationWorkflows", action = "GetAllForms" });
+            webApplication.SidMapControllerRoute("getRegistrationWorkflowLayoutLst",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/workflowLayouts",
+                defaults: new { controller = "RegistrationWorkflows", action = "GetAllWorkflowLayouts" });
             webApplication.SidMapControllerRoute("getRegistrationWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
                 defaults: new { controller = "RegistrationWorkflows", action = "Get" });
@@ -408,9 +411,6 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("updateRegistrationWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/{id}",
                 defaults: new { controller = "RegistrationWorkflows", action = "Update" });
-            webApplication.SidMapControllerRoute("getRegistrationWorkflowLayoutLst",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RegistrationWorkflows + "/workflowLayouts",
-                defaults: new { controller = "RegistrationWorkflows", action = "GetAllWorkflowLayouts" });
 
             webApplication.SidMapControllerRoute("getWorkflow",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Workflows + "/{id}",

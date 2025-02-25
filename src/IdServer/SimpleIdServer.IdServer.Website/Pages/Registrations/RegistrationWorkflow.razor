@@ -1,0 +1,83 @@
+﻿@page "/registrations/workflows/{id}"
+@using FormBuilder.Components.Workflow
+@using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore
+@using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore
+@using SimpleIdServer.IdServer.Website.Resources
+@using FormBuilder.Components
+@using FormBuilder.Models
+@inject IUrlHelper urlHelper
+@inject IState<RegistrationWorkflowState> registrationState
+@inject IState<WorkflowLayoutListState> workflowLayoutListState
+@inject IState<RegistrationFormsState> registrationFormsState
+@inject IState<WorkflowState> workflowState
+@inject IDispatcher dispatcher
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+<SidAuthorizeView Roles=@("/manualidprovisioning/manage,/manualidprovisioning/view")>
+    <Authorized>
+        <RadzenBreadCrumb>
+            <RadzenBreadCrumbItem Path="@urlHelper.GetUrl($"/registrations/workflows")" Text="@Global.RegistrationWorkflows" />
+            <RadzenBreadCrumbItem Text="@registrationState.Value.Value?.Name" />
+        </RadzenBreadCrumb>
+
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@registrationState.Value.Value?.Name" TextStyle="TextStyle.DisplayH3" />
+
+        <RadzenCardLoader Variant="Variant.Filled" IsLoading=@IsLoading>
+            @if (!IsLoading)
+            {
+                <WorkflowEditor Forms=@registrationFormsState.Value.FormRecords
+                                Workflow=@workflowState.Value.Value
+                                WorkflowLayouts=@workflowLayoutListState.Value.Values
+                                Saved=@HandleSave></WorkflowEditor>
+            }
+        </RadzenCardLoader>
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
+@code {
+    [Parameter] public string? id { get; set; }
+    private ActionState<WorkflowRecord, bool> _saveWorkflow;
+
+    public bool IsLoading
+    {
+        get
+        {
+            return registrationFormsState.Value.IsLoading || workflowLayoutListState.Value.IsLoading || workflowState.Value.IsLoading;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<GetRegistrationWorkflowSuccessAction>((act) =>
+            {
+                dispatcher.Dispatch(new GetWorkflowAction { Id = act.RegistrationWorkflow.WorkflowId });
+            });
+            SubscribeToAction<UpdateWorkflowSuccessAction>((act) =>
+            {
+                _saveWorkflow.Callback(true);
+                StateHasChanged();
+            });
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        dispatcher.Dispatch(new GetRegistrationWorkflowAction { Id = id });
+        dispatcher.Dispatch(new GetAllRegistrationWorkflowLayoutsAction());
+        dispatcher.Dispatch(new GetAllRegistrationFormsAction());
+    }
+
+    private void HandleSave(ActionState<WorkflowRecord, bool> state)
+    {
+        _saveWorkflow = state;
+        dispatcher.Dispatch(new UpdateWorkflowAction { Id = state.Content.Id, Workflow = state.Content });
+    }
+}

@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using FormBuilder;
+using FormBuilder.Builders;
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using Microsoft.AspNetCore.Antiforgery;
@@ -71,6 +73,11 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
     }
 
     protected override void EnrichUser(User user, VerifiablePresentationRegisterViewModel viewModel) { }
+
+    protected override WorkflowRecord BuildNewUpdateCredentialWorkflow()
+    {
+        return StandardVpRegistrationWorkflows.DefaultWorkflow;
+    }
 
     private string GetRealm(string realm) => Options.UseRealm ? $"{realm}/" : string.Empty;
 }

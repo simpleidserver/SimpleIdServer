@@ -18,4 +18,5 @@ public class RegisterMobileViewModel : IRegisterViewModel
     public string CurrentLink { get; set; }
     public bool IsCreated { get; set; }
     public string Realm { get; set; }
+    public bool UpdateOneCredential { get; set; }
 }

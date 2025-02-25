@@ -18,6 +18,7 @@ public abstract class OTPRegisterViewModel : IRegisterViewModel, IOTPViewModel
     public string WorkflowId { get; set; }
     public string CurrentLink { get; set; }
     public string Realm { get; set; }
+    public bool UpdateOneCredential { get; set; }
 
     public List<string> Validate()
     {

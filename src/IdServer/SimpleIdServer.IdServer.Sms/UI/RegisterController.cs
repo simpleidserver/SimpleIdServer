@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using FormBuilder;
+using FormBuilder.Builders;
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using MassTransit.Testing;
@@ -82,5 +84,10 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions, 
         }
 
         return await UserRepository.IsClaimExists(JwtRegisteredClaimNames.PhoneNumber, value, prefix, CancellationToken.None);
+    }
+
+    protected override WorkflowRecord BuildNewUpdateCredentialWorkflow()
+    {
+        return StandardSmsRegisterWorkflows.DefaultWorkflow;
     }
 }

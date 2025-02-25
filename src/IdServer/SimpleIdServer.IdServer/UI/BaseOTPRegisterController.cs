@@ -76,6 +76,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         }
 
         var viewModel = Activator.CreateInstance<TViewModel>();
+        await UpdateViewModel(prefix, isAuthenticated, viewModel, cancellationToken);
         var result = await BuildViewModel(registrationProgress, prefix, isAuthenticated, viewModel, cancellationToken);
         viewModel.ReturnUrl = redirectUrl;
         result.SetInput(viewModel);
@@ -210,13 +211,6 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
     protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProcess, string prefix, bool isAuthenticated, TViewModel viewModel, CancellationToken cancellationToken)
     {
         var result = await BuildViewModel(registrationProcess, viewModel, prefix, cancellationToken);
-        if (isAuthenticated)
-        {
-            var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
-            Enrich(viewModel, authenticatedUser);
-        }
-
         return result;
     }
 
@@ -234,5 +228,17 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
     {
         var section = _configuration.GetSection(typeof(TOptions).Name);
         return section.Get<TOptions>();
+    }
+
+    private async Task UpdateViewModel(string prefix, bool isAuthenticated, TViewModel viewModel, CancellationToken cancellationToken)
+    {
+        if(!isAuthenticated)
+        {
+            return;
+        }
+
+        var nameIdentifier = User.Claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        var authenticatedUser = await _userRepository.GetBySubject(nameIdentifier, prefix, cancellationToken);
+        Enrich(viewModel, authenticatedUser);
     }
 }
