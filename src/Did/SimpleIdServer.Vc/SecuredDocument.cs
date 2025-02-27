@@ -130,29 +130,44 @@ public class SecuredDocument
         if (vcCredential == null) throw new ArgumentNullException(nameof(vcCredential));
         var verificationMethod = didDocument.VerificationMethod.SingleOrDefault(m => m.Id == verificationMethodId);
         if (verificationMethod == null) throw new ArgumentException($"The verification method {verificationMethodId} doesn't exist");
-        if (asymKey == null)
-            if (verificationMethod.PrivateKeyJwk != null)
-                asymKey = new JsonWebKeySecurityKey(verificationMethod.PrivateKeyJwk);
-            else
-                asymKey = _verificationMethodEncoding.Decode(verificationMethod);
-        var signingCredentials = asymKey.BuildSigningCredentials(verificationMethod.Id);
-        var claims = new Dictionary<string, object>
+        Did.Constants.SharedLck.WaitOne();
+        try
+        {
+            if (asymKey == null)
+                if (verificationMethod.PrivateKeyJwk != null)
+                    asymKey = new JsonWebKeySecurityKey(verificationMethod.PrivateKeyJwk);
+                else
+                    asymKey = _verificationMethodEncoding.Decode(verificationMethod);
+            var signingCredentials = asymKey.BuildSigningCredentials(verificationMethod.Id);
+            var claims = new Dictionary<string, object>
         {
             { "sub", subject },
             { "jti", vcCredential.Id },
             { "vc", new W3CVerifiableCredentialJsonSerializer().SerializeToDic(vcCredential) }
         };
-        var securityTokenDescriptor = new SecurityTokenDescriptor
+            var securityTokenDescriptor = new SecurityTokenDescriptor
+            {
+                Issuer = didDocument.Id,
+                IssuedAt = DateTime.UtcNow.Date,
+                SigningCredentials = signingCredentials,
+                Claims = claims,
+                NotBefore = DateTime.UtcNow.Date
+            };
+            var handler = new JsonWebTokenHandler();
+            try
+            {
+                var result = handler.CreateToken(securityTokenDescriptor);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("Impossible to create a JWT", ex);
+            }
+        }
+        finally
         {
-            Issuer = didDocument.Id,
-            IssuedAt = DateTime.UtcNow.Date,
-            SigningCredentials = signingCredentials,
-            Claims = claims,
-            NotBefore = DateTime.UtcNow.Date
-        };
-        var handler = new JsonWebTokenHandler();
-        var result = handler.CreateToken(securityTokenDescriptor);
-        return result;
+            Did.Constants.SharedLck.Release();
+        }
     }
 
     private byte[] HashDocument(JsonObject jObj, ISignatureProof proof)

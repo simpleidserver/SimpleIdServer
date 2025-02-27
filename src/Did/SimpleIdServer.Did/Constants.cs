@@ -2,11 +2,16 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using System.Collections.Generic;
+using System.Threading;
 
 namespace SimpleIdServer.Did;
 
 public static class Constants
 {
+    // The security keys "Ed25519" and "EsSecurityKey" are overriding the default `this.CryptoProviderFactory.CustomCryptoProvider`.
+    // Therefore it is important that the following code is thread safe.
+    public static Semaphore SharedLck = new Semaphore(1, 1);
+
     public static class StandardKty
     {
         /// <summary>

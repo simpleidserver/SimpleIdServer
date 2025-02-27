@@ -284,44 +284,52 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
 
     private async Task<(Dictionary<string, string> claims, string errorMessage)> ExecutePostAuthorizationRequest(DidDocument didDocument, IAsymmetricKey privateKey, DTOs.BaseCredentialIssuer credentialIssuer, string redirectUri, string nonce, string state, string responseType, Dictionary<string, string> authzParameters, CancellationToken cancellationToken)
     {
-        var signingCredentials = privateKey.BuildSigningCredentials(didDocument.Authentication.First().ToString());
-        var handler = new JsonWebTokenHandler();
-        var securityTokenDescriptor = new SecurityTokenDescriptor
+        Constants.SharedLck.WaitOne();
+        try
         {
-            IssuedAt = DateTime.UtcNow,
-            SigningCredentials = signingCredentials
-        };
-        var claims = new Dictionary<string, object>();
-        PresentationSubmission presentationSubmission = null;
-        switch(responseType)
-        {
-            case SupportedResponseTypes.IdToken:
-                claims = BuildIdTokenClaims();
-                securityTokenDescriptor.Audience = credentialIssuer.CredentialIssuer;
-                break;
-            case SupportedResponseTypes.VpToken:
-                var r = await BuildVpTokenClaims();
-                if (!string.IsNullOrWhiteSpace(r.errorMessage)) return (null, r.errorMessage);
-                securityTokenDescriptor.Audience = credentialIssuer.GetAuthorizationServers().First();
-                claims = r.claims;
-                claims.Add("nonce", nonce);
-                claims.Add("iss", didDocument.Id);
-                claims.Add("sub", didDocument.Id);
-                presentationSubmission = r.presentationSubmission;
-                break;
-            default:
-                return (null, string.Format(Global.ResponseTypeIsNotSupported, responseType));
-        }
+            var signingCredentials = privateKey.BuildSigningCredentials(didDocument.Authentication.First().ToString());
+            var handler = new JsonWebTokenHandler();
+            var securityTokenDescriptor = new SecurityTokenDescriptor
+            {
+                IssuedAt = DateTime.UtcNow,
+                SigningCredentials = signingCredentials
+            };
+            var claims = new Dictionary<string, object>();
+            PresentationSubmission presentationSubmission = null;
+            switch (responseType)
+            {
+                case SupportedResponseTypes.IdToken:
+                    claims = BuildIdTokenClaims();
+                    securityTokenDescriptor.Audience = credentialIssuer.CredentialIssuer;
+                    break;
+                case SupportedResponseTypes.VpToken:
+                    var r = await BuildVpTokenClaims();
+                    if (!string.IsNullOrWhiteSpace(r.errorMessage)) return (null, r.errorMessage);
+                    securityTokenDescriptor.Audience = credentialIssuer.GetAuthorizationServers().First();
+                    claims = r.claims;
+                    claims.Add("nonce", nonce);
+                    claims.Add("iss", didDocument.Id);
+                    claims.Add("sub", didDocument.Id);
+                    presentationSubmission = r.presentationSubmission;
+                    break;
+                default:
+                    return (null, string.Format(Global.ResponseTypeIsNotSupported, responseType));
+            }
 
-        securityTokenDescriptor.Claims = claims;
-        var token = handler.CreateToken(securityTokenDescriptor);
-        var res = new Dictionary<string, string>();
-        if (responseType == SupportedResponseTypes.IdToken)
-            res = await _sidServerClient.PostAuthorizationRequestWithIdToken(redirectUri, token, state, cancellationToken);
-        else
-            res = await _sidServerClient.PostAuthorizationRequestWithVpToken(redirectUri, token, state, JsonSerializer.Serialize(presentationSubmission), cancellationToken);
-        if (res.ContainsKey("error_description")) return (null, res["error_description"]);
-        return (res, null);
+            securityTokenDescriptor.Claims = claims;
+            var token = handler.CreateToken(securityTokenDescriptor);
+            var res = new Dictionary<string, string>();
+            if (responseType == SupportedResponseTypes.IdToken)
+                res = await _sidServerClient.PostAuthorizationRequestWithIdToken(redirectUri, token, state, cancellationToken);
+            else
+                res = await _sidServerClient.PostAuthorizationRequestWithVpToken(redirectUri, token, state, JsonSerializer.Serialize(presentationSubmission), cancellationToken);
+            if (res.ContainsKey("error_description")) return (null, res["error_description"]);
+            return (res, null);
+        }
+        finally
+        {
+            Constants.SharedLck.Release();
+        }
 
         Dictionary<string, object> BuildIdTokenClaims()
         {
@@ -374,22 +382,30 @@ public abstract class BaseGenericVerifiableCredentialService<T> : IVerifiableCre
 
     private string BuildProofOfPossession(DidDocument didDocument, IAsymmetricKey privateKey, DTOs.BaseCredentialIssuer credentialIssuer, string cNonce)
     {
-        var signingCredentials = privateKey.BuildSigningCredentials(didDocument.Authentication.First().ToString());
-        var handler = new JsonWebTokenHandler();
-        var securityTokenDescriptor = new SecurityTokenDescriptor
+        Constants.SharedLck.WaitOne();
+        try
         {
-            IssuedAt = DateTime.UtcNow,
-            SigningCredentials = signingCredentials,
-            Audience = credentialIssuer.CredentialIssuer,
-            TokenType = "openid4vci-proof+jwt"
-        };
-        var claims = new Dictionary<string, object>
+            var signingCredentials = privateKey.BuildSigningCredentials(didDocument.Authentication.First().ToString());
+            var handler = new JsonWebTokenHandler();
+            var securityTokenDescriptor = new SecurityTokenDescriptor
+            {
+                IssuedAt = DateTime.UtcNow,
+                SigningCredentials = signingCredentials,
+                Audience = credentialIssuer.CredentialIssuer,
+                TokenType = "openid4vci-proof+jwt"
+            };
+            var claims = new Dictionary<string, object>
+            {
+                { "iss", didDocument.Id },
+                { "nonce", cNonce }
+            };
+            securityTokenDescriptor.Claims = claims;
+            return handler.CreateToken(securityTokenDescriptor);
+        }
+        finally
         {
-            { "iss", didDocument.Id },
-            { "nonce", cNonce }
-        };
-        securityTokenDescriptor.Claims = claims;
-        return handler.CreateToken(securityTokenDescriptor);
+            Constants.SharedLck.Release();
+        }
     }
 
     private static (string codeChallenge, string verifier) GeneratePkce(int size = 32)
