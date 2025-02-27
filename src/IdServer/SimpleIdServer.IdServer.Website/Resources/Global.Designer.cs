@@ -2608,6 +2608,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Is public?.
+        /// </summary>
+        public static string IsPublic {
+            get {
+                return ResourceManager.GetString("IsPublic", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Use authorization code with Proof Key for Code Exchange (PKCE).
+        /// </summary>
+        public static string IsPublicTooltip {
+            get {
+                return ResourceManager.GetString("IsPublicTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Jwe.
         /// </summary>
         public static string Jwe {

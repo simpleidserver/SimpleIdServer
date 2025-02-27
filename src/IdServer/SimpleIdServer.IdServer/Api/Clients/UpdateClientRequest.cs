@@ -43,4 +43,6 @@ public class UpdateClientRequest
     public bool RedirectToRevokeSessionUI { get; set; }
     [JsonPropertyName(OAuthClientParameters.DefaultAcrValues)]
     public ICollection<string> DefaultAcrValues { get; set; }
+    [JsonPropertyName(OAuthClientParameters.IsPublic)]
+    public bool IsPublic { get; set; }
 }

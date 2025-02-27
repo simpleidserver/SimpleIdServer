@@ -31,20 +31,20 @@ Scenario: Error is returned when code_verifier is missing
 Scenario: Error is returned when code is missing
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                   | Value              |
-	| grant_type            | client_credentials |
+	| grant_type            | authorization_code |
 	| scope                 | scope              |
 	| client_id             | nineClient         |
 	| code_verifier         | code               |
 
 	And extract JSON from body
 	Then HTTP status code equals to '400'
-	And JSON '$.error'='invalid_client'
-	And JSON '$.error_description'='bad client credential'
+	And JSON '$.error'='invalid_request'
+	And JSON '$.error_description'='missing parameter code'
 
 Scenario: Error is returned when code doesn't exist
 	When execute HTTP POST request 'https://localhost:8080/token'
 	| Key                   | Value              |
-	| grant_type            | client_credentials |
+	| grant_type            | authorization_code |
 	| scope                 | scope              |
 	| client_id             | nineClient         |
 	| code_verifier         | code               |
@@ -52,8 +52,8 @@ Scenario: Error is returned when code doesn't exist
 
 	And extract JSON from body
 	Then HTTP status code equals to '400'
-	And JSON '$.error'='invalid_client'
-	And JSON '$.error_description'='bad client credential'
+	And JSON '$.error'='invalid_grant'
+	And JSON '$.error_description'='bad authorization code'
 
 Scenario: Error is returned when code_verifier is invalid
 	Given authenticate a user

@@ -191,7 +191,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table102.AddRow(new string[] {
                             "grant_type",
-                            "client_credentials"});
+                            "authorization_code"});
                 table102.AddRow(new string[] {
                             "scope",
                             "scope"});
@@ -211,10 +211,10 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 41
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 42
- testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error_description\'=\'missing parameter code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -243,7 +243,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "Value"});
                 table103.AddRow(new string[] {
                             "grant_type",
-                            "client_credentials"});
+                            "authorization_code"});
                 table103.AddRow(new string[] {
                             "scope",
                             "scope"});
@@ -266,10 +266,10 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 55
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error\'=\'invalid_grant\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 56
- testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'$.error_description\'=\'bad authorization code\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
