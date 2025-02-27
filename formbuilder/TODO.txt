@@ -1,32 +1,7 @@
-Ajouter toutes les UIS pour registration workflows
+=> ajouter les projets de migration : OK
+=> mettre à jour le script powershell pour construire les nuget package 			: 	OK
+=> mettre à jour le script powershell pour exécuter le test unitaire formbuilder 	: 	OK
+=> mettre à jour le projet template													:	OK
 
-Release 5.0.2
-
-=> télécharger docker
-=> transférer les fichiers azure
-=> déployer la version 5.0.2
-
-=> Finir pour les workflows d'enregistrement												:	TODO
-=> => afficher le btn back quand enregistré avec pwd										:	OK
-=> => pouvoir afficher le formulaire d'enregistrement vp									:	OK
-=> => pouvoir afficher tous les workflows d'enregistrement									:	OK
-=> => pouvoir ajouter un workflow d'enregistrement											:	OK
-=> => lorsque l'on supprime un ACR ou Manual provisioning, alors supprimer le workflow 		: OK
-
-=> => essayer toutes les méthodes d'enregistrement				:
-=> => => pwd		:	OK
-=> => => email		:	OK
-=> => => mobile		:	OK
-=> => => sms		:	OK
-=> => => webauthn	:	OK
-=> => => vp			:	OK
-
-=> utiliser le site id server pour mettre à jour les différents credentials
-=> => mettre à jour le mot de passer											:	OK
-=> => redirection vers mobile ne fonctionne pas bien (webauthn & mobile)		:	OK
-=> => mettre à jour le numéro de téléphone & email, le champ doit être activé 	:	OK
-=> => email & mobile ne sont pas update											:	TODO
-=> Vérifier si le link avec google account fonctionne encore					:	TODO
-
-=> ajouter les projets pour migrer forms & workflows vers BDD	:	TODO
 => développer les scripts de migration pour passer de la version 5.0.3 vers 6.0.0	:	TODO
+=> 

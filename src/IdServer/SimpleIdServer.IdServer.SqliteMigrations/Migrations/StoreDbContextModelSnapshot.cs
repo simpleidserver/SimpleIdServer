@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
@@ -335,10 +335,9 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
-                    b.Property<string>("AuthenticationMethodReferences")
-                        .IsRequired()
+                    b.Property<string>("AuthenticationWorkflow")
                         .HasColumnType("TEXT")
-                        .HasAnnotation("Relational:JsonPropertyName", "amrs");
+                        .HasAnnotation("Relational:JsonPropertyName", "authentication_workflow");
 
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("TEXT")
@@ -355,8 +354,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("RegistrationWorkflowId")
-                        .HasColumnType("TEXT")
-                        .HasAnnotation("Relational:JsonPropertyName", "workflow_id");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("TEXT")
@@ -1773,11 +1771,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Steps")
-                        .IsRequired()
+                    b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("UpdateDateTime")
+                    b.Property<string>("WorkflowId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -1785,8 +1782,6 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.HasIndex("RealmName");
 
                     b.ToTable("RegistrationWorkflows");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "registration_workflow");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
@@ -2699,11 +2694,9 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", "RegistrationWorkflow")
+                    b.HasOne("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", null)
                         .WithMany("Acrs")
                         .HasForeignKey("RegistrationWorkflowId");
-
-                    b.Navigation("RegistrationWorkflow");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>

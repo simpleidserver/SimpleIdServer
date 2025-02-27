@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -342,10 +342,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(450)")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
-                    b.Property<string>("AuthenticationMethodReferences")
-                        .IsRequired()
+                    b.Property<string>("AuthenticationWorkflow")
                         .HasColumnType("nvarchar(max)")
-                        .HasAnnotation("Relational:JsonPropertyName", "amrs");
+                        .HasAnnotation("Relational:JsonPropertyName", "authentication_workflow");
 
                     b.Property<DateTime>("CreateDateTime")
                         .HasColumnType("datetime2")
@@ -362,8 +361,7 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("RegistrationWorkflowId")
-                        .HasColumnType("nvarchar(450)")
-                        .HasAnnotation("Relational:JsonPropertyName", "workflow_id");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2")
@@ -1790,20 +1788,17 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Steps")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("WorkflowId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("RealmName");
 
                     b.ToTable("RegistrationWorkflows");
-
-                    b.HasAnnotation("Relational:JsonPropertyName", "registration_workflow");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
@@ -2728,11 +2723,9 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", "RegistrationWorkflow")
+                    b.HasOne("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", null)
                         .WithMany("Acrs")
                         .HasForeignKey("RegistrationWorkflowId");
-
-                    b.Navigation("RegistrationWorkflow");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>

@@ -2,8 +2,7 @@
 @using SimpleIdServer.IdServer.Startup.Resources
 @using Microsoft.Extensions.Options
 @using System.Globalization
-
-@inject IOptions<SimpleIdServer.IdServer.Options.IdServerHostOptions> Options
+@model SimpleIdServer.IdServer.UI.ViewModels.ILayoutViewModel
 
 @{
     var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
@@ -58,12 +57,12 @@
                         @languagesLabel
                     </a>
                     <div class="dropdown-menu">
-                        @foreach (var uiCulture in Options.Value.SupportedUICultures)
+                        @foreach(var language in Model.Languages)
                         {
                             <form asp-controller="Home" asp-action="SwitchLanguage" asp-area="" method="post">
-                                <input type="hidden" name="culture" value="@uiCulture.Name" />
+                                <input type="hidden" name="culture" value="@language.Code" />
                                 <input type="hidden" name="returnUrl" value="@returnUrl" />
-                                <button type="submit" class="dropdown-item" href="#">@LayoutResource.ResourceManager.GetString(uiCulture.Name)</button>
+                                <button type="submit" class="dropdown-item" href="#">@language.Description</button>
                             </form>
                         }
                     </div>

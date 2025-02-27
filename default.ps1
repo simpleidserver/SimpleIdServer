@@ -274,6 +274,13 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Provisioning.Scim\SimpleIdServer.FastFed.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
+		
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder\FormBuilder.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.EF\FormBuilder.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	
 	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }
@@ -376,6 +383,14 @@ task test {
     }
 
     Push-Location -Path $base_dir\tests\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Tests
+
+    try {
+        exec { & dotnet test -c $config --no-build --no-restore }
+    } finally {
+        Pop-Location
+    }
+
+    Push-Location -Path $base_dir\formbuilder\FormBuilder.Tests
 
     try {
         exec { & dotnet test -c $config --no-build --no-restore }

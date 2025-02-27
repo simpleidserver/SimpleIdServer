@@ -1,84 +1,32 @@
-﻿@using Microsoft.Extensions.Options;
-@using SimpleIdServer.IdServer.Options;
-@using SimpleIdServer.IdServer.Startup;
-@using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.UI.ViewModels.OTPRegisterViewModel;
-@inject IOptions<IdServerHostOptions> configuration
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    ViewBag.Title = RegisterEmailResource.title;
-    Layout = "~/Views/Shared/_RegisterLayout.cshtml";
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
 }
 
-@if(!Model.IsUpdated)
-{
-    <h5>@(User.Identity.IsAuthenticated ? RegisterEmailResource.update_email : RegisterEmailResource.register_email)</h5>
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
 
-    @if (Model.IsOTPCodeSent)
-    {
-        <div class="alert alert-success">@RegisterEmailResource.otpcode_sent</div>
-    }
-
-    @if (!ViewData.ModelState.IsValid)
-    {
-        <ul class="list-group">
-            @foreach (var modelState in ViewData.ModelState.Values)
-            {
-                foreach (var error in modelState.Errors)
-                {
-                    <li class="list-group-item list-group-item-danger">@RegisterEmailResource.ResourceManager.GetString(error.ErrorMessage)</li>
-                }
-            }
-        </ul>        
-    }
-
-    <!-- Send confirmation code -->
-    <div class="mt-3">
-        @using (Html.BeginForm("Index", "Register", new { area = SimpleIdServer.IdServer.Email.Constants.AMR }, FormMethod.Post))
-        {
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
-            <input type="hidden" asp-for="RedirectUrl" />
-            <div class="form-floating mb-3">
-                <input asp-for="Value" placeholder="@RegisterEmailResource.email" id="floatingConfirmationCodeEmail" type="text" class="form-control" />
-                <label for="floatingConfirmationCodeEmail">@RegisterEmailResource.email</label>
-            </div>
-            <button type="submit" class="btn btn-primary">@RegisterEmailResource.sendconfirmationcode</button>
-        }
-    </div>
-
-    <!-- Registration form -->
-    <div class="mt-3">
-        @using (Html.BeginForm("Index", "Register", new { area = SimpleIdServer.IdServer.Email.Constants.AMR }, FormMethod.Post))
-        {
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="Action" value="REGISTER" />
-            <input type="hidden" asp-for="RedirectUrl" />
-            <input asp-for="Value" placeholder="@RegisterEmailResource.email" id="floatingEmail" type="hidden" class="form-control" />
-            <!-- Confirmation code -->
-            <div class="form-floating mb-3">
-                <input asp-for="OTPCode" placeholder="@RegisterEmailResource.confirmationcode" id="floatingConfirmationCode" type="password" class="form-control" />
-                <label for="floatingConfirmationCode">@RegisterEmailResource.confirmationcode</label>
-            </div>
-            @if (User.Identity.IsAuthenticated)
-            {
-                <button type="submit" class="btn btn-primary">@RegisterEmailResource.update</button>
-            }
-            else
-            {
-                <button type="submit" class="btn btn-primary">@RegisterEmailResource.create</button>
-            }
-        }
-    </div>
-}
-else
-{
-    if (User.Identity.IsAuthenticated)
-    {
-        <div class="alert alert-success">@RegisterEmailResource.email_is_enrolled</div>
-    }
-    else
-    {
-        <div class="alert alert-success">@RegisterEmailResource.user_is_created</div>
-    }
+@section Header {
+        <link rel="stylesheet" href="@path" />
 }

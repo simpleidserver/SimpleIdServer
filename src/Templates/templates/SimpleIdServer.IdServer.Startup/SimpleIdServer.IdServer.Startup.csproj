@@ -4,6 +4,10 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="FormBuilder.MySQLMigrations.csproj" Version="5.0.*-*" />
+	  <ProjectReference Include="FormBuilder.PostgreMigrations.csproj" Version="5.0.*-*" />
+	  <ProjectReference Include="FormBuilder.SqliteMigrations.csproj" Version="5.0.*-*" />
+	  <ProjectReference Include="FormBuilder.SqlServerMigrations.csproj" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Did.Key" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.VerifiablePresentation" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="5.0.*-*" />
@@ -27,7 +31,7 @@
 	  <PackageReference Include="SimpleIdServer.IdServer.Provisioning.SCIM" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Federation" Version="5.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Configuration" Version="5.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.Configuration.Redis" Version="5.0.*-*" />	
+	  <PackageReference Include="SimpleIdServer.Configuration.Redis" Version="5.0.*-*" />
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
@@ -168,6 +172,11 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>LayoutResource.resx</DependentUpon>
 		</Compile>
+		<Compile Update="Resources\SessionsResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>SessionsResource.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Update="Resources\AccountsResource.resx">
@@ -265,6 +274,10 @@
 		<EmbeddedResource Update="Resources\LayoutResource.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\SessionsResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>SessionsResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>

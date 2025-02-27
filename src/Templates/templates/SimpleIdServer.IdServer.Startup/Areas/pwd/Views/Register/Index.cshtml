@@ -1,67 +1,32 @@
-﻿@using Microsoft.Extensions.Options;
-@using SimpleIdServer.IdServer.Options;
-@using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.Pwd.UI.ViewModels.PwdRegisterViewModel;
-
-@inject IOptions<IdServerHostOptions> configuration
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    Layout = "~/Views/Shared/_RegisterLayout.cshtml";
-    ViewBag.Title = RegisterPwdResource.register_title;
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
 }
 
-@if(Model.IsUpdated)
-{
-    <div class="alert alert-success">@(User.Identity.IsAuthenticated ? RegisterPwdResource.pwd_updated : RegisterPwdResource.user_created)</div>
-}
-else
-{
-    <h5>@(User.Identity.IsAuthenticated ? RegisterPwdResource.update_pwd : RegisterPwdResource.register_pwd)</h5>
-    <div id="registrationContainer">
-        <ul class="list-group mb-3" id="errors">
-            @if (!ViewData.ModelState.IsValid)
-            {
-                @foreach (var modelState in ViewData.ModelState.Values)
-                {
-                    foreach (var error in modelState.Errors)
-                    {
-                        <li class="list-group-item list-group-item-danger">@RegisterPwdResource.ResourceManager.GetString(error.ErrorMessage)</li>
-                    }
-                }
-            }
-        </ul>
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
 
-        <!-- Registration form -->
-        <form id="registerMobile" method="post">
-            @Html.AntiForgeryToken()
-            <input type="hidden" asp-for="RedirectUrl" />
-            <div class="form-floating mb-3">
-                @if (User.Identity.IsAuthenticated)
-                {
-                    <input asp-for="Login" placeholder="@RegisterPwdResource.login" id="floatingLogin" type="text" class="form-control" disabled="true" />
-                }
-                else
-                {
-                    <input asp-for="Login" placeholder="@RegisterPwdResource.login" id="floatingLogin" type="text" class="form-control" />
-                }
-                <label for="floatingLogin">@RegisterPwdResource.login</label>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Password" placeholder="@RegisterPwdResource.password" id="floatingPassword" type="password" class="form-control" />
-                <label for="floatingPassword">@RegisterPwdResource.password</label>
-            </div>
-            <div class="form-floating  mb-3">
-                <input asp-for="ConfirmedPassword" placeholder="@RegisterPwdResource.confirmed_password" id="floatingConfirmedPassword" type="password" class="form-control" />
-                <label for="floatingConfirmedPassword">@RegisterPwdResource.confirmed_password</label>
-            </div>
-            @if (User.Identity.IsAuthenticated)
-            {
-                <button type="submit" class="btn btn-primary card-link">@RegisterPwdResource.update</button>
-            }
-            else
-            {
-                <button type="submit" class="btn btn-primary card-link">@RegisterPwdResource.create</button>
-            }
-        </form>
-    </div>
+@section Header {
+    <link rel="stylesheet" href="@path" />
 }

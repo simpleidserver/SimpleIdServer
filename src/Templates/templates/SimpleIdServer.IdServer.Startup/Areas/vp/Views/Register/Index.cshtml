@@ -1,84 +1,70 @@
-﻿@using Microsoft.Extensions.Options;
+﻿@using FormBuilder.Components.Workflow
+@using FormBuilder
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Fido.UI.ViewModels
 @using SimpleIdServer.IdServer.Options;
-@using SimpleIdServer.IdServer.Startup;
 @using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.VerifiablePresentation.UI.ViewModels.VerifiablePresentationRegisterViewModel;
-@inject IOptions<IdServerHostOptions> configuration
+@using System.Text.Json
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    ViewBag.Title = RegisterVpResource.title;
-    Layout = "~/Views/Shared/_RegisterLayout.cshtml";
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
+    var vm = JsonSerializer.Deserialize<SimpleIdServer.IdServer.VerifiablePresentation.UI.ViewModels.VerifiablePresentationRegisterViewModel>(Model.Input.ToString());
+    var mobileFormId = SimpleIdServer.IdServer.VerifiablePresentation.StandardVpRegisterForms.vpRegistrationFormId;
 }
 
-<div id="registrationContainer">
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
 
-    <h5>@RegisterVpResource.enroll_vp</h5>
+@section Header {
+    <link rel="stylesheet" href="@path" />
+}
 
-    <ul class="list-group mb-3" id="errors">
-    </ul>
-
-    <div class="row g-2">
-        @foreach (var verifiablePresentation in Model.VerifiablePresentations)
-        {
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">@verifiablePresentation.Name</div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            @foreach (var vcName in verifiablePresentation.VcNames)
-                            {
-                                <li class="list-group-item">@vcName</li>
-                            }
-                        </ul>
-                    </div>
-                    <div class="card-footer">
-                        <form class="vpRegister" action="#" method="post">
-                            <input type="hidden" name="id" value="@verifiablePresentation.Id" />
-                            <button type="submit" class="btn btn-primary card-link">@RegisterVpResource.register</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-
-    <!-- Qr code -->
-    <div id="qrCode" style="display: none; text-align: center;">
-        <h5>@RegisterVpResource.scan_mobileapp</h5>
-        <img src="#" style="max-width:280px;" />
-    </div>
-</div>
-
-<div style="display: none;" id="registerSuccessMessage">
-    <div class="alert alert-success">
-        @RegisterVpResource.credential_added
-    </div>
-    @if (!string.IsNullOrWhiteSpace(Model.RedirectUrl))
-    {
-        <a href="@Model.RedirectUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
-    }
-</div>
-                            
-@section SubScripts {
+@section Scripts {
     <script type="text/javascript">
-        $(document).ready(function () {
-            var getQrCodeUrl = "@Model.QrCodeUrl";
-            var statusUrl = "@Model.StatusUrl";
-            var endRegisterURL = "@Model.EndRegisterUrl";
+        let csharpReference;
+        var isInitialized = false;
+
+        var init = function () {
+            var getQrCodeUrl = "@vm.QrCodeUrl";
+            var statusUrl = "@vm.StatusUrl";
+            var endRegisterURL = "@vm.EndRegisterUrl";
+            var isCreated = "IsCreated";
+            var mId = "@mobileFormId";
 
             var displayError = function (errorJson) {
-                $("#errors").empty();
-                $("#errors").append("<li  class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
+                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
             }
 
-            var displayQRCode = function (img) {
-                $("#qrCode").css("display", "");
-                $("#qrCode img").attr("src", img);
+            var viewQrCode = function (img) {
+                $("#generateQrCodeForm").attr("style", "display: none !important");
+                $("#qrCodeContainer").css("display", "");
+                $("#qrCodeContainer img").attr("src", img);
             }
 
             var displaySuccessMessage = function () {
-                $("#registerSuccessMessage").css('display', '');
-                $("#registrationContainer").css('display', 'none');
+                csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
+                csharpReference.invokeMethodAsync("ClearErrorMessages");
+                csharpReference.invokeMethodAsync("SetInputData", isCreated, "true");
+                $("#generateQrCodeForm").attr("style", "display: none !important");
+                $("#qrCodeContainer").attr("style", "display: none !important");
             }
 
             async function register(state) {
@@ -130,16 +116,32 @@
                 const state = response.headers.get('state');
                 const blob = await response.blob();
                 const img = URL.createObjectURL(blob);
-                displayQRCode(img, qrCode);
+                viewQrCode(img);
                 await checkStatus(state);
             }
 
-            $(".vpRegister").submit(function (evt) {
-                evt.preventDefault();
-                var id = $(evt.target)
-                    .serializeArray()[0].value;
-                displayQrCode(id);
-            });
-        });
+            var tryListenForm = function () {
+                const elt = $(".vpRegister");
+                if (isInitialized === true) return;
+                if (elt.length === 0) {
+                    setTimeout(() => tryListenForm(), 500);
+                    return;
+                }
+
+                isInitialized = true;
+                elt.submit(function (e) {
+                    e.preventDefault();
+                    var id = $(e.target).serializeArray()[0].value;
+                    displayQrCode(id);
+                });
+            }
+
+            tryListenForm();
+        }
+
+        setCsharpReference = function (ref) {
+            csharpReference = ref;
+            init();
+        };
     </script>
 }

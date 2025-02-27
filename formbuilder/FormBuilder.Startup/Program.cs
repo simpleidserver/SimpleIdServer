@@ -1,6 +1,4 @@
-using FormBuilder.EF;
 using FormBuilder.Startup.Config;
-using FormBuilder.Startup.Workflows;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +24,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-SeedData(app);
+DataSeeder.SeedData(app);
 app.Use(async (context, next) =>
 {
     var cookie = context.Request.Headers;
@@ -47,29 +45,3 @@ app.UseEndpoints(edps =>
 });
 
 app.Run();
-
-void SeedData(WebApplication application)
-{
-    using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
-    {
-        using (var dbContext = scope.ServiceProvider.GetService<FormBuilderDbContext>())
-        {
-            var content = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "form.css"));
-            var allForms = AllForms.GetAllForms();
-            foreach (var form in allForms)
-            {
-                form.AvailableStyles.Add(new FormBuilder.Models.FormStyle
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Content = content,
-                    IsActive = true
-                });
-            }
-
-            dbContext.Forms.AddRange(allForms);
-            dbContext.Workflows.Add(AuthWorkflows.SampleWorkflow);
-            dbContext.Workflows.Add(AuthWorkflows.AuthWorkflow);
-            dbContext.SaveChanges();
-        }
-    }
-}

@@ -5,7 +5,10 @@
 		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\formbuilder\FormBuilder.EF\FormBuilder.EF.csproj" />
+	  <ProjectReference Include="..\..\..\formbuilder\FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj" />
+	  <ProjectReference Include="..\..\..\formbuilder\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj" />
+	  <ProjectReference Include="..\..\..\formbuilder\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj" />
+	  <ProjectReference Include="..\..\..\formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj" />
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />

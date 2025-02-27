@@ -11,6 +11,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.Tests", "FormBu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.EF", "FormBuilder.EF\FormBuilder.EF.csproj", "{F7262589-9F63-4518-8367-A41406991159}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.SqlServerMigrations", "FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj", "{349A7CD5-422A-DE7E-5EFB-5D2215F33C1B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Migrations", "01. Migrations", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.SqliteMigrations", "FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj", "{09E612F1-2510-804B-831F-051AAB5D1706}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.MySQLMigrations", "FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj", "{C98BFCAE-A7C6-3E05-CE9F-6BA233EC4669}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.PostgreMigrations", "FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj", "{E3423A3E-4F07-10D7-98F4-90966BB91621}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,9 +43,31 @@ Global
 		{F7262589-9F63-4518-8367-A41406991159}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F7262589-9F63-4518-8367-A41406991159}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F7262589-9F63-4518-8367-A41406991159}.Release|Any CPU.Build.0 = Release|Any CPU
+		{349A7CD5-422A-DE7E-5EFB-5D2215F33C1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{349A7CD5-422A-DE7E-5EFB-5D2215F33C1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{349A7CD5-422A-DE7E-5EFB-5D2215F33C1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{349A7CD5-422A-DE7E-5EFB-5D2215F33C1B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09E612F1-2510-804B-831F-051AAB5D1706}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09E612F1-2510-804B-831F-051AAB5D1706}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09E612F1-2510-804B-831F-051AAB5D1706}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09E612F1-2510-804B-831F-051AAB5D1706}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C98BFCAE-A7C6-3E05-CE9F-6BA233EC4669}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C98BFCAE-A7C6-3E05-CE9F-6BA233EC4669}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C98BFCAE-A7C6-3E05-CE9F-6BA233EC4669}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C98BFCAE-A7C6-3E05-CE9F-6BA233EC4669}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3423A3E-4F07-10D7-98F4-90966BB91621}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3423A3E-4F07-10D7-98F4-90966BB91621}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3423A3E-4F07-10D7-98F4-90966BB91621}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3423A3E-4F07-10D7-98F4-90966BB91621}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{349A7CD5-422A-DE7E-5EFB-5D2215F33C1B} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{09E612F1-2510-804B-831F-051AAB5D1706} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{C98BFCAE-A7C6-3E05-CE9F-6BA233EC4669} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{E3423A3E-4F07-10D7-98F4-90966BB91621} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {239744AB-F267-414E-A21C-6B2AE70C21B8}

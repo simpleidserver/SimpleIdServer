@@ -8,9 +8,17 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
 		<PackageReference Include="Radzen.Blazor" Version="5.6.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\FormBuilder.EF\FormBuilder.EF.csproj" />
+	  <ProjectReference Include="..\FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj" />
+	  <ProjectReference Include="..\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj" />
+	  <ProjectReference Include="..\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj" />
+	  <ProjectReference Include="..\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj" />
 	  <ProjectReference Include="..\FormBuilder\FormBuilder.csproj" />
 	</ItemGroup>
 	<ItemGroup>

@@ -1,86 +1,68 @@
-﻿@using Microsoft.Extensions.Options;
+﻿@using FormBuilder.Components.Workflow
+@using FormBuilder
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Fido.UI.ViewModels
 @using SimpleIdServer.IdServer.Options;
 @using SimpleIdServer.IdServer.Startup.Resources;
-@model SimpleIdServer.IdServer.Fido.UI.ViewModels.RegisterWebauthnViewModel
-
-@inject IOptions<IdServerHostOptions> configuration
+@using System.Text.Json
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    Layout = "~/Views/Shared/_RegisterLayout.cshtml";
-    ViewBag.Title = AuthenticateWebauthnResource.register_title;
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
+    var vm = JsonSerializer.Deserialize<RegisterWebauthnViewModel>(Model.Input.ToString());
 }
 
-<h5>@(User.Identity.IsAuthenticated ? AuthenticateWebauthnResource.update_webauthn : AuthenticateWebauthnResource.register_webauthn)</h5>
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
 
-<div id="registrationContainer">
-    <ul class="list-group mb-3" id="errors">
-        @foreach (var modelState in ViewData.ModelState.Values)
-        {
-            foreach (var error in modelState.Errors)
-            {
-                <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
-            }
-        }
-    </ul>
+@section Header {
+    <link rel="stylesheet" href="@path" />
+}
 
-    <!-- Registration form -->
-    <form id="registerWebauthn">
-        <div class="form-floating mb-3">
-            @if(!string.IsNullOrWhiteSpace(Model.Login))
-            {
-                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" disabled="true" />
-            }
-            else
-            {
-                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" />
-            }
-            <label for="floatingLogin">@AuthenticateWebauthnResource.login</label>
-        </div>
-        <div class="form-floating mb-3">
-            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" id="floatingDisplayName" type="text" class="form-control" />
-            <label for="floatingDisplayName">@AuthenticateWebauthnResource.display_name</label>
-        </div>
-        <button type="submit" class="btn btn-primary card-link">@AuthenticateWebauthnResource.register</button>
-    </form>
-</div>
-
-<div style="display: none;" id="registerSuccessMessage">
-    <div class="alert alert-success">
-        @AuthenticateWebauthnResource.credential_added
-    </div>
-    @if(!string.IsNullOrWhiteSpace(Model.RedirectUrl))
-    {
-        <a href="@Model.RedirectUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
-    }
-</div>
-
-@section SubScripts {
+@section Scripts {
     <script type="text/javascript">
-        $(document).ready(function() {
-            var beginRegisterUrl = "@Model.BeginRegisterUrl";
-            var endRegisterUrl = "@Model.EndRegisterUrl";
-            var redirectUrl = "@Model.RedirectUrl";
+        let csharpReference;
 
-            var toggleBtn = function(isDisabled) {
-                $("#registerWebauthn button[type='submit']").attr('disabled', isDisabled);
-            }
+        var init = function () {
+            var beginRegisterUrl = "@vm.BeginRegisterUrl";
+            var endRegisterUrl = "@vm.EndRegisterUrl";
+            var redirectUrl = "@vm.ReturnUrl";
+            var isCreated = "IsCreated";
+            var isInitialized = false;
 
-            var displayError = function(errorJson) {
-                console.error(errorJson);
-                $("#errors").empty();
-                $("#errors").append("<li class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
+            var displayError = function (errorJson) {
+                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
             }
 
             var displaySuccessMessage = function () {
-                $("#registerSuccessMessage").css('display', '');
-                $("#registrationContainer").css('display', 'none');
+                csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
+                csharpReference.invokeMethodAsync("ClearErrorMessages");
+                csharpReference.invokeMethodAsync("SetInputData", isCreated, "true");
+                $("#webauthForm").hide();
             }
 
             async function registerCredential(newCredential, sessionId, login, nextRegistrationRedirectUrl) {
                 let attestationObject = new Uint8Array(newCredential.response.attestationObject);
                 let clientDataJSON = new Uint8Array(newCredential.response.clientDataJSON);
                 let rawId = new Uint8Array(newCredential.rawId);
-                const serializedAuthenticatorAttestationRawResponse = {                    
+                const serializedAuthenticatorAttestationRawResponse = {
                     id: newCredential.id,
                     rawId: coerceToBase64Url(rawId),
                     type: newCredential.type,
@@ -105,7 +87,6 @@
                 });
                 let responseJson = await response.json();
                 if (!response.ok) {
-                    toggleBtn(false);
                     displayError(responseJson);
                     return;
                 }
@@ -114,14 +95,11 @@
                     window.location.href = nextRegistrationRedirectUrl;
                     return;
                 }
-                
-                toggleBtn(false);
+
                 displaySuccessMessage();
             }
 
             async function makeCredential(login, displayName) {
-                toggleBtn(true);
-
                 let response = await fetch(beginRegisterUrl, {
                     method: 'POST',
                     body: JSON.stringify({ login: login, display_name: displayName, credential_type: 'webauthn' }),
@@ -131,8 +109,7 @@
                     }
                 });
                 let responseJson = await response.json();
-                if(!response.ok) {
-                    toggleBtn(false);
+                if (!response.ok) {
                     displayError(responseJson);
                     return;
                 }
@@ -159,19 +136,35 @@
                 } catch (e) {
                     var msg = "Could not create credentials in browser. Probably because the username is already registered with your authenticator. Please change username or authenticator."
                     console.error(msg, e);
-                    toggleBtn(false);
                     return;
                 }
 
                 await registerCredential(newCredential, sessionId, login, nextRegistrationRedirectUrl);
             };
 
-            $("#registerWebauthn").submit(function (e) {
-                e.preventDefault();
-                var login = $("#registerWebauthn input[name='Login']").val();
-                var displayName = $("#registerWebauthn input[name='DisplayName']").val();
-                makeCredential(login, displayName);
-            });
-        });
+            var tryListenForm = function () {
+                const elt = $("#webauthForm");
+                if (isInitialized === true) return;
+                if (elt.length === 0) {
+                    setTimeout(() => tryListenForm(), 500);
+                    return;
+                }
+
+                isInitialized = true;
+                elt.submit(function (e) {
+                    e.preventDefault();
+                    var login = $("#webauthForm input[name='Login']").val();
+                    var displayName = $("#webauthForm input[name='DisplayName']").val();
+                    makeCredential(login, displayName);
+                });
+            }
+
+            tryListenForm();
+        };
+
+        setCsharpReference = function (ref) {
+            csharpReference = ref;
+            init();
+        };
     </script>
 }
