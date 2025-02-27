@@ -108,7 +108,7 @@ public class SIDSwaggerMiddleware
     private bool RequestingSwaggerDocument(HttpRequest request, out string documentName, out string realm)
     {
         realm = null;
-        var routeTemplate = _options.RouteTemplate;
+        var routeTemplate = _options.RouteTemplate.TrimStart('/');
         if (_idOptions.UseRealm) routeTemplate = "{"+ Constants.Prefix + "}/" + routeTemplate;
         var requestMatcher = new TemplateMatcher(TemplateParser.Parse(routeTemplate), new RouteValueDictionary());
         documentName = null;

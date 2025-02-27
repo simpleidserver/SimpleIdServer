@@ -31,7 +31,7 @@ namespace SimpleIdServer.Scim.Tests
             {
                 Id = Guid.NewGuid().ToString(),
                 LastModified = DateTime.Parse("2012-05-13T04:42:34Z"),
-                Version = 2
+                Version = "2"
             };
             var thirdRepresentation = new SCIMRepresentation
             {

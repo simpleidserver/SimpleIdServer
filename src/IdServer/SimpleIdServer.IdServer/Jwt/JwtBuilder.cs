@@ -1,8 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Helpers;
@@ -49,12 +51,14 @@ namespace SimpleIdServer.IdServer.Jwt
     {
         private readonly IKeyStore _keyStore;
         private readonly IClientHelper _clientHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IdServerHostOptions _options;
 
-        public JwtBuilder(IKeyStore keyStore, IClientHelper clientHelper, IOptions<IdServerHostOptions> options)
+        public JwtBuilder(IKeyStore keyStore, IClientHelper clientHelper, IHttpContextAccessor httpContextAccessor, IOptions<IdServerHostOptions> options)
         {
             _keyStore = keyStore;
             _clientHelper = clientHelper;
+            _httpContextAccessor = httpContextAccessor;
             _options = options.Value;
         }
 
@@ -118,6 +122,8 @@ namespace SimpleIdServer.IdServer.Jwt
             var handler = new JsonWebTokenHandler();
             if (!handler.CanReadToken(jwt)) return ReadJsonWebTokenResult.BuildError(Global.InvalidJwt);
             var jsonWebToken = handler.ReadJsonWebToken(jwt);
+            var issuer = HandlerContext.GetIssuer(_httpContextAccessor.HttpContext.Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+            if (jsonWebToken.Issuer != issuer) return ReadJsonWebTokenResult.BuildError(Global.BadAccessTokenIssuer);
             JsonWebToken encJwt = null;
             if(jsonWebToken.IsEncrypted)
             {

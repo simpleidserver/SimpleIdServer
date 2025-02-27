@@ -22,6 +22,6 @@ public class DidJsonWebTokenHandlerFixture
         var result = DidJsonWebTokenHandler.New().CheckJwt(idToken, didDocument, did);
 
         // ASSERT
-        Assert.True(result);
+        Assert.That(result);
     }
 }

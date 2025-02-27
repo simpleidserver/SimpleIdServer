@@ -2,12 +2,14 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
+using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.IntegrationEvents;
@@ -35,6 +37,7 @@ public class AuthorizationController : Controller
     private readonly IDataProtector _dataProtector;
     private readonly IBusControl _busControl;
     private readonly IdServerHostOptions _options;
+    private readonly CookieAuthenticationOptions _cookieAuthOptions;
 
     public AuthorizationController(
         IAuthorizationRequestHandler authorizationRequestHandler,
@@ -42,7 +45,8 @@ public class AuthorizationController : Controller
         IResponseModeHandler responseModeHandler, 
         IDataProtectionProvider dataProtectionProvider, 
         IBusControl busControl,
-        IOptions<IdServerHostOptions> options)
+        IOptions<IdServerHostOptions> options,
+        IOptions<CookieAuthenticationOptions> cookieAuthOptions)
     {
         _authorizationRequestHandler = authorizationRequestHandler;
         _authorizationCallbackRequestHandler = authorizationCallbackRequestHandler;
@@ -50,6 +54,7 @@ public class AuthorizationController : Controller
         _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         _busControl = busControl;
         _options = options.Value;
+        _cookieAuthOptions = cookieAuthOptions.Value;
     }
 
     [HttpGet]
@@ -95,11 +100,7 @@ public class AuthorizationController : Controller
                         }
                     }
 
-                    try
-                    {
-                        await HttpContext.SignOutAsync();
-                    }
-                    catch { }
+                    Response.Cookies.Delete(IdServerCookieAuthenticationHandler.GetCookieName(_cookieAuthOptions.Cookie.Name));
                 }
 
                 if(redirectActionAuthorizationResponse.AmrAuthInfo != null)

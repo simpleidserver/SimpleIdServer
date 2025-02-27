@@ -1,6 +1,5 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
@@ -22,18 +21,21 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly IRepresentationHelper _representationHelper;
+        private readonly IRepresentationVersionBuilder _representationVersionBuilder;
 
         public AddRepresentationCommandHandler(
             ISCIMSchemaCommandRepository scimSchemaCommandRepository,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
             IRepresentationHelper representationHelper,
-            IBusControl busControl) : base(busControl)
+            IBusHelper busControl,
+            IRepresentationVersionBuilder representationVersionBuilder) : base(busControl)
         {
             _scimSchemaCommandRepository = scimSchemaCommandRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
             _representationHelper = representationHelper;
+            _representationVersionBuilder = representationVersionBuilder;
         }
 
         public async virtual Task<GenericResult<SCIMRepresentation>> Handle(AddRepresentationCommand addRepresentationCommand)
@@ -60,8 +62,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var scimRepresentation = _representationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation.Attributes, addRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList());
             scimRepresentation.Id = Guid.NewGuid().ToString();
             scimRepresentation.SetCreated(DateTime.UtcNow);
-            scimRepresentation.SetUpdated(DateTime.UtcNow);
-            scimRepresentation.SetVersion(0);
+            scimRepresentation.SetUpdated(DateTime.UtcNow, _representationVersionBuilder.Build(scimRepresentation));
             scimRepresentation.RealmName = addRepresentationCommand.Realm;
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
             foreach (var attr in scimRepresentation.FlatAttributes) attr.RepresentationId = scimRepresentation.Id;

@@ -68,7 +68,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
         {
             var codeChallenge = handlerContext.Request.RequestData.GetCodeChallengeFromAuthorizationRequest();
             var codeChallengeMethod = handlerContext.Request.RequestData.GetCodeChallengeMethodFromAuthorizationRequest();
-            if (handlerContext.Client.TokenEndPointAuthMethod == OAuthPKCEAuthenticationHandler.AUTH_METHOD && string.IsNullOrWhiteSpace(codeChallenge))
+            if (handlerContext.Client.IsPublic && string.IsNullOrWhiteSpace(codeChallenge))
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.CodeChallenge));
 
             if (string.IsNullOrWhiteSpace(codeChallengeMethod))

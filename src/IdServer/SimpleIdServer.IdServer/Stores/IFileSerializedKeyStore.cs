@@ -10,6 +10,7 @@ namespace SimpleIdServer.IdServer.Stores;
 
 public interface IFileSerializedKeyStore
 {
+    Task<List<SerializedFileKey>> GetByKeyIds(List<string> keyIds, CancellationToken cancellationToken);
     Task<List<SerializedFileKey>> GetAll(string realm, CancellationToken cancellationToken);
     Task<List<SerializedFileKey>> GetAllSig(string realm, CancellationToken cancellationToken);
     Task<List<SerializedFileKey>> GetAllEnc(string realm, CancellationToken cancellationToken);

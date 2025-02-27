@@ -1312,6 +1312,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Expiration time of the cookie.
+        /// </summary>
+        public static string CookieExpirationTime {
+            get {
+                return ResourceManager.GetString("CookieExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the expiration time of the user&apos;s cookie in milliseconds (ms).
+        /// </summary>
+        public static string CookieExpirationTimeTooltip {
+            get {
+                return ResourceManager.GetString("CookieExpirationTimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Counter.
         /// </summary>
         public static string Counter {
@@ -1596,6 +1614,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Download {
             get {
                 return ResourceManager.GetString("Download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Do-you want to delete the current realm?.
+        /// </summary>
+        public static string DoYouWantToDeleteRealm {
+            get {
+                return ResourceManager.GetString("DoYouWantToDeleteRealm", resourceCulture);
             }
         }
         
@@ -3294,6 +3321,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Public.
+        /// </summary>
+        public static string PublicClient {
+            get {
+                return ResourceManager.GetString("PublicClient", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Public Key.
         /// </summary>
         public static string PublicKey {
@@ -3375,6 +3411,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The realm is removed.
+        /// </summary>
+        public static string RealmRemoved {
+            get {
+                return ResourceManager.GetString("RealmRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Roles have been updated.
         /// </summary>
         public static string RealmRoleScopesUpdated {
@@ -3443,6 +3488,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Reference {
             get {
                 return ResourceManager.GetString("Reference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Do-you want to refresh the page ?.
+        /// </summary>
+        public static string RefreshPage {
+            get {
+                return ResourceManager.GetString("RefreshPage", resourceCulture);
             }
         }
         
@@ -3542,6 +3596,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Remove {
             get {
                 return ResourceManager.GetString("Remove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Remove current realm.
+        /// </summary>
+        public static string RemoveRealm {
+            get {
+                return ResourceManager.GetString("RemoveRealm", resourceCulture);
             }
         }
         

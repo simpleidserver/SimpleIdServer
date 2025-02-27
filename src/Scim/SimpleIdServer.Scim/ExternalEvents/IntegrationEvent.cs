@@ -11,22 +11,24 @@ namespace SimpleIdServer.Scim.ExternalEvents
 
         }
 
-        public IntegrationEvent(string id, int version, string resourceType)
+        public IntegrationEvent(string id, string version, string resourceType, string realm)
         {
             Id = id;
             Version = version;
             ResourceType = resourceType;
+            Realm = realm;
         }
 
 
-        public IntegrationEvent(string id, int version, string resourceType, JObject representation) : this(id, version, resourceType)
+        public IntegrationEvent(string id, string version, string resourceType, string realm, JObject representation) : this(id, version, resourceType, realm)
         {
             SerializedRepresentation = representation?.ToString();
         }
 
         public string Id { get; set; }
-        public int Version { get; set; }
+        public string Version { get; set; }
         public string ResourceType { get; set; }
+        public string Realm { get; set; }
         public string SerializedRepresentation { get; set; }
         [System.Text.Json.Serialization.JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]

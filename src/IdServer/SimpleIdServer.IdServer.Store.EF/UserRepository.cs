@@ -158,6 +158,8 @@ public class UserRepository : IUserRepository
 
     public void Remove(IEnumerable<User> users) => _dbContext.Users.RemoveRange(users);
 
+    public void Remove(IEnumerable<UserClaim> claims) => _dbContext.UserClaims.RemoveRange(claims);
+
     public virtual async Task BulkUpdate(List<UserClaim> userClaims)
     {
         if(_dbContext.Database.IsRelational())

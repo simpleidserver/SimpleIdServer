@@ -104,6 +104,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddDeviceAuthorizationApi()
                 .AddTokenTypes();
             services.AddAuthorization();
+            services.AddHttpContextAccessor();
             services.Configure<AuthorizationOptions>(o =>
             {
                 o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
@@ -133,16 +134,18 @@ namespace Microsoft.Extensions.DependencyInjection
                     };
                     opts.Events.OnSigningOut += (CookieSigningOutContext ctx) =>
                     {
-                        if (ctx.HttpContext.User != null && ctx.HttpContext.User.Identity != null && ctx.HttpContext.User.Identity.IsAuthenticated)
+                        string nameIdentifier = null;
+                        if(ctx.Properties != null && ctx.Properties.Items.ContainsKey(Constants.LogoutUserKey)) nameIdentifier = ctx.Properties.Items[Constants.LogoutUserKey];
+                        if (string.IsNullOrWhiteSpace(nameIdentifier) && ctx.HttpContext.User != null && ctx.HttpContext.User.Identity != null && ctx.HttpContext.User.Identity.IsAuthenticated)
                         {
-                            var nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                            ctx.Options.CookieManager.DeleteCookie(
-                                ctx.HttpContext,
-                                $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
-                                ctx.CookieOptions);
-                            return Task.CompletedTask;
+                            nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
                         }
 
+                        if(!string.IsNullOrWhiteSpace(nameIdentifier))
+                            ctx.Options.CookieManager.DeleteCookie(
+                                    ctx.HttpContext,
+                                    $"{IdServerCookieAuthenticationHandler.GetCookieName(ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
+                                    ctx.CookieOptions);
                         return Task.CompletedTask;
                     };
                 });
@@ -225,9 +228,9 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretPostAuthenticationHandler>();
-            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthPKCEAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientTlsClientAuthenticationHandler>();
             services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSelfSignedTlsClientAuthenticationHandler>();
+            services.AddTransient<IPkceVerifier, PkceVerifier>();
             return services;
         }
 

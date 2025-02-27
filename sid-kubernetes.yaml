@@ -322,7 +322,7 @@ spec:
             - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
               value: "true"
             - name: "DefaultSecurityOptions__Issuer"
-              value: "https://idserver.sid.svc.cluster.local/master"
+              value: "https://idserver.sid.svc.cluster.local"
             - name: "DefaultSecurityOptions__IgnoreCertificateError"
               value: "true"
             - name: "IdServerBaseUrl"

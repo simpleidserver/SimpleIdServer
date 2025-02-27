@@ -295,6 +295,7 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:uma-ticket' grant type to get an
 	| Key   | Value           |
 	| sub   | user            |
 	| email | user@hotmail.fr |
+	| iss | http://localhost |
 
 	When execute HTTP POST request 'http://localhost/token'
 	| Key           | Value              |
@@ -406,8 +407,9 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:pre-authorized_code' grant type 
 	Given build access_token and sign with the key 'keyid'
 	| Key   | Value    |
 	| sub   | otpUser  |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
 	| client_id           | seventyTwoClient                                              |
@@ -419,7 +421,7 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:pre-authorized_code' grant type 
 	And extract JSON from body
 	And extract parameter '$.pre-authorized_code' from JSON body into 'preAuthorizedCode'
 
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key                     | Value                                                    |
 	| grant_type              | urn:ietf:params:oauth:grant-type:pre-authorized_code     |
 	| client_id               | seventyThreeClient                                       |
@@ -583,8 +585,9 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and i
 	Given build access_token and sign with the key 'keyid'
 	| Key         | Value           |
 	| client_id   | fortyFourClient |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                  | Value                                           |
 	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
 	| client_id            | sixtySixClient                                  |
@@ -602,8 +605,9 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and d
 	Given build access_token and sign with the key 'keyid'
 	| Key         | Value           |
 	| client_id   | fortyFourClient |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                  | Value                                           |
 	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
 	| client_id            | sixtySevenClient                                |
@@ -622,8 +626,9 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and d
 	Given build access_token and sign with the key 'keyid'
 	| Key         | Value           |
 	| client_id   | fortyFourClient |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                  | Value                                           |
 	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
 	| client_id            | sixtySevenClient                                |
@@ -634,7 +639,7 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:token-exchange' grant_type and d
 	And extract JSON from body
 	And extract parameter 'access_token' from JSON body
 
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key                  | Value                                           |
 	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
 	| client_id            | sixtySevenClient                                |
@@ -653,8 +658,9 @@ Scenario: Use 'urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code' gr
 	Given build access_token and sign with the key 'keyid'
 	| Key   | Value    |
 	| sub   | otpUser  |
+	| iss | http://localhost |
 	
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                 | Value                                                         |
 	| grant_type          | urn:ietf:params:oauth:grant-type:exchange-pre-authorized_code |
 	| client_id           | seventyTwoClient                                              |

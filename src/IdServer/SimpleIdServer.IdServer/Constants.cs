@@ -7,12 +7,15 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer
 {
     public static class Constants
     {
+        public const string LogoutUserKey = "otherUser";
+
         public static class JWKUsages
         {
             public const string Enc = "enc";
@@ -34,6 +37,20 @@ namespace SimpleIdServer.IdServer
             "website",
             "urn:website",
             "SIDS-manager"
+        };
+
+        public static List<string> StandardAcrNames => new List<string>
+        {
+            StandardAcrs.FirstLevelAssurance.Name,
+            StandardAcrs.IapSilver.Name
+        };
+
+        public static List<string> StandardKeyIds => StandardKeys.Select(s => s.KeyId).ToList();
+
+        public static List<SerializedFileKey> StandardKeys => new List<SerializedFileKey>
+        {
+            KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"),
+            KeyGenerator.GenerateECDSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "ecdsa-1")
         };
 
         public static List<string> RealmStandardScopes = new List<string>
@@ -825,7 +842,7 @@ namespace SimpleIdServer.IdServer
         public static class StandardUsers
         {
             public static User AdministratorUser = UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorGroup).GenerateRandomTOTPKey().Build();
-            public static User AdministratorReadonlyUser = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
+            public static User AdministratorReadonlyUser = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm-ro@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
         }
 
         public static class StandardAcrs

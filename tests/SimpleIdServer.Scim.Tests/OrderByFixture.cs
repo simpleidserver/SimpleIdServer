@@ -46,7 +46,7 @@ namespace SimpleIdServer.Scim.Tests
                 })
                 .Build();
             firstRepresentation.LastModified = DateTime.Parse("2012-05-13T04:42:34Z");
-            firstRepresentation.Version = 2;
+            firstRepresentation.Version = "2";
             var secondRepresentation = SCIMRepresentationBuilder.Create(new List<SCIMSchema> { StandardSchemas.UserSchema })
                 .AddStringAttribute("userName", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "Justine" })
                 .AddStringAttribute("title", "urn:ietf:params:scim:schemas:core:2.0:User", new List<string> { "title" })

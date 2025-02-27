@@ -43,6 +43,15 @@ public class ScopeRepository : IScopeRepository
                 .SingleOrDefaultAsync(s => s.Name == name && s.Realms.Any(r => r.Name == realm), cancellationToken);
     }
 
+    public Task<List<Scope>> GetByNames(List<string> scopeNames, CancellationToken cancellationToken)
+    {
+        return _dbContext.Scopes
+                .Include(s => s.Realms)
+                .Include(s => s.ClaimMappers)
+                .Where(s => scopeNames.Contains(s.Name))
+                .ToListAsync(cancellationToken);
+    }
+
     public Task<List<Scope>> GetByNames(string realm, List<string> scopeNames, CancellationToken cancellationToken)
     {
         return _dbContext.Scopes

@@ -42,6 +42,14 @@ public class RegistrationWorkflowRepository : IRegistrationWorkflowRepository
             .ToListAsync(cancellationToken);
     }
 
+    public Task<List<RegistrationWorkflow>> GetByIds(string realm, List<string> ids, CancellationToken cancellationToken)
+    {
+        return _dbContext.RegistrationWorkflows
+            .Where(r => r.RealmName == realm && ids.Contains(r.Id))
+            .OrderByDescending(r => r.UpdateDateTime)
+            .ToListAsync(cancellationToken);
+    }
+
     public void Delete(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Remove(record);
 
 	public void Add(RegistrationWorkflow record) => _dbContext.RegistrationWorkflows.Add(record);

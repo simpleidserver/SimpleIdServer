@@ -144,6 +144,7 @@ Scenario: Subject in id_token_hint must be valid
 	And build JWS id_token_hint and sign with the key 'keyid'
 	| Key | Value     |
 	| sub | otheruser |
+	| iss | http://localhost |
 	
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value                 |
@@ -166,6 +167,7 @@ Scenario: Audience in the id_token_hint must be valid
 	| Key | Value     |
 	| sub | user      |
 	| aud | aud1 aud2 |
+	| iss | http://localhost |
 	
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value                 |

@@ -1947,4 +1947,25 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="Welcome" xml:space="preserve">
     <value>Welcome {0}</value>
   </data>
+  <data name="RemoveRealm" xml:space="preserve">
+    <value>Remove current realm</value>
+  </data>
+  <data name="DoYouWantToDeleteRealm" xml:space="preserve">
+    <value>Do-you want to delete the current realm?</value>
+  </data>
+  <data name="RealmRemoved" xml:space="preserve">
+    <value>The realm is removed</value>
+  </data>
+  <data name="RefreshPage" xml:space="preserve">
+    <value>Do-you want to refresh the page ?</value>
+  </data>
+  <data name="CookieExpirationTime" xml:space="preserve">
+    <value>Expiration time of the cookie</value>
+  </data>
+  <data name="CookieExpirationTimeTooltip" xml:space="preserve">
+    <value>Set the expiration time of the user's cookie in milliseconds (ms)</value>
+  </data>
+  <data name="PublicClient" xml:space="preserve">
+    <value>Public</value>
+  </data>
 </root>

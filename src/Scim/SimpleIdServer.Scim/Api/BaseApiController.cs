@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -25,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +42,7 @@ namespace SimpleIdServer.Scim.Api
         private readonly IAttributeReferenceEnricher _attributeReferenceEnricher;
         private readonly SCIMHostOptions _options;
         private readonly ILogger _logger;
-        private readonly IBusControl _busControl;
+        private readonly IBusHelper _busControl;
         private readonly IResourceTypeResolver _resourceTypeResolver;
         private readonly IUriProvider _uriProvider;
         private readonly IRealmRepository _realmRepository;
@@ -58,8 +56,8 @@ namespace SimpleIdServer.Scim.Api
             IGetRepresentationQueryHandler getRepresentationQueryHandler, 
             IAttributeReferenceEnricher attributeReferenceEnricher, 
             IOptionsMonitor<SCIMHostOptions> options, 
-            ILogger logger, 
-            IBusControl busControl, 
+            ILogger logger,
+            IBusHelper busControl, 
             IResourceTypeResolver resourceTypeResolver, 
             IUriProvider uriProvider,
             IRealmRepository realmRepository)
@@ -259,7 +257,7 @@ namespace SimpleIdServer.Scim.Api
                 foreach (var record in representations)
                 {
                     JObject newJObj = null;
-                    var location = $"{baseUrl}/{_resourceTypeResolver.ResolveByResourceType(_resourceType).ControllerName}/{record.Id}";
+                    var location = GetLocation(realm, record);
                     bool includeStandardRequest = true;
                     if (searchRequest.Attributes.Any())
                     {
@@ -316,6 +314,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalGet(string realm, string id, GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
+            id = id ?? ExtractId();
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             try
             {
@@ -323,7 +322,7 @@ namespace SimpleIdServer.Scim.Api
                 if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
                 var representation = getRepresentationResult.Result;
                 await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
-                return BuildHTTPResult(representation, HttpStatusCode.OK, true);
+                return BuildHTTPResult(realm, representation, HttpStatusCode.OK, true);
             }
             catch (SCIMSchemaViolatedException ex)
             {
@@ -355,9 +354,17 @@ namespace SimpleIdServer.Scim.Api
                 if (addRepresentationResult.HasError) return this.BuildError(addRepresentationResult);
                 var representation = addRepresentationResult.Result;
                 representation.ApplyEmptyArray();
-                var location = GetLocation(representation);
+                var location = GetLocation(realm, representation);
                 var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                if (IsPublishEvtsEnabled)
+                {
+                    var message = new BigMessage
+                    {
+
+                    };
+                    await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                }
+
                 return BuildHTTPResult(HttpStatusCode.Created, location, representation.Version, content);
             }
             catch (SCIMSchemaViolatedException ex)
@@ -388,6 +395,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalDelete(string prefix, string id, CancellationToken cancellationToken)
         {
+            id = id ?? ExtractId();
             var realm = _options.EnableRealm ? prefix : string.Empty;
             var status = await CheckRealm(realm, cancellationToken);
             if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
@@ -398,9 +406,9 @@ namespace SimpleIdServer.Scim.Api
                 if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
                 var representation = getRepresentationResult.Result;
                 representation.ApplyEmptyArray();
-                var location = GetLocation(representation);
+                var location = GetLocation(realm, representation);
                 var content = representation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
             catch (SCIMSchemaViolatedException ex)
@@ -426,6 +434,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalUpdate(string prefix, string id, RepresentationParameter representationParameter, CancellationToken cancellationToken)
         {
+            id = id ?? ExtractId();
             if (representationParameter == null)
             {
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPutNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
@@ -442,11 +451,11 @@ namespace SimpleIdServer.Scim.Api
                 if (!updateResult.Result.IsReplaced) return NoContent();
                 var representation = updateResult.Result.Representation;
                 representation.ApplyEmptyArray();
-                var location = GetLocation(representation);
+                var location = GetLocation(realm, representation);
                 if (!_options.IsFullRepresentationReturned)
                 {
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty, updateResult.Result.PatchOperations));
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty, updateResult.Result.PatchOperations));
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
                 else
@@ -455,7 +464,7 @@ namespace SimpleIdServer.Scim.Api
                     representation = getRepresentationResult.Result;
                     await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty, updateResult.Result.PatchOperations));
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty, updateResult.Result.PatchOperations));
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
             }
@@ -497,6 +506,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalPatch(string prefix, string id, PatchRepresentationParameter patchRepresentation, CancellationToken cancellationToken)
         {
+            id = id ?? ExtractId();
             if (patchRepresentation == null)
             {
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPatchNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
@@ -515,12 +525,12 @@ namespace SimpleIdServer.Scim.Api
                 if (!patchResult.IsPatched) return NoContent();
                 var representation = patchResult.Representation;
                 representation.ApplyEmptyArray();
-                var location = GetLocation(representation);
+                var location = GetLocation(realm, representation);
                 if(!_options.IsFullRepresentationReturned)
                 {
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                     if (IsPublishEvtsEnabled)
-                        await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty, patchRes.Result.PatchOperations));
+                        await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty, patchRes.Result.PatchOperations));
                     
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
@@ -530,7 +540,7 @@ namespace SimpleIdServer.Scim.Api
                     representation = getRepresentationResult.Result;
                     await _attributeReferenceEnricher.Enrich(_resourceType, new List<SCIMRepresentation> { representation }, _uriProvider.GetAbsoluteUriWithVirtualPath());
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), content, _options.IncludeToken ? Request.GetToken() : string.Empty, patchRes.Result.PatchOperations));
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty, patchRes.Result.PatchOperations));
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
             }
@@ -592,17 +602,17 @@ namespace SimpleIdServer.Scim.Api
             return customActionResult;
         }
 
-        protected IActionResult BuildHTTPResult(SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)
+        protected IActionResult BuildHTTPResult(string realm, SCIMRepresentation representation, HttpStatusCode status, bool isGetRequest)
         {
-            var location = GetLocation(representation);
+            var location = GetLocation(realm, representation);
             var content = representation.ToResponse(location, isGetRequest, mergeExtensionAttributes: _options.MergeExtensionAttributes);
             return BuildHTTPResult(status, location, representation.Version, content);
         }
 
-        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, int version, JObject content)
+        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, string version, JObject content)
         {
             HttpContext.Response.Headers.Add("Location", location);
-            HttpContext.Response.Headers.Add("ETag", version.ToString());
+            HttpContext.Response.Headers.Add("ETag", version);
             return new ContentResult
             {
                 StatusCode = (int)status,
@@ -611,9 +621,9 @@ namespace SimpleIdServer.Scim.Api
             };
         }
 
-        protected string GetLocation(SCIMRepresentation representation)
+        protected string GetLocation(string realm, SCIMRepresentation representation)
         {
-            return $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
+            return $"{_uriProvider.GetAbsoluteUriWithVirtualPath()}{(!string.IsNullOrWhiteSpace(realm) ? $"/{realm}" : string.Empty)}/{_resourceTypeResolver.ResolveByResourceType(representation.ResourceType).ControllerName}/{representation.Id}";
         }
 
         protected virtual string GetResourceType(string resourceType)
@@ -636,6 +646,13 @@ namespace SimpleIdServer.Scim.Api
             if(status == RealmStatus.UNAUTHORIZED)
                 return this.BuildError(HttpStatusCode.Unauthorized, string.Format(Global.RealmUnauthorized, realm));
             return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.RealmUnknown, realm));
+        }
+
+        private string ExtractId()
+        {
+            var uri = new Uri($"{_uriProvider.GetAbsoluteUriWithVirtualPath()}{HttpContext.Request.Path.Value}");
+            var path = uri.GetLeftPart(UriPartial.Path);
+            return path.Split('/').Last();
         }
 
         private enum RealmStatus

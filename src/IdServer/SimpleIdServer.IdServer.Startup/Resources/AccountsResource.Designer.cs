@@ -97,6 +97,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Reject.
+        /// </summary>
+        public static string reject {
+            get {
+                return ResourceManager.GetString("reject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Revoke a session.
         /// </summary>
         public static string revoke_session_title {
@@ -111,6 +120,24 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static string select_session {
             get {
                 return ResourceManager.GetString("select_session", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The user session has been rejected.
+        /// </summary>
+        public static string useraccount_rejected {
+            get {
+                return ResourceManager.GetString("useraccount_rejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The user session has been switched.
+        /// </summary>
+        public static string useraccount_switched {
+            get {
+                return ResourceManager.GetString("useraccount_switched", resourceCulture);
             }
         }
     }

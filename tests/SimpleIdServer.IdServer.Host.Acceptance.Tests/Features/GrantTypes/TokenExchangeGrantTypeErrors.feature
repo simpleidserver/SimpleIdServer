@@ -59,8 +59,9 @@ Scenario: Subject cannot be extracted from the subject_token
 	Given build access_token and sign with the key 'keyid'
 	| Key   | Value |
 	| key   | value |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                  | Value                                           |
 	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
 	| client_id            | sixtySixClient                                  |
@@ -77,8 +78,9 @@ Scenario: The parameter 'actor_subject_type' is not recognized
 	Given build access_token and sign with the key 'keyid'
 	| Key         | Value    |
 	| client_id   | clientId |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/token'
+	When execute HTTP POST request 'http://localhost/token'
 	| Key                  | Value                                           |
 	| grant_type           | urn:ietf:params:oauth:grant-type:token-exchange |
 	| client_id            | sixtySixClient                                  |

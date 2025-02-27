@@ -19,7 +19,8 @@ namespace SimpleIdServer.IdServer.Authenticate
 {
     public interface IAuthenticateClient
     {
-        Task<Client> Authenticate(AuthenticateInstruction authenticateIsnstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT);
+        Task<Client> Authenticate(AuthenticateInstruction authenticateIsnstruction, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
+        Task Authenticate(Client client, AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
         bool TryGetClientId(AuthenticateInstruction instruction, out string clientId);
     }
 
@@ -40,16 +41,22 @@ namespace SimpleIdServer.IdServer.Authenticate
             _options = options.Value;
         }
 
-        public async Task<Client> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, bool isAuthorizationCodeGrantType = false, string errorCode = ErrorCodes.INVALID_CLIENT)
+        public async Task<Client> Authenticate(AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
             if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
-
             string clientId;
             if (!TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(errorCode, Global.MissingClientId);
 
             var client = await _clientRepository.GetByClientId(authenticateInstruction.Realm, clientId, cancellationToken);
             if (client == null) throw new OAuthException(errorCode, string.Format(Global.UnknownClient, clientId));
-            if (isAuthorizationCodeGrantType) return client;
+            await Authenticate(client, authenticateInstruction, issuerName, cancellationToken, errorCode);
+            return client;
+        }
+
+        public async Task Authenticate(Client client, AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
+        {
+            if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
+            if (client.IsPublic) return;
 
             var tokenEndPointAuthMethod = client.TokenEndPointAuthMethod ?? _options.DefaultTokenEndPointAuthMethod;
             var handler = _handlers.FirstOrDefault(h => h.AuthMethod == tokenEndPointAuthMethod);
@@ -72,7 +79,6 @@ namespace SimpleIdServer.IdServer.Authenticate
                 AuthMethod = tokenEndPointAuthMethod,
                 Realm = authenticateInstruction.Realm
             });
-            return client;
         }
 
         public bool TryExtractClientIdFromClientAssertion(AuthenticateInstruction instruction, out string clientId)

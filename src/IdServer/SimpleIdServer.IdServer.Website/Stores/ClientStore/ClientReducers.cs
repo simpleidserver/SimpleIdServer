@@ -33,7 +33,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         public static SearchClientsState ReduceUpdateClientDetailsAction(SearchClientsState state, UpdateClientDetailsAction act)
         {
             var clients = state.Clients;
-            var client = clients.SingleOrDefault(c => c.Value.Id == act.Id);
+            var client = clients?.SingleOrDefault(c => c.Value.Id == act.Id);
             if (client != null) client.Value.UpdateClientName(act.ClientName);
             return state with
             {
@@ -330,6 +330,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.IsDPOPNonceRequired = act.IsDPoPNonceRequired;
             client.DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds;
             client.TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds;
+            client.UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds;
             return state with
             {
                 Client = client

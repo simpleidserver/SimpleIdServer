@@ -57,7 +57,7 @@ namespace SimpleIdServer.IdServer.U2FClient.Tests
             }).Result;
 
             // ACT
-            Assert.IsTrue(success.Status == "ok");
+            Assert.That(success.Status == "ok");
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace SimpleIdServer.IdServer.U2FClient.Tests
             var res = await _fido2.MakeAssertionAsync(authResponse, assertionOptions, result.PublicKey, new List<byte[]> { result.PublicKey }, storedCounter, callback);
 
             // ASSERT
-            Assert.IsTrue(res.Status == "ok");
+            Assert.That(res.Status == "ok");
         }
     }
 }

@@ -28,14 +28,14 @@ namespace SimpleIdServer.DID.Tests
             var contextLst = JsonObject.Parse(json)["@context"] as JsonArray;
 
             // ASSERT
-            Assert.IsNotNull(json);
+            Assert.That(json != null);
             Assert.That(identityDocument.Id, Is.EqualTo("did"));
             Assert.That(contextLst.ElementAt(0).ToString(), Is.EqualTo("https://www.w3.org/ns/did/v1"));
             Assert.That(contextLst.ElementAt(1).ToString(), Is.EqualTo("https://w3id.org/security/suites/ed25519-2020/v1"));
             Assert.That(identityDocument.AlsoKnownAs.First(), Is.EqualTo("didSubject"));
             Assert.That(identityDocument.Controller.ToString(), Is.EqualTo("didController"));
             Assert.That(identityDocument.VerificationMethod.ElementAt(0).Type, Is.EqualTo("Ed25519VerificationKey2020"));
-            Assert.IsNotNull(identityDocument.VerificationMethod.ElementAt(0).PublicKeyMultibase);
+            Assert.That(identityDocument.VerificationMethod.ElementAt(0).PublicKeyMultibase != null);
         }
 
         [Test]

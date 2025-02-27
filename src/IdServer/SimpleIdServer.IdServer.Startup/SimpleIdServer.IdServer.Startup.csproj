@@ -31,21 +31,21 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.4" />
-	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.4" />
-	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.4" />
-	  <PackageReference Include="Pomelo.Extensions.Caching.MySql" Version="2.1.4" />
+	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.10" />
+	  <PackageReference Include="Pomelo.Extensions.Caching.MySql" Version="2.2.0" />
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.4" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
-	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.2" />
-	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.4" />
-	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.4" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
+	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
+	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.10" />
+	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.6" />
 	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="8.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.4" />
-	  <PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.2.5" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
+	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.10" />
+	  <PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.3.0" />
+	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 	  </PackageReference>
@@ -171,6 +171,11 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>LayoutResource.resx</DependentUpon>
 		</Compile>
+		<Compile Update="Resources\SessionsResource.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>SessionsResource.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 	<ItemGroup>
 		<EmbeddedResource Update="Resources\AccountsResource.resx">
@@ -268,6 +273,10 @@
 		<EmbeddedResource Update="Resources\LayoutResource.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>LayoutResource.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\SessionsResource.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>SessionsResource.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
 	</ItemGroup>
 	<ItemGroup>

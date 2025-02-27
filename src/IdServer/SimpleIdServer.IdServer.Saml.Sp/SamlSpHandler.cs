@@ -9,11 +9,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Encodings.Web;
 
 namespace SimpleIdServer.IdServer.Saml.Sp;
 
-public class SamlSpHandler : RemoteAuthenticationHandler<SamlSpOptions>
+public class SamlSpHandler : RemoteAuthenticationHandler<SamlSpOptions>, IAuthenticationSignOutHandler
 {
     private EntityDescriptor _entityDescriptor;
 
@@ -27,19 +28,22 @@ public class SamlSpHandler : RemoteAuthenticationHandler<SamlSpOptions>
         set { base.Events = value; }
     }
 
+    public async Task SignOutAsync(AuthenticationProperties? properties)
+    {
+        if (Context.User?.Identity == null || !Context.User.Identity.IsAuthenticated) return;
+        var saml2Configuration = await GetSpConfiguration();
+        var binding = new Saml2PostBinding();
+        var saml2LogoutRequest = new Saml2LogoutRequest(saml2Configuration, Context.User);
+        await Context.SignOutAsync();
+        var postBinding = binding.Bind(saml2LogoutRequest);
+        var payload = Encoding.UTF8.GetBytes(postBinding.PostContent);
+        await Context.Response.Body.WriteAsync(payload, 0, payload.Length);
+    }
+
     protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
     {
-        var entityDescriptor = await GetEntityDescriptor(CancellationToken.None);
+        var saml2Configuration = await GetSpConfiguration();
         var binding = new Saml2RedirectBinding();
-        var saml2Configuration = new Saml2Configuration
-        {
-            Issuer = Options.SPId,
-            AllowedIssuer = entityDescriptor.EntityId,
-            SingleSignOnDestination = entityDescriptor.IdPSsoDescriptor.SingleSignOnServices.First().Location,
-            SingleLogoutDestination = entityDescriptor.IdPSsoDescriptor.SingleLogoutServices.First().Location,
-            SigningCertificate = Options.SigningCertificate,
-            SignAuthnRequest = Options.SigningCertificate != null
-        };
         binding.Bind(new Saml2AuthnRequest(saml2Configuration));
         var redirectionContext = new RedirectContext<SamlSpOptions>(
                 Context,
@@ -123,6 +127,21 @@ public class SamlSpHandler : RemoteAuthenticationHandler<SamlSpOptions>
         }
 
         return HandleRequestResult.Fail("Not supported");
+    }
+
+    private async Task<Saml2Configuration> GetSpConfiguration()
+    {
+        var entityDescriptor = await GetEntityDescriptor(CancellationToken.None);
+        var saml2Configuration = new Saml2Configuration
+        {
+            Issuer = Options.SPId,
+            AllowedIssuer = entityDescriptor.EntityId,
+            SingleSignOnDestination = entityDescriptor.IdPSsoDescriptor.SingleSignOnServices.First().Location,
+            SingleLogoutDestination = entityDescriptor.IdPSsoDescriptor.SingleLogoutServices.First().Location,
+            SigningCertificate = Options.SigningCertificate,
+            SignAuthnRequest = Options.SigningCertificate != null
+        };
+        return saml2Configuration;
     }
 
     private async Task<EntityDescriptor> GetEntityDescriptor(CancellationToken cancellationToken)

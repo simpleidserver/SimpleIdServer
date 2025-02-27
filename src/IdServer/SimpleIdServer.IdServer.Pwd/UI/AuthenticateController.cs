@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Pwd.Services;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
@@ -40,7 +41,8 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         IUserTransformer userTransformer,
         IBusControl busControl,
         IAntiforgery antiforgery,
-        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository)
+        IAuthenticationContextClassReferenceRepository authenticationContextClassReferenceRepository,
+        ISessionManager sessionManager) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager)
     {
         _configuration = configuration;
     }

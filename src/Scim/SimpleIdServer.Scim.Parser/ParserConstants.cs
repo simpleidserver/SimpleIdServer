@@ -25,7 +25,7 @@ namespace SimpleIdServer.Scim.Parser
             { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.ResourceType}", SCIMSchemaAttributeTypes.STRING },
             { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Created}", SCIMSchemaAttributeTypes.DATETIME },
             { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.LastModified}", SCIMSchemaAttributeTypes.DATETIME },
-            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}", SCIMSchemaAttributeTypes.INTEGER }
+            { $"{StandardSCIMRepresentationAttributes.Meta}.{StandardSCIMMetaAttributes.Version}", SCIMSchemaAttributeTypes.STRING }
         };
     }
 }

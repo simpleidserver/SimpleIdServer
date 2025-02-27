@@ -93,6 +93,18 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             return result?.ToDomain();
         }
 
+        public async Task<List<Client>> GetByClientIds(List<string> clientIds, CancellationToken cancellationToken)
+        {
+            var result = await _dbContext.Client.Queryable<SugarClient>()
+                .Includes(c => c.SerializedJsonWebKeys)
+                .Includes(c => c.Realms)
+                .Includes(c => c.ClientScopes, c => c.Scope)
+                .Includes(c => c.Translations)
+                .Where(c => clientIds.Contains(c.ClientId))
+                .ToListAsync(cancellationToken);
+            return result.Select(r => r.ToDomain()).ToList();
+        }
+
         public async Task<List<Client>> GetByClientIds(string realm, List<string> clientIds, CancellationToken cancellationToken)
         {
             var result = await _dbContext.Client.Queryable<SugarClient>()
@@ -108,6 +120,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
         public async Task<List<Client>> GetByClientIdsAndExistingBackchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
         {
             var result = await _dbContext.Client.Queryable<SugarClient>()
+                .Includes(c => c.Realms)
                 .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.RealmsName == realm) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
                 .ToListAsync();
             return result.Select(r => r.ToDomain()).ToList();

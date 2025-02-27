@@ -164,6 +164,11 @@ public class UserRepository : IUserRepository
         _dbContext.Client.Deleteable(users.Select(u => SugarUser.Transform(u)).ToList()).ExecuteCommand();
     }
 
+    public void Remove(IEnumerable<UserClaim> claims)
+    {
+        _dbContext.Client.Deleteable(claims.Select(u => SugarUserClaim.Transform(u)).ToList()).ExecuteCommand();
+    }
+
     public async Task<SearchResult<User>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)
     {
         var query = _dbContext.Client.Queryable<SugarUser>()

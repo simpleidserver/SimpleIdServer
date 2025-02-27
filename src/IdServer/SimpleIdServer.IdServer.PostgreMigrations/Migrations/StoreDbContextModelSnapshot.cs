@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -846,6 +846,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_nonce_required");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_public");
+
                     b.Property<bool>("IsRedirectUrlCaseSensitive")
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "is_redirect_url_casesensitive");
@@ -998,6 +1002,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
+
+                    b.Property<double?>("UserCookieExpirationTimeInSeconds")
+                        .HasColumnType("double precision")
+                        .HasAnnotation("Relational:JsonPropertyName", "user_cookie_expirationtime_seconds");
 
                     b.Property<string>("UserInfoEncryptedResponseAlg")
                         .HasColumnType("text")

@@ -33,6 +33,8 @@ public class RealmRepository : IRealmRepository
     public void Add(Realm realm)
         => _dbContext.Client.Insertable(Transform(realm)).ExecuteCommand();
 
+    public void Remove(Realm realm) => _dbContext.Client.Deleteable(realm);
+
     private static SugarRealm Transform(Realm realm)
     {
         return new SugarRealm

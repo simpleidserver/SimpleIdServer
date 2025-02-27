@@ -23,4 +23,6 @@ public class RealmRepository : IRealmRepository
         => _dbContext.Realms.SingleOrDefaultAsync(r => r.Name == name, cancellationToken);
 
     public void Add(Realm realm) =>_dbContext.Realms.Add(realm);
+
+    public void Remove(Realm realm) => _dbContext.Realms.Remove(realm);
 }

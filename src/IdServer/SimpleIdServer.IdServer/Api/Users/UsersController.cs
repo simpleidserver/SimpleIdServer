@@ -540,6 +540,7 @@ namespace SimpleIdServer.IdServer.Api.Users
 
                 void Update(User user, UpdateUserClaimsRequest request)
                 {
+                    _userRepository.Remove(user.OAuthUserClaims);
                     user.OAuthUserClaims.Clear();
                     foreach (var cl in request.Claims)
                         user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = cl.Name, Value = cl.Value });

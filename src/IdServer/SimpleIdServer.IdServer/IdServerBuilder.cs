@@ -4,6 +4,7 @@ using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
@@ -127,6 +128,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 o.AddConsumer<IdServerEventsConsumer>();
                 o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
                 o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();
+                o.AddConsumer<RemoveRealmCommandConsumer, RemoveRealmConsumerDefinition>();
                 cb(o);
             });
             return this;

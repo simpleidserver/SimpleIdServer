@@ -198,7 +198,7 @@ namespace SimpleIdServer.Scim.Domains
                 c.AddStringAttribute(StandardSCIMMetaAttributes.ResourceType, description: "The name of the resource type of the resource.");
                 c.AddDateTimeAttribute(StandardSCIMMetaAttributes.Created, description: "The DateTime that the resource was added to the service provider");
                 c.AddDateTimeAttribute(StandardSCIMMetaAttributes.LastModified, description: "The most recent DateTime that the details of this resource were updated at the service provider");
-                c.AddIntAttribute(StandardSCIMMetaAttributes.Version, description: "The version of the resource being returned");
+                c.AddStringAttribute(StandardSCIMMetaAttributes.Version, description: "The version of the resource being returned");
                 c.AddStringAttribute(StandardSCIMMetaAttributes.Location, description: "The URI of the resource being returned");
             }, multiValued: false, description: "A complex attribute containing resource metadata")
             .Build();

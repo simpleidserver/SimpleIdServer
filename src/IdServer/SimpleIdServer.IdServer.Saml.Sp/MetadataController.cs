@@ -43,6 +43,10 @@ public class MetadataController : Controller
             },
             AttributeConsumingServices = new AttributeConsumingService[]
             {
+            },
+            SingleLogoutServices = new SingleLogoutService[]
+            {
+                new SingleLogoutService { Binding = ProtocolBindings.HttpPost, Location = new Uri(issuer + "/LoggedOut") }
             }
         };
         entityDescriptor.ContactPersons = _options.ContactPersons;        

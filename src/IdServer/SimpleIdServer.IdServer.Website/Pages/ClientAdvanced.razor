@@ -25,9 +25,9 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="TokenSignedResponseAlg" Class="w-100"
-                                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
-                                        TValue="string"
-                                        @bind-Value=@updateAdvancedClient.TokenSignedResponseAlg />
+                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                        TValue="string"
+                        @bind-Value=@updateAdvancedClient.TokenSignedResponseAlg />
                     </div>
                 </div>
                 <!-- IdTokenSignedResponseAlg -->
@@ -38,9 +38,9 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="IdTokenSignedResponseAlg" Class="w-100"
-                                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
-                                        TValue="string"
-                                        @bind-Value=@updateAdvancedClient.IdTokenSignedResponseAlg />
+                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                        TValue="string"
+                        @bind-Value=@updateAdvancedClient.IdTokenSignedResponseAlg />
                     </div>
                 </div>
                 <!-- AuthorizationSignedResponseAlg -->
@@ -51,9 +51,9 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="AuthorizationSignedResponseAlg" Class="w-100"
-                                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
-                                        TValue="string"
-                                        @bind-Value=@updateAdvancedClient.AuthorizationSignedResponseAlg />
+                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                        TValue="string"
+                        @bind-Value=@updateAdvancedClient.AuthorizationSignedResponseAlg />
                     </div>
                 </div>
                 <!-- AuthorizationDataTypes -->
@@ -85,6 +85,16 @@
                     </div>
                     <div class="col">
                         <RadzenNumeric Name="TokenExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.TokenExpirationTimeInSeconds></RadzenNumeric>
+                    </div>
+                </div>
+                <!-- Cookie expiration time -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.CookieExpirationTimeTooltip))" />
+                        <RadzenLabel Text="@Global.CookieExpirationTime" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric Name="UserCookieExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.UserCookieExpirationTimeInSeconds></RadzenNumeric>
                     </div>
                 </div>
                 <!-- DPoP -->
@@ -144,6 +154,7 @@
         public bool IsDPoPRequired { get; set; } = false;
         public bool IsDPoPNonceRequired { get; set; } = false;
         public double DPOPNonceLifetimeInSeconds { get; set; }
+        public double UserCookieExpirationTimeInSeconds { get; set; } = 60 * 30;
         public double TokenExpirationTimeInSeconds { get; set; } = 60 * 30;
     }
 
@@ -187,8 +198,10 @@
             IsDPoPNonceRequired = Client.IsDPOPNonceRequired,
             DPOPNonceLifetimeInSeconds = Client.DPOPNonceLifetimeInSeconds
         };
-        if (Client.TokenExpirationTimeInSeconds != null) 
+        if (Client.TokenExpirationTimeInSeconds != null)
             updateAdvancedClient.TokenExpirationTimeInSeconds = Client.TokenExpirationTimeInSeconds.Value;
+        if (Client.UserCookieExpirationTimeInSeconds != null)
+            updateAdvancedClient.UserCookieExpirationTimeInSeconds = Client.UserCookieExpirationTimeInSeconds.Value;
         selectedResponseTypes = Client.ResponseTypes.Where(r => !string.IsNullOrWhiteSpace(r));
     }
 
@@ -206,7 +219,8 @@
             DPOPNonceLifetimeInSeconds = client.DPOPNonceLifetimeInSeconds,
             IsDPoPNonceRequired = client.IsDPoPNonceRequired,
             IsDPoPRequired = client.IsDPoPRequired,
-            TokenExpirationTimeInSeconds = client.TokenExpirationTimeInSeconds
+            TokenExpirationTimeInSeconds = client.TokenExpirationTimeInSeconds,
+            UserCookieExpirationTimeInSeconds = client.UserCookieExpirationTimeInSeconds
         });
     }
 

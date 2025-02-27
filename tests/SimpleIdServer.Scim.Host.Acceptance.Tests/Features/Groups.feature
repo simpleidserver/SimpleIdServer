@@ -181,6 +181,48 @@ Scenario: Check group can be updated with multiple users
 	Then JSON exists 'members[0].value'
 	Then JSON exists 'members[1].value'
 
+Scenario: Update a group with two users (HTTP PATCH - replace)
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                          |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstUser'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ] |
+	| members     | [ { "value" : "$firstUser$" } ]                   |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroup'
+
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen3                                                                                                          |
+	| externalId     | externalid2                                                                                                    |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondUser'
+		
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$firstGroup$'
+	| Key        | Value                                                                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                              |
+	| Operations | [ { "op": "replace", "path": "members", "value": [ { "value": "$firstUser$" }, { "value": "$secondUser$" } ] } ] |
+
+	And execute HTTP GET request 'http://localhost/Groups/$firstGroup$'	
+	And extract JSON from body
+	
+	Then HTTP status code equals to '200'
+	Then 'members' length is equals to '2'
+
 Scenario: Add a user to a group (HTTP PATCH)
 	When execute HTTP POST JSON request 'http://localhost/Groups'
 	| Key         | Value                                             |

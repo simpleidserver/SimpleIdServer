@@ -36,9 +36,9 @@ public class SecuredVerifiableCredentialFixture
         var isSignatureValid = vc.Check(credential, identityDocument);
 
         // ASSERT
-        Assert.IsNotNull(credential);
-        Assert.True(credential.Proof != null);
-        Assert.True(isSignatureValid);
+        Assert.That(credential != null);
+        Assert.That(credential.Proof != null);
+        Assert.That(isSignatureValid);
     }
 
     [Test]
@@ -67,11 +67,11 @@ public class SecuredVerifiableCredentialFixture
         var isSignatureValid = vc.Check(credential, identityDocument);
 
         // ASSERT
-        Assert.IsNotNull(vc);
-        Assert.IsTrue(isSignatureValid);
-        Assert.True(credential.Proof != null);
+        Assert.That(vc != null);
+        Assert.That(isSignatureValid);
+        Assert.That(credential.Proof != null);
         var proofValue = credential.Proof["proofValue"].ToString();
-        Assert.AreEqual("zW3gwNq5uhWFj9UvZpLW57FqniTW21oKQ1JavgTtmarkPFekN4zEH3PzGBoCCG6CiLm9LzZiSWTKjPQyhFV44hD9", proofValue);
+        Assert.That("zW3gwNq5uhWFj9UvZpLW57FqniTW21oKQ1JavgTtmarkPFekN4zEH3PzGBoCCG6CiLm9LzZiSWTKjPQyhFV44hD9" == proofValue);
     }
 
     #endregion
@@ -96,9 +96,9 @@ public class SecuredVerifiableCredentialFixture
         var isSignatureValid = vc.Check(credential, identityDocument);
 
         // ASSERT
-        Assert.IsNotNull(credential);
-        Assert.True(credential.Proof != null);
-        Assert.True(isSignatureValid);
+        Assert.That(credential != null);
+        Assert.That(credential.Proof != null);
+        Assert.That(isSignatureValid);
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class SecuredVerifiableCredentialFixture
         var credential = JsonSerializer.Deserialize<W3CVerifiableCredential>(json);
         vc.Secure(credential, identityDocument, identityDocument.VerificationMethod.First().Id);
 
-        Assert.IsNotNull(credential);
+        Assert.That(credential != null);
     }
 
     #endregion

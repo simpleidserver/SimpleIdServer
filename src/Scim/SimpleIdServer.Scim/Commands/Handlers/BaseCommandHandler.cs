@@ -12,9 +12,9 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 {
     public class BaseCommandHandler
     {
-        private readonly IBusControl _busControl;
+        private readonly IBusHelper _busControl;
 
-        public BaseCommandHandler(IBusControl busControl)
+        public BaseCommandHandler(IBusHelper busControl)
         {
             _busControl = busControl;
         }

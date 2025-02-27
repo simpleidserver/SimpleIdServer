@@ -326,6 +326,7 @@ task test {
     } finally {
         Pop-Location
     }
+	
     Push-Location -Path $base_dir\tests\SimpleIdServer.IdServer.Tests
 
     try {

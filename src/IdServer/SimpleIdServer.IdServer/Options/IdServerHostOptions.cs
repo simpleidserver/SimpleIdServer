@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Middlewares;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text.Json;
@@ -61,6 +62,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Default Token Expiration Time in seconds.
         /// </summary>
         public double DefaultTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
+        /// <summary>
+        /// Default expiration time of the user cookie.
+        /// </summary>
+        public double DefaultUserCookieExpirationTimeInSeconds { get; set; } = 60 * 30;
         /// <summary>
         /// Default Refresh Token Expiration Time in seconds.
         /// </summary>
@@ -212,7 +217,10 @@ namespace SimpleIdServer.IdServer.Options
         /// Set if the password is encoded in base64.
         /// </summary>
         public bool IsPasswordEncodeInBase64 { get; set; } = false;
-
+        /// <summary>
+        /// Maximum number of active sessions.
+        /// </summary>
+        public int MaxNbActiveSessions { get; set; } = 4;
         public ScimClientOptions ScimClientOptions { get; set; }
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);
@@ -223,12 +231,13 @@ namespace SimpleIdServer.IdServer.Options
 
         public IEnumerable<T> GetObjectArrayParameter<T>(string name) => JsonSerializer.Deserialize<IEnumerable<T>>(Parameters[name]);
 
-        public string GetSessionCookieName()
+        public string GetSessionCookieName(string userName)
         {
             var realm = RealmContext.Instance().Realm;
+            userName = userName.SanitizeNameIdentifier();
             if (!string.IsNullOrWhiteSpace(realm))
-                return $"{SessionCookieName}.{realm}";
-            return SessionCookieName;
+                return $"{SessionCookieName}.{realm}-{userName}";
+            return $"{SessionCookieName}-{userName}";
         }
 
         public string GetRegistrationCookieName()

@@ -187,6 +187,9 @@ this.ScenarioInitialize(scenarioInfo);
                 table3.AddRow(new string[] {
                             "sub",
                             "otheruser"});
+                table3.AddRow(new string[] {
+                            "iss",
+                            "http://localhost"});
 #line 26
  testRunner.Given("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table3, "Given ");
 #line hidden
@@ -196,19 +199,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table4.AddRow(new string[] {
                             "id_token",
                             "$id_token_hint$"});
-#line 30
- testRunner.When("execute HTTP POST request \'https://localhost:8080/authorization/callback\'", ((string)(null)), table4, "When ");
+#line 31
+ testRunner.When("execute HTTP POST request \'http://localhost/authorization/callback\'", ((string)(null)), table4, "When ");
 #line hidden
-#line 34
+#line 35
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 36
+#line 37
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 37
+#line 38
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 38
+#line 39
  testRunner.Then("JSON \'error_description\'=\'the nonce claim is missing in the id_token\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }
@@ -223,7 +226,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Nonce must be valid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 40
+#line 41
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -242,7 +245,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table5.AddRow(new string[] {
                             "nonce",
                             "invalidnonce"});
-#line 41
+                table5.AddRow(new string[] {
+                            "iss",
+                            "http://localhost"});
+#line 42
  testRunner.Given("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table5, "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table6 = new TechTalk.SpecFlow.Table(new string[] {
@@ -251,19 +257,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table6.AddRow(new string[] {
                             "id_token",
                             "$id_token_hint$"});
-#line 46
- testRunner.When("execute HTTP POST request \'https://localhost:8080/authorization/callback\'", ((string)(null)), table6, "When ");
-#line hidden
-#line 50
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line 48
+ testRunner.When("execute HTTP POST request \'http://localhost/authorization/callback\'", ((string)(null)), table6, "When ");
 #line hidden
 #line 52
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 53
- testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
 #line 54
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 55
+ testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 56
  testRunner.Then("JSON \'error_description\'=\'the nonce is invalid and doesn\'t match the nonce presen" +
                         "t in the authorization request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
@@ -279,7 +285,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Identity token must be signed by the Distributed Identity Document", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 56
+#line 58
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -289,7 +295,7 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 57
+#line 59
  testRunner.Given("build authorization request callback \'nonce\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
                 TechTalk.SpecFlow.Table table7 = new TechTalk.SpecFlow.Table(new string[] {
@@ -301,7 +307,10 @@ this.ScenarioInitialize(scenarioInfo);
                 table7.AddRow(new string[] {
                             "nonce",
                             "nonce"});
-#line 59
+                table7.AddRow(new string[] {
+                            "iss",
+                            "http://localhost"});
+#line 61
  testRunner.And("build JWS id_token_hint and sign with the key \'keyid\'", ((string)(null)), table7, "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table8 = new TechTalk.SpecFlow.Table(new string[] {
@@ -310,19 +319,19 @@ this.ScenarioInitialize(scenarioInfo);
                 table8.AddRow(new string[] {
                             "id_token",
                             "$id_token_hint$"});
-#line 64
- testRunner.When("execute HTTP POST request \'https://localhost:8080/authorization/callback\'", ((string)(null)), table8, "When ");
-#line hidden
-#line 68
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 70
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line 67
+ testRunner.When("execute HTTP POST request \'http://localhost/authorization/callback\'", ((string)(null)), table8, "When ");
 #line hidden
 #line 71
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 73
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 74
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 72
+#line 75
  testRunner.Then("JSON \'error_description\'=\'did doesn\'t have the correct format\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
             }

@@ -98,31 +98,70 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
+#line 5
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
                 TechTalk.SpecFlow.Table table100 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table100.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table100.AddRow(new string[] {
-                            "scope",
-                            "scope"});
+                            "response_type",
+                            "code"});
                 table100.AddRow(new string[] {
                             "client_id",
                             "nineClient"});
-#line 5
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table100, "When ");
+                table100.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table100.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table100.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table100.AddRow(new string[] {
+                            "scope",
+                            "secondScope"});
+                table100.AddRow(new string[] {
+                            "code_challenge_method",
+                            "plain"});
+                table100.AddRow(new string[] {
+                            "code_challenge",
+                            "challenge"});
+#line 6
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table100, "When ");
 #line hidden
-#line 11
+#line 17
+ testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table101 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table101.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table101.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table101.AddRow(new string[] {
+                            "client_id",
+                            "nineClient"});
+                table101.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+#line 19
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table101, "When ");
+#line hidden
+#line 26
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 12
+#line 27
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 13
+#line 28
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 14
+#line 29
  testRunner.And("JSON \'$.error_description\'=\'missing parameter code_verifier\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -137,59 +176,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when code is missing", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 16
-this.ScenarioInitialize(scenarioInfo);
-#line hidden
-            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
-            {
-                testRunner.SkipScenario();
-            }
-            else
-            {
-                this.ScenarioStart();
-                TechTalk.SpecFlow.Table table101 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table101.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table101.AddRow(new string[] {
-                            "scope",
-                            "scope"});
-                table101.AddRow(new string[] {
-                            "client_id",
-                            "nineClient"});
-                table101.AddRow(new string[] {
-                            "code_verifier",
-                            "code"});
-#line 17
- testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table101, "When ");
-#line hidden
-#line 24
- testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 25
- testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
-#line hidden
-#line 26
- testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-#line 27
- testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
-#line hidden
-            }
-            this.ScenarioCleanup();
-        }
-        
-        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when code doesn\'t exist")]
-        [Xunit.TraitAttribute("FeatureTitle", "ClientPkceAuthenticationErrors")]
-        [Xunit.TraitAttribute("Description", "Error is returned when code doesn\'t exist")]
-        public void ErrorIsReturnedWhenCodeDoesntExist()
-        {
-            string[] tagsOfScenario = ((string[])(null));
-            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when code doesn\'t exist", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 29
+#line 31
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -214,22 +201,74 @@ this.ScenarioInitialize(scenarioInfo);
                 table102.AddRow(new string[] {
                             "code_verifier",
                             "code"});
-                table102.AddRow(new string[] {
-                            "code",
-                            "code"});
-#line 30
+#line 32
  testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table102, "When ");
 #line hidden
-#line 38
+#line 39
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 39
+#line 40
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 40
+#line 41
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 41
+#line 42
+ testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Xunit.SkippableFactAttribute(DisplayName="Error is returned when code doesn\'t exist")]
+        [Xunit.TraitAttribute("FeatureTitle", "ClientPkceAuthenticationErrors")]
+        [Xunit.TraitAttribute("Description", "Error is returned when code doesn\'t exist")]
+        public void ErrorIsReturnedWhenCodeDoesntExist()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when code doesn\'t exist", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 44
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table103 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table103.AddRow(new string[] {
+                            "grant_type",
+                            "client_credentials"});
+                table103.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table103.AddRow(new string[] {
+                            "client_id",
+                            "nineClient"});
+                table103.AddRow(new string[] {
+                            "code_verifier",
+                            "code"});
+                table103.AddRow(new string[] {
+                            "code",
+                            "code"});
+#line 45
+ testRunner.When("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table103, "When ");
+#line hidden
+#line 53
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 54
+ testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 55
+ testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 56
  testRunner.And("JSON \'$.error_description\'=\'bad client credential\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
@@ -244,7 +283,7 @@ this.ScenarioInitialize(scenarioInfo);
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
             TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Error is returned when code_verifier is invalid", null, tagsOfScenario, argumentsOfScenario, featureTags);
-#line 43
+#line 58
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
             if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
@@ -254,73 +293,73 @@ this.ScenarioInitialize(scenarioInfo);
             else
             {
                 this.ScenarioStart();
-#line 44
+#line 59
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
-#line hidden
-                TechTalk.SpecFlow.Table table103 = new TechTalk.SpecFlow.Table(new string[] {
-                            "Key",
-                            "Value"});
-                table103.AddRow(new string[] {
-                            "response_type",
-                            "code"});
-                table103.AddRow(new string[] {
-                            "client_id",
-                            "nineClient"});
-                table103.AddRow(new string[] {
-                            "state",
-                            "state"});
-                table103.AddRow(new string[] {
-                            "redirect_uri",
-                            "http://localhost:8080"});
-                table103.AddRow(new string[] {
-                            "response_mode",
-                            "query"});
-                table103.AddRow(new string[] {
-                            "scope",
-                            "secondScope"});
-                table103.AddRow(new string[] {
-                            "code_challenge_method",
-                            "plain"});
-                table103.AddRow(new string[] {
-                            "code_challenge",
-                            "challenge"});
-#line 45
- testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table103, "When ");
-#line hidden
-#line 56
- testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table104 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
                             "Value"});
                 table104.AddRow(new string[] {
-                            "grant_type",
-                            "client_credentials"});
-                table104.AddRow(new string[] {
-                            "scope",
-                            "scope"});
+                            "response_type",
+                            "code"});
                 table104.AddRow(new string[] {
                             "client_id",
                             "nineClient"});
                 table104.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table104.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table104.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table104.AddRow(new string[] {
+                            "scope",
+                            "secondScope"});
+                table104.AddRow(new string[] {
+                            "code_challenge_method",
+                            "plain"});
+                table104.AddRow(new string[] {
+                            "code_challenge",
+                            "challenge"});
+#line 60
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table104, "When ");
+#line hidden
+#line 71
+ testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table105 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table105.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table105.AddRow(new string[] {
+                            "scope",
+                            "scope"});
+                table105.AddRow(new string[] {
+                            "client_id",
+                            "nineClient"});
+                table105.AddRow(new string[] {
                             "code_verifier",
                             "invalid"});
-                table104.AddRow(new string[] {
+                table105.AddRow(new string[] {
                             "code",
                             "$code$"});
-#line 58
- testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table104, "And ");
+#line 73
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table105, "And ");
 #line hidden
-#line 66
+#line 81
  testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 67
+#line 82
  testRunner.Then("HTTP status code equals to \'400\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
-#line 68
+#line 83
  testRunner.And("JSON \'$.error\'=\'invalid_client\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
-#line 69
+#line 84
  testRunner.And("JSON \'$.error_description\'=\'code_verifier is invalid\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }

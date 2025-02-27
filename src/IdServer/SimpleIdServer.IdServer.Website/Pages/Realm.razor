@@ -29,10 +29,14 @@
     <div class="mb-1">
         <SidAuthorizeView Roles="SIDS-manager/administrator" IsRealmEnabled=false>
             <Authorized>
-                <RadzenButton Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.AddRealm" />
+                <RadzenButton Icon="add_circle" Click=@((args) => AddRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.AddRealm" />
+                @if (RealmContext.Instance()?.Realm != SimpleIdServer.IdServer.Constants.DefaultRealm)
+                {
+                    <RadzenButton Class="rz-ml-1" Icon="delete" Click=@(async (args) => await DeleteCurrentRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.RemoveRealm" />
+                }
             </Authorized>
         </SidAuthorizeView>
-        <RadzenButton Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.ChooseRealm" />
+        <RadzenButton Icon="check_circle" Click=@((args) => ChooseRealm()) Variant="Variant.Flat" ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Primary" Text="@Global.ChooseRealm" />
     </div>    
 }
 
@@ -73,12 +77,32 @@
         base.OnParametersSet();
         if (string.IsNullOrWhiteSpace(action)) action = "overview";
         selectedIndex = mappingActionNameToIndex[action];
-
     }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<DeleteCurrentRealmSuccessAction>(async (act) =>
+            {
+                await dialogService.Confirm(Global.RefreshPage, Global.RealmRemoved, new ConfirmOptions { OkButtonText = Global.Yes });
+                navigationManager.NavigateTo(navigationManager.Uri, true);
+            });
+        }
+    }
+
 
     void AddRealm()
     {
         navigationManager.NavigateTo(urlHelper.GetUrl("/addrealm"));
+    }
+
+    async Task DeleteCurrentRealm()
+    {
+        var confirmationResult = await dialogService.Confirm(Global.DoYouWantToDeleteRealm, Global.Delete, new ConfirmOptions { OkButtonText = Global.Yes, CancelButtonText = Global.No });
+        if (confirmationResult == null || !confirmationResult.Value) return;
+        dispatcher.Dispatch(new DeleteCurrentRealmAction());
     }
 
     async void ChooseRealm()

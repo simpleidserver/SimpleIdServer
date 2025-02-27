@@ -107,20 +107,6 @@ public class SidSwaggerUIMiddleware
         return _middlewares[key];
     }
 
-    private StaticFileMiddleware CreateStaticFileMiddleware(
-        RequestDelegate next,
-        IWebHostEnvironment hostingEnv,
-        ILoggerFactory loggerFactory,
-        SwaggerUIOptions options)
-    {
-        var staticFileOptions = new StaticFileOptions
-        {
-            RequestPath = string.IsNullOrEmpty(options.RoutePrefix) ? string.Empty : $"/{options.RoutePrefix}",
-            FileProvider = new EmbeddedFileProvider(typeof(SwaggerUIMiddleware).GetTypeInfo().Assembly, EmbeddedFileNamespace),
-        };
-        return new StaticFileMiddleware(next, hostingEnv, Microsoft.Extensions.Options.Options.Create(staticFileOptions), loggerFactory);
-    }
-
     private void RespondWithRedirect(HttpResponse response, string location)
     {
         response.StatusCode = 301;

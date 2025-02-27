@@ -87,6 +87,16 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             return result?.ToDomain();
         }
 
+        public async Task<List<Scope>> GetByNames(List<string> scopeNames, CancellationToken cancellationToken)
+        {
+            var result = await _dbContext.Client.Queryable<SugarScope>()
+                .Includes(s => s.Realms)
+                .Includes(s => s.ClaimMappers)
+                .Where(s => scopeNames.Contains(s.Name))
+                .ToListAsync(cancellationToken);
+            return result.Select(s => s.ToDomain()).ToList();
+        }
+
         public async Task<List<Scope>> GetByNames(string realm, List<string> scopeNames, CancellationToken cancellationToken)
         {
             var result = await _dbContext.Client.Queryable<SugarScope>()

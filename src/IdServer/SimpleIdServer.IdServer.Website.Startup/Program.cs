@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 var dataProtectionPath = builder.Configuration["dataProtectionPath"]?.ToString();
 var isRealmEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
+var cookieName = CookieAuthenticationDefaults.CookiePrefix + Uri.EscapeDataString("AdminWebsite");
 builder.Services.AddSIDWebsite(o =>
 {
     o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
@@ -27,7 +29,7 @@ var forceHttpsStr = builder.Configuration["forceHttps"];
 if (!string.IsNullOrWhiteSpace(forceHttpsStr) && bool.TryParse(forceHttpsStr, out bool r))
     forceHttps = r;
 
-builder.Services.AddDefaultSecurity(builder.Configuration, isRealmEnabled);
+builder.Services.AddDefaultSecurity(builder.Configuration, isRealmEnabled, cookieName);
 builder.Services.AddLocalization();
 
 var app = builder.Build();

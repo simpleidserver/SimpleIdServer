@@ -18,8 +18,10 @@ namespace SimpleIdServer.Scim.MySQLMigrations.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("dbo")
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("SCIMRepresentationSCIMSchema", b =>
                 {
@@ -61,6 +63,8 @@ namespace SimpleIdServer.Scim.MySQLMigrations.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
@@ -100,6 +104,8 @@ namespace SimpleIdServer.Scim.MySQLMigrations.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("IsArray")
                         .HasColumnType("tinyint(1)");
@@ -193,8 +199,8 @@ namespace SimpleIdServer.Scim.MySQLMigrations.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("int");
+                    b.Property<string>("Version")
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -244,7 +250,8 @@ namespace SimpleIdServer.Scim.MySQLMigrations.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<decimal?>("ValueDecimal")
-                        .HasColumnType("decimal(65,30)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("ValueInteger")
                         .HasColumnType("int");

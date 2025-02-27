@@ -204,6 +204,9 @@
   <data name="BadAccessToken" xml:space="preserve">
     <value>access token is not correct</value>
   </data>
+  <data name="BadAccessTokenIssuer" xml:space="preserve">
+    <value>the access token issuer is not valid</value>
+  </data>
   <data name="BadAuthorizationCode" xml:space="preserve">
     <value>bad authorization code</value>
   </data>
@@ -1049,5 +1052,8 @@
   </data>
   <data name="UserNotAuthenticated" xml:space="preserve">
     <value>you're not authenticated</value>
+  </data>
+  <data name="CannotRemoveMasterRealm" xml:space="preserve">
+    <value>Master realm cannot be removed</value>
   </data>
 </root>

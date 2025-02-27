@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
@@ -105,11 +104,21 @@ namespace SimpleIdServer.Scim.Helpers
                 if (scimFilter != null)
                 {
                     filteredAttributes = await _scimRepresentationCommandRepository.FindAttributes(representation.Id, scimExpr, cancellationToken);
-                    hierarchicalFilteredAttributes = SCIMRepresentation.BuildHierarchicalAttributes(filteredAttributes);
+                    if(hierarchicalNewAttributes != null && !filteredAttributes.Any())
+                    {
+                        hierarchicalFilteredAttributes = scimFilter.EvaluateAttributes(SCIMRepresentation.BuildHierarchicalAttributes(result.Patches.Select(p => p.Attr)).AsQueryable(), false).ToList();
+                        filteredAttributes = SCIMRepresentation.BuildFlatAttributes(hierarchicalNewAttributes);
+                    }
+                    else
+                    {
+                        hierarchicalFilteredAttributes = SCIMRepresentation.BuildHierarchicalAttributes(filteredAttributes);
+                    }
+
                     var complexAttr = scimFilter as SCIMComplexAttributeExpression;
                     if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null && patch.Operation == SCIMPatchOperations.REPLACE) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                 }
 
+                var computedIndexes = hierarchicalNewAttributes?.Select(a => a.ComputedValueIndex)?.ToList() ?? new List<string>();
                 if(hierarchicalFilteredAttributes != null && hierarchicalNewAttributes != null) hierarchicalNewAttributes = FilterDuplicate(hierarchicalFilteredAttributes, hierarchicalNewAttributes);
 
                 var removeCallback = new Action<ICollection<SCIMRepresentationAttribute>>((attrs) =>
@@ -190,6 +199,16 @@ namespace SimpleIdServer.Scim.Helpers
                             if(hierarchicalFilteredAttributes == null)
                             {
                                 await OverrideRootAttributes(result, hierarchicalNewAttributes, representation, cancellationToken);
+                            }
+                            // If the target location is a multi-valued attribute and no filter is specified, the attribute and all values are replaced.
+                            else if (scimFilter != null && !(scimFilter is SCIMComplexAttributeExpression) && scimExprSchemaAttr != null && scimExprSchemaAttr.MultiValued == true)
+                            {
+                                removeCallback(hierarchicalFilteredAttributes.Where(h => !computedIndexes.Contains(h.ComputedValueIndex)).SelectMany(a => a.ToFlat()).ToList());
+                                hierarchicalNewAttributes.SelectMany(a => a.ToFlat()).ToList().ForEach(a =>
+                                {
+                                    a.RepresentationId = representation.Id;
+                                    result.Add(a);
+                                });
                             }
                             else
                             {
@@ -561,11 +580,24 @@ namespace SimpleIdServer.Scim.Helpers
 
         public void CheckMutability(List<SCIMPatchResult> patchOperations)
         {
-            var attrWithBrokenMutability = patchOperations
-                .Where(o => o.Attr != null && (o.Operation == SCIMPatchOperations.REMOVE || o.Operation == SCIMPatchOperations.REPLACE) && (o.Attr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE))
-                .Select(o => o.Attr);
-            if(attrWithBrokenMutability.Any())
-                throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, string.Join(",", attrWithBrokenMutability.Select(a => a.FullPath).Distinct())));
+            var rootPatchOperations = patchOperations.Where(o => !patchOperations.Any(p => o.Attr.GetParentFullPath() == p.Path));
+            foreach (var rootOperation in rootPatchOperations)
+            {
+                var scopedOperations = new List<SCIMPatchResult>
+                {
+                    rootOperation
+                };
+                if (rootOperation.Operation == SCIMPatchOperations.ADD)
+                {
+                    scopedOperations  = patchOperations.Where(p => p.Path.StartsWith(rootOperation.Path) && p.Operation == rootOperation.Operation).ToList();
+                }
+
+                var attrWithBrokenMutability = scopedOperations
+                    .Where(o => o.Attr != null && (o.Operation == SCIMPatchOperations.REMOVE || o.Operation == SCIMPatchOperations.REPLACE) && (o.Attr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE))
+                    .Select(o => o.Attr);
+                if (attrWithBrokenMutability.Any())
+                    throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, string.Join(",", attrWithBrokenMutability.Select(a => a.FullPath).Distinct())));
+            }
         }
 
         #endregion
@@ -617,13 +649,12 @@ namespace SimpleIdServer.Scim.Helpers
                 if (record.SchemaAttribute.MultiValued)
                 {
                     var jArr = record.Content as JArray;
-                    if (jArr == null)
+                    if (jArr == null && !record.Content.IsEmpty())
                     {
                         throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotArray, record.SchemaAttribute.Name));
                     }
 
-
-                    attributes.AddRange(BuildAttributes(jArr, record.SchemaAttribute, record.Schema, ignoreUnsupportedCanonicalValues));
+                    if(jArr != null) attributes.AddRange(BuildAttributes(jArr, record.SchemaAttribute, record.Schema, ignoreUnsupportedCanonicalValues));
                 }
                 else
                 {
@@ -898,12 +929,14 @@ namespace SimpleIdServer.Scim.Helpers
         private static ICollection<ResolutionRowResult> ResolveFullQualifiedName(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> extensionSchemas)
         {
             var jObj = kvp.Value as JObject;
-            if (jObj == null)
+            var jArr = kvp.Value as JArray;
+            if (jArr != null)
             {
                 throw new SCIMSchemaViolatedException(string.Format(Global.PropertyCannotContainsArray, kvp.Key));
             }
 
             var result = new List<ResolutionRowResult>();
+            if (jObj == null) return result;
             var schema = extensionSchemas.First(e => kvp.Key == e.Id);
             foreach (var skvp in jObj)
             {

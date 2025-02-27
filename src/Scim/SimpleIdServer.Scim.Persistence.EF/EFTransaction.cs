@@ -25,6 +25,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public async Task Commit(CancellationToken token)
         {
+            if (_dbContextTransaction == null)
+            {
+                await _dbContext.SaveChangesAsync(token);
+                return;
+            }
+
             var entries = _dbContext.ChangeTracker.Entries();
             var attrsToRemove = entries
                 .Where(e => e.Entity.GetType() == typeof(SCIMRepresentationAttribute))
@@ -35,11 +41,12 @@ namespace SimpleIdServer.Scim.Persistence.EF
 
         public void Dispose()
         {
-            _dbContextTransaction.Dispose();
+            _dbContextTransaction?.Dispose();
         }
 
         public ValueTask DisposeAsync() 
         {
+            if(_dbContextTransaction == null) return ValueTask.CompletedTask;
             return _dbContextTransaction.DisposeAsync();
         }
     }

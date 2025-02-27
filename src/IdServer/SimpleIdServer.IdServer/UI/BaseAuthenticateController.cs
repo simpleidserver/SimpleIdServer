@@ -147,9 +147,9 @@ namespace SimpleIdServer.IdServer.UI
         protected async Task<IActionResult> Sign(string realm, AuthenticationContextClassReference acr, string returnUrl, string currentAmr, User user, Client client, CancellationToken token, bool rememberLogin = false)
         {
             var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
-            await AddSession(realm, user, client, token, rememberLogin);
-            var offset = DateTimeOffset.UtcNow.AddSeconds(expirationTimeInSeconds);
             var claims = _userTransformer.Transform(user);
+            await AddSession(realm, claims, user, client, token, rememberLogin);
+            var offset = DateTimeOffset.UtcNow.AddSeconds(expirationTimeInSeconds);
             if(acr != null)
                 claims.Add(new Claim(Constants.UserClaims.Amrs, string.Join(" ", acr.AuthenticationMethodReferences)));
             var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
@@ -180,7 +180,7 @@ namespace SimpleIdServer.IdServer.UI
             return Redirect(returnUrl);
         }
 
-        protected async Task AddSession(string realm, User user, Client client, CancellationToken cancellationToken, bool rememberLogin = false)
+        protected async Task AddSession(string realm, ICollection<Claim> claims, User user, Client client, CancellationToken cancellationToken, bool rememberLogin = false)
         {
             using(var transaction = TransactionBuilder.Build())
             {
@@ -211,14 +211,15 @@ namespace SimpleIdServer.IdServer.UI
                     cookieOptions.MaxAge = TimeSpan.FromSeconds(expirationTimeInSeconds);
                 }
 
-                Response.Cookies.Append(_options.GetSessionCookieName(), session.SessionId, cookieOptions);
+                var sub = claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                Response.Cookies.Append(_options.GetSessionCookieName(sub), session.SessionId, cookieOptions);
             }
         }
 
         private double GetCookieExpirationTimeInSeconds(Client client)
         {
-            var expirationTimeInSeconds = client == null || client.TokenExpirationTimeInSeconds == null ?
-               _options.DefaultTokenExpirationTimeInSeconds : client.TokenExpirationTimeInSeconds.Value;
+            var expirationTimeInSeconds = client == null || client.UserCookieExpirationTimeInSeconds == null ?
+               _options.DefaultTokenExpirationTimeInSeconds : client.UserCookieExpirationTimeInSeconds.Value;
             return expirationTimeInSeconds;
         }
     }

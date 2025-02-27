@@ -19,7 +19,7 @@ public class DidKeyGeneratorFixture
         var resolved = await resolver.Resolve(did.Did, CancellationToken.None);
 
         // ASSERT
-        Assert.IsNotNull(resolved);
+        Assert.That(resolved != null);
     }
 
     [Test]
@@ -34,6 +34,6 @@ public class DidKeyGeneratorFixture
         var resolved = await resolver.Resolve(did.Did, CancellationToken.None);
 
         // ASSERT
-        Assert.IsNotNull(resolved);
+        Assert.That(resolved != null);
     }
 }

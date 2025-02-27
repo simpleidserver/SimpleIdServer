@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SimpleIdServer.IdServer.Website.ViewModels;
 using System.Text.Json.Nodes;
@@ -14,18 +15,21 @@ namespace SimpleIdServer.IdServer.Website.Controllers;
 public class LoginController : Controller
 {
     private readonly DefaultSecurityOptions _defaultSecurityOptions;
+    private readonly IdServerWebsiteOptions _options;
     private readonly ILogger<LoginController> _logger;
 
     public LoginController(
         DefaultSecurityOptions defaultSecurityOptions,
+        IOptions<IdServerWebsiteOptions> options,
         ILogger<LoginController> logger)
     {
         _defaultSecurityOptions = defaultSecurityOptions;
+        _options = options.Value;
         _logger = logger;
     }
 
     [Route("login")]
-    public IActionResult Login(string acrValues)
+    public IActionResult Login(string acrValues, string realm = null)
     {
         var items = new Dictionary<string, string>
         {
@@ -34,19 +38,21 @@ public class LoginController : Controller
         var props = new AuthenticationProperties(items);
         props.SetParameter(OpenIdConnectParameterNames.Prompt, "login");
         props.SetParameter(OpenIdConnectParameterNames.AcrValues, acrValues);
-        props.SetParameter(OpenIdConnectParameterNames.RedirectUri, GetRedirectUri());
+        props.SetParameter(OpenIdConnectParameterNames.RedirectUri, GetRedirectUri(realm));
         var result = Challenge(props, "oidc");
         return result;
     }
 
     [Route("callback")]
-    public async Task<IActionResult> Callback()
+    public async Task<IActionResult> Callback(string realm)
     {
         _logger.LogInformation("Execute callback");
-        var tokenEndpoint = $"{_defaultSecurityOptions.Issuer}/token";
-        var userInfoEndpoint = $"{_defaultSecurityOptions.Issuer}/userinfo";
+        var issuer = _defaultSecurityOptions.Issuer;
+        if(_options.IsReamEnabled) issuer = $"{issuer}/{realm}";
+        var tokenEndpoint = $"{issuer}/token";
+        var userInfoEndpoint = $"{issuer}/userinfo";
         var authorizationResponse = await ExtractAuthorizationResponse();
-        var tokenResponse = await GetToken(authorizationResponse, tokenEndpoint);
+        var tokenResponse = await GetToken(realm, authorizationResponse, tokenEndpoint);
         var userInfo = await GetUserInfo(tokenResponse, userInfoEndpoint);
         return View(new CallbackViewModel { Claims = userInfo });
     }
@@ -71,9 +77,9 @@ public class LoginController : Controller
         return message;
     }
 
-    private async Task<OpenIdConnectMessage> GetToken(OpenIdConnectMessage authorizationResponse, string tokenEndpoint)
+    private async Task<OpenIdConnectMessage> GetToken(string realm, OpenIdConnectMessage authorizationResponse, string tokenEndpoint)
     {
-        var redirectUri = GetRedirectUri();
+        var redirectUri = GetRedirectUri(realm);
         using (var httpClient = BuildHttpClient())
         {
             var tokenEndpointRequest = new OpenIdConnectMessage
@@ -125,9 +131,9 @@ public class LoginController : Controller
         return new HttpClient(handler);
     }
 
-    private string GetRedirectUri()
+    private string GetRedirectUri(string realm)
     {
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
-        return $"{issuer}/callback";
+        return $"{issuer}/callback?realm={realm}";
     }
 }

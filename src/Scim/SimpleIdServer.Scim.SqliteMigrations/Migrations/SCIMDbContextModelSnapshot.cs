@@ -191,8 +191,8 @@ namespace SimpleIdServer.Scim.SqliteMigrations.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Version")
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
