@@ -117,64 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="external_authenticate" xml:space="preserve">
-    <value>External authentication</value>
-  </data>
-  <data name="invalid_credential" xml:space="preserve">
-    <value>Credential is invalid</value>
-  </data>
-  <data name="invalid_login" xml:space="preserve">
-    <value>Login is missing</value>
-  </data>
-  <data name="login" xml:space="preserve">
-    <value>Login</value>
-  </data>
-  <data name="missing_login" xml:space="preserve">
-    <value>Login is missing</value>
-  </data>
-  <data name="missing_password" xml:space="preserve">
-    <value>Password is missing</value>
-  </data>
-  <data name="missing_return_url" xml:space="preserve">
-    <value>Return url is missing</value>
-  </data>
-  <data name="password" xml:space="preserve">
-    <value>Password</value>
-  </data>
-  <data name="policy" xml:space="preserve">
-    <value>Policy</value>
-  </data>
-  <data name="register" xml:space="preserve">
-    <value>Register</value>
-  </data>
-  <data name="remember_login" xml:space="preserve">
-    <value>Remember me</value>
-  </data>
-  <data name="reset_pwd" xml:space="preserve">
-    <value>Forget my password</value>
-  </data>
-  <data name="submit" xml:space="preserve">
-    <value>Submit</value>
-  </data>
   <data name="title" xml:space="preserve">
-    <value>Authenticate</value>
+    <value>Choose a session</value>
   </data>
-  <data name="tos" xml:space="preserve">
-    <value>Terms of service</value>
+  <data name="realm" xml:space="preserve">
+    <value>Sessions in the realm '{0}'</value>
   </data>
-  <data name="unknown_user" xml:space="preserve">
-    <value>The user doesn't exist</value>
+  <data name="revoke" xml:space="preserve">
+    <value>Revoke</value>
   </data>
-  <data name="user_blocked" xml:space="preserve">
-    <value>User account is blocked</value>
-  </data>
-  <data name="maximum_number_active_sessions" xml:space="preserve">
-    <value>The maximum number of active sessions has been reached.</value>
-  </data>
-  <data name="reject_sessions" xml:space="preserve">
-    <value>Click the following link to reject sessions</value>
-  </data>
-  <data name="sessions" xml:space="preserve">
-    <value>Sessions</value>
+  <data name="no_session" xml:space="preserve">
+    <value>There is no session</value>
   </data>
 </root>

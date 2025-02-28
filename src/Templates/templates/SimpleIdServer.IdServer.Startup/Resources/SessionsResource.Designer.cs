@@ -22,14 +22,14 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class AccountsResource {
+    public class SessionsResource {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal AccountsResource() {
+        internal SessionsResource() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.AccountsResource", typeof(AccountsResource).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("SimpleIdServer.IdServer.Startup.Resources.SessionsResource", typeof(SessionsResource).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,83 +61,38 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Active sessions.
+        ///   Recherche une chaîne localisée semblable à There is no session.
         /// </summary>
-        public static string active_sessions {
+        public static string no_session {
             get {
-                return ResourceManager.GetString("active_sessions", resourceCulture);
+                return ResourceManager.GetString("no_session", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Authentication time {0}.
+        ///   Recherche une chaîne localisée semblable à Sessions in the realm &apos;{0}&apos;.
         /// </summary>
-        public static string authentication_time {
+        public static string realm {
             get {
-                return ResourceManager.GetString("authentication_time", resourceCulture);
+                return ResourceManager.GetString("realm", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Choose session.
+        ///   Recherche une chaîne localisée semblable à Revoke.
         /// </summary>
-        public static string choose_session {
+        public static string revoke {
             get {
-                return ResourceManager.GetString("choose_session", resourceCulture);
+                return ResourceManager.GetString("revoke", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Expiration time {0}.
+        ///   Recherche une chaîne localisée semblable à Choose a session.
         /// </summary>
-        public static string expiration_time {
+        public static string title {
             get {
-                return ResourceManager.GetString("expiration_time", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Reject.
-        /// </summary>
-        public static string reject {
-            get {
-                return ResourceManager.GetString("reject", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Revoke a session.
-        /// </summary>
-        public static string revoke_session_title {
-            get {
-                return ResourceManager.GetString("revoke_session_title", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à Select a session.
-        /// </summary>
-        public static string select_session {
-            get {
-                return ResourceManager.GetString("select_session", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à The user session has been rejected.
-        /// </summary>
-        public static string useraccount_rejected {
-            get {
-                return ResourceManager.GetString("useraccount_rejected", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Recherche une chaîne localisée semblable à The user session has been switched.
-        /// </summary>
-        public static string useraccount_switched {
-            get {
-                return ResourceManager.GetString("useraccount_switched", resourceCulture);
+                return ResourceManager.GetString("title", resourceCulture);
             }
         }
     }

@@ -135,4 +135,13 @@
   <data name="select_session" xml:space="preserve">
     <value>Select a session</value>
   </data>
+  <data name="useraccount_switched" xml:space="preserve">
+    <value>The user session has been switched</value>
+  </data>
+  <data name="reject" xml:space="preserve">
+    <value>Reject</value>
+  </data>
+  <data name="useraccount_rejected" xml:space="preserve">
+    <value>The user session has been rejected</value>
+  </data>
 </root>

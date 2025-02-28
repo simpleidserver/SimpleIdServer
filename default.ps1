@@ -244,6 +244,7 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqliteMigrations\SimpleIdServer.Scim.SqliteMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj -c $config --no-build $versionSuffix --output $result_dir }
