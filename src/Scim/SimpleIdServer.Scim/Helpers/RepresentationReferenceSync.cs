@@ -43,7 +43,6 @@ namespace SimpleIdServer.Scim.Helpers
             var allAdded = new List<RepresentationModified>();
             var allRemoved = new List<RepresentationModified>();
 
-            // Update 'direct' references : GROUP => USER
             foreach (var kvp in attributeMappingLst.GroupBy(m => m.SourceAttributeId))
             {
                 var sourceSchema = mappedSchemas.First(s => s.ResourceType == kvp.First().SourceResourceType && s.Attributes.Any(a => a.Id == kvp.Key)); 
@@ -56,6 +55,7 @@ namespace SimpleIdServer.Scim.Helpers
                     .SelectMany(p => patchOperations.Where(po => po.Attr.ParentAttributeId == p.Attr.Id && po.Attr.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Value).Select(po => po.Attr.ValueString)).ToList();
                 var duplicateIds = allCurrentIds.GroupBy(i => i).Where(i => i.Count() > 1).ToList();
                 if (duplicateIds.Any()) throw new SCIMUniquenessAttributeException(string.Format(Global.DuplicateReference, string.Join(",", duplicateIds.Select(_ => _.Key).Distinct())));
+                // Update 'direct' references : GROUP => USER.
                 foreach (var attributeMapping in kvp.Where(a => !a.IsSelf)) 
                 {
                     var sourceAttribute = sourceSchema.GetAttributeById(attributeMapping.SourceAttributeId);
@@ -92,7 +92,7 @@ namespace SimpleIdServer.Scim.Helpers
                             if (referencedRepresentation == null) continue;
                             var attr = BuildScimRepresentationAttribute(missingReferenceAttribute, attributeMapping.TargetAttributeId, newSourceScimRepresentation, mode, newSourceScimRepresentation.ResourceType, targetSchema);
                             result.AddReferenceAttributes(attr);
-                            UpdateScimRepresentation(result, patchOperations, referencedRepresentation, schema, sourceAttribute);
+                            UpdateScimRepresentation(sync, result, patchOperations, referencedRepresentation, schema, sourceAttribute);
                         }
 
                         var removedIds = result.RemovedRepresentationAttributes.Where(a => a.SchemaAttributeId == targetAttributeValue.Id).Select(r => r.RepresentationId).ToList();
@@ -107,7 +107,7 @@ namespace SimpleIdServer.Scim.Helpers
                     }
                 }
 
-                // Update indirect references : GROUP => GROUP
+                // Update indirect references : GROUP => GROUP.
                 foreach (var attributeMapping in kvp.Where(a => a.IsSelf))
                 {
                     var sourceAttribute = schema.GetAttributeById(attributeMapping.SourceAttributeId);
@@ -115,7 +115,7 @@ namespace SimpleIdServer.Scim.Helpers
                     var referencedRepresentations = (await _scimRepresentationCommandRepository.FindRepresentations(newIds)).Where(r => r.ResourceType == attributeMapping.TargetResourceType);
                     foreach (var referencedRepresentation in referencedRepresentations)
                     {
-                        UpdateScimRepresentation(result, patchOperations, referencedRepresentation, schema, sourceAttribute);
+                        UpdateScimRepresentation(sync, result, patchOperations, referencedRepresentation, schema, sourceAttribute);
                     }
 
                     // Remove the reference.
@@ -370,7 +370,7 @@ namespace SimpleIdServer.Scim.Helpers
             public bool IsDirect { get; private set; }
         }
 
-        protected virtual void UpdateScimRepresentation(RepresentationSyncResult result, ICollection<SCIMPatchResult> patches, SCIMRepresentation targetRepresentation, SCIMSchema sourceSchema, SCIMSchemaAttribute sourceAttribute)
+        protected virtual void UpdateScimRepresentation(List<RepresentationSyncResult> sync, RepresentationSyncResult result, ICollection<SCIMPatchResult> patches, SCIMRepresentation targetRepresentation, SCIMSchema sourceSchema, SCIMSchemaAttribute sourceAttribute)
         {
             var sourceAttributeValue = sourceSchema.GetChildren(sourceAttribute).Single(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Value);
             var sourceAttributeType = sourceSchema.GetChildren(sourceAttribute).SingleOrDefault(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Type);
@@ -378,32 +378,52 @@ namespace SimpleIdServer.Scim.Helpers
             var flatAttrs = patches.Select(p => p.Attr);
             var representationId = flatAttrs.First().RepresentationId;
             var valAttr = flatAttrs.Single(a => a.SchemaAttributeId == sourceAttributeValue.Id && a.ValueString == targetRepresentation.Id);
+            // When the attribute doesn't exist then insert it.
+            // When the attribute already exists then update its value.
             if (sourceAttributeType != null)
             {
-                result.AddReferenceAttributes(new List<SCIMRepresentationAttribute>
+                var existingTypeAttribute = flatAttrs.SingleOrDefault(a => a.ParentAttributeId == valAttr.ParentAttributeId && a.SchemaAttributeId == sourceAttributeType.Id);
+                if(existingTypeAttribute == null)
                 {
-                    new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), sourceAttributeType, sourceAttributeType.SchemaId)
+                    result.AddReferenceAttributes(new List<SCIMRepresentationAttribute>
                     {
-                        ValueString = targetRepresentation.ResourceType,
-                        ParentAttributeId = valAttr.ParentAttributeId,
-                        RepresentationId = representationId,
-                        IsComputed = true
-                    }
-                });
+                        new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), sourceAttributeType, sourceAttributeType.SchemaId)
+                        {
+                            ValueString = targetRepresentation.ResourceType,
+                            ParentAttributeId = valAttr.ParentAttributeId,
+                            RepresentationId = representationId,
+                            IsComputed = true
+                        }
+                    });
+                }
+                else if(existingTypeAttribute.ValueString != targetRepresentation.ResourceType)
+                {
+                    existingTypeAttribute.ValueString = targetRepresentation.ResourceType;
+                    result.UpdateReferenceAttributes(new List<SCIMRepresentationAttribute> { existingTypeAttribute }, sync);
+                }
             }
 
             if (sourceAttributeDisplay != null)
             {
-                result.AddReferenceAttributes(new List<SCIMRepresentationAttribute>
+                var existingDisplayAttribute = flatAttrs.SingleOrDefault(a => a.ParentAttributeId == valAttr.ParentAttributeId && a.SchemaAttributeId == sourceAttributeDisplay.Id);
+                if(existingDisplayAttribute == null)
                 {
-                    new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), sourceAttributeDisplay, sourceAttributeDisplay.SchemaId)
+                    result.AddReferenceAttributes(new List<SCIMRepresentationAttribute>
                     {
-                        ValueString = targetRepresentation.DisplayName,
-                        ParentAttributeId = valAttr.ParentAttributeId,
-                        RepresentationId = representationId,
-                        IsComputed = true
-                    }
-                });
+                        new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), sourceAttributeDisplay, sourceAttributeDisplay.SchemaId)
+                        {
+                            ValueString = targetRepresentation.DisplayName,
+                            ParentAttributeId = valAttr.ParentAttributeId,
+                            RepresentationId = representationId,
+                            IsComputed = true
+                        }
+                    });
+                }
+                else if (existingDisplayAttribute.ValueString != targetRepresentation.DisplayName)
+                {
+                    existingDisplayAttribute.ValueString = targetRepresentation.DisplayName;
+                    result.UpdateReferenceAttributes(new List<SCIMRepresentationAttribute> { existingDisplayAttribute }, sync);
+                }
             }
         }
 

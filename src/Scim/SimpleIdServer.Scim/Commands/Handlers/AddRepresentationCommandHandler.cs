@@ -22,6 +22,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly IRepresentationHelper _representationHelper;
         private readonly IRepresentationVersionBuilder _representationVersionBuilder;
+        private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
 
         public AddRepresentationCommandHandler(
             ISCIMSchemaCommandRepository scimSchemaCommandRepository,
@@ -29,13 +30,15 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             IRepresentationReferenceSync representationReferenceSync,
             IRepresentationHelper representationHelper,
             IBusHelper busControl,
-            IRepresentationVersionBuilder representationVersionBuilder) : base(busControl)
+            IRepresentationVersionBuilder representationVersionBuilder,
+            ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository) : base(busControl)
         {
             _scimSchemaCommandRepository = scimSchemaCommandRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
             _representationHelper = representationHelper;
             _representationVersionBuilder = representationVersionBuilder;
+            _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
         }
 
         public async virtual Task<GenericResult<SCIMRepresentation>> Handle(AddRepresentationCommand addRepresentationCommand)
@@ -44,6 +47,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (!requestedSchemas.Any())
                 throw new SCIMBadSyntaxException(string.Format(Global.AttributeMissing, StandardSCIMRepresentationAttributes.Schemas));
 
+            var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(addRepresentationCommand.ResourceType);
             var schema = await _scimSchemaCommandRepository.FindRootSCIMSchemaByResourceType(addRepresentationCommand.ResourceType);
             if (schema == null) throw new SCIMSchemaNotFoundException();
             var allSchemas = new List<string> { schema.Id };
@@ -59,7 +63,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMBadSyntaxException(string.Format(Global.SchemasAreUnknown, string.Join(",", unsupportedSchemas)));
 
             var schemas = await _scimSchemaCommandRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
-            var scimRepresentation = _representationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation.Attributes, addRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList());
+            var scimRepresentation = _representationHelper.ExtractSCIMRepresentationFromJSON(addRepresentationCommand.Representation.Attributes, addRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList(), attributeMappings);
             scimRepresentation.Id = Guid.NewGuid().ToString();
             scimRepresentation.SetCreated(DateTime.UtcNow);
             scimRepresentation.SetUpdated(DateTime.UtcNow, _representationVersionBuilder.Build(scimRepresentation));

@@ -1,6 +1,5 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
@@ -41,7 +40,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
         public async virtual Task<GenericResult<ReplaceRepresentationResult>> Handle(ReplaceRepresentationCommand replaceRepresentationCommand)
         {
-            var kvp = await Validate(replaceRepresentationCommand);
+            var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(replaceRepresentationCommand.ResourceType);
+            var kvp = await Validate(replaceRepresentationCommand, attributeMappings);
             var existingRepresentation = kvp.Item1;
             var schema = kvp.Item2;
             var oldDisplayName = existingRepresentation.DisplayName;
@@ -53,7 +53,6 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                     Value = replaceRepresentationCommand.Representation.Attributes
                 }
             };
-            var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(replaceRepresentationCommand.ResourceType);
             var patchResult = await _representationHelper.Apply(existingRepresentation, patchParameters, attributeMappings, true, CancellationToken.None);
             if (!patchResult.Patches.Any()) return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.NoReplacement());
             var patchOperations = patchResult.Patches.Where(p => p.Attr != null).ToList();
@@ -84,7 +83,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.Ok(existingRepresentation, patchOperations));
         }
 
-        private async Task<(SCIMRepresentation, SCIMSchema)> Validate(ReplaceRepresentationCommand replaceRepresentationCommand)
+        private async Task<(SCIMRepresentation, SCIMSchema)> Validate(ReplaceRepresentationCommand replaceRepresentationCommand, IEnumerable<SCIMAttributeMapping> attributeMappings)
         {
             var requestedSchemas = replaceRepresentationCommand.Representation.Schemas;
             if (!requestedSchemas.Any())
@@ -103,7 +102,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 throw new SCIMNotFoundException(string.Format(Global.ResourceNotFound, replaceRepresentationCommand.Id));
 
             var schemas = await _scimSchemaCommandRepository.FindSCIMSchemaByIdentifiers(requestedSchemas);
-            _representationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation.Attributes, replaceRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList());
+            _representationHelper.ExtractSCIMRepresentationFromJSON(replaceRepresentationCommand.Representation.Attributes, replaceRepresentationCommand.Representation.ExternalId, schema, schemas.Where(s => s.Id != schema.Id).ToList(), attributeMappings);
             
             return (existingRepresentation, schema);
         }

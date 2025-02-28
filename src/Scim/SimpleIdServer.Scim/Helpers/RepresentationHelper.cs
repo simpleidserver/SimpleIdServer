@@ -24,7 +24,7 @@ namespace SimpleIdServer.Scim.Helpers
         Task<SCIMRepresentationPatchResult> Apply(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues, CancellationToken cancellationToken);
         Task CheckUniqueness(IEnumerable<SCIMRepresentationAttribute> attributes);
         void CheckMutability(List<SCIMPatchResult> patchOperations);
-        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas);
+        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings);
     }
 
     public class RepresentationHelper : IRepresentationHelper
@@ -84,7 +84,9 @@ namespace SimpleIdServer.Scim.Helpers
                     }
 
                     foreach (var h in hierarchicalNewAttributes)
+                    {
                         h.ComputeValueIndex();
+                    }
                 }
 
                 if (patch.Operation == SCIMPatchOperations.ADD && !(scimFilter is SCIMComplexAttributeExpression) && attrSelectors.Contains(fullPath))
@@ -117,6 +119,7 @@ namespace SimpleIdServer.Scim.Helpers
                     var complexAttr = scimFilter as SCIMComplexAttributeExpression;
                     if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null && patch.Operation == SCIMPatchOperations.REPLACE) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                 }
+
 
                 var computedIndexes = hierarchicalNewAttributes?.Select(a => a.ComputedValueIndex)?.ToList() ?? new List<string>();
                 if(hierarchicalFilteredAttributes != null && hierarchicalNewAttributes != null) hierarchicalNewAttributes = FilterDuplicate(hierarchicalFilteredAttributes, hierarchicalNewAttributes);
@@ -605,13 +608,13 @@ namespace SimpleIdServer.Scim.Helpers
         #region Extract
 
 
-        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas)
+        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings)
         {
             CheckRequiredAttributes(mainSchema, extensionSchemas, json);
-            return BuildRepresentation(json, externalId, mainSchema, extensionSchemas, _options.IgnoreUnsupportedCanonicalValues);
+            return BuildRepresentation(json, externalId, mainSchema, extensionSchemas, _options.IgnoreUnsupportedCanonicalValues, attributeMappings);
         }
 
-        public static SCIMRepresentation BuildRepresentation(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, bool ignoreUnsupportedCanonicalValues)
+        public static SCIMRepresentation BuildRepresentation(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, bool ignoreUnsupportedCanonicalValues, IEnumerable<SCIMAttributeMapping> attributeMappings)
         {
             var schemas = new List<SCIMSchema>
             {
@@ -625,7 +628,9 @@ namespace SimpleIdServer.Scim.Helpers
             };
             result.Schemas = schemas;
             var resolutionResult = Resolve(json, mainSchema, extensionSchemas);
-            result.FlatAttributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
+            var flatAttributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
+            flatAttributes = RemoveStandardReferenceProperties(flatAttributes, attributeMappings);
+            result.FlatAttributes = flatAttributes;
             var attr = result.FlatAttributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
             if (attr != null)
             {

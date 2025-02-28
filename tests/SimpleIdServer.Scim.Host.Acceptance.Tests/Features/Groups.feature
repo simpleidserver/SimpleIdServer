@@ -1173,3 +1173,52 @@ Scenario: Check member can be removed when full path is passed in the PATH remov
 	
 	Then HTTP status code equals to '200'
 	And 'members' length is equals to '0'
+
+Scenario: Update a group with an existing user and a new one
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | firstUser                                                                                                      |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstUserId'
+	
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | secondUser                                                                                                     |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondUserId'
+	
+	And execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | thirdUser                                                                                                      |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdUserId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                                                             |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]                                 |
+	| displayName | Tour Guides														                  |
+	| members     | [ { "value": "$firstUserId$" }, { "value" : "$secondUserId$", "type": "User" } ]  |
+	And extract JSON from body
+	And extract 'id' from JSON body into 'groupId'
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$groupId$'
+	| Key         | Value                                                                                                                 |
+	| schemas     | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                                                                   |
+	| Operations  | [ { "op": "replace", "path": "members", "value": [ { "value": "$secondUserId$" }, { "value" : "$thirdUserId$" } ] } ] |
+	
+	And execute HTTP GET request 'http://localhost/Groups/$groupId$'	
+	And extract JSON from body
+
+	Then '$.members' length is equals to '2'
