@@ -174,7 +174,7 @@ public class IdServerConfiguration
             ClientBuilder.BuildApiClient("sixClient", "password").AddScope(SecondScope).EnableRefreshTokenGrantType().Build(),
             ClientBuilder.BuildApiClient("sevenClient", "password").AddScope(SecondScope).AddSigningKey(ClientSigningCredentials["sevenClient"], SecurityAlgorithms.RsaSha256, SecurityKeyTypes.RSA).UsePrivateKeyJwtAuthentication().Build(),
             ClientBuilder.BuildApiClient("eightClient", "ProEMLh5e_qnzdNU").AddScope(SecondScope).AddSigningKey(ClientSigningCredentials["eightClient"], SecurityAlgorithms.RsaSha256, SecurityKeyTypes.RSA).UseClientSecretJwtAuthentication().Build(),
-            ClientBuilder.BuildTraditionalWebsiteClient("nineClient", "password",null, "http://localhost:8080").AddScope(SecondScope).UseClientPkceAuthentication().Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("nineClient", "password",null, "http://localhost:8080").Public().AddScope(SecondScope).Build(),
             ClientBuilder.BuildApiClient("elevenClient", "password").AddScope(SecondScope).UseClientSelfSignedAuthentication().AddSelfSignedCertificate("elevelClientKeyId").Build(),
             ClientBuilder.BuildApiClient("twelveClient", "password").AddScope(SecondScope).UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE").Build(),
             ClientBuilder.BuildApiClient("thirteenClient", "password").AddScope(SecondScope).SetTokenExpirationTimeInSeconds(-2).Build(),

@@ -339,6 +339,7 @@ public class ClientEffects
             AccessTokenType = act.AccessTokenType,
             RedirectToRevokeSessionUI = act.RedirectToRevokeSessionUI,
             DefaultAcrValues = act.DefaultAcrValues,
+            IsPublic = act.IsPublic,
             Parameters = new Dictionary<string, string>
             {
                 { ClientExtensions.SAML2_USE_ACS_ARTIFACT_NAME, act.UseAcs.ToString() },
@@ -381,7 +382,8 @@ public class ClientEffects
                 MetadataUrl = act.MetadataUrl,
                 RedirectToRevokeSessionUI = act.RedirectToRevokeSessionUI,
                 AccessTokenType = act.AccessTokenType,
-                DefaultAcrValues = act.DefaultAcrValues
+                DefaultAcrValues = act.DefaultAcrValues,
+                IsPublic = act.IsPublic
             });
         }
         catch
@@ -694,7 +696,8 @@ public class ClientEffects
             DPOPBoundAccessTokens = act.IsDPoPRequired,
             DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
             IsDPOPNonceRequired = act.IsDPoPNonceRequired,
-            TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds
+            TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds,
+            UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds
         };
         var requestMessage = new HttpRequestMessage
         {
@@ -717,7 +720,8 @@ public class ClientEffects
                 DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
                 IsDPoPNonceRequired = act.IsDPoPNonceRequired,
                 IsDPoPRequired = act.IsDPoPRequired,
-                TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds
+                TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds,
+                UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds
             });
         }
         catch
@@ -979,6 +983,7 @@ public class UpdateClientDetailsAction
     public bool RedirectToRevokeSessionUI { get; set; }
     public bool IsTokenExchangePreAuthorizedCodeEnabled { get; set; }
     public ICollection<string> DefaultAcrValues { get; set; }
+    public bool IsPublic { get; set; }
 }
 
 public class UpdateClientDetailsSuccessAction
@@ -1007,6 +1012,7 @@ public class UpdateClientDetailsSuccessAction
     public AccessTokenTypes AccessTokenType { get; set; }
     public bool RedirectToRevokeSessionUI { get; set; }
     public ICollection<string> DefaultAcrValues { get; set; }
+    public bool IsPublic { get; set; }
 }
 
 public class UpdateClientDetailsFailureAction
@@ -1252,6 +1258,7 @@ public class UpdateAdvancedClientSettingsAction
     public bool IsDPoPNonceRequired { get; set; } = false;
     public double DPOPNonceLifetimeInSeconds { get; set; }
     public double TokenExpirationTimeInSeconds { get; set; }
+    public double UserCookieExpirationTimeInSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsSuccessAction
@@ -1265,6 +1272,7 @@ public class UpdateAdvancedClientSettingsSuccessAction
     public double DPOPNonceLifetimeInSeconds { get; set; }
     public double TokenExpirationTimeInSeconds { get; set; }
     public string? TokenSignedResponseAlg { get; set;  }
+    public double UserCookieExpirationTimeInSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsFailureAction

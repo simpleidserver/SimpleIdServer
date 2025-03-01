@@ -8,7 +8,7 @@
 SimpleIdServer is an open source framework enabling the support of OPENID, OAUTH2.0, SCIM2.0, UMA2.0, FAPI and CIBA. It streamlines development, configuration and deployment of custom access control servers. 
 Thanks to its modularity and extensibility, SimpleIdServer can be customized to the specific needs of your organization for authentication, authorization and more.
 
-[Website](http://simpleidserver.com), [Documentation](https://simpleidserver.com/docs/intro) and [Demo](https://website.simpleidserver.com/).
+[Website](http://simpleidserver.com), [Documentation](https://simpleidserver.com/docs/intro) and [Demo](https://website.simpleidserver.com/master/clients).
 
 ## Packages
 

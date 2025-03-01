@@ -39,8 +39,14 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         protected async Task<Client> AuthenticateClient(HandlerContext context, CancellationToken cancellationToken)
         {
             var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken);
-            if (oauthClient.GrantTypes == null || !oauthClient.GrantTypes.Contains(GrantType)) throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.BadClientGrantType, GrantType));
+            CheckGrantType(oauthClient);
             return oauthClient;
+        }
+
+        protected async Task Authenticate(HandlerContext context, Client client, CancellationToken cancellationToken)
+        {
+            await _clientAuthenticationHelper.AuthenticateClient(client, context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken);
+            CheckGrantType(client);
         }
 
         protected IEnumerable<string> GetScopes(JsonObject previousRequest, HandlerContext context) => GetScopes(previousRequest, context.Request.RequestData);
@@ -99,6 +105,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                 [TokenResponseParameters.ExpiresIn] = context.Client?.TokenExpirationTimeInSeconds ?? _options.DefaultTokenExpirationTimeInSeconds,
                 [TokenResponseParameters.Scope] = string.Join(" ", scopes)
             };
+        }
+
+        private void CheckGrantType(Client client)
+        {
+            if (client.GrantTypes == null || !client.GrantTypes.Contains(GrantType)) throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.BadClientGrantType, GrantType));
         }
 
         public static IActionResult BuildError(HttpStatusCode httpStatusCode, string error, string errorMessage)

@@ -1,0 +1,72 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@model SimpleIdServer.IdServer.UI.ViewModels.BaseAuthenticateViewModel
+@using IdServer.Resources
+@using System.Globalization
+
+@{
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="loginContainer">
+    <div class="card login">
+        <div class="card-body">
+            @if (Model.AmrAuthInfo != null && Model.AmrAuthInfo.AllAmr != null && Model.AmrAuthInfo.AllAmr.Count() > 1)
+            {
+                <ul class="progressbar">
+                    @{
+                        bool isAmrActive = true;
+                        int i = 1;
+                        foreach(var amr in Model.AmrAuthInfo.AllAmr)
+                        {
+                            var className = isAmrActive ? "active" : string.Empty;
+                            var id = "step" + i;
+                            i++;
+                            if (amr == Model.AmrAuthInfo.CurrentAmr) isAmrActive = false;
+                            <li class="@className" id="@id">
+                                <strong>@amr</strong>
+                            </li>
+                        }
+                    }
+                </ul>   
+            }
+            <div class="clientinfo">
+                @Html.ClientPicture(Model.LogoUri)
+            </div>
+            @RenderBody()
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <div>
+                <ul class="extauth">
+                    @foreach (var extProvider in Model.ExternalIdsProviders)
+                    {
+                        <li>
+                            <a class="btn btn-secondary"
+                           asp-controller="ExternalAuthenticate"
+                           asp-area=""
+                           asp-action="Login"
+                           asp-route-scheme="@extProvider.AuthenticationScheme"
+                           asp-route-returnUrl="@Model.ReturnUrl"
+                           asp-route-prefix="@Model.Realm">@extProvider.DisplayName</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="card-footer">
+            @if (!string.IsNullOrWhiteSpace(Model.TosUri))
+            {
+                <a href="@Model.TosUri" target="_blank">@AuthenticatePasswordResource.tos</a>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.PolicyUri))
+            {
+                <a href="@Model.PolicyUri" target="_blank">@AuthenticatePasswordResource.policy</a>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("SubScripts", required: false)
+}

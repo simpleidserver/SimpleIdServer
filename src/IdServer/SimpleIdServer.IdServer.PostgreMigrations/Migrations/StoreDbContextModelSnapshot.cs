@@ -844,6 +844,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_nonce_required");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("boolean")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_public");
+
                     b.Property<bool>("IsRedirectUrlCaseSensitive")
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "is_redirect_url_casesensitive");
@@ -996,6 +1000,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
+
+                    b.Property<double?>("UserCookieExpirationTimeInSeconds")
+                        .HasColumnType("double precision")
+                        .HasAnnotation("Relational:JsonPropertyName", "user_cookie_expirationtime_seconds");
 
                     b.Property<string>("UserInfoEncryptedResponseAlg")
                         .HasColumnType("text")

@@ -121,7 +121,7 @@ namespace SimpleIdServer.Scim.Domains
                 {
                     c.AddStringAttribute("value");
                     c.AddStringAttribute("$ref");
-                    c.AddStringAttribute("display");
+                    c.AddStringAttribute("type", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE);
                 }, multiValued: true)
                 .Build();
         public static SCIMSchema ErrorSchemas = SCIMSchemaBuilder.Create("urn:ietf:params:scim:api:messages:2.0:Error", "Error", null, "SCIM errors", true)

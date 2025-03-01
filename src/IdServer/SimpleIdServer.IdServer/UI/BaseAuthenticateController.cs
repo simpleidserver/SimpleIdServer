@@ -140,7 +140,7 @@ public class BaseAuthenticateController : BaseController
 
         if (WorkflowHelper.IsLastStep(nextAmr))
         {
-            if(rememberLogin == null)
+            if (rememberLogin == null)
             {
                 if (HttpContext.Request.Cookies.ContainsKey(Constants.DefaultRememberMeCookieName))
                     rememberLogin = bool.Parse(HttpContext.Request.Cookies[Constants.DefaultRememberMeCookieName]);
@@ -170,7 +170,7 @@ public class BaseAuthenticateController : BaseController
         var claims = _userTransformer.Transform(user);
         await AddSession(realm, claims, user, client, token, rememberLogin);
         var offset = DateTimeOffset.UtcNow.AddSeconds(expirationTimeInSeconds);
-        if(amrs != null)
+        if (amrs != null)
             claims.Add(new Claim(Constants.UserClaims.Amrs, string.Join(" ", amrs)));
         var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
@@ -202,7 +202,7 @@ public class BaseAuthenticateController : BaseController
 
     protected async Task AddSession(string realm, ICollection<Claim> claims, User user, Client client, CancellationToken cancellationToken, bool rememberLogin = false)
     {
-        using(var transaction = TransactionBuilder.Build())
+        using (var transaction = TransactionBuilder.Build())
         {
             var currentDateTime = DateTime.UtcNow;
             var expirationTimeInSeconds = GetCookieExpirationTimeInSeconds(client);
@@ -245,7 +245,7 @@ public class BaseAuthenticateController : BaseController
         return (nextAmr, amrs);
     }
 
-    private async Task<(string nextAmr, Client client, AcrResult acr)> GetNextAmrFormAuthorizationRequestAuthentication<T>(string realm, string currentAmr, string unprotectedUrl, T viewModel, CancellationToken cancellationToken)  where T : ISidStepViewModel
+    private async Task<(string nextAmr, Client client, AcrResult acr)> GetNextAmrFormAuthorizationRequestAuthentication<T>(string realm, string currentAmr, string unprotectedUrl, T viewModel, CancellationToken cancellationToken) where T : ISidStepViewModel
     {
         var query = ExtractQueryFromUnprotectedUrl(unprotectedUrl);
         var acrValues = query.GetAcrValuesFromAuthorizationRequest();
@@ -259,8 +259,8 @@ public class BaseAuthenticateController : BaseController
 
     private double GetCookieExpirationTimeInSeconds(Client client)
     {
-        var expirationTimeInSeconds = client == null || client.TokenExpirationTimeInSeconds == null ?
-           _options.DefaultTokenExpirationTimeInSeconds : client.TokenExpirationTimeInSeconds.Value;
+        var expirationTimeInSeconds = client == null || client.UserCookieExpirationTimeInSeconds == null ?
+           _options.DefaultTokenExpirationTimeInSeconds : client.UserCookieExpirationTimeInSeconds.Value;
         return expirationTimeInSeconds;
     }
 }

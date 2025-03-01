@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
@@ -77,10 +78,10 @@ public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandR
         return result;
     }
 
-    public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
+    public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, List<string> values, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
     {
         var parentIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-            .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+            .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && values.Contains(a.ValueString) || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
             .Select(r => r.ParentAttributeId)
             .AsNoTracking()
             .Distinct()
@@ -216,6 +217,15 @@ public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandR
 
     public async Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, string currentRepresentationId, bool isReference = false)
     {
+        if(_scimDbContext.Database.IsInMemory())
+        {
+            var ids = scimRepresentationAttributes.Select(a => a.Id).ToList();
+            var attrs = await _scimDbContext.SCIMRepresentationAttributeLst.Where(a => ids.Contains(a.Id)).ToListAsync(); ;
+            _scimDbContext.SCIMRepresentationAttributeLst.RemoveRange(attrs);
+            await _scimDbContext.SaveChangesAsync();
+            return;
+
+        }
         scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId)).ToList();
         var merged = LinqToDB.LinqExtensions.DeleteWhenMatched(
                         LinqToDB.LinqExtensions.On(
@@ -258,7 +268,9 @@ public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandR
 
     public async Task<ITransaction> StartTransaction(CancellationToken token)
     {
-        var transaction = await _scimDbContext.Database.BeginTransactionAsync(token);
+        var inMemory = _scimDbContext.Database.IsInMemory();
+        IDbContextTransaction transaction = null;
+        if(!inMemory) transaction = await _scimDbContext.Database.BeginTransactionAsync(token);
         return new EFTransaction(_scimDbContext, transaction);
     }
 

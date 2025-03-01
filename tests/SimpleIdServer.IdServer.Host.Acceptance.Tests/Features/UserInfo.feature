@@ -211,7 +211,7 @@ Scenario: Claims are returned in JSON format (HTTP GET & Reference Access token)
 
 	And extract parameter 'code' from redirect url
 	
-	And execute HTTP POST request 'https://localhost:8080/token'
+	And execute HTTP POST request 'http://localhost/token'
 	| Key           | Value        			|
 	| client_id     | seventyClient         |
 	| client_secret | password     			|

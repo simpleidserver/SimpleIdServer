@@ -10,11 +10,12 @@ using SimpleIdServer.IdServer.Api.Token.Helpers;
 using SimpleIdServer.IdServer.Api.Token.TokenBuilders;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
 using SimpleIdServer.IdServer.Api.Token.Validators;
+using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -40,6 +41,7 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
     private readonly IBusControl _busControl;
     private readonly IDPOPProofValidator _dpopProofValidator;
     private readonly IClientHelper _clientHelper;
+    private readonly IPkceVerifier _pkceVerifier;
     private readonly ILogger<AuthorizationCodeHandler> _logger;
 
     public AuthorizationCodeHandler(
@@ -55,6 +57,7 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
         IOptions<IdServerHostOptions> options,
         IEnumerable<ITokenProfile> tokenProfiles,
         IClientHelper clientHelper,
+        IPkceVerifier pkceVerifier,
         ILogger<AuthorizationCodeHandler> logger) : base(clientAuthenticationHelper, tokenProfiles, options)
     {
         _grantedTokenHelper = grantedTokenHelper;
@@ -66,6 +69,7 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
         _busControl = busControl;
         _dpopProofValidator = dpopProofValidator;
         _clientHelper = clientHelper;
+        _pkceVerifier = pkceVerifier;
         _logger = logger;
     }
 
@@ -197,7 +201,9 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
             return;
         }
 
-        var oauthClient = await AuthenticateClient(context, cancellationToken);
+        var oauthClient = await _clientHelper.ResolveClient(context.Realm, clientId, cancellationToken);
+        if(!oauthClient.IsPublic) await Authenticate(context, oauthClient, cancellationToken);
+        else await _pkceVerifier.Validate(context, oauthClient, context.GetIssuer(), cancellationToken);
         context.SetClient(oauthClient);
         await _dpopProofValidator.Validate(context);
     }

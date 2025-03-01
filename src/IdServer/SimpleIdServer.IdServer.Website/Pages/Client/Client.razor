@@ -23,6 +23,10 @@
 
         <div class="mb-1">
             <RadzenBadge Text="@clientState.Value.Client.ClientType" IsPill="true" />
+            @if(clientState.Value.Client.IsPublic)
+            {                
+                <RadzenBadge style="margin-left: 5px;" Text="@Global.PublicClient" IsPill="true" />
+            }
         </div>
 
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@clientState.Value.IsLoading>

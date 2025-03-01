@@ -126,10 +126,10 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             return result;
         }
 
-        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, string valueStr, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
+        public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, List<string> values, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             var parentIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && a.ValueString == valueStr || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && values.Contains(a.ValueString) || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
                 .Select(r => r.ParentAttributeId)
                 .ToMongoListAsync();
             var result = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()

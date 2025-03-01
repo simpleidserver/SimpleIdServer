@@ -55,17 +55,25 @@ public class DidJsonWebTokenHandler
     {
         if (claims == null) throw new ArgumentNullException(nameof(claims));
         if (asymmKey == null) throw new ArgumentNullException(nameof(asymmKey));
-        var signingCredentials = asymmKey.BuildSigningCredentials(kid);
-        var securityTokenDescriptor = new SecurityTokenDescriptor
+        Constants.SharedLck.WaitOne();
+        try
         {
-            TokenType = tokenType,
-            IssuedAt = DateTime.UtcNow,
-            SigningCredentials = signingCredentials
-        };
-        securityTokenDescriptor.Claims = claims;
-        var handler = new JsonWebTokenHandler();
-        var result = handler.CreateToken(securityTokenDescriptor);
-        return result;
+            var signingCredentials = asymmKey.BuildSigningCredentials(kid);
+            var securityTokenDescriptor = new SecurityTokenDescriptor
+            {
+                TokenType = tokenType,
+                IssuedAt = DateTime.UtcNow,
+                SigningCredentials = signingCredentials
+            };
+            securityTokenDescriptor.Claims = claims;
+            var handler = new JsonWebTokenHandler();
+            var result = handler.CreateToken(securityTokenDescriptor);
+            return result;
+        }
+        finally
+        {
+            Constants.SharedLck.Release();
+        }
     }
 
     public async Task<bool> CheckJwt(

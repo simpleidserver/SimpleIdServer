@@ -26,10 +26,11 @@ Scenario: Nonce claim must be present in the JSON Web Token
 	Given build JWS id_token_hint and sign with the key 'keyid'
 	| Key | Value     |
 	| sub | otheruser |
+	| iss | http://localhost |	
 
-	When execute HTTP POST request 'https://localhost:8080/authorization/callback'
+	When execute HTTP POST request 'http://localhost/authorization/callback'
 	| Key        | Value           |
-	| id_token   | $id_token_hint$ |	
+	| id_token   | $id_token_hint$ |
 	
 	And extract JSON from body
 	
@@ -42,8 +43,9 @@ Scenario: Nonce must be valid
 	| Key   | Value        |
 	| sub   | otheruser    |
 	| nonce | invalidnonce |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/authorization/callback'
+	When execute HTTP POST request 'http://localhost/authorization/callback'
 	| Key        | Value           |
 	| id_token   | $id_token_hint$ |	
 	
@@ -60,8 +62,9 @@ Scenario: Identity token must be signed by the Distributed Identity Document
 	| Key   | Value        |
 	| sub   | otheruser    |
 	| nonce | nonce        |
+	| iss | http://localhost |
 
-	When execute HTTP POST request 'https://localhost:8080/authorization/callback'
+	When execute HTTP POST request 'http://localhost/authorization/callback'
 	| Key        | Value           |
 	| id_token   | $id_token_hint$ |	
 	

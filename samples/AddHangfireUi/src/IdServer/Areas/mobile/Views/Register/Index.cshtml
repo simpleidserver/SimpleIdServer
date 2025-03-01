@@ -1,0 +1,161 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using IdServer.Resources;
+@model SimpleIdServer.IdServer.Fido.UI.ViewModels.RegisterMobileViewModel;
+
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    Layout = "~/Views/Shared/_RegisterLayout.cshtml";
+    ViewBag.Title = AuthenticateMobileResource.register_title;
+}
+
+<h5>@(User.Identity.IsAuthenticated ? AuthenticateMobileResource.enroll_mobile : AuthenticateMobileResource.register_mobile)</h5>
+
+<div id="registrationContainer">
+    <ul class="list-group mb-3" id="errors">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@AuthenticateWebauthnResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    </ul>
+
+    <!-- Registration form -->
+    <form id="registerMobile">
+        <div class="form-floating mb-3">
+            @if(!string.IsNullOrWhiteSpace(Model.Login))
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" disabled="true" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateWebauthnResource.login" id="floatingLogin" type="text" class="form-control" />
+            }
+            <label for="floatingLogin">@AuthenticateWebauthnResource.login</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input asp-for="DisplayName" placeholder="@AuthenticateWebauthnResource.display_name" id="floatingDisplayName" type="text" class="form-control" />
+            <label for="floatingDisplayName">@AuthenticateWebauthnResource.display_name</label>
+        </div>
+        <button type="submit" class="btn btn-primary card-link">@AuthenticateMobileResource.generate_qrcode</button>
+    </form>
+
+    <!-- QR Code-->
+    <div id="qrCode" style="display: none; text-align: center;">
+        <h3>@AuthenticateMobileResource.scan_mobileapp</h3>
+        <img src="#" style="max-width:280px;"/>
+        @if(Model.IsDeveloperModeEnabled)
+        {
+            <div class="divider"></div>
+            <div id="qrCodeText">
+                <h3>@AuthenticateMobileResource.qrcode</h3>
+                <textarea class="form-control" rows="5"></textarea>
+            </div>
+        }
+    </div>
+</div>
+
+
+<div style="display: none;" id="registerSuccessMessage">
+    <div class="alert alert-success">
+        @AuthenticateWebauthnResource.credential_added
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.RedirectUrl))
+    {
+        <a href="@Model.RedirectUrl" class="btn btn-primary mt-1">@LayoutResource.back</a>
+    }
+</div>
+
+@section SubScripts {
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var beginRegisterUrl = "@Model.BeginRegisterUrl";
+            var registerStatusUrl = "@Model.RegisterStatusUrl";
+
+            var toggleBtn = function(isDisabled) {
+                $("#registerWebauthn button[type='submit']").attr('disabled', isDisabled);
+            }
+
+            var displayError = function(errorJson) {
+                console.error(errorJson);
+                $("#errors").empty();
+                $("#errors").append("<li class='list-group-item list-group-item-danger'>" + errorJson["error_description"] + "</li>");
+            }
+
+            var displaySuccessMessage = function () {
+                $("#registerSuccessMessage").css('display', '');
+                $("#registrationContainer").css('display', 'none');
+            }
+
+            var displayQRCode = function(img, qrCode) {
+                $("#registerMobile").css("display", "none");
+                $("#qrCode").css("display", "");
+                $("#qrCode img").attr("src", img);
+                var qrCodeText = $("#qrCodeText");
+                if(qrCodeText.length > 0) {
+                    $("#qrCodeText textarea").val(qrCode);
+                }
+            }
+
+            async function checkStatus(sessionId, nextRegistrationRedirectUrl) {
+                setTimeout(async function(){
+                    let response = await fetch(registerStatusUrl + "/" + sessionId, {
+                        method: 'GET'
+                    });
+                    if (!response.ok) {
+                        let responseJson = await response.json();
+                        displayError(responseJson);
+                        await checkStatus(sessionId, nextRegistrationRedirectUrl);
+                        return;
+                    }
+
+                    if(nextRegistrationRedirectUrl) {
+                        window.location.href = nextRegistrationRedirectUrl;
+                    } else {
+                        displaySuccessMessage();
+                    }
+                }, 1000);
+            }
+
+            async function makeCredential(login, displayName, form) {
+                toggleBtn(true);
+
+                let response = await fetch(beginRegisterUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login: login, display_name: displayName, credential_type: 'mobile' }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    let responseJson = await response.json();
+                    toggleBtn(false);
+                    displayError(responseJson);
+                    return;
+                }
+                
+                const sessionId = response.headers.get('SessionId');
+                const qrCode = response.headers.get('QRCode');
+                let nextRegistrationRedirectUrl = response.headers.get('NextRegistrationRedirectUrl');
+
+                const blob = await response.blob();
+                const img = URL.createObjectURL(blob);
+                displayQRCode(img, qrCode);
+                console.log(nextRegistrationRedirectUrl);
+                await checkStatus(sessionId, nextRegistrationRedirectUrl);
+            };
+
+            $("#registerMobile").submit(function (e) {
+                e.preventDefault();
+                var login = $("#registerMobile input[name='Login']").val();
+                var displayName = $("#registerMobile input[name='DisplayName']").val();
+                makeCredential(login, displayName, convertFormToJSON($(e.target)));
+            });
+        });
+    </script>
+}

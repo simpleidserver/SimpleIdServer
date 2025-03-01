@@ -14,6 +14,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Helpers
     public interface IClientAuthenticationHelper
     {
         Task<Client> AuthenticateClient(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
+        Task AuthenticateClient(Client client, string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT);
         bool TryGetClientId(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, out string clientId);
     }
 
@@ -32,6 +33,12 @@ namespace SimpleIdServer.IdServer.Api.Token.Helpers
             var oauthClient = await _authenticateClient.Authenticate(authenticateInstruction, issuerName, cancellationToken, errorCode: errorCode);
             if (oauthClient == null) throw new OAuthException(errorCode, Global.BadClientCredential);
             return oauthClient;
+        }
+
+        public async Task AuthenticateClient(Client client, string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken, string errorCode = "invalid_client")
+        {
+            var authenticateInstruction = BuildAuthenticateInstruction(realm, jObjHeader, jObjBody, certificate);
+            await _authenticateClient.Authenticate(client, authenticateInstruction, issuerName, cancellationToken, errorCode: errorCode);
         }
 
         public bool TryGetClientId(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, out string clientId)

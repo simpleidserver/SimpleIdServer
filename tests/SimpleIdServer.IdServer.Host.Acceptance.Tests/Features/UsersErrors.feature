@@ -2,7 +2,7 @@
 	Check errors returned by the /users endpoint
 
 Scenario: access token must be passed (HTTP POST)
-	When execute HTTP POST JSON request 'https://localhost:8080/users'
+	When execute HTTP POST JSON request 'http://localhost/users'
 	| Key | Value |
 
 	And extract JSON from body
@@ -20,7 +20,7 @@ Scenario: access token must be passed (HTTP GET)
 	And JSON 'error_description'='missing token'
 
 Scenario: access token must be passed (HTTP DELETE)
-	When execute HTTP DELETE request 'https://localhost:8080/users/id'
+	When execute HTTP DELETE request 'http://localhost/users/id'
 	| Key | Value |
 
 	And extract JSON from body
@@ -29,7 +29,7 @@ Scenario: access token must be passed (HTTP DELETE)
 	And JSON 'error_description'='missing token'
 
 Scenario: access token must be passed (HTTP PUT Credentials)
-	When execute HTTP PUT JSON request 'https://localhost:8080/users/id/credentials/cred'
+	When execute HTTP PUT JSON request 'http://localhost/users/id/credentials/cred'
 	| Key | Value |
 
 	And extract JSON from body

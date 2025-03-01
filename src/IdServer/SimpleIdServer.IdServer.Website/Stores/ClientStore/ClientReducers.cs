@@ -254,6 +254,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.IsRedirectUrlCaseSensitive = act.IsRedirectUrlCaseSensitive;
             client.RedirectToRevokeSessionUI = act.RedirectToRevokeSessionUI;
             client.DefaultAcrValues = act.DefaultAcrValues;
+            client.IsPublic = act.IsPublic;
             var grantTypes = new List<string>();
             if (act.IsClientCredentialsGrantTypeEnabled)
                 grantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
@@ -330,6 +331,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.IsDPOPNonceRequired = act.IsDPoPNonceRequired;
             client.DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds;
             client.TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds;
+            client.UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds;
             return state with
             {
                 Client = client

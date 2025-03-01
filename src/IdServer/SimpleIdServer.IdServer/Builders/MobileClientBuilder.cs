@@ -244,17 +244,6 @@ namespace SimpleIdServer.IdServer.Builders
             return this;
         }
 
-        /// <summary>
-        /// PKCE is an extension to the Authorization Code flow to prevent CSRF and 
-        /// For more information: https://oauth.net/2/pkce/
-        /// </summary>
-        /// <returns></returns>
-        public MobileClientBuilder UseClientPkceAuthentication()
-        {
-            _client.TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD;
-            return this;
-        }
-
         #endregion
 
         #region Other parameters

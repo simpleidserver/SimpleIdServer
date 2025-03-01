@@ -2,12 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.IdentityModel.Tokens;
-using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
+using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -121,6 +119,22 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         #endregion
+
+        #region Grant types
+
+        public UserAgentClientBuilder AddRefreshToken()
+        {
+            _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
+            return this;
+        }
+
+        #endregion
+
+        public UserAgentClientBuilder SetTokenExpirationTimeInSeconds(int expirationTimeInSeconds)
+        {
+            _client.TokenExpirationTimeInSeconds = expirationTimeInSeconds;
+            return this;
+        }
 
         public Client Build() => _client;
     }

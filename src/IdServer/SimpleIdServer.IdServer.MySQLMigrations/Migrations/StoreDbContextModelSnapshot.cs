@@ -844,6 +844,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_nonce_required");
 
+                    b.Property<bool>("IsPublic")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_public");
+
                     b.Property<bool>("IsRedirectUrlCaseSensitive")
                         .HasColumnType("tinyint(1)")
                         .HasAnnotation("Relational:JsonPropertyName", "is_redirect_url_casesensitive");
@@ -996,6 +1000,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime(6)")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
+
+                    b.Property<double?>("UserCookieExpirationTimeInSeconds")
+                        .HasColumnType("double")
+                        .HasAnnotation("Relational:JsonPropertyName", "user_cookie_expirationtime_seconds");
 
                     b.Property<string>("UserInfoEncryptedResponseAlg")
                         .HasColumnType("longtext")

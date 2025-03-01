@@ -1959,6 +1959,21 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="RefreshPage" xml:space="preserve">
     <value>Do-you want to refresh the page ?</value>
   </data>
+  <data name="CookieExpirationTime" xml:space="preserve">
+    <value>Expiration time of the cookie</value>
+  </data>
+  <data name="CookieExpirationTimeTooltip" xml:space="preserve">
+    <value>Set the expiration time of the user's cookie in milliseconds (ms)</value>
+  </data>
+  <data name="PublicClient" xml:space="preserve">
+    <value>Public</value>
+  </data>
+  <data name="IsPublic" xml:space="preserve">
+    <value>Is public?</value>
+  </data>
+  <data name="IsPublicTooltip" xml:space="preserve">
+    <value>Use authorization code with Proof Key for Code Exchange (PKCE)</value>
+  </data>
   <data name="Forms" xml:space="preserve">
     <value>Forms</value>
   </data>

@@ -273,6 +273,7 @@ Scenario: Identity Token must be returned in JWS format with alg set to 'RS512'
 
 Scenario: Identity Token must be returned in JWE format with alg set to 'RSA1_5' and enc set to 'A128CBC-HS256'
 	Given authenticate a user
+
 	When execute HTTP GET request 'http://localhost/authorization'
 	| Key           | Value                 |
 	| response_type | id_token              |

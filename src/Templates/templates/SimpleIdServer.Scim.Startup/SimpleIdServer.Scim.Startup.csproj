@@ -13,7 +13,6 @@
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0 " />
 	<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="8.0.1" />
 	<PackageReference Include="MassTransit.Azure.Storage" Version="8.2.1" />
-	<ProjectReference Include="SimpleIdServer.Scim.SqliteMigrations" Version="5.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.Persistence.MongoDB" Version="5.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.PostgreMigrations" Version="5.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.SqlServerMigrations" Version="5.0.*-*" />
@@ -21,5 +20,6 @@
 	<PackageReference Include="SimpleIdServer.Scim.SwashbuckleV6" Version="5.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim" Version="5.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="5.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.SqliteMigrations" Version="5.0.*-*" />
   </ItemGroup>
 </Project>

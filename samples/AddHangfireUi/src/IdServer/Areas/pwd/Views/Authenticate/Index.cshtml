@@ -1,0 +1,102 @@
+﻿@model SimpleIdServer.IdServer.UI.ViewModels.AuthenticatePasswordViewModel
+@using IdServer.Resources
+
+@{
+    ViewBag.Title = AuthenticatePasswordResource.title;
+    Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
+    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
+    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="list-group">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@AuthenticatePasswordResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    </ul>
+}
+
+@if (Model.IsLoginMissing)
+{
+    <div class="alert alert-danger">
+        @AuthenticatePasswordResource.missing_login
+    </div>
+}
+else
+{
+    @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Constants.Areas.Password, returnUrl = Model.ReturnUrl }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <div class="alert alert-info">
+            Default credentials :
+            <p style="margin: 0px;">
+                <b>Login: </b>administrator<br />
+                <b>Password: </b>password
+            </p>
+        </div>
+        <!-- Login -->
+        <div class="input-group mb-3">
+            @if (Model.IsAuthInProgress)
+            {
+                <input asp-for="Login" placeholder="@AuthenticatePasswordResource.login" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticatePasswordResource.login" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticatePasswordResource.login" type="text" class="form-control" />
+            }
+        </div>
+        <!-- Password -->
+        <div class="input-group mb-3">
+            <input type="password" value="@Model.Password" name="Password" class="form-control" placeholder="@AuthenticatePasswordResource.password">
+        </div>
+        @if (Model.IsFirstAmr)
+        {
+            <div>
+                <input type="checkbox" name="RememberLogin" />
+                <label>@AuthenticatePasswordResource.remember_login</label>
+            </div>
+        }
+        <button type="submit" class="btn btn-primary">@AuthenticatePasswordResource.submit</button>
+    }
+
+    @if(Model.CanResetPassword)
+    {
+        <div class="mb-3">            
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@Url.Action("Index", "Reset", new { area = SimpleIdServer.IdServer.Constants.Areas.Password, returnUrl = returnUrl })">@AuthenticatePasswordResource.reset_pwd</a>
+        </div>
+    }
+
+    @if(Model.IsFirstAmr && Model.RegistrationWorkflow != null)
+    {
+        <div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
+        </div>
+    }
+}
+
+@section SubScripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".login input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+        });
+    </script>
+}

@@ -3,6 +3,7 @@
 using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
 using System.Linq;
+using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -14,7 +15,12 @@ namespace SimpleIdServer.Scim.Helpers
 
         public void AddReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs) => AddedRepresentationAttributes.AddRange(attrs);
 
-        public void RemoveReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs) => RemovedRepresentationAttributes.AddRange(attrs);
+        public void RemoveReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs)
+        {
+            var ids = RemovedRepresentationAttributes.Select(a => a.Id);
+            var filteredAttrs = attrs.Where(a => !ids.Contains(a.Id));
+            RemovedRepresentationAttributes.AddRange(filteredAttrs);
+        }
 
         public void UpdateReferenceAttributes(IEnumerable<SCIMRepresentationAttribute> attrs, IEnumerable<RepresentationSyncResult> result)
         {

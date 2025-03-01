@@ -128,6 +128,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                     UpdateDateTime = DateTime.UtcNow,
                     RefreshTokenExpirationTimeInSeconds = _options.DefaultRefreshTokenExpirationTimeInSeconds,
                     TokenExpirationTimeInSeconds = _options.DefaultTokenExpirationTimeInSeconds,
+                    UserCookieExpirationTimeInSeconds = _options.DefaultUserCookieExpirationTimeInSeconds,
                     PreferredTokenProfile = _options.DefaultTokenProfile,
                     ClientSecret = Guid.NewGuid().ToString(),
                     ClientSecretExpirationTime = expirationDateTime,

@@ -1,0 +1,84 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using IdServer;
+@using IdServer.Resources;
+@model SimpleIdServer.IdServer.UI.ViewModels.OTPRegisterViewModel;
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = RegisterSmsResource.title;
+    Layout = "~/Views/Shared/_RegisterLayout.cshtml";
+}
+
+@if(!Model.IsUpdated)
+{
+    <h5>@(User.Identity.IsAuthenticated ? RegisterSmsResource.update_sms : RegisterSmsResource.register_sms)</h5>
+
+    @if (Model.IsOTPCodeSent)
+    {
+        <div class="alert alert-success">@RegisterSmsResource.otpcode_sent</div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <ul class="list-group">
+            @foreach (var modelState in ViewData.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    <li class="list-group-item list-group-item-danger">@RegisterSmsResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                }
+            }
+        </ul>
+    }
+
+    <!-- Send confirmation code -->
+    <div class="mt-3">
+        @using (Html.BeginForm("Index", "Register", new { area = SimpleIdServer.IdServer.Sms.Constants.AMR }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Action" value="SENDCONFIRMATIONCODE" />
+            <input type="hidden" asp-for="RedirectUrl" />
+            <div class="form-floating mb-3">
+                <input asp-for="Value" placeholder="@RegisterSmsResource.phonenumber" type="text" id="floatingConfirmationCodePhoneNumber" class="form-control" />
+                <label for="floatingConfirmationCodePhoneNumber">@RegisterSmsResource.phonenumber</label>
+            </div>
+            <button type="submit" class="btn btn-primary">@RegisterSmsResource.sendconfirmationcode</button>
+        }
+    </div>
+
+    <div class="mt-3">
+        <!-- Registration form -->
+        @using (Html.BeginForm("Index", "Register", new { area = SimpleIdServer.IdServer.Sms.Constants.AMR }, FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="Action" value="REGISTER" />
+            <input type="hidden" asp-for="RedirectUrl" />
+            <input asp-for="Value" placeholder="@RegisterSmsResource.phonenumber" type="hidden" id="floatingEmail" class="form-control" />
+            <!-- Confirmation code -->
+            <div class="form-floating mb-3">
+                <input asp-for="OTPCode" placeholder="@RegisterSmsResource.confirmationcode" id="floatingConfirmationCode" type="password" class="form-control" />
+                <label for="floatingConfirmationCode">@RegisterSmsResource.confirmationcode</label>
+            </div>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <button type="submit" class="btn btn-primary">@RegisterSmsResource.update</button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-primary">@RegisterSmsResource.create</button>
+            }
+        }
+    </div>
+}
+else
+{
+    if (User.Identity.IsAuthenticated)
+    {
+        <div class="alert alert-success">@RegisterSmsResource.sms_is_enrolled</div>
+    }
+    else
+    {
+        <div class="alert alert-success">@RegisterSmsResource.user_is_created</div>
+    }
+}

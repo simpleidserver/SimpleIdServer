@@ -7,8 +7,8 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Register;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -261,6 +261,7 @@ public class ClientsController : BaseController
             existingClient.JwksUri = newClient.JwksUrl;
             existingClient.IsRedirectUrlCaseSensitive = newClient.IsRedirectUrlCaseSensitive;
             existingClient.DefaultAcrValues = newClient.DefaultAcrValues;
+            existingClient.IsPublic = newClient.IsPublic;
             if (newClient.Parameters != null)
             {
                 var existingClientParameters = existingClient.Parameters;

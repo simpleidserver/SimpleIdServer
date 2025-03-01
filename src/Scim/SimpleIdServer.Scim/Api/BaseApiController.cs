@@ -314,6 +314,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalGet(string realm, string id, GetSCIMResourceRequest parameter, CancellationToken cancellationToken)
         {
+            id = id ?? ExtractId();
             _logger.LogInformation(string.Format(Global.StartGetResource, id));
             try
             {
@@ -394,6 +395,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalDelete(string prefix, string id, CancellationToken cancellationToken)
         {
+            id = id ?? ExtractId();
             var realm = _options.EnableRealm ? prefix : string.Empty;
             var status = await CheckRealm(realm, cancellationToken);
             if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
@@ -432,6 +434,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalUpdate(string prefix, string id, RepresentationParameter representationParameter, CancellationToken cancellationToken)
         {
+            id = id ?? ExtractId();
             if (representationParameter == null)
             {
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPutNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
@@ -503,6 +506,7 @@ namespace SimpleIdServer.Scim.Api
 
         protected async Task<IActionResult> InternalPatch(string prefix, string id, PatchRepresentationParameter patchRepresentation, CancellationToken cancellationToken)
         {
+            id = id ?? ExtractId();
             if (patchRepresentation == null)
             {
                 return this.BuildError(HttpStatusCode.BadRequest, Global.HttpPatchNotWellFormatted, SCIMConstants.ErrorSCIMTypes.InvalidSyntax);
@@ -642,6 +646,13 @@ namespace SimpleIdServer.Scim.Api
             if(status == RealmStatus.UNAUTHORIZED)
                 return this.BuildError(HttpStatusCode.Unauthorized, string.Format(Global.RealmUnauthorized, realm));
             return this.BuildError(HttpStatusCode.NotFound, string.Format(Global.RealmUnknown, realm));
+        }
+
+        private string ExtractId()
+        {
+            var uri = new Uri($"{_uriProvider.GetAbsoluteUriWithVirtualPath()}{HttpContext.Request.Path.Value}");
+            var path = uri.GetLeftPart(UriPartial.Path);
+            return path.Split('/').Last();
         }
 
         private enum RealmStatus

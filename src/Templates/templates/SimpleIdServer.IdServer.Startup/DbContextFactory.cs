@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using SimpleIdServer.IdServer.Store.EF;
 
 namespace SimpleIdServer.IdServer.PostgreMigrations;
+/*
 public class DbContextFactory : IDesignTimeDbContextFactory<StoreDbContext>
 {
     public StoreDbContext CreateDbContext(string[] args)

@@ -42,7 +42,7 @@ public class AuthorizationCallbackRequestHandler : IAuthorizationCallbackRequest
         context.Request.SetRequestData(record);
         context.SetClient(new Domains.Client
         {
-            TokenEndPointAuthMethod = OAuthPKCEAuthenticationHandler.AUTH_METHOD
+            IsPublic = true
         });
         foreach(var responseTypeHandler in filteredResponseTypeHandlers)
             await responseTypeHandler.Enrich(new EnrichParameter { AuthorizationDetails = authorizationDetails, Scopes = scopes }, context, cancellationToken);

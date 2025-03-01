@@ -45,13 +45,13 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 Operation = SCIMPatchOperations.REMOVE,
                 Path = a.FullPath
             }).ToList();
-            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, pathOperations, request.Location, schema, true);
+            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, pathOperations, request.Location, schema, true, true);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
                 {
                     await _scimRepresentationCommandRepository.BulkInsert(reference.AddedRepresentationAttributes, representation.Id, true).ConfigureAwait(false);
-                    // await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes, representation.Id, true).ConfigureAwait(false);
+                    await _scimRepresentationCommandRepository.BulkDelete(reference.RemovedRepresentationAttributes, representation.Id, true).ConfigureAwait(false);
                 }
 
                 await _scimRepresentationCommandRepository.Delete(representation).ConfigureAwait(false);

@@ -14,6 +14,7 @@ namespace SimpleIdServer.Scim.Startup.Configurations
         POSTGRE = 1,
         MONGODB = 2,
         MYSQL = 3,
-        SQLITE = 4
+        SQLITE = 4,
+        INMEMORY = 5
     }
 }

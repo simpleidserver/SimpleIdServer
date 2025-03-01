@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
@@ -17,7 +16,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace SimpleIdServer.Scim.Helpers
 {
@@ -26,7 +24,7 @@ namespace SimpleIdServer.Scim.Helpers
         Task<SCIMRepresentationPatchResult> Apply(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues, CancellationToken cancellationToken);
         Task CheckUniqueness(IEnumerable<SCIMRepresentationAttribute> attributes);
         void CheckMutability(List<SCIMPatchResult> patchOperations);
-        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas);
+        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings);
     }
 
     public class RepresentationHelper : IRepresentationHelper
@@ -86,7 +84,9 @@ namespace SimpleIdServer.Scim.Helpers
                     }
 
                     foreach (var h in hierarchicalNewAttributes)
+                    {
                         h.ComputeValueIndex();
+                    }
                 }
 
                 if (patch.Operation == SCIMPatchOperations.ADD && !(scimFilter is SCIMComplexAttributeExpression) && attrSelectors.Contains(fullPath))
@@ -120,6 +120,8 @@ namespace SimpleIdServer.Scim.Helpers
                     if (complexAttr != null && !hierarchicalFilteredAttributes.Any() && complexAttr.GroupingFilter != null && patch.Operation == SCIMPatchOperations.REPLACE) throw new SCIMNoTargetException(Global.PatchMissingAttribute);
                 }
 
+
+                var computedIndexes = hierarchicalNewAttributes?.Select(a => a.ComputedValueIndex)?.ToList() ?? new List<string>();
                 if(hierarchicalFilteredAttributes != null && hierarchicalNewAttributes != null) hierarchicalNewAttributes = FilterDuplicate(hierarchicalFilteredAttributes, hierarchicalNewAttributes);
 
                 var removeCallback = new Action<ICollection<SCIMRepresentationAttribute>>((attrs) =>
@@ -200,6 +202,16 @@ namespace SimpleIdServer.Scim.Helpers
                             if(hierarchicalFilteredAttributes == null)
                             {
                                 await OverrideRootAttributes(result, hierarchicalNewAttributes, representation, cancellationToken);
+                            }
+                            // If the target location is a multi-valued attribute and no filter is specified, the attribute and all values are replaced.
+                            else if (scimFilter != null && !(scimFilter is SCIMComplexAttributeExpression) && scimExprSchemaAttr != null && scimExprSchemaAttr.MultiValued == true)
+                            {
+                                removeCallback(hierarchicalFilteredAttributes.Where(h => !computedIndexes.Contains(h.ComputedValueIndex)).SelectMany(a => a.ToFlat()).ToList());
+                                hierarchicalNewAttributes.SelectMany(a => a.ToFlat()).ToList().ForEach(a =>
+                                {
+                                    a.RepresentationId = representation.Id;
+                                    result.Add(a);
+                                });
                             }
                             else
                             {
@@ -571,11 +583,24 @@ namespace SimpleIdServer.Scim.Helpers
 
         public void CheckMutability(List<SCIMPatchResult> patchOperations)
         {
-            var attrWithBrokenMutability = patchOperations
-                .Where(o => o.Attr != null && (o.Operation == SCIMPatchOperations.REMOVE || o.Operation == SCIMPatchOperations.REPLACE) && (o.Attr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE))
-                .Select(o => o.Attr);
-            if(attrWithBrokenMutability.Any())
-                throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, string.Join(",", attrWithBrokenMutability.Select(a => a.FullPath).Distinct())));
+            var rootPatchOperations = patchOperations.Where(o => !patchOperations.Any(p => o.Attr.GetParentFullPath() == p.Path));
+            foreach (var rootOperation in rootPatchOperations)
+            {
+                var scopedOperations = new List<SCIMPatchResult>
+                {
+                    rootOperation
+                };
+                if (rootOperation.Operation == SCIMPatchOperations.ADD)
+                {
+                    scopedOperations  = patchOperations.Where(p => p.Path.StartsWith(rootOperation.Path) && p.Operation == rootOperation.Operation).ToList();
+                }
+
+                var attrWithBrokenMutability = scopedOperations
+                    .Where(o => o.Attr != null && (o.Operation == SCIMPatchOperations.REMOVE || o.Operation == SCIMPatchOperations.REPLACE) && (o.Attr.SchemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.IMMUTABLE))
+                    .Select(o => o.Attr);
+                if (attrWithBrokenMutability.Any())
+                    throw new SCIMImmutableAttributeException(string.Format(Global.AttributeImmutable, string.Join(",", attrWithBrokenMutability.Select(a => a.FullPath).Distinct())));
+            }
         }
 
         #endregion
@@ -583,13 +608,13 @@ namespace SimpleIdServer.Scim.Helpers
         #region Extract
 
 
-        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas)
+        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings)
         {
             CheckRequiredAttributes(mainSchema, extensionSchemas, json);
-            return BuildRepresentation(json, externalId, mainSchema, extensionSchemas, _options.IgnoreUnsupportedCanonicalValues);
+            return BuildRepresentation(json, externalId, mainSchema, extensionSchemas, _options.IgnoreUnsupportedCanonicalValues, attributeMappings);
         }
 
-        public static SCIMRepresentation BuildRepresentation(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, bool ignoreUnsupportedCanonicalValues)
+        public static SCIMRepresentation BuildRepresentation(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, bool ignoreUnsupportedCanonicalValues, IEnumerable<SCIMAttributeMapping> attributeMappings)
         {
             var schemas = new List<SCIMSchema>
             {
@@ -603,7 +628,9 @@ namespace SimpleIdServer.Scim.Helpers
             };
             result.Schemas = schemas;
             var resolutionResult = Resolve(json, mainSchema, extensionSchemas);
-            result.FlatAttributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
+            var flatAttributes = BuildRepresentationAttributes(resolutionResult, resolutionResult.AllSchemaAttributes, ignoreUnsupportedCanonicalValues);
+            flatAttributes = RemoveStandardReferenceProperties(flatAttributes, attributeMappings);
+            result.FlatAttributes = flatAttributes;
             var attr = result.FlatAttributes.FirstOrDefault(a => a.SchemaAttribute.Name == "displayName");
             if (attr != null)
             {

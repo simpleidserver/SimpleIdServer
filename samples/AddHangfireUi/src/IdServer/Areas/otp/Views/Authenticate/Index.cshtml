@@ -1,0 +1,92 @@
+﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using IdServer;
+@using IdServer.Resources;
+@model SimpleIdServer.IdServer.Otp.UI.ViewModels.AuthenticateOtpViewModel
+@inject IOptions<IdServerHostOptions> configuration
+
+@{
+    ViewBag.Title = AuthenticateOtpResource.title;
+    Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
+    var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
+    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
+    var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="list-group mb-3">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            foreach (var error in modelState.Errors)
+            {
+                <li class="list-group-item list-group-item-danger">@AuthenticateOtpResource.ResourceManager.GetString(error.ErrorMessage)</li>
+            }
+        }
+    </ul>
+}
+
+@if (Model.IsLoginMissing)
+{
+    <div class="alert alert-danger">
+        @AuthenticateOtpResource.missing_login
+    </div>
+}
+else
+{
+    <!-- Login form -->
+    @using (Html.BeginForm("Index", "Authenticate", new { area = SimpleIdServer.IdServer.Otp.Constants.Amr, returnUrl = Model.ReturnUrl }, FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="ReturnUrl" />
+        <input type="hidden" name="Action" value="AUTHENTICATE" />
+        <input asp-for="IsFirstAmr" type="hidden" class="form-control" />
+        <input asp-for="IsLoginMissing" type="hidden" class="form-control" />
+        <input asp-for="IsAuthInProgress" type="hidden" class="form-control" />
+        <!-- Login -->
+        <div class="input-group mb-3">
+            @if (Model.IsAuthInProgress)
+            {
+                <input asp-for="Login" placeholder="@AuthenticateOtpResource.login" type="text" class="form-control" disabled="disabled" />
+                <input asp-for="Login" placeholder="@AuthenticateOtpResource.login" type="hidden" class="form-control" />
+            }
+            else
+            {
+                <input asp-for="Login" placeholder="@AuthenticateOtpResource.login" type="text" class="form-control" />
+            }
+        </div>
+        <!-- Confirmation code -->
+        <div class="input-group mb-3">
+            <input asp-for="OTPCode" placeholder="@AuthenticateOtpResource.confirmationcode" type="password" class="form-control" />
+        </div>
+        @if (Model.IsFirstAmr)
+        {
+            <div>
+                <input type="checkbox" asp-for="RememberLogin " />
+                <label>@AuthenticateOtpResource.remember_login</label>
+            </div>
+        }
+
+        <button type="submit" class="btn btn-primary">@AuthenticateOtpResource.authenticate</button>
+    }
+
+    @if (Model.IsFirstAmr && Model.RegistrationWorkflow != null)
+    {
+        <div>
+            <div class="divider">
+                <p class="fw-bold text">OR</p>
+            </div>
+            <a href="@registationUrl">@AuthenticatePasswordResource.register</a>
+        </div>
+    }
+}
+
+@section SubScripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".login input[name='RememberLogin']").change(function (e) {
+                $(this).val($(this).is(':checked'));
+            });
+        });
+    </script>
+}
