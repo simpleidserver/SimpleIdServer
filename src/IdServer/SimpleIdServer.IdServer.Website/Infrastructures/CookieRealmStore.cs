@@ -24,7 +24,7 @@ public class CookieRealmStore : IRealmStore
     {
         get
         {
-            if(_configuration.IsReamEnabled)
+            if (!_configuration.IsReamEnabled)
             {
                 return Constants.DefaultRealm;
             }

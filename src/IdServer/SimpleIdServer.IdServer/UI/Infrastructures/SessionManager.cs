@@ -69,7 +69,8 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
 
         public AuthenticationTicket FetchTicket(HttpContext context, string name)
         {
-            var cookie = context.Request.Cookies.FirstOrDefault(c => c.Key.StartsWith($"{COOKIE_NAME}-{name.SanitizeNameIdentifier()}"));
+            var cookieName = $"{IdServerCookieAuthenticationHandler.GetCookieName(_realmStore.Realm, COOKIE_NAME)}-{name.SanitizeNameIdentifier()}";
+            var cookie = context.Request.Cookies.FirstOrDefault(c => c.Key.StartsWith(cookieName));
             if (cookie.Equals(default(KeyValuePair<string, string>))) return null;
             return _ticketDataFormat.Unprotect(cookie.Value);
         }
