@@ -13,6 +13,7 @@
 		<PackageReference Include="linq2db.EntityFrameworkCore" Version="8.1.0" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\..\efdataseeder\EfdataSeeder.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.OpenidFederation\SimpleIdServer.OpenidFederation.csproj" />
 	</ItemGroup>

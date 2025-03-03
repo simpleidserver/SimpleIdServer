@@ -1,0 +1,25 @@
+﻿@page "/claims"
+
+@using System.Security.Claims
+
+<h3>Claims</h3>
+
+@foreach(var cl in claims)
+{
+    <h1>@cl.Type @cl.Value</h1>
+}
+
+@code {
+    @inject AuthenticationStateProvider GetAuthenticationStateAsync
+    IEnumerable<Claim> claims;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            var authState = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
+            claims = authState.User.Claims;
+        }
+    }
+}

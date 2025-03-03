@@ -22,13 +22,12 @@ builder.Services.ConfigureClientCertificateForwarding(identityServerConfiguratio
 builder.Services.ConfigureCors();
 builder.Services.ConfigureRazorAndLocalization();
 SidServerSetup.ConfigureIdServer(builder, identityServerConfiguration);
+SidServerSetup.ConfigureDataseeder(builder);
 SidServerSetup.ConfigureCentralizedConfiguration(builder);
 
-// Uncomment these two lines to enable seed data from JSON file.
-// builder.Services.AddJsonSeeding(builder.Configuration);
-// builder.Services.AddEntitySeeders(typeof(UserEntitySeeder));
 var app = builder.Build();
 DataSeeder.SeedData(app, builder.Configuration["SCIM:SCIMRepresentationsExtractionJobOptions:SCIMEdp"]);
+DataSeeder.MigrateData(app);
 app.UseCors("AllowAll");
 if (identityServerConfiguration.IsForwardedEnabled) app.UseForwardedHeaders();
 if (identityServerConfiguration.ForceHttps) app.SetHttpsScheme();

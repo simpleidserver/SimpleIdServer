@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using EfdataSeeder;
 using FormBuilder.Builders;
 using FormBuilder.EF;
 using FormBuilder.Models;
@@ -27,6 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 namespace SimpleIdServer.IdServer.Startup.Conf;
 
@@ -107,6 +109,15 @@ public class DataSeeder
         {
             SeedSid(scope, scimBaseUrl);
             SeedFormRecords(scope);
+        }
+    }
+
+    public static void MigrateData(WebApplication webApplication)
+    {
+        using (var scope = webApplication.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            var dataMigrationService = scope.ServiceProvider.GetService<IDataMigrationService>();
+            dataMigrationService.Migrate(CancellationToken.None).Wait();
         }
     }
 
@@ -519,6 +530,11 @@ public class DataSeeder
         {
             var isInMemory = formDbContext.Database.IsInMemory();
             if (!isInMemory) formDbContext.Database.Migrate();
+            if(formDbContext.Forms.Any())
+            {
+                return;
+            }
+
             var allForms = new List<FormRecord>();
             allForms.Add(FormBuilder.Constants.EmptyStep);
             allForms.AddRange(allAuthForms);

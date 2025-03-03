@@ -1,9 +1,9 @@
-=> corriger problème avec credential issuer : OK
-=> mettre à jour fichier de configuration docker : OK
-=> publier version 5.0.0 du site : OK
-=> mettre à jour les templates : OK 
-=> vérifier les tests unitaires du credential issuer : TODO
-=> essayer de migrer l'application mobile vers DOTNET8 : TODO
-=> publier les nuget packages : TODO
-=> vérifier si les templates fonctionnent : TODO
-=> publier les projets DOCKER : TODO
+=> appliquer script de migration EF pour mettre à jour ACR (de la version 5.0.3 vers 6.0.0).
+=> ajouter la possibilité de pouvoir rechercher des données dans un tableau.
+=> pouvoir éditer les expressions CRON des jobs.
+=> pouvoir bloquer ou débloquer un utilisateur.
+=> migrer du duende vers SID.
+=> faire un site de marketing sur le formbuilder et ajouter de la documentation autour.
+
+=> faire déploiement de la version 2.28
+=> 

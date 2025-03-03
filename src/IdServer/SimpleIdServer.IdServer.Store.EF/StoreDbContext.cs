@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using EfdataSeeder;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
@@ -9,7 +10,7 @@ using SimpleIdServer.OpenidFederation.Domains;
 
 namespace SimpleIdServer.IdServer.Store.EF
 {
-    public class StoreDbContext : DbContext, IDataProtectionKeyContext
+    public class StoreDbContext : DataSeederDbContext<StoreDbContext>, IDataProtectionKeyContext
     {
         public StoreDbContext(DbContextOptions<StoreDbContext> options) : base(options) { }
 
@@ -53,9 +54,8 @@ namespace SimpleIdServer.IdServer.Store.EF
         public DbSet<MessageBusErrorMessage> MessageBusErrorMessages { get; set; }
         public DbSet<FederationEntity> FederationEntities { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void Update(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
             builder.ApplyConfiguration(new LanguageConfiguration());
             builder.ApplyConfiguration(new ClientConfiguration());
             builder.ApplyConfiguration(new ConsentConfiguration());

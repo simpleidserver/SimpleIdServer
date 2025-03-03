@@ -145,6 +145,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.SqliteMigration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.SqlServerMigrations", "formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj", "{BAFEDA3F-189F-B2A8-21DD-F7BAE7D30EE6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "09. Dataseeder", "09. Dataseeder", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfdataSeeder", "efdataseeder\EfdataSeeder.csproj", "{55C25893-59CB-C7AF-9D67-6711FD49F5E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -383,6 +387,10 @@ Global
 		{BAFEDA3F-189F-B2A8-21DD-F7BAE7D30EE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAFEDA3F-189F-B2A8-21DD-F7BAE7D30EE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BAFEDA3F-189F-B2A8-21DD-F7BAE7D30EE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55C25893-59CB-C7AF-9D67-6711FD49F5E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55C25893-59CB-C7AF-9D67-6711FD49F5E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55C25893-59CB-C7AF-9D67-6711FD49F5E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55C25893-59CB-C7AF-9D67-6711FD49F5E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -455,6 +463,8 @@ Global
 		{42E3FC87-4D0A-DE61-272C-A82E4B5017DF} = {8653824C-E1CF-422F-BE17-0A271C249D22}
 		{520722FF-1548-3DE4-7561-BC8A0BD5FDFA} = {8653824C-E1CF-422F-BE17-0A271C249D22}
 		{BAFEDA3F-189F-B2A8-21DD-F7BAE7D30EE6} = {8653824C-E1CF-422F-BE17-0A271C249D22}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
+		{55C25893-59CB-C7AF-9D67-6711FD49F5E7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

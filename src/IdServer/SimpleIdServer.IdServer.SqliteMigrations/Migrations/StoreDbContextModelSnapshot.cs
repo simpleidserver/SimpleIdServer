@@ -152,6 +152,23 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.ToTable("ConfigurationDefinitionRecordValueTranslation");
                 });
 
+            modelBuilder.Entity("EfdataSeeder.DataSeederExecutionHistory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ExecutionDateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExecutionHistories");
+                });
+
             modelBuilder.Entity("GroupScope", b =>
                 {
                     b.Property<string>("GroupsId")

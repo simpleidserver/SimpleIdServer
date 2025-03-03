@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
+using EfdataSeeder;
 using FormBuilder;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
@@ -21,6 +22,7 @@ using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Sms;
+using SimpleIdServer.IdServer.Startup.Conf.Migrations;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store.EF;
@@ -118,6 +120,12 @@ public class SidServerSetup
         });
         ConfigureDistributedCache(builder);
         ConfigureMessageBroker(builder, idServerBuilder);
+    }
+
+    public static void ConfigureDataseeder(WebApplicationBuilder builder)
+    {
+        builder.Services.AddEfdataSeeder();
+        builder.Services.AddTransient<IDataSeeder, FormAndWorkflowDataSeeder>();
     }
 
     public static void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)

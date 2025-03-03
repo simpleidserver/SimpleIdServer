@@ -157,6 +157,23 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("ConfigurationDefinitionRecordValueTranslation");
                 });
 
+            modelBuilder.Entity("EfdataSeeder.DataSeederExecutionHistory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("ExecutionDateTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ExecutionHistories");
+                });
+
             modelBuilder.Entity("GroupScope", b =>
                 {
                     b.Property<string>("GroupsId")
