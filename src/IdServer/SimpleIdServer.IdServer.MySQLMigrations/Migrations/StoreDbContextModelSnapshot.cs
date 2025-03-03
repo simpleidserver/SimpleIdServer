@@ -786,8 +786,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("datetime(6)")
                         .HasAnnotation("Relational:JsonPropertyName", "client_secret_expires_at");
 
-                    b.Property<string>("ClientType")
-                        .HasColumnType("longtext")
+                    b.Property<int?>("ClientType")
+                        .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "client_type");
 
                     b.Property<string>("Contacts")

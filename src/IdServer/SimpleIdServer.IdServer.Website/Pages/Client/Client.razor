@@ -22,7 +22,7 @@
         <RadzenText class="mt-3 mb-3 no-margin" Text="@clientState.Value.Client.ClientId" TextStyle="TextStyle.DisplayH3" />
 
         <div class="mb-1">
-            <RadzenBadge Text="@clientState.Value.Client.ClientType" IsPill="true" />
+            <RadzenBadge Text="@(clientState.Value.Client.ClientType == null ? string.Empty : Enum.GetName(typeof(ClientTypes), clientState.Value.Client.ClientType.Value))" IsPill="true" />
             @if(clientState.Value.Client.IsPublic)
             {                
                 <RadzenBadge style="margin-left: 5px;" Text="@Global.PublicClient" IsPill="true" />

@@ -125,7 +125,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public bool IsResourceParameterRequired { get; set; }
         public int AuthReqIdExpirationTimeInSeconds { get; set; }
         [SugarColumn(IsNullable = true)]
-        public string? ClientType { get; set; } = null;
+        public ClientTypes? ClientType { get; set; } = null;
         public bool IsDPOPNonceRequired { get; set; }
         public double DPOPNonceLifetimeInSeconds { get; set; }
         public bool IsRedirectUrlCaseSensitive { get; set; }

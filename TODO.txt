@@ -1,5 +1,5 @@
-=> appliquer script de migration EF pour mettre à jour ACR (de la version 5.0.3 vers 6.0.0).
-=> ajouter la possibilité de pouvoir rechercher des données dans un tableau.
+=> appliquer script de migration EF pour mettre à jour ACR (de la version 5.0.3 vers 6.0.0)	:	OK
+=> ajouter la possibilité de pouvoir rechercher des données dans un tableau.		:	IN PROGRESS
 => pouvoir éditer les expressions CRON des jobs.
 => pouvoir bloquer ou débloquer un utilisateur.
 => migrer du duende vers SID.

@@ -511,7 +511,7 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.SerializedJsonWebKeys)]
         public ICollection<ClientJsonWebKey> SerializedJsonWebKeys { get; set; } = new List<ClientJsonWebKey>();
         [JsonPropertyName(OAuthClientParameters.ClientType)]
-        public string? ClientType { get; set; } = null;
+        public ClientTypes? ClientType { get; set; } = null;
         [JsonPropertyName(OAuthClientParameters.ExpirationDateTime)]
         public DateTime? ExpirationDateTime { get; set; } = null;
         /// <summary>
@@ -638,19 +638,20 @@ namespace SimpleIdServer.IdServer.Domains
         }
     }
 
-    public class ClientTypes
+    public enum ClientTypes
     {
-        public const string SPA = "SPA";
-        public const string MACHINE = "MACHINE";
-        public const string WEBSITE = "WEBSITE";
-        public const string MOBILE = "MOBILE";
-        public const string EXTERNAL = "EXTERNALDEVICE";
-        public const string WALLET = "WALLET";
-        public const string DEVICE = "DEVICE";
-        public const string HIGHLYSECUREDWEBSITE = "HIGHLYSECUREDWEBSITE";
-        public const string GRANTMANAGEMENT = "GRANTMANAGEMENT";
-        public const string SAML = "SAML";
-        public const string CREDENTIAL_ISSUER = "CREDENTIALISSUER";
-        public const string FEDERATION = "FEDERATION";
+        SPA = 0,
+        MACHINE = 1,
+        WEBSITE = 2,
+        MOBILE = 3,
+        EXTERNAL = 4,
+        WALLET = 5,
+        DEVICE = 6,
+        HIGHLYSECUREDWEBSITE = 7,
+        GRANTMANAGEMENT = 8,
+        SAML = 9,
+        CREDENTIAL_ISSUER = 10,
+        FEDERATION = 11,
+        WSFEDERATION = 12
     }
 }

@@ -773,8 +773,8 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "client_secret_expires_at");
 
-                    b.Property<string>("ClientType")
-                        .HasColumnType("TEXT")
+                    b.Property<int?>("ClientType")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "client_type");
 
                     b.Property<string>("Contacts")

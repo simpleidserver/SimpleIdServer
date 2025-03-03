@@ -289,9 +289,9 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             var baseUrl = await GetScopesUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var types = new List<ScopeProtocols>();
-            if (!string.IsNullOrWhiteSpace(action.ClientType))
+            if (action.ClientType != null)
             {
-                if (action.ClientType == SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE)
+                if (action.ClientType == ClientTypes.WSFEDERATION)
                     types = new List<ScopeProtocols> { ScopeProtocols.SAML };
                 else
                     types = new List<ScopeProtocols> { ScopeProtocols.OAUTH, ScopeProtocols.OPENID };
@@ -327,7 +327,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         public string? OrderBy { get; set; } = null;
         public int? Skip { get; set; } = null;
         public int? Take { get; set; } = null;
-        public string? ClientType { get; set; } = null;
+        public ClientTypes? ClientType { get; set; } = null;
     }
 
     public class SearchScopesAction : BaseSearchScopesAction

@@ -32,21 +32,24 @@
         </div>
 
         <RadzenDataGrid @ref="clientsGrid"
-                        AllowFiltering="true"
-                        AllowColumnResize="true"
-                        AllowAlternatingRows="false"
-                        AllowSorting="true"
-                        PageSize="30"
-                        AllowPaging="true"
-                        PagerHorizontalAlign="HorizontalAlign.Left"
-                        ShowPagingSummary="true"
-                        IsLoading="@clientState.Value.IsLoading"
-                        Count="@clientState.Value.Count"
-                        Data="@clientState.Value.Clients"
-                        LoadData="@LoadData"
-                        RowRender="@RowRender"
-                        TItem="SelectableClient"
-                        ColumnWidth="300px">
+        AllowFiltering="true"
+        AllowColumnResize="true"
+        AllowAlternatingRows="false"
+        AllowSorting="true"
+        PageSize="30"
+        AllowPaging="true"
+        PagerHorizontalAlign="HorizontalAlign.Left"
+        ShowPagingSummary="true"
+        IsLoading="@clientState.Value.IsLoading"
+        Count="@clientState.Value.Count"
+        Data="@clientState.Value.Clients"
+        FilterMode="FilterMode.Simple"
+        LogicalFilterOperator="LogicalFilterOperator.And"
+        FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+        LoadData="@LoadData"
+        RowRender="@RowRender"
+        TItem="SelectableClient"
+        ColumnWidth="300px">
             <Columns>
                 <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                     <HeaderTemplate>
@@ -56,15 +59,15 @@
                         <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="true" SortProperty="Value.ClientId" Title="@Global.Identifier" Width="80px">
+                <RadzenDataGridColumn TItem="SelectableClient" Filterable="true" Property="Value.ClientId" Sortable="true" SortProperty="Value.ClientId" Title="@Global.Identifier" Width="80px">
                     <Template Context="data">
                         <RadzenLink Text="@data.Value.ClientId" Path="@(urlHelper.GetUrl($"/clients/{data.Value.Id}/settings"))" />
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableClient" Property="Value.ClientName" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" Title="Type" Width="80px">
+                <RadzenDataGridColumn TItem="SelectableClient" Filterable="true" Property="Value.ClientType" Sortable="false" Title="Type" Width="80px">
                     <Template Context="data">
-                        <RadzenBadge Text="@data.Value.ClientType" IsPill="true" />
+                        <RadzenBadge Text="@(data.Value.ClientType == null ? string.Empty : Enum.GetName(typeof(ClientTypes), data.Value.ClientType.Value))" IsPill="true" />
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableClient" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />

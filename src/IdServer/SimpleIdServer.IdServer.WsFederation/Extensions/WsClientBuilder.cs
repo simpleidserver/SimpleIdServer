@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = Guid.NewGuid().ToString(),
-                ClientType = WsFederationConstants.CLIENT_TYPE,
+                ClientType = ClientTypes.WSFEDERATION,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };

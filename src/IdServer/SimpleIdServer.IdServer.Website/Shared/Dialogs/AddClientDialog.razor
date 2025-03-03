@@ -166,7 +166,7 @@
                         </RadzenTemplateForm>
                         break;
                     // Ws-Federation
-                    case SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE:
+                    case ClientTypes.WSFEDERATION:
                         <RadzenTemplateForm Submit=@AddWsFederationApplication TItem="WsFederationApplication" Data=@wsFederationApplication>
                             @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
                             {
@@ -472,7 +472,7 @@
         public string Name { get; set; } = null!;
         public string ShortDescription { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public string Type { get; set; }
+        public ClientTypes Type { get; set; }
         public string PictureUrl { get; set; } = null!;
         public ClientTemplateTypes ClientTemplate { get; set; }
     }
@@ -637,8 +637,8 @@
         new ApplicationType { Name = Global.Machine, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.MachineShortDescription, Description = Global.MachineDescription, Type = ClientTypes.MACHINE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MachineClient.png" },
         new ApplicationType { Name = Global.WebApp, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.WebAppShortDescription, Description = Global.WebAppDescription, Type = ClientTypes.WEBSITE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png" },
         new ApplicationType { Name = Global.Mobile, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.MobileShortDescription, Description = Global.MobileDescription, Type = ClientTypes.MOBILE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/MobileClient.png" },
-        new ApplicationType { Name = Global.WsRelyingParty, ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = Global.WsRelyingPartyShortDescription, Description = Global.WsRelyingPartyDescription, Type = SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WsFedClient.png" },
-        new ApplicationType { Name = Global.SamlSp, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.SamlSpShortDescription, Description = Global.SamlSpDescription, Type = SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SAMLSP.png" },
+        new ApplicationType { Name = Global.WsRelyingParty, ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = Global.WsRelyingPartyShortDescription, Description = Global.WsRelyingPartyDescription, Type = ClientTypes.WSFEDERATION, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WsFedClient.png" },
+        new ApplicationType { Name = Global.SamlSp, ClientTemplate = ClientTemplateTypes.STANDARD, ShortDescription = Global.SamlSpShortDescription, Description = Global.SamlSpDescription, Type = ClientTypes.SAML, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SAMLSP.png" },
         new ApplicationType { Name = Global.Device, ClientTemplate = ClientTemplateTypes.STANDARD,  ShortDescription = Global.DeviceShortDescription, Description = Global.DeviceDescription, Type = ClientTypes.DEVICE, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/DeviceClient.png" },
         new ApplicationType { Name = Global.HighlySecuredWebApp, ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = Global.HighlySecuredWebAppShortDescription, Description = Global.HighlySecuredWebAppDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.HIGHLYSECUREDWEBSITE },
         new ApplicationType { Name = Global.GrantMgt, ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = Global.GrantMgtShortDescription, Description = Global.GrantMgtDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.GRANTMANAGEMENT },

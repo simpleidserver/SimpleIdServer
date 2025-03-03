@@ -51,7 +51,7 @@
                     </div>
                 }
                 <!-- Access Token Type -->
-                @if(Client.ClientType != WsFederationConstants.CLIENT_TYPE && Client.ClientType != SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE)
+                @if(Client.ClientType != ClientTypes.WSFEDERATION && Client.ClientType != ClientTypes.SAML)
                 {                    
                     <div class="row mt-1">
                         <div class="col-md-2">
@@ -142,11 +142,11 @@
                 </RadzenAccordionItem>
             }
 
-            @if(Client.ClientType != WsFederationConstants.CLIENT_TYPE && Client.ClientType != ClientTypes.FEDERATION)
+            @if(Client.ClientType != ClientTypes.WSFEDERATION && Client.ClientType != ClientTypes.FEDERATION)
             {
                 <RadzenAccordionItem Text="@Global.CapabilityConfig" Selected=true>
                     <!-- Grant types -->
-                    @if(Client.ClientType != SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE)
+                    @if(Client.ClientType != ClientTypes.SAML)
                     {
                         <div class="row">
                             <div class="col-md-2">
@@ -262,7 +262,7 @@
                         </div>
                     }
 
-                    @if (Client.ClientType == SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE)
+                    @if (Client.ClientType == ClientTypes.SAML)
                     {
                         <!-- Metadata Url -->
                         <div class="row">                            

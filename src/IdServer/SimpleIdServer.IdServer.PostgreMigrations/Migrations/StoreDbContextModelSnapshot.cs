@@ -786,8 +786,8 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "client_secret_expires_at");
 
-                    b.Property<string>("ClientType")
-                        .HasColumnType("text")
+                    b.Property<int?>("ClientType")
+                        .HasColumnType("integer")
                         .HasAnnotation("Relational:JsonPropertyName", "client_type");
 
                     b.Property<string>("Contacts")

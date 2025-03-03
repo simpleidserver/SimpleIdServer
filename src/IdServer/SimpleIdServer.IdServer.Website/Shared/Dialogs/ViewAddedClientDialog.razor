@@ -9,7 +9,7 @@
 @inject IState<RealmsState> realmsState
 
 <p>
-    The <RadzenBadge Text="@Client.ClientType" IsPill="true" /> client named <RadzenBadge Text="@Client.ClientName" IsPill="true" /> has been created. Please use the following properties to configure your client.
+    The <RadzenBadge Text="@Enum.GetName(typeof(ClientTypes), Client.ClientType)" IsPill="true" /> client named <RadzenBadge Text="@Client.ClientName" IsPill="true" /> has been created. Please use the following properties to configure your client.
 </p>
 
 <!-- Client Identifier -->
@@ -47,14 +47,14 @@
 
 @switch(Client.ClientType)
 {
-    case SimpleIdServer.IdServer.WsFederation.WsFederationConstants.CLIENT_TYPE:
+    case ClientTypes.WSFEDERATION:
         <!-- WSFederation -->
         <div>
             <RadzenLabel Text="@Global.WsFederation" Style="padding: 0px;"></RadzenLabel>
             <RadzenTextBox Value=@GetFederationMetadataUrl() Class="w-100"></RadzenTextBox>
         </div>
         break;
-    case SimpleIdServer.IdServer.Saml.Idp.Constants.CLIENT_TYPE:
+    case ClientTypes.SAML:
         <!-- SAML -->
         <div>
             <RadzenLabel Text="@Global.Saml" Style="padding: 0px;"></RadzenLabel>

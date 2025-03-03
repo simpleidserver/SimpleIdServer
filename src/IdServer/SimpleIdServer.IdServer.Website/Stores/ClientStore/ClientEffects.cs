@@ -233,7 +233,7 @@ public class ClientEffects
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         var newClient = newClientBuilder.Build();
-        await CreateClient(newClient, dispatcher, WsFederationConstants.CLIENT_TYPE);
+        await CreateClient(newClient, dispatcher, ClientTypes.WSFEDERATION);
     }
 
     [EffectMethod]
@@ -247,7 +247,7 @@ public class ClientEffects
         newClientBuilder.SetUseAcsArtifact(action.UseAcs);
         var newClient = newClientBuilder.Build();
         var pemResult = PemConverter.ConvertFromSecurityKey(securityKey);
-        await CreateClient(newClient, dispatcher, Saml.Idp.Constants.CLIENT_TYPE, pemResult);
+        await CreateClient(newClient, dispatcher, ClientTypes.SAML, pemResult);
     }
 
     [EffectMethod]
@@ -750,7 +750,7 @@ public class ClientEffects
         dispatcher.Dispatch(new UpdateClientRealmsSuccessAction());
     }
 
-    private async Task CreateClient(Domains.Client client, IDispatcher dispatcher, string clientType, PemResult pemResult = null, string jsonWebKey = null)
+    private async Task CreateClient(Domains.Client client, IDispatcher dispatcher, ClientTypes clientType, PemResult pemResult = null, string jsonWebKey = null)
     {
         var baseUrl = await GetClientsUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
@@ -913,7 +913,7 @@ public class AddClientSuccessAction
     public string ClientId { get; set; } = null!;
     public string? ClientName { get; set; } = null;
     public string? Language { get; set; } = null;
-    public string ClientType { get; set; }
+    public ClientTypes ClientType { get; set; }
     public string? JsonWebKeyStr { get; set; } = null;
     public PemResult? Pem { get; set; } = null;
 }

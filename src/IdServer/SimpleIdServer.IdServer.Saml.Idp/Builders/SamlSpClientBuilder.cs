@@ -24,7 +24,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 ClientSecret = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientType = Saml.Idp.Constants.CLIENT_TYPE,
+                ClientType = ClientTypes.SAML,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
