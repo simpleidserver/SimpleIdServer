@@ -29,7 +29,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientSecret = clientSecret,
-                ClientType = ClientTypes.CREDENTIAL_ISSUER,
+                ClientType = ClientTypes.CREDENTIALISSUER,
                 RedirectionUrls = redirectUrls,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,

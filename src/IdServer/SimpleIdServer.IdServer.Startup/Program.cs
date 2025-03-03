@@ -26,8 +26,9 @@ SidServerSetup.ConfigureDataseeder(builder);
 SidServerSetup.ConfigureCentralizedConfiguration(builder);
 
 var app = builder.Build();
+DataSeeder.MigrateDataBeforeDeployment(app);
 DataSeeder.SeedData(app, builder.Configuration["SCIM:SCIMRepresentationsExtractionJobOptions:SCIMEdp"]);
-DataSeeder.MigrateData(app);
+DataSeeder.MigrateDataAfterDeployment(app);
 app.UseCors("AllowAll");
 if (identityServerConfiguration.IsForwardedEnabled) app.UseForwardedHeaders();
 if (identityServerConfiguration.ForceHttps) app.SetHttpsScheme();

@@ -6,4 +6,5 @@ namespace EfdataSeeder;
 public interface IDataSeeder
 {
     Task Apply(CancellationToken cancellationToken);
+    bool IsBeforeDeployment { get; }
 }

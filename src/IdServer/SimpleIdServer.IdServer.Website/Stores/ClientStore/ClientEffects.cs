@@ -213,7 +213,7 @@ public class ClientEffects
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         var newClient = newClientBuilder.Build();
-        await CreateClient(newClient, dispatcher, ClientTypes.CREDENTIAL_ISSUER);
+        await CreateClient(newClient, dispatcher, ClientTypes.CREDENTIALISSUER);
     }
 
     [EffectMethod]

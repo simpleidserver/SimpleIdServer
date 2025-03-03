@@ -15,6 +15,8 @@ public abstract class DataSeeder<T, U> : IDataSeeder where T : DataSeederDbConte
 
     protected abstract string Name { get; }
 
+    public abstract bool IsBeforeDeployment { get; }
+
     public async Task Apply(CancellationToken cancellationToken)
     {
         var existingExecutionHistory = await DbContext.ExecutionHistories.SingleOrDefaultAsync(e => e.Name == Name, cancellationToken);

@@ -401,7 +401,7 @@
                         </RadzenTemplateForm>
                         break;
                     // Credential issuer
-                    case ClientTypes.CREDENTIAL_ISSUER:
+                    case ClientTypes.CREDENTIALISSUER:
                         <RadzenTemplateForm Submit=@AddCredentialIssuerApplication TItem="CredentialIssuerApplication" Data=@credentialIssuerApplication>
                             @if (!addClientState.Value.IsAdding && !string.IsNullOrWhiteSpace(addClientState.Value.ErrorMessage))
                             {
@@ -643,7 +643,7 @@
         new ApplicationType { Name = Global.HighlySecuredWebApp, ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = Global.HighlySecuredWebAppShortDescription, Description = Global.HighlySecuredWebAppDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.HIGHLYSECUREDWEBSITE },
         new ApplicationType { Name = Global.GrantMgt, ClientTemplate = ClientTemplateTypes.FAPI, ShortDescription = Global.GrantMgtShortDescription, Description = Global.GrantMgtDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/WebsiteClient.png", Type = ClientTypes.GRANTMANAGEMENT },
         new ApplicationType { Name = Global.ExternalDeviceAuth, ClientTemplate = ClientTemplateTypes.FAPI,  ShortDescription = Global.ExternalDeviceAuthShortDescription, Description = Global.ExternalDeviceDescription, Type = ClientTypes.EXTERNAL, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/ExternalDeviceClient.png" },
-        new ApplicationType { Name = Global.CredentialIssuer, ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = Global.CredentialIssuerShortDescription, Description = Global.CredentialIssuerDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/CredentialIssuer.png", Type = ClientTypes.CREDENTIAL_ISSUER },
+        new ApplicationType { Name = Global.CredentialIssuer, ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = Global.CredentialIssuerShortDescription, Description = Global.CredentialIssuerDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/CredentialIssuer.png", Type = ClientTypes.CREDENTIALISSUER },
         new ApplicationType { Name = Global.Wallet, ClientTemplate = ClientTemplateTypes.CREDENTIALISSUER, ShortDescription = Global.WalletShortDescription, Description = Global.WalletDescription, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/Wallet.png", Type = ClientTypes.WALLET }
     };
 

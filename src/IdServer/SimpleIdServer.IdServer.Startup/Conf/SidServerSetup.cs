@@ -22,7 +22,8 @@ using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Sms;
-using SimpleIdServer.IdServer.Startup.Conf.Migrations;
+using SimpleIdServer.IdServer.Startup.Conf.Migrations.AfterDeployment;
+using SimpleIdServer.IdServer.Startup.Conf.Migrations.BeforeDeployment;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store.EF;
@@ -126,6 +127,7 @@ public class SidServerSetup
     {
         builder.Services.AddEfdataSeeder();
         builder.Services.AddTransient<IDataSeeder, FormAndWorkflowDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ClientTypeDataSeeder>();
     }
 
     public static void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)

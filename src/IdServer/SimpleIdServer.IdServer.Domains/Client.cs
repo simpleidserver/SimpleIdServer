@@ -650,7 +650,7 @@ namespace SimpleIdServer.IdServer.Domains
         HIGHLYSECUREDWEBSITE = 7,
         GRANTMANAGEMENT = 8,
         SAML = 9,
-        CREDENTIAL_ISSUER = 10,
+        CREDENTIALISSUER = 10,
         FEDERATION = 11,
         WSFEDERATION = 12
     }

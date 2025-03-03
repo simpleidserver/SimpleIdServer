@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Startup.Conf.Migrations;
+namespace SimpleIdServer.IdServer.Startup.Conf.Migrations.AfterDeployment;
 
 public class FormAndWorkflowDataSeeder : EfdataSeeder.DataSeeder<StoreDbContext, StoreDbContext>
 {
@@ -30,6 +30,7 @@ public class FormAndWorkflowDataSeeder : EfdataSeeder.DataSeeder<StoreDbContext,
     }
 
     protected override string Name => "FormAndWorkflowDataSeeder";
+    public override bool IsBeforeDeployment => false;
 
     protected override async Task Up(CancellationToken cancellationToken)
     {

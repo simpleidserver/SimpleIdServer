@@ -7,7 +7,8 @@ namespace EfdataSeeder;
 
 public interface IDataMigrationService
 {
-    Task Migrate(CancellationToken cancellationToken);
+    Task MigrateBeforeDeployment(CancellationToken cancellationToken);
+    Task MigrateAfterDeployment(CancellationToken cancellationToken);
 }
 
 public class DataMigrationService : IDataMigrationService
@@ -19,9 +20,17 @@ public class DataMigrationService : IDataMigrationService
         _dataSeeders = serviceProvider.GetRequiredService<IEnumerable<IDataSeeder>>();
     }
 
-    public async Task Migrate(CancellationToken cancellationToken)
+    public async Task MigrateBeforeDeployment(CancellationToken cancellationToken)
     {
-        foreach (var dataSeeder in _dataSeeders)
+        foreach (var dataSeeder in _dataSeeders.Where(d => d.IsBeforeDeployment))
+        {
+            await dataSeeder.Apply(cancellationToken);
+        }
+    }
+
+    public async Task MigrateAfterDeployment(CancellationToken cancellationToken)
+    {
+        foreach (var dataSeeder in _dataSeeders.Where(d => !d.IsBeforeDeployment))
         {
             await dataSeeder.Apply(cancellationToken);
         }

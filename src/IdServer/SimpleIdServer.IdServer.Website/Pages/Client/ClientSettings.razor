@@ -91,7 +91,7 @@
                     </div>
                 }
             </RadzenAccordionItem>
-            @if (Client.ClientType == ClientTypes.CREDENTIAL_ISSUER || 
+            @if (Client.ClientType == ClientTypes.CREDENTIALISSUER || 
                Client.ClientType == ClientTypes.SPA || 
                Client.ClientType == ClientTypes.WEBSITE || 
                Client.ClientType == ClientTypes.EXTERNAL || 
@@ -219,7 +219,7 @@
                                     </div>
                                 }
 
-                                @if(Client.ClientType == ClientTypes.CREDENTIAL_ISSUER)
+                                @if(Client.ClientType == ClientTypes.CREDENTIALISSUER)
                                 {                                    
                                     <!-- Authorization code  -->
                                     <div>
@@ -292,7 +292,7 @@
                Client.ClientType == ClientTypes.GRANTMANAGEMENT || 
                Client.ClientType == ClientTypes.MOBILE || 
                Client.ClientType == ClientTypes.EXTERNAL ||
-               Client.ClientType == ClientTypes.CREDENTIAL_ISSUER)
+               Client.ClientType == ClientTypes.CREDENTIALISSUER)
             {
                 <RadzenAccordionItem Text="@Global.LoginSettings" Selected=true>
                     <!-- Consent required -->
@@ -305,7 +305,7 @@
                         </div>
                     </div>
                     <!-- default acr methods -->
-                    @if (Client.ClientType == ClientTypes.CREDENTIAL_ISSUER ||
+                    @if (Client.ClientType == ClientTypes.CREDENTIALISSUER ||
                       Client.ClientType == ClientTypes.SPA ||
                       Client.ClientType == ClientTypes.WEBSITE ||
                       Client.ClientType == ClientTypes.HIGHLYSECUREDWEBSITE)
@@ -342,7 +342,7 @@
                Client.ClientType == ClientTypes.SPA || 
                Client.ClientType == ClientTypes.MOBILE || 
                Client.ClientType == ClientTypes.EXTERNAL ||
-               Client.ClientType == ClientTypes.CREDENTIAL_ISSUER)
+               Client.ClientType == ClientTypes.CREDENTIALISSUER)
             {
                 <RadzenAccordionItem Text="Logout settings" Selected=true>
                     <!-- Front-channel logout session required -->

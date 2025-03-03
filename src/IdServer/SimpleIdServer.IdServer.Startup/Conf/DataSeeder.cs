@@ -103,6 +103,15 @@ public class DataSeeder
         .AddConfirmResetPwd()
         .Build(DateTime.UtcNow);
 
+    public static void MigrateDataBeforeDeployment(WebApplication webApplication)
+    {
+        using (var scope = webApplication.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+        {
+            var dataMigrationService = scope.ServiceProvider.GetService<IDataMigrationService>();
+            dataMigrationService.MigrateBeforeDeployment(CancellationToken.None).Wait();
+        }
+    }
+
     public static void SeedData(WebApplication webApplication, string scimBaseUrl)
     {
         using (var scope = webApplication.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
@@ -112,12 +121,12 @@ public class DataSeeder
         }
     }
 
-    public static void MigrateData(WebApplication webApplication)
+    public static void MigrateDataAfterDeployment(WebApplication webApplication)
     {
         using (var scope = webApplication.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         {
             var dataMigrationService = scope.ServiceProvider.GetService<IDataMigrationService>();
-            dataMigrationService.Migrate(CancellationToken.None).Wait();
+            dataMigrationService.MigrateAfterDeployment(CancellationToken.None).Wait();
         }
     }
 
