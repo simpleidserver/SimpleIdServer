@@ -448,6 +448,15 @@ namespace SimpleIdServer.Scim.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Representation cannot have a self reference.
+        /// </summary>
+        public static string RepresentationCannotHaveSelfReference {
+            get {
+                return ResourceManager.GetString("RepresentationCannotHaveSelfReference", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à &apos;{0}&apos; request is not well-formatted.
         /// </summary>
         public static string RequestIsNotWellFormatted {

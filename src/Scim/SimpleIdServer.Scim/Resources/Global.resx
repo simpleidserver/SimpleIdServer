@@ -246,6 +246,9 @@
   <data name="ReferencesDontExist" xml:space="preserve">
     <value>references {0} don't exist</value>
   </data>
+  <data name="RepresentationCannotHaveSelfReference" xml:space="preserve">
+    <value>Representation cannot have a self reference</value>
+  </data>
   <data name="RequestIsNotWellFormatted" xml:space="preserve">
     <value>'{0}' request is not well-formatted</value>
   </data>

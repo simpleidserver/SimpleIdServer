@@ -54,7 +54,16 @@ namespace SimpleIdServer.Scim.Helpers
                     .Where(p => p.Operation == SCIMPatchOperations.REMOVE && p.Attr.SchemaAttributeId == kvp.Key)
                     .SelectMany(p => patchOperations.Where(po => po.Attr.ParentAttributeId == p.Attr.Id && po.Attr.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Value).Select(po => po.Attr.ValueString)).ToList();
                 var duplicateIds = allCurrentIds.GroupBy(i => i).Where(i => i.Count() > 1).ToList();
-                if (duplicateIds.Any()) throw new SCIMUniquenessAttributeException(string.Format(Global.DuplicateReference, string.Join(",", duplicateIds.Select(_ => _.Key).Distinct())));
+                if (duplicateIds.Any())
+                {
+                    throw new SCIMUniquenessAttributeException(string.Format(Global.DuplicateReference, string.Join(",", duplicateIds.Select(_ => _.Key).Distinct())));
+                }
+
+                if(allCurrentIds.Contains(newSourceScimRepresentation.Id))
+                {
+                    throw new SCIMAttributeException(Global.RepresentationCannotHaveSelfReference);
+                }
+
                 // Update 'direct' references : GROUP => USER.
                 foreach (var attributeMapping in kvp.Where(a => !a.IsSelf)) 
                 {
