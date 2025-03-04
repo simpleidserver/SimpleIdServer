@@ -54,7 +54,16 @@ namespace SimpleIdServer.Scim.Helpers
                     .Where(p => p.Operation == SCIMPatchOperations.REMOVE && p.Attr.SchemaAttributeId == kvp.Key)
                     .SelectMany(p => patchOperations.Where(po => po.Attr.ParentAttributeId == p.Attr.Id && po.Attr.SchemaAttribute.Name == SCIMConstants.StandardSCIMReferenceProperties.Value).Select(po => po.Attr.ValueString)).ToList();
                 var duplicateIds = allCurrentIds.GroupBy(i => i).Where(i => i.Count() > 1).ToList();
-                if (duplicateIds.Any()) throw new SCIMUniquenessAttributeException(string.Format(Global.DuplicateReference, string.Join(",", duplicateIds.Select(_ => _.Key).Distinct())));
+                if (duplicateIds.Any())
+                {
+                    throw new SCIMUniquenessAttributeException(string.Format(Global.DuplicateReference, string.Join(",", duplicateIds.Select(_ => _.Key).Distinct())));
+                }
+
+                if(allCurrentIds.Contains(newSourceScimRepresentation.Id))
+                {
+                    throw new SCIMAttributeException(Global.RepresentationCannotHaveSelfReference);
+                }
+
                 // Update 'direct' references : GROUP => USER.
                 foreach (var attributeMapping in kvp.Where(a => !a.IsSelf)) 
                 {
@@ -179,7 +188,7 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     result = new RepresentationSyncResult();
                     allParents = await GetParents(new List<SCIMRepresentation> { newSourceScimRepresentation }, selfReferenceAttribute);
-                    var existingParentReferencedIds = (await _scimRepresentationCommandRepository.FindAttributesBySchemaAttributeAndValues(valueAttr.Id, allParents.Select(p => p.Id), CancellationToken.None)).Select(p => p.ValueString).ToList();
+                    var existingParentReferencedIds = (await _scimRepresentationCommandRepository.FindAttributesBySchemaAttributeAndValues(propagatedAttribute.Id, allParents.Select(p => p.Id), CancellationToken.None)).Select(p => p.ValueString).ToList();
                     foreach(var parent in allParents.Where(p => !existingParentReferencedIds.Contains(p.Id)))
                         foreach(var addedId in addedDirectChildrenIds)
                             result.AddReferenceAttributes(BuildScimRepresentationAttribute(addedId, propagatedAttribute.TargetAttributeId, parent, Mode.PROPAGATE_INHERITANCE, parent.ResourceType, targetSchema, false));
