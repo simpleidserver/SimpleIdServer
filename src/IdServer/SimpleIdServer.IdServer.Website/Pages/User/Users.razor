@@ -41,6 +41,9 @@
                         IsLoading="@userState.Value.IsLoading"
                         Count="@userState.Value.Count"
                         Data="@userState.Value.Users"
+                        FilterMode="FilterMode.Simple"
+                        LogicalFilterOperator="LogicalFilterOperator.And"
+                        FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         LoadData="@LoadData"
                         RowRender="@RowRender"
                         TItem="SelectableUser"
@@ -59,11 +62,11 @@
                         <RadzenLink Text="@data.Value.Id" Path="@(urlHelper.GetUrl($"/users/{data.Value.Id}/settings"))" />
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Name" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Email" Filterable="false" Sortable="false" Title="@Global.Email" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Firstname" Filterable="false" Sortable="false" Title="@Global.Firstname" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Lastname" Filterable="false" Sortable="false" Title="@Global.Lastname" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" Title="@Global.Source" Width="80px">
+                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Name" Filterable="true" Sortable="false" Title="@Global.Name" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Email" Filterable="true" Sortable="false" Title="@Global.Email" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Firstname" Filterable="true" Sortable="false" Title="@Global.Firstname" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.Lastname" Filterable="true" Sortable="false" Title="@Global.Lastname" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableUser" Filterable="true" Property="Value.Source" Sortable="false" Title="@Global.Source" Width="80px">
                     <Template Context="data">
                         @if (!string.IsNullOrWhiteSpace(data.Value.Source))
                         {
@@ -71,7 +74,7 @@
                         }
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableUser" Property="Value.UpdateDateTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableUser" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
                         <SidAuthorizeView Roles=@($"/users/manage")>

@@ -69,6 +69,13 @@
                     <Template Context="data">
                         <RadzenBadge Text="@(data.Value.ClientType == null ? string.Empty : Enum.GetName(typeof(ClientTypes), data.Value.ClientType.Value))" IsPill="true" />
                     </Template>
+                    <FilterTemplate>
+                        <RadzenDropDown @bind-Value="@context.FilterValue"
+                                        Data="@GetClientTypes()"
+                                        AllowClear="true" 
+                                        Placeholder="@Global.SelectValue" 
+                                        Change="@(args => { context.FilterValue = args; clientsGrid.Reload(); })" />
+                    </FilterTemplate>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableClient" Filterable="true" Property="Value.UpdateDateTime" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
@@ -94,6 +101,11 @@
     [Parameter]
     public string? realm { get; set; } = null;
     [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    public List<ClientTypes> GetClientTypes()
+    {
+        return Enum.GetValues(typeof(ClientTypes)).Cast<ClientTypes>().ToList();
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {

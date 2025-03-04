@@ -16,8 +16,11 @@
             AllowAlternatingRows="false" 
             AllowSorting="true" 
             PageSize="30" 
-            AllowPaging="true" 
-            PagerHorizontalAlign="HorizontalAlign.Left" 
+            AllowPaging="true"
+            PagerHorizontalAlign="HorizontalAlign.Left"
+            FilterMode="FilterMode.Simple"
+            LogicalFilterOperator="LogicalFilterOperator.And"
+            FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
             ShowPagingSummary="true"
             IsLoading="@updateUserState.Value.IsUpdating"
             Count="@User.ExternalAuthProviders.Count"
@@ -25,9 +28,9 @@
             TItem="UserExternalAuthProvider" 
             ColumnWidth="300px">
         <Columns>
-            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Scheme" Title="@Global.Name" Filterable="false" Sortable="false" Width="80px" />
-            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Subject" Title="@Global.Login" Filterable="false" Sortable="false" Width="80px" />
-            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="CreateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.CreatedAt" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Scheme" Title="@Global.Name" Filterable="true" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="Subject" Title="@Global.Login" Filterable="true" Sortable="false" Width="80px" />
+            <RadzenDataGridColumn TItem="UserExternalAuthProvider" Property="CreateDateTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.CreatedAt" Width="80px" />
             <RadzenDataGridColumn TItem="UserExternalAuthProvider" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                 <Template Context="data">
                     <SidAuthorizeView Roles=@($"/users/manage")>

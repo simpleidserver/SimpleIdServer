@@ -41,6 +41,9 @@
                         AllowPaging="true"
                         PagerHorizontalAlign="HorizontalAlign.Left"
                         ShowPagingSummary="true"
+                        FilterMode="FilterMode.Simple"
+                        LogicalFilterOperator="LogicalFilterOperator.And"
+                        FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         IsLoading="@searchCertificateAuthoritiesState.Value.IsLoading"
                         Count="@searchCertificateAuthoritiesState.Value.Count"
                         Data="@searchCertificateAuthoritiesState.Value.CertificateAuthorities"
@@ -57,7 +60,7 @@
                         <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" Title="@Global.Identifier" Width="80px">
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.SubjectName" Filterable="true" Sortable="false" Title="@Global.Identifier" Width="80px">
                     <Template Context="data">
                         <RadzenLink Text="@data.Value.SubjectName" Path="@(urlHelper.GetUrl($"/certificateauthorities/{data.Value.Id}/details"))" />
                     </Template>
@@ -67,9 +70,9 @@
                         <RadzenBadge Text="@(Enum.GetName(typeof(CertificateAuthoritySources), data.Value.Source))" IsPill="true" />
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.StartDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.StartDatetime" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.EndDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.EndDatetime" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.StartDateTime" Filterable="true" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.StartDatetime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.EndDateTime" Filterable="true" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Title="@Global.EndDatetime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Property="Value.UpdateDateTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableCertificateAuthority" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
                         <SidAuthorizeView Roles=@("/certificateauthorities/manage")>

@@ -21,6 +21,9 @@
                 AllowSorting="true"
                 PageSize="30"
                 AllowPaging="true"
+                FilterMode="FilterMode.Simple"
+                LogicalFilterOperator="LogicalFilterOperator.And"
+                FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                 PagerHorizontalAlign="HorizontalAlign.Left"
                 ShowPagingSummary="true"
                 IsLoading="@clientRolesState.Value.IsLoading"
@@ -38,9 +41,9 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Name" Filterable="false" Sortable="false" SortOrder=SortOrder.Ascending Title="@Global.Name" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" SortOrder=SortOrder.Descending Title="@Global.UpdateDateTime" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Name" Filterable="true" Sortable="false" SortOrder=SortOrder.Ascending Title="@Global.Name" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.Description" Filterable="true" Sortable="false" Title="@Global.Description" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableClientRole" Property="Value.UpdateDateTime" Filterable="true" Sortable="false" SortOrder=SortOrder.Descending Title="@Global.UpdateDateTime" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableClientRole" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <SidAuthorizeView Roles=@("/clients/manage")>

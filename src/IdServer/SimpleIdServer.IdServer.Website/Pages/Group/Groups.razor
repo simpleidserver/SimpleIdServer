@@ -37,6 +37,9 @@
                         AllowSorting="true"
                         PageSize="30"
                         AllowPaging="true"
+                        FilterMode="FilterMode.Simple"
+                        LogicalFilterOperator="LogicalFilterOperator.And"
+                        FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         PagerHorizontalAlign="HorizontalAlign.Left"
                         ShowPagingSummary="true"
                         IsLoading="@searchGroupsState.Value.IsLoading"
@@ -55,13 +58,13 @@
                         <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableGroup" Filterable="false" Sortable="true" Title="@Global.Name" Width="80px">
+                <RadzenDataGridColumn TItem="SelectableGroup" Filterable="true" Property="Group.Name" Sortable="true" Title="@Global.Name" Width="80px">
                     <Template Context="data">
                         <RadzenLink Text="@data.Group.Name" Path="@(urlHelper.GetUrl($"/groups/{data.Group.Id}/children"))" />
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableGroup" Property="Group.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableGroup" Property="Group.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableGroup" Property="Group.Description" Filterable="true" Sortable="false" Title="@Global.Description" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableGroup" Property="Group.UpdateDateTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableGroup" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
                         <SidAuthorizeView Roles=@("/groups/manage")>

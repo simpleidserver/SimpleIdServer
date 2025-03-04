@@ -1992,4 +1992,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="RegistrationFormsTitle" xml:space="preserve">
     <value>Forms</value>
   </data>
+  <data name="SelectValue" xml:space="preserve">
+    <value>Select a value</value>
+  </data>
 </root>

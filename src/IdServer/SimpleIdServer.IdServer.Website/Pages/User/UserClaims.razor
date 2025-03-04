@@ -29,6 +29,9 @@
         AllowSorting="true" 
         PageSize="30" 
         AllowPaging="true" 
+        FilterMode="FilterMode.Simple"
+        LogicalFilterOperator="LogicalFilterOperator.And"
+        FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
         PagerHorizontalAlign="HorizontalAlign.Left" 
         ShowPagingSummary="true"
         IsLoading="@updateUserState.Value.IsUpdating"
@@ -38,8 +41,8 @@
         RowRender="@RowRender"
         ColumnWidth="300px">
     <Columns>
-        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Name" Title="@Global.Key" Filterable="false" Sortable="true" SortOrder="SortOrder.Ascending" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Value" Title="@Global.Value" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Name" Title="@Global.Key" Filterable="true" Sortable="true" SortOrder="SortOrder.Ascending" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserClaim" Property="Value.Value" Title="@Global.Value" Filterable="true" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUserClaim" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
                 @if(!data.IsRole)

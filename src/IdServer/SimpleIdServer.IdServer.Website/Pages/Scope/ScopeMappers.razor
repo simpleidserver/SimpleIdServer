@@ -24,6 +24,9 @@
                 AllowPaging="true"
                 PagerHorizontalAlign="HorizontalAlign.Left"
                 ShowPagingSummary="true"
+                FilterMode="FilterMode.Simple"
+                LogicalFilterOperator="LogicalFilterOperator.And"
+                FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                 IsLoading="false"
                 RowRender="@RowRender"
                 Count="@scopeMappersState.Value.Count"
@@ -39,12 +42,12 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="@Global.Name" Filterable="false" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending">
+        <RadzenDataGridColumn TItem="SelectableScopeMapper" Property="Value.Name" Title="@Global.Name" Filterable="true" Sortable="true" Width="80px" SortOrder="SortOrder.Ascending">
             <Template Context="data">
                 <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/scopes/{Scope.Id}/mappers/" + data.Value.Id))" />
             </Template>        
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableScopeMapper" Title="@Global.Type" Filterable="false" Sortable="false" Width="80px">
+        <RadzenDataGridColumn TItem="SelectableScopeMapper" Property="Value.MapperType" Title="@Global.Type" Filterable="true" Sortable="false" Width="80px">
             <Template Context="data">
                 @switch (data.Value.MapperType)
                 {

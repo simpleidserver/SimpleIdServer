@@ -38,6 +38,9 @@
                         AllowPaging="true"
                         PagerHorizontalAlign="HorizontalAlign.Left"
                         ShowPagingSummary="true"
+                        FilterMode="FilterMode.Simple"
+                        LogicalFilterOperator="LogicalFilterOperator.And"
+                        FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         IsLoading="@scopesState.Value.IsLoading"
                         Count="@scopesState.Value.Count"
                         Data="@scopesState.Value.Scopes"
@@ -54,12 +57,12 @@
                         <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="@Global.Name" Width="80px">
+                <RadzenDataGridColumn TItem="SelectableScope" Property="Value.Name" Filterable="true" Sortable="false" Title="@Global.Name" Width="80px">
                     <Template Context="data">
                         <RadzenLink Text="@data.Value.Name" Path="@(urlHelper.GetUrl($"/scopes/{data.Value.Id}/settings"))" />
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="@Global.Type" Width="80px">
+                <RadzenDataGridColumn TItem="SelectableScope" Property="Value.Type" Filterable="true" Sortable="false" Title="@Global.Type" Width="80px">
                     <Template Context="data">
                         @if (data.Value.Type == ScopeTypes.IDENTITY)
                         {
@@ -71,7 +74,7 @@
                         }
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" Title="@Global.Protocol" Width="80px">
+                <RadzenDataGridColumn TItem="SelectableScope" Property="Value.Protocol" Filterable="true" Sortable="false" Title="@Global.Protocol" Width="80px">
                     <Template Context="data">
                         @if (data.Value.Protocol == ScopeProtocols.OPENID)
                         {
@@ -87,8 +90,8 @@
                         }
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="SelectableScope" Property="Value.Description" Filterable="false" Sortable="false" Title="@Global.Description" Width="80px" />
-                <RadzenDataGridColumn TItem="SelectableScope" Property="Value.UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableScope" Property="Value.Description" Filterable="true" Sortable="false" Title="@Global.Description" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableScope" Property="Value.UpdateDateTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">
                         <SidAuthorizeView Roles=@($"/scopes/manage")>

@@ -4369,6 +4369,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Select a value.
+        /// </summary>
+        public static string SelectValue {
+            get {
+                return ResourceManager.GetString("SelectValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The application utilizes a self-signed certificate. The public key of the certificate (RSA or EC) must be provided to the Identity Server either as a value in JWKS (JSON Web Key Set) format or as a URL using the jwks_uri..
         /// </summary>
         public static string SelfSignedX509CertificateDescription {

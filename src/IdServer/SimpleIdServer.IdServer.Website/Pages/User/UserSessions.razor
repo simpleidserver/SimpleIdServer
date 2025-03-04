@@ -25,6 +25,9 @@
             AllowPaging="true"
             PagerHorizontalAlign="HorizontalAlign.Left"
             ShowPagingSummary="true"
+            FilterMode="FilterMode.Simple"
+            LogicalFilterOperator="LogicalFilterOperator.And"
+            FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
             IsLoading="@updateUserState.Value.IsUpdating"
             Count="@userSessionsState.Value.Count"
             Data="@userSessionsState.Value.UserSessions"
@@ -33,8 +36,8 @@
             TItem="UserSession"
             ColumnWidth="300px">
     <Columns>
-        <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="@Global.AuthenticationTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
-        <RadzenDataGridColumn TItem="UserSession" Property="SessionId" Title="@Global.Identifier" Filterable="false" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="UserSession" Property="AuthenticationDateTime" Title="@Global.AuthenticationTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Width="80px" />
+        <RadzenDataGridColumn TItem="UserSession" Property="SessionId" Title="@Global.Identifier" Filterable="true" Sortable="false" Width="80px" />
         <RadzenDataGridColumn TItem="UserSession" Title="@Global.Clients" Filterable="false" Sortable="false" Width="80px">
             <Template Context="data">
                 @foreach(var clientId in data.ClientIds)
@@ -43,8 +46,8 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="UserSession" Property="ExpirationDateTime" Title="@Global.ExpirationTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
-        <RadzenDataGridColumn TItem="UserSession" Title="@Global.State" Filterable="false" Sortable="false" Width="80px">
+        <RadzenDataGridColumn TItem="UserSession" Property="ExpirationDateTime" Title="@Global.ExpirationTime" Filterable="true" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" />
+        <RadzenDataGridColumn TItem="UserSession" Title="@Global.State" Filterable="false" Sortable="true" Property="State" Width="80px">
             <Template Context="data">
                 @if (data.State == UserSessionStates.Rejected)
                 {

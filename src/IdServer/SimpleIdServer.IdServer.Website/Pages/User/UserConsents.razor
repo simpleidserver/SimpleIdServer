@@ -19,6 +19,9 @@
             AllowSorting="true" 
             PageSize="30" 
             AllowPaging="true" 
+            FilterMode="FilterMode.Simple"
+            LogicalFilterOperator="LogicalFilterOperator.And"
+            FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
             PagerHorizontalAlign="HorizontalAlign.Left" 
             ShowPagingSummary="true"
             IsLoading="@updateUserState.Value.IsUpdating"
@@ -28,7 +31,7 @@
             ColumnWidth="300px">
         <Columns>
             <RadzenDataGridColumn TItem="Consent" Property="ClientId" Title="@Global.Client" Filterable="false" Sortable="false" Width="80px" />
-            <RadzenDataGridColumn TItem="Consent" Title="@Global.Status" Filterable="false" Sortable="false" Width="80px">
+            <RadzenDataGridColumn TItem="Consent" Title="@Global.Status" Filterable="false" Sortable="true" Property="Status" Width="80px">
                 <Template Context="data">
                     @if(data.Status == ConsentStatus.PENDING)
                     {
@@ -64,7 +67,7 @@
                     }
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Consent" Property="UpdateDateTime" Filterable="false" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.CreatedAt" Width="80px" />
+            <RadzenDataGridColumn TItem="Consent" Property="UpdateDateTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.CreatedAt" Width="80px" />
             <RadzenDataGridColumn TItem="Consent" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
                 <Template Context="data">
                     <SidAuthorizeView Roles=@($"/users/manage")>

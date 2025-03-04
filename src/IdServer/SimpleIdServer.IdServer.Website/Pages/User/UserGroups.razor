@@ -22,6 +22,9 @@
                 AllowSorting="true"
                 PageSize="30"
                 AllowPaging="true"
+                FilterMode="FilterMode.Simple"
+                LogicalFilterOperator="LogicalFilterOperator.And"
+                FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                 PagerHorizontalAlign="HorizontalAlign.Left"
                 ShowPagingSummary="true"
                 IsLoading="@userGroupsState.Value.IsLoading"
@@ -39,8 +42,8 @@
                 <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleChanged(args, data))" TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.FullPath" Title="@Global.Path" Filterable="false" Sortable="false" Width="80px" />
-        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.UpdateDateTime" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdatedAt" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.FullPath" Title="@Global.Path" Filterable="true" Sortable="false" Width="80px" />
+        <RadzenDataGridColumn TItem="SelectableUserGroup" Property="Value.UpdateDateTime" Filterable="true" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdatedAt" Width="80px" />
         <RadzenDataGridColumn TItem="SelectableUserGroup" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <SidAuthorizeView Roles=@($"/users/manage")>
