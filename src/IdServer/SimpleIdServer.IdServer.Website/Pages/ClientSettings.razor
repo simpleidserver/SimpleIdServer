@@ -240,6 +240,11 @@
                                         <RadzenCheckBox Name="IsAuthorizationCodeGrantTypeEnabled" Disabled=true @bind-Value=updateClient.IsAuthorizationCodeGrantTypeEnabled></RadzenCheckBox>
                                         <RadzenLabel Text="@Global.AuthorizationCode" Component="IsAuthorizationCodeGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
                                     </div>
+                                    <!-- Refresh token -->
+                                    <div>
+                                        <RadzenCheckBox Name="IsRefreshTokenGrantTypeEnabled" @bind-Value=updateClient.IsRefreshTokenGrantTypeEnabled></RadzenCheckBox>
+                                        <RadzenLabel Text="@Global.RefreshToken" Component="IsRefreshTokenGrantTypeEnabled" Style="margin-left: 8px; vertical-align: middle;" />
+                                    </div>
                                 }
                             </div>
                         </div>
