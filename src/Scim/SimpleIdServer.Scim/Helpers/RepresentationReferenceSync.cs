@@ -179,7 +179,7 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     result = new RepresentationSyncResult();
                     allParents = await GetParents(new List<SCIMRepresentation> { newSourceScimRepresentation }, selfReferenceAttribute);
-                    var existingParentReferencedIds = (await _scimRepresentationCommandRepository.FindAttributesBySchemaAttributeAndValues(valueAttr.Id, allParents.Select(p => p.Id), CancellationToken.None)).Select(p => p.ValueString).ToList();
+                    var existingParentReferencedIds = (await _scimRepresentationCommandRepository.FindAttributesBySchemaAttributeAndValues(propagatedAttribute.Id, allParents.Select(p => p.Id), CancellationToken.None)).Select(p => p.ValueString).ToList();
                     foreach(var parent in allParents.Where(p => !existingParentReferencedIds.Contains(p.Id)))
                         foreach(var addedId in addedDirectChildrenIds)
                             result.AddReferenceAttributes(BuildScimRepresentationAttribute(addedId, propagatedAttribute.TargetAttributeId, parent, Mode.PROPAGATE_INHERITANCE, parent.ResourceType, targetSchema, false));
