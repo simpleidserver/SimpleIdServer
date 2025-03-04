@@ -19,6 +19,11 @@ public abstract class DataSeeder<T, U> : IDataSeeder where T : DataSeederDbConte
 
     public async Task Apply(CancellationToken cancellationToken)
     {
+        if (!TableExists<DataSeederExecutionHistory>(DbContext))
+        {
+            return;
+        }
+
         var existingExecutionHistory = await DbContext.ExecutionHistories.SingleOrDefaultAsync(e => e.Name == Name, cancellationToken);
         if (existingExecutionHistory != null)
         {
@@ -36,4 +41,17 @@ public abstract class DataSeeder<T, U> : IDataSeeder where T : DataSeederDbConte
     }
 
     protected abstract Task Up(CancellationToken cancellationTokenn);
+
+    private bool TableExists<T>(DbContext context) where T : class
+    {
+        try
+        {
+            context.Set<T>().Any();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return false;
+        }
+    }
 }
