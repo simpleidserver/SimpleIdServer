@@ -127,6 +127,7 @@ namespace SimpleIdServer.IdServer
             public const string ErrorMessages = "errormessages";
             public const string Workflows = "workflows";
             public const string Forms = "forms";
+            public const string RecurringJobs = "recurringjobs";
         }
 
         public static List<string> AllStandardNotificationModes = new List<string>
@@ -749,6 +750,20 @@ namespace SimpleIdServer.IdServer
                 Id = Guid.NewGuid().ToString(),
                 Type = ScopeTypes.APIRESOURCE,
                 Name = "certificateauthorities",
+                Realms = new List<Domains.Realm>
+                {
+                    StandardRealms.Master
+                },
+                Protocol = ScopeProtocols.OAUTH,
+                IsExposedInConfigurationEdp = true,
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow
+            };
+            public static Scope RecurringJobs = new Scope
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = ScopeTypes.APIRESOURCE,
+                Name = "recurringjobs",
                 Realms = new List<Domains.Realm>
                 {
                     StandardRealms.Master

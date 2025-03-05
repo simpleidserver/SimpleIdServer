@@ -1,0 +1,11 @@
+﻿@using SimpleIdServer.IdServer.Website.Shared.Common
+
+<CronEditor @bind-CronExpression="@Cron"></CronEditor>
+
+@code {
+    [Parameter]
+    public string Cron
+    {
+        get; set;
+    }
+}

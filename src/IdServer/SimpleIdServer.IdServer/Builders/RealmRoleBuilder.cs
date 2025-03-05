@@ -22,7 +22,8 @@ public class RealmRoleBuilder
         "automaticidprovisioning",
         "certificateauthorities",
         "auditing",
-        "trustanchors"
+        "trustanchors",
+        "recurringjobs"
     };
 
     public static List<Scope> BuildAdministrativeRole(Realm realm)

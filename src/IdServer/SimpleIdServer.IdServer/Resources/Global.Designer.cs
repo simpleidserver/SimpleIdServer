@@ -2698,6 +2698,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The recurring job {0} doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownRecurringJob {
+            get {
+                return ResourceManager.GetString("UnknownRecurringJob", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à no registration workflow has been resolved.
         /// </summary>
         public static string UnknownRegistrationWorkflow {

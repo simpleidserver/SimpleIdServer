@@ -1,0 +1,270 @@
+﻿@using Radzen
+@using Radzen.Blazor
+@using CronExpressionDescriptor
+@using SimpleIdServer.IdServer.Website.Resources
+@inject DialogService dialogService
+
+<RadzenStack Orientation="Orientation.Vertical">
+    <!-- Cron editor -->
+    <RadzenTabs @bind-SelectedIndex="SelectedTabIndex" RenderMode="TabRenderMode.Client">
+        <Tabs>
+            <!-- Seconds -->
+            <RadzenTabsItem Text="@Global.Seconds">
+                <RadzenRow>
+                    <RadzenColumn>
+                        <RadzenLabel Text="@Global.Every" />
+                    </RadzenColumn>
+                    <RadzenColumn>
+                        <RadzenDropDown @bind-Value="Frequency" Data="@SecondFrequencyOptions" TValue="int" class="fullWidth" Change="@UpdateCronExpression" />
+                    </RadzenColumn>
+                    <RadzenColumn>
+                        <RadzenLabel Text="@Global.Seconds" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <!-- Minutes -->
+            <RadzenTabsItem Text="@Global.Minutes">
+                <RadzenRow>
+                    <RadzenColumn>
+                        <RadzenLabel Text="@Global.Every" />
+                    </RadzenColumn>
+                    <RadzenColumn>
+                        <RadzenDropDown @bind-Value="Frequency" Data="@MinuteFrequencyOptions" TValue="int" class="fullWidth" Change="@UpdateCronExpression" />
+                    </RadzenColumn>
+                    <RadzenColumn>
+                        <RadzenLabel Text="@Global.Minutes" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <!-- Hourly-->
+            <RadzenTabsItem Text="@Global.Hourly">
+                <RadzenRow>
+                    <RadzenColumn Size="3">
+                        <RadzenRadioButtonList Value=@HourlyType ValueChanged="@((int value) => OnHourlyTypeChanged(value))" TValue="int" Orientation="Orientation.Vertical">
+                            <Items>
+                                <RadzenRadioButtonListItem Text="@Global.Every" Value="1" />
+                                <RadzenRadioButtonListItem Text="@Global.StartsAt" Value="2" />
+                            </Items>
+                        </RadzenRadioButtonList>
+                    </RadzenColumn>
+                    <RadzenColumn Size="9">
+                        <RadzenStack Orientation="Orientation.Vertical">
+                            <!-- Every -->
+                            <RadzenRow>
+                                <RadzenColumn>
+                                    <RadzenDropDown @bind-Value="Frequency" Data="@HourlyFrequencyOptions" TValue="int" class="fullWidth" Change="@UpdateCronExpression" Disabled="@(HourlyType == 2)" />
+                                </RadzenColumn>
+                                <RadzenColumn>
+                                    <RadzenLabel Text="@Global.Hours" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                            <!-- Start at -->
+                            <RadzenRow>
+                                <RadzenColumn Size="4">
+                                    <RadzenDropDown @bind-Value="StartHour" Data="@HourOptions" TValue="int" class="fullWidth" Change="@UpdateCronExpression" Disabled="@(HourlyType == 1)" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="1">
+                                    <RadzenLabel Text=":" />
+                                </RadzenColumn>
+                                <RadzenColumn Size="4">
+                                    <RadzenDropDown @bind-Value="StartMinute" Data="@MinuteOptions" TValue="int" class="fullWidth" Change="@UpdateCronExpression" Disabled="@(HourlyType == 1)" />
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+    <!-- Cron expression -->
+    <div>
+        <RadzenLabel Text="@Global.CronExpression" Style="font-weight: bold;" />
+        <RadzenTextBox Value="@CronExpression" ReadOnly="true" class="fullWidth" />
+    </div>
+    <!-- Description -->
+    <div>
+        <RadzenLabel Text="@Global.Description" Style="font-weight: bold;" />
+        <div>
+            <RadzenLabel Text="@Description"></RadzenLabel>
+        </div>
+    </div>
+    <RadzenButton Click="HandleSave" Text="Save" class="fullWidth"></RadzenButton>
+</RadzenStack>
+
+@code {
+    private bool _isInitialized;
+    [Parameter]
+    public string CronExpression { get; set; } = "0 * * * *";
+
+    [Parameter]
+    public EventCallback<string> CronExpressionChanged { get; set; }
+
+    private int _frequency = 1;
+    private int Frequency
+    {
+        get => _frequency;
+        set 
+        {
+            if (_frequency == value)
+            {
+                return;
+            }
+
+            _frequency = value; 
+            UpdateCronExpression();
+        }
+    }
+
+    private int _startHour = 0;
+    private int StartHour
+    {
+        get => _startHour;
+        set 
+        { 
+            if(_startHour == value)
+            {
+                return;
+            }
+
+            _startHour = value; 
+            UpdateCronExpression(); 
+        }
+    }
+
+    private int _startMinute = 0;
+    private int StartMinute
+    {
+        get => _startMinute;
+        set 
+        {
+            if(_startMinute == value)
+            {
+                return;
+            }
+
+            _startMinute = value; 
+            UpdateCronExpression(); 
+        }
+    }
+
+    private int HourlyType
+    {
+        get; set;
+    } = 1;
+
+    private void OnHourlyTypeChanged(int value)
+    {
+        HourlyType = value;
+        UpdateCronExpression();
+    }
+
+    private string Description { get; set; }
+
+    private readonly int[] SecondFrequencyOptions = Enumerable.Range(1, 59).ToArray();
+    private readonly int[] MinuteFrequencyOptions = Enumerable.Range(1, 59).ToArray();
+    private readonly int[] HourlyFrequencyOptions = Enumerable.Range(1, 23).ToArray();
+    private readonly int[] HourOptions = Enumerable.Range(0, 24).ToArray();
+    private readonly int[] MinuteOptions = Enumerable.Range(0, 60).ToArray();
+
+    private async Task UpdateCronExpression()
+    {
+        string newCronExpression;
+        switch (SelectedTabIndex)
+        {
+            // */15 * * * * *
+            case 0: // Seconds
+                newCronExpression = $"*/{Frequency} * * * * *";
+                break;
+            case 1: // Minutes
+                
+                break;
+            case 2: // Hourly
+                if (HourlyType == 1)
+                {
+                    newCronExpression = $"0 */{Frequency} * * *";
+                }
+                else if (HourlyType == 2)
+                {
+                    newCronExpression = $"{StartMinute} {StartHour} */ * *";
+                }
+                else
+                {
+                    newCronExpression = "0 * * * *"; // Default
+                }
+                break;
+            default:
+                newCronExpression = "0 * * * *";
+                break;
+        }
+
+        if (newCronExpression != CronExpression)
+        {
+            CronExpression = newCronExpression;
+            await CronExpressionChanged.InvokeAsync(CronExpression);
+        }
+
+        Description = ExpressionDescriptor.GetDescription(CronExpression, new Options { ThrowExceptionOnParseError = true });
+        StateHasChanged();
+    }
+
+    private int _selectedTabIndex = 0;
+    private int SelectedTabIndex
+    {
+        get => _selectedTabIndex;
+        set
+        {
+            _selectedTabIndex = value;
+            Frequency = 1;
+            StartHour = 0;
+            StartMinute = 0;
+            HourlyType = 1;
+            UpdateCronExpression();
+        }
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (!_isInitialized && !string.IsNullOrWhiteSpace(CronExpression))
+        {
+            ParseCronExpression(CronExpression);
+            _isInitialized = true;
+        }
+    }
+
+    private void ParseCronExpression(string cron)
+    {
+        if (string.IsNullOrEmpty(cron)) 
+        {
+            return;
+        }
+
+        var parts = cron.Split(' ');
+        if (parts.Length >= 5)
+        {
+            if (parts[0].StartsWith("*/"))
+            {
+                SelectedTabIndex = 0;
+                Frequency = int.Parse(parts[0].Substring(2));
+            }
+            else if (parts[1].Contains("*/"))
+            {
+                SelectedTabIndex = 1;
+                HourlyType = 1;
+                Frequency = int.Parse(parts[1].Substring(2));
+                StartMinute = int.Parse(parts[0]);
+            }
+            else if (parts[2].Contains("*/"))
+            {
+                SelectedTabIndex = 1;
+                HourlyType = 2;
+                StartMinute = int.Parse(parts[0]);
+                StartHour = int.Parse(parts[1]);
+            }
+        }
+    }
+
+    private void HandleSave()
+    {
+        dialogService.Close(CronExpression);
+    }
+}

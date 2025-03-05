@@ -1474,6 +1474,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cron.
+        /// </summary>
+        public static string Cron {
+            get {
+                return ResourceManager.GetString("Cron", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Cron expression.
+        /// </summary>
+        public static string CronExpression {
+            get {
+                return ResourceManager.GetString("CronExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Data.
         /// </summary>
         public static string Data {
@@ -1672,6 +1690,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Edit the cron expression.
+        /// </summary>
+        public static string EditCronExpression {
+            get {
+                return ResourceManager.GetString("EditCronExpression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Email.
         /// </summary>
         public static string Email {
@@ -1753,6 +1780,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Error Message.
         /// </summary>
         public static string ErrorMessage {
@@ -1794,6 +1830,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string EthrNetworkExists {
             get {
                 return ResourceManager.GetString("EthrNetworkExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Every.
+        /// </summary>
+        public static string Every {
+            get {
+                return ResourceManager.GetString("Every", resourceCulture);
             }
         }
         
@@ -2253,6 +2298,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string HotpDescription {
             get {
                 return ResourceManager.GetString("HotpDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Hourly.
+        /// </summary>
+        public static string Hourly {
+            get {
+                return ResourceManager.GetString("Hourly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à hour(s).
+        /// </summary>
+        public static string Hours {
+            get {
+                return ResourceManager.GetString("Hours", resourceCulture);
             }
         }
         
@@ -2770,6 +2833,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Last execution.
+        /// </summary>
+        public static string LastExecution {
+            get {
+                return ResourceManager.GetString("LastExecution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Last job state.
+        /// </summary>
+        public static string LastJobState {
+            get {
+                return ResourceManager.GetString("LastJobState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Last name.
         /// </summary>
         public static string Lastname {
@@ -2995,6 +3076,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Minutes.
+        /// </summary>
+        public static string Minutes {
+            get {
+                return ResourceManager.GetString("Minutes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Mobile.
         /// </summary>
         public static string Mobile {
@@ -3083,6 +3173,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string NbLoginAttempt {
             get {
                 return ResourceManager.GetString("NbLoginAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Next execution.
+        /// </summary>
+        public static string NextExecution {
+            get {
+                return ResourceManager.GetString("NextExecution", resourceCulture);
             }
         }
         
@@ -3492,6 +3591,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The recurring job is updated.
+        /// </summary>
+        public static string RecurringJobIsUpdated {
+            get {
+                return ResourceManager.GetString("RecurringJobIsUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Recurring jobs.
+        /// </summary>
+        public static string RecurringJobs {
+            get {
+                return ResourceManager.GetString("RecurringJobs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Redirection URLs.
         /// </summary>
         public static string RedirectionUrls {
@@ -3758,6 +3875,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ResponseTypesTooltip {
             get {
                 return ResourceManager.GetString("ResponseTypesTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Retry attempt.
+        /// </summary>
+        public static string RetryAttempt {
+            get {
+                return ResourceManager.GetString("RetryAttempt", resourceCulture);
             }
         }
         
@@ -4037,6 +4163,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ScopesDescription {
             get {
                 return ResourceManager.GetString("ScopesDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Seconds.
+        /// </summary>
+        public static string Seconds {
+            get {
+                return ResourceManager.GetString("Seconds", resourceCulture);
             }
         }
         
@@ -4581,6 +4716,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string StartImport {
             get {
                 return ResourceManager.GetString("StartImport", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Starts at.
+        /// </summary>
+        public static string StartsAt {
+            get {
+                return ResourceManager.GetString("StartsAt", resourceCulture);
             }
         }
         

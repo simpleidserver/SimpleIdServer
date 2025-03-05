@@ -1155,4 +1155,7 @@
   <data name="Version" xml:space="preserve">
     <value>Version</value>
   </data>
+  <data name="UnknownRecurringJob" xml:space="preserve">
+    <value>The recurring job {0} doesn't exist</value>
+  </data>
 </root>

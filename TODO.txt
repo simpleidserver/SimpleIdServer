@@ -1,13 +1,10 @@
-=> appliquer script de migration EF pour mettre à jour ACR (de la version 5.0.3 vers 6.0.0)	:	OK
-=> ajouter la possibilité de pouvoir rechercher des données dans un tableau.		:	IN PROGRESS
-=> corriger lock account, options pas affichés										:	TODO
-=> impossible d'afficher le userattribute & userproperty							:	OK
-=> => problème d'affichage des différents écrans									:	TODO
+* Ticket #831 : 
+** afficher les recurring jobs
+** pouvoir mettre à jour les recurring jobs
+** pouvoir lancer un job
+** ajouter les filtres
+** vérifier si le script de migration fonctionne
 
-=> pouvoir éditer les expressions CRON des jobs.
-=> pouvoir bloquer ou débloquer un utilisateur.
-=> migrer du duende vers SID.
-=> faire un site de marketing sur le formbuilder et ajouter de la documentation autour.
 
-=> faire déploiement de la version 2.28
-=> 
+    private bool UseEvery { get; set; } = 1
+    private bool UseStartAt { get; set; } = 2

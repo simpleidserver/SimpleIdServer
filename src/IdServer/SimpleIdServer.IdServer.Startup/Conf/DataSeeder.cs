@@ -366,9 +366,9 @@ public class DataSeeder
             foreach (var role in grp.Roles)
             {
                 role.Realms = new List<Realm>
-                    {
-                        masterRealm
-                    };
+                {
+                    masterRealm
+                };
             }
 
             dbContext.Groups.Add(grp);

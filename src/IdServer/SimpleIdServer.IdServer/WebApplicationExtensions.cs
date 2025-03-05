@@ -594,6 +594,13 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Forms + "/{id}/css",
                 defaults: new { controller = "Forms", action = "UpdateCss" });
 
+            webApplication.SidMapControllerRoute("getAllRecurringJobs",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs,
+                defaults: new { controller = "RecurringJobs", action = "Get" });
+            webApplication.SidMapControllerRoute("updateRecurringJob",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/{id}",
+                defaults: new { controller = "RecurringJobs", action = "Update" });
+
             webApplication.SidMapControllerRoute("getAllLanguages",
                 pattern: Constants.EndPoints.Languages,
                 defaults: new { controller = "Languages", action = "GetAll" });

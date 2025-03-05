@@ -1995,4 +1995,52 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="SelectValue" xml:space="preserve">
     <value>Select a value</value>
   </data>
+  <data name="RecurringJobs" xml:space="preserve">
+    <value>Recurring jobs</value>
+  </data>
+  <data name="LastExecution" xml:space="preserve">
+    <value>Last execution</value>
+  </data>
+  <data name="LastJobState" xml:space="preserve">
+    <value>Last job state</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="RetryAttempt" xml:space="preserve">
+    <value>Retry attempt</value>
+  </data>
+  <data name="NextExecution" xml:space="preserve">
+    <value>Next execution</value>
+  </data>
+  <data name="Cron" xml:space="preserve">
+    <value>Cron</value>
+  </data>
+  <data name="EditCronExpression" xml:space="preserve">
+    <value>Edit the cron expression</value>
+  </data>
+  <data name="RecurringJobIsUpdated" xml:space="preserve">
+    <value>The recurring job is updated</value>
+  </data>
+  <data name="CronExpression" xml:space="preserve">
+    <value>Cron expression</value>
+  </data>
+  <data name="Minutes" xml:space="preserve">
+    <value>Minutes</value>
+  </data>
+  <data name="Hourly" xml:space="preserve">
+    <value>Hourly</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>hour(s)</value>
+  </data>
+  <data name="Every" xml:space="preserve">
+    <value>Every</value>
+  </data>
+  <data name="StartsAt" xml:space="preserve">
+    <value>Starts at</value>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>Seconds</value>
+  </data>
 </root>
