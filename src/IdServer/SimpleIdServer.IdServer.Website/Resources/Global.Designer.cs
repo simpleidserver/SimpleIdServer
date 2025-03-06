@@ -2725,6 +2725,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Jobs.
+        /// </summary>
+        public static string Jobs {
+            get {
+                return ResourceManager.GetString("Jobs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Jwe.
         /// </summary>
         public static string Jwe {
@@ -3587,6 +3596,33 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Realms {
             get {
                 return ResourceManager.GetString("Realms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Reason.
+        /// </summary>
+        public static string Reason {
+            get {
+                return ResourceManager.GetString("Reason", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Execution history of the recurring job {0}.
+        /// </summary>
+        public static string RecurringJobExecutionHistory {
+            get {
+                return ResourceManager.GetString("RecurringJobExecutionHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The recurring job is launched.
+        /// </summary>
+        public static string RecurringJobIsLaunched {
+            get {
+                return ResourceManager.GetString("RecurringJobIsLaunched", resourceCulture);
             }
         }
         
@@ -4527,6 +4563,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string SelfSignedX509CertificateName {
             get {
                 return ResourceManager.GetString("SelfSignedX509CertificateName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Servers.
+        /// </summary>
+        public static string Servers {
+            get {
+                return ResourceManager.GetString("Servers", resourceCulture);
             }
         }
         
@@ -5751,6 +5796,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Welcome {
             get {
                 return ResourceManager.GetString("Welcome", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Workers.
+        /// </summary>
+        public static string WorkersCount {
+            get {
+                return ResourceManager.GetString("WorkersCount", resourceCulture);
             }
         }
         

@@ -168,7 +168,7 @@
 
     private async Task UpdateCronExpression()
     {
-        string newCronExpression;
+        string newCronExpression = null;
         switch (SelectedTabIndex)
         {
             // */15 * * * * *
@@ -176,24 +176,24 @@
                 newCronExpression = $"*/{Frequency} * * * * *";
                 break;
             case 1: // Minutes
-                
+                newCronExpression = $"0 */{Frequency} * * * *";
                 break;
             case 2: // Hourly
                 if (HourlyType == 1)
                 {
-                    newCronExpression = $"0 */{Frequency} * * *";
+                    newCronExpression = $"0 0 */{Frequency} * * *";
                 }
                 else if (HourlyType == 2)
                 {
-                    newCronExpression = $"{StartMinute} {StartHour} */ * *";
+                    newCronExpression = $"0 {StartMinute} {StartHour} */ * *";
                 }
                 else
                 {
-                    newCronExpression = "0 * * * *"; // Default
+                    newCronExpression = "0 * * * * *"; // Default
                 }
                 break;
             default:
-                newCronExpression = "0 * * * *";
+                newCronExpression = "0 * * * * *";
                 break;
         }
 
@@ -239,26 +239,31 @@
         }
 
         var parts = cron.Split(' ');
-        if (parts.Length >= 5)
+        if (parts.Length >= 6)
         {
             if (parts[0].StartsWith("*/"))
             {
                 SelectedTabIndex = 0;
                 Frequency = int.Parse(parts[0].Substring(2));
             }
-            else if (parts[1].Contains("*/"))
+            else if (parts[1].StartsWith("*/"))
             {
                 SelectedTabIndex = 1;
-                HourlyType = 1;
                 Frequency = int.Parse(parts[1].Substring(2));
-                StartMinute = int.Parse(parts[0]);
             }
             else if (parts[2].Contains("*/"))
             {
-                SelectedTabIndex = 1;
+                SelectedTabIndex = 2;
+                HourlyType = 1;
+                Frequency = int.Parse(parts[2].Substring(2));
+                StartMinute = int.Parse(parts[1]);
+            }
+            else if (parts[3].Contains("*/"))
+            {
+                SelectedTabIndex = 2;
                 HourlyType = 2;
-                StartMinute = int.Parse(parts[0]);
-                StartHour = int.Parse(parts[1]);
+                StartMinute = int.Parse(parts[1]);
+                StartHour = int.Parse(parts[2]);
             }
         }
     }

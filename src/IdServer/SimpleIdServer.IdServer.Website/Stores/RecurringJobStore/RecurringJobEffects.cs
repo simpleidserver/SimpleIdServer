@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
+using Hangfire.Storage.Monitoring;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.RecurringJobs;
 using SimpleIdServer.IdServer.Helpers;
@@ -58,6 +59,58 @@ public class RecurringJobEffects
         dispatcher.Dispatch(new UpdateRecurringJobSuccessAction { Cron = action.Cron, Id = action.Id });
     }
 
+    [EffectMethod]
+    public async Task Handle(GetRecurringJobAction action, IDispatcher dispatcher)
+    {
+        var url = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{url}/{action.Id}/histories"),
+            Method = HttpMethod.Get
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var histories = JsonSerializer.Deserialize<List<StateHistoryDto>>(json, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+        dispatcher.Dispatch(new GetRecurringJobSuccessAction { Id = action.Id, Histories = histories });
+    }
+
+    [EffectMethod]
+    public async Task Handle(LaunchRecurringJobAction action, IDispatcher dispatcher)
+    {
+        var url = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{url}/{action.Id}/launch"),
+            Method = HttpMethod.Get
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new LaunchRecurringJobSuccessAction { Id = action.Id });
+    }
+
+    [EffectMethod]
+    public async Task Handle(GetServersAction action, IDispatcher dispatcher)
+    {
+        var url = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{url}/servers"),
+            Method = HttpMethod.Get
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var servers = JsonSerializer.Deserialize<List<ServerDto>>(json, new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        });
+        dispatcher.Dispatch(new GetServersSuccessAction { Servers = servers });
+    }
+
     private async Task<string> GetBaseUrl()
     {
         if (_options.IsReamEnabled)
@@ -107,5 +160,55 @@ public class UpdateRecurringJobSuccessAction
     public string Cron 
     { 
         get; set; 
+    }
+}
+
+public class GetRecurringJobAction
+{
+    public string Id
+    {
+        get; set;
+    }
+}
+
+public class GetRecurringJobSuccessAction
+{
+    public string Id
+    {
+        get; set;
+    }
+
+    public List<StateHistoryDto> Histories
+    {
+        get; set;
+    }
+}
+
+public class LaunchRecurringJobAction
+{
+    public string Id
+    {
+        get; set;
+    }
+}
+
+public class LaunchRecurringJobSuccessAction
+{
+    public string Id
+    {
+        get; set;
+    }
+}
+
+public class GetServersAction
+{
+
+}
+
+public class GetServersSuccessAction
+{
+    public List<ServerDto> Servers
+    {
+        get; set;
     }
 }

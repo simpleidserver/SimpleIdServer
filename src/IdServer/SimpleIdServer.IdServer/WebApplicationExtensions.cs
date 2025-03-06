@@ -597,6 +597,15 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("getAllRecurringJobs",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs,
                 defaults: new { controller = "RecurringJobs", action = "Get" });
+            webApplication.SidMapControllerRoute("getServers",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/servers",
+                defaults: new { controller = "RecurringJobs", action = "GetServers" });
+            webApplication.SidMapControllerRoute("getRecurringJobHistories",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/{id}/histories",
+                defaults: new { controller = "RecurringJobs", action = "GetHistories" });
+            webApplication.SidMapControllerRoute("launchRecurringJob",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/{id}/launch",
+                defaults: new { controller = "RecurringJobs", action = "Launch" });
             webApplication.SidMapControllerRoute("updateRecurringJob",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/{id}",
                 defaults: new { controller = "RecurringJobs", action = "Update" });

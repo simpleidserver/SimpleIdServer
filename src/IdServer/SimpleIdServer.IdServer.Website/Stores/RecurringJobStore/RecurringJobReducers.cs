@@ -7,6 +7,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.RecurringJobStore;
 
 public class RecurringJobReducers
 {
+    #region RecurringJobsState
+
     [ReducerMethod]
     public static RecurringJobsState ReduceGetRecurringJobsAction(RecurringJobsState state, GetRecurringJobsAction act) => new RecurringJobsState { IsLoading = true };
 
@@ -34,4 +36,53 @@ public class RecurringJobReducers
             RecurringJobs = recurringJobs
         };
     }
+
+    #endregion
+
+    #region RecurringJobState
+
+    [ReducerMethod]
+    public static RecurringJobState ReduceGetRecurringJobAction(RecurringJobState state, GetRecurringJobAction act)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static RecurringJobState ReduceGetRecurringJobSuccessAction(RecurringJobState state, GetRecurringJobSuccessAction act)
+    {
+        return state with
+        {
+            IsLoading = false,
+            Id = act.Id,
+            Histories = act.Histories
+        };
+    }
+
+    #endregion
+
+    #region HangfireServersState
+
+    [ReducerMethod]
+    public static HangfireServersState ReduceGetServersAction(HangfireServersState state, GetServersAction act)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static HangfireServersState ReduceGetServersSuccessAction(HangfireServersState state, GetServersSuccessAction act)
+    {
+        return state with
+        {
+            IsLoading = false,
+            Servers = act.Servers
+        };
+    }
+
+    #endregion
 }

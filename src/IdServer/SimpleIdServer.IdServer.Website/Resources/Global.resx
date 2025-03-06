@@ -2043,4 +2043,22 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="Seconds" xml:space="preserve">
     <value>Seconds</value>
   </data>
+  <data name="Reason" xml:space="preserve">
+    <value>Reason</value>
+  </data>
+  <data name="RecurringJobIsLaunched" xml:space="preserve">
+    <value>The recurring job is launched</value>
+  </data>
+  <data name="RecurringJobExecutionHistory" xml:space="preserve">
+    <value>Execution history of the recurring job {0}</value>
+  </data>
+  <data name="Jobs" xml:space="preserve">
+    <value>Jobs</value>
+  </data>
+  <data name="Servers" xml:space="preserve">
+    <value>Servers</value>
+  </data>
+  <data name="WorkersCount" xml:space="preserve">
+    <value>Workers</value>
+  </data>
 </root>
