@@ -1222,3 +1222,56 @@ Scenario: Update a group with an existing user and a new one
 	And extract JSON from body
 
 	Then '$.members' length is equals to '2'
+	
+
+Scenario: Assign a group to a hierarchy of groups and check the user belongs to the parent groups
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | firstUser                                                                                                      |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstUserId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                               |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]   |
+	| displayName | FirstGroup											|
+	| members     | [ { "value": "$firstUserId$" } ]					|
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroupId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                               |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]   |
+	| displayName | SecondGroup											|
+	And extract JSON from body
+	And extract 'id' from JSON body into 'secondGroupId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                               |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]   |
+	| displayName | ThirdGroup											|
+	| members     | [ { "value": "$secondGroupId$" } ]					|
+	And extract JSON from body
+	And extract 'id' from JSON body into 'thirdGroupId'
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                               |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]   |
+	| displayName | ThirdGroup											|
+	| members     | [ { "value": "$thirdGroupId$" } ]					|
+	And extract JSON from body
+	And extract 'id' from JSON body into 'fourthGroupId'
+	
+	And execute HTTP PATCH JSON request 'http://localhost/Groups/$secondGroupId$'
+	| Key         | Value                                                                             |
+	| schemas     | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                               |
+	| Operations  | [ { "op": "add", "path": "members", "value": [ { "value": "$firstUserId$" } ] } ] |
+	
+	And execute HTTP GET request 'http://localhost/Users/$firstUserId$'	
+	And extract JSON from body
+
+	Then '$.groups' length is equals to '4'

@@ -261,7 +261,17 @@ namespace SimpleIdServer.Scim.Helpers
                                 foreach (var pa in parentAttrs)
                                 {
                                     if (!filteredChildren.Any(r => r.ParentAttributeId == pa.Id && r.SchemaAttributeId == valueAttr.Id && r.ValueString == newSourceScimRepresentation.Id))
+                                    {
                                         result.AddReferenceAttributes(BuildScimRepresentationAttribute(pa.RepresentationId, propagatedAttribute.TargetAttributeId, newSourceScimRepresentation, Mode.PROPAGATE_INHERITANCE, newSourceScimRepresentation.ResourceType, targetSchema, false));
+                                    }
+
+                                    foreach(var allParent in allParents)
+                                    {
+                                        if (!filteredChildren.Any(r => r.ParentAttributeId == pa.Id && r.SchemaAttributeId == valueAttr.Id && r.ValueString == allParent.Id))
+                                        {
+                                            result.AddReferenceAttributes(BuildScimRepresentationAttribute(pa.RepresentationId, propagatedAttribute.TargetAttributeId, allParent, Mode.PROPAGATE_INHERITANCE, allParent.ResourceType, targetSchema, false));
+                                        }
+                                    }
                                 }
                             }
                             else
