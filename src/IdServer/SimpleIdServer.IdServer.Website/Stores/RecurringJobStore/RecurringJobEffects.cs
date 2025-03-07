@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Fluxor;
-using Hangfire.Storage.Monitoring;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.RecurringJobs;
 using SimpleIdServer.IdServer.Helpers;
@@ -60,25 +59,6 @@ public class RecurringJobEffects
     }
 
     [EffectMethod]
-    public async Task Handle(GetRecurringJobAction action, IDispatcher dispatcher)
-    {
-        var url = await GetBaseUrl();
-        var httpClient = await _websiteHttpClientFactory.Build();
-        var requestMessage = new HttpRequestMessage
-        {
-            RequestUri = new Uri($"{url}/{action.Id}/histories"),
-            Method = HttpMethod.Get
-        };
-        var httpResult = await httpClient.SendAsync(requestMessage);
-        var json = await httpResult.Content.ReadAsStringAsync();
-        var histories = JsonSerializer.Deserialize<List<StateHistoryDto>>(json, new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-        dispatcher.Dispatch(new GetRecurringJobSuccessAction { Id = action.Id, Histories = histories });
-    }
-
-    [EffectMethod]
     public async Task Handle(LaunchRecurringJobAction action, IDispatcher dispatcher)
     {
         var url = await GetBaseUrl();
@@ -93,22 +73,50 @@ public class RecurringJobEffects
     }
 
     [EffectMethod]
-    public async Task Handle(GetServersAction action, IDispatcher dispatcher)
+    public async Task Handle(EnableRecurringJobAction action, IDispatcher dispatcher)
     {
         var url = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
-            RequestUri = new Uri($"{url}/servers"),
+            RequestUri = new Uri($"{url}/{action.Id}/enable"),
+            Method = HttpMethod.Post
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new EnableRecurringJobSuccessAction { Id = action.Id });
+    }
+
+    [EffectMethod]
+    public async Task Handle(DisableRecurringJobAction action, IDispatcher dispatcher)
+    {
+        var url = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{url}/{action.Id}/disable"),
+            Method = HttpMethod.Delete
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new DisableRecurringJobSuccessAction { Id = action.Id });
+    }
+
+    [EffectMethod]
+    public async Task Handle(GetLastFailedJobsAction action, IDispatcher dispatcher)
+    {
+        var url = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{url}/failedjobs"),
             Method = HttpMethod.Get
         };
-        var httpResult = await httpClient.SendAsync(requestMessage);
-        var json = await httpResult.Content.ReadAsStringAsync();
-        var servers = JsonSerializer.Deserialize<List<ServerDto>>(json, new JsonSerializerOptions
+        var result = await httpClient.SendAsync(requestMessage);
+        var json = await result.Content.ReadAsStringAsync();
+        var failedJobs = JsonSerializer.Deserialize<List<FailedJobResult>>(json, new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
         });
-        dispatcher.Dispatch(new GetServersSuccessAction { Servers = servers });
+        dispatcher.Dispatch(new GetLastFailedJobsSuccessAction { FailedJobs = failedJobs });
     }
 
     private async Task<string> GetBaseUrl()
@@ -163,27 +171,6 @@ public class UpdateRecurringJobSuccessAction
     }
 }
 
-public class GetRecurringJobAction
-{
-    public string Id
-    {
-        get; set;
-    }
-}
-
-public class GetRecurringJobSuccessAction
-{
-    public string Id
-    {
-        get; set;
-    }
-
-    public List<StateHistoryDto> Histories
-    {
-        get; set;
-    }
-}
-
 public class LaunchRecurringJobAction
 {
     public string Id
@@ -200,14 +187,46 @@ public class LaunchRecurringJobSuccessAction
     }
 }
 
-public class GetServersAction
+public class EnableRecurringJobAction
+{
+    public string Id
+    {
+        get; set;
+    }
+}
+
+public class EnableRecurringJobSuccessAction
+{
+    public string Id
+    {
+        get; set;
+    }
+}
+
+public class DisableRecurringJobAction
+{
+    public string Id
+    {
+        get; set;
+    }
+}
+
+public class DisableRecurringJobSuccessAction
+{
+    public string Id
+    {
+        get; set;
+    }
+}
+
+public class GetLastFailedJobsAction
 {
 
 }
 
-public class GetServersSuccessAction
+public class GetLastFailedJobsSuccessAction
 {
-    public List<ServerDto> Servers
+    public List<FailedJobResult> FailedJobs
     {
         get; set;
     }

@@ -1775,6 +1775,19 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.ToTable("RealmUser");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RecurringJobStatus", b =>
+                {
+                    b.Property<string>("JobId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("JobId");
+
+                    b.ToTable("RecurringJobStatusLst");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", b =>
                 {
                     b.Property<string>("Id")

@@ -10,6 +10,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\AuthorizationErrors.feature.cs" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.10" />

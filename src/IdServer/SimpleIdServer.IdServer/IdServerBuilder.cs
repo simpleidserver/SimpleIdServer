@@ -55,14 +55,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// Add back channel authentication (CIBA).
         /// </summary>
         /// <returns></returns>
-        public IdServerBuilder AddBackChannelAuthentication(Action<IGlobalConfiguration> callback = null)
+        public IdServerBuilder AddBackChannelAuthentication()
         {
             _serviceCollection.AddTransient<BCNotificationJob>();
-            _serviceCollection.AddHangfire(callback == null ? (o => {
-                o.UseRecommendedSerializerSettings();
-                o.UseIgnoredAssemblyVersionTypeResolver();
-                o.UseInMemoryStorage();
-            }) : callback);
             _serviceCollection.AddHangfireServer();
             _serviceCollection.Configure<IdServerHostOptions>(o =>
             {

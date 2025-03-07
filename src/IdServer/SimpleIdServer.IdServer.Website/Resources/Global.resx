@@ -2061,4 +2061,22 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="WorkersCount" xml:space="preserve">
     <value>Workers</value>
   </data>
+  <data name="Inactive" xml:space="preserve">
+    <value>Inactive</value>
+  </data>
+  <data name="RecurringJobIsDisabled" xml:space="preserve">
+    <value>The recurring job {0} is disabled</value>
+  </data>
+  <data name="RecurringJobIsEnabled" xml:space="preserve">
+    <value>The recurring job {0} is enabled</value>
+  </data>
+  <data name="FailedJobs" xml:space="preserve">
+    <value>Failed jobs</value>
+  </data>
+  <data name="FailedAt" xml:space="preserve">
+    <value>Failed at</value>
+  </data>
+  <data name="JobName" xml:space="preserve">
+    <value>Job</value>
+  </data>
 </root>

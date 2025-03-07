@@ -1,32 +1,31 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
 using Fluxor;
-using Hangfire.Storage.Monitoring;
+using SimpleIdServer.IdServer.Api.RecurringJobs;
 
 namespace SimpleIdServer.IdServer.Website.Stores.RecurringJobStore;
 
 [FeatureState]
-public record RecurringJobState
+public record LastFailedJobsState
 {
-    public RecurringJobState()
+    public LastFailedJobsState()
     {
         
     }
 
-    public string Id
+    public bool IsLoading
     {
         get; set;
     }
 
-    public List<StateHistoryDto> Histories
+    public List<FailedJobResult> FailedJobs
     {
         get; set;
-    } = new List<StateHistoryDto>();
+    } = new List<FailedJobResult>();
 
-    public bool IsLoading
+    public int Count
     {
         get; set;
-    } = false;
-
-    public int Count => Histories.Count;
+    }
 }

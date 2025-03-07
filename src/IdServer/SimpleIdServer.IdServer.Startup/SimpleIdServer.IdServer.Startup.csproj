@@ -35,6 +35,11 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
+	  <PackageReference Include="Hangfire.SqlServer" Version="1.8.15" />
+	  <PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />
+	  <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
+	  <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />

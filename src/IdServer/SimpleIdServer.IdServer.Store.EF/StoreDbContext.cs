@@ -53,6 +53,7 @@ namespace SimpleIdServer.IdServer.Store.EF
         public DbSet<PresentationDefinition> PresentationDefinitions { get; set; }
         public DbSet<MessageBusErrorMessage> MessageBusErrorMessages { get; set; }
         public DbSet<FederationEntity> FederationEntities { get; set; }
+        public DbSet<RecurringJobStatus> RecurringJobStatusLst { get; set; }
 
         protected override void Update(ModelBuilder builder)
         {
@@ -114,6 +115,7 @@ namespace SimpleIdServer.IdServer.Store.EF
             builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConstraintConfiguration());
             builder.ApplyConfiguration(new MessageBusErrorMessageConfiguration());
             builder.ApplyConfiguration(new FederationEntityConfiguration());
+            builder.ApplyConfiguration(new RecurringJobStatusConfiguration());
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using FormBuilder;
 using FormBuilder.Builders;
+using Hangfire;
 using LinqToDB;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication.Certificate;
@@ -22,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using TechTalk.SpecFlow.Assist;
 
 var builder = WebApplication.CreateBuilder(args);
 var p = GetKey(512);
@@ -31,6 +33,12 @@ var s = new SymmetricSecurityKey(p)
 };
 
 builder.Services.AddSingleton(BuildProtectedSessionStorage());
+
+builder.Services.AddHangfire(o => {
+    o.UseRecommendedSerializerSettings();
+    o.UseIgnoredAssemblyVersionTypeResolver();
+    o.UseInMemoryStorage();
+});
 builder.Services.AddSIDIdentityServer(o =>
 {
     o.WalletAuthorizationServer = "http://localhost";

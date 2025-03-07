@@ -37,12 +37,8 @@ public class RecurringJobReducers
         };
     }
 
-    #endregion
-
-    #region RecurringJobState
-
     [ReducerMethod]
-    public static RecurringJobState ReduceGetRecurringJobAction(RecurringJobState state, GetRecurringJobAction act)
+    public static RecurringJobsState ReduceEnableRecurringJobAction(RecurringJobsState state, EnableRecurringJobAction act)
     {
         return state with
         {
@@ -51,22 +47,20 @@ public class RecurringJobReducers
     }
 
     [ReducerMethod]
-    public static RecurringJobState ReduceGetRecurringJobSuccessAction(RecurringJobState state, GetRecurringJobSuccessAction act)
+    public static RecurringJobsState ReduceEnableRecurringJobSuccessAction(RecurringJobsState state, EnableRecurringJobSuccessAction act)
     {
+        var recurringJobs = state.RecurringJobs;
+        var job = recurringJobs.Single(r => r.Id == act.Id);
+        job.IsDisabled = false;
         return state with
         {
             IsLoading = false,
-            Id = act.Id,
-            Histories = act.Histories
+            RecurringJobs = recurringJobs
         };
     }
 
-    #endregion
-
-    #region HangfireServersState
-
     [ReducerMethod]
-    public static HangfireServersState ReduceGetServersAction(HangfireServersState state, GetServersAction act)
+    public static RecurringJobsState ReduceDisableRecurringJobAction(RecurringJobsState state, DisableRecurringJobAction act)
     {
         return state with
         {
@@ -75,12 +69,38 @@ public class RecurringJobReducers
     }
 
     [ReducerMethod]
-    public static HangfireServersState ReduceGetServersSuccessAction(HangfireServersState state, GetServersSuccessAction act)
+    public static RecurringJobsState ReduceDisableRecurringJobSuccessAction(RecurringJobsState state, DisableRecurringJobSuccessAction act)
+    {
+        var recurringJobs = state.RecurringJobs;
+        var job = recurringJobs.Single(r => r.Id == act.Id);
+        job.IsDisabled = true;
+        return state with
+        {
+            IsLoading = false,
+            RecurringJobs = recurringJobs
+        };
+    }
+
+    #endregion
+
+    #region LastFailedJobsState
+
+    [ReducerMethod]
+    public static LastFailedJobsState ReduceGetLastFailedJobsAction(LastFailedJobsState state, GetLastFailedJobsAction act)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static LastFailedJobsState ReduceGetLastFailedJobsSuccessAction(LastFailedJobsState state, GetLastFailedJobsSuccessAction act)
     {
         return state with
         {
             IsLoading = false,
-            Servers = act.Servers
+            FailedJobs = act.FailedJobs
         };
     }
 

@@ -1158,4 +1158,7 @@
   <data name="UnknownRecurringJob" xml:space="preserve">
     <value>The recurring job {0} doesn't exist</value>
   </data>
+  <data name="RecurringJobExists" xml:space="preserve">
+    <value>The recurring job already exists</value>
+  </data>
 </root>

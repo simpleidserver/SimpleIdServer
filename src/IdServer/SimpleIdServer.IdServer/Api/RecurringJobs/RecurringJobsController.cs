@@ -2,9 +2,9 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
 using Hangfire.Storage;
-using Hangfire.Storage.Monitoring;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
@@ -13,6 +13,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Api.RecurringJobs;
@@ -24,6 +25,8 @@ public class RecurringJobsController : BaseController
     private readonly IServiceProvider _serviceProvider;
     private readonly IMonitoringApi _monitoringApi;
     private readonly IRecurringJobManager _recurringJobManager;
+    private readonly IRecurringJobStatusRepository _recurringJobStatusRepository;
+    private readonly ITransactionBuilder _transactionBuilder;
 
     public RecurringJobsController(
         JobStorage jobStorage, 
@@ -31,21 +34,26 @@ public class RecurringJobsController : BaseController
         ITokenRepository tokenRepository, 
         IJwtBuilder jwtBuilder,
         IServiceProvider serviceProvider,
-        IRecurringJobManager recurringJobManager) : base(tokenRepository, jwtBuilder)
+        IRecurringJobManager recurringJobManager,
+        IRecurringJobStatusRepository recurringJobStatusRepository,
+        ITransactionBuilder transactionBuilder) : base(tokenRepository, jwtBuilder)
     {
         _jobStorage = jobStorage;
         _logger = logger;
         _serviceProvider = serviceProvider;
         _monitoringApi = jobStorage.GetMonitoringApi();
         _recurringJobManager = recurringJobManager;
+        _recurringJobStatusRepository = recurringJobStatusRepository;
+        _transactionBuilder = transactionBuilder;
     }
 
     [HttpGet]
-    public async Task<IActionResult> Get()
+    public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
         using (var connection = _jobStorage.GetConnection())
         {
             var recurringJobs = connection.GetRecurringJobs();
+            var allStatus = await _recurringJobStatusRepository.Get(recurringJobs.Select(r => r.Id).ToList(), cancellationToken);
             var result = recurringJobs.Select(j => new RecurringJobResult
             {
                 Id = j.Id,
@@ -54,46 +62,40 @@ public class RecurringJobsController : BaseController
                 Error = j.Error,
                 RetryAttempt = j.RetryAttempt,
                 NextExecution = j.NextExecution,
-                Cron = j.Cron
+                Cron = j.Cron,
+                IsDisabled = allStatus.SingleOrDefault(s => s.JobId == j.Id)?.IsDisabled ?? false
+                
             }).ToList();
             return Ok(result);
         }
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetServers()
+    public IActionResult GetLastFailedJobs([FromRoute] string prefix)
     {
-        var servers = _monitoringApi.Servers();
-        return new OkObjectResult(servers);
+        var result = _monitoringApi.FailedJobs(0, 100).Select(j => new FailedJobResult
+        {
+            ExceptionDetails = j.Value.ExceptionDetails,
+            ExceptionMessage = j.Value.ExceptionMessage,
+            ExceptionType = j.Value.ExceptionType,
+            FailedAt = j.Value.FailedAt,
+            InFailedState = j.Value.InFailedState,
+            Method = j.Value.Job.Type.Name,
+            Reason = j.Value.Reason
+        });
+        return new OkObjectResult(result);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetHistories([FromRoute] string prefix, string id)
+    [HttpPost]
+    public Task<IActionResult> Enable([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
-        using (var connection = _jobStorage.GetConnection())
-        {
-            var recurringJob = connection.GetRecurringJobs().SingleOrDefault(r => r.Id == id); 
-            if (recurringJob == null)
-            {
-                return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRecurringJob, id));
-            }
+        return Toggle(prefix, id, false, cancellationToken);
+    }
 
-            var jobs = _monitoringApi.SucceededJobs(0, 1000).Where(j => j.Value.Job?.Method.Name == recurringJob.Job.Method.Name).Select(m => new StateHistoryDto
-            {
-                CreatedAt = m.Value.SucceededAt.Value,
-                Data = m.Value.StateData,
-                StateName = "success"
-            }).ToList();
-            jobs.AddRange(_monitoringApi.FailedJobs(0, 1000).Where(j => j.Value.Job?.Method.Name == recurringJob.Job.Method.Name).Select(m => new StateHistoryDto
-            {
-                CreatedAt = m.Value.FailedAt.Value,
-                Data = m.Value.StateData,
-                Reason = m.Value.ExceptionDetails,
-                StateName = "failed"
-            }).ToList());
-            var result = jobs.OrderByDescending(j => j.CreatedAt).Take(100).ToList();
-            return new OkObjectResult(result);
-        }
+    [HttpDelete]
+    public Task<IActionResult> Disable([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+    {
+        return Toggle(prefix, id, true, cancellationToken);
     }
 
     [HttpPut]
@@ -166,6 +168,47 @@ public class RecurringJobsController : BaseController
         }
     }
 
+    private async Task<IActionResult> Toggle(string prefix, string id, bool isDisabled, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        try
+        {
+            await CheckAccessToken(prefix, Constants.StandardScopes.RecurringJobs.Name);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+
+        using (var connection = _jobStorage.GetConnection())
+        {
+            var recurringJob = connection.GetRecurringJobs().FirstOrDefault(r => r.Id == id);
+            if (recurringJob == null)
+            {
+                return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownRecurringJob, id));
+            }
+
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var recurringJobStatus = await _recurringJobStatusRepository.Get(id, cancellationToken);
+                if (recurringJobStatus == null)
+                {
+                    recurringJobStatus = new RecurringJobStatus
+                    {
+                        JobId = id,
+                        IsDisabled = isDisabled
+                    };
+                    _recurringJobStatusRepository.Add(recurringJobStatus);
+                }
+                recurringJobStatus.IsDisabled = isDisabled;
+                await transaction.Commit(cancellationToken);
+            }
+
+            return NoContent();
+        }
+    }
+
     private Expression<Action> BuildLambdaExpression(Hangfire.Common.Job job)
     {
         var methodInfo = job.Method;
@@ -177,7 +220,7 @@ public class RecurringJobsController : BaseController
 
         var serviceProviderExpr = Expression.Constant(_serviceProvider);
         var getServiceMethod = typeof(IServiceProvider).GetMethod("GetService");
-        var typeExpr = Expression.Constant(methodInfo.DeclaringType);
+        var typeExpr = Expression.Constant(methodInfo.ReflectedType);
         var getServiceCall = Expression.Call(serviceProviderExpr, getServiceMethod, typeExpr);
         var instanceExpression = Expression.Convert(getServiceCall, methodInfo.DeclaringType);
 

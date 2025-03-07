@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.JSInterop;
 using Moq;
+using Hangfire;
 var builder = WebApplication.CreateBuilder(args);
 var p = GetKey(512);
 var s = new SymmetricSecurityKey(p)
@@ -23,6 +24,11 @@ var s = new SymmetricSecurityKey(p)
 };
 
 builder.Services.AddSingleton(BuildProtectedSessionStorage());
+builder.Services.AddHangfire(o => {
+    o.UseRecommendedSerializerSettings();
+    o.UseIgnoredAssemblyVersionTypeResolver();
+    o.UseInMemoryStorage();
+});
 builder.Services.AddSIDIdentityServer()
     .UseInMemoryEFStore(o =>
     {

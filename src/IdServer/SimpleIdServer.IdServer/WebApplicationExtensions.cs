@@ -597,12 +597,15 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("getAllRecurringJobs",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs,
                 defaults: new { controller = "RecurringJobs", action = "Get" });
-            webApplication.SidMapControllerRoute("getServers",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/servers",
-                defaults: new { controller = "RecurringJobs", action = "GetServers" });
-            webApplication.SidMapControllerRoute("getRecurringJobHistories",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/{id}/histories",
-                defaults: new { controller = "RecurringJobs", action = "GetHistories" });
+            webApplication.SidMapControllerRoute("getLastFailedJobs",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/failedjobs",
+                defaults: new { controller = "RecurringJobs", action = "GetLastFailedJobs" });
+            webApplication.SidMapControllerRoute("enableRecurringJob",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/{id}/enable",
+                defaults: new { controller = "RecurringJobs", action = "Enable" });
+            webApplication.SidMapControllerRoute("disableRecurringJob",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/{id}/disable",
+                defaults: new { controller = "RecurringJobs", action = "Disable" });
             webApplication.SidMapControllerRoute("launchRecurringJob",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.RecurringJobs + "/{id}/launch",
                 defaults: new { controller = "RecurringJobs", action = "Launch" });

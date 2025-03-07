@@ -1792,6 +1792,19 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("RealmUser");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RecurringJobStatus", b =>
+                {
+                    b.Property<string>("JobId")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("JobId");
+
+                    b.ToTable("RecurringJobStatusLst");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", b =>
                 {
                     b.Property<string>("Id")

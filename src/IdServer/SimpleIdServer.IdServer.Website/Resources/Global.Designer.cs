@@ -1951,6 +1951,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Failed at.
+        /// </summary>
+        public static string FailedAt {
+            get {
+                return ResourceManager.GetString("FailedAt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Failed jobs.
+        /// </summary>
+        public static string FailedJobs {
+            get {
+                return ResourceManager.GetString("FailedJobs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Manage the trust anchors used by the identity server..
         /// </summary>
         public static string FederationEntitiesDescription {
@@ -2608,6 +2626,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Inactive.
+        /// </summary>
+        public static string Inactive {
+            get {
+                return ResourceManager.GetString("Inactive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Include in access token.
         /// </summary>
         public static string IncludeInAccessToken {
@@ -2721,6 +2748,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string IsPublicTooltip {
             get {
                 return ResourceManager.GetString("IsPublicTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Job.
+        /// </summary>
+        public static string JobName {
+            get {
+                return ResourceManager.GetString("JobName", resourceCulture);
             }
         }
         
@@ -3614,6 +3650,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string RecurringJobExecutionHistory {
             get {
                 return ResourceManager.GetString("RecurringJobExecutionHistory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The recurring job {0} is disabled.
+        /// </summary>
+        public static string RecurringJobIsDisabled {
+            get {
+                return ResourceManager.GetString("RecurringJobIsDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The recurring job {0} is enabled.
+        /// </summary>
+        public static string RecurringJobIsEnabled {
+            get {
+                return ResourceManager.GetString("RecurringJobIsEnabled", resourceCulture);
             }
         }
         

@@ -1,0 +1,164 @@
+﻿@page "/recurringjobs"
+@using Fluxor.Blazor.Web.Components
+@using Hangfire.Storage.Monitoring
+@using SimpleIdServer.IdServer.Api.RecurringJobs
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Shared.Common
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.RecurringJobStore
+@inject ContextMenuService contextMenuService
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IState<RecurringJobsState> recurringJobsState
+@inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
+@inherits FluxorComponent
+
+<RadzenDataGrid AllowFiltering="true"
+                AllowColumnResize="true"
+                AllowAlternatingRows="false"
+                AllowSorting="true"
+                PageSize="30"
+                AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="@recurringJobsState.Value.IsLoading"
+                Count="@recurringJobsState.Value.Count"
+                Data="@recurringJobsState.Value.RecurringJobs"
+                FilterMode="FilterMode.Simple"
+                LogicalFilterOperator="LogicalFilterOperator.And"
+                FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                RowRender="@RowRender"
+                TItem="RecurringJobResult"
+                ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="RecurringJobResult" Property="Id" Filterable="true" Sortable="false" SortOrder=SortOrder.Descending Title="@Global.LastExecution" Width="80px" />
+        <RadzenDataGridColumn TItem="RecurringJobResult" Property="LastExecution" Filterable="true" Sortable="false" Title="@Global.LastExecution" Width="80px" />
+        <RadzenDataGridColumn TItem="RecurringJobResult" Property="LastJobState" Filterable="true" Sortable="false" Title="@Global.LastJobState" Width="80px">
+            <Template Context="ctx">
+                <RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="@ctx.LastJobState"></RadzenBadge>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="RecurringJobResult" Property="IsDisabled" Filterable="false" Sortable="false" Title="@Global.Status" Width="80px">
+            <Template Context="ctx">
+                @if(ctx.IsDisabled)
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="@Global.Inactive"></RadzenBadge>
+                }
+                else
+                {
+                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="@Global.Active"></RadzenBadge>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn TItem="RecurringJobResult" Property="Error" Filterable="true" Sortable="false" Title="@Global.Error" Width="80px" />
+        <RadzenDataGridColumn TItem="RecurringJobResult" Property="RetryAttempt" Filterable="true" Sortable="false" Title="@Global.RetryAttempt" Width="80px" />
+        <RadzenDataGridColumn TItem="RecurringJobResult" Property="NextExecution" Filterable="true" Sortable="false" Title="@Global.NextExecution" Width="80px" />
+        <RadzenDataGridColumn TItem="RecurringJobResult" Property="Cron" Filterable="true" Sortable="false" Title="@Global.Cron" Width="80px" />
+        <RadzenDataGridColumn TItem="RecurringJobResult" Filterable="false">
+            <Template Context="ctx">
+                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(ctx, args))" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            SubscribeToAction<UpdateRecurringJobSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.RecurringJobIsUpdated });
+                StateHasChanged();
+            });
+            SubscribeToAction<LaunchRecurringJobSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.RecurringJobIsLaunched, act.Id) });
+                StateHasChanged();
+            });
+            SubscribeToAction<EnableRecurringJobSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.RecurringJobIsEnabled, act.Id) });
+                StateHasChanged();
+            });
+            SubscribeToAction<DisableRecurringJobSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = string.Format(Global.RecurringJobIsDisabled, act.Id) });
+                StateHasChanged();
+            });
+            var act = new GetRecurringJobsAction();
+            dispatcher.Dispatch(act);
+        }
+    }
+
+    private void RowRender(RowRenderEventArgs<RecurringJobResult> row)
+    {
+        const string className = "class";
+        if (row.Attributes.ContainsKey(className))
+        {
+            row.Attributes.Remove(className);
+        }
+    }
+
+    private void ShowMoreContextMenu(RecurringJobResult recurringJob, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Edit", Value = 1 },
+            new ContextMenuItem { Text = "Launch", Value = 2 },
+            new ContextMenuItem { Text = recurringJob.IsDisabled ? "Enable" : "Disable", Value = 3 },
+        }, async (a) =>
+        {
+            if (a.Value.Equals(1))
+            {
+                await Edit(recurringJob);
+            }
+            else if (a.Value.Equals(2))
+            {
+                Launch(recurringJob);
+            }
+            else if(a.Value.Equals(3))
+            {
+                Toggle(recurringJob);
+            }
+        });
+    }
+
+    private async Task Edit(RecurringJobResult recurringJob)
+    {
+        contextMenuService.Close();
+        var result = await dialogService.OpenAsync<EditRecurringJobDialog>(Global.EditCronExpression, new Dictionary<string, object>
+        {
+            { nameof(EditRecurringJobDialog.Cron), recurringJob.Cron }
+        });
+        var newCronExpression = result?.ToString();
+        if (string.IsNullOrWhiteSpace(newCronExpression))
+        {
+            return;
+        }
+
+        dispatcher.Dispatch(new UpdateRecurringJobAction { Id = recurringJob.Id, Cron = newCronExpression });
+    }
+
+    private void Launch(RecurringJobResult recurringJob)
+    {
+        contextMenuService.Close();
+        dispatcher.Dispatch(new LaunchRecurringJobAction { Id = recurringJob.Id });
+    }
+
+    private void Toggle(RecurringJobResult recurringJob)
+    {
+        contextMenuService.Close();
+        if(recurringJob.IsDisabled)
+        {
+            dispatcher.Dispatch(new EnableRecurringJobAction { Id = recurringJob.Id });
+        }
+        else
+        {
+            dispatcher.Dispatch(new DisableRecurringJobAction { Id = recurringJob.Id });
+        }
+    }
+}

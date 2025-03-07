@@ -40,4 +40,9 @@ public class RecurringJobResult
     {
         get; set;
     }
+
+    public bool IsDisabled
+    {
+        get; set;
+    }
 }

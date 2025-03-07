@@ -1,0 +1,52 @@
+﻿@using Fluxor.Blazor.Web.Components
+@using SimpleIdServer.IdServer.Api.RecurringJobs
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Stores.RecurringJobStore
+@inject IState<LastFailedJobsState> lastFailedJobsState
+@inject IDispatcher dispatcher
+@inherits FluxorComponent
+
+<RadzenDataGrid AllowFiltering="true"
+AllowColumnResize="true"
+AllowAlternatingRows="false"
+AllowSorting="true"
+PageSize="30"
+AllowPaging="true"
+PagerHorizontalAlign="HorizontalAlign.Left"
+ShowPagingSummary="true"
+IsLoading="@lastFailedJobsState.Value.IsLoading"
+Count="@lastFailedJobsState.Value.Count"
+Data="@lastFailedJobsState.Value.FailedJobs"
+FilterMode="FilterMode.Simple"
+LogicalFilterOperator="LogicalFilterOperator.And"
+FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+RowRender="@RowRender"
+TItem="FailedJobResult"
+ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn TItem="FailedJobResult" Property="Method" Filterable="true" Sortable="false" Title="@Global.JobName" Width="80px" />
+        <RadzenDataGridColumn TItem="FailedJobResult" Property="ExceptionMessage" Filterable="true" Sortable="false" Title="@Global.Reason" Width="80px" />
+        <RadzenDataGridColumn TItem="FailedJobResult" Property="FailedAt" Filterable="true" Sortable="true" SortOrder="SortOrder.Descending" Title="@Global.FailedAt" Width="80px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            var act = new GetLastFailedJobsAction();
+            dispatcher.Dispatch(act);
+        }
+    }
+
+    private void RowRender(RowRenderEventArgs<FailedJobResult> row)
+    {
+        const string className = "class";
+        if (row.Attributes.ContainsKey(className))
+        {
+            row.Attributes.Remove(className);
+        }
+    }
+}

@@ -3,6 +3,10 @@
 using Community.Microsoft.Extensions.Caching.PostgreSql;
 using EfdataSeeder;
 using FormBuilder;
+using Hangfire;
+using Hangfire.MySql;
+using Hangfire.PostgreSql;
+using Hangfire.SQLite;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +37,7 @@ using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.VerifiablePresentation;
 using System;
 using System.Collections.Generic;
+using System.Transactions;
 
 namespace SimpleIdServer.IdServer.Startup.Conf;
 
@@ -121,6 +126,46 @@ public class SidServerSetup
         });
         ConfigureDistributedCache(builder);
         ConfigureMessageBroker(builder, idServerBuilder);
+        ConfigureHangfire(builder);
+    }
+
+    public static void ConfigureHangfire(WebApplicationBuilder builder)
+    {
+        var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
+        var conf = section.Get<StorageConfiguration>();
+        var services = builder.Services;
+        services.AddHangfire(o => {
+            o.UseRecommendedSerializerSettings();
+            o.UseIgnoredAssemblyVersionTypeResolver();
+            switch(conf.Type)
+            {
+                case StorageTypes.INMEMORY:
+                    o.UseInMemoryStorage();
+                    break;
+                case StorageTypes.SQLSERVER:
+                    o.UseSqlServerStorage(conf.ConnectionString);
+                    break;
+                case StorageTypes.POSTGRE:
+                    o.UsePostgreSqlStorage(conf.ConnectionString);
+                    break;
+                case StorageTypes.MYSQL:
+                    o.UseStorage(new MySqlStorage(conf.ConnectionString, new MySqlStorageOptions
+                    {
+                        TransactionIsolationLevel = IsolationLevel.ReadCommitted,
+                        QueuePollInterval = TimeSpan.FromSeconds(15),
+                        JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                        CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                        PrepareSchemaIfNecessary = true,
+                        DashboardJobListLimit = 50000,
+                        TransactionTimeout = TimeSpan.FromMinutes(1),
+                        TablesPrefix = "Hangfire"
+                    }));
+                    break;
+                case StorageTypes.SQLITE:
+                    o.UseSQLiteStorage(conf.ConnectionString);
+                    break;
+            }
+        });
     }
 
     public static void ConfigureDataseeder(WebApplicationBuilder builder)

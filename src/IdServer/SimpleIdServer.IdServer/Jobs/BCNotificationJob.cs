@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Hangfire;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
@@ -21,7 +22,8 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Jobs
 {
-    public class BCNotificationJob : IJob
+    [AutomaticRetry(Attempts = 0)]
+    public class BCNotificationJob : BaseJob
     {
         private readonly IBCAuthorizeRepository _repository;
         private readonly ILogger<BCNotificationJob> _logger;
@@ -40,7 +42,8 @@ namespace SimpleIdServer.IdServer.Jobs
             IUserRepository userRepository,
             IClientRepository clientRepository,
             ITransactionBuilder transactionBuilder,
-            IOptions<IdServerHostOptions> options)
+            IRecurringJobStatusRepository recurringJobStatusRepository,
+            IOptions<IdServerHostOptions> options) : base(recurringJobStatusRepository)
         {
             _repository = repository;
             _logger = logger;
@@ -52,8 +55,9 @@ namespace SimpleIdServer.IdServer.Jobs
             _options = options.Value;
         }
 
-        public async Task Execute()
+        protected override async Task ExecuteInternal()
         {
+            
             using (var transaction = _transactionBuilder.Build())
             {
                 var notificationMethods = GetNotificationMethods();

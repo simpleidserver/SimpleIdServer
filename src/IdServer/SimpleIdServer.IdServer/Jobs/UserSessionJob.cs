@@ -12,7 +12,8 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Jobs
 {
-    public class UserSessionJob : IJob
+    [AutomaticRetry(Attempts = 0)]
+    public class UserSessionJob : BaseJob
     {
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly ISessionHelper _sessionHelper;
@@ -29,7 +30,8 @@ namespace SimpleIdServer.IdServer.Jobs
             IClientRepository clientRepository,
             IKeyStore keyStore,
             ITransactionBuilder transactionBuilder,
-            IOptions<IdServerHostOptions> options)
+            IRecurringJobStatusRepository recurringJobStatusRepository,
+            IOptions<IdServerHostOptions> options) : base(recurringJobStatusRepository)
         {
             _userSessionRepository = userSessionRepository;
             _sessionHelper = sessionHelper;
@@ -40,8 +42,7 @@ namespace SimpleIdServer.IdServer.Jobs
             _options = options.Value;
         }
 
-        [DisableConcurrentExecution(timeoutInSeconds: 10 * 60)]
-        public async Task Execute()
+        protected override async Task ExecuteInternal()
         {
             using (var transaction = _transactionBuilder.Build())
             {

@@ -2176,6 +2176,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The recurring job already exists.
+        /// </summary>
+        public static string RecurringJobExists {
+            get {
+                return ResourceManager.GetString("RecurringJobExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the redirect_uri cannot contains fragment.
         /// </summary>
         public static string RedirectUriContainsFragment {
