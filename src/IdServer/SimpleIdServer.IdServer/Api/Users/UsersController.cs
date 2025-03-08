@@ -4,6 +4,7 @@ using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
@@ -16,6 +17,7 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.UI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,9 +31,9 @@ namespace SimpleIdServer.IdServer.Api.Users
 {
     public class UsersController : BaseController
     {
+        private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
         private readonly IUserSessionResitory _userSessionRepository;
-        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IRealmRepository _realmRepository;
         private readonly IGroupRepository _groupRepository;
         private readonly IBusControl _busControl;
@@ -42,9 +44,9 @@ namespace SimpleIdServer.IdServer.Api.Users
         private readonly IdServerHostOptions _options;
 
         public UsersController(
+            IConfiguration configuration,
             IUserRepository userRepository,
             IUserSessionResitory userSessionRepository,
-            IAuthenticationHelper authenticationHelper,
             IRealmRepository realmRepository,
             IGroupRepository groupRepository,
             IBusControl busControl,
@@ -56,9 +58,9 @@ namespace SimpleIdServer.IdServer.Api.Users
             ILogger<UsersController> logger,
             IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
         {
+            _configuration = configuration;
             _userRepository = userRepository;
             _userSessionRepository = userSessionRepository;
-            _authenticationHelper = authenticationHelper;
             _realmRepository = realmRepository;
             _groupRepository = groupRepository;
             _busControl = busControl;
@@ -846,5 +848,68 @@ namespace SimpleIdServer.IdServer.Api.Users
         }
 
         #endregion
+
+        #region Block & unblock
+
+        [HttpGet]
+        public Task<IActionResult> Block([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+        {
+            var options = GetOptions();
+            return Toggle(prefix, id, UserStatus.BLOCKED, options, cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> Unblock([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+        {
+            return Toggle(prefix, id, UserStatus.ACTIVATED, null, cancellationToken);
+        }
+
+        private async Task<IActionResult> Toggle(string prefix, string id, UserStatus userStatus, UserLockingOptions options, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
+            }
+
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var user = await _userRepository.GetById(id, cancellationToken);
+                if(user == null)
+                {
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                }
+
+                if(userStatus == UserStatus.ACTIVATED)
+                {
+                    user.Unblock();
+                }
+                else
+                {
+                    user.Block(options.LockTimeInSeconds);
+                }
+
+                await transaction.Commit(cancellationToken);
+                if(userStatus == UserStatus.ACTIVATED)
+                {
+                    return NoContent();
+                }
+
+                return new OkObjectResult(new UserBlockResult { UnblockDateTime = user.UnblockDateTime.Value });
+            }
+        }
+
+        #endregion
+
+        protected UserLockingOptions GetOptions()
+        {
+            var section = _configuration.GetSection(typeof(UserLockingOptions).Name);
+            return section.Get<UserLockingOptions>();
+        }
     }
 }

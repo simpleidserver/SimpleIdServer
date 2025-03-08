@@ -199,6 +199,12 @@ namespace Microsoft.AspNetCore.Builder
             webApplication.SidMapControllerRoute("searchUsers",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/.search",
                 defaults: new { controller = "Users", action = "Search" });
+            webApplication.SidMapControllerRoute("blockUser",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/block",
+                defaults: new { controller = "Users", action = "Block" });
+            webApplication.SidMapControllerRoute("unblockUser",
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/unblock",
+                defaults: new { controller = "Users", action = "Unblock" });
             webApplication.SidMapControllerRoute("searchUserSessions",
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Users + "/{id}/sessions/.search",
                 defaults: new { controller = "Users", action = "SearchSessions" });

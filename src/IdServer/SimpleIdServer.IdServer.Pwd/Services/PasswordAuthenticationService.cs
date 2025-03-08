@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -52,7 +53,7 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
 
     protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticatePasswordViewModel viewModel, CancellationToken cancellationToken)
     {
-        if (authenticatedUser.IsBlocked()) return Task.FromResult(CredentialsValidationResult.Error("user_blocked", "user_blocked"));
+        if (authenticatedUser.IsBlocked()) return Task.FromResult(CredentialsValidationResult.Error("user_blocked", Global.UserAccountIsBlocked));
         var authService = _authServices.SingleOrDefault(s => s.Name == authenticatedUser.Source);
         if (authService != null)
         {

@@ -148,6 +148,17 @@ namespace SimpleIdServer.IdServer.Domains
             return false;
         }
 
+        public void Block(int lockTimeInSeconds)
+        {
+            UnblockDateTime = DateTime.UtcNow.AddSeconds(lockTimeInSeconds);
+            Status = UserStatus.BLOCKED;
+        }
+
+        public void Unblock()
+        {
+            ResetLoginAttempt();
+        }
+
         public void LoginAttempt(int maxAttempt, int lockTimeInSeconds)
         {
             NbLoginAttempt++;

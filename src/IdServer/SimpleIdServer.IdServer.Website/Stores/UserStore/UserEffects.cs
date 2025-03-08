@@ -6,7 +6,6 @@ using Radzen;
 using SimpleIdServer.IdServer.Api.Users;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.Website.Stores.Base;
 using System.Linq.Dynamic.Core;
 using System.Text;
@@ -398,6 +397,40 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             }
         }
 
+        [EffectMethod]
+        public async Task Handle(BlockUserAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/block"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var blockResult = JsonSerializer.Deserialize<UserBlockResult>(json, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+            dispatcher.Dispatch(new BlockUserSuccessAction { UserId = action.UserId, UnblockDateTime = blockResult.UnblockDateTime.ToLocalTime() });
+        }
+
+        [EffectMethod]
+        public async Task Handle(UnblockUserAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/unblock"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            await httpResult.Content.ReadAsStringAsync();
+            dispatcher.Dispatch(new UnblockUserSuccessAction());
+        }
+
         private async Task<string> GetUsersUrl()
         {
             var baseUrl = await GetBaseUrl();
@@ -746,5 +779,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     public class StartAddUserAction
     {
 
+    }
+
+    public class BlockUserAction
+    {
+        public string UserId { get; set; }
+    }
+
+    public class BlockUserSuccessAction
+    {
+        public string UserId { get; set; }
+        public DateTime UnblockDateTime { get; set; }
+    }
+
+    public class UnblockUserAction
+    {
+        public string UserId { get; set; }
+    }
+
+    public class UnblockUserSuccessAction
+    {
+        public string UserId { get; set; }
     }
 }

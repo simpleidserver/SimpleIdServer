@@ -170,6 +170,49 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         #region UserState
 
         [ReducerMethod]
+        public static UserState ReduceBlockUserAction(UserState state, BlockUserAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceBlockUserSuccessAction(UserState state, BlockUserSuccessAction act)
+        {
+            var user = state.User;
+            user.Status = UserStatus.BLOCKED;
+            user.UnblockDateTime = act.UnblockDateTime;
+            return state with
+            {
+                IsLoading = false,
+                User = user
+            };
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceUnblockUserAction(UserState state, UnblockUserAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceUnblockUserSuccessAction(UserState state, UnblockUserSuccessAction act)
+        {
+            var user = state.User;
+            user.Unblock();
+            return state with
+            {
+                IsLoading = false,
+                User = user
+            };
+        }
+
+        [ReducerMethod]
         public static UserState ReduceGetUserAction(UserState state, GetUserAction act) => new(isLoading: true, user: null);
 
         [ReducerMethod]

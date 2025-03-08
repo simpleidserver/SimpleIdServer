@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.Apis;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using System.Text.Json;
@@ -47,7 +48,7 @@ public class UserMobileAuthenticationService : GenericAuthenticationService<Auth
 
     protected override async Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticateMobileViewModel viewModel, CancellationToken cancellationToken)
     {
-        if (authenticatedUser.IsBlocked()) return CredentialsValidationResult.Error("user_blocked", "user_blocked");
+        if (authenticatedUser.IsBlocked()) return CredentialsValidationResult.Error("user_blocked", Global.UserAccountIsBlocked);
         var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
         if (string.IsNullOrWhiteSpace(session))
         {

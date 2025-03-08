@@ -3094,6 +3094,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Your account is blocked.
+        /// </summary>
+        public static string UserAccountIsBlocked {
+            get {
+                return ResourceManager.GetString("UserAccountIsBlocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à user &apos;{0}&apos; already exists.
         /// </summary>
         public static string UserAlreadyExists {

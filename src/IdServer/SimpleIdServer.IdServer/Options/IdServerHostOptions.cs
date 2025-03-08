@@ -215,6 +215,7 @@ namespace SimpleIdServer.IdServer.Options
         /// The default authentication workflow.
         /// </summary>
         public string DefaultAuthenticationWorkflowId { get; set; }
+
         public ScimClientOptions ScimClientOptions { get; set; }
 
         public int GetIntParameter(string name) => int.Parse(Parameters[name]);

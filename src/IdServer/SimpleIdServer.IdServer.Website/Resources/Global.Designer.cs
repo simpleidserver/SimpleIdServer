@@ -5431,6 +5431,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à User is blocked until {0}.
+        /// </summary>
+        public static string UserBlocked {
+            get {
+                return ResourceManager.GetString("UserBlocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à User claims.
         /// </summary>
         public static string UserClaims {
@@ -5557,6 +5566,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à User is blocked.
+        /// </summary>
+        public static string UserIsBlocked {
+            get {
+                return ResourceManager.GetString("UserIsBlocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User is blocked.
+        /// </summary>
+        public static string UserIsBlocked1 {
+            get {
+                return ResourceManager.GetString("UserIsBlocked1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Options have been updated.
         /// </summary>
         public static string UserLockingOptionsUpdated {
@@ -5679,6 +5706,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string UserSubjectDescription {
             get {
                 return ResourceManager.GetString("UserSubjectDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à User is unblocked.
+        /// </summary>
+        public static string UserUnblocked {
+            get {
+                return ResourceManager.GetString("UserUnblocked", resourceCulture);
             }
         }
         

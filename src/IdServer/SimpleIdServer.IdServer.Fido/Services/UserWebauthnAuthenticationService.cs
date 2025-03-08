@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.Apis;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using System.Text.Json;
@@ -47,7 +48,7 @@ namespace SimpleIdServer.IdServer.Fido.Services
 
         protected override async Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticateWebauthnViewModel viewModel, CancellationToken cancellationToken)
         {
-            if (authenticatedUser.IsBlocked()) return CredentialsValidationResult.Error("user_blocked", "user_blocked");
+            if (authenticatedUser.IsBlocked()) return CredentialsValidationResult.Error("user_blocked", Global.UserAccountIsBlocked);
             if (!authenticatedUser.GetStoredFidoCredentials(Constants.AMR).Any()) return CredentialsValidationResult.Error("missing_credential", "missing_credential");
             var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session))
