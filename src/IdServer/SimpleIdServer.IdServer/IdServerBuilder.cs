@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
 using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
@@ -18,14 +19,19 @@ namespace Microsoft.Extensions.DependencyInjection
     {
         private readonly IServiceCollection _serviceCollection;
         private readonly AuthenticationBuilder _authBuilder;
+        private readonly FormBuilderRegistration _formBuilder;
 
-        public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder)
+        public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler)
         {
             _serviceCollection = serviceCollection;
             _authBuilder = authBuilder;
+            _formBuilder = formBuidler;
+            this.UseInMemoryMassTransit();
         }
 
         public IServiceCollection Services => _serviceCollection;
+
+        public FormBuilderRegistration FormBuilder => _formBuilder;
 
         #region Authentication & Authorization
 
@@ -40,7 +46,7 @@ namespace Microsoft.Extensions.DependencyInjection
         public IdServerBuilder AddAuthentication(Action<AuthBuilder> callback = null)
         {
             _authBuilder
-                .AddCookie(Constants.DefaultExternalCookieAuthenticationScheme);
+                .AddCookie(SimpleIdServer.IdServer.Constants.DefaultExternalCookieAuthenticationScheme);
             if(callback != null)
                 callback(new AuthBuilder(_serviceCollection, _authBuilder));
 

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
+using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,6 +14,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
@@ -55,359 +58,409 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Constants = SimpleIdServer.IdServer.Constants;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    /// <summary>
+    /// Configure the Identity Server.
+    /// </summary>
+    /// <param name="services"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static IdServerBuilder AddSidIdentityServer(
+        this IServiceCollection services,
+        Action<IdServerHostOptions>? callback = null,
+        Action<CookieAuthenticationOptions>? configureAuthCookieCb = null,
+        Action<IDataProtectionBuilder>? dataProtectionBuilderCallback = null)
     {
-
-        /// <summary>
-        /// Configure OPENID & OAUTH2.0 server.
-        /// </summary>
-        /// <param name="services"></param>
-        /// <param name="options"></param>
-        /// <returns></returns>
-        public static IdServerStoreChooser AddSIDIdentityServer(
-            this IServiceCollection services,
-            Action<IdServerHostOptions>? callback = null,
-            Action<CookieAuthenticationOptions>? cookie = null,
-            Action<IDataProtectionBuilder>? dataProtectionBuilderCallback = null)
+        if (callback != null) services.Configure(callback);
+        else services.Configure<IdServerHostOptions>(o => { });
+        services.Configure<RouteOptions>(opt =>
         {
-            if (callback != null) services.Configure(callback);
-            else services.Configure<IdServerHostOptions>(o => { });
-            services.Configure<RouteOptions>(opt =>
+            opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
+        });
+        Tracing.Init();
+        services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+        services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
+        services.AddControllersWithViews();
+        var b = services.AddDataProtection();
+        if (dataProtectionBuilderCallback != null) dataProtectionBuilderCallback(b);
+        services.AddDistributedMemoryCache();
+        services.AddDidKey();
+        ConfigureBlazorAndLocalization(services);
+        ConfigureIdentityServer(services);
+        var formBuilder = ConfigureFormBuilder(services);
+        ConfigureHangfire(services);
+        services.AddHttpContextAccessor();
+        var authBuilder = ConfigureAuth(services, configureAuthCookieCb);
+        return new IdServerBuilder(services, authBuilder, formBuilder);
+    }
+
+    private static void ConfigureIdentityServer(IServiceCollection services)
+    {
+        services.AddResponseModeHandlers()
+            .AddOAuthClientAuthentication()
+            .AddClientAssertionParsers()
+            .AddOauthJwksApi()
+            .AddOAuthTokenApi()
+            .AddOAuthAuthorizationApi()
+            .AddOAuthJwt()
+            .AddLib()
+            .AddConfigurationApi()
+            .AddUI()
+            .AddSubjectTypeBuilder()
+            .AddClaimsEnricher()
+            .AddOAuthIntrospectionTokenApi()
+            .AddRegisterApi()
+            .AddBCAuthorizeApi()
+            .AddDeviceAuthorizationApi()
+            .AddTokenTypes();
+    }
+
+    private static void ConfigureBlazorAndLocalization(IServiceCollection services)
+    {
+        services.AddServerSideBlazor().AddCircuitOptions(o =>
+        {
+            o.DetailedErrors = true;
+        }).AddHubOptions(o =>
+        {
+            o.MaximumReceiveMessageSize = 102400000;
+        });
+        services.AddRazorPages().AddRazorRuntimeCompilation();
+        services.AddLocalization();
+    }
+
+    private static FormBuilderRegistration ConfigureFormBuilder(IServiceCollection services)
+    {
+        const string cookieName = "XSFR-TOKEN";
+        services.AddAntiforgery(c =>
+        {
+            c.Cookie.Name = cookieName;
+        });
+        var formBuilder = services.AddFormBuilder(cb =>
+        {
+            cb.AntiforgeryCookieName = cookieName;
+        });
+        return formBuilder;
+    }
+
+    private static void ConfigureHangfire(IServiceCollection services)
+    {
+        services.AddHangfire(o => {
+            o.UseRecommendedSerializerSettings();
+            o.UseIgnoredAssemblyVersionTypeResolver();
+            o.UseInMemoryStorage();
+        });
+    }
+
+    private static AuthenticationBuilder ConfigureAuth(IServiceCollection services, Action<CookieAuthenticationOptions>? configureAuthCookieCb = null)
+    {
+        services.AddAuthorization();
+        services.Configure<AuthorizationOptions>(o =>
+        {
+            o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
+        });
+        var authBuilder = services
+            .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddIdServerCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
             {
-                opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
-            });
-            Tracing.Init();
-            services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-            services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
-            services.AddControllersWithViews();
-            var b = services.AddDataProtection();
-            if (dataProtectionBuilderCallback != null) dataProtectionBuilderCallback(b);
-            services.AddDistributedMemoryCache();
-            services.AddResponseModeHandlers()
-                .AddOAuthClientAuthentication()
-                .AddClientAssertionParsers()
-                .AddOAuthJwksApi()
-                .AddOAuthTokenApi()
-                .AddOAuthAuthorizationApi()
-                .AddOAuthJwt()
-                .AddLib()
-                .AddConfigurationApi()
-                .AddUI()
-                .AddSubjectTypeBuilder()
-                .AddClaimsEnricher()
-                .AddOAuthIntrospectionTokenApi()
-                .AddRegisterApi()
-                .AddBCAuthorizeApi()
-                .AddDeviceAuthorizationApi()
-                .AddTokenTypes();
-            services.AddAuthorization();
-            services.AddHttpContextAccessor();
-            services.Configure<AuthorizationOptions>(o =>
-            {
-                o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
-            });
-            var authBuilder = services
-                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddIdServerCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
+                if (configureAuthCookieCb != null) configureAuthCookieCb(opts);
+                opts.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
+                opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                 {
-                    if (cookie != null) cookie(opts);
-                    opts.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
-                    opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
+                    if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
                     {
-                        if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
-                        {
-                            var nameIdentifier = ctx.Principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                            var ticket = new AuthenticationTicket(ctx.Principal, ctx.Properties, ctx.Scheme.Name);
-                            var realmStore = ctx.HttpContext.RequestServices.GetRequiredService<IRealmStore>();
-                            var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
-                            ctx.Options.CookieManager.AppendResponseCookie(
+                        var nameIdentifier = ctx.Principal.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                        var ticket = new AuthenticationTicket(ctx.Principal, ctx.Properties, ctx.Scheme.Name);
+                        var realmStore = ctx.HttpContext.RequestServices.GetRequiredService<IRealmStore>();
+                        var cookieValue = ctx.Options.TicketDataFormat.Protect(ticket, GetTlsTokenBinding(ctx));
+                        ctx.Options.CookieManager.AppendResponseCookie(
+                            ctx.HttpContext,
+                            $"{IdServerCookieAuthenticationHandler.GetCookieName(realmStore.Realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
+                            cookieValue,
+                            ctx.CookieOptions);
+                    }
+
+                    return Task.CompletedTask;
+                };
+                opts.Events.OnSigningOut += (CookieSigningOutContext ctx) =>
+                {
+                    string nameIdentifier = null;
+                    if (ctx.Properties != null && ctx.Properties.Items.ContainsKey(Constants.LogoutUserKey)) nameIdentifier = ctx.Properties.Items[Constants.LogoutUserKey];
+                    if (string.IsNullOrWhiteSpace(nameIdentifier) && ctx.HttpContext.User != null && ctx.HttpContext.User.Identity != null && ctx.HttpContext.User.Identity.IsAuthenticated)
+                    {
+                        nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(nameIdentifier))
+                    {
+                        var realmStore = ctx.HttpContext.RequestServices.GetRequiredService<IRealmStore>();
+                        ctx.Options.CookieManager.DeleteCookie(
                                 ctx.HttpContext,
                                 $"{IdServerCookieAuthenticationHandler.GetCookieName(realmStore.Realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
-                                cookieValue,
                                 ctx.CookieOptions);
-                        }
+                    }
+                    return Task.CompletedTask;
+                };
+            });
+        return authBuilder;
 
-                        return Task.CompletedTask;
-                    };
-                    opts.Events.OnSigningOut += (CookieSigningOutContext ctx) =>
-                    {
-                        string nameIdentifier = null;
-                        if(ctx.Properties != null && ctx.Properties.Items.ContainsKey(Constants.LogoutUserKey)) nameIdentifier = ctx.Properties.Items[Constants.LogoutUserKey];
-                        if (string.IsNullOrWhiteSpace(nameIdentifier) && ctx.HttpContext.User != null && ctx.HttpContext.User.Identity != null && ctx.HttpContext.User.Identity.IsAuthenticated)
-                        {
-                            nameIdentifier = ctx.HttpContext.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                        }
-
-                        if(!string.IsNullOrWhiteSpace(nameIdentifier))
-                        {
-                            var realmStore = ctx.HttpContext.RequestServices.GetRequiredService<IRealmStore>();
-                            ctx.Options.CookieManager.DeleteCookie(
-                                    ctx.HttpContext,
-                                    $"{IdServerCookieAuthenticationHandler.GetCookieName(realmStore.Realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
-                                    ctx.CookieOptions);
-                        }
-                        return Task.CompletedTask;
-                    };
-                });
-            return new IdServerStoreChooser(services, authBuilder);
-
-            string GetTlsTokenBinding(CookieSigningInContext context)
-            {
-                var binding = context.HttpContext.Features.Get<ITlsTokenBindingFeature>()?.GetProvidedTokenBindingId();
-                return binding == null ? null : Convert.ToBase64String(binding);
-            }
-        }
-
-        /// <summary>
-        /// Registrates the services to allow the seeding via JSON file.
-        /// </summary>
-        /// <param name="services">The services collection.</param>
-        /// <param name="configuration">The application's configuration.</param>
-        /// <returns>The services collection.</returns>
-        public static IServiceCollection AddJsonSeeding(this IServiceCollection services, IConfiguration configuration)
+        string GetTlsTokenBinding(CookieSigningInContext context)
         {
-            string jsonSeedsFilePath = configuration.GetValue<string>(Constants.ConfigurationSections.JsonSeedsFilePath);
-
-            services.AddOptionsWithValidateOnStart<JsonSeedingOptions>()
-                .Configure(options =>
-                {
-                    options.SeedFromJson = !string.IsNullOrEmpty(jsonSeedsFilePath);
-                    options.JsonFilePath = jsonSeedsFilePath;
-                })
-                .Validate(
-                    config => !config.SeedFromJson || (config.SeedFromJson && File.Exists(config.JsonFilePath)),
-                    "The JSON file for seeding must exists."
-                );
-
-            services.AddTransient<ISeedStrategy, JsonSeedStrategy>();
-
-            return services;
+            var binding = context.HttpContext.Features.Get<ITlsTokenBindingFeature>()?.GetProvidedTokenBindingId();
+            return binding == null ? null : Convert.ToBase64String(binding);
         }
-
-        public static IServiceCollection AddEntitySeeders(this IServiceCollection services, Type referenceType)
-        {
-            Type[] entitySeeders = referenceType.Assembly.GetTypes()
-                .Where(t => t.IsClass && t.GetInterfaces().Any(i => i.Name.Contains("IEntitySeeder")))
-                .ToArray();
-
-            foreach (Type entitySeeder in entitySeeders)
-            {
-                Type interfaceType = entitySeeder.GetInterfaces().First(i => i.Name.Contains("IEntitySeeder"));
-                services.TryAddTransient(interfaceType, entitySeeder);
-            }
-
-            return services;
-        }
-
-        #region Private methods
-
-        private static IServiceCollection AddResponseModeHandlers(this IServiceCollection services)
-        {
-            services.AddTransient<IOAuthResponseMode, QueryResponseModeHandler>();
-            services.AddTransient<IOAuthResponseMode, FragmentResponseModeHandler>();
-            services.AddTransient<IOAuthResponseMode, FormPostResponseModeHandler>();
-            services.AddTransient<IOAuthResponseMode, FormPostJwtResponseModeHandler>();
-            services.AddTransient<IOAuthResponseMode, QueryJwtResponseModeHandler>();
-            services.AddTransient<IOAuthResponseMode, FragmentJwtResponseModeHandler>();
-            services.AddTransient<IOAuthResponseMode, JwtResponseModeHandler>();
-            services.AddTransient<IOAuthResponseModeHandler, QueryResponseModeHandler>();
-            services.AddTransient<IOAuthResponseModeHandler, FragmentResponseModeHandler>();
-            services.AddTransient<IOAuthResponseModeHandler, FormPostResponseModeHandler>();
-            services.AddTransient<IOAuthResponseModeHandler, FormPostJwtResponseModeHandler>();
-            services.AddTransient<IOAuthResponseModeHandler, QueryJwtResponseModeHandler>();
-            services.AddTransient<IOAuthResponseModeHandler, FragmentJwtResponseModeHandler>();
-            services.AddTransient<IOAuthResponseModeHandler, JwtResponseModeHandler>();
-            services.AddTransient<IResponseModeHandler, ResponseModeHandler>();
-            return services;
-        }
-
-        private static IServiceCollection AddOAuthClientAuthentication(this IServiceCollection services)
-        {
-            services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>(), s.GetServices<IClientAssertionParser>(), s.GetService<IBusControl>(), s.GetService<IOptions<IdServerHostOptions>>()));
-            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientPrivateKeyJwtAuthenticationHandler>();
-            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
-            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();
-            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretPostAuthenticationHandler>();
-            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientTlsClientAuthenticationHandler>();
-            services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSelfSignedTlsClientAuthenticationHandler>();
-            services.AddTransient<IPkceVerifier, PkceVerifier>();
-            return services;
-        }
-
-        private static IServiceCollection AddClientAssertionParsers(this IServiceCollection services)
-        {
-            services.AddTransient<IClientAssertionParser, ClientJwtAssertionParser>();
-            return services;
-        }
-
-        private static IServiceCollection AddOAuthJwksApi(this IServiceCollection services)
-        {
-            services.AddTransient<IJwksRequestHandler, JwksRequestHandler>();
-            services.AddTransient<IKeyStore, InMemoryKeyStore>();
-            services.AddTransient<ICertificateAuthorityStore, CertificateAuthorityStore>();
-            return services;
-        }
-
-        private static IServiceCollection AddDeviceAuthorizationApi(this IServiceCollection services)
-        {
-            services.AddTransient<IDeviceAuthorizationRequestHandler, DeviceAuthorizationRequestHandler>();
-            services.AddTransient<IDeviceAuthorizationRequestValidator, DeviceAuthorizationRequestValidator>();
-            return services;
-        }
-
-        private static IServiceCollection AddSubjectTypeBuilder(this IServiceCollection services)
-        {
-            services.AddTransient<ISubjectTypeBuilder, PairWiseSubjectTypeBuidler>();
-            services.AddTransient<ISubjectTypeBuilder, PublicSubjectTypeBuilder>();
-            return services;
-        }
-
-        private static IServiceCollection AddClaimsEnricher(this IServiceCollection services)
-        {
-            services.AddTransient<IRelayClaimsExtractor, HttpClaimsExtractor>();
-            services.AddTransient<IClaimsEnricher, ClaimsEnricher>();
-            return services;
-        }
-
-        private static IServiceCollection AddOAuthTokenApi(this IServiceCollection services)
-        {
-            services.AddTransient<ITokenRequestHandler>(s => new TokenRequestHandler(s.GetServices<IGrantTypeHandler>()));
-            services.AddTransient<IClientCredentialsGrantTypeValidator, ClientCredentialsGrantTypeValidator>();
-            services.AddTransient<IRefreshTokenGrantTypeValidator, RefreshTokenGrantTypeValidator>();
-            services.AddTransient<IAuthorizationCodeGrantTypeValidator, AuthorizationCodeGrantTypeValidator>();
-            services.AddTransient<IRevokeTokenValidator, RevokeTokenValidator>();
-            services.AddTransient<IPasswordGrantTypeValidator, PasswordGrantTypeValidator>();
-            services.AddTransient<IGrantedTokenHelper, GrantedTokenHelper>();
-            services.AddTransient<IAcrHelper, AcrHelper>();
-            services.AddTransient<ITokenExchangeValidator, TokenExchangeValidator>();
-            services.AddTransient<IGrantTypeHandler, TokenExchangeHandler>();
-            services.AddTransient<IGrantTypeHandler, ClientCredentialsHandler>();
-            services.AddTransient<IGrantTypeHandler, RefreshTokenHandler>();
-            services.AddTransient<IGrantTypeHandler, PasswordHandler>();
-            services.AddTransient<IGrantTypeHandler, AuthorizationCodeHandler>();
-            services.AddTransient<IGrantTypeHandler, CIBAHandler>();
-            services.AddTransient<IGrantTypeHandler, UmaTicketHandler>();
-            services.AddTransient<IGrantTypeHandler, PreAuthorizedCodeHandler>();
-            services.AddTransient<IGrantTypeHandler, DeviceCodeHandler>();
-            services.AddTransient<IGrantTypeHandler, TokenExchangePreAuthorizedCodeHandler>();
-            services.AddTransient<ICIBAGrantTypeValidator, CIBAGrantTypeValidator>();
-            services.AddTransient<IClientAuthenticationHelper, ClientAuthenticationHelper>();
-            services.AddTransient<IRevokeTokenRequestHandler, RevokeTokenRequestHandler>();
-            services.AddTransient<ITokenExchangePreAuthorizedCodeValidator, TokenExchangePreAuthorizedCodeValidator>();
-            services.AddTransient<ITokenProfile, BearerTokenProfile>();
-            services.AddTransient<ITokenProfile, MacTokenProfile>();
-            services.AddTransient<ITokenBuilder, AccessTokenBuilder>();
-            services.AddTransient<ITokenBuilder, IdTokenBuilder>();
-            services.AddTransient<ITokenBuilder, RefreshTokenBuilder>();
-            services.AddTransient<IClaimsJwsPayloadEnricher, ClaimsJwsPayloadEnricher>();
-            services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
-            services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
-            services.AddTransient<IClientHelper, StandardClientHelper>();
-            services.AddTransient<IAmrHelper, AmrHelper>();
-            services.AddTransient<IWorkflowHelper, WorkflowHelper>();
-            services.AddTransient<IUmaPermissionTicketHelper, UMAPermissionTicketHelper>();
-            services.AddTransient<IExtractRequestHelper, ExtractRequestHelper>();
-            services.AddTransient<IGrantHelper, GrantHelper>();
-            services.AddTransient<IClaimTokenFormat, OpenIDClaimTokenFormat>();
-            services.AddTransient<IUmaTicketGrantTypeValidator, UmaTicketGrantTypeValidator>();
-            services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
-            services.AddTransient<IScopeClaimsExtractor, ScopeClaimsExtractor>();
-            services.AddTransient<IClaimsExtractor, ClaimsExtractor>();
-            services.AddTransient<IClaimExtractor, AttributeClaimExtractor>();
-            services.AddTransient<IClaimExtractor, PropertyClaimExtractor>();
-            services.AddTransient<IClaimExtractor, ScimClaimExtractor>();
-            services.AddTransient<IClaimExtractor, SubClaimExtractor>();
-            services.AddTransient<IUserHelper, UserHelper>();
-            services.AddTransient<IPreAuthorizedCodeValidator, PreAuthorizedCodeValidator>();
-            services.AddTransient<IKeyStore, InMemoryKeyStore>();
-            services.AddTransient<IDeviceCodeGrantTypeValidator, DeviceCodeGrantTypeValidator>();
-            services.AddTransient<IDPOPProofValidator, DPOPProofValidator>();
-            services.AddTransient<ISessionHelper, SessionHelper>();
-            services.AddTransient<UserSessionJob>();
-            return services;
-        }
-
-        private static IServiceCollection AddOAuthIntrospectionTokenApi(this IServiceCollection services)
-        {
-            services.AddTransient<ITokenIntrospectionRequestHandler, TokenIntrospectionRequestHandler>();
-            return services;
-        }
-
-        private static IServiceCollection AddOAuthAuthorizationApi(this IServiceCollection services)
-        {
-            services.AddTransient<IAuthorizationRequestHandler, AuthorizationRequestHandler>();
-            services.AddTransient<IResponseTypeHandler, AuthorizationCodeResponseTypeHandler>();
-            services.AddTransient<IResponseTypeHandler, IdTokenResponseTypeHandler>();
-            services.AddTransient<IResponseTypeHandler, TokenResponseTypeHandler>();
-            services.AddTransient<IAuthorizationRequestValidator, OAuthAuthorizationRequestValidator>();
-            services.AddTransient<IAuthorizationRequestEnricher, AuthorizationRequestEnricher>();
-            services.AddTransient<IUserConsentFetcher, OAuthUserConsentFetcher>();
-            services.AddTransient<IAuthorizationCallbackRequestHandler, AuthorizationCallbackRequestHandler>();
-            services.AddTransient<IAuthorizationCallbackRequestValidator, AuthorizationCallbackRequestValidator>();
-            return services;
-        }
-
-        private static IServiceCollection AddBCAuthorizeApi(this IServiceCollection services)
-        {
-            services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
-            services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
-            services.AddTransient<IBCNotificationService, BCNotificationService>();
-            return services;
-        }
-
-        private static IServiceCollection AddTokenTypes(this IServiceCollection services)
-        {
-            services.AddTransient<ITokenTypeService, AccessTokenTypeService>();
-            services.AddTransient<ITokenTypeService, IdTokenTypeService>();
-            return services;
-        }
-
-        private static IServiceCollection AddOAuthJwt(this IServiceCollection services)
-        {
-            services.AddTransient<IJwtBuilder, JwtBuilder>();
-            return services;
-        }
-
-        private static IServiceCollection AddLib(this IServiceCollection services)
-        {
-            services.AddTransient<IHttpClientFactory, HttpClientFactory>();
-            services.AddScoped<IRealmStore, CookieRealmStore>();
-            return services;
-        }
-
-        private static IServiceCollection AddConfigurationApi(this IServiceCollection services)
-        {
-            services.AddTransient<IOAuthConfigurationRequestHandler, OAuthConfigurationRequestHandler>();
-            services.AddTransient<IOpenidConfigurationRequestHandler, OpenidConfigurationRequestHandler>();
-            services.AddTransient<IOAuthWorkflowConverter, OAuthWorkflowConverter>();
-            return services;
-        }
-
-        private static IServiceCollection AddUI(this IServiceCollection services)
-        {
-            services.AddTransient<IOTPAuthenticator, HOTPAuthenticator>();
-            services.AddTransient<IOTPAuthenticator, TOTPAuthenticator>();
-            services.AddTransient<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
-            services.AddTransient<ISessionManager, SessionManager>();
-            // services.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-            services.AddTransient<IUserTransformer, UserTransformer>();
-            return services;
-        }
-
-        private static IServiceCollection AddRegisterApi(this IServiceCollection services)
-        {
-            services.AddTransient<IRegisterClientRequestValidator, RegisterClientRequestValidator>();
-            return services;
-        }
-
-        #endregion
     }
 
-    public class RealmRoutePrefixConstraint : IRouteConstraint
+    /// <summary>
+    /// Registrates the services to allow the seeding via JSON file.
+    /// </summary>
+    /// <param name="services">The services collection.</param>
+    /// <param name="configuration">The application's configuration.</param>
+    /// <returns>The services collection.</returns>
+    public static IServiceCollection AddJsonSeeding(this IServiceCollection services, IConfiguration configuration)
     {
-        public bool Match(HttpContext? httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection) => true;
+        string jsonSeedsFilePath = configuration.GetValue<string>(Constants.ConfigurationSections.JsonSeedsFilePath);
+
+        services.AddOptionsWithValidateOnStart<JsonSeedingOptions>()
+            .Configure(options =>
+            {
+                options.SeedFromJson = !string.IsNullOrEmpty(jsonSeedsFilePath);
+                options.JsonFilePath = jsonSeedsFilePath;
+            })
+            .Validate(
+                config => !config.SeedFromJson || (config.SeedFromJson && File.Exists(config.JsonFilePath)),
+                "The JSON file for seeding must exists."
+            );
+
+        services.AddTransient<ISeedStrategy, JsonSeedStrategy>();
+
+        return services;
     }
+
+    public static IServiceCollection AddEntitySeeders(this IServiceCollection services, Type referenceType)
+    {
+        Type[] entitySeeders = referenceType.Assembly.GetTypes()
+            .Where(t => t.IsClass && t.GetInterfaces().Any(i => i.Name.Contains("IEntitySeeder")))
+            .ToArray();
+
+        foreach (Type entitySeeder in entitySeeders)
+        {
+            Type interfaceType = entitySeeder.GetInterfaces().First(i => i.Name.Contains("IEntitySeeder"));
+            services.TryAddTransient(interfaceType, entitySeeder);
+        }
+
+        return services;
+    }
+
+    #region Private methods
+
+    private static IServiceCollection AddResponseModeHandlers(this IServiceCollection services)
+    {
+        services.AddTransient<IOAuthResponseMode, QueryResponseModeHandler>();
+        services.AddTransient<IOAuthResponseMode, FragmentResponseModeHandler>();
+        services.AddTransient<IOAuthResponseMode, FormPostResponseModeHandler>();
+        services.AddTransient<IOAuthResponseMode, FormPostJwtResponseModeHandler>();
+        services.AddTransient<IOAuthResponseMode, QueryJwtResponseModeHandler>();
+        services.AddTransient<IOAuthResponseMode, FragmentJwtResponseModeHandler>();
+        services.AddTransient<IOAuthResponseMode, JwtResponseModeHandler>();
+        services.AddTransient<IOAuthResponseModeHandler, QueryResponseModeHandler>();
+        services.AddTransient<IOAuthResponseModeHandler, FragmentResponseModeHandler>();
+        services.AddTransient<IOAuthResponseModeHandler, FormPostResponseModeHandler>();
+        services.AddTransient<IOAuthResponseModeHandler, FormPostJwtResponseModeHandler>();
+        services.AddTransient<IOAuthResponseModeHandler, QueryJwtResponseModeHandler>();
+        services.AddTransient<IOAuthResponseModeHandler, FragmentJwtResponseModeHandler>();
+        services.AddTransient<IOAuthResponseModeHandler, JwtResponseModeHandler>();
+        services.AddTransient<IResponseModeHandler, ResponseModeHandler>();
+        return services;
+    }
+
+    private static IServiceCollection AddOAuthClientAuthentication(this IServiceCollection services)
+    {
+        services.AddTransient<IAuthenticateClient>(s => new AuthenticateClient(s.GetService<IClientRepository>(), s.GetServices<IOAuthClientAuthenticationHandler>(), s.GetServices<IClientAssertionParser>(), s.GetService<IBusControl>(), s.GetService<IOptions<IdServerHostOptions>>()));
+        services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientPrivateKeyJwtAuthenticationHandler>();
+        services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretBasicAuthenticationHandler>();
+        services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretJwtAuthenticationHandler>();
+        services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretPostAuthenticationHandler>();
+        services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientTlsClientAuthenticationHandler>();
+        services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSelfSignedTlsClientAuthenticationHandler>();
+        services.AddTransient<IPkceVerifier, PkceVerifier>();
+        return services;
+    }
+
+    private static IServiceCollection AddClientAssertionParsers(this IServiceCollection services)
+    {
+        services.AddTransient<IClientAssertionParser, ClientJwtAssertionParser>();
+        return services;
+    }
+
+    private static IServiceCollection AddOauthJwksApi(this IServiceCollection services)
+    {
+        services.AddTransient<IJwksRequestHandler, JwksRequestHandler>();
+        services.AddTransient<IKeyStore, InMemoryKeyStore>();
+        services.AddTransient<ICertificateAuthorityStore, CertificateAuthorityStore>();
+        return services;
+    }
+
+    private static IServiceCollection AddDeviceAuthorizationApi(this IServiceCollection services)
+    {
+        services.AddTransient<IDeviceAuthorizationRequestHandler, DeviceAuthorizationRequestHandler>();
+        services.AddTransient<IDeviceAuthorizationRequestValidator, DeviceAuthorizationRequestValidator>();
+        return services;
+    }
+
+    private static IServiceCollection AddSubjectTypeBuilder(this IServiceCollection services)
+    {
+        services.AddTransient<ISubjectTypeBuilder, PairWiseSubjectTypeBuidler>();
+        services.AddTransient<ISubjectTypeBuilder, PublicSubjectTypeBuilder>();
+        return services;
+    }
+
+    private static IServiceCollection AddClaimsEnricher(this IServiceCollection services)
+    {
+        services.AddTransient<IRelayClaimsExtractor, HttpClaimsExtractor>();
+        services.AddTransient<IClaimsEnricher, ClaimsEnricher>();
+        return services;
+    }
+
+    private static IServiceCollection AddOAuthTokenApi(this IServiceCollection services)
+    {
+        services.AddTransient<ITokenRequestHandler>(s => new TokenRequestHandler(s.GetServices<IGrantTypeHandler>()));
+        services.AddTransient<IClientCredentialsGrantTypeValidator, ClientCredentialsGrantTypeValidator>();
+        services.AddTransient<IRefreshTokenGrantTypeValidator, RefreshTokenGrantTypeValidator>();
+        services.AddTransient<IAuthorizationCodeGrantTypeValidator, AuthorizationCodeGrantTypeValidator>();
+        services.AddTransient<IRevokeTokenValidator, RevokeTokenValidator>();
+        services.AddTransient<IPasswordGrantTypeValidator, PasswordGrantTypeValidator>();
+        services.AddTransient<IGrantedTokenHelper, GrantedTokenHelper>();
+        services.AddTransient<IAcrHelper, AcrHelper>();
+        services.AddTransient<ITokenExchangeValidator, TokenExchangeValidator>();
+        services.AddTransient<IGrantTypeHandler, TokenExchangeHandler>();
+        services.AddTransient<IGrantTypeHandler, ClientCredentialsHandler>();
+        services.AddTransient<IGrantTypeHandler, RefreshTokenHandler>();
+        services.AddTransient<IGrantTypeHandler, PasswordHandler>();
+        services.AddTransient<IGrantTypeHandler, AuthorizationCodeHandler>();
+        services.AddTransient<IGrantTypeHandler, CIBAHandler>();
+        services.AddTransient<IGrantTypeHandler, UmaTicketHandler>();
+        services.AddTransient<IGrantTypeHandler, PreAuthorizedCodeHandler>();
+        services.AddTransient<IGrantTypeHandler, DeviceCodeHandler>();
+        services.AddTransient<IGrantTypeHandler, TokenExchangePreAuthorizedCodeHandler>();
+        services.AddTransient<ICIBAGrantTypeValidator, CIBAGrantTypeValidator>();
+        services.AddTransient<IClientAuthenticationHelper, ClientAuthenticationHelper>();
+        services.AddTransient<IRevokeTokenRequestHandler, RevokeTokenRequestHandler>();
+        services.AddTransient<ITokenExchangePreAuthorizedCodeValidator, TokenExchangePreAuthorizedCodeValidator>();
+        services.AddTransient<ITokenProfile, BearerTokenProfile>();
+        services.AddTransient<ITokenProfile, MacTokenProfile>();
+        services.AddTransient<ITokenBuilder, AccessTokenBuilder>();
+        services.AddTransient<ITokenBuilder, IdTokenBuilder>();
+        services.AddTransient<ITokenBuilder, RefreshTokenBuilder>();
+        services.AddTransient<IClaimsJwsPayloadEnricher, ClaimsJwsPayloadEnricher>();
+        services.AddTransient<ICodeChallengeMethodHandler, PlainCodeChallengeMethodHandler>();
+        services.AddTransient<ICodeChallengeMethodHandler, S256CodeChallengeMethodHandler>();
+        services.AddTransient<IClientHelper, StandardClientHelper>();
+        services.AddTransient<IAmrHelper, AmrHelper>();
+        services.AddTransient<IWorkflowHelper, WorkflowHelper>();
+        services.AddTransient<IUmaPermissionTicketHelper, UMAPermissionTicketHelper>();
+        services.AddTransient<IExtractRequestHelper, ExtractRequestHelper>();
+        services.AddTransient<IGrantHelper, GrantHelper>();
+        services.AddTransient<IClaimTokenFormat, OpenIDClaimTokenFormat>();
+        services.AddTransient<IUmaTicketGrantTypeValidator, UmaTicketGrantTypeValidator>();
+        services.AddTransient<IAuthenticationHelper, AuthenticationHelper>();
+        services.AddTransient<IScopeClaimsExtractor, ScopeClaimsExtractor>();
+        services.AddTransient<IClaimsExtractor, ClaimsExtractor>();
+        services.AddTransient<IClaimExtractor, AttributeClaimExtractor>();
+        services.AddTransient<IClaimExtractor, PropertyClaimExtractor>();
+        services.AddTransient<IClaimExtractor, ScimClaimExtractor>();
+        services.AddTransient<IClaimExtractor, SubClaimExtractor>();
+        services.AddTransient<IUserHelper, UserHelper>();
+        services.AddTransient<IPreAuthorizedCodeValidator, PreAuthorizedCodeValidator>();
+        services.AddTransient<IKeyStore, InMemoryKeyStore>();
+        services.AddTransient<IDeviceCodeGrantTypeValidator, DeviceCodeGrantTypeValidator>();
+        services.AddTransient<IDPOPProofValidator, DPOPProofValidator>();
+        services.AddTransient<ISessionHelper, SessionHelper>();
+        services.AddTransient<UserSessionJob>();
+        return services;
+    }
+
+    private static IServiceCollection AddOAuthIntrospectionTokenApi(this IServiceCollection services)
+    {
+        services.AddTransient<ITokenIntrospectionRequestHandler, TokenIntrospectionRequestHandler>();
+        return services;
+    }
+
+    private static IServiceCollection AddOAuthAuthorizationApi(this IServiceCollection services)
+    {
+        services.AddTransient<IAuthorizationRequestHandler, AuthorizationRequestHandler>();
+        services.AddTransient<IResponseTypeHandler, AuthorizationCodeResponseTypeHandler>();
+        services.AddTransient<IResponseTypeHandler, IdTokenResponseTypeHandler>();
+        services.AddTransient<IResponseTypeHandler, TokenResponseTypeHandler>();
+        services.AddTransient<IAuthorizationRequestValidator, OAuthAuthorizationRequestValidator>();
+        services.AddTransient<IAuthorizationRequestEnricher, AuthorizationRequestEnricher>();
+        services.AddTransient<IUserConsentFetcher, OAuthUserConsentFetcher>();
+        services.AddTransient<IAuthorizationCallbackRequestHandler, AuthorizationCallbackRequestHandler>();
+        services.AddTransient<IAuthorizationCallbackRequestValidator, AuthorizationCallbackRequestValidator>();
+        return services;
+    }
+
+    private static IServiceCollection AddBCAuthorizeApi(this IServiceCollection services)
+    {
+        services.AddTransient<IBCAuthorizeHandler, BCAuthorizeHandler>();
+        services.AddTransient<IBCAuthorizeRequestValidator, BCAuthorizeRequestValidator>();
+        services.AddTransient<IBCNotificationService, BCNotificationService>();
+        return services;
+    }
+
+    private static IServiceCollection AddTokenTypes(this IServiceCollection services)
+    {
+        services.AddTransient<ITokenTypeService, AccessTokenTypeService>();
+        services.AddTransient<ITokenTypeService, IdTokenTypeService>();
+        return services;
+    }
+
+    private static IServiceCollection AddOAuthJwt(this IServiceCollection services)
+    {
+        services.AddTransient<IJwtBuilder, JwtBuilder>();
+        return services;
+    }
+
+    private static IServiceCollection AddLib(this IServiceCollection services)
+    {
+        services.AddTransient<IHttpClientFactory, HttpClientFactory>();
+        services.AddScoped<IRealmStore, CookieRealmStore>();
+        return services;
+    }
+
+    private static IServiceCollection AddConfigurationApi(this IServiceCollection services)
+    {
+        services.AddTransient<IOAuthConfigurationRequestHandler, OAuthConfigurationRequestHandler>();
+        services.AddTransient<IOpenidConfigurationRequestHandler, OpenidConfigurationRequestHandler>();
+        services.AddTransient<IOAuthWorkflowConverter, OAuthWorkflowConverter>();
+        return services;
+    }
+
+    private static IServiceCollection AddUI(this IServiceCollection services)
+    {
+        services.AddTransient<IOTPAuthenticator, HOTPAuthenticator>();
+        services.AddTransient<IOTPAuthenticator, TOTPAuthenticator>();
+        services.AddTransient<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
+        services.AddTransient<ISessionManager, SessionManager>();
+        // services.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+        services.AddTransient<IUserTransformer, UserTransformer>();
+        return services;
+    }
+
+    private static IServiceCollection AddRegisterApi(this IServiceCollection services)
+    {
+        services.AddTransient<IRegisterClientRequestValidator, RegisterClientRequestValidator>();
+        return services;
+    }
+
+    #endregion
+}
+
+public class RealmRoutePrefixConstraint : IRouteConstraint
+{
+    public bool Match(HttpContext? httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection) => true;
 }

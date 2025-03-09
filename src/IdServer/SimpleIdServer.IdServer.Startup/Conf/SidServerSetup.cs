@@ -55,7 +55,7 @@ public class SidServerSetup
         {
             o.MaximumReceiveMessageSize = 102400000;
         });
-        var idServerBuilder = services.AddSIDIdentityServer(callback: cb =>
+        var idServerBuilder = services.AddSidIdentityServer(callback: cb =>
         {
             cb.DefaultAuthenticationWorkflowId = DataSeeder.completePwdAuthWorkflowId;
             if (!string.IsNullOrWhiteSpace(configuration.SessionCookieNamePrefix))
@@ -359,9 +359,6 @@ public class SidServerSetup
                         cfg.ConfigureEndpoints(ctx);
                     });
                 });
-                break;
-            default:
-                idServerBuilder.UseInMemoryMassTransit();
                 break;
         }
     }

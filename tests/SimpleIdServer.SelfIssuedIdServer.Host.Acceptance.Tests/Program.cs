@@ -29,7 +29,7 @@ builder.Services.AddHangfire(o => {
     o.UseIgnoredAssemblyVersionTypeResolver();
     o.UseInMemoryStorage();
 });
-builder.Services.AddSIDIdentityServer()
+builder.Services.AddSidIdentityServer()
     .UseInMemoryEFStore(o =>
     {
         o.AddInMemoryRealms(IdServerConfiguration.Realms);
@@ -49,8 +49,7 @@ builder.Services.AddSIDIdentityServer()
             new EncryptingCredentials(BuildRsaSecurityKey("keyid4"), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
         });
     })
-    .AddBackChannelAuthentication()
-    .UseInMemoryMassTransit();
+    .AddBackChannelAuthentication();
 builder.Services.AddFormBuilder().UseEF();
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
 var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));

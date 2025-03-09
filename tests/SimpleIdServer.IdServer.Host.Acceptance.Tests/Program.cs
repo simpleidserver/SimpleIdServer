@@ -39,7 +39,7 @@ builder.Services.AddHangfire(o => {
     o.UseIgnoredAssemblyVersionTypeResolver();
     o.UseInMemoryStorage();
 });
-builder.Services.AddSIDIdentityServer(o =>
+builder.Services.AddSidIdentityServer(o =>
 {
     o.WalletAuthorizationServer = "http://localhost";
 })
@@ -76,7 +76,6 @@ builder.Services.AddSIDIdentityServer(o =>
             new EncryptingCredentials(BuildRsaSecurityKey("keyid4"), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
         });
     })
-    .UseInMemoryMassTransit()
     .AddConsoleNotification()
     .AddPwdAuthentication()
     .AddBackChannelAuthentication()

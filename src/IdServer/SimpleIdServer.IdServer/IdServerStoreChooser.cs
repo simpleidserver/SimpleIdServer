@@ -4,17 +4,16 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace SimpleIdServer.IdServer
-{
-    public class IdServerStoreChooser
-    {
-        public IdServerStoreChooser(IServiceCollection services, AuthenticationBuilder authBuilder)
-        {
-            Services = services;
-            AuthBuilder = authBuilder;
-        }
+namespace SimpleIdServer.IdServer;
 
-        public IServiceCollection Services { get; private set; }
-        public AuthenticationBuilder AuthBuilder { get; private set; }
+public class IdServerStoreChooser
+{
+    public IdServerStoreChooser(IServiceCollection services, AuthenticationBuilder authBuilder)
+    {
+        Services = services;
+        AuthBuilder = authBuilder;
     }
+
+    public IServiceCollection Services { get; private set; }
+    public AuthenticationBuilder AuthBuilder { get; private set; }
 }

@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddEFStore(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null)
+        public static IServiceCollection AddEfStore(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null)
         {
             var lifetime = ServiceLifetime.Scoped;
             RegisterDepedencies(services);

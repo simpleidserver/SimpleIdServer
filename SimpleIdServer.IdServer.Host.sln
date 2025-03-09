@@ -149,6 +149,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "09. Dataseeder", "09. Datas
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfdataSeeder", "efdataseeder\EfdataSeeder.csproj", "{55C25893-59CB-C7AF-9D67-6711FD49F5E7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Light.Startup", "src\IdServer\SimpleIdServer.IdServer.Light.Startup\SimpleIdServer.IdServer.Light.Startup.csproj", "{615AC50D-D2DE-6025-B4BE-F74FDC618BA6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -391,6 +393,10 @@ Global
 		{55C25893-59CB-C7AF-9D67-6711FD49F5E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{55C25893-59CB-C7AF-9D67-6711FD49F5E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55C25893-59CB-C7AF-9D67-6711FD49F5E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{615AC50D-D2DE-6025-B4BE-F74FDC618BA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{615AC50D-D2DE-6025-B4BE-F74FDC618BA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{615AC50D-D2DE-6025-B4BE-F74FDC618BA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{615AC50D-D2DE-6025-B4BE-F74FDC618BA6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -465,6 +471,7 @@ Global
 		{BAFEDA3F-189F-B2A8-21DD-F7BAE7D30EE6} = {8653824C-E1CF-422F-BE17-0A271C249D22}
 		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{55C25893-59CB-C7AF-9D67-6711FD49F5E7} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{615AC50D-D2DE-6025-B4BE-F74FDC618BA6} = {68306EFF-55D9-497B-9482-FEB81C485914}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}
