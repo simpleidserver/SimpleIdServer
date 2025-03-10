@@ -28,6 +28,26 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Store.EF" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Store.SqlSugar" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Provisioning.LDAP" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Provisioning.SCIM" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.WsFederation" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Console" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Email" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Fido" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Notification.Fcm" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Gotify" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Otp" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Pwd" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Sms" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.VerifiablePresentation" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Federation" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Saml.Idp" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Swagger" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Notification.Gotify" />
+	</ItemGroup>
+	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>

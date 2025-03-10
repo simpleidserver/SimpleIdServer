@@ -66,8 +66,8 @@ public class SidServerSetup
         {
             if (!string.IsNullOrWhiteSpace(configuration.AuthCookieNamePrefix))
                 c.Cookie.Name = configuration.AuthCookieNamePrefix;
-        }, dataProtectionBuilderCallback: ConfigureDataProtection)
-            .UseEFStore(o => ConfigureStorage(builder, o))
+        })
+            .UseEfStore(o => ConfigureStorage(builder, o))
             .AddSwagger(o =>
             {
                 o.IncludeDocumentation<AccessTokenTypeService>();
@@ -91,16 +91,12 @@ public class SidServerSetup
                 f.ServerDomain = url.Host;
                 f.Origins = new HashSet<string> { authority };
             })
-            .EnableConfigurableAuthentication()
             .AddSCIMProvisioning()
             .AddLDAPProvisioning()
-            .AddAuthentication(callback: (a) =>
+            .AddMutualAuthentication(m =>
             {
-                a.AddMutualAuthentication(m =>
-                {
-                    m.AllowedCertificateTypes = CertificateTypes.All;
-                    m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
-                });
+                m.AllowedCertificateTypes = CertificateTypes.All;
+                m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
             })
             .AddOpenidFederation(o =>
             {
@@ -197,11 +193,6 @@ public class SidServerSetup
             o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
             o.UseEFConnector();
         });
-    }
-
-    private static void ConfigureDataProtection(IDataProtectionBuilder dataProtectionBuilder)
-    {
-        dataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();
     }
 
     private static void ConfigureStorage(WebApplicationBuilder builder, DbContextOptionsBuilder b)

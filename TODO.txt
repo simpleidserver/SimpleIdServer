@@ -1,10 +1,28 @@
-* Ticket #831 : 
-** afficher les recurring jobs
-** pouvoir mettre à jour les recurring jobs
-** pouvoir lancer un job
-** ajouter les filtres
-** vérifier si le script de migration fonctionne
+=> réfléchir à faire un projet de migration de duende vers identity server
+=> créer une librairie afin d'utiliser la BDD de duende
+=> créer une librairie afin d'utiliser la BDD de openiddct
+=> https://github.com/alexhiggins732/IdentityServer8, voir pour créer un nuget package plus petit et technique
+
+=> toujours enregistrer masstransit comme dépendance obligatoire	:	OK
+=> avoir une déclaration minimale pour faire fonctionner SID		:	OK
+=> migrer dataProtectionBuilderCallback								:	OK
+=> dans SID toujours offrir des implémentations par défaut pour les stores, ne pas obliger à choisir entre EF ou un autre			:	OK
+
+Configuration très light avec que identity server :
+
+// TODO
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSidIdentityServer();
+var app = builder.Build();
+app.UseSID();
+app.Run();
 
 
-    private bool UseEvery { get; set; } = 1
-    private bool UseStartAt { get; set; } = 2
+
+=> pouvoir surcharger la configuration par défault de masstransit																	:	TODO
+=> par défault "EnableConfigurableAuthentication" doit toujours être activé															:	OK
+=> par défault "AddSCIMProvisioning" et "ADDLDAPProvisioning" doivent être activés
+=> La fonction "AddAuthentication" n'est pas très clair, peut être la renommer
+=> AddOpenidFederation n'est pas très clair, il faut renommer en "UseOpenidFederation".
+
+Corriger cette classe et utiliser la propriété et ne pas ajouter des commentaires

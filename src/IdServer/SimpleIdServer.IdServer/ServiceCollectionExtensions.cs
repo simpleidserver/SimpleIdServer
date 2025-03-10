@@ -6,7 +6,6 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -40,6 +39,7 @@ using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Infastructures;
@@ -48,12 +48,15 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.Stores.Default;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using SimpleIdServer.IdServer.TokenTypes;
 using SimpleIdServer.IdServer.UI;
+using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
@@ -70,11 +73,12 @@ public static class ServiceCollectionExtensions
     /// <param name="services"></param>
     /// <param name="options"></param>
     /// <returns></returns>
-    public static IdServerBuilder AddSidIdentityServer(
+    public static IdServerBuilder AddSidIdentityServer
+    (
         this IServiceCollection services,
         Action<IdServerHostOptions>? callback = null,
-        Action<CookieAuthenticationOptions>? configureAuthCookieCb = null,
-        Action<IDataProtectionBuilder>? dataProtectionBuilderCallback = null)
+        Action<CookieAuthenticationOptions>? configureAuthCookieCb = null
+    )
     {
         if (callback != null) services.Configure(callback);
         else services.Configure<IdServerHostOptions>(o => { });
@@ -86,8 +90,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
         services.AddControllersWithViews();
-        var b = services.AddDataProtection();
-        if (dataProtectionBuilderCallback != null) dataProtectionBuilderCallback(b);
+        var dataProtectionBuilder = services.AddDataProtection();
         services.AddDistributedMemoryCache();
         services.AddDidKey();
         ConfigureBlazorAndLocalization(services);
@@ -96,7 +99,9 @@ public static class ServiceCollectionExtensions
         ConfigureHangfire(services);
         services.AddHttpContextAccessor();
         var authBuilder = ConfigureAuth(services, configureAuthCookieCb);
-        return new IdServerBuilder(services, authBuilder, formBuilder);
+        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder);
+        ConfigureMassTransit(result);
+        return result;
     }
 
     private static void ConfigureIdentityServer(IServiceCollection services)
@@ -117,7 +122,8 @@ public static class ServiceCollectionExtensions
             .AddRegisterApi()
             .AddBCAuthorizeApi()
             .AddDeviceAuthorizationApi()
-            .AddTokenTypes();
+            .AddTokenTypes()
+            .AddStores();
     }
 
     private static void ConfigureBlazorAndLocalization(IServiceCollection services)
@@ -156,8 +162,23 @@ public static class ServiceCollectionExtensions
         });
     }
 
+    private static void ConfigureMassTransit(IdServerBuilder idserverBuilder)
+    {
+        idserverBuilder.UseMassTransit(o =>
+        {
+            o.UsingInMemory((ctx, cfg) =>
+            {
+                cfg.UsePublishMessageScheduler();
+                cfg.ConfigureEndpoints(ctx);
+            });
+        });
+    }
+
     private static AuthenticationBuilder ConfigureAuth(IServiceCollection services, Action<CookieAuthenticationOptions>? configureAuthCookieCb = null)
     {
+        services.AddSingleton<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
+        services.AddSingleton<ISIDAuthenticationSchemeProvider>(x => x.GetService<IAuthenticationSchemeProvider>() as ISIDAuthenticationSchemeProvider);
+        services.AddScoped<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
         services.AddAuthorization();
         services.Configure<AuthorizationOptions>(o =>
         {
@@ -205,7 +226,8 @@ public static class ServiceCollectionExtensions
                     }
                     return Task.CompletedTask;
                 };
-            });
+            })
+            .AddCookie(SimpleIdServer.IdServer.Constants.DefaultExternalCookieAuthenticationScheme);
         return authBuilder;
 
         string GetTlsTokenBinding(CookieSigningInContext context)
@@ -224,7 +246,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddJsonSeeding(this IServiceCollection services, IConfiguration configuration)
     {
         string jsonSeedsFilePath = configuration.GetValue<string>(Constants.ConfigurationSections.JsonSeedsFilePath);
-
         services.AddOptionsWithValidateOnStart<JsonSeedingOptions>()
             .Configure(options =>
             {
@@ -237,7 +258,6 @@ public static class ServiceCollectionExtensions
             );
 
         services.AddTransient<ISeedStrategy, JsonSeedStrategy>();
-
         return services;
     }
 
@@ -256,7 +276,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    #region Private methods
+    #region Register identity server depedencies
 
     private static IServiceCollection AddResponseModeHandlers(this IServiceCollection services)
     {
@@ -449,6 +469,41 @@ public static class ServiceCollectionExtensions
         // services.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
         services.AddTransient<IUserTransformer, UserTransformer>();
         return services;
+    }
+
+    private static IServiceCollection AddStores(this IServiceCollection services)
+    {
+        services.AddSingleton<IApiResourceRepository>(new DefaultApiResourceRepository(new List<ApiResource>()));
+        services.AddSingleton<IAuditEventRepository>(new DefaultAuditEventRepository(new List<AuditEvent>()));
+        services.AddSingleton<IAuthenticationContextClassReferenceRepository>(new DefaultAuthenticationContextClassReferenceRepository(new List<AuthenticationContextClassReference>()));
+        services.AddSingleton<IAuthenticationSchemeProviderDefinitionRepository>(new DefaultAuthenticationSchemeProviderDefinitionRepository(new List<AuthenticationSchemeProviderDefinition>()));
+        services.AddSingleton<IAuthenticationSchemeProviderRepository>(new DefaultAuthenticationSchemeProviderRepository(new List<SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider>()));
+        services.AddSingleton<IBCAuthorizeRepository>(new DefaultBCAuthorizeRepository(new List<BCAuthorize>()));
+        services.AddSingleton<IClaimProviderRepository>(new DefaultClaimProviderRepository(new List<ClaimProvider>()));
+        services.AddSingleton<ICertificateAuthorityRepository>(new DefaultCertificateAuthorityRepository(new List<CertificateAuthority>()));
+        services.AddSingleton<IClientRepository>(new DefaultClientRepository(new List<Client>()));
+        services.AddSingleton<IGrantRepository>(new DefaultGrantRepository(new List<Consent>()));
+        services.AddSingleton<IGroupRepository>(new DefaultGroupRepository(new List<Group>()));
+        services.AddSingleton<IKeyValueRepository>(new DefaultKeyValueRepository(new List<ConfigurationKeyPairValueRecord>()));
+        services.AddSingleton<ILanguageRepository>(new DefaultLanguageRepository(new List<SimpleIdServer.IdServer.Domains.Language>()));
+        services.AddSingleton<IRealmRepository>(new DefaultRealmRepository(new List<Realm>()));
+        services.AddSingleton<IRecurringJobStatusRepository>(new DefaultRecurringJobStatusRepository(new List<RecurringJobStatus>()));
+        services.AddSingleton<IRegistrationWorkflowRepository>(new DefaultRegistrationWorkflowRepository(new List<RegistrationWorkflow>()));
+        services.AddSingleton<IScopeRepository>(new DefaultScopeRepository(new List<Scope>()));
+        services.AddSingleton<ITokenRepository>(new DefaultTokenRepository(new List<Token>()));
+        services.AddSingleton<ITranslationRepository>(new DefaultTranslationRepository(new List<SimpleIdServer.IdServer.Domains.Translation>()));
+        services.AddSingleton<IUmaPendingRequestRepository>(new DefaultUmaPendingRequestRepository(new List<UMAPendingRequest>()));
+        services.AddSingleton<IUmaResourceRepository>(new DefaultUmaResourceRepository(new List<UMAResource>()));
+        services.AddSingleton<IUserRepository>(new DefaultUserRepository(new List<User>()));
+        services.AddSingleton<IUserSessionResitory>(new DefaultUserSessionRepository(new List<UserSession>()));
+        services.AddSingleton<IDeviceAuthCodeRepository>(new DefaultDeviceAuthCodeRepository(new List<DeviceAuthCode>()));
+        services.AddSingleton<IFileSerializedKeyStore>(new DefaultFileSerializedKeyStore(new List<SerializedFileKey>()));
+        services.AddSingleton<IMessageBusErrorStore>(new DefaultMessageBusErrorStore(new List<MessageBusErrorMessage>()));
+        services.AddSingleton<IIdentityProvisioningStore>(new DefaultIdentityProvisioningStore(new List<IdentityProvisioningDefinition>()));
+        services.AddSingleton<IProvisioningStagingStore>(new DefaultProvisioningStagingStore(new List<ExtractedRepresentationStaging>()));
+        services.AddTransient<ITransactionBuilder, DefaultTranslationBuilder>();
+        return services;
+
     }
 
     private static IServiceCollection AddRegisterApi(this IServiceCollection services)

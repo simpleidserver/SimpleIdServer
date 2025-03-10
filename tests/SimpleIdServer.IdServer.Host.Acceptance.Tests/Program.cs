@@ -84,13 +84,10 @@ builder.Services.AddSidIdentityServer(o =>
         o.IsFederationEnabled = true;
         o.TokenSignedKid = "keyid";
     })
-    .AddAuthentication(o =>
+    .AddMutualAuthentication(m =>
     {
-        o.AddMutualAuthentication(m =>
-        {
-            m.AllowedCertificateTypes = CertificateTypes.All;
-            m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
-        });
+        m.AllowedCertificateTypes = CertificateTypes.All;
+        m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
     });
 
 builder.Services.AddFormBuilder().UseInMemoryEF(o =>

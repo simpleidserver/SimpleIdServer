@@ -16,8 +16,11 @@ using FormBuilder.Factories;
 using FormBuilder.Helpers;
 using FormBuilder.Link;
 using FormBuilder.Link.Services;
+using FormBuilder.Repositories;
 using FormBuilder.Rules;
 using FormBuilder.Services;
+using FormBuilder.Stores;
+using FormBuilder.Stores.Default;
 using FormBuilder.Transformers;
 using FormBuilder.Urls;
 using Radzen;
@@ -30,6 +33,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddFormBuilderUi(cb);
         services.AddTransient<IVersionedFormService, VersionedFormService>();
+        services.AddSingleton<IFormStore>(new DefaultFormStore(new List<FormBuilder.Models.FormRecord>()));
+        services.AddSingleton<IWorkflowStore>(new DefaultWorkflowStore(new List<FormBuilder.Models.WorkflowRecord>()));
         return new FormBuilderRegistration(services);
     }
 
