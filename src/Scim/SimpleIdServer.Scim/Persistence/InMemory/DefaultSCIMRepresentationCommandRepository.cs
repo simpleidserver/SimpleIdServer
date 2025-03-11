@@ -1,6 +1,5 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit.SagaStateMachine;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System;
@@ -78,7 +77,7 @@ namespace SimpleIdServer.Scim.Persistence.InMemory
         public Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, List<string> values, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             var parentIds = _attributes
-                .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && values.Contains(a.ValueString) || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+                .Where(a => a.SchemaAttributeId == schemaAttributeId && (representationIds.Contains(a.RepresentationId) && values.Contains(a.ValueString)) || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
                 .Select(r => r.ParentAttributeId)
                 .Distinct()
                 .ToList();
