@@ -14,6 +14,7 @@ public static class StandardPwdAuthWorkflows
 {
     public static string pwdWorkflowId = "241a7509-4c58-4f49-b1df-49011b2c9bcb";
     public static string confirmResetPwdWorkflowId = "e05d75d5-5df1-42d4-8c1e-884fc9a2ecff";
+    public static string completePwdAuthWorkflowId = "059f49b2-f76a-4b5a-8ecc-cf64abdf9b39";
 
     public static WorkflowRecord DefaultPwdWorkflow = WorkflowBuilder.New(pwdWorkflowId)
         .AddPwdAuth()
@@ -21,6 +22,12 @@ public static class StandardPwdAuthWorkflows
         .Build(DateTime.UtcNow);
 
     public static WorkflowRecord DefaultConfirmResetPwdWorkflow = WorkflowBuilder.New(confirmResetPwdWorkflowId)
+        .AddConfirmResetPwd()
+        .Build(DateTime.UtcNow);
+
+    public static WorkflowRecord DefaultCompletePwdAuthWorkflow => WorkflowBuilder.New(completePwdAuthWorkflowId)
+        .AddPwdAuth(resetStep: StandardPwdAuthForms.ResetForm)
+        .AddResetPwd(StandardPwdAuthForms.ConfirmResetForm)
         .AddConfirmResetPwd()
         .Build(DateTime.UtcNow);
 

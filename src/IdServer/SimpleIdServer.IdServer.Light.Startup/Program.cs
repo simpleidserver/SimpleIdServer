@@ -4,8 +4,4 @@ using Microsoft.AspNetCore.Builder;
 using SimpleIdServer.IdServer.Light.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
-SidServerSetup.ConfigureClientCredentials(builder.Services);
-
-var app = builder.Build();
-app.UseSID();
-app.Run();
+SidServerSetup.ConfigureAuthentication(builder);

@@ -45,10 +45,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IOTPQRCodeGenerator _otpQRCodeGenerator;
         private readonly IBusControl _busControl;
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
-        private readonly IUserSessionResitory _userSessionRepository;
-        private readonly IRecurringJobManager _recurringJobManager;
         private readonly IDistributedCache _distributedCache;
-        private readonly ISessionHelper _sessionHelper;
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly ISessionManager _sessionManager;
         private readonly ILanguageRepository _languageRepository;
@@ -83,10 +80,7 @@ namespace SimpleIdServer.IdServer.UI
             _otpQRCodeGenerator = otpQRCodeGenerator;
             _busControl = busControl;
             _authenticationMethodServices = authenticationMethodServices;
-            _userSessionRepository = userSessionRepository;
-            _recurringJobManager = recurringJobManager;
             _distributedCache = distributedCache;
-            _sessionHelper = sessionHelper;
             _transactionBuilder = transactionBuilder;
             _sessionManager = sessionManager;
             _languageRepository = languageRepository;

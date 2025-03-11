@@ -1,0 +1,69 @@
+﻿@using SimpleIdServer.IdServer.Light.Startup.Resources
+@model SimpleIdServer.IdServer.UI.ViewModels.AccountsIndexViewModel
+
+@{
+    ViewBag.Title = AccountsResource.select_session;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>@AccountsResource.active_sessions</h1>
+
+@if (!string.IsNullOrWhiteSpace(ViewBag.IsUserAccountSwitched))
+{
+    <div class="alert alert-success">@AccountsResource.useraccount_switched</div>
+}
+
+@if (!string.IsNullOrWhiteSpace(ViewBag.IsSessionRejected))
+{
+    <div class="alert alert-success">@AccountsResource.useraccount_rejected</div>
+}
+
+<div class="row">
+    @{
+        int i = 0;
+        foreach (var account in Model.Accounts)
+        {
+            i++;
+            string rejectFormId = "reject-" + i;
+            <div class="col-md-4">
+                @using (Html.BeginForm("Index", "Accounts", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="card">
+                        <input type="hidden" name="AccountName" value="@account.Name" />
+                        <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+                        <input type="hidden" name="Action" value="Choose" />
+                        <div class="card-header">@account.Name</div>
+                        <div class="card-body">
+                            @if (account.IssuedUtc != null)
+                            {
+                                <p>
+                                    @string.Format(AccountsResource.authentication_time, account.IssuedUtc.Value.ToString("s"))
+                                </p>
+                            }
+                            @if (account.ExpiresUct != null)
+                            {
+                                <p>
+                                    @string.Format(AccountsResource.expiration_time, account.ExpiresUct.Value.ToString("s"))
+                                </p>
+                            }
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <input type="submit" class="btn btn-primary" value="@AccountsResource.choose_session" />
+                            <input type="submit" class="btn btn-danger" form="@rejectFormId" value="@AccountsResource.reject" />
+                        </div>
+                    </div>
+                }
+
+                @using (Html.BeginForm("Index", "Accounts", FormMethod.Post, new { id = rejectFormId }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="AccountName" value="@account.Name" />
+                    <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+                    <input type="hidden" name="Action" value="Reject" />
+                }
+            </div>
+        }
+        
+    }
+</div>

@@ -34,6 +34,15 @@ public class RegisterLayoutBuilder
             ActAsStep = true,
             Realm = realm ?? Constants.DefaultRealm,
             Category = FormCategories.Registration,
+            AvailableStyles = new List<FormStyle>
+            {
+                new FormStyle
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Content = FormCssStyle.Get(),
+                    IsActive = true
+                }
+            },
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new RegisterLayoutBuilder(record);

@@ -3,6 +3,7 @@
 
 using FormBuilder.Models;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace SimpleIdServer.IdServer.Layout.AuthFormLayout;
@@ -28,6 +29,15 @@ public class AuthLayoutBuilder
             UpdateDateTime = DateTime.UtcNow,
             Category = FormCategories.Authentication,
             Status = RecordVersionStatus.Published,
+            AvailableStyles = new List<FormStyle>
+            {
+                new FormStyle
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Content = FormCssStyle.Get(),
+                    IsActive = true
+                }
+            },
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new AuthLayoutBuilder(record);

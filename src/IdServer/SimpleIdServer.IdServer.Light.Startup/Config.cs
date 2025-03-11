@@ -19,4 +19,9 @@ public class Config
     {
         Scope
     };
+
+    public static List<User> Users => new List<User>
+    {
+        UserBuilder.Create("administrator", "password").Build()
+    };
 }

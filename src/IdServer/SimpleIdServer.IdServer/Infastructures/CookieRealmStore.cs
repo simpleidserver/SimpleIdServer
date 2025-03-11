@@ -28,7 +28,7 @@ public class CookieRealmStore : IRealmStore
         {
             if (!_idServerHostOptions.UseRealm)
             {
-                return Constants.DefaultRealm;
+                return null;
             }
 
             if (!string.IsNullOrWhiteSpace(_realm))

@@ -24,13 +24,15 @@ public class IdServerBuilder
     private readonly AuthenticationBuilder _authBuilder;
     private readonly FormBuilderRegistration _formBuilder;
     private readonly IDataProtectionBuilder _dataProtectionBuilder;
+    private readonly IMvcBuilder _mvcBuilder;
 
-    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder)
+    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder)
     {
         _serviceCollection = serviceCollection;
         _authBuilder = authBuilder;
         _formBuilder = formBuidler;
         _dataProtectionBuilder = dataProtectionBuilder;
+        _mvcBuilder = mvcBuilder;
     }
 
     internal IServiceCollection Services => _serviceCollection;
@@ -38,6 +40,8 @@ public class IdServerBuilder
     internal FormBuilderRegistration FormBuilder => _formBuilder;
 
     internal IDataProtectionBuilder DataProtectionBuilder => _dataProtectionBuilder;
+
+    internal IMvcBuilder MvcBuilder => _mvcBuilder;
 
     public IdServerBuilder AddDeveloperSigningCredential()
     {
@@ -54,6 +58,12 @@ public class IdServerBuilder
     public IdServerBuilder AddInMemoryScopes(List<Scope> scopes)
     {
         Services.AddSingleton<IScopeRepository>(new DefaultScopeRepository(scopes));
+        return this;
+    }
+
+    public IdServerBuilder AddInMemoryUsers(List<User> users)
+    {
+        Services.AddSingleton<IUserRepository>(new DefaultUserRepository(users));
         return this;
     }
 

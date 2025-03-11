@@ -33,6 +33,15 @@ public class QrCodeFormLayoutBuilder
             ActAsStep = true,
             Realm = realm ?? Constants.DefaultRealm,
             Category = FormCategories.Authentication,
+            AvailableStyles = new List<FormStyle>
+            {
+                new FormStyle
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Content = FormCssStyle.Get(),
+                    IsActive = true
+                }
+            },
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new QrCodeFormLayoutBuilder(record, loginTranslations);

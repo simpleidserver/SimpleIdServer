@@ -89,7 +89,7 @@ public static class ServiceCollectionExtensions
         Tracing.Init();
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
-        services.AddControllersWithViews();
+        var mvcBuilder = services.AddControllersWithViews();
         var dataProtectionBuilder = services.AddDataProtection();
         services.AddDistributedMemoryCache();
         services.AddDidKey();
@@ -99,7 +99,7 @@ public static class ServiceCollectionExtensions
         ConfigureHangfire(services);
         services.AddHttpContextAccessor();
         var authBuilder = ConfigureAuth(services, configureAuthCookieCb);
-        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder);
+        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder);
         ConfigureMassTransit(result);
         return result;
     }
@@ -466,7 +466,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IOTPAuthenticator, TOTPAuthenticator>();
         services.AddTransient<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
         services.AddTransient<ISessionManager, SessionManager>();
-        // services.AddTransient<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
         services.AddTransient<IUserTransformer, UserTransformer>();
         return services;
     }

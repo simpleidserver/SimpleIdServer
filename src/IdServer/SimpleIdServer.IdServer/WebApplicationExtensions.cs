@@ -18,6 +18,7 @@ namespace Microsoft.AspNetCore.Builder
             var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
             var usePrefix = opts.UseRealm;
             if(usePrefix) webApplication.UseMiddleware<RealmMiddleware>();
+            webApplication.MapBlazorHub();
             webApplication.UseMiddleware<LanguageMiddleware>();
             webApplication.UseCookiePolicy(new CookiePolicyOptions
             {

@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
-using FormBuilder;
 using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
@@ -73,7 +73,7 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
     protected override void EnrichViewModel(AuthenticatePasswordViewModel viewModel)
     {
         var options = GetOptions();
-        viewModel.CanResetPassword = options.CanResetPassword;
+        viewModel.CanResetPassword = options?.CanResetPassword ?? false;
     }
 
     private IdServerPasswordOptions GetOptions()
