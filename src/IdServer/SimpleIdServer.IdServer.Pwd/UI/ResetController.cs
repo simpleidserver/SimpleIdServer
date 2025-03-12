@@ -23,7 +23,6 @@ using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Security.Claims;
-using static Org.BouncyCastle.Bcpg.Attr.ImageAttrib;
 
 namespace SimpleIdServer.IdServer.Pwd.UI;
 
@@ -41,6 +40,7 @@ public class ResetController : BaseController
     private readonly IAntiforgery _antiforgery;
     private readonly IWorkflowStore _workflowStore;
     private readonly ILanguageRepository _languageRepository;
+    private readonly IRealmStore _realmStore;
     private readonly ILogger<ResetController> _logger;
     private readonly FormBuilderOptions _formBuilderOptions;
 
@@ -58,6 +58,7 @@ public class ResetController : BaseController
         IAntiforgery antiforgery,
         IWorkflowStore workflowStore,
         ILanguageRepository languageRepository,
+        IRealmStore realmStore,
         ILogger<ResetController> logger,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(tokenRepository, jwtBuilder)
     {
@@ -72,6 +73,7 @@ public class ResetController : BaseController
         _antiforgery = antiforgery;
         _workflowStore = workflowStore;
         _languageRepository = languageRepository;
+        _realmStore = realmStore;
         _logger = logger;
         _formBuilderOptions = formBuilderOptions.Value;
     }
@@ -81,7 +83,7 @@ public class ResetController : BaseController
     {
         prefix = prefix ?? Constants.DefaultRealm;
         string login = null;
-        var notificationMode = GetOptions().NotificationMode;
+        var notificationMode = GetOptions()?.NotificationMode ?? Constants.DefaultNotificationMode;
         var service = _resetPasswordServices.Single(p => p.NotificationMode == notificationMode);
         if (User.Identity.IsAuthenticated)
         {
@@ -96,7 +98,7 @@ public class ResetController : BaseController
             NotificationMode = notificationMode,
             Value = null,
             ReturnUrl = vm.ReturnUrl,
-            Realm = prefix,
+            Realm = _realmStore.Realm,
             WorkflowId = vm.WorkflowId,
             StepId = vm.StepId,
             CurrentLink = vm.CurrentLink
@@ -212,7 +214,7 @@ public class ResetController : BaseController
             Destination = destination,
             Code = code,
             ReturnUrl = returnUrl,
-            Realm = prefix
+            Realm = _realmStore.Realm
         };
         var result = await BuildWorkflowViewModel(prefix, options.ConfirmResetPasswordWorkflowId, cancellationToken);
         result.SetInput(viewModel);
@@ -271,7 +273,7 @@ public class ResetController : BaseController
     private IdServerPasswordOptions GetOptions()
     {
         var section = _configuration.GetSection(typeof(IdServerPasswordOptions).Name);
-        return section.Get<IdServerPasswordOptions>();
+        return section.Get<IdServerPasswordOptions>() ?? new IdServerPasswordOptions();
     }
 
     private Task<WorkflowViewModel> BuildWorkflowViewModel(string realm, IStepViewModel viewModel, CancellationToken cancellationToken)

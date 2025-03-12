@@ -3,7 +3,9 @@
 using EfdataSeeder;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.Configuration.Models;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.Store.Configurations;
 using SimpleIdServer.IdServer.Store.EF.Configurations;
 using SimpleIdServer.OpenidFederation.Domains;

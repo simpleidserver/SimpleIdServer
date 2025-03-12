@@ -12,7 +12,6 @@
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
-	  <ProjectReference Include="..\SimpleIdServer.IdServer.Console\SimpleIdServer.IdServer.Console.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj" />

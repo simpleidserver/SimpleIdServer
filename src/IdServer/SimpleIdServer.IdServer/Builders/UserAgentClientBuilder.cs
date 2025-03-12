@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers.Models;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.Builders

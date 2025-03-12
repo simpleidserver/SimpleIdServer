@@ -23,6 +23,7 @@
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj" />
 	  <ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj" />
+      <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj" />

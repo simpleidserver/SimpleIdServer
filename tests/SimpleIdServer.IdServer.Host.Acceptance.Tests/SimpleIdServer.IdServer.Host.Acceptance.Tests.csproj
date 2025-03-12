@@ -76,7 +76,6 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\..\formbuilder\FormBuilder.EF\FormBuilder.EF.csproj" />
 	  <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
-	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Console\SimpleIdServer.IdServer.Console.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj" />

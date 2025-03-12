@@ -18,11 +18,12 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class IdServerBuilderExtensions
 {
     /// <summary>
-    /// Add pwd authentication method.
-    /// The amr is pwd.
+    /// Adds password authentication services to the IdServerBuilder.
+    /// Optionally configures in-memory stores for forms and workflows.
     /// </summary>
-    /// <param name="idServerBuilder"></param>
-    /// <returns></returns>
+    /// <param name="idServerBuilder">The IdServerBuilder instance.</param>
+    /// <param name="isInMemory">Indicates whether to use in-memory stores.</param>
+    /// <returns>The updated IdServerBuilder instance.</returns>
     public static IdServerBuilder AddPwdAuthentication(this IdServerBuilder idServerBuilder, bool isInMemory = false)
     {
         idServerBuilder.MvcBuilder.AddApplicationPart(typeof(SimpleIdServer.IdServer.UI.AuthenticateController).Assembly);
@@ -33,7 +34,9 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ConfirmResetPwdWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ResetPwdWorkflowLayout>();
-        if(isInMemory)
+        idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerPasswordOptions));
+        
+        if (isInMemory)
         {
             idServerBuilder.Services.AddSingleton<IFormStore>(new DefaultFormStore(new List<FormRecord>
             {
@@ -43,12 +46,14 @@ public static class IdServerBuilderExtensions
             }));
             idServerBuilder.Services.AddSingleton<IWorkflowStore>(new DefaultWorkflowStore(new List<WorkflowRecord>
             {
-                StandardPwdAuthWorkflows.DefaultCompletePwdAuthWorkflow
+                StandardPwdAuthWorkflows.DefaultCompletePwdAuthWorkflow,
+                StandardPwdAuthWorkflows.DefaultConfirmResetPwdWorkflow
             }));
             idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
             {
                 o.DefaultAuthenticationWorkflowId = StandardPwdAuthWorkflows.completePwdAuthWorkflowId;
             });
+            // Registration method ???
         }
 
         return idServerBuilder;

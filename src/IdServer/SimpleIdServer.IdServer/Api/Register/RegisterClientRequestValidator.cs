@@ -6,6 +6,7 @@ using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;

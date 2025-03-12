@@ -6,10 +6,10 @@
 		<Description>Support LDAP provisioning.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="System.DirectoryServices" Version="8.0.0" />
 		<PackageReference Include="System.DirectoryServices.Protocols" Version="8.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 </Project>

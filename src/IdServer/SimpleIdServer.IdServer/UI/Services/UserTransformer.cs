@@ -37,7 +37,7 @@ namespace SimpleIdServer.IdServer.UI.Services
             };
             user.Realms.Add(new RealmUser
             {
-                RealmsName = realm.Name
+                RealmsName = realm?.Name ?? Constants.DefaultRealm
             });
             foreach(var mapper in idProvider.Mappers)
             {

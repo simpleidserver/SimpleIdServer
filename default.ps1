@@ -201,7 +201,6 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Otp\SimpleIdServer.IdServer.Otp.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Console\SimpleIdServer.IdServer.Console.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj -c $config --no-build $versionSuffix --output $result_dir }

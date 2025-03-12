@@ -5,6 +5,7 @@ using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.DTOs;
+using SimpleIdServer.IdServer.Helpers.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

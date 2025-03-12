@@ -103,7 +103,7 @@ public class SidServerSetup
                 o.IsFederationEnabled = true;
             });
         var isRealmEnabled = configuration.IsRealmEnabled;
-        if (isRealmEnabled) idServerBuilder.UseRealm();
+        if (isRealmEnabled) idServerBuilder.EnableRealm();
         var cookieName = "XSFR-TOKEN";
         services.AddAntiforgery(c =>
         {

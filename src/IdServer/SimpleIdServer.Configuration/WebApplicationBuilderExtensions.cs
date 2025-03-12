@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class WebApplicationBuilderExtensions
 {
-    public static WebApplicationBuilder AddAutomaticConfiguration(this WebApplicationBuilder builder, Action<AutomaticConfigurationOptions> callback)
+    public static AutomaticConfigurationOptions AddAutomaticConfiguration(this WebApplicationBuilder builder, Action<AutomaticConfigurationOptions> callback)
     {
         var options = new AutomaticConfigurationOptions(builder.Services);
         callback(options);
@@ -17,6 +17,6 @@ public static class WebApplicationBuilderExtensions
         var configurationBuilder = (IConfigurationBuilder)builder.Configuration;
         var provider = builder.Services.BuildServiceProvider();
         configurationBuilder.Add(new AutomaticConfigurationSource(options, provider));
-        return builder;
+        return options;
     }
 }

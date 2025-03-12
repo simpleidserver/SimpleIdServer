@@ -3,6 +3,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using SimpleIdServer.Configuration.Models;
 using SimpleIdServer.IdServer.Domains;
 
 namespace SimpleIdServer.IdServer.Store.Configurations;

@@ -130,6 +130,7 @@ public static class Constants
         public const string Workflows = "workflows";
         public const string Forms = "forms";
         public const string RecurringJobs = "recurringjobs";
+        public const string ConfigurationDefs = "confdefs";
     }
 
     public static List<string> AllStandardNotificationModes = new List<string>
@@ -366,6 +367,20 @@ public static class Constants
             },
             Type = ScopeTypes.IDENTITY,
             Protocol = ScopeProtocols.OPENID,
+            IsExposedInConfigurationEdp = true,
+            CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
+        };
+        public static Scope ConfigurationsScope = new Scope
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "configurations",
+            Realms = new List<Realm>
+            {
+                StandardRealms.Master
+            },
+            Type = ScopeTypes.APIRESOURCE,
+            Protocol = ScopeProtocols.OAUTH,
             IsExposedInConfigurationEdp = true,
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
@@ -962,6 +977,7 @@ public static class Constants
     public const string DefaultRememberMeCookieName = "RememberMe";
     public const string Prefix = "prefix";
     public const string DefaultLanguage = "en";
+    public const string ConsoleAmr = "console";
 
     /// <summary>
     /// Configration sections.

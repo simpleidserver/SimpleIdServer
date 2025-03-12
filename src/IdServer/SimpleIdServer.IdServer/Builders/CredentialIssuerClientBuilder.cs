@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers.Models;
 
 namespace SimpleIdServer.IdServer.Builders;
 

@@ -5,6 +5,7 @@ using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers.Models;
 using System;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;

@@ -6,6 +6,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -13,8 +14,10 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Configuration;
 using SimpleIdServer.Did.Key;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
@@ -39,9 +42,12 @@ using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
+using SimpleIdServer.IdServer.Console;
+using SimpleIdServer.IdServer.Console.Services;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
@@ -75,11 +81,12 @@ public static class ServiceCollectionExtensions
     /// <returns></returns>
     public static IdServerBuilder AddSidIdentityServer
     (
-        this IServiceCollection services,
+        this WebApplicationBuilder app,
         Action<IdServerHostOptions>? callback = null,
         Action<CookieAuthenticationOptions>? configureAuthCookieCb = null
     )
     {
+        var services = app.Services;
         if (callback != null) services.Configure(callback);
         else services.Configure<IdServerHostOptions>(o => { });
         services.Configure<RouteOptions>(opt =>
@@ -97,9 +104,11 @@ public static class ServiceCollectionExtensions
         ConfigureIdentityServer(services);
         var formBuilder = ConfigureFormBuilder(services);
         ConfigureHangfire(services);
+        var autoConfig = ConfigureCentralizedConfiguration(app);
+        ConfigureConsoleNotification(services);
         services.AddHttpContextAccessor();
         var authBuilder = ConfigureAuth(services, configureAuthCookieCb);
-        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder);
+        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig);
         ConfigureMassTransit(result);
         return result;
     }
@@ -124,6 +133,17 @@ public static class ServiceCollectionExtensions
             .AddDeviceAuthorizationApi()
             .AddTokenTypes()
             .AddStores();
+    }
+
+    private static void ConfigureConsoleNotification(IServiceCollection services)
+    {
+        services.AddTransient<IUserAuthenticationService, UserConsoleAuthenticationService>();
+        services.AddTransient<IUserConsoleAuthenticationService, UserConsoleAuthenticationService>();
+        services.AddTransient<IResetPasswordService, UserConsolePasswordResetService>();
+        services.AddTransient<IAuthenticationMethodService, ConsoleAuthenticationService>();
+        services.AddTransient<IUserConsoleNotificationService, ConsoleNotificationService>();
+        services.AddTransient<IUserNotificationService, ConsoleNotificationService>();
+        services.AddTransient<IWorkflowLayoutService, ConsoleAuthWorkflowLayout>();
     }
 
     private static void ConfigureBlazorAndLocalization(IServiceCollection services)
@@ -159,6 +179,15 @@ public static class ServiceCollectionExtensions
             o.UseRecommendedSerializerSettings();
             o.UseIgnoredAssemblyVersionTypeResolver();
             o.UseInMemoryStorage();
+        });
+    }
+
+    private static AutomaticConfigurationOptions ConfigureCentralizedConfiguration(WebApplicationBuilder app)
+    {
+        return app.AddAutomaticConfiguration(o =>
+        {
+            o.Add<UserLockingOptions>();
+            o.Add<IdServerConsoleOptions>();
         });
     }
 
@@ -483,14 +512,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IClientRepository>(new DefaultClientRepository(new List<Client>()));
         services.AddSingleton<IGrantRepository>(new DefaultGrantRepository(new List<Consent>()));
         services.AddSingleton<IGroupRepository>(new DefaultGroupRepository(new List<Group>()));
-        services.AddSingleton<IKeyValueRepository>(new DefaultKeyValueRepository(new List<ConfigurationKeyPairValueRecord>()));
         services.AddSingleton<ILanguageRepository>(new DefaultLanguageRepository(new List<SimpleIdServer.IdServer.Domains.Language>()));
         services.AddSingleton<IRealmRepository>(new DefaultRealmRepository(new List<Realm>()));
         services.AddSingleton<IRecurringJobStatusRepository>(new DefaultRecurringJobStatusRepository(new List<RecurringJobStatus>()));
         services.AddSingleton<IRegistrationWorkflowRepository>(new DefaultRegistrationWorkflowRepository(new List<RegistrationWorkflow>()));
         services.AddSingleton<IScopeRepository>(new DefaultScopeRepository(new List<Scope>()));
         services.AddSingleton<ITokenRepository>(new DefaultTokenRepository(new List<Token>()));
-        services.AddSingleton<ITranslationRepository>(new DefaultTranslationRepository(new List<SimpleIdServer.IdServer.Domains.Translation>()));
+        services.AddSingleton<ITranslationRepository>(new DefaultTranslationRepository(new List<Translation>()));
         services.AddSingleton<IUmaPendingRequestRepository>(new DefaultUmaPendingRequestRepository(new List<UMAPendingRequest>()));
         services.AddSingleton<IUmaResourceRepository>(new DefaultUmaResourceRepository(new List<UMAResource>()));
         services.AddSingleton<IUserRepository>(new DefaultUserRepository(new List<User>()));

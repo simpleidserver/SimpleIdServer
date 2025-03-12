@@ -6,8 +6,8 @@
 		<Description>Support SCIM provisioning.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 		<ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />

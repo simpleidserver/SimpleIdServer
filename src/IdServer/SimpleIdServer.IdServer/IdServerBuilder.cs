@@ -5,6 +5,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.DataProtection;
+using SimpleIdServer.Configuration;
 using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Domains;
@@ -25,14 +26,16 @@ public class IdServerBuilder
     private readonly FormBuilderRegistration _formBuilder;
     private readonly IDataProtectionBuilder _dataProtectionBuilder;
     private readonly IMvcBuilder _mvcBuilder;
+    private readonly AutomaticConfigurationOptions _automaticConfigurationOptions;
 
-    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder)
+    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions)
     {
         _serviceCollection = serviceCollection;
         _authBuilder = authBuilder;
         _formBuilder = formBuidler;
         _dataProtectionBuilder = dataProtectionBuilder;
         _mvcBuilder = mvcBuilder;
+        _automaticConfigurationOptions = automaticConfigurationOptions;
     }
 
     internal IServiceCollection Services => _serviceCollection;
@@ -43,27 +46,75 @@ public class IdServerBuilder
 
     internal IMvcBuilder MvcBuilder => _mvcBuilder;
 
+    internal AutomaticConfigurationOptions AutomaticConfigurationOptions => _automaticConfigurationOptions;
+
+    /// <summary>
+    /// Adds a developer signing credential by registering a DefaultFileSerializedKeyStore with the standard keys.
+    /// This is intended for development environments only.
+    /// </summary>
     public IdServerBuilder AddDeveloperSigningCredential()
     {
         Services.AddSingleton<IFileSerializedKeyStore>(new DefaultFileSerializedKeyStore(SimpleIdServer.IdServer.Constants.StandardKeys));
         return this;
     }
 
+    /// <summary>
+    /// Adds an in-memory client repository using the provided list of clients.
+    /// </summary>
     public IdServerBuilder AddInMemoryClients(List<Client> clients)
     {
         Services.AddSingleton<IClientRepository>(new DefaultClientRepository(clients));
         return this;
     }
 
+    /// <summary>
+    /// Adds an in-memory scope repository with the provided list of scopes.
+    /// </summary>
     public IdServerBuilder AddInMemoryScopes(List<Scope> scopes)
     {
         Services.AddSingleton<IScopeRepository>(new DefaultScopeRepository(scopes));
         return this;
     }
 
+    /// <summary>
+    /// Adds an in-memory user repository using the provided list of users.
+    /// </summary>
     public IdServerBuilder AddInMemoryUsers(List<User> users)
     {
         Services.AddSingleton<IUserRepository>(new DefaultUserRepository(users));
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an in-memory language repository using the provided list of languages.
+    /// </summary>
+    public IdServerBuilder AddInMemoryLanguages(List<SimpleIdServer.IdServer.Domains.Language> languages)
+    {
+        Services.AddSingleton<ILanguageRepository>(new DefaultLanguageRepository(languages));
+        return this;
+    }
+
+    /// <summary>
+    /// Registers in-memory authentication scheme providers and their definitions.
+    /// </summary>
+    public IdServerBuilder AddInMemoryAuthenticationSchemes(List<SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider> authenticationSchemeProviders, List<AuthenticationSchemeProviderDefinition> authSchemeProviderDefinitions)
+    {
+        Services.AddSingleton<IAuthenticationSchemeProviderRepository>(new DefaultAuthenticationSchemeProviderRepository(authenticationSchemeProviders));
+        Services.AddSingleton<IAuthenticationSchemeProviderDefinitionRepository>(new DefaultAuthenticationSchemeProviderDefinitionRepository(authSchemeProviderDefinitions));
+        foreach(var def in authSchemeProviderDefinitions)
+        {
+            _automaticConfigurationOptions.Add(Type.GetType(def.HandlerFullQualifiedName));
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Adds an in-memory realm repository using the provided list of realms.
+    /// </summary>
+    public IdServerBuilder AddInMemoryRealms(List<Realm> realms)
+    {
+        Services.AddSingleton<IRealmRepository>(new DefaultRealmRepository(realms));
         return this;
     }
 
@@ -115,10 +166,10 @@ public class IdServerBuilder
     #region Other
 
     /// <summary>
-    /// IdentityServer can be hosted in several Realm.
+    /// Enable realm.
     /// </summary>
     /// <returns></returns>
-    public IdServerBuilder UseRealm()
+    public IdServerBuilder EnableRealm()
     {
         _serviceCollection.Configure<IdServerHostOptions>(o =>
         {

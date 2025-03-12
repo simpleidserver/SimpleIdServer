@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;

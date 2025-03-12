@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.Configuration.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,10 +10,9 @@ namespace SimpleIdServer.Configuration;
 
 public class ConfigurationDefinitionExtractor
 {
-    public static ConfigurationDefinition Extract<T>()
+    public static ConfigurationDefinition Extract(Type type)
     {
-        var type = typeof(T);
-        var language = Language.Default;
+        var language = "en";
         // default language (en).
         var result = new ConfigurationDefinition { Id = type.Name, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow, FullQualifiedName = type.FullName };
         var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);

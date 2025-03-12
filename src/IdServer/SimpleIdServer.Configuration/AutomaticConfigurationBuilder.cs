@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.Configuration.Models;
 using System;
 using System.Collections.Generic;
 
@@ -14,20 +14,20 @@ public class AutomaticConfigurationOptions
     public AutomaticConfigurationOptions(IServiceCollection services)
     {
         Services = services;
+        Services.AddTransient<IKeyValueConnector, DefaultKeyValueConnector>();
+        Services.AddSingleton<IKeyValueRepository, DefaultKeyValueRepository>();
     }
 
     public IServiceCollection Services { get; set; }
 
-    public AutomaticConfigurationOptions UseEFConnector()
-    {
-        Services.AddTransient<IKeyValueConnector, EFKeyValueConnector>();
-        return this;
-    }
-
     public AutomaticConfigurationOptions Add<T>()
     {
-        var type = typeof(T);
-        ConfigurationDefinitions.Add(new AutomaticConfigurationRecord(type, type.Name, ConfigurationDefinitionExtractor.Extract<T>()));
+        return Add(typeof(T));
+    }
+
+    public AutomaticConfigurationOptions Add(Type type)
+    {
+        ConfigurationDefinitions.Add(new AutomaticConfigurationRecord(type, type.Name, ConfigurationDefinitionExtractor.Extract(type)));
         return this;
     }
 }

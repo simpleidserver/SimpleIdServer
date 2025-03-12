@@ -8,6 +8,7 @@ using Microsoft.Extensions.Primitives;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
