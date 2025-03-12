@@ -3,14 +3,13 @@
 
 using SimpleIdServer.Configuration;
 
-namespace SimpleIdServer.IdServer.Fido
+namespace SimpleIdServer.IdServer.Fido;
+
+public class WebauthnOptions : IFidoOptions
 {
-    public class WebauthnOptions : IFidoOptions
-    {
-        /// <summary>
-        /// Expiration time in seconds of the U2F FIDO session identifier.
-        /// </summary>
-        [ConfigurationRecord("Duration of the authentication/registration process in seconds", null, order: 0)]
-        public int U2FExpirationTimeInSeconds { get; set; } = 5 * 60;
-    }
+    /// <summary>
+    /// Expiration time in seconds of the U2F FIDO session identifier.
+    /// </summary>
+    [ConfigurationRecord("Duration of the authentication/registration process in seconds", null, order: 0)]
+    public int U2FExpirationTimeInSeconds { get; set; } = 5 * 60;
 }

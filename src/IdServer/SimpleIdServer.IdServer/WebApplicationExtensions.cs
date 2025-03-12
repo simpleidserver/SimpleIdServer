@@ -4,6 +4,7 @@ using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Jobs;
@@ -23,6 +24,7 @@ public static class WebApplicationExtensions
         var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
         var usePrefix = opts.UseRealm;
         if(usePrefix) webApplication.UseMiddleware<RealmMiddleware>();
+        var sidRoutesStore = webApplication.Services.GetRequiredService<ISidRoutesStore>();
         webApplication.MapBlazorHub();
         webApplication.UseSidRequestLocalization();
         webApplication.UseMiddleware<LanguageMiddleware>();
@@ -632,6 +634,14 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("getAllLanguages",
             pattern: Constants.EndPoints.Languages,
             defaults: new { controller = "Languages", action = "GetAll" });
+
+        var sidRoutes = sidRoutesStore.GetAll();
+        foreach (var sidRoute in sidRoutes)
+        {
+            webApplication.SidMapControllerRoute(sidRoute.Name,
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + sidRoute.RelativePattern,
+                defaults: sidRoute.Default);
+        }
 
         webApplication.MapControllerRoute(
             name: "defaultWithArea",

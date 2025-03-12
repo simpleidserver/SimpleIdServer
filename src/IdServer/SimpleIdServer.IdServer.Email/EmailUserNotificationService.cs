@@ -52,7 +52,7 @@ namespace SimpleIdServer.IdServer.Email
         private IdServerEmailOptions GetOptions()
         {
             var section = _configuration.GetSection(typeof(IdServerEmailOptions).Name);
-            return section.Get<IdServerEmailOptions>();
+            return section.Get<IdServerEmailOptions>() ?? new IdServerEmailOptions();
         }
     }
 }

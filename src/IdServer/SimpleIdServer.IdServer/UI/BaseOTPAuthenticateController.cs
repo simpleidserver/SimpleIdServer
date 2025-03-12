@@ -18,6 +18,7 @@ using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -83,9 +84,16 @@ namespace SimpleIdServer.IdServer.UI
                 case "SENDCONFIRMATIONCODE":
                     var notificationService = _notificationServices.First(n => n.Name == Amr);
                     var otpCode = otpAuthenticator.GenerateOtp(activeOtp);
-                    await notificationService.Send("One Time Password", string.Format(FormattedMessage, otpCode), new Dictionary<string, string>(), authenticatedUser);
-                    if(activeOtp.OTPAlg == Domains.OTPAlgs.TOTP) viewModel.TOTPStep = activeOtp.TOTPStep;
-                    return UserAuthenticationResult.Success(Global.ConfirmationcodeSent);
+                    try
+                    {
+                        await notificationService.Send("One Time Password", string.Format(FormattedMessage, otpCode), new Dictionary<string, string>(), authenticatedUser);
+                        if (activeOtp.OTPAlg == Domains.OTPAlgs.TOTP) viewModel.TOTPStep = activeOtp.TOTPStep;
+                        return UserAuthenticationResult.Success(Global.ConfirmationcodeSent);
+                    }
+                    catch(Exception)
+                    {
+                        return UserAuthenticationResult.Error(Global.AuthenticationMethodIsNotWellConfigured);
+                    }
                 default:
                     var errors = viewModel.CheckConfirmationCode();
                     if (errors.Any()) return UserAuthenticationResult.Error(errors);

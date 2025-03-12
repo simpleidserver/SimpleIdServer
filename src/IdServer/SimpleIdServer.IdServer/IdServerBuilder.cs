@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.DataProtection;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.IdServer.Api.Realms;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jobs;
@@ -22,20 +23,26 @@ namespace Microsoft.Extensions.DependencyInjection;
 public class IdServerBuilder
 {
     private readonly IServiceCollection _serviceCollection;
+    private readonly ISidRoutesStore _sidRoutesStore;
     private readonly AuthenticationBuilder _authBuilder;
     private readonly FormBuilderRegistration _formBuilder;
     private readonly IDataProtectionBuilder _dataProtectionBuilder;
     private readonly IMvcBuilder _mvcBuilder;
     private readonly AutomaticConfigurationOptions _automaticConfigurationOptions;
+    private readonly SidAuthCookie _sidAuthCookie;
 
-    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions)
+    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie)
     {
+        _sidRoutesStore = new SidRoutesStore();
+        _serviceCollection.AddSingleton(_sidRoutesStore);
         _serviceCollection = serviceCollection;
         _authBuilder = authBuilder;
         _formBuilder = formBuidler;
         _dataProtectionBuilder = dataProtectionBuilder;
         _mvcBuilder = mvcBuilder;
         _automaticConfigurationOptions = automaticConfigurationOptions;
+        _sidAuthCookie = sidAuthCookie;
+        
     }
 
     internal IServiceCollection Services => _serviceCollection;
@@ -47,6 +54,8 @@ public class IdServerBuilder
     internal IMvcBuilder MvcBuilder => _mvcBuilder;
 
     internal AutomaticConfigurationOptions AutomaticConfigurationOptions => _automaticConfigurationOptions;
+
+    internal SidAuthCookie SidAuthCookie => _sidAuthCookie;
 
     /// <summary>
     /// Adds a developer signing credential by registering a DefaultFileSerializedKeyStore with the standard keys.
@@ -213,4 +222,14 @@ public class IdServerBuilder
     }
 
     #endregion
+
+    internal void AddRoute(string routeName, string relativePattern, object def)
+    {
+        _sidRoutesStore.Add(new SidRoute
+        {
+            Default = def,
+            Name = routeName,
+            RelativePattern = relativePattern
+        });
+    }
 }

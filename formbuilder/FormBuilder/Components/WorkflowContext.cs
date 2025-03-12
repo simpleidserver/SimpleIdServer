@@ -72,9 +72,11 @@ public class WorkflowContext
 
     public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> records, string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, JsonObject inputData, List<string> supportedLanguageCodes)
     {
+        var clonedWorkflow = workflow.Clone() as WorkflowRecord;
+        var clonedRecords = records.Select(x => x.Clone() as FormRecord).ToList();
         var result = new WorkflowContext
         {
-            Definition = new WorkflowDefinition(workflow, records),
+            Definition = new WorkflowDefinition(clonedWorkflow, clonedRecords),
             Execution = new WorkflowExecution(currentStepId, errorMessages, successMessages, antiforgeryTokenRecord, supportedLanguageCodes),
             FormEditorContext = new FormEditorContext(null)
         };

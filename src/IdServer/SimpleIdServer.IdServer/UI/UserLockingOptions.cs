@@ -7,7 +7,7 @@ namespace SimpleIdServer.IdServer.UI;
 public class UserLockingOptions
 {
     [ConfigurationRecord("Account lock time", "Lock time of the user account (in seconds)", order: 1)]
-    public int LockTimeInSeconds { get; set; }
+    public int LockTimeInSeconds { get; set; } = 60 * 5;
     [ConfigurationRecord("Max login attempts", "Number of login attempts", order: 2)]
-    public int MaxLoginAttempts { get; set; }
+    public int MaxLoginAttempts { get; set; } = 10;
 }

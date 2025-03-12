@@ -118,7 +118,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         private MobileOptions GetMobileOptions()
         {
             var section = _configuration.GetSection(typeof(MobileOptions).Name);
-            return section.Get<MobileOptions>();
+            return section.Get<MobileOptions>() ?? new MobileOptions();
         }
     }
 }

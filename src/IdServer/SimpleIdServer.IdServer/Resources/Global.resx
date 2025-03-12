@@ -1164,4 +1164,7 @@
   <data name="UserAccountIsBlocked" xml:space="preserve">
     <value>Your account is blocked</value>
   </data>
+  <data name="AuthenticationMethodIsNotWellConfigured" xml:space="preserve">
+    <value>The authentication method is not configured correctly.</value>
+  </data>
 </root>

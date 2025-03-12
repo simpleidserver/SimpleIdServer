@@ -46,7 +46,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null, CancellationToken cancellationToken = default(CancellationToken))
     {
-        prefix = prefix ?? Constants.Prefix;
+        prefix = prefix ?? Constants.DefaultRealm;
         var isAuthenticated = User.Identity.IsAuthenticated;
         var viewModel = new PwdRegisterViewModel();
         viewModel.ReturnUrl = redirectUrl;
@@ -73,7 +73,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Index([FromRoute] string prefix, PwdRegisterViewModel viewModel, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? Constants.Prefix;
+        prefix = prefix ?? Constants.DefaultRealm;
         var isAuthenticated = User.Identity.IsAuthenticated;
         var userRegistrationProgress = await GetRegistrationProgress();
         // 1. When the user is not authenticated then a registration process must exists.

@@ -26,6 +26,9 @@ public class FormRecord : BaseVersionRecord, ICloneable
 
     public object Clone()
     {
+        var elements = Elements == null ? 
+            new ObservableCollection<IFormElementRecord>() : 
+            new ObservableCollection<IFormElementRecord>(Elements.Select(e => JsonSerializer.Deserialize<IFormElementRecord>(JsonSerializer.Serialize(e))).ToList());
         return new FormRecord
         {
             Id = Id,
@@ -38,7 +41,7 @@ public class FormRecord : BaseVersionRecord, ICloneable
             UpdateDateTime = UpdateDateTime,
             VersionNumber = VersionNumber,
             AvailableStyles = AvailableStyles.Select(a => a.Clone() as FormStyle).ToList(),
-            Elements = Elements
+            Elements = elements
         };
     }
 

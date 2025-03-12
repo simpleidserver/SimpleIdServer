@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.Email.Services
         protected override IOTPRegisterOptions GetOTPOptions()
         {
             var section = Configuration.GetSection(typeof(IdServerEmailOptions).Name);
-            return section.Get<IdServerEmailOptions>();
+            return section.Get<IdServerEmailOptions>() ?? new IdServerEmailOptions();
         }
     }
 }

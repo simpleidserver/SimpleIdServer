@@ -21,7 +21,7 @@ namespace SimpleIdServer.IdServer.Sms
         [ConfigurationRecord("OTP Algorithm", null, order: 4)]
         public OTPTypes OTPType { get; set; } = OTPTypes.TOTP;
         [ConfigurationRecord("OTP Value", null, 5, null, CustomConfigurationRecordType.OTPVALUE)]
-        public string OTPValue { get; set; } = null;
+        public string OTPValue { get; set; } = "PBJ777ZITHOPF7AVR7I47VRSNQYVFFNY";
         [ConfigurationRecord("OTP Counter", null, 6, "OTPType=HOTP")]
         public int OTPCounter { get; set; } = 10;
         [ConfigurationRecord("TOTP Step", null, 7, "OTPType=TOTP")]

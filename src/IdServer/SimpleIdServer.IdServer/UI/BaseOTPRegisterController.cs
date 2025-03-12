@@ -65,7 +65,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null, CancellationToken cancellationToken = default(CancellationToken))
     {
-        prefix = prefix ?? Constants.Prefix;
+        prefix = prefix ?? Constants.DefaultRealm;
         var isAuthenticated = User.Identity.IsAuthenticated;
         var registrationProgress = await GetRegistrationProgress();
         if (registrationProgress == null && !isAuthenticated)
@@ -87,7 +87,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Index([FromRoute] string prefix, TViewModel viewModel, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? Constants.Prefix;
+        prefix = prefix ?? Constants.DefaultRealm;
         var isAuthenticated = User.Identity.IsAuthenticated;
         UserRegistrationProgress userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
@@ -227,7 +227,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
     private TOptions GetOptions()
     {
         var section = _configuration.GetSection(typeof(TOptions).Name);
-        return section.Get<TOptions>();
+        return section.Get<TOptions>() ?? Activator.CreateInstance<TOptions>();
     }
 
     private async Task UpdateViewModel(string prefix, bool isAuthenticated, TViewModel viewModel, CancellationToken cancellationToken)

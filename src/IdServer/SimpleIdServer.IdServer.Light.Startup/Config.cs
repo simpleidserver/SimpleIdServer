@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
@@ -26,7 +25,7 @@ public class Config
 
     public static List<User> Users => new List<User>
     {
-        UserBuilder.Create("administrator", "password").SetEmail("adm@mail.com").Build()
+        UserBuilder.Create("administrator", "password").SetEmail("adm@mail.com").SetPhoneNumber("0485").GenerateRandomTOTPKey().Build()
     };
 
     public static List<AuthenticationSchemeProvider> AuthenticationSchemes => new List<AuthenticationSchemeProvider>

@@ -82,8 +82,7 @@ public static class ServiceCollectionExtensions
     public static IdServerBuilder AddSidIdentityServer
     (
         this WebApplicationBuilder app,
-        Action<IdServerHostOptions>? callback = null,
-        Action<CookieAuthenticationOptions>? configureAuthCookieCb = null
+        Action<IdServerHostOptions>? callback = null
     )
     {
         var services = app.Services;
@@ -107,8 +106,9 @@ public static class ServiceCollectionExtensions
         var autoConfig = ConfigureCentralizedConfiguration(app);
         ConfigureConsoleNotification(services);
         services.AddHttpContextAccessor();
-        var authBuilder = ConfigureAuth(services, configureAuthCookieCb);
-        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig);
+        var sidAuthCookie = new SidAuthCookie();
+        var authBuilder = ConfigureAuth(services, sidAuthCookie);
+        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie);
         ConfigureMassTransit(result);
         return result;
     }
@@ -203,10 +203,10 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    private static AuthenticationBuilder ConfigureAuth(IServiceCollection services, Action<CookieAuthenticationOptions>? configureAuthCookieCb = null)
+    private static AuthenticationBuilder ConfigureAuth(IServiceCollection services, SidAuthCookie sidAuthCookie)
     {
         services.AddSingleton<IAuthenticationSchemeProvider, DynamicAuthenticationSchemeProvider>();
-        services.AddSingleton<ISIDAuthenticationSchemeProvider>(x => x.GetService<IAuthenticationSchemeProvider>() as ISIDAuthenticationSchemeProvider);
+        services.AddSingleton(x => x.GetService<IAuthenticationSchemeProvider>() as ISIDAuthenticationSchemeProvider);
         services.AddScoped<IAuthenticationHandlerProvider, DynamicAuthenticationHandlerProvider>();
         services.AddAuthorization();
         services.Configure<AuthorizationOptions>(o =>
@@ -217,8 +217,7 @@ public static class ServiceCollectionExtensions
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddIdServerCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
             {
-                if (configureAuthCookieCb != null) configureAuthCookieCb(opts);
-                opts.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
+                sidAuthCookie.Callback(opts);
                 opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                 {
                     if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
@@ -545,4 +544,17 @@ public static class ServiceCollectionExtensions
 public class RealmRoutePrefixConstraint : IRouteConstraint
 {
     public bool Match(HttpContext? httpContext, IRouter route, string routeKey, RouteValueDictionary values, RouteDirection routeDirection) => true;
+}
+
+public class SidAuthCookie
+{
+    public SidAuthCookie()
+    {
+        Callback = (o) =>
+        {
+            o.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
+        };
+    }
+
+    internal Action<CookieAuthenticationOptions> Callback { get; set; }
 }

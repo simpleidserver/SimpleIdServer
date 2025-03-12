@@ -3,7 +3,6 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
-using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.UI;
@@ -33,7 +32,7 @@ namespace SimpleIdServer.IdServer.Sms.Services
         protected override IOTPRegisterOptions GetOTPOptions()
         {
             var section = Configuration.GetSection(typeof(IdServerSmsOptions).Name);
-            return section.Get<IdServerSmsOptions>();
+            return section.Get<IdServerSmsOptions>() ?? new IdServerSmsOptions();
         }
     }
 }

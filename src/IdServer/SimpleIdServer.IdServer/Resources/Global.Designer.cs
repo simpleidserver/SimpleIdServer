@@ -115,6 +115,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The authentication method is not configured correctly..
+        /// </summary>
+        public static string AuthenticationMethodIsNotWellConfigured {
+            get {
+                return ResourceManager.GetString("AuthenticationMethodIsNotWellConfigured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the authentication method {0} doesn&apos;t exist.
         /// </summary>
         public static string AuthenticationMethodNotFound {

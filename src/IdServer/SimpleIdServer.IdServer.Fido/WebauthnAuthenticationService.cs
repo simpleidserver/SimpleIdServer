@@ -3,14 +3,13 @@
 
 using SimpleIdServer.IdServer.Domains;
 
-namespace SimpleIdServer.IdServer.Fido
+namespace SimpleIdServer.IdServer.Fido;
+
+public class WebauthnAuthenticationService : IAuthenticationMethodService
 {
-    public class WebauthnAuthenticationService : IAuthenticationMethodService
-    {
-        public string Amr => Constants.AMR;
-        public string Name => "Web Authentication (Webauthn)";
-        public Type? OptionsType => typeof(WebauthnOptions);
-        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
-        public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Amr);
-    }
+    public string Amr => Constants.AMR;
+    public string Name => "Web Authentication (Webauthn)";
+    public Type? OptionsType => typeof(WebauthnOptions);
+    public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
+    public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Amr);
 }

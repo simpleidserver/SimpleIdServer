@@ -82,7 +82,7 @@ namespace SimpleIdServer.IdServer.Sms.UI
         private IdServerSmsOptions GetOptions()
         {
             var section = _configuration.GetSection(typeof(IdServerSmsOptions).Name);
-            return section.Get<IdServerSmsOptions>();
+            return section.Get<IdServerSmsOptions>() ?? new IdServerSmsOptions();
         }
     }
 }

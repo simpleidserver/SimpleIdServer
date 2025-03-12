@@ -378,7 +378,7 @@ namespace SimpleIdServer.IdServer.UI
         protected UserLockingOptions GetOptions()
         {
             var section = _configuration.GetSection(typeof(UserLockingOptions).Name);
-            return section.Get<UserLockingOptions>();
+            return section.Get<UserLockingOptions>() ?? new UserLockingOptions();
         }
     }
 

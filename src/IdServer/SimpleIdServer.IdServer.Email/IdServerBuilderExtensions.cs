@@ -2,32 +2,67 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using FormBuilder;
+using FormBuilder.Builders;
+using FormBuilder.Repositories;
+using FormBuilder.Stores;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Email.Services;
+using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.UI.Services;
+using Constants = SimpleIdServer.IdServer.Email.Constants;
 
-namespace Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class IdServerBuilderExtensions
 {
-    public static class IdServerBuilderExtensions
+    /// <summary>
+    /// Registers the necessary services for Email Authentication. Registers email notification, authentication,
+    /// password reset, and workflow layout services. Optionally seeds in-memory stores for forms and workflows.
+    /// </summary>
+    public static IdServerBuilder AddEmailAuthentication(this IdServerBuilder idServerBuilder, bool isInMemory = false, bool isDefaultAuthMethod = false)
     {
-        /// <summary>
-        /// Add email authentication method.
-        /// The amr is email.
-        /// </summary>
-        /// <param name="idServerBuilder"></param>
-        /// <returns></returns>
-        public static IdServerBuilder AddEmailAuthentication(this IdServerBuilder idServerBuilder)
+        idServerBuilder.Services.AddTransient<IUserNotificationService, EmailUserNotificationService>();
+        idServerBuilder.Services.AddTransient<IEmailUserNotificationService, EmailUserNotificationService>();
+        idServerBuilder.Services.AddTransient<IAuthenticationMethodService, EmailAuthenticationMethodService>();
+        idServerBuilder.Services.AddTransient<IUserEmailAuthenticationService, UserEmailAuthenticationService>();
+        idServerBuilder.Services.AddTransient<IResetPasswordService, UserEmailResetPasswordService>();
+        idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailAuthWorkflowLayout>();
+        idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailRegisterWorkflowLayout>();
+        idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerEmailOptions));
+        if (isInMemory)
         {
-            idServerBuilder.Services.AddTransient<IUserNotificationService, EmailUserNotificationService>();
-            idServerBuilder.Services.AddTransient<IEmailUserNotificationService, EmailUserNotificationService>();
-            idServerBuilder.Services.AddTransient<IAuthenticationMethodService, EmailAuthenticationMethodService>();
-            idServerBuilder.Services.AddTransient<IUserEmailAuthenticationService, UserEmailAuthenticationService>();
-            idServerBuilder.Services.AddTransient<IResetPasswordService, UserEmailResetPasswordService>();
-            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailAuthWorkflowLayout>();
-            idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailRegisterWorkflowLayout>();
-            return idServerBuilder;
+            Seed(idServerBuilder, isDefaultAuthMethod);
+        }
+
+        return idServerBuilder;
+    }
+
+    private static void Seed(IdServerBuilder idServerBuilder, bool isDefaultAuthMethod)
+    {
+        using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
+        {
+            var formStore = serviceProvider.GetService<IFormStore>();
+            formStore.Add(StandardEmailAuthForms.EmailForm);
+            formStore.Add(StandardEmailRegistrationForms.EmailForm);
+            formStore.SaveChanges(CancellationToken.None).Wait();
+
+            var workflowStore = serviceProvider.GetService<IWorkflowStore>();
+            workflowStore.Add(StandardEmailAuthWorkflows.DefaultWorkflow);
+            workflowStore.SaveChanges(CancellationToken.None).Wait();
+
+            if(isDefaultAuthMethod)
+            {
+                idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
+                {
+                    o.DefaultAuthenticationWorkflowId = StandardEmailAuthWorkflows.workflowId;
+                });
+                idServerBuilder.SidAuthCookie.Callback = (o) =>
+                {
+                    o.LoginPath = $"/{Constants.AMR}/Authenticate";
+                };
+            }
         }
     }
 }

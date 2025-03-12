@@ -3,14 +3,13 @@
 
 using SimpleIdServer.IdServer.Domains;
 
-namespace SimpleIdServer.IdServer.Fido
+namespace SimpleIdServer.IdServer.Fido;
+
+public class MobileAuthenticationService : IAuthenticationMethodService
 {
-    public class MobileAuthenticationService : IAuthenticationMethodService
-    {
-        public string Amr => Constants.MobileAMR;
-        public string Name => "Mobile";
-        public Type? OptionsType => typeof(MobileOptions);
-        public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
-        public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Amr);
-    }
+    public string Amr => Constants.MobileAMR;
+    public string Name => "Mobile";
+    public Type? OptionsType => typeof(MobileOptions);
+    public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
+    public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Amr);
 }
