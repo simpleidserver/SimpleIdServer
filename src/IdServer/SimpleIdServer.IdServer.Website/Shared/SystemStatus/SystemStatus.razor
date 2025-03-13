@@ -1,0 +1,42 @@
+@using Microsoft.Extensions.Diagnostics.HealthChecks
+@inject HealthCheckService HealthCheckService
+@implements IDisposable
+
+<RadzenCard Style="margin-bottom: 20px;">
+    <div class="d-flex align-items-center">
+        <div class="p-2">
+            <RadzenIcon Icon="check_circle" class="health-status-icon" Style="color: #4CAF50;" />
+        </div>
+        <div class="p-2">
+            <RadzenText TextStyle="TextStyle.H6">Healthcheck Server Status</RadzenText>
+            <RadzenText class="health-status-text">Tous les services sont opérationnels</RadzenText>
+        </div>
+    </div>
+</RadzenCard>
+
+@code {
+    private System.Threading.Timer? _timer;
+    private HealthReport? _healthReport;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckHealthAsync();
+        
+        // Mettre à jour le statut toutes les 30 secondes
+        _timer = new System.Threading.Timer(async _ => 
+        {
+            await CheckHealthAsync();
+            await InvokeAsync(StateHasChanged);
+        }, null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
+    }
+
+    private async Task CheckHealthAsync()
+    {
+        _healthReport = await HealthCheckService.CheckHealthAsync();
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

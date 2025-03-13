@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.DataProtection;
 using SimpleIdServer.Configuration;
+using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Consumers;
@@ -33,8 +34,6 @@ public class IdServerBuilder
 
     public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie)
     {
-        _sidRoutesStore = new SidRoutesStore();
-        _serviceCollection.AddSingleton(_sidRoutesStore);
         _serviceCollection = serviceCollection;
         _authBuilder = authBuilder;
         _formBuilder = formBuidler;
@@ -42,7 +41,9 @@ public class IdServerBuilder
         _mvcBuilder = mvcBuilder;
         _automaticConfigurationOptions = automaticConfigurationOptions;
         _sidAuthCookie = sidAuthCookie;
-        
+        _sidRoutesStore = new SidRoutesStore();
+        _serviceCollection.AddSingleton(_sidRoutesStore);
+
     }
 
     internal IServiceCollection Services => _serviceCollection;
@@ -63,7 +64,9 @@ public class IdServerBuilder
     /// </summary>
     public IdServerBuilder AddDeveloperSigningCredential()
     {
-        Services.AddSingleton<IFileSerializedKeyStore>(new DefaultFileSerializedKeyStore(SimpleIdServer.IdServer.Constants.StandardKeys));
+        var keys = new List<SerializedFileKey>();
+        keys.AddRange(SimpleIdServer.IdServer.Constants.StandardKeys);
+        keys.Add(KeyGenerator.GenerateX509SigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "certificate"));
         return this;
     }
 
@@ -231,5 +234,10 @@ public class IdServerBuilder
             Name = routeName,
             RelativePattern = relativePattern
         });
+    }
+
+    internal void Commit()
+    {
+        // TODO : Add the logic to update the record.
     }
 }

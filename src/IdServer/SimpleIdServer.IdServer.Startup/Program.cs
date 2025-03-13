@@ -48,10 +48,10 @@ if (!app.Environment.IsDevelopment())
 if(identityServerConfiguration.IsClientCertificateForwarded) app.UseCertificateForwarding();
 app.MapBlazorHub();
 app
-    .UseSID()
+    .UseSid()
     .UseVerifiablePresentation()
-    .UseSIDSwagger()
-    .UseSIDSwaggerUI()
+    .UseSidSwagger()
+    .UseSidSwaggerUI()
     // .UseSIDReDoc()
     .UseWsFederation()
     .UseFIDO()

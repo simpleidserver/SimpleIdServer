@@ -40,6 +40,7 @@ using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
+using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Console;
@@ -511,7 +512,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IClientRepository>(new DefaultClientRepository(new List<Client>()));
         services.AddSingleton<IGrantRepository>(new DefaultGrantRepository(new List<Consent>()));
         services.AddSingleton<IGroupRepository>(new DefaultGroupRepository(new List<Group>()));
-        services.AddSingleton<ILanguageRepository>(new DefaultLanguageRepository(new List<SimpleIdServer.IdServer.Domains.Language>()));
+        services.AddSingleton<ILanguageRepository>(new DefaultLanguageRepository(new List<SimpleIdServer.IdServer.Domains.Language>
+        {
+            LanguageBuilder.Build(SimpleIdServer.IdServer.Domains.Language.Default).AddDescription("English", "en").AddDescription("Anglais", "fr").Build()
+        }));
         services.AddSingleton<IRealmRepository>(new DefaultRealmRepository(new List<Realm>()));
         services.AddSingleton<IRecurringJobStatusRepository>(new DefaultRecurringJobStatusRepository(new List<RecurringJobStatus>()));
         services.AddSingleton<IRegistrationWorkflowRepository>(new DefaultRegistrationWorkflowRepository(new List<RegistrationWorkflow>()));

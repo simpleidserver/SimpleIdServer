@@ -19,7 +19,7 @@ namespace Microsoft.AspNetCore.Builder;
 
 public static class WebApplicationExtensions
 {
-    public static WebApplication UseSID(this WebApplication webApplication, bool cookiesAlwaysSecure = true)
+    public static WebApplication UseSid(this WebApplication webApplication, bool cookiesAlwaysSecure = true)
     {
         var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
         var usePrefix = opts.UseRealm;

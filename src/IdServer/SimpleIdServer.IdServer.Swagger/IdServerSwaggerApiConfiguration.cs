@@ -24,7 +24,7 @@ public class IdServerSwaggerApiConfiguration
         return this;
     }
 
-    public IdServerSwaggerApiConfiguration AddOAuthSecurity()
+    internal IdServerSwaggerApiConfiguration AddOAuthSecurity()
     {
         _options.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
         {
@@ -49,7 +49,11 @@ public class IdServerSwaggerApiConfiguration
                         { Constants.StandardScopes.Realms.Name, "Realms" },
                         { Constants.StandardScopes.RegistrationWorkflows.Name, "RegistrationWorkflows" },
                         { Constants.StandardScopes.Scopes.Name, "Scopes" },
-                        { Constants.StandardScopes.Users.Name, "Users" }
+                        { Constants.StandardScopes.Users.Name, "Users" },
+                        { Constants.StandardScopes.Register.Name, "Register" },
+                        { Constants.StandardScopes.Workflows.Name, "Workflows" },
+                        { Constants.StandardScopes.RecurringJobs.Name, "RecurringJobs" },
+                        { Constants.StandardScopes.Forms.Name, "Forms" }
                     }
                 }
             }

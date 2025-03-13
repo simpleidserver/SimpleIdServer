@@ -59,7 +59,7 @@ builder.Services.Remove(memoryDistribution);
 builder.Services.AddTransient<IAntiforgery, FakeAntiforgery>();
 builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Instance().Get());
 var app = builder.Build()
-    .UseSID();
+    .UseSid();
 app.Run();
 
 static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())

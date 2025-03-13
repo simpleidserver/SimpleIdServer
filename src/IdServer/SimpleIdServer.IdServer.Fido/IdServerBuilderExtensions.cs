@@ -5,11 +5,13 @@ using FormBuilder;
 using FormBuilder.Builders;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
-using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Fido.Services;
 using SimpleIdServer.IdServer.Options;
+using Constants = SimpleIdServer.IdServer.Fido.Constants;
 
-namespace SimpleIdServer.IdServer.Fido;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IdServerBuilderExtensions
 {

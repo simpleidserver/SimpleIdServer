@@ -15,6 +15,10 @@ public static class IdBuilderExtensions
         else builder.Services.Configure<SamlIdpOptions>(c => { });
         builder.Services.AddTransient<ISaml2ConfigurationFactory, Saml2ConfigurationFactory>();
         builder.Services.AddTransient<ISaml2AuthResponseEnricher, Saml2AuthResponseEnricher>();
+        builder.AddRoute("getSamlMetadataIdp", Constants.RouteNames.Metadata, new { controller = "SamlMetadata", action = "Get" });
+        builder.AddRoute("ssoHttpRedirect", Constants.RouteNames.SingleSignOnHttpRedirect, new { controller = "SamlSSO", action = "LoginGet" });
+        builder.AddRoute("ssoArtifact", Constants.RouteNames.SingleSignOnArtifact, new { controller = "SamlSSO", action = "LoginArtifact" });
+        builder.AddRoute("ssoLogout", Constants.RouteNames.SingleSignLogout, new { controller = "SamlSSO", action = "Logout" });
         return builder;
     }
 }

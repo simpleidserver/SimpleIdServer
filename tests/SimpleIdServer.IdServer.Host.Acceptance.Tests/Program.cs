@@ -105,7 +105,7 @@ builder.Services.AddSingleton<IDistributedCache>(SingletonDistributedCache.Insta
 builder.Services.AddDidKey();
 var app = builder.Build();
 app.UseOpenidFederation()
-    .UseSID();
+    .UseSid();
 app.Run();
 
 static RsaSecurityKey BuildRsaSecurityKey(string keyid) => new RsaSecurityKey(RSA.Create())

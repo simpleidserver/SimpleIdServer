@@ -19,7 +19,7 @@ public static class WebApplicationExtensions
         return app;
     }
 
-    public static WebApplication UseSIDSwagger(
+    public static WebApplication UseSidSwagger(
         this WebApplication app,
         Action<SwaggerOptions> setupAction = null)
     {
@@ -39,7 +39,7 @@ public static class WebApplicationExtensions
         return app;
     }
 
-    public static WebApplication UseSIDSwaggerUI(this WebApplication app, Action<SwaggerUIOptions> setupAction = null)
+    public static WebApplication UseSidSwaggerUI(this WebApplication app, Action<SwaggerUIOptions> setupAction = null)
     {
         SwaggerUIOptions options;
         using (var scope = app.Services.CreateScope())

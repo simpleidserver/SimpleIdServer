@@ -6,34 +6,33 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Stores;
 
-namespace SimpleIdServer.IdServer.WsFederation.Api
+namespace SimpleIdServer.IdServer.WsFederation.Api;
+
+public class BaseWsFederationController : Controller
 {
-    public class BaseWsFederationController : Controller
+    private readonly IdServerWsFederationOptions _options;
+    private readonly IKeyStore _keyStore;
+
+    public BaseWsFederationController(IOptions<IdServerWsFederationOptions> options, IKeyStore keyStore)
     {
-        private readonly IdServerWsFederationOptions _options;
-        private readonly IKeyStore _keyStore;
+        _options = options.Value;
+        _keyStore = keyStore;
+    }
 
-        public BaseWsFederationController(IOptions<IdServerWsFederationOptions> options, IKeyStore keyStore)
-        {
-            _options = options.Value;
-            _keyStore = keyStore;
-        }
+    protected IKeyStore KeyStore => _keyStore;
+    protected IdServerWsFederationOptions Options => _options;
 
-        protected IKeyStore KeyStore => _keyStore;
-        protected IdServerWsFederationOptions Options => _options;
+    protected SigningCredentials? GetSigningCredentials(string realm) => GetSigningCredentials(_keyStore.GetAllSigningKeys(realm));
 
-        protected SigningCredentials? GetSigningCredentials(string realm) => GetSigningCredentials(_keyStore.GetAllSigningKeys(realm));
+    protected SigningCredentials? GetSigningCredentials(IEnumerable<SigningCredentials> sigKeys)
+    {
+        if (!sigKeys.Any())
+            return null;
 
-        protected SigningCredentials? GetSigningCredentials(IEnumerable<SigningCredentials> sigKeys)
-        {
-            if (!sigKeys.Any())
-                return null;
+        var sigKey = sigKeys.FirstOrDefault(k => k.Kid == _options.DefaultKid);
+        if (sigKey == null)
+            sigKey = sigKeys.First();
 
-            var sigKey = sigKeys.FirstOrDefault(k => k.Kid == _options.DefaultKid);
-            if (sigKey == null)
-                sigKey = sigKeys.First();
-
-            return sigKey;
-        }
+        return sigKey;
     }
 }

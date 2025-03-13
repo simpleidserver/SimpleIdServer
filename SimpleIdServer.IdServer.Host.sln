@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Ema
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Sms", "src\IdServer\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj", "{DE396E1F-F734-4835-9557-65D559C2953A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. WsFederation", "01. WsFederation", "{15CD3447-BC21-4D46-AD8A-E76685376077}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. WsFederation", "02. WsFederation", "{15CD3447-BC21-4D46-AD8A-E76685376077}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.WsFederation", "src\IdServer\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj", "{25E98779-29F9-4C74-A935-15D20D9F0E0E}"
 EndProject
@@ -61,7 +61,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Configuratio
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Configuration.Tests", "tests\SimpleIdServer.Configuration.Tests\SimpleIdServer.Configuration.Tests.csproj", "{4E8282F4-A23F-4665-AD3C-4CDD52248AC6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Provisioning", "02. Provisioning", "{654E3738-8074-4079-AE56-8B2C31BE6781}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. Provisioning", "04. Provisioning", "{654E3738-8074-4079-AE56-8B2C31BE6781}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Provisioning.LDAP", "src\IdServer\SimpleIdServer.IdServer.Provisioning.LDAP\SimpleIdServer.IdServer.Provisioning.LDAP.csproj", "{B116874E-AAD8-4E5D-87D0-630876B56011}"
 EndProject
@@ -69,7 +69,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Pro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Authentication", "03. Authentication", "{E5886E09-671E-4B3E-AA8F-824C39DF94E4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. Configuration", "04. Configuration", "{CA774DE9-8091-4298-BDB3-924561F36B75}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05. Configuration", "05. Configuration", "{CA774DE9-8091-4298-BDB3-924561F36B75}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Configuration.Redis", "src\IdServer\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj", "{3EA05774-266E-4C68-AE40-CE246F8EDD31}"
 EndProject
@@ -89,7 +89,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Not
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.VerifiablePresentation", "src\IdServer\SimpleIdServer.IdServer.VerifiablePresentation\SimpleIdServer.IdServer.VerifiablePresentation.csproj", "{DF8ABFF6-6F35-4E70-BE74-9096E937643E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "05. Did", "05. Did", "{39266BD6-0925-4D5C-804F-B4F537800ECE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "06. Did", "06. Did", "{39266BD6-0925-4D5C-804F-B4F537800ECE}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Vp", "src\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj", "{56088324-367E-49AE-8E24-A5125B89A3D0}"
 EndProject
@@ -103,13 +103,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Did.Key", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Store.SqlSugar", "src\IdServer\SimpleIdServer.IdServer.Store.SqlSugar\SimpleIdServer.IdServer.Store.SqlSugar.csproj", "{80479B56-99CC-457E-9823-BD3B20814B9D}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "06. Stores", "06. Stores", "{06BF894C-69D7-406A-A97F-BD990A3D59ED}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "07. Stores", "07. Stores", "{06BF894C-69D7-406A-A97F-BD990A3D59ED}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Store.EF", "src\IdServer\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj", "{BE501B31-2CF6-4218-AA74-F536C11AD9D7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.SelfIdServer.Host.Acceptance.Tests", "tests\SimpleIdServer.SelfIssuedIdServer.Host.Acceptance.Tests\SimpleIdServer.SelfIdServer.Host.Acceptance.Tests.csproj", "{467B3D10-E6C9-427F-A29F-373AE95ECF69}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "07. OpenidFederation", "07. OpenidFederation", "{0473E3F7-F4CB-4305-A980-174A953CF0DB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "09. OpenidFederation", "09. OpenidFederation", "{0473E3F7-F4CB-4305-A980-174A953CF0DB}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.Federation", "src\IdServer\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj", "{4A7E1AFE-98FB-4B40-B41B-A912C448D020}"
 EndProject
@@ -143,7 +143,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.SqliteMigration
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.SqlServerMigrations", "formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj", "{BAFEDA3F-189F-B2A8-21DD-F7BAE7D30EE6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "09. Dataseeder", "09. Dataseeder", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "10. Dataseeder", "10. Dataseeder", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfdataSeeder", "efdataseeder\EfdataSeeder.csproj", "{55C25893-59CB-C7AF-9D67-6711FD49F5E7}"
 EndProject

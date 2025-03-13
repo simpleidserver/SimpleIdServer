@@ -1,0 +1,9 @@
+/* Styles for the SystemStatus component */
+.health-status-icon {
+    font-size: 2rem;
+    margin-right: 10px;
+}
+
+.health-status-text {
+    margin-bottom: 0;
+}

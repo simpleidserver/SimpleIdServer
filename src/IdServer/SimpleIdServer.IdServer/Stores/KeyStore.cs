@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace SimpleIdServer.IdServer.Stores

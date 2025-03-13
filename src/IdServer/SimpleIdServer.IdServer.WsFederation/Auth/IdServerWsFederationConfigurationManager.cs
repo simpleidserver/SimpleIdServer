@@ -5,32 +5,30 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.WsFederation;
 using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Stores;
 
-namespace SimpleIdServer.IdServer.WsFederation.Auth
+namespace SimpleIdServer.IdServer.WsFederation.Auth;
+
+public class IdServerWsFederationConfigurationManager : BaseIdServerConfigurationManager<WsFederationConfiguration>
 {
-    public class IdServerWsFederationConfigurationManager : BaseIdServerConfigurationManager<WsFederationConfiguration>
+    private readonly IServiceProvider _serviceProvider;
+
+    public IdServerWsFederationConfigurationManager(IServiceProvider serviceProvider, string metadataAddress, IConfigurationRetriever<WsFederationConfiguration> configRetriever, IDocumentRetriever documentRetriever) : base(metadataAddress, configRetriever, documentRetriever)
     {
-        private readonly IServiceProvider _serviceProvider;
+        _serviceProvider = serviceProvider;
+    }
 
-        public IdServerWsFederationConfigurationManager(IServiceProvider serviceProvider, string metadataAddress, IConfigurationRetriever<WsFederationConfiguration> configRetriever, IDocumentRetriever documentRetriever) : base(metadataAddress, configRetriever, documentRetriever)
-        {
-            _serviceProvider = serviceProvider;
-        }
-
-        protected override string GetAddress()
-        {
-            var realmStore = _serviceProvider.GetRequiredService<IRealmStore>();
-            var address = MetadataAddress;
-            var realm = realmStore.Realm;
-            if (string.IsNullOrWhiteSpace(realm))
-                return address;
-
-            if (!address.EndsWith("/"))
-                address += "/";
-            address += realm;
-            address += "/FederationMetadata/2007-06/FederationMetadata.xml";
+    protected override string GetAddress()
+    {
+        var realmStore = _serviceProvider.GetRequiredService<IRealmStore>();
+        var address = MetadataAddress;
+        var realm = realmStore.Realm;
+        if (string.IsNullOrWhiteSpace(realm))
             return address;
-        }
+
+        if (!address.EndsWith("/"))
+            address += "/";
+        address += realm;
+        address += "/FederationMetadata/2007-06/FederationMetadata.xml";
+        return address;
     }
 }
