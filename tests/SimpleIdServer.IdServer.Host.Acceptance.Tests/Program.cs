@@ -45,7 +45,7 @@ builder.Services.AddSidIdentityServer(o =>
 })
     .UseInMemoryEFStore(o =>
     {
-        var acrs = new List<AuthenticationContextClassReference> { SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance, SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver };
+        var acrs = new List<AuthenticationContextClassReference> { SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance };
         foreach (var acr in acrs)
             acr.AuthenticationWorkflow = StandardPwdAuthWorkflows.pwdWorkflowId;
         o.AddInMemoryAcr(acrs);

@@ -15,12 +15,15 @@ public class Config
 
     public static List<Client> Clients => new List<Client>
     {
-        ClientBuilder.BuildApiClient("client", "secret").AddScope(Scope).Build()
+        ClientBuilder.BuildApiClient("client", "secret").AddScope(Scope).Build(),
+        WsClientBuilder.BuildWsFederationClient("urn:samplewebsite").SetClientName("WsFederationClient").Build(),
+        SamlSpClientBuilder.BuildSamlSpClient("samlSp", "http://localhost:5125/Metadata").Build()
     };
 
     public static List<Scope> Scopes => new List<Scope>
     {
-        Scope
+        Scope,
+        Constants.StandardScopes.SAMLProfile
     };
 
     public static List<User> Users => new List<User>

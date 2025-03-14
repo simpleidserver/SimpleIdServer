@@ -7,9 +7,12 @@ using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Api;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Sms.Services;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
+using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Sms;
 
@@ -37,6 +40,10 @@ public static class IdServerBuildExtensions
     {
         using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
         {
+            var newAcr = BuildAcr();
+            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
+            acrStore.Add(newAcr);
+
             var formStore = serviceProvider.GetService<IFormStore>();
             formStore.Add(StandardSmsAuthForms.SmsForm);
             formStore.Add(StandardSmsRegisterForms.SmsForm);
@@ -50,7 +57,7 @@ public static class IdServerBuildExtensions
             {
                 idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
                 {
-                    o.DefaultAuthenticationWorkflowId = StandardSmsAuthWorkflows.workflowId;
+                    o.DefaultAcrValue = newAcr.Name;
                 });
                 idServerBuilder.SidAuthCookie.Callback = (o) =>
                 {
@@ -59,4 +66,16 @@ public static class IdServerBuildExtensions
             }
         }
     }
+
+    private static AuthenticationContextClassReference BuildAcr() => new AuthenticationContextClassReference
+    {
+        Id = Guid.NewGuid().ToString(),
+        Name = "sms",
+        DisplayName = "sms",
+        UpdateDateTime = DateTime.UtcNow,
+        Realms = new List<Realm>
+        {
+            StandardRealms.Master
+        }
+    };
 }

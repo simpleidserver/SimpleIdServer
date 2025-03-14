@@ -11,7 +11,7 @@ builder.Services.AddAuthentication(options =>
     .AddWsFederation("sid", options =>
     {
         options.Wtrealm = "urn:samplewebsite";
-        options.MetadataAddress = "https://localhost:5001/master/FederationMetadata/2007-06/FederationMetadata.xml";
+        options.MetadataAddress = "https://localhost:5001/FederationMetadata/2007-06/FederationMetadata.xml";
     });
 
 var app = builder.Build();

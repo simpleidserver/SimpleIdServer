@@ -67,6 +67,7 @@ public class IdServerBuilder
         var keys = new List<SerializedFileKey>();
         keys.AddRange(SimpleIdServer.IdServer.Constants.StandardKeys);
         keys.Add(KeyGenerator.GenerateX509SigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "certificate"));
+        Services.AddSingleton<IFileSerializedKeyStore>(new DefaultFileSerializedKeyStore(keys));
         return this;
     }
 

@@ -461,11 +461,8 @@ public class DataSeeder
         if (!dbContext.Acrs.Any())
         {
             var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
-            var iapSilver = SimpleIdServer.IdServer.Constants.StandardAcrs.IapSilver;
             firstLevelAssurance.AuthenticationWorkflow = completePwdAuthWorkflowId;
-            iapSilver.AuthenticationWorkflow = completePwdAuthWorkflowId;
             dbContext.Acrs.Add(firstLevelAssurance);
-            dbContext.Acrs.Add(iapSilver);
             dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
             {
                 Id = Guid.NewGuid().ToString(),

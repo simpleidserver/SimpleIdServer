@@ -27,7 +27,7 @@ namespace SimpleIdServer.IdServer.Provisioning.LDAP
         {
             var distinguishedName = user.OAuthUserClaims.Single(c => c.Name == Constants.LDAPDistinguishedName).Value;
             var section = _configuration.GetSection($"{identityProvisioning.Name}:{typeof(LDAPRepresentationsExtractionJobOptions).Name}");
-            var options = section.Get<LDAPRepresentationsExtractionJobOptions>();
+            var options = section.Get<LDAPRepresentationsExtractionJobOptions>() ?? new LDAPRepresentationsExtractionJobOptions();
             var credentials = new NetworkCredential(distinguishedName, password);
             using(var ldapConnection = new LdapConnection(new LdapDirectoryIdentifier(options.Server, options.Port), credentials, AuthType.Basic))
             {

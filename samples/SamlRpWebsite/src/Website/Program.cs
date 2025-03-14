@@ -14,7 +14,7 @@ builder.Services.AddAuthentication(options =>
     .AddSamlSp("samlSp", options =>
     {
         options.SPId = "samlSp";
-        options.IdpMetadataUrl = "https://localhost:5001/master/saml/metadata";
+        options.IdpMetadataUrl = "https://localhost:5001/saml/metadata";
         var currentPath = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         options.SigningCertificate = X509Certificate2.CreateFromPemFile(Path.Combine(currentPath, "sidClient.crt"), Path.Combine(currentPath, "sidClient.key"));
     });

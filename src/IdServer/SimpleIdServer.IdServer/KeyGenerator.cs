@@ -3,6 +3,7 @@
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
 using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -65,7 +66,11 @@ public static class KeyGenerator
             PrivateKeyPem = pem.PrivateKey,
             PublicKeyPem = pem.PublicKey,
             Usage = Constants.JWKUsages.Sig,
-            IsSymmetric = false
+            IsSymmetric = false,
+            Realms = new List<Domains.Realm>
+            {
+                realm
+            }
         };
         return result;
     }

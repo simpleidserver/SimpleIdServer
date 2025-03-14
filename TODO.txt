@@ -1,4 +1,1 @@
-=> faire fonctionner le réinitialisation du pwd						:	OK
-=> faire fonctionner realm											:	OK
-=> comprendre pourquoi "register" est vide avec realm enabled		:	OK
-=> vérifier si l'authentification avec email fonctionne				:	TODO
+=> vérifier si l'authentification avec ws-federation fonctionne	:	DONE

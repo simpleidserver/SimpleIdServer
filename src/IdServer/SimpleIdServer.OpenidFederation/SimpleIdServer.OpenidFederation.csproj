@@ -13,6 +13,9 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
+	</ItemGroup>
+	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>

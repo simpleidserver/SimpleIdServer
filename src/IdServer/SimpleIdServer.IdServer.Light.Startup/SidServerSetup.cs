@@ -3,6 +3,8 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.IdServer.Provisioning.LDAP;
+using SimpleIdServer.IdServer.Provisioning.SCIM;
 using SimpleIdServer.IdServer.Sms;
 
 namespace SimpleIdServer.IdServer.Light.Startup;
@@ -66,7 +68,6 @@ public class SidServerSetup
             .AddDeveloperSigningCredential()
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
             .AddEmailAuthentication(true, true);
 
         var app = webApplicationBuilder.Build();
@@ -84,7 +85,6 @@ public class SidServerSetup
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
             .AddInMemoryRealms(Config.Realms)
-            .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
             .AddEmailAuthentication(true, true)
             .EnableRealm();
 
@@ -102,7 +102,6 @@ public class SidServerSetup
             .AddDeveloperSigningCredential()
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
             .AddOtpAuthentication(true, true);
 
         var app = webApplicationBuilder.Build();
@@ -120,7 +119,6 @@ public class SidServerSetup
             .AddInMemoryRealms(Config.Realms)
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
             .AddOtpAuthentication(true, true)
             .EnableRealm();
 
@@ -138,7 +136,6 @@ public class SidServerSetup
             .AddDeveloperSigningCredential()
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
             .AddSmsAuthentication(true, true);
 
         var app = webApplicationBuilder.Build();
@@ -156,7 +153,6 @@ public class SidServerSetup
             .AddInMemoryRealms(Config.Realms)
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
             .AddSmsAuthentication(true, true)
             .EnableRealm();
 
@@ -175,7 +171,6 @@ public class SidServerSetup
             .AddInMemoryRealms(Config.Realms)
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
             .AddMobileAuthentication(null, true, true);
 
         var app = webApplicationBuilder.Build();
@@ -185,17 +180,30 @@ public class SidServerSetup
 
     public static void ConfigureWebauthnAuthentication(WebApplicationBuilder webApplicationBuilder)
     {
+        webApplicationBuilder.Configuration.AddJsonFile("appsettings.json")
+            .AddJsonFile($"appsettings.{webApplicationBuilder.Environment.EnvironmentName}.json", optional: true)
+            .AddEnvironmentVariables();
+        webApplicationBuilder.AddSidIdentityServer()
+            .AddDeveloperSigningCredential()
+            .AddInMemoryRealms(Config.Realms)
+            .AddInMemoryUsers(Config.Users)
+            .AddInMemoryLanguages(Config.Languages)
+            .AddWebauthnAuthentication(null, true, true);
+
+        var app = webApplicationBuilder.Build();
+        app.UseSid();
+        app.Run();
     }
 
     public static void ConfigureWsFederation(WebApplicationBuilder webApplicationBuilder)
     {
-        // TODO : configure the client.
         webApplicationBuilder.AddSidIdentityServer()
             .AddDeveloperSigningCredential()
             .AddInMemoryClients(Config.Clients)
             .AddInMemoryScopes(Config.Scopes)
+            .AddInMemoryUsers(Config.Users)
+            .AddPwdAuthentication(true, true)
             .AddWsFederation();
-
         var app = webApplicationBuilder.Build();
         app.UseSid();
         app.Run();
@@ -203,11 +211,12 @@ public class SidServerSetup
 
     public static void ConfigureSaml(WebApplicationBuilder webApplicationBuilder)
     {
-        // TODO : configure the client.
         webApplicationBuilder.AddSidIdentityServer()
             .AddDeveloperSigningCredential()
             .AddInMemoryClients(Config.Clients)
             .AddInMemoryScopes(Config.Scopes)
+            .AddInMemoryUsers(Config.Users)
+            .AddPwdAuthentication(true, true)
             .AddSamlIdp();
 
         var app = webApplicationBuilder.Build();
@@ -217,8 +226,10 @@ public class SidServerSetup
 
     public static void ConfigureSwagger(WebApplicationBuilder webApplicationBuilder)
     {
-        // TODO : Pass swagger ui options???
-        webApplicationBuilder.AddSidIdentityServer()
+        webApplicationBuilder.AddSidIdentityServer(o =>
+            {
+                o.Authority = "https://localhost:5001";
+            })
             .AddDeveloperSigningCredential()
             .AddInMemoryClients(Config.Clients)
             .AddInMemoryScopes(Config.Scopes)
@@ -226,38 +237,62 @@ public class SidServerSetup
         var app = webApplicationBuilder.Build();
         app.UseSid();
         app.UseSidSwagger();
-        app.UseSidSwaggerUI();
+        app.UseSidSwaggerUi();
         app.Run();
     }
 
     public static void ConfigureSwaggerWithRealm(WebApplicationBuilder webApplicationBuilder)
     {
+        webApplicationBuilder.AddSidIdentityServer(o =>
+        {
+            o.Authority = "https://localhost:5001";
+        })
+            .AddDeveloperSigningCredential()
+            .AddInMemoryClients(Config.Clients)
+            .AddInMemoryScopes(Config.Scopes)
+            .AddInMemoryRealms(Config.Realms)
+            .EnableRealm()
+            .AddSwagger();
+        var app = webApplicationBuilder.Build();
+        app.UseSid();
+        app.UseSidSwagger();
+        app.UseSidSwaggerUi();
+        app.Run();
+    }
+
+    public static void ConfigureLdapProvisioning(WebApplicationBuilder webApplicationBuilder)
+    {
         webApplicationBuilder.AddSidIdentityServer()
             .AddDeveloperSigningCredential()
             .AddInMemoryClients(Config.Clients)
             .AddInMemoryScopes(Config.Scopes)
-            .AddSwagger(o =>
-            {
-            });
+            .AddLdapProvisioning();
         var app = webApplicationBuilder.Build();
         app.UseSid();
-        app.UseSidSwagger();
-        app.UseSidSwaggerUI();
         app.Run();
     }
 
-    public static void ConfigureLdapProvisioning()
+    public static void ConfigureScimProvisioning(WebApplicationBuilder webApplicationBuilder)
     {
-
+        webApplicationBuilder.AddSidIdentityServer()
+            .AddDeveloperSigningCredential()
+            .AddInMemoryClients(Config.Clients)
+            .AddInMemoryScopes(Config.Scopes)
+            .AddScimProvisioning();
+        var app = webApplicationBuilder.Build();
+        app.UseSid();
+        app.Run();
     }
 
-    public static void ConfigureScimProvisioning()
+    public static void ConfigureOpenidFederation(WebApplicationBuilder webApplicationBuilder)
     {
-
-    }
-
-    public static void ConfigureOpenidFederation()
-    {
-
+        webApplicationBuilder.AddSidIdentityServer()
+            .AddDeveloperSigningCredential()
+            .AddInMemoryClients(Config.Clients)
+            .AddInMemoryScopes(Config.Scopes)
+            .AddOpenidFederation(null, true);
+        var app = webApplicationBuilder.Build();
+        app.UseSid();
+        app.Run();
     }
 }

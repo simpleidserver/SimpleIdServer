@@ -5,10 +5,13 @@ using FormBuilder.Builders;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Otp;
 using SimpleIdServer.IdServer.Otp.Services;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
+using static SimpleIdServer.IdServer.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -39,6 +42,10 @@ public static class IdServerBuilderExtensions
     {
         using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
         {
+            var newAcr = BuildAcr();
+            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
+            acrStore.Add(newAcr);
+
             var formStore = serviceProvider.GetService<IFormStore>();
             formStore.Add(StandardOtpAuthForms.OtpForm);
             formStore.SaveChanges(CancellationToken.None).Wait();
@@ -51,7 +58,7 @@ public static class IdServerBuilderExtensions
             {
                 idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
                 {
-                    o.DefaultAuthenticationWorkflowId = StandardOtpAuthWorkflows.workflowId;
+                    o.DefaultAcrValue = newAcr.Name;
                 });
                 idServerBuilder.SidAuthCookie.Callback = (o) =>
                 {
@@ -60,4 +67,16 @@ public static class IdServerBuilderExtensions
             }
         }
     }
+
+    private static AuthenticationContextClassReference BuildAcr() => new AuthenticationContextClassReference
+    {
+        Id = Guid.NewGuid().ToString(),
+        Name = "otp",
+        DisplayName = "otp",
+        UpdateDateTime = DateTime.UtcNow,
+        Realms = new List<Realm>
+        {
+            StandardRealms.Master
+        }
+    };
 }

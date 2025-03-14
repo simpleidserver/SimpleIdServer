@@ -38,6 +38,7 @@ public class BaseAuthenticateController : BaseController
     private readonly IUserTransformer _userTransformer;
     private readonly IDataProtector _dataProtector;
     private readonly IAuthenticationHelper _authenticationHelper;
+    private readonly IAuthenticationContextClassReferenceRepository _acrRepository;
     private readonly IdServerHostOptions _options;
 
     public BaseAuthenticateController(
@@ -55,6 +56,7 @@ public class BaseAuthenticateController : BaseController
         IWorkflowStore workflowStore,
         IFormStore formStore,
         IAcrHelper acrHelper,
+        IAuthenticationContextClassReferenceRepository acrRepository,
         IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
     {
         _clientRepository = clientRepository;
@@ -69,6 +71,7 @@ public class BaseAuthenticateController : BaseController
         WorkflowStore = workflowStore;
         FormStore = formStore;
         AcrHelper = acrHelper;
+        _acrRepository = acrRepository;
         _options = options.Value;
     }
 
@@ -83,6 +86,7 @@ public class BaseAuthenticateController : BaseController
     protected IFormStore FormStore { get; }
     protected IAcrHelper AcrHelper { get; }
     protected IRealmStore RealmStore { get; }
+    protected IAuthenticationContextClassReferenceRepository AcrRepository => _acrRepository;
 
     protected JsonObject ExtractQuery(string returnUrl) => ExtractQueryFromUnprotectedUrl(Unprotect(returnUrl));
 
@@ -238,7 +242,8 @@ public class BaseAuthenticateController : BaseController
 
     private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication<T>(string realm, T viewModel, CancellationToken cancellationToken) where T : ISidStepViewModel
     {
-        var workflow = await WorkflowStore.Get(realm, Options.DefaultAuthenticationWorkflowId, cancellationToken);
+        var acr = await AcrRepository.GetByName(realm, Options.DefaultAcrValue, cancellationToken);
+        var workflow = await WorkflowStore.Get(realm, acr.AuthenticationWorkflow, cancellationToken);
         var forms = await FormStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
         var nextAmr = WorkflowHelper.GetNextAmr<T>(workflow, forms, viewModel.CurrentLink);
         var amrs = WorkflowHelper.ExtractAmrs(workflow, forms);

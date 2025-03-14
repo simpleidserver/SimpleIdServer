@@ -48,6 +48,10 @@ public static class IdServerBuilderExtensions
     {
         using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
         {
+            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
+            SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance.AuthenticationWorkflow = StandardPwdAuthWorkflows.completePwdAuthWorkflowId;
+            acrStore.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance);
+
             var formStore = serviceProvider.GetService<IFormStore>();
             formStore.Add(StandardPwdAuthForms.PwdForm);
             formStore.Add(StandardPwdAuthForms.ResetForm);
@@ -68,7 +72,7 @@ public static class IdServerBuilderExtensions
             {
                 idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
                 {
-                    o.DefaultAuthenticationWorkflowId = StandardPwdAuthWorkflows.completePwdAuthWorkflowId;
+                    o.DefaultAcrValue = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance.Name;
                 });
                 idServerBuilder.SidAuthCookie.Callback = (o) =>
                 {

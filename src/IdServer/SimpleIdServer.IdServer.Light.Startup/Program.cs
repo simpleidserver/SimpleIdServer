@@ -4,4 +4,4 @@ using Microsoft.AspNetCore.Builder;
 using SimpleIdServer.IdServer.Light.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
-SidServerSetup.ConfigureSwagger(builder);
+SidServerSetup.ConfigureSaml(builder);

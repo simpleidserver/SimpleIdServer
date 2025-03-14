@@ -7,10 +7,13 @@ using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
 using SimpleIdServer.IdServer.Email.Services;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
+using static SimpleIdServer.IdServer.Constants;
 using Constants = SimpleIdServer.IdServer.Email.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -43,6 +46,10 @@ public static class IdServerBuilderExtensions
     {
         using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
         {
+            var newAcr = BuildAcr();
+            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
+            acrStore.Add(newAcr);
+
             var formStore = serviceProvider.GetService<IFormStore>();
             formStore.Add(StandardEmailAuthForms.EmailForm);
             formStore.Add(StandardEmailRegistrationForms.EmailForm);
@@ -56,7 +63,7 @@ public static class IdServerBuilderExtensions
             {
                 idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
                 {
-                    o.DefaultAuthenticationWorkflowId = StandardEmailAuthWorkflows.workflowId;
+                    o.DefaultAcrValue = newAcr.Name;
                 });
                 idServerBuilder.SidAuthCookie.Callback = (o) =>
                 {
@@ -65,4 +72,16 @@ public static class IdServerBuilderExtensions
             }
         }
     }
-}
+
+    private static AuthenticationContextClassReference BuildAcr() => new AuthenticationContextClassReference
+    {
+        Id = Guid.NewGuid().ToString(),
+        Name = "email",
+        DisplayName = "Email",
+        UpdateDateTime = DateTime.UtcNow,
+        Realms = new List<Realm>
+        {
+            StandardRealms.Master
+        }
+    };
+};

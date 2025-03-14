@@ -1,8 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using FormBuilder.Builders;
-using FormBuilder.Models;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
@@ -43,16 +41,14 @@ public static class Constants
 
     public static List<string> StandardAcrNames => new List<string>
     {
-        StandardAcrs.FirstLevelAssurance.Name,
-        StandardAcrs.IapSilver.Name
+        StandardAcrs.FirstLevelAssurance.Name
     };
 
     public static List<string> StandardKeyIds => StandardKeys.Select(s => s.KeyId).ToList();
 
     public static List<SerializedFileKey> StandardKeys => new List<SerializedFileKey>
     {
-        KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1"),
-        KeyGenerator.GenerateECDSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "ecdsa-1")
+        KeyGenerator.GenerateRSASigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master, "rsa-1")
     };
 
     public static List<string> RealmStandardScopes = new List<string>
@@ -915,17 +911,6 @@ public static class Constants
             Id = Guid.NewGuid().ToString(),
             Name = "sid-load-01",
             DisplayName = "First level of assurance",
-            UpdateDateTime = DateTime.UtcNow,
-            Realms = new List<Domains.Realm>
-            {
-                StandardRealms.Master
-            }
-        };
-        public static AuthenticationContextClassReference IapSilver = new AuthenticationContextClassReference
-        {
-            Id = Guid.NewGuid().ToString(),
-            Name = "urn:mace:incommon:iap:silver",
-            DisplayName = "Silver",
             UpdateDateTime = DateTime.UtcNow,
             Realms = new List<Domains.Realm>
             {

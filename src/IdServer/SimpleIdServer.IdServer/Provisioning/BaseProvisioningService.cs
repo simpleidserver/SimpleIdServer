@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Domains;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -28,6 +29,6 @@ public abstract class BaseProvisioningService<T> : IProvisioningService
     public T GetOptions(IdentityProvisioningDefinition definition)
     {
         var section = _configuration.GetSection($"{definition.Name}:{typeof(T).Name}");
-        return section.Get<T>();
+        return section.Get<T>() ?? Activator.CreateInstance<T>();
     }
 }

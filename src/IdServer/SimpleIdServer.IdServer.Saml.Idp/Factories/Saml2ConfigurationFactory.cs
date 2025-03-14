@@ -5,6 +5,7 @@ using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Stores;
 using System.Security.Cryptography.X509Certificates;
@@ -13,7 +14,7 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Factories;
 
 public interface ISaml2ConfigurationFactory
 {
-    Saml2Configuration BuildSamlIdpConfiguration(string url, string issuer, string realm);
+    Saml2Configuration BuildSamlIdpConfiguration(string url, string issuer);
     Task<(Saml2Configuration, EntityDescriptor)> BuildSamSpConfiguration(Client rp, CancellationToken cancellationToken);
 }
 
@@ -22,21 +23,25 @@ public class Saml2ConfigurationFactory : ISaml2ConfigurationFactory
     private readonly IKeyStore _keyStore;
     private readonly Helpers.IHttpClientFactory _httpClientFactory;
     private readonly SamlIdpOptions _options;
+    private readonly IRealmStore _realmStore;
 
     public Saml2ConfigurationFactory(
         IKeyStore keyStore,
         Helpers.IHttpClientFactory httpClientFactory,
-        IOptions<SamlIdpOptions> options)
+        IOptions<SamlIdpOptions> options,
+        IRealmStore realmStore)
     {
         _keyStore = keyStore;
         _httpClientFactory = httpClientFactory;
         _options = options.Value;
+        _realmStore = realmStore;
     }
 
-    public Saml2Configuration BuildSamlIdpConfiguration(string url, string issuer, string realm)
+    public Saml2Configuration BuildSamlIdpConfiguration(string url, string issuer)
     {
         X509Certificate2 sigCertificate = null;
-        if (_options.SignAuthnRequest) sigCertificate = GetSigningCertificates(realm).FirstOrDefault();
+        var realm = _realmStore.Realm;
+        if (_options.SignAuthnRequest) sigCertificate = GetSigningCertificates(realm ?? IdServer.Constants.DefaultRealm).FirstOrDefault();
         var result = new Saml2Configuration
         {
             Issuer = issuer,
@@ -45,7 +50,7 @@ public class Saml2ConfigurationFactory : ISaml2ConfigurationFactory
             ArtifactResolutionService = new Saml2IndexedEndpoint
             {
                 Index = 1,
-                Location = new Uri($"{url}/{realm}/{Constants.RouteNames.SingleSignOnArtifact}")
+                Location = new Uri($"{url}/{(string.IsNullOrWhiteSpace(realm) ? string.Empty : $"{realm}/")}{Constants.RouteNames.SingleSignOnArtifact}")
             }
         };
         return result;

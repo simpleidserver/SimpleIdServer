@@ -17,6 +17,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Extractors;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Saml.Idp.Apis;
 using SimpleIdServer.IdServer.Saml.Idp.DTOs;
@@ -40,6 +41,7 @@ public class SamlSSOController : Controller
     private readonly IDistributedCache _distributedCache;
     private readonly IUserRepository _userRepository;
     private readonly ISaml2AuthResponseEnricher _saml2AuthResponseEnricher;
+    private readonly IRealmStore _realmStore;
     private readonly IdServerHostOptions _options;
     private readonly ILogger<SamlSSOController> _logger;
 
@@ -51,6 +53,7 @@ public class SamlSSOController : Controller
         IDistributedCache distributedCache,
         IUserRepository userRepository,
         ISaml2AuthResponseEnricher saml2AuthResponseEnricher,
+        IRealmStore realmStore,
         IOptions<IdServerHostOptions> options,
         ILogger<SamlSSOController> logger)
     {
@@ -61,6 +64,7 @@ public class SamlSSOController : Controller
         _distributedCache = distributedCache;
         _userRepository = userRepository;
         _saml2AuthResponseEnricher = saml2AuthResponseEnricher;
+        _realmStore = realmStore;
         _options = options.Value;
         _logger = logger;
     }
@@ -68,7 +72,6 @@ public class SamlSSOController : Controller
     [HttpGet]
     public async Task<IActionResult> LoginGet([FromRoute] string prefix, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? Constants.DefaultRealm;
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var requestBinding = new Saml2RedirectBinding();
         var deserializedHttpRequest = Request.ToGenericHttpRequest();
@@ -76,7 +79,7 @@ public class SamlSSOController : Controller
         var requestedIssuer = requestBinding.ReadSamlRequest(deserializedHttpRequest, new Saml2AuthnRequest(new Saml2Configuration())).Issuer;
         try
         {
-            clientResult = await GetClient(requestedIssuer, prefix, cancellationToken);
+            clientResult = await GetClient(requestedIssuer, _realmStore.Realm ?? Constants.DefaultRealm, cancellationToken);
         }
         catch(Exception ex)
         {
@@ -91,12 +94,12 @@ public class SamlSSOController : Controller
         try
         {
             requestBinding.Unbind(deserializedHttpRequest, saml2AuthnRequest);
-            return await BuildLoginResponse(saml2AuthnRequest, clientResult, Saml2StatusCodes.Success, requestBinding.RelayState, issuer, prefix, cancellationToken);
+            return await BuildLoginResponse(saml2AuthnRequest, clientResult, Saml2StatusCodes.Success, requestBinding.RelayState, issuer, cancellationToken);
         }
         catch(Exception ex)
         {
             _logger.LogError(ex.ToString());
-            return await BuildLoginResponse(saml2AuthnRequest, clientResult, Saml2StatusCodes.Responder, requestBinding.RelayState, issuer, prefix, cancellationToken);
+            return await BuildLoginResponse(saml2AuthnRequest, clientResult, Saml2StatusCodes.Responder, requestBinding.RelayState, issuer, cancellationToken);
         }
 
         IActionResult RedirectToLoginPage()
@@ -113,16 +116,15 @@ public class SamlSSOController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Logout([FromRoute] string prefix, CancellationToken cancellationToken)
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
-        prefix = prefix ?? Constants.DefaultRealm;
         ClientResult clientResult = null;
         var httpRequest = await Request.ToGenericHttpRequestAsync(validate: false);
         var binding = new Saml2PostBinding();
         var requestedIssuer = binding.ReadSamlRequest(httpRequest, new Saml2LogoutRequest(new Saml2Configuration())).Issuer;
         try
         {
-            clientResult = await GetClient(requestedIssuer, prefix, cancellationToken);
+            clientResult = await GetClient(requestedIssuer, _realmStore.Realm ?? Constants.DefaultRealm, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -130,7 +132,7 @@ public class SamlSSOController : Controller
             return BuildError(ex);
         }
 
-        var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(Request.GetAbsoluteUriWithVirtualPath(), Request.GetAbsoluteUriWithVirtualPath(), prefix);
+        var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(Request.GetAbsoluteUriWithVirtualPath(), Request.GetAbsoluteUriWithVirtualPath());
         var saml2LogoutRequest = new Saml2LogoutRequest(clientResult.SpSamlConfiguration);
         try
         {
@@ -146,16 +148,15 @@ public class SamlSSOController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> LoginArtifact([FromRoute] string prefix, CancellationToken cancellationToken)
+    public async Task<IActionResult> LoginArtifact(CancellationToken cancellationToken)
     {
-        prefix = prefix ?? Constants.DefaultRealm;
         var soapEnvelope = new Saml2SoapEnvelope();
         var httpRequest = await Request.ToGenericHttpRequestAsync(readBodyAsString: true);
         var issuer = soapEnvelope.ReadSamlRequest(httpRequest, new Saml2ArtifactResolve(new Saml2Configuration())).Issuer;
         ClientResult clientResult = null;
         try
         {
-            clientResult = await GetClient(issuer, prefix, cancellationToken);
+            clientResult = await GetClient(issuer, _realmStore.Realm ?? Constants.DefaultRealm, cancellationToken);
         }
         catch (Exception ex)
         {
@@ -166,7 +167,7 @@ public class SamlSSOController : Controller
         var saml2ArtifactResolve = new Saml2ArtifactResolve(clientResult.SpSamlConfiguration);
         try
         {
-            var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(Request.GetAbsoluteUriWithVirtualPath(), Request.GetAbsoluteUriWithVirtualPath(), prefix);
+            var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(Request.GetAbsoluteUriWithVirtualPath(), Request.GetAbsoluteUriWithVirtualPath());
             soapEnvelope.Unbind(httpRequest, saml2ArtifactResolve);
             var base64 = await _distributedCache.GetStringAsync(saml2ArtifactResolve.Artifact, cancellationToken);
             if (string.IsNullOrWhiteSpace(base64)) throw new OAuthException(string.Empty, $"Saml2AuthnResponse not found by Artifact '{saml2ArtifactResolve.Artifact}' in the cache.");
@@ -213,43 +214,43 @@ public class SamlSSOController : Controller
         return new ClientResult { Client = client, SpSamlConfiguration = kvp.Item1, EntityDescriptor = kvp.Item2 };
     }
 
-    private Task<IActionResult> BuildLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
+    private Task<IActionResult> BuildLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, CancellationToken cancellationToken)
     {
-        if (clientResult.Client.GetUseAcrsArtifact()) return BuildArtifactLoginResponse(request, clientResult, status, relayState, issuer, realm, cancellationToken);
-        else return BuildPostLoginResponse(request, clientResult, status, relayState, issuer, realm, cancellationToken);
+        if (clientResult.Client.GetUseAcrsArtifact()) return BuildArtifactLoginResponse(request, clientResult, status, relayState, issuer, cancellationToken);
+        else return BuildPostLoginResponse(request, clientResult, status, relayState, issuer, cancellationToken);
     }
 
-    private async Task<IActionResult> BuildPostLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
+    private async Task<IActionResult> BuildPostLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, CancellationToken cancellationToken)
     {
         var destination = clientResult.EntityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault && a.Binding == ProtocolBindings.HttpPost).OrderBy(a => a.Index).First().Location;
-        var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, realm);
+        var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer);
         var responsebinding = new Saml2PostBinding
         {
-            RelayState = relayState
+            RelayState = _realmStore.Realm ?? Constants.DefaultRealm
         };
-        var response = await BuildAuthnSamlResponse(request, clientResult, idpSamlConfiguration, status, destination, issuer, realm, cancellationToken);
+        var response = await BuildAuthnSamlResponse(request, clientResult, idpSamlConfiguration, status, destination, issuer, cancellationToken);
         return responsebinding.Bind(response).ToActionResult();
     }
 
-    private async Task<IActionResult> BuildArtifactLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer, string realm, CancellationToken cancellationToken)
+    private async Task<IActionResult> BuildArtifactLoginResponse(Saml2Request request, ClientResult clientResult, Saml2StatusCodes status, string relayState, string issuer,CancellationToken cancellationToken)
     {
         var destination = clientResult.EntityDescriptor.SPSsoDescriptor.AssertionConsumerServices.Where(a => a.IsDefault && a.Binding == ProtocolBindings.HttpArtifact).OrderBy(a => a.Index).First().Location;
-        var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, realm);
+        var idpSamlConfiguration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer);
         var responsebinding = new Saml2ArtifactBinding
         {
-            RelayState = realm
+            RelayState = _realmStore.Realm ?? Constants.DefaultRealm
         };
         var saml2ArtifactResolve = new Saml2ArtifactResolve(idpSamlConfiguration)
         {
             Destination = destination
         };
         responsebinding.Bind(saml2ArtifactResolve);
-        var response = await BuildAuthnSamlResponse(request, clientResult, idpSamlConfiguration, status, destination, issuer, realm, cancellationToken);
+        var response = await BuildAuthnSamlResponse(request, clientResult, idpSamlConfiguration, status, destination, issuer, cancellationToken);
         await _distributedCache.SetStringAsync(saml2ArtifactResolve.Artifact, Convert.ToBase64String(Encoding.UTF8.GetBytes(response.ToXml().OuterXml)));
         return responsebinding.ToActionResult();
     }
 
-    private async Task<Saml2AuthnResponse> BuildAuthnSamlResponse(Saml2Request request, ClientResult clientResult, Saml2Configuration idpSamlConfiguration, Saml2StatusCodes status, Uri destination, string issuer, string realm, CancellationToken cancellationToken)
+    private async Task<Saml2AuthnResponse> BuildAuthnSamlResponse(Saml2Request request, ClientResult clientResult, Saml2Configuration idpSamlConfiguration, Saml2StatusCodes status, Uri destination, string issuer, CancellationToken cancellationToken)
     {
         var response = new Saml2AuthnResponse(idpSamlConfiguration)
         {
@@ -259,7 +260,7 @@ public class SamlSSOController : Controller
         };
         if (status == Saml2StatusCodes.Success)
         {
-            var claimsIdentity = await BuildSubject(clientResult.Client, issuer, realm, cancellationToken);
+            var claimsIdentity = await BuildSubject(clientResult.Client, issuer, cancellationToken);
             response.SessionIndex = Guid.NewGuid().ToString();
             response.NameId = new Saml2NameIdentifier(claimsIdentity.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).Select(c => c.Value).Single(), NameIdentifierFormats.Persistent);
             response.ClaimsIdentity = claimsIdentity;
@@ -270,10 +271,11 @@ public class SamlSSOController : Controller
         return response;
     }
 
-    private async Task<ClaimsIdentity> BuildSubject(Client client, string issuer, string realm, CancellationToken cancellationToken)
+    private async Task<ClaimsIdentity> BuildSubject(Client client, string issuer, CancellationToken cancellationToken)
     {
         var nameIdentifier = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
-        var user = await _userRepository.GetBySubject(nameIdentifier, realm ?? Constants.DefaultRealm, cancellationToken);
+        var realm = _realmStore.Realm ?? Constants.DefaultRealm;
+        var user = await _userRepository.GetBySubject(nameIdentifier, realm, cancellationToken);
         var context = new HandlerContext(new HandlerContextRequest(issuer, string.Empty, null, null, null, (X509Certificate2)null, null), realm, _options);
         context.SetUser(user, null);
         var claims = (await _scopeClaimsExtractor.ExtractClaims(context, client.Scopes, ScopeProtocols.SAML)).Select(c => new Claim(c.Key, c.Value.ToString())).ToList();

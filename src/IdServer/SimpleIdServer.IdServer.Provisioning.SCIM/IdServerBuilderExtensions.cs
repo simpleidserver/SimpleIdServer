@@ -7,9 +7,15 @@ namespace SimpleIdServer.IdServer.Provisioning.SCIM;
 
 public static class IdServerBuilderExtensions
 {
-    public static IdServerBuilder AddSCIMProvisioning(this IdServerBuilder builder)
+    /// <summary>
+    /// Adds the SCIM provisioning service to the IdServer builder.
+    /// </summary>
+    /// <param name="builder">The IdServerBuilder to configure.</param>
+    /// <returns>The updated IdServerBuilder instance.</returns>
+    public static IdServerBuilder AddScimProvisioning(this IdServerBuilder builder)
     {
         builder.Services.AddTransient<IProvisioningService, SCIMProvisioningService>();
+        builder.AutomaticConfigurationOptions.Add<SCIMRepresentationsExtractionJobOptions>();
         return builder;
     }
 }

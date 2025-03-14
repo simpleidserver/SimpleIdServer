@@ -92,7 +92,7 @@ public class SidServerSetup
                 f.Origins = new HashSet<string> { authority };
             })
             .AddSCIMProvisioning()
-            .AddLDAPProvisioning()
+            .AddLdapProvisioning()
             .AddMutualAuthentication(m =>
             {
                 m.AllowedCertificateTypes = CertificateTypes.All;

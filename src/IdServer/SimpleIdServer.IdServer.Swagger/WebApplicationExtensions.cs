@@ -13,15 +13,19 @@ namespace Microsoft.AspNetCore.Builder;
 
 public static class WebApplicationExtensions
 {
-    public static WebApplication UseSIDSwagger(this WebApplication app, SwaggerOptions options)
+    /// <summary>
+    /// Configures the application to use the SID Swagger middleware with the provided SwaggerOptions.
+    /// </summary>
+    public static WebApplication UseSidSwagger(this WebApplication app, SwaggerOptions options)
     {
         app.UseMiddleware<SIDSwaggerMiddleware>(options);
         return app;
     }
 
-    public static WebApplication UseSidSwagger(
-        this WebApplication app,
-        Action<SwaggerOptions> setupAction = null)
+    /// <summary>
+    /// Configures the application to use the SID Swagger middleware using a setup action for SwaggerOptions.
+    /// </summary>
+    public static WebApplication UseSidSwagger(this WebApplication app, Action<SwaggerOptions> setupAction = null)
     {
         SwaggerOptions options;
         using (var scope = app.Services.CreateScope())
@@ -30,16 +34,22 @@ public static class WebApplicationExtensions
             setupAction?.Invoke(options);
         }
 
-        return app.UseSIDSwagger(options);
+        return app.UseSidSwagger(options);
     }
 
-    public static WebApplication UseSIDSwaggerUI(this WebApplication app, SwaggerUIOptions options)
+    /// <summary>
+    /// Configures the application to use the SID Swagger UI middleware with the specified SwaggerUIOptions.
+    /// </summary>
+    public static WebApplication UseSidSwaggerUi(this WebApplication app, SwaggerUIOptions options)
     {
         app.UseMiddleware<SidSwaggerUIMiddleware>(options);
         return app;
     }
 
-    public static WebApplication UseSidSwaggerUI(this WebApplication app, Action<SwaggerUIOptions> setupAction = null)
+    /// <summary>
+    /// Configures the application to use the SID Swagger UI middleware using a setup action for SwaggerUIOptions.
+    /// </summary>
+    public static WebApplication UseSidSwaggerUi(this WebApplication app, Action<SwaggerUIOptions> setupAction = null)
     {
         SwaggerUIOptions options;
         using (var scope = app.Services.CreateScope())
@@ -48,35 +58,38 @@ public static class WebApplicationExtensions
             setupAction?.Invoke(options);
         }
 
-        // To simplify the common case, use a default that will work with the SwaggerMiddleware defaults
         if (options.ConfigObject.Urls == null)
         {
             var hostingEnv = app.Services.GetRequiredService<IWebHostEnvironment>();
             options.ConfigObject.Urls = new[] { new UrlDescriptor { Name = $"{hostingEnv.ApplicationName} v1", Url = "v1/swagger.json" } };
         }
 
-        if(string.IsNullOrWhiteSpace(options.OAuthConfigObject.ClientId))
+        if (string.IsNullOrWhiteSpace(options.OAuthConfigObject.ClientId))
         {
             options.OAuthClientId("swagger");
         }
 
-        if(string.IsNullOrWhiteSpace(options.OAuthConfigObject.ClientSecret))
+        if (string.IsNullOrWhiteSpace(options.OAuthConfigObject.ClientSecret))
         {
             options.OAuthClientSecret("password");
         }
 
-        return app.UseSIDSwaggerUI(options);
+        return app.UseSidSwaggerUi(options);
     }
 
-    public static WebApplication UseSIDReDoc(this WebApplication app, ReDocOptions options)
-    {        
+    /// <summary>
+    /// Configures the application to use the SID ReDoc middleware with the specified ReDocOptions.
+    /// </summary>
+    public static WebApplication UseSidRedoc(this WebApplication app, ReDocOptions options)
+    {
         app.UseMiddleware<SIDReDocMiddleware>(options);
         return app;
     }
 
-    public static WebApplication UseSIDReDoc(
-        this WebApplication app,
-        Action<ReDocOptions> setupAction = null)
+    /// <summary>
+    /// Configures the application to use the SID ReDoc middleware using a setup action for ReDocOptions.
+    /// </summary>
+    public static WebApplication UseSidRedoc(this WebApplication app, Action<ReDocOptions> setupAction = null)
     {
         ReDocOptions options;
         using (var scope = app.Services.CreateScope())
@@ -85,13 +98,12 @@ public static class WebApplicationExtensions
             setupAction?.Invoke(options);
         }
 
-        // To simplify the common case, use a default that will work with the SwaggerMiddleware defaults
         if (options.SpecUrl == null)
         {
             options.SpecUrl = "../swagger/v1/swagger.json";
         }
 
-        app.UseSIDReDoc(options);
+        app.UseSidRedoc(options);
         return app;
     }
 }

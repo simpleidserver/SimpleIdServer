@@ -41,7 +41,6 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IUserAuthenticationService _authenticationService;
         private readonly IAntiforgery _antiforgery;
-        private readonly IAuthenticationContextClassReferenceRepository _authenticationContextClassReferenceRepository;
         private readonly ISessionManager _sessionManager;
         private readonly ILanguageRepository _languageRepository;
         private readonly FormBuilderOptions _formBuilderOptions;
@@ -69,13 +68,12 @@ namespace SimpleIdServer.IdServer.UI
             IFormStore formStore,
             ILanguageRepository languageRepository,
             IAcrHelper acrHelper,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, options)
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, authenticationContextClassReferenceRepository, options)
         {
             _configuration = configuration;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;
             _antiforgery = antiforgery;
-            _authenticationContextClassReferenceRepository = authenticationContextClassReferenceRepository;
             _sessionManager = sessionManager;
             _languageRepository = languageRepository;
             _formBuilderOptions = formBuilderOptions.Value;
@@ -109,7 +107,8 @@ namespace SimpleIdServer.IdServer.UI
                 else
                 {
                     viewModel.RememberLogin = false;
-                    workflow = await WorkflowStore.Get(prefix, Options.DefaultAuthenticationWorkflowId, cancellationToken);
+                    var acr = await AcrRepository.GetByName(prefix, Options.DefaultAcrValue, cancellationToken);
+                    workflow = await WorkflowStore.Get(prefix, acr.AuthenticationWorkflow, cancellationToken);
                     forms = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Authentication, cancellationToken);
                 }
 

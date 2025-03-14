@@ -6,9 +6,12 @@ using FormBuilder.Builders;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Fido.Services;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Stores;
+using static SimpleIdServer.IdServer.Constants;
 using Constants = SimpleIdServer.IdServer.Fido.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -83,6 +86,10 @@ public static class IdServerBuilderExtensions
     {
         using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
         {
+            var acr = BuildMobileAcr();
+            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
+            acrStore.Add(acr);
+
             var formStore = serviceProvider.GetService<IFormStore>();
             formStore.Add(StandardFidoAuthForms.MobileForm);
             formStore.Add(StandardFidoRegisterForms.MobileForm);
@@ -96,7 +103,7 @@ public static class IdServerBuilderExtensions
             {
                 idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
                 {
-                    o.DefaultAuthenticationWorkflowId = StandardFidoAuthWorkflows.mobileWorkflowId;
+                    o.DefaultAcrValue = acr.Name;
                 });
                 idServerBuilder.SidAuthCookie.Callback = (o) =>
                 {
@@ -110,6 +117,10 @@ public static class IdServerBuilderExtensions
     {
         using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
         {
+            var acr = BuildWebauthnAcr();
+            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
+            acrStore.Add(acr);
+
             var formStore = serviceProvider.GetService<IFormStore>();
             formStore.Add(StandardFidoAuthForms.WebauthnForm);
             formStore.Add(StandardFidoRegisterForms.WebauthnForm);
@@ -123,7 +134,7 @@ public static class IdServerBuilderExtensions
             {
                 idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
                 {
-                    o.DefaultAuthenticationWorkflowId = StandardFidoAuthWorkflows.webauthnWorkflowId;
+                    o.DefaultAcrValue = acr.Name;
                 });
                 idServerBuilder.SidAuthCookie.Callback = (o) =>
                 {
@@ -132,4 +143,28 @@ public static class IdServerBuilderExtensions
             }
         }
     }
+
+    private static AuthenticationContextClassReference BuildMobileAcr() => new AuthenticationContextClassReference
+    {
+        Id = Guid.NewGuid().ToString(),
+        Name = "mobile",
+        DisplayName = "mobile",
+        UpdateDateTime = DateTime.UtcNow,
+        Realms = new List<Realm>
+        {
+            StandardRealms.Master
+        }
+    };
+
+    private static AuthenticationContextClassReference BuildWebauthnAcr() => new AuthenticationContextClassReference
+    {
+        Id = Guid.NewGuid().ToString(),
+        Name = "webauthn",
+        DisplayName = "webauthn",
+        UpdateDateTime = DateTime.UtcNow,
+        Realms = new List<Realm>
+        {
+            StandardRealms.Master
+        }
+    };
 }

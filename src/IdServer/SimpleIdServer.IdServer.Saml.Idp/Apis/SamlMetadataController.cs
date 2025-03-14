@@ -7,6 +7,7 @@ using ITfoxtec.Identity.Saml2.Schemas.Metadata;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Saml.Idp.Factories;
 using System.Security.Cryptography.X509Certificates;
 
@@ -15,26 +16,30 @@ namespace SimpleIdServer.IdServer.Saml.Idp.Apis;
 public class SamlMetadataController : Controller
 {
     private readonly ISaml2ConfigurationFactory _saml2ConfigurationFactory;
+    private readonly IRealmStore _realmStore;
     private readonly SamlIdpOptions _options;
 
     public SamlMetadataController(
-        ISaml2ConfigurationFactory saml2ConfigurationFactory, 
+        ISaml2ConfigurationFactory saml2ConfigurationFactory,
+        IRealmStore realmStore,
         IOptions<SamlIdpOptions> options)
     {
         _saml2ConfigurationFactory = saml2ConfigurationFactory;
+        _realmStore = realmStore;
         _options = options.Value;
     }
 
     [HttpGet]
-    public IActionResult Get([FromRoute] string prefix)
+    public IActionResult Get()
     {
-        prefix = prefix ?? IdServer.Constants.DefaultRealm;
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
-        var configuration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer, prefix);
+        var configuration = _saml2ConfigurationFactory.BuildSamlIdpConfiguration(issuer, issuer);
         var entityDescriptor = new EntityDescriptor(configuration)
         {
             ValidUntil = 365
         };
+        var realm = _realmStore.Realm;
+        var prefix = string.IsNullOrWhiteSpace(realm) ? string.Empty : $"{realm}/";
         entityDescriptor.IdPSsoDescriptor = new IdPSsoDescriptor
         {
             WantAuthnRequestsSigned = configuration.SignAuthnRequest,
@@ -44,15 +49,15 @@ public class SamlMetadataController : Controller
             },
             SingleSignOnServices = new SingleSignOnService[]
             {
-                new SingleSignOnService { Binding = ProtocolBindings.HttpRedirect, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignOnHttpRedirect}") }
+                new SingleSignOnService { Binding = ProtocolBindings.HttpRedirect, Location = new Uri($"{issuer}/{prefix}{Constants.RouteNames.SingleSignOnHttpRedirect}") }
             },
             SingleLogoutServices = new SingleLogoutService[]
             {
-                new SingleLogoutService { Binding = ProtocolBindings.HttpPost, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignLogout}") }
+                new SingleLogoutService { Binding = ProtocolBindings.HttpPost, Location = new Uri($"{issuer}/{prefix}{Constants.RouteNames.SingleSignLogout}") }
             },
             ArtifactResolutionServices = new ArtifactResolutionService[]
             {
-                new ArtifactResolutionService { Binding = ProtocolBindings.ArtifactSoap, Index = 1, Location = new Uri($"{issuer}/{prefix}/{Constants.RouteNames.SingleSignOnArtifact}") }
+                new ArtifactResolutionService { Binding = ProtocolBindings.ArtifactSoap, Index = 1, Location = new Uri($"{issuer}/{prefix}{Constants.RouteNames.SingleSignOnArtifact}") }
             },
             NameIDFormats = new Uri[] { NameIdentifierFormats.Persistent }
         };

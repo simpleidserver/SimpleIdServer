@@ -8,10 +8,16 @@ namespace SimpleIdServer.IdServer.Provisioning.LDAP;
 
 public static class IdServerBuilderExtensions
 {
-    public static IdServerBuilder AddLDAPProvisioning(this IdServerBuilder builder)
+    /// <summary>
+    /// Adds support for LDAP provisioning services.
+    /// </summary>
+    /// <param name="builder"></param>
+    /// <returns></returns>
+    public static IdServerBuilder AddLdapProvisioning(this IdServerBuilder builder)
     {
         builder.Services.AddTransient<IIdProviderAuthService, LDAPAuthenticationService>();
         builder.Services.AddTransient<IProvisioningService, LDAPProvisioningService>();
+        builder.AutomaticConfigurationOptions.Add<LDAPRepresentationsExtractionJobOptions>();
         return builder;
     }
 }
