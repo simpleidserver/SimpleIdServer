@@ -59,7 +59,7 @@ public class ScopesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
             var result = await _scopeRepository.Search(prefix, request, cancellationToken);
             return new OkObjectResult(result);
         }
@@ -76,7 +76,7 @@ public class ScopesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
             var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
             if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
             return new OkObjectResult(scope);
@@ -94,7 +94,7 @@ public class ScopesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
             var scopes = await _scopeRepository.GetAllRealmScopes(prefix, cancellationToken);
             return new OkObjectResult(scopes);
         }
@@ -119,7 +119,7 @@ public class ScopesController : BaseController
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                     _scopeRepository.DeleteRange(new List<Scope> { scope });
@@ -147,7 +147,7 @@ public class ScopesController : BaseController
                 using (var transaction = _transactionBuilder.Build())
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
                     var existingScope = await _scopeRepository.GetByName(prefix, scope.Name, cancellationToken);
                     if (existingScope != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scope.Name));
                     var realm = await _realmRepository.Get(prefix, cancellationToken);
@@ -183,7 +183,7 @@ public class ScopesController : BaseController
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                     scope.Description = request.Description;
@@ -217,7 +217,7 @@ public class ScopesController : BaseController
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                     if (scope.ClaimMappers.Any(m => m.Name == request.Name))
@@ -261,7 +261,7 @@ public class ScopesController : BaseController
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                     var scopeClaimMapper = scope.ClaimMappers.FirstOrDefault(m => m.Id == mapperId);
@@ -292,7 +292,7 @@ public class ScopesController : BaseController
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
                     var scopeClaimMapper = scope.ClaimMappers.FirstOrDefault(m => m.Id == mapperId);
@@ -345,7 +345,7 @@ public class ScopesController : BaseController
                 {
                     activity?.SetTag("realm", prefix);
                     activity?.SetTag("scope", id);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     if (request.Resources == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ScopeNames.Resources));
                     var existingScope = await _scopeRepository.Get(prefix, id, cancellationToken);

@@ -34,7 +34,7 @@ public class WorkflowsController : BaseController
         try
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.StandardScopes.Workflows.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.Workflows.Name);
             var workflow = await _workflowStore.Get(prefix, id, cancellationToken);
             if (workflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_WORKFLOW, string.Format(Global.UnknownWorkflow, id));
             return new OkObjectResult(workflow);
@@ -52,7 +52,7 @@ public class WorkflowsController : BaseController
         try
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.StandardScopes.Workflows.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.Workflows.Name);
             var workflow = await _workflowStore.Get(prefix, id, cancellationToken);
             if (workflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_WORKFLOW, string.Format(Global.UnknownWorkflow, id));
             workflow.Update(record.Steps, record.Links, _dateTimeHelper.GetCurrent());

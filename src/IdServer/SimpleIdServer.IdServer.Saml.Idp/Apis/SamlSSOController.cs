@@ -70,7 +70,7 @@ public class SamlSSOController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> LoginGet([FromRoute] string prefix, CancellationToken cancellationToken)
+    public async Task<IActionResult> LoginGet(CancellationToken cancellationToken)
     {
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var requestBinding = new Saml2RedirectBinding();
@@ -105,7 +105,9 @@ public class SamlSSOController : Controller
         IActionResult RedirectToLoginPage()
         {
             var queryStr = Request.QueryString.Value.TrimStart('?');
-            var returnUrl = $"{issuer}/{prefix}/{Saml.Idp.Constants.RouteNames.SingleSignOnHttpRedirect}?{AuthorizationRequestParameters.ClientId}={clientResult.Client.ClientId}&{queryStr}";
+            var realm = _realmStore.Realm;
+            var prefix = string.IsNullOrWhiteSpace(realm) ? string.Empty : $"{realm}/";
+            var returnUrl = $"{issuer}/{prefix}{Saml.Idp.Constants.RouteNames.SingleSignOnHttpRedirect}?{AuthorizationRequestParameters.ClientId}={clientResult.Client.ClientId}&{queryStr}";
             var url = Url.Action("Index", "Authenticate", new
             {
                 returnUrl = _dataProtector.Protect(returnUrl),

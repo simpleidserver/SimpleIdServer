@@ -50,7 +50,7 @@ public class ApiResourcesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.ApiResources.Name);
             var result = await _apiResourceRepository.Search(prefix, request, cancellationToken);
             return new OkObjectResult(result);
         }
@@ -72,7 +72,7 @@ public class ApiResourcesController : BaseController
                 using (var transaction = _transactionBuilder.Build())
                 {
                     activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.ApiResources.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.ApiResources.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ApiResourceNames.Name));
                     var existingApiResource = await _apiResourceRepository.GetByName(prefix, request.Name, cancellationToken);
@@ -131,7 +131,7 @@ public class ApiResourcesController : BaseController
                 using (var transaction = _transactionBuilder.Build())
                 {
                     activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Scopes.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Scopes.Name);
                     var apiResource = await _apiResourceRepository.Get(prefix, id, cancellationToken);
                     if (apiResource == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownApiResource, id));
                     activity?.SetStatus(ActivityStatusCode.Ok, $"API resource {id} is removed");

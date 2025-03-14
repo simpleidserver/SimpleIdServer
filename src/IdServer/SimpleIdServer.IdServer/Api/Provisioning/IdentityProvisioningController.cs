@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Search(prefix, request, cancellationToken);
                 return new OkObjectResult(new SearchResult<IdentityProvisioningResult>
                 {
@@ -75,7 +75,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var optionKey = $"{result.Name}:{result.Definition.OptionsName}";
@@ -114,7 +114,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                     var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                     if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                     result.Description = request.Description;
@@ -137,7 +137,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                     var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                     if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                     if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
@@ -162,7 +162,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                     var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                     if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                     var mapper = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
@@ -189,7 +189,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                     var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                     if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                     if (IProvisioningMappingRule.IsUnique(request.MappingRule) && result.Definition.MappingRules.Any(r => r.MapperType == request.MappingRule))
@@ -235,7 +235,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                     var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                     if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                     var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
@@ -263,7 +263,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var mapperRule = result.Definition.MappingRules.SingleOrDefault(r => r.Id == mapperId);
@@ -282,7 +282,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
                 var provisioningService = _provisioningServices.Single(s => s.Name == result.Definition.Name);
@@ -356,7 +356,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                     var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                     if (result == null)
                         return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
@@ -397,7 +397,7 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             try
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                await CheckAccessToken(prefix, Constants.StandardScopes.Provisioning.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.Provisioning.Name);
                 var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
                 if (result == null) 
                     return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));

@@ -11,24 +11,10 @@ namespace SimpleIdServer.IdServer.Light.Startup;
 public class Config
 {
     private static AuthenticationSchemeProviderDefinition Google = AuthenticationSchemeProviderDefinitionBuilder.Create("google", "Google", typeof(GoogleHandler), typeof(GoogleOptionsLite)).Build();
-    public static readonly Scope Scope = ScopeBuilder.CreateApiScope("api1", false).Build();
-
-    public static List<Client> Clients => new List<Client>
-    {
-        ClientBuilder.BuildApiClient("client", "secret").AddScope(Scope).Build(),
-        WsClientBuilder.BuildWsFederationClient("urn:samplewebsite").SetClientName("WsFederationClient").Build(),
-        SamlSpClientBuilder.BuildSamlSpClient("samlSp", "http://localhost:5125/Metadata").Build()
-    };
-
-    public static List<Scope> Scopes => new List<Scope>
-    {
-        Scope,
-        Constants.StandardScopes.SAMLProfile
-    };
-
+    
     public static List<User> Users => new List<User>
     {
-        UserBuilder.Create("administrator", "password").SetEmail("adm@mail.com").SetPhoneNumber("0485").GenerateRandomTOTPKey().Build()
+        UserBuilder.Create("administrator", "password").SetFirstname("Administrator").SetEmail("adm@mail.com").SetPhoneNumber("0485").GenerateRandomTOTPKey().Build()
     };
 
     public static List<AuthenticationSchemeProvider> AuthenticationSchemes => new List<AuthenticationSchemeProvider>

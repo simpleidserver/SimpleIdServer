@@ -31,7 +31,7 @@ public class SamlSpClientBuilder
         };
         if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
         else client.Realms.Add(realm);
-        client.Scopes.Add(Constants.StandardScopes.SAMLProfile);
+        client.Scopes.Add(Constants.DefaultScopes.SAMLProfile);
         client.SetSaml2SpMetadataUrl(metadataUrl);
         client.SetSaml2SigningCertificate(certificate);
         return new SamlSpClientBuilder(client);

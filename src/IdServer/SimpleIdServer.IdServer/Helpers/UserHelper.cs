@@ -36,7 +36,7 @@ namespace SimpleIdServer.IdServer.Helpers
         public virtual Consent GetConsent(User user, string prefix, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizedClaim> claims, ICollection<AuthorizationData> authDetails, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
             return user.Consents.FirstOrDefault(c => c.Status == ConsentStatus.ACCEPTED && c.ClientId == clientId && c.Realm == prefix &&
-                (scopes == null || (scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name).All(s => c.Scopes.Any(sc => sc.Scope == s)))) &&
+                (scopes == null || (scopes.Where(s => s != Constants.DefaultScopes.OpenIdScope.Name).All(s => c.Scopes.Any(sc => sc.Scope == s)))) &&
                 (claims == null || (claims.Where(cl => cl.Type == claimType && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name)).All(cl => c.Claims.Any(scl => scl == cl.Name)))) &&
                 ((authDetails == null || !authDetails.Any()) || (authDetails.All(d =>
                 {

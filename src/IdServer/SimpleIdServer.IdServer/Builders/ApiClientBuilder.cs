@@ -262,7 +262,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public ApiClientBuilder ActAsUMAResourceServer()
         {
-            AddScope(Constants.StandardScopes.UmaProtection);
+            AddScope(Constants.DefaultScopes.UmaProtection);
             return this;
         }
 

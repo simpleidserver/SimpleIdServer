@@ -53,7 +53,7 @@ public class CertificateAuthoritiesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.CertificateAuthorities.Name);
             var result = await _certificateAuthorityRepository.Search(prefix, request, cancellationToken);
             return new OkObjectResult(result);
         }
@@ -70,7 +70,7 @@ public class CertificateAuthoritiesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.CertificateAuthorities.Name);
             if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
             if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, CertificateAuthorityNames.SubjectName));
             CertificateAuthority certificateAuthority = null;
@@ -103,7 +103,7 @@ public class CertificateAuthoritiesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.CertificateAuthorities.Name);
             if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
             if (string.IsNullOrWhiteSpace(request.FindValue)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, CertificateAuthorityNames.FindValue));
             var store = new X509Store(request.StoreName, request.StoreLocation);
@@ -160,7 +160,7 @@ public class CertificateAuthoritiesController : BaseController
                 using (var transaction = _transactionBuilder.Build())
                 {
                     activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.CertificateAuthorities.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     activity?.SetTag("subjectName", request.SubjectName);
                     var id = Guid.NewGuid().ToString();
@@ -222,7 +222,7 @@ public class CertificateAuthoritiesController : BaseController
                 using (var transaction = _transactionBuilder.Build())
                 {
                     activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.CertificateAuthorities.Name);
                     var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
                     if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
                     _certificateAuthorityRepository.Delete(ca);
@@ -256,7 +256,7 @@ public class CertificateAuthoritiesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.CertificateAuthorities.Name);
             var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
             if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
             return new OkObjectResult(ca);
@@ -279,7 +279,7 @@ public class CertificateAuthoritiesController : BaseController
                 using (var transaction = _transactionBuilder.Build())
                 {
                     activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.CertificateAuthorities.Name);
                     var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
                     if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
                     var clientCertificate = ca.ClientCertificates.SingleOrDefault(c => c.Id == clientCertificateId);
@@ -323,7 +323,7 @@ public class CertificateAuthoritiesController : BaseController
                 using (var transaction = _transactionBuilder.Build())
                 {
                     activity?.SetTag("realm", prefix);
-                    await CheckAccessToken(prefix, Constants.StandardScopes.CertificateAuthorities.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.CertificateAuthorities.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ClientCertificateNames.SubjectName));
                     activity?.SetTag("subjectName", request.SubjectName);

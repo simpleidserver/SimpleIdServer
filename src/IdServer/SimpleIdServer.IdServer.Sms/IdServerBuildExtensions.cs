@@ -5,16 +5,17 @@ using FormBuilder;
 using FormBuilder.Builders;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
-using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Sms.Services;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using static SimpleIdServer.IdServer.Constants;
 
-namespace SimpleIdServer.IdServer.Sms;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IdServerBuildExtensions
 {
@@ -61,7 +62,7 @@ public static class IdServerBuildExtensions
                 });
                 idServerBuilder.SidAuthCookie.Callback = (o) =>
                 {
-                    o.LoginPath = $"/{Constants.AMR}/Authenticate";
+                    o.LoginPath = $"/{SimpleIdServer.IdServer.Sms.Constants.AMR}/Authenticate";
                 };
             }
         }

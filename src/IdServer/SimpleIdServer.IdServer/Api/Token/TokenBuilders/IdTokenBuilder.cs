@@ -52,7 +52,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public virtual async Task Build(BuildTokenParameter parameter, HandlerContext context, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
-            if (!parameter.Scopes.Contains(StandardScopes.OpenIdScope.Name) || context.User == null)
+            if (!parameter.Scopes.Contains(DefaultScopes.OpenIdScope.Name) || context.User == null)
                 return;
 
             var openidClient = context.Client;
@@ -94,7 +94,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
                 claims.Add(JwtRegisteredClaimNames.Acr, acrResult.Acr.Name);
             }
 
-            IEnumerable<Scope> scopes = new Scope[1] { StandardScopes.OpenIdScope };
+            IEnumerable<Scope> scopes = new Scope[1] { DefaultScopes.OpenIdScope };
             var responseTypes = queryParameters.GetResponseTypesFromAuthorizationRequest();
             if (responseTypes.Count() == 1 && responseTypes.First() == AuthorizationResponseParameters.IdToken)
                 scopes = openidClient.Scopes.Where(s => requestedScopes.Contains(s.Name));

@@ -9,6 +9,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Builders;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
@@ -22,7 +23,6 @@ using System.Net;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Api.Realms;
 
@@ -80,7 +80,7 @@ public class RealmsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.StandardScopes.Realms.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.Realms.Name);
             var realms = await _realmRepository.GetAll(cancellationToken);
             return new OkObjectResult(realms);
         }
@@ -101,7 +101,7 @@ public class RealmsController : BaseController
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.StandardScopes.Realms.Name);
+                    await CheckAccessToken(prefix, Constants.DefaultScopes.Realms.Name);
                     var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
                     if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
                     var clonedForms = new List<FormRecord>();
@@ -128,7 +128,7 @@ public class RealmsController : BaseController
                     foreach(var group in groups)
                     {
                         group.Realms.Add(new GroupRealm { RealmsName = request.Name });
-                        if(group.FullPath == StandardGroups.AdministratorGroup.FullPath)
+                        if(group.FullPath == DefaultGroups.AdministratorGroup.FullPath)
                         {
                             foreach(var scope in administratorRole)
                                 group.Roles.Add(scope);
@@ -207,7 +207,7 @@ public class RealmsController : BaseController
         {
             try
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.Realms.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.Realms.Name);
                 if (id == Constants.DefaultRealm) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CannotRemoveMasterRealm);
                 using (var transaction = _transactionBuilder.Build())
                 {

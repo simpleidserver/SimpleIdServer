@@ -21,7 +21,7 @@ public static class WsClientBuilder
         };
         if (realm == null) client.Realms.Add(SimpleIdServer.IdServer.Constants.StandardRealms.Master);
         else client.Realms.Add(realm);
-        client.Scopes.Add(Constants.StandardScopes.SAMLProfile);
+        client.Scopes.Add(Constants.DefaultScopes.SAMLProfile);
         client.SetWsFederationEnabled(true);
         return new WsFederationClientBuilder(client);
     }

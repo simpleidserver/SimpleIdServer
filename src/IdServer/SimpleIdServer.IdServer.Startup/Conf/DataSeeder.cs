@@ -23,7 +23,6 @@ using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Store.EF;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.VerifiablePresentation;
-using SimpleIdServer.IdServer.WsFederation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -304,17 +303,17 @@ public class DataSeeder
     {
         var admGroup = dbContext.Groups.Include(g => g.Realms)
             .Include(g => g.Roles)
-            .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name);
+            .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorGroup.Name);
         var admRoGroup = dbContext.Groups.Include(g => g.Realms)
             .Include(g => g.Roles)
-            .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name);
+            .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorReadonlyGroup.Name);
         var fastFedAdmGroup = dbContext.Groups.Include(g => g.Realms)
             .Include(g => g.Roles)
             .FirstOrDefault(g => g.Name == IdServerConfiguration.FastFedAdministratorGroup.Name);
 
         if (admGroup == null)
         {
-            admGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup;
+            admGroup = SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorGroup;
             admGroup.Realms = new List<GroupRealm>();
             masterRealm.Groups.Add(new GroupRealm
             {
@@ -324,7 +323,7 @@ public class DataSeeder
 
         if (admRoGroup == null)
         {
-            admRoGroup = SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup;
+            admRoGroup = SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorReadonlyGroup;
             admRoGroup.Realms = new List<GroupRealm>();
             masterRealm.Groups.Add(new GroupRealm
             {
@@ -348,16 +347,16 @@ public class DataSeeder
                 admRoGroup.Roles.Add(scope);
         }
 
-        var existingAdministratorRole = dbContext.Scopes.FirstOrDefault(s => s.Name == SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole.Name);
+        var existingAdministratorRole = dbContext.Scopes.FirstOrDefault(s => s.Name == SimpleIdServer.IdServer.Constants.DefaultScopes.WebsiteAdministratorRole.Name);
         if (existingAdministratorRole == null)
         {
-            existingAdministratorRole = SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole;
+            existingAdministratorRole = SimpleIdServer.IdServer.Constants.DefaultScopes.WebsiteAdministratorRole;
             existingAdministratorRole.Realms.Clear();
             existingAdministratorRole.Realms.Add(masterRealm);
             dbContext.Scopes.Add(existingAdministratorRole);
         }
 
-        if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Constants.StandardScopes.WebsiteAdministratorRole.Name))
+        if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Constants.DefaultScopes.WebsiteAdministratorRole.Name))
             admGroup.Roles.Add(existingAdministratorRole);
 
         if (fastFedAdmGroup == null)
@@ -392,7 +391,7 @@ public class DataSeeder
             dbContext.Users.Add(UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build());
         if (existingAdministratorRoUser == null)
             dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser);
-        else if (!existingAdministratorRoUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorReadonlyGroup.Name))
+        else if (!existingAdministratorRoUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorReadonlyGroup.Name))
         {
             existingAdministratorRoUser.Groups.Add(new GroupUser
             {
@@ -411,7 +410,7 @@ public class DataSeeder
         }
         else
         {
-            if (!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.StandardGroups.AdministratorGroup.Name))
+            if (!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorGroup.Name))
             {
                 existingAdministratorUser.Groups.Add(new GroupUser
                 {

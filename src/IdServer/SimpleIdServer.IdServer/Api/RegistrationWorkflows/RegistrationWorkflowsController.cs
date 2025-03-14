@@ -82,7 +82,7 @@ public class RegistrationWorkflowsController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.RegistrationWorkflows.Name);
                 var registrationWorkflow = await _registrationWorkflowRepository.Get(prefix, id, cancellationToken);
                 if (registrationWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
                 if (!string.IsNullOrWhiteSpace(registrationWorkflow.WorkflowId))
@@ -114,7 +114,7 @@ public class RegistrationWorkflowsController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.RegistrationWorkflows.Name);
                 if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
                 var existingRegistrationWorkflow = await _registrationWorkflowRepository.GetByName(prefix, request.Name, cancellationToken);
                 if (existingRegistrationWorkflow != null) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.RegistrationWorkflowExists);
@@ -169,7 +169,7 @@ public class RegistrationWorkflowsController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.StandardScopes.RegistrationWorkflows.Name);
+                await CheckAccessToken(prefix, Constants.DefaultScopes.RegistrationWorkflows.Name);
                 if (string.IsNullOrWhiteSpace(request.Name)) return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, RegistrationWorkflowNames.Name));
                 var existingRegistrationWorkflow = await _registrationWorkflowRepository.Get(prefix, id, cancellationToken);
                 if (existingRegistrationWorkflow == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownRegistrationWorkflow, id));
@@ -200,7 +200,7 @@ public class RegistrationWorkflowsController : BaseController
         try
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
+            await CheckAccessToken(prefix, Constants.DefaultScopes.Acrs.Name);
             var result = _workflowLayoutServices.Where(w => w.Category == FormCategories.Registration).Select(w => w.Get());
             return new OkObjectResult(result);
         }
@@ -215,7 +215,7 @@ public class RegistrationWorkflowsController : BaseController
     public async Task<IActionResult> GetAllForms([FromRoute] string prefix, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        await CheckAccessToken(prefix, Constants.StandardScopes.Acrs.Name);
+        await CheckAccessToken(prefix, Constants.DefaultScopes.Acrs.Name);
         var result = await _formStore.GetByCategory(prefix, FormCategories.Registration, cancellationToken);
         return new OkObjectResult(result);
     }
@@ -224,7 +224,7 @@ public class RegistrationWorkflowsController : BaseController
     public async Task<IActionResult> GetForms([FromRoute] string prefix, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        await CheckAccessToken(prefix, Constants.StandardScopes.Register.Name);
+        await CheckAccessToken(prefix, Constants.DefaultScopes.Register.Name);
         var forms = await _formStore.GetByCategory(prefix, FormCategories.Registration, cancellationToken);
         return new OkObjectResult(forms);
     }

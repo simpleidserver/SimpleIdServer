@@ -72,7 +72,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         {
             await ValidateClient();
             var scopes = context.Request.RequestData.GetScopes();
-            var unexpectedScopes = scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name);
+            var unexpectedScopes = scopes.Where(s => s != Constants.DefaultScopes.OpenIdScope.Name);
             if (unexpectedScopes.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ScopeDifferentToOpenidCannotBeSelfIssued);
             var result = await CommonValidationAuthorizationRequest(context, cancellationToken);
             return result;
@@ -202,7 +202,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any() && !authDetails.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameters, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource},{AuthorizationRequestParameters.AuthorizationDetails}"));
 
-            var unsupportedScopes = grantRequest.Scopes.Where(s => s != Constants.StandardScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
+            var unsupportedScopes = grantRequest.Scopes.Where(s => s != Constants.DefaultScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedScopes, string.Join(",", unsupportedScopes)));
 

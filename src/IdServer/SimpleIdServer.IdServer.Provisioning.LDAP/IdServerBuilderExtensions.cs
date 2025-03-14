@@ -1,10 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.IdServer.Provisioning;
+using SimpleIdServer.IdServer.Provisioning.LDAP;
 using SimpleIdServer.IdServer.Provisioning.LDAP.Services;
 using SimpleIdServer.IdServer.UI.Services;
 
-namespace SimpleIdServer.IdServer.Provisioning.LDAP;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IdServerBuilderExtensions
 {

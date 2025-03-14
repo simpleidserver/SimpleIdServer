@@ -83,11 +83,11 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public MobileClientBuilder EnableAccessToGrantsApi()
         {
-            if (!_client.Scopes.Any(s => s.Name == StandardScopes.GrantManagementQuery.Name))
-                _client.Scopes.Add(StandardScopes.GrantManagementQuery);
+            if (!_client.Scopes.Any(s => s.Name == DefaultScopes.GrantManagementQuery.Name))
+                _client.Scopes.Add(DefaultScopes.GrantManagementQuery);
 
-            if (!_client.Scopes.Any(s => s.Name == StandardScopes.GrantManagementRevoke.Name))
-                _client.Scopes.Add(StandardScopes.GrantManagementRevoke);
+            if (!_client.Scopes.Any(s => s.Name == DefaultScopes.GrantManagementRevoke.Name))
+                _client.Scopes.Add(DefaultScopes.GrantManagementRevoke);
 
             return this;
         }
@@ -99,7 +99,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public MobileClientBuilder EnableOfflineAccess()
         {
-            AddScope(Constants.StandardScopes.OfflineAccessScope);
+            AddScope(Constants.DefaultScopes.OfflineAccessScope);
             if (!_client.GrantTypes.Contains(RefreshTokenHandler.GRANT_TYPE))
                 _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             return this;

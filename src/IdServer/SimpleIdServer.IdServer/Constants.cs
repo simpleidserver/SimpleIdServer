@@ -4,6 +4,7 @@
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Builders;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ public static class Constants
 
     public static List<string> RealmStandardGroupsFullPath = new List<string>
     {
-        StandardGroups.AdministratorGroup.FullPath
+        DefaultGroups.AdministratorGroup.FullPath
     };
 
     public static List<string> RealmStandardClients = new List<string>
@@ -53,11 +54,11 @@ public static class Constants
 
     public static List<string> RealmStandardScopes = new List<string>
     {
-        StandardScopes.OpenIdScope.Name,
-        StandardScopes.Profile.Name,
-        StandardScopes.SAMLProfile.Name,
-        StandardScopes.WebsiteAdministratorRole.Name,
-        StandardScopes.Role.Name
+        DefaultScopes.OpenIdScope.Name,
+        DefaultScopes.Profile.Name,
+        DefaultScopes.SAMLProfile.Name,
+        DefaultScopes.WebsiteAdministratorRole.Name,
+        DefaultScopes.Role.Name
     };
 
     public static class StandardAuthorizationDetails
@@ -333,7 +334,7 @@ public static class Constants
         }
     };
 
-    public static class StandardScopes
+    public static class DefaultScopes
     {
         public static Scope Profile = new Scope
         {
@@ -859,49 +860,10 @@ public static class Constants
         };
     }
 
-    public static class StandardGroups
-    {
-        public static Domains.Group AdministratorGroup = new Domains.Group
-        {
-            Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
-            CreateDateTime = DateTime.UtcNow,
-            UpdateDateTime = DateTime.UtcNow,
-            FullPath = "administrator",
-            Realms = new List<GroupRealm>
-            {
-                new GroupRealm
-                {
-                    RealmsName = StandardRealms.Master.Name
-                }
-            },
-            Name = "administrator",
-            Description = "Administration role",
-            Roles = new List<SimpleIdServer.IdServer.Domains.Scope>
-            {
-                StandardScopes.WebsiteAdministratorRole
-            }
-        };
-        public static Domains.Group AdministratorReadonlyGroup = new Domains.Group
-        {
-            Id = "7a3014a3-5985-4986-bfcc-8e574fb6da27",
-            CreateDateTime = DateTime.UtcNow,
-            FullPath = "administrator-ro",
-            Realms = new List<GroupRealm>
-            {
-                new GroupRealm
-                {
-                    RealmsName = StandardRealms.Master.Name
-                }
-            },
-            Name = "administrator-ro",
-            Description = "Administration role readonly"
-        };
-    }
-
     public static class StandardUsers
     {
-        public static User AdministratorUser = UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPhoneNumber("0485").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorGroup).GenerateRandomTOTPKey().Build();
-        public static User AdministratorReadonlyUser = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm-ro@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(StandardGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
+        public static User AdministratorUser = UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPhoneNumber("0485").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(DefaultGroups.AdministratorGroup).GenerateRandomTOTPKey().Build();
+        public static User AdministratorReadonlyUser = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm-ro@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(DefaultGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
     }
 
     public static class StandardAcrs

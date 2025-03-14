@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
                 var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
                 if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
                 var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
-                if (!scopes.Contains(Constants.StandardScopes.GrantManagementQuery.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.InvalidAccessTokenScope);
+                if (!scopes.Contains(Constants.DefaultScopes.GrantManagementQuery.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.InvalidAccessTokenScope);
                 var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
                 if (grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(Global.UnauthorizedClientAccessGrant, clientId));
                 return new OkObjectResult(grant);
@@ -70,7 +70,7 @@ namespace SimpleIdServer.IdServer.Api.Grants
                     var token = await _grantedTokenHelper.GetAccessToken(bearerToken, cancellationToken);
                     if (token == null) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.UnknownAccessToken);
                     var scopes = token.Claims.Where(c => c.Type == "scope").Select(c => c.Value).ToList();
-                    if (!scopes.Contains(Constants.StandardScopes.GrantManagementRevoke.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.InvalidAccessTokenScope);
+                    if (!scopes.Contains(Constants.DefaultScopes.GrantManagementRevoke.Name)) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, Global.InvalidAccessTokenScope);
                     var clientId = token.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
                     if (grant.ClientId != clientId) return BuildError(HttpStatusCode.Unauthorized, ErrorCodes.INVALID_TOKEN, string.Format(Global.UnauthorizedClientAccessGrant, clientId));
                     _grantRepository.Remove(grant);
