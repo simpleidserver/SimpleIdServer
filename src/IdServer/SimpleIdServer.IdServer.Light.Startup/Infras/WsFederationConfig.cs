@@ -18,7 +18,7 @@ public static class WsFederationConfig
         };
         var scopes = new List<Scope>
         {
-            Constants.DefaultScopes.SAMLProfile
+            IdServer.Config.DefaultScopes.SAMLProfile
         };
         webApplicationBuilder.AddSidIdentityServer()
             .AddDeveloperSigningCredential()

@@ -33,7 +33,7 @@ builder.Services.AddSidIdentityServer()
     .UseInMemoryEFStore(o =>
     {
         o.AddInMemoryRealms(IdServerConfiguration.Realms);
-        o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
+        o.AddInMemoryKeys(SimpleIdServer.IdServer.Config.DefaultRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
             new SigningCredentials(BuildRsaSecurityKey("keyid2"), SecurityAlgorithms.RsaSha384),

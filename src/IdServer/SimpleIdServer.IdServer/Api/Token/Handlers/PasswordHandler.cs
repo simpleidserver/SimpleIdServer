@@ -78,7 +78,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                     var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
-                    var authenticationService = _userAuthenticationServices.Single(s => s.Amr == Constants.Areas.Password);
+                    var authenticationService = _userAuthenticationServices.Single(s => s.Amr == Constants.AreaPwd);
                     var userAuthenticationResult = await authenticationService.Validate(context.Realm ?? Constants.DefaultRealm, string.Empty, new AuthenticatePasswordViewModel
                     {
                         Login = userName,

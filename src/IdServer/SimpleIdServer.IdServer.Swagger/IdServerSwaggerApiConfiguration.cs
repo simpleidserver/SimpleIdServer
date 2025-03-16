@@ -37,23 +37,23 @@ public class IdServerSwaggerApiConfiguration
                     TokenUrl = null,
                     Scopes = new Dictionary<string, string>
                     {
-                        { Constants.DefaultScopes.ApiResources.Name, "ApiResources" },
-                        { Constants.DefaultScopes.Auditing.Name, "Auditing" },
-                        { Constants.DefaultScopes.Acrs.Name, "AuthenticationClassReferences" },
-                        { Constants.DefaultScopes.AuthenticationMethods.Name, "AuthenticationMethods" },
-                        { Constants.DefaultScopes.AuthenticationSchemeProviders.Name, "AuthenticationSchemeProviders" },
-                        { Constants.DefaultScopes.CertificateAuthorities.Name, "CertificateAuthorities" },
-                        { Constants.DefaultScopes.Clients.Name, "Clients" },
-                        { Constants.DefaultScopes.Groups.Name, "Groups" },
-                        { Constants.DefaultScopes.Provisioning.Name, "IdentityProvisioning" },
-                        { Constants.DefaultScopes.Realms.Name, "Realms" },
-                        { Constants.DefaultScopes.RegistrationWorkflows.Name, "RegistrationWorkflows" },
-                        { Constants.DefaultScopes.Scopes.Name, "Scopes" },
-                        { Constants.DefaultScopes.Users.Name, "Users" },
-                        { Constants.DefaultScopes.Register.Name, "Register" },
-                        { Constants.DefaultScopes.Workflows.Name, "Workflows" },
-                        { Constants.DefaultScopes.RecurringJobs.Name, "RecurringJobs" },
-                        { Constants.DefaultScopes.Forms.Name, "Forms" }
+                        { Config.DefaultScopes.ApiResources.Name, "ApiResources" },
+                        { Config.DefaultScopes.Auditing.Name, "Auditing" },
+                        { Config.DefaultScopes.Acrs.Name, "AuthenticationClassReferences" },
+                        { Config.DefaultScopes.AuthenticationMethods.Name, "AuthenticationMethods" },
+                        { Config.DefaultScopes.AuthenticationSchemeProviders.Name, "AuthenticationSchemeProviders" },
+                        { Config.DefaultScopes.CertificateAuthorities.Name, "CertificateAuthorities" },
+                        { Config.DefaultScopes.Clients.Name, "Clients" },
+                        { Config.DefaultScopes.Groups.Name, "Groups" },
+                        { Config.DefaultScopes.Provisioning.Name, "IdentityProvisioning" },
+                        { Config.DefaultScopes.Realms.Name, "Realms" },
+                        { Config.DefaultScopes.RegistrationWorkflows.Name, "RegistrationWorkflows" },
+                        { Config.DefaultScopes.Scopes.Name, "Scopes" },
+                        { Config.DefaultScopes.Users.Name, "Users" },
+                        { Config.DefaultScopes.Register.Name, "Register" },
+                        { Config.DefaultScopes.Workflows.Name, "Workflows" },
+                        { Config.DefaultScopes.RecurringJobs.Name, "RecurringJobs" },
+                        { Config.DefaultScopes.Forms.Name, "Forms" }
                     }
                 }
             }

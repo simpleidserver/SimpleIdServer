@@ -16,7 +16,7 @@ public class SerializeFixture
     {
         // ARRANGE
         var client = ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code")
-            .AddScope(SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.DefaultScopes.Profile)
+            .AddScope(SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Config.DefaultScopes.Profile)
             .SetClientName("clientname")
             .Build();
         var json = JsonSerializer.Serialize(client);

@@ -36,8 +36,8 @@ namespace SimpleIdServer.IdServer.Helpers
         public virtual Consent GetConsent(User user, string prefix, string clientId, IEnumerable<string> scopes, IEnumerable<AuthorizedClaim> claims, ICollection<AuthorizationData> authDetails, AuthorizationClaimTypes claimType = AuthorizationClaimTypes.IdToken)
         {
             return user.Consents.FirstOrDefault(c => c.Status == ConsentStatus.ACCEPTED && c.ClientId == clientId && c.Realm == prefix &&
-                (scopes == null || (scopes.Where(s => s != Constants.DefaultScopes.OpenIdScope.Name).All(s => c.Scopes.Any(sc => sc.Scope == s)))) &&
-                (claims == null || (claims.Where(cl => cl.Type == claimType && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name)).All(cl => c.Claims.Any(scl => scl == cl.Name)))) &&
+                (scopes == null || (scopes.Where(s => s != Config.DefaultScopes.OpenIdScope.Name).All(s => c.Scopes.Any(sc => sc.Scope == s)))) &&
+                (claims == null || (claims.Where(cl => cl.Type == claimType && cl.IsEssential && Config.DefaultUserClaims.All.Contains(cl.Name)).All(cl => c.Claims.Any(scl => scl == cl.Name)))) &&
                 ((authDetails == null || !authDetails.Any()) || (authDetails.All(d =>
                 {
                     return c.AuthorizationDetails.Any(ad => ad.Type == d.Type && d.Actions != null && d.Actions.All(a => ad.Actions.Contains(a)) && d.Identifier == ad.Identifier);
@@ -55,9 +55,9 @@ namespace SimpleIdServer.IdServer.Helpers
                 pictureBase64 = Convert.ToBase64String(payload);
             }
 
-            var pictureUrl = $"{issuer}/{Constants.EndPoints.Users}/{user.Id}/picture";
+            var pictureUrl = $"{issuer}/{Config.DefaultEndpoints.Users}/{user.Id}/picture";
             user.EncodedPicture = pictureBase64;
-            user.UpdateClaim(Constants.UserClaims.Picture, pictureUrl);
+            user.UpdateClaim(Config.DefaultUserClaims.Picture, pictureUrl);
         }
     }
 }

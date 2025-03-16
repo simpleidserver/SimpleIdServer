@@ -19,9 +19,9 @@ public static class WsClientBuilder
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
-        if (realm == null) client.Realms.Add(SimpleIdServer.IdServer.Constants.StandardRealms.Master);
+        if (realm == null) client.Realms.Add(SimpleIdServer.IdServer.Config.DefaultRealms.Master);
         else client.Realms.Add(realm);
-        client.Scopes.Add(Constants.DefaultScopes.SAMLProfile);
+        client.Scopes.Add(Config.DefaultScopes.SAMLProfile);
         client.SetWsFederationEnabled(true);
         return new WsFederationClientBuilder(client);
     }

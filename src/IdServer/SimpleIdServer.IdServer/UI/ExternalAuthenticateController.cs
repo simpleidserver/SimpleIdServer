@@ -84,8 +84,8 @@ public class ExternalAuthenticateController : BaseAuthenticateController
                 CurrentLink = currentLink
             };
             if (!string.IsNullOrWhiteSpace(returnUrl))
-                return await Authenticate(prefix, viewModel, Constants.Areas.Password, user, cancellationToken, false);
-            return await Sign(prefix, null, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
+                return await Authenticate(prefix, viewModel, Constants.AreaPwd, user, cancellationToken, false);
+            return await Sign(prefix, null, "~/", Constants.AreaPwd, user, null, cancellationToken, false);
         }
 
         var items = new Dictionary<string, string>
@@ -134,10 +134,10 @@ public class ExternalAuthenticateController : BaseAuthenticateController
                 ReturnUrl = result.Properties.Items[RETURN_URL_NAME],
                 CurrentLink = result.Properties.Items[CURRENT_LINK_NAME]
             };
-            return await Authenticate(prefix, viewModel, Constants.Areas.Password, user, cancellationToken, false);
+            return await Authenticate(prefix, viewModel, Constants.AreaPwd, user, cancellationToken, false);
         }
 
-        return await Sign(prefix, null, "~/", Constants.Areas.Password, user, null, cancellationToken, false);
+        return await Sign(prefix, null, "~/", Constants.AreaPwd, user, null, cancellationToken, false);
     }
 
     private async Task<User> JustInTimeProvision(string realm, string scheme, AuthenticateResult authResult, CancellationToken cancellationToken)

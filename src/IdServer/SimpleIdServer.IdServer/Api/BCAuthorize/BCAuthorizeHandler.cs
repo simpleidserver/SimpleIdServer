@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Api.Token.Helpers;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -16,7 +17,6 @@ using System.Net;
 using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Api.BCAuthorize
 {
@@ -99,8 +99,8 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                     { BCAuthenticationResponseParameters.AuthReqId, bcAuthorize.Id },
                     { BCAuthenticationResponseParameters.ExpiresIn, requestedExpiry },
                 };
-                    if (oauthClient.BCTokenDeliveryMode == StandardNotificationModes.Ping ||
-                        oauthClient.BCTokenDeliveryMode == StandardNotificationModes.Poll)
+                    if (oauthClient.BCTokenDeliveryMode == DefaultNotificationModes.Ping ||
+                        oauthClient.BCTokenDeliveryMode == DefaultNotificationModes.Poll)
                         res.Add(BCAuthenticationResponseParameters.Interval, interval);
 
                     return new OkObjectResult(res);

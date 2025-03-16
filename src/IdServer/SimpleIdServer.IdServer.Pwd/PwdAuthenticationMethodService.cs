@@ -6,10 +6,10 @@ namespace SimpleIdServer.IdServer.Pwd
 {
     public class PwdAuthenticationMethodService : IAuthenticationMethodService
     {
-        public string Amr => Constants.Areas.Password;
+        public string Amr => Constants.AreaPwd;
         public string Name => "Password";
         public Type? OptionsType => typeof(IdServerPasswordOptions);
         public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERAUTHENTICATION | AuthenticationMethodCapabilities.USERREGISTRATION;
-        public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Constants.Areas.Password);
+        public bool IsCredentialExists(User user) => user.Credentials.Any(c => c.CredentialType == Constants.AreaPwd);
     }
 }

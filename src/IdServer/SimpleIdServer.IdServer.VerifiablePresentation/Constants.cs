@@ -16,6 +16,6 @@ public static class Constants
         public const string VpAuthorizeQrCode = $"{VpAuthorize}/qr";
         public const string VpRegisterStatus = $"{VpRegister}/status";
         public const string VpEndRegister = $"{VpRegister}/end";
-        public const string VpAuthorizePost = $"{IdServer.Constants.EndPoints.Authorization}/post";
+        public const string VpAuthorizePost = $"{IdServer.Config.DefaultEndpoints.Authorization}/post";
     }
 }

@@ -3,6 +3,7 @@
 
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer;
+using SimpleIdServer.IdServer.Config;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using System.Text.Json.Nodes;
@@ -38,7 +39,7 @@ namespace Microsoft.IdentityModel.Tokens
         public static JsonWebKey SerializeJWK(this EncryptingCredentials credentials)
         {
             var result = JsonWebKeyConverter.ConvertFromSecurityKey(credentials.Key);
-            result.Use = Constants.JWKUsages.Enc;
+            result.Use = DefaultTokenSecurityAlgs.JwkUsages.Enc;
             result.Alg = credentials.Alg;
             if (credentials.Key is X509SecurityKey)
             {

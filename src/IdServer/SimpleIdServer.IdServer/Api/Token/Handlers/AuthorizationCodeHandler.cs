@@ -134,7 +134,7 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
                 var parameters = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Scopes = extractionResult.Scopes, Audiences = extractionResult.Audiences, Claims = claims, GrantId = authCode.GrantId, AdditionalClaims = additionalClaims };
                 foreach (var tokenBuilder in _tokenBuilders)
                 {
-                    if (tokenBuilder.Name == TokenResponseParameters.RefreshToken && !extractionResult.Scopes.Contains(Constants.DefaultScopes.OfflineAccessScope.Name)) continue;
+                    if (tokenBuilder.Name == TokenResponseParameters.RefreshToken && !extractionResult.Scopes.Contains(Config.DefaultScopes.OfflineAccessScope.Name)) continue;
                     await tokenBuilder.Build(parameters, context, cancellationToken, true);
                 }
 

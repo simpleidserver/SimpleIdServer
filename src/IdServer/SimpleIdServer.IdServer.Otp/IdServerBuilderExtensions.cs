@@ -11,7 +11,6 @@ using SimpleIdServer.IdServer.Otp;
 using SimpleIdServer.IdServer.Otp.Services;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -76,7 +75,7 @@ public static class IdServerBuilderExtensions
         UpdateDateTime = DateTime.UtcNow,
         Realms = new List<Realm>
         {
-            StandardRealms.Master
+            SimpleIdServer.IdServer.Config.DefaultRealms.Master
         }
     };
 }

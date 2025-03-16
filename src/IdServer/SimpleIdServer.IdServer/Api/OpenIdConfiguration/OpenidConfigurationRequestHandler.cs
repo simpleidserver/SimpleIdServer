@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Configuration;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
@@ -52,49 +53,49 @@ public class OpenidConfigurationRequestHandler : IOpenidConfigurationRequestHand
         if (!string.IsNullOrWhiteSpace(prefix))
             prefix = $"{prefix}/";
 
-        result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UserInfo}");
-        result.Add(OpenIDConfigurationNames.DeviceAuthorizationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.DeviceAuthorization}");
-        result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{prefix}{Constants.EndPoints.CheckSession}");
-        result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.EndSession}");
-        result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.BCAuthorize}");
-        result.Add(OpenIDConfigurationNames.PushedAuthorizationRequestEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.PushedAuthorizationRequest}");
+        result.Add(OpenIDConfigurationNames.UserInfoEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.UserInfo}");
+        result.Add(OpenIDConfigurationNames.DeviceAuthorizationEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.DeviceAuthorization}");
+        result.Add(OpenIDConfigurationNames.CheckSessionIframe, $"{issuer}/{prefix}{Config.DefaultEndpoints.CheckSession}");
+        result.Add(OpenIDConfigurationNames.EndSessionEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.EndSession}");
+        result.Add(OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.BCAuthorize}");
+        result.Add(OpenIDConfigurationNames.PushedAuthorizationRequestEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.PushedAuthorizationRequest}");
         result.Add(OpenIDConfigurationNames.RequestParameterSupported, true);
         result.Add(OpenIDConfigurationNames.RequestUriParameterSupported, true);
-        result.Add(OpenIDConfigurationNames.RequestObjectSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
-        result.Add(OpenIDConfigurationNames.RequestObjectEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
-        result.Add(OpenIDConfigurationNames.RequestObjectEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
+        result.Add(OpenIDConfigurationNames.RequestObjectSigningAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
+        result.Add(OpenIDConfigurationNames.RequestObjectEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllEncAlgs));
+        result.Add(OpenIDConfigurationNames.RequestObjectEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllEncs));
         result.Add(OpenIDConfigurationNames.SubjectTypesSupported, JsonSerializer.SerializeToNode(_subjectTypeBuilders.Select(r => r.SubjectType)));
         result.Add(OpenIDConfigurationNames.AcrValuesSupported, JsonSerializer.SerializeToNode(acrLst.Select(_ => _.Name)));
-        result.Add(OpenIDConfigurationNames.IdTokenSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
-        result.Add(OpenIDConfigurationNames.IdTokenEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
-        result.Add(OpenIDConfigurationNames.IdTokenEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
-        result.Add(OpenIDConfigurationNames.UserInfoSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
-        result.Add(OpenIDConfigurationNames.UserInfoEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
-        result.Add(OpenIDConfigurationNames.UserInfoEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
+        result.Add(OpenIDConfigurationNames.IdTokenSigningAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
+        result.Add(OpenIDConfigurationNames.IdTokenEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllEncAlgs));
+        result.Add(OpenIDConfigurationNames.IdTokenEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllEncs));
+        result.Add(OpenIDConfigurationNames.UserInfoSigningAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
+        result.Add(OpenIDConfigurationNames.UserInfoEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllEncAlgs));
+        result.Add(OpenIDConfigurationNames.UserInfoEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllEncs));
         result.Add(OpenIDConfigurationNames.ClaimsSupported, JsonSerializer.SerializeToNode(claims.DistinctBy(c => c.TargetClaimPath).Select(c => c.TargetClaimPath)));
         result.Add(OpenIDConfigurationNames.ClaimsParameterSupported, true);
-        result.Add(OpenIDConfigurationNames.BackchannelTokenDeliveryModesSupported, JsonSerializer.SerializeToNode(Constants.AllStandardNotificationModes));
-        result.Add(OpenIDConfigurationNames.BackchannelAuthenticationRequestSigningAlgValues, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
+        result.Add(OpenIDConfigurationNames.BackchannelTokenDeliveryModesSupported, JsonSerializer.SerializeToNode(DefaultNotificationModes.All));
+        result.Add(OpenIDConfigurationNames.BackchannelAuthenticationRequestSigningAlgValues, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
         result.Add(OpenIDConfigurationNames.BackchannelUserCodeParameterSupported, false);
         result.Add(OpenIDConfigurationNames.FrontChannelLogoutSupported, true);
         result.Add(OpenIDConfigurationNames.FrontChannelLogoutSessionSupported, true);
         result.Add(OpenIDConfigurationNames.BackchannelLogoutSupported, true);
         result.Add(OpenIDConfigurationNames.BackchannelLogoutSessionSupported, true);
         result.Add(OpenIDConfigurationNames.GrantManagementActionRequired, _options.GrantManagementActionRequired);
-        result.Add(OpenIDConfigurationNames.GrantManagementEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.Grants}");
-        result.Add(OpenIDConfigurationNames.GrantManagementActionsSupported, JsonSerializer.SerializeToNode(Constants.AllStandardGrantManagementActions));
-        result.Add(OpenIDConfigurationNames.AuthorizationSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
-        result.Add(OpenIDConfigurationNames.AuthorizationEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncAlgs));
-        result.Add(OpenIDConfigurationNames.AuthorizationEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(Constants.AllEncryptions));
+        result.Add(OpenIDConfigurationNames.GrantManagementEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.Grants}");
+        result.Add(OpenIDConfigurationNames.GrantManagementActionsSupported, JsonSerializer.SerializeToNode(DefaultGrantManagementActions.All));
+        result.Add(OpenIDConfigurationNames.AuthorizationSigningAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
+        result.Add(OpenIDConfigurationNames.AuthorizationEncryptionAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllEncAlgs));
+        result.Add(OpenIDConfigurationNames.AuthorizationEncryptionEncValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllEncs));
         result.Add(OpenIDConfigurationNames.RequirePushedAuthorizationRequests, _options.RequiredPushedAuthorizationRequest);
         result.Add(OpenIDConfigurationNames.AuthorizationDetailsSupported, true);
-        result.Add(OpenIDConfigurationNames.DPOPSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
+        result.Add(OpenIDConfigurationNames.DPOPSigningAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
         if (_options.MtlsEnabled)
         {
             result.Add(OpenIDConfigurationNames.MtlsEndpointAliases, JsonSerializer.SerializeToNode(new JsonObject
                 {
-                    { OAuthConfigurationNames.TokenEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.MtlsToken}" },
-                    { OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.MtlsBCAuthorize}" }
+                    { OAuthConfigurationNames.TokenEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.MtlsToken}" },
+                    { OpenIDConfigurationNames.BackchannelAuthenticationEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.MtlsBCAuthorize}" }
                 }));
         }
 

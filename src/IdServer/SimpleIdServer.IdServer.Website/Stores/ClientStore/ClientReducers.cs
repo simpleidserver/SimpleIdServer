@@ -507,7 +507,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 Alg = act.Alg,
                 Kid = act.KeyId,
                 KeyType = act.KeyType,
-                Usage = Constants.JWKUsages.Sig,
+                Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig,
                 SerializedJsonWebKey = JsonWebKeySerializer.Write(jsonWebKey)
             };
             keys.Add(new SelectableClientKey(newKey) { IsNew = true, Value = newKey });
@@ -528,7 +528,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
                 Alg = act.Alg,
                 Kid = act.KeyId,
                 KeyType = act.KeyType,
-                Usage = Constants.JWKUsages.Enc,
+                Usage = DefaultTokenSecurityAlgs.JwkUsages.Enc,
                 SerializedJsonWebKey = JsonWebKeySerializer.Write(jsonWebKey)
             };
             keys.Add(new SelectableClientKey(newKey) { IsNew = true, Value = newKey });

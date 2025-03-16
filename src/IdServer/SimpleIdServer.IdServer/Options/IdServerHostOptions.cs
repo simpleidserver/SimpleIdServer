@@ -120,7 +120,7 @@ public class IdServerHostOptions
     /// <summary>
     /// Default acr value.
     /// </summary>
-    public string DefaultAcrValue { get; set; } = Constants.StandardAcrs.FirstLevelAssurance.Name;
+    public string DefaultAcrValue { get; set; } = Config.DefaultAcrs.FirstLevelAssurance.Name;
     /// <summary>
     /// Enable or disable realm.
     /// </summary>

@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
@@ -83,11 +84,11 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public MobileClientBuilder EnableAccessToGrantsApi()
         {
-            if (!_client.Scopes.Any(s => s.Name == DefaultScopes.GrantManagementQuery.Name))
-                _client.Scopes.Add(DefaultScopes.GrantManagementQuery);
+            if (!_client.Scopes.Any(s => s.Name == Config.DefaultScopes.GrantManagementQuery.Name))
+                _client.Scopes.Add(Config.DefaultScopes.GrantManagementQuery);
 
-            if (!_client.Scopes.Any(s => s.Name == DefaultScopes.GrantManagementRevoke.Name))
-                _client.Scopes.Add(DefaultScopes.GrantManagementRevoke);
+            if (!_client.Scopes.Any(s => s.Name == Config.DefaultScopes.GrantManagementRevoke.Name))
+                _client.Scopes.Add(Config.DefaultScopes.GrantManagementRevoke);
 
             return this;
         }
@@ -99,7 +100,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public MobileClientBuilder EnableOfflineAccess()
         {
-            AddScope(Constants.DefaultScopes.OfflineAccessScope);
+            AddScope(Config.DefaultScopes.OfflineAccessScope);
             if (!_client.GrantTypes.Contains(RefreshTokenHandler.GRANT_TYPE))
                 _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             return this;
@@ -119,7 +120,7 @@ namespace SimpleIdServer.IdServer.Builders
         {
             var jsonWebKey = signingCredentials.SerializePublicJWK();
             jsonWebKey.Alg = alg;
-            _client.Add(signingCredentials.Kid, jsonWebKey, Constants.JWKUsages.Sig, keyType);
+            _client.Add(signingCredentials.Kid, jsonWebKey, DefaultTokenSecurityAlgs.JwkUsages.Sig, keyType);
             return this;
         }
 
@@ -133,7 +134,7 @@ namespace SimpleIdServer.IdServer.Builders
         {
             var jsonWebKey = credentials.SerializePublicJWK();
             jsonWebKey.Alg = credentials.Alg;
-            _client.Add(credentials.Key.KeyId, jsonWebKey, Constants.JWKUsages.Enc, keyType);
+            _client.Add(credentials.Key.KeyId, jsonWebKey, DefaultTokenSecurityAlgs.JwkUsages.Enc, keyType);
             return this;
         }
 

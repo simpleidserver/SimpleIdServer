@@ -54,7 +54,7 @@ namespace SimpleIdServer.IdServer.Api
             return false;
         }
 
-        protected Task<(JsonWebToken, Domains.Token)> CheckHasPAT(string realm) => CheckAccessToken(realm, Constants.DefaultScopes.UmaProtection.Name);
+        protected Task<(JsonWebToken, Domains.Token)> CheckHasPAT(string realm) => CheckAccessToken(realm, Config.DefaultScopes.UmaProtection.Name);
 
         protected async Task<(JsonWebToken, Domains.Token)> CheckAccessToken(string realm, string scope = null, string accessToken = null)
         {

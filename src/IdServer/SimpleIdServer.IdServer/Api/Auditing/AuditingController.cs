@@ -24,7 +24,7 @@ public class AuditingController : BaseController
     public async Task<IActionResult> Search([FromRoute] string prefix, [FromBody] SearchAuditingRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        await CheckAccessToken(prefix, Constants.DefaultScopes.Auditing.Name);
+        await CheckAccessToken(prefix, Config.DefaultScopes.Auditing.Name);
         prefix = prefix ?? Constants.DefaultRealm;
         var result = await _repository.Search(prefix, request, cancellationToken);
         return new OkObjectResult(result);

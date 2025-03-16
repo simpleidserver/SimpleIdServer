@@ -51,7 +51,7 @@ namespace SimpleIdServer.IdServer.Extractors
                 var allGroups = await _groupRepository.GetAllByStrictFullPath(context.Realm, grpPathLst, CancellationToken.None);
                 var roles = allGroups.SelectMany(g => g.Roles).Where(r => r.Realms.Any(re => re.Name == context.Realm)).Select(r => r.Name).Distinct();
                 foreach (var role in roles)
-                    newContext.User.AddClaim(Constants.UserClaims.Role, role);
+                    newContext.User.AddClaim(Config.DefaultUserClaims.Role, role);
             }
 
             return await Extract(newContext, mappingRules, CancellationToken.None);

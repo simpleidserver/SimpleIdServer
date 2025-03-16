@@ -145,7 +145,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         protected virtual void CheckUserCode(User user, string userCode)
         {
             if (string.IsNullOrWhiteSpace(userCode)) return;
-            var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
+            var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.AreaPwd && c.IsActive);
             var hash = PasswordHelper.ComputeHash(userCode, _options.IsPasswordEncodeInBase64);
             if (credential == null || credential.Value != PasswordHelper.ComputeHash(userCode, _options.IsPasswordEncodeInBase64))
                 throw new OAuthException(ErrorCodes.INVALID_CREDENTIALS, Global.InvalidUserCode);
@@ -223,8 +223,8 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             var clientNotificationToken = context.Request.RequestData.GetClientNotificationToken();
             Client openidClient = context.Client;
-            if (openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Ping &&
-                openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Push)
+            if (openidClient.BCTokenDeliveryMode != Config.DefaultNotificationModes.Ping &&
+                openidClient.BCTokenDeliveryMode != Config.DefaultNotificationModes.Push)
             {
                 return;
             }

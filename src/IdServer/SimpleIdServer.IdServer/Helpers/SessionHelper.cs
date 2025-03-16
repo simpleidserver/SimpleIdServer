@@ -56,7 +56,7 @@ public class SessionHelper : ISessionHelper
                 {
                     { JwtRegisteredClaimNames.Sub, subject },
                     { JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString() },
-                    { Constants.UserClaims.Events, events }
+                    { Config.DefaultUserClaims.Events, events }
                 };
                 if (client.BackChannelLogoutSessionRequired)
                 {

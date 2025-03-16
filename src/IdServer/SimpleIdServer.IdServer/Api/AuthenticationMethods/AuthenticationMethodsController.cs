@@ -50,7 +50,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationMethods.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationMethods.Name);
                 var authMethod = _authMethods.SingleOrDefault(m => m.Amr == amr);
                 if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(Global.AuthenticationMethodNotFound, amr)));
                 if (authMethod.OptionsType == null) return NoContent();
@@ -70,7 +70,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationMethods.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationMethods.Name);
                 var authMethod = _authMethods.SingleOrDefault(m => m.Amr == amr);
                 if (authMethod == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(string.Format(Global.AuthenticationMethodNotFound, amr)));
                 if (authMethod.OptionsType == null) return NoContent();
@@ -109,7 +109,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
         {
             try
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationMethods.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationMethods.Name);
                 var userLockingOptions = typeof(UserLockingOptions);
                 var section = _configuration.GetSection(userLockingOptions.Name);
                 var configuration = section.Get(userLockingOptions);
@@ -144,7 +144,7 @@ namespace SimpleIdServer.IdServer.Api.AuthenticationMethods
             try
             {
                 var type = typeof(UserLockingOptions);
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationMethods.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationMethods.Name);
                 foreach (var kvp in request.Values)
                     _configuration[$"{type.Name}:{kvp.Key}"] = kvp.Value;
                 return NoContent();

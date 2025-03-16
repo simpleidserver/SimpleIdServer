@@ -18,7 +18,7 @@ public static class SamlConfig
         };
         var scopes = new List<Scope>
         {
-            Constants.DefaultScopes.SAMLProfile
+            IdServer.Config.DefaultScopes.SAMLProfile
         };
         webApplicationBuilder.AddSidIdentityServer()
             .AddDeveloperSigningCredential()

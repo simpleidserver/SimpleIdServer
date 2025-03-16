@@ -4,6 +4,7 @@ using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
@@ -60,12 +61,12 @@ namespace SimpleIdServer.IdServer.Api.Configuration
             var jObj = new JsonObject
             {
                 [OAuthConfigurationNames.Issuer] = issuerStr,
-                [OAuthConfigurationNames.AuthorizationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Authorization}",
-                [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Registration}",
-                [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Token}",
-                [OAuthConfigurationNames.RevocationEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.Token}/revoke",
-                [OAuthConfigurationNames.JwksUri] = $"{issuer}/{subUrl}{Constants.EndPoints.Jwks}",
-                [OAuthConfigurationNames.IntrospectionEndpoint] = $"{issuer}/{subUrl}{Constants.EndPoints.TokenInfo}"
+                [OAuthConfigurationNames.AuthorizationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Authorization}",
+                [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Registration}",
+                [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Token}",
+                [OAuthConfigurationNames.RevocationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Token}/revoke",
+                [OAuthConfigurationNames.JwksUri] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Jwks}",
+                [OAuthConfigurationNames.IntrospectionEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.TokenInfo}"
             };
             var scopes = (await _scopeRepository.GetAllExposedScopes(prefix, cancellationToken)).Select(s => s.Name);
             jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);
@@ -74,7 +75,7 @@ namespace SimpleIdServer.IdServer.Api.Configuration
             jObj.Add(OAuthConfigurationNames.ResponseModesSupported, JsonSerializer.SerializeToNode(_oauthResponseModes.Select(s => s.ResponseMode)));
             jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JsonSerializer.SerializeToNode(GetGrantTypes()));
             jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JsonSerializer.SerializeToNode(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
-            jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(Constants.AllSigningAlgs));
+            jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
             return jObj;
         }
 

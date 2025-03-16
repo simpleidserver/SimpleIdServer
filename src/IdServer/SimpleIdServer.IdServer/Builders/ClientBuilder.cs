@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,7 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(TokenExchangePreAuthorizedCodeHandler.GRANT_TYPE);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
@@ -60,7 +61,7 @@ namespace SimpleIdServer.IdServer.Builders
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
             client.AuthorizationDataTypes.Add("openid_credential");
             client.GrantTypes.Add(PreAuthorizedCodeHandler.GRANT_TYPE);
@@ -86,7 +87,7 @@ namespace SimpleIdServer.IdServer.Builders
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(ClientCredentialsHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
@@ -114,11 +115,47 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             client.TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD;
             return new TraditionalWebsiteClientBuilder(client);
+        }
+
+        public static TraditionalWebsiteClientBuilder BuildSidAdmWebsite(string password, List<Scope> additionalScopes, params string[] redirectUrls)
+        {
+            var scopes = new List<Scope>
+            {
+                DefaultScopes.Role,
+                DefaultScopes.OpenIdScope,
+                DefaultScopes.Profile,
+                DefaultScopes.Provisioning,
+                DefaultScopes.Users,
+                DefaultScopes.Workflows,
+                DefaultScopes.Acrs,
+                DefaultScopes.ConfigurationsScope,
+                DefaultScopes.AuthenticationSchemeProviders,
+                DefaultScopes.AuthenticationMethods,
+                DefaultScopes.RegistrationWorkflows,
+                DefaultScopes.ApiResources,
+                DefaultScopes.Auditing,
+                DefaultScopes.Scopes,
+                DefaultScopes.CertificateAuthorities,
+                DefaultScopes.Clients,
+                DefaultScopes.Realms,
+                DefaultScopes.Groups,
+                DefaultScopes.WebsiteAdministratorRole,
+                DefaultScopes.Forms,
+                DefaultScopes.RecurringJobs,
+            };
+            scopes.AddRange(additionalScopes);
+            return ClientBuilder.BuildTraditionalWebsiteClient(DefaultClients.SidAdminClientId, password, null, redirectUrls)
+                .EnableClientGrantType()
+                .SetRequestObjectEncryption()
+                .AddAuthDataTypes("photo")
+                .SetClientName("SimpleIdServer manager")
+                .SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png")
+                .AddScope(scopes.ToArray());
         }
 
         /// <summary>
@@ -136,14 +173,14 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientType = ClientTypes.EXTERNAL,
                 TlsClientAuthSubjectDN = subjectName,
                 TokenEndPointAuthMethod = OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD,
-                BCTokenDeliveryMode = StandardNotificationModes.Poll,
+                BCTokenDeliveryMode = Config.DefaultNotificationModes.Poll,
                 BCAuthenticationRequestSigningAlg = SecurityAlgorithms.EcdsaSha256,
                 IdTokenSignedResponseAlg = SecurityAlgorithms.EcdsaSha256,
                 BCUserCodeParameter = false,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(CIBAHandler.GRANT_TYPE);
             return new ExternalDeviceClientBuilder(client);
@@ -169,7 +206,7 @@ namespace SimpleIdServer.IdServer.Builders
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow
             };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(DeviceCodeHandler.GRANT_TYPE);
             return new DeviceClientBuilder(client);
@@ -197,7 +234,7 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             return new MobileClientBuilder(client);
@@ -225,7 +262,7 @@ namespace SimpleIdServer.IdServer.Builders
                 IsPublic = true,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
             };
-            if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
             client.GrantTypes.Add(AuthorizationCodeHandler.GRANT_TYPE);
             return new UserAgentClientBuilder(client);

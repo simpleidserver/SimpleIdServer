@@ -75,8 +75,8 @@ namespace SimpleIdServer.IdServer.UI
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             var userId = User.Claims.SingleOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
             var newHtml = Html.Replace("{cookieName}", _options.GetSessionCookieName(_realmStore.Realm, userId));
-            var activeSessionUrl = $"{issuer}/{Constants.EndPoints.ActiveSession}";
-            if (!string.IsNullOrWhiteSpace(prefix)) activeSessionUrl = $"{issuer}/{prefix}/{Constants.EndPoints.ActiveSession}";
+            var activeSessionUrl = $"{issuer}/{Config.DefaultEndpoints.ActiveSession}";
+            if (!string.IsNullOrWhiteSpace(prefix)) activeSessionUrl = $"{issuer}/{prefix}/{Config.DefaultEndpoints.ActiveSession}";
             newHtml = newHtml.Replace("{activeSessionUrl}", activeSessionUrl);
             return new ContentResult
             {
@@ -105,7 +105,7 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> EndSession([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            var url = Constants.EndPoints.EndSessionCallback;
+            var url = Config.DefaultEndpoints.EndSessionCallback;
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();
             var postLogoutRedirectUri = jObjBody.GetPostLogoutRedirectUriFromRpInitiatedLogoutRequest();
@@ -138,7 +138,7 @@ namespace SimpleIdServer.IdServer.UI
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 if (Request.QueryString.HasValue)
                 {
-                    url = Request.GetEncodedPathAndQuery().Replace($"/{Constants.EndPoints.EndSession}", $"/{Constants.EndPoints.EndSessionCallback}");
+                    url = Request.GetEncodedPathAndQuery().Replace($"/{Config.DefaultEndpoints.EndSession}", $"/{Config.DefaultEndpoints.EndSessionCallback}");
                 }
 
                 var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(_realmStore.Realm, subject));
@@ -176,7 +176,7 @@ namespace SimpleIdServer.IdServer.UI
             }
         }
 
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         [HttpGet]
         public async Task<IActionResult> EndSessionCallback([FromRoute] string prefix, CancellationToken cancellationToken)
         {

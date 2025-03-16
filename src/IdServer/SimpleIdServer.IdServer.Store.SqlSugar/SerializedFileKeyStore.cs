@@ -53,7 +53,7 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
     {
         var result = await _dbContext.Client.Queryable<SugarSerializedFileKey>()
             .Includes(s => s.Realms)
-            .Where(s => s.Usage == Constants.JWKUsages.Enc && s.Realms.Any(r => r.RealmsName == realm))
+            .Where(s => s.Usage == DefaultTokenSecurityAlgs.JwkUsages.Enc && s.Realms.Any(r => r.RealmsName == realm))
             .ToListAsync(cancellationToken);
         return result.Select(r => r.ToDomain()).ToList();
     }
@@ -62,7 +62,7 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
     {
         var result = await _dbContext.Client.Queryable<SugarSerializedFileKey>()
             .Includes(s => s.Realms)
-            .Where(s => s.Usage == Constants.JWKUsages.Sig && s.Realms.Any(r => r.RealmsName == realm))
+            .Where(s => s.Usage == DefaultTokenSecurityAlgs.JwkUsages.Sig && s.Realms.Any(r => r.RealmsName == realm))
             .ToListAsync(cancellationToken);
         return result.Select(r => r.ToDomain()).ToList();
     }

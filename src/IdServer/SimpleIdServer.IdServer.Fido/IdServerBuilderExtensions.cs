@@ -11,7 +11,6 @@ using SimpleIdServer.IdServer.Fido;
 using SimpleIdServer.IdServer.Fido.Services;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
-using static SimpleIdServer.IdServer.Constants;
 using Constants = SimpleIdServer.IdServer.Fido.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -152,7 +151,7 @@ public static class IdServerBuilderExtensions
         UpdateDateTime = DateTime.UtcNow,
         Realms = new List<Realm>
         {
-            StandardRealms.Master
+            SimpleIdServer.IdServer.Config.DefaultRealms.Master
         }
     };
 
@@ -164,7 +163,7 @@ public static class IdServerBuilderExtensions
         UpdateDateTime = DateTime.UtcNow,
         Realms = new List<Realm>
         {
-            StandardRealms.Master
+            SimpleIdServer.IdServer.Config.DefaultRealms.Master
         }
     };
 }

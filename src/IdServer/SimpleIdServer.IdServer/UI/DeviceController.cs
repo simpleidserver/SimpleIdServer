@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI
 {
-    [Authorize(Constants.Policies.Authenticated)]
+    [Authorize(Constants.AuthenticatedPolicyName)]
     public class DeviceController : Controller
     {
         private readonly IDeviceAuthCodeRepository _deviceAuthCodeRepository;

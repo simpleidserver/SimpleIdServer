@@ -78,7 +78,7 @@ public class IdServerConfiguration
         {
             new GroupRealm
             {
-                RealmsName = StandardRealms.Master.Name
+                RealmsName = DefaultRealms.Master.Name
             }
         },
         Name = "fastFedAdministrator",
@@ -96,7 +96,7 @@ public class IdServerConfiguration
         Name = "university_degree",
         Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
         {
-            StandardRealms.Master
+            DefaultRealms.Master
         },
         Type = ScopeTypes.APIRESOURCE,
         Protocol = ScopeProtocols.OAUTH,
@@ -111,7 +111,7 @@ public class IdServerConfiguration
         Name = "ct_wallet",
         Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
         {
-            StandardRealms.Master
+            DefaultRealms.Master
         },
         Type = ScopeTypes.APIRESOURCE,
         Protocol = ScopeProtocols.OAUTH,
@@ -126,7 +126,7 @@ public class IdServerConfiguration
         Name = "scim",
         Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
         {
-            StandardRealms.Master
+            DefaultRealms.Master
         },
         Type = ScopeTypes.APIRESOURCE,
         Protocol = ScopeProtocols.OAUTH,
@@ -137,48 +137,48 @@ public class IdServerConfiguration
 
     public static ICollection<Scope> Scopes => new List<Scope>
     {
-        SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Profile,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.SAMLProfile,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.GrantManagementQuery,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.GrantManagementRevoke,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Users,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Register,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Provisioning,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Address,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Role,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.AuthenticationSchemeProviders,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.RegistrationWorkflows,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.AuthenticationMethods,
+        SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Profile,
+        SimpleIdServer.IdServer.Config.DefaultScopes.SAMLProfile,
+        SimpleIdServer.IdServer.Config.DefaultScopes.GrantManagementQuery,
+        SimpleIdServer.IdServer.Config.DefaultScopes.GrantManagementRevoke,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Users,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Register,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Provisioning,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Address,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Role,
+        SimpleIdServer.IdServer.Config.DefaultScopes.AuthenticationSchemeProviders,
+        SimpleIdServer.IdServer.Config.DefaultScopes.RegistrationWorkflows,
+        SimpleIdServer.IdServer.Config.DefaultScopes.AuthenticationMethods,
         SimpleIdServer.Configuration.Constants.ConfigurationsScope,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.ApiResources,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Auditing,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Scopes,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.CertificateAuthorities,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Clients,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Realms,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Groups,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.OfflineAccessScope,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.CredentialConfigurations,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.CredentialInstances,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.DeferredCreds,
+        SimpleIdServer.IdServer.Config.DefaultScopes.ApiResources,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Auditing,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Scopes,
+        SimpleIdServer.IdServer.Config.DefaultScopes.CertificateAuthorities,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Clients,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Realms,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Groups,
+        SimpleIdServer.IdServer.Config.DefaultScopes.OfflineAccessScope,
+        SimpleIdServer.IdServer.Config.DefaultScopes.CredentialConfigurations,
+        SimpleIdServer.IdServer.Config.DefaultScopes.CredentialInstances,
+        SimpleIdServer.IdServer.Config.DefaultScopes.DeferredCreds,
         UniversityDegreeScope,
         CtWalletScope,
         SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.WebsiteAdministratorRole,
+        SimpleIdServer.IdServer.Config.DefaultScopes.WebsiteAdministratorRole,
         ScimScope,
         IdProviderAdministratorScope,
         AppProviderAdministratorScope,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Acrs,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Workflows,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.Forms,
-        SimpleIdServer.IdServer.Constants.DefaultScopes.RecurringJobs
+        SimpleIdServer.IdServer.Config.DefaultScopes.Acrs,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Workflows,
+        SimpleIdServer.IdServer.Config.DefaultScopes.Forms,
+        SimpleIdServer.IdServer.Config.DefaultScopes.RecurringJobs
     };
 
     public static ICollection<User> Users => new List<User>
     {
-        SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser,
-        SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser,
+        SimpleIdServer.IdServer.Config.DefaultUsers.Administrator,
+        SimpleIdServer.IdServer.Config.DefaultUsers.ReadonlyAdministrator,
         UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build()
     };
 
@@ -190,8 +190,8 @@ public class IdServerConfiguration
         ClientBuilder.BuildCredentialIssuer("CredentialIssuer", "password", null, "https://38a0-81-246-134-116.ngrok-free.app/signin-oidc", "https://localhost:5005/*", "http://localhost:5005/*", "https://credentialissuer.simpleidserver.com/*", "https://credentialissuer.localhost.com/*", "https://credentialissuer.sid.svc.cluster.local/*")
             .SetClientName("Credential issuer")
             .AddScope(
-                SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Profile,
+                SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Profile,
                 UniversityDegreeScope,
                 CtWalletScope).IsTransactionCodeRequired().Build(),
         ClientBuilder.BuildTraditionalWebsiteClient("CredentialIssuer-manager", "password", null, "https://localhost:5006/*", "https://credentialissuerwebsite.simpleidserver.com/*", "https://credentialissuerwebsite.localhost.com/*", "http://credentialissuerwebsite.localhost.com/*", "https://credentialissuerwebsite.sid.svc.cluster.local/*").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("https://localhost:5006/signout-callback-oidc").AddPostLogoutUri("https://credissuer-website.sid.svc.cluster.local/signout-callback-oidc")
@@ -201,105 +201,107 @@ public class IdServerConfiguration
             .SetBackChannelLogoutUrl("https://localhost:5006/bc-logout")
             .SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png")
             .AddScope(
-                SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Profile,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.CredentialConfigurations,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.CredentialInstances,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.DeferredCreds).Build(),
+                SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Profile,
+                SimpleIdServer.IdServer.Config.DefaultScopes.CredentialConfigurations,
+                SimpleIdServer.IdServer.Config.DefaultScopes.CredentialInstances,
+                SimpleIdServer.IdServer.Config.DefaultScopes.DeferredCreds).Build(),
         ClientBuilder.BuildTraditionalWebsiteClient("identityProvider", "password", null, "https://localhost:5020/*").EnableClientGrantType()
             .SetClientName("Identity Provider")
             .AddScope(
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Role,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Profile,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Groups,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Role,
+                SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Profile,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Groups,
                 IdServerConfiguration.IdProviderAdministratorScope).Build(),
         ClientBuilder.BuildTraditionalWebsiteClient("applicationProvider", "password", null, "https://localhost:5021/*").EnableClientGrantType()
             .SetClientName("Application Provider")
             .AddScope(
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Role,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Profile,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Groups,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Role,
+                SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Profile,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Groups,
                 IdServerConfiguration.AppProviderAdministratorScope).Build(),
-        ClientBuilder.BuildTraditionalWebsiteClient("SIDS-manager", "password", null, "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*").EnableClientGrantType().SetRequestObjectEncryption().AddPostLogoutUri("https://localhost:5002/signout-callback-oidc").AddPostLogoutUri("https://website.sid.svc.cluster.local/signout-callback-oidc")
-            .AddPostLogoutUri("https://website.simpleidserver.com/signout-callback-oidc")
+        ClientBuilder.BuildTraditionalWebsiteClient("SIDS-manager", "password", null, "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*")
+            .EnableClientGrantType()
+            .SetRequestObjectEncryption()
+            .AddPostLogoutUri("https://localhost:5002/signout-callback-oidc").AddPostLogoutUri("https://website.sid.svc.cluster.local/signout-callback-oidc").AddPostLogoutUri("https://website.simpleidserver.com/signout-callback-oidc")
             .AddAuthDataTypes("photo")
             .SetClientName("SimpleIdServer manager")
             .SetBackChannelLogoutUrl("https://localhost:5002/bc-logout")
             .SetClientLogoUri("https://cdn.logo.com/hotlink-ok/logo-social.png")
             .AddScope(
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Role,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope, 
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Profile, 
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Provisioning,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Users,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Workflows,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Acrs,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Role,
+                SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope, 
+                SimpleIdServer.IdServer.Config.DefaultScopes.Profile, 
+                SimpleIdServer.IdServer.Config.DefaultScopes.Provisioning,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Users,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Workflows,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Acrs,
                 SimpleIdServer.Configuration.Constants.ConfigurationsScope, 
-                SimpleIdServer.IdServer.Constants.DefaultScopes.AuthenticationSchemeProviders, 
-                SimpleIdServer.IdServer.Constants.DefaultScopes.AuthenticationMethods, 
-                SimpleIdServer.IdServer.Constants.DefaultScopes.RegistrationWorkflows,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.ApiResources,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Auditing,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Scopes, 
-                SimpleIdServer.IdServer.Constants.DefaultScopes.CertificateAuthorities,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Clients,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Realms, 
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Groups,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.WebsiteAdministratorRole,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.Forms,
-                SimpleIdServer.IdServer.Constants.DefaultScopes.RecurringJobs,
+                SimpleIdServer.IdServer.Config.DefaultScopes.AuthenticationSchemeProviders, 
+                SimpleIdServer.IdServer.Config.DefaultScopes.AuthenticationMethods, 
+                SimpleIdServer.IdServer.Config.DefaultScopes.RegistrationWorkflows,
+                SimpleIdServer.IdServer.Config.DefaultScopes.ApiResources,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Auditing,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Scopes, 
+                SimpleIdServer.IdServer.Config.DefaultScopes.CertificateAuthorities,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Clients,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Realms, 
+                SimpleIdServer.IdServer.Config.DefaultScopes.Groups,
+                SimpleIdServer.IdServer.Config.DefaultScopes.WebsiteAdministratorRole,
+                SimpleIdServer.IdServer.Config.DefaultScopes.Forms,
+                SimpleIdServer.IdServer.Config.DefaultScopes.RecurringJobs,
                 SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
         ClientBuilder.BuildTraditionalWebsiteClient("swaggerClient", "password", null, "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html", "http://localhost").AddScope(
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Provisioning, 
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Users, 
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Acrs, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.Provisioning, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.Users, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.Acrs, 
             SimpleIdServer.Configuration.Constants.ConfigurationsScope,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.AuthenticationSchemeProviders,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.AuthenticationMethods, 
-            SimpleIdServer.IdServer.Constants.DefaultScopes.RegistrationWorkflows, 
-            SimpleIdServer.IdServer.Constants.DefaultScopes.ApiResources, 
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Auditing, 
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Scopes, 
-            SimpleIdServer.IdServer.Constants.DefaultScopes.CertificateAuthorities,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Clients, 
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Realms,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Groups,
+            SimpleIdServer.IdServer.Config.DefaultScopes.AuthenticationSchemeProviders,
+            SimpleIdServer.IdServer.Config.DefaultScopes.AuthenticationMethods, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.RegistrationWorkflows, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.ApiResources, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.Auditing, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.Scopes, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.CertificateAuthorities,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Clients, 
+            SimpleIdServer.IdServer.Config.DefaultScopes.Realms,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Groups,
             SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
         ClientBuilder.BuildTraditionalWebsiteClient("postman", "password", null, "http://localhost").EnableClientGrantType().AddScope(
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Provisioning,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Users,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Acrs,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Provisioning,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Users,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Acrs,
             SimpleIdServer.Configuration.Constants.ConfigurationsScope,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.AuthenticationSchemeProviders,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.AuthenticationMethods,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.RegistrationWorkflows,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.ApiResources,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Auditing,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Scopes,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.CertificateAuthorities,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Clients,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Realms,
-            SimpleIdServer.IdServer.Constants.DefaultScopes.Groups,
+            SimpleIdServer.IdServer.Config.DefaultScopes.AuthenticationSchemeProviders,
+            SimpleIdServer.IdServer.Config.DefaultScopes.AuthenticationMethods,
+            SimpleIdServer.IdServer.Config.DefaultScopes.RegistrationWorkflows,
+            SimpleIdServer.IdServer.Config.DefaultScopes.ApiResources,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Auditing,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Scopes,
+            SimpleIdServer.IdServer.Config.DefaultScopes.CertificateAuthorities,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Clients,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Realms,
+            SimpleIdServer.IdServer.Config.DefaultScopes.Groups,
             SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build(),
         WsClientBuilder.BuildWsFederationClient("urn:website").SetClientName("NAME").Build(),
         ClientBuilder.BuildUserAgentClient("oauth", "password", null, "https://oauth.tools/callback/code")
-            .AddScope(SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.DefaultScopes.Profile)
+            .AddScope(SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Config.DefaultScopes.Profile)
             .Build(),
         ClientBuilder.BuildTraditionalWebsiteClient("fapi", "password", null, "https://localhost:8443/test/(.*)")
             .SetIdTokenSignedResponseAlg(SecurityAlgorithms.EcdsaSha256)
             .SetRequestObjectSigning(SecurityAlgorithms.EcdsaSha256)
             .SetSigAuthorizationResponse(SecurityAlgorithms.EcdsaSha256)
-            .AddScope(SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.DefaultScopes.Profile)
+            .AddScope(SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Config.DefaultScopes.Profile)
             .UseClientTlsAuthentication("CN=sidClient, O=Internet Widgits Pty Ltd, S=BE, C=BE")
             .AddSigningKey(new SigningCredentials(SimpleIdServer.IdServer.PemImporter.Import(new SimpleIdServer.IdServer.PemResult("-----BEGIN PUBLIC KEY-----\nMFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIe\nsCLiWObLDFKKf3gJl0hll/ZTI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END PUBLIC KEY-----", "-----BEGIN EC PRIVATE KEY-----\nMHcCAQEEIDHtu+N0u38ZN7DF/TpycDfaUs8WfPGUB3UusR0uv3TVoAoGCCqGSM49\nAwEHoUQDQgAEK21CoKCA2Vk5zPM+7+vqtnrq4pIesCLiWObLDFKKf3gJl0hll/ZT\nI5ww/oRrKIXO/uRe9AkckkKwqrqqXGnvsQ==\n-----END EC PRIVATE KEY-----"), "keyId"), SecurityAlgorithms.EcdsaSha256), SecurityAlgorithms.EcdsaSha256, SecurityKeyTypes.ECDSA)
             .Build(),
         ClientBuilder.BuildApiClient("scimClient", "password").AddScope(ScimScope)
             .Build(),
-        ClientBuilder.BuildApiClient("fastFed", "password").AddScope(SimpleIdServer.IdServer.Constants.DefaultScopes.Clients, SimpleIdServer.IdServer.Constants.DefaultScopes.Scopes).Build(),
-        ClientBuilder.BuildApiClient("managementClient", "password").AddScope(SimpleIdServer.IdServer.Constants.DefaultScopes.Users).AddScope(SimpleIdServer.IdServer.Constants.DefaultScopes.Register).Build(),
-        ClientBuilder.BuildDeviceClient("deviceClient", "password").AddScope(SimpleIdServer.IdServer.Constants.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Constants.DefaultScopes.Profile).Build(),
+        ClientBuilder.BuildApiClient("fastFed", "password").AddScope(SimpleIdServer.IdServer.Config.DefaultScopes.Clients, SimpleIdServer.IdServer.Config.DefaultScopes.Scopes).Build(),
+        ClientBuilder.BuildApiClient("managementClient", "password").AddScope(SimpleIdServer.IdServer.Config.DefaultScopes.Users).AddScope(SimpleIdServer.IdServer.Config.DefaultScopes.Register).Build(),
+        ClientBuilder.BuildDeviceClient("deviceClient", "password").AddScope(SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Config.DefaultScopes.Profile).Build(),
         SamlSpClientBuilder.BuildSamlSpClient("samlSp", "http://localhost:5125/Metadata").Build()
     };
 
@@ -333,12 +335,12 @@ public class IdServerConfiguration
 
     public static ICollection<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
     {
-        SimpleIdServer.IdServer.Constants.StandardRealms.Master
+        SimpleIdServer.IdServer.Config.DefaultRealms.Master
     };
 
     public static ICollection<CertificateAuthority> CertificateAuthorities = new List<CertificateAuthority>
     {
-        CertificateAuthorityBuilder.Create("CN=simpleIdServerCA", SimpleIdServer.IdServer.Constants.StandardRealms.Master).Build()
+        CertificateAuthorityBuilder.Create("CN=simpleIdServerCA", SimpleIdServer.IdServer.Config.DefaultRealms.Master).Build()
     };
 
     public static ICollection<IdentityProvisioningDefinition> IdentityProvisioningDefLst = new List<IdentityProvisioningDefinition>

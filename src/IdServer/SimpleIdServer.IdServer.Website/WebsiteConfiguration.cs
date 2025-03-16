@@ -18,9 +18,9 @@ namespace SimpleIdServer.IdServer.Website
 
         public static List<string> StandardScopes = new List<string>
         {
-            Constants.DefaultScopes.OpenIdScope.Name,
-            Constants.DefaultScopes.Profile.Name,
-            Constants.DefaultScopes.SAMLProfile.Name
+            Config.DefaultScopes.OpenIdScope.Name,
+            Config.DefaultScopes.Profile.Name,
+            Config.DefaultScopes.SAMLProfile.Name
         };
     }
 }

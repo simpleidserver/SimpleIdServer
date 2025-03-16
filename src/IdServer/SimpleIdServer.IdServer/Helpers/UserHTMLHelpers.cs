@@ -15,7 +15,7 @@ namespace Microsoft.AspNetCore.Mvc.Rendering
                 src = picture;
             else
             {
-                var cl = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == SimpleIdServer.IdServer.Constants.UserClaims.Picture);
+                var cl = claimsPrincipal.Claims.FirstOrDefault(c => c.Type == SimpleIdServer.IdServer.Config.DefaultUserClaims.Picture);
                 if (cl != null)
                     src = cl.Value;
             }

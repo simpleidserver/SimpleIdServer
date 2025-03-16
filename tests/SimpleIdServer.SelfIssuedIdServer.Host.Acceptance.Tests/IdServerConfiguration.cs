@@ -8,6 +8,6 @@ public class IdServerConfiguration
 {
     public static List<SimpleIdServer.IdServer.Domains.Realm> Realms = new List<SimpleIdServer.IdServer.Domains.Realm>
     {
-        SimpleIdServer.IdServer.Constants.StandardRealms.Master
+        SimpleIdServer.IdServer.Config.DefaultRealms.Master
     };
 }

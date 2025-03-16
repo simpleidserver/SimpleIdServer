@@ -80,7 +80,7 @@ public class RealmsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.DefaultScopes.Realms.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.Realms.Name);
             var realms = await _realmRepository.GetAll(cancellationToken);
             return new OkObjectResult(realms);
         }
@@ -101,17 +101,17 @@ public class RealmsController : BaseController
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    await CheckAccessToken(prefix, Constants.DefaultScopes.Realms.Name);
+                    await CheckAccessToken(prefix, DefaultScopes.Realms.Name);
                     var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
                     if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
                     var clonedForms = new List<FormRecord>();
                     var clonedWorkflows = new List<WorkflowRecord>();
                     var realm = new Realm { Name = request.Name, Description = request.Description, CreateDateTime = DateTime.UtcNow, UpdateDateTime = DateTime.UtcNow };
                     var administratorRole = RealmRoleBuilder.BuildAdministrativeRole(realm);
-                    var users = await _userRepository.GetUsersBySubjects(Constants.RealmStandardUsers, Constants.DefaultRealm, cancellationToken);
-                    var groups = await _groupRepository.GetAllByStrictFullPath(Constants.DefaultRealm, Constants.RealmStandardGroupsFullPath, cancellationToken);
-                    var clients = await _clientRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardClients, cancellationToken);
-                    var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, Constants.RealmStandardScopes, cancellationToken);
+                    var users = await _userRepository.GetUsersBySubjects(DefaultUsers.AllUserNames, Constants.DefaultRealm, cancellationToken);
+                    var groups = await _groupRepository.GetAllByStrictFullPath(Constants.DefaultRealm, DefaultGroups.AllFullPath, cancellationToken);
+                    var clients = await _clientRepository.GetAll(Constants.DefaultRealm, DefaultClients.AllClientIds, cancellationToken);
+                    var scopes = await _scopeRepository.GetAll(Constants.DefaultRealm, DefaultScopes.DefaultRealmScopeNames, cancellationToken);
                     var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
                     var acrs = await _authenticationContextClassReferenceRepository.GetAll(Constants.DefaultRealm, cancellationToken);
                     var forms = await _formStore.GetAll(prefix, cancellationToken);
@@ -207,7 +207,7 @@ public class RealmsController : BaseController
         {
             try
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.Realms.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.Realms.Name);
                 if (id == Constants.DefaultRealm) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CannotRemoveMasterRealm);
                 using (var transaction = _transactionBuilder.Build())
                 {

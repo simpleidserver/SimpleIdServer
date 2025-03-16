@@ -22,7 +22,7 @@ using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Pwd;
 
-[Area(Constants.Areas.Password)]
+[Area(Constants.AreaPwd)]
 public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 {
     public RegisterController(
@@ -41,7 +41,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
     {
     }
 
-    protected override string Amr => Constants.Areas.Password;
+    protected override string Amr => Constants.AreaPwd;
 
     [HttpGet]
     public async Task<IActionResult> Index([FromRoute] string prefix, string? redirectUrl = null, CancellationToken cancellationToken = default(CancellationToken))
@@ -116,7 +116,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                 return View(result);
             }
 
-            return await base.CreateUser(result, userRegistrationProgress, viewModel, prefix, Constants.Areas.Password, viewModel.ReturnUrl);
+            return await base.CreateUser(result, userRegistrationProgress, viewModel, prefix, Constants.AreaPwd, viewModel.ReturnUrl);
         }
 
         async Task<IActionResult> UpdateUser()
@@ -135,7 +135,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                 });
                 UserRepository.Update(user);
                 await transaction.Commit(cancellationToken);
-                return await base.UpdateUser(result, userRegistrationProgress, viewModel, Constants.Areas.Password, viewModel.ReturnUrl);
+                return await base.UpdateUser(result, userRegistrationProgress, viewModel, Constants.AreaPwd, viewModel.ReturnUrl);
             }
         }
     }

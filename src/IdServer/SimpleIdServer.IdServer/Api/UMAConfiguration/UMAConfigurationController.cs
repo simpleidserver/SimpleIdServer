@@ -24,8 +24,8 @@ namespace SimpleIdServer.IdServer.Api.UMAConfiguration
             if (!string.IsNullOrWhiteSpace(prefix))
                 prefix = $"{prefix}/";
 
-            result.Add(UMAConfigurationNames.PermissionEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UMAPermissions}");
-            result.Add(UMAConfigurationNames.ResourceRegistrationEndpoint, $"{issuer}/{prefix}{Constants.EndPoints.UMAResources}");
+            result.Add(UMAConfigurationNames.PermissionEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.UMAPermissions}");
+            result.Add(UMAConfigurationNames.ResourceRegistrationEndpoint, $"{issuer}/{prefix}{Config.DefaultEndpoints.UMAResources}");
             return new OkObjectResult(result);
         }
     }

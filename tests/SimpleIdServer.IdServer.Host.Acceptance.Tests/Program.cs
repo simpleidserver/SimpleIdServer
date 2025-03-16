@@ -45,7 +45,7 @@ builder.Services.AddSidIdentityServer(o =>
 })
     .UseInMemoryEFStore(o =>
     {
-        var acrs = new List<AuthenticationContextClassReference> { SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance };
+        var acrs = new List<AuthenticationContextClassReference> { SimpleIdServer.IdServer.Config.DefaultAcrs.FirstLevelAssurance };
         foreach (var acr in acrs)
             acr.AuthenticationWorkflow = StandardPwdAuthWorkflows.pwdWorkflowId;
         o.AddInMemoryAcr(acrs);
@@ -60,7 +60,7 @@ builder.Services.AddSidIdentityServer(o =>
         o.AddInMemoryUserSessions(IdServerConfiguration.Sessions);
         o.AddInMemoryDeviceCodes(IdServerConfiguration.DeviceAuthCodes);
         o.AddInMemoryFederatonEntities(IdServerConfiguration.FederationEntities);
-        o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
+        o.AddInMemoryKeys(SimpleIdServer.IdServer.Config.DefaultRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
             new SigningCredentials(BuildRsaSecurityKey("keyid2"), SecurityAlgorithms.RsaSha384),

@@ -29,9 +29,9 @@ public class SamlSpClientBuilder
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow
         };
-        if (realm == null) client.Realms.Add(Constants.StandardRealms.Master);
+        if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
         else client.Realms.Add(realm);
-        client.Scopes.Add(Constants.DefaultScopes.SAMLProfile);
+        client.Scopes.Add(Config.DefaultScopes.SAMLProfile);
         client.SetSaml2SpMetadataUrl(metadataUrl);
         client.SetSaml2SigningCertificate(certificate);
         return new SamlSpClientBuilder(client);

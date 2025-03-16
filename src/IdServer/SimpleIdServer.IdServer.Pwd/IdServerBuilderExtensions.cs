@@ -49,8 +49,8 @@ public static class IdServerBuilderExtensions
         using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
         {
             var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
-            SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance.AuthenticationWorkflow = StandardPwdAuthWorkflows.completePwdAuthWorkflowId;
-            acrStore.Add(SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance);
+            SimpleIdServer.IdServer.Config.DefaultAcrs.FirstLevelAssurance.AuthenticationWorkflow = StandardPwdAuthWorkflows.completePwdAuthWorkflowId;
+            acrStore.Add(SimpleIdServer.IdServer.Config.DefaultAcrs.FirstLevelAssurance);
 
             var formStore = serviceProvider.GetService<IFormStore>();
             formStore.Add(StandardPwdAuthForms.PwdForm);
@@ -66,17 +66,17 @@ public static class IdServerBuilderExtensions
             workflowStore.SaveChanges(CancellationToken.None).Wait();
 
             var registrationStore = serviceProvider.GetService<IRegistrationWorkflowRepository>();
-            registrationStore.Add(RegistrationWorkflowBuilder.New(SimpleIdServer.IdServer.Constants.Areas.Password, StandardPwdRegistrationWorkflows.workflowId).Build());
+            registrationStore.Add(RegistrationWorkflowBuilder.New(SimpleIdServer.IdServer.Constants.AreaPwd, StandardPwdRegistrationWorkflows.workflowId).Build());
 
             if(isDefaultAuthMethod)
             {
                 idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
                 {
-                    o.DefaultAcrValue = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance.Name;
+                    o.DefaultAcrValue = SimpleIdServer.IdServer.Config.DefaultAcrs.FirstLevelAssurance.Name;
                 });
                 idServerBuilder.SidAuthCookie.Callback = (o) =>
                 {
-                    o.LoginPath = $"/{SimpleIdServer.IdServer.Constants.Areas.Password}/Authenticate";
+                    o.LoginPath = $"/{SimpleIdServer.IdServer.Constants.AreaPwd}/Authenticate";
                 };
             }
         }

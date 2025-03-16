@@ -18,14 +18,14 @@ namespace SimpleIdServer.IdServer.Builders
         public static ApiResourceBuilder Create(string name, string description, params Scope[] scopes)
         {
             var record = new ApiResource { Id = Guid.NewGuid().ToString(), Name = name, Description = description, Scopes = scopes };
-            record.Realms.Add(Constants.StandardRealms.Master);
+            record.Realms.Add(Config.DefaultRealms.Master);
             return new ApiResourceBuilder(record);
         }
 
         public static ApiResourceBuilder Create(string name, string audience, string description, params Scope[] scopes)
         {
             var record = new ApiResource { Id = Guid.NewGuid().ToString(), Name = name, Description = description, Scopes = scopes, Audience = audience };
-            record.Realms.Add(Constants.StandardRealms.Master);
+            record.Realms.Add(Config.DefaultRealms.Master);
             return new ApiResourceBuilder(record);
         }
 

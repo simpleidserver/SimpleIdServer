@@ -13,7 +13,6 @@ using SimpleIdServer.IdServer.Email.Services;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
-using static SimpleIdServer.IdServer.Constants;
 using Constants = SimpleIdServer.IdServer.Email.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -81,7 +80,7 @@ public static class IdServerBuilderExtensions
         UpdateDateTime = DateTime.UtcNow,
         Realms = new List<Realm>
         {
-            StandardRealms.Master
+            SimpleIdServer.IdServer.Config.DefaultRealms.Master
         }
     };
 };

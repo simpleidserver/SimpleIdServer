@@ -26,7 +26,7 @@ using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Pwd.UI;
 
-[Area(Constants.Areas.Password)]
+[Area(Constants.AreaPwd)]
 public class ResetController : BaseController
 {
     private readonly IdServerHostOptions _options;
@@ -154,7 +154,7 @@ public class ResetController : BaseController
         // 4. Send the OTP code.
         var url = Url.Action("Confirm", "Reset", new
         {
-            area = Constants.Areas.Password
+            area = Constants.AreaPwd
         });
         var issuer = Request.GetAbsoluteUriWithVirtualPath();
         var parameter = new ResetPasswordParameter(
@@ -248,13 +248,13 @@ public class ResetController : BaseController
             }
 
             var user = await _authenticationHelper.GetUserByLogin(resetPasswordLink.Login, prefix, cancellationToken);
-            var credential = user.Credentials.SingleOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
+            var credential = user.Credentials.SingleOrDefault(c => c.CredentialType == Constants.AreaPwd && c.IsActive);
             if (credential == null)
             {
                 credential = new UserCredential
                 {
                     Id = Guid.NewGuid().ToString(),
-                    CredentialType = Constants.Areas.Password,
+                    CredentialType = Constants.AreaPwd,
                     IsActive = true
                 };
                 user.Credentials.Add(credential);

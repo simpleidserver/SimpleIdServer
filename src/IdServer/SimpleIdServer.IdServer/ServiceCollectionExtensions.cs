@@ -43,6 +43,7 @@ using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Console.Services;
 using SimpleIdServer.IdServer.Domains;
@@ -212,7 +213,7 @@ public static class ServiceCollectionExtensions
         services.AddAuthorization();
         services.Configure<AuthorizationOptions>(o =>
         {
-            o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
+            o.AddPolicy(Constants.AuthenticatedPolicyName, p => p.RequireAuthenticatedUser());
         });
         var authBuilder = services
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -274,7 +275,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The services collection.</returns>
     public static IServiceCollection AddJsonSeeding(this IServiceCollection services, IConfiguration configuration)
     {
-        string jsonSeedsFilePath = configuration.GetValue<string>(Constants.ConfigurationSections.JsonSeedsFilePath);
+        string jsonSeedsFilePath = configuration.GetValue<string>(ConfigurationSections.JsonSeedsFilePath);
         services.AddOptionsWithValidateOnStart<JsonSeedingOptions>()
             .Configure(options =>
             {
@@ -556,7 +557,7 @@ public class SidAuthCookie
     {
         Callback = (o) =>
         {
-            o.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
+            o.LoginPath = $"/{Constants.AreaPwd}/Authenticate";
         };
     }
 

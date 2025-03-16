@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Authorization.Validators;
 using SimpleIdServer.IdServer.Api.Token.TokenProfiles;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -162,7 +163,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
         protected async Task<AuthorizationResponse> BuildSelfIssuedResponse(HandlerContext context, CancellationToken cancellationToken)
         {
             await _validator.ValidateSelfIssuedAuthorizationRequest(context, cancellationToken);
-            var redirectUri = $"{context.GetIssuer()}/{Constants.EndPoints.AuthorizationCallback}";
+            var redirectUri = $"{context.GetIssuer()}/{Config.DefaultEndpoints.AuthorizationCallback}";
             var targetUri = context.Request.RequestData.GetRedirectUriFromAuthorizationRequest();
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
@@ -174,7 +175,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                 Claims = new Dictionary<string, object>
                 {
                     { AuthorizationRequestParameters.ResponseType, IdTokenResponseTypeHandler.RESPONSE_TYPE },
-                    { AuthorizationRequestParameters.ResponseMode, Constants.StandardResponseModes.DirectPost },
+                    { AuthorizationRequestParameters.ResponseMode, ResponseModeNames.DirectPost },
                     { AuthorizationRequestParameters.ClientId, context.Client.ClientId },
                     { AuthorizationRequestParameters.RedirectUri, redirectUri },
                     { AuthorizationRequestParameters.Scope, string.Join(" ", scopes) },
@@ -188,7 +189,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             {
                 { AuthorizationRequestParameters.ClientId, context.Client.ClientId },
                 { AuthorizationRequestParameters.ResponseType, IdTokenResponseTypeHandler.RESPONSE_TYPE },
-                { AuthorizationRequestParameters.ResponseMode, Constants.StandardResponseModes.DirectPost },
+                { AuthorizationRequestParameters.ResponseMode, ResponseModeNames.DirectPost },
                 { AuthorizationRequestParameters.Scope, string.Join(" ", scopes) },
                 { AuthorizationRequestParameters.RedirectUri, redirectUri },
                 { AuthorizationRequestParameters.Request, jwt },
@@ -224,14 +225,14 @@ namespace SimpleIdServer.IdServer.Api.Authorization
             switch (grantManagementAction)
             {
                 // create a fresh grant.
-                case Constants.StandardGrantManagementActions.Create:
+                case DefaultGrantManagementActions.Create:
                     {
                         grant = context.User.AddConsent(context.Realm, context.Client.ClientId, allClaims, extractionResult.Authorizations, authDetails.ToList());
                         context.Request.OriginalRequestData.Add(AuthorizationRequestParameters.GrantId, grant.Id);
                     }
                     break;
                 // change the grant to be ONLY the permissions requested by the client and consented by the resource owner.
-                case Constants.StandardGrantManagementActions.Replace:
+                case DefaultGrantManagementActions.Replace:
                     {
                         if (grant == null)
                             throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(Global.UnknownGrant, grantId));
@@ -245,7 +246,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
                     }
                     break;
                 // merge the permissions consented by the resource owner in the actual request with those which already exist within the grant and shall invalidate existing refresh tokens associated with the updated grant
-                case Constants.StandardGrantManagementActions.Merge:
+                case DefaultGrantManagementActions.Merge:
                     {
                         if (grant == null)
                             throw new OAuthException(ErrorCodes.INVALID_GRANT, string.Format(Global.UnknownGrant, grantId));

@@ -18,20 +18,20 @@ public static class SwaggerConfig
         };
         var scopes = new List<Scope>
         {
-            Constants.DefaultScopes.Provisioning,
-            Constants.DefaultScopes.Users,
-            Constants.DefaultScopes.Acrs,
-            Constants.DefaultScopes.ConfigurationsScope,
-            Constants.DefaultScopes.AuthenticationSchemeProviders,
-            Constants.DefaultScopes.AuthenticationMethods,
-            Constants.DefaultScopes.RegistrationWorkflows,
-            Constants.DefaultScopes.ApiResources,
-            Constants.DefaultScopes.Auditing,
-            Constants.DefaultScopes.Scopes,
-            Constants.DefaultScopes.CertificateAuthorities,
-            Constants.DefaultScopes.Clients,
-            Constants.DefaultScopes.Realms,
-            Constants.DefaultScopes.Groups
+            IdServer.Config.DefaultScopes.Provisioning,
+            IdServer.Config.DefaultScopes.Users,
+            IdServer.Config.DefaultScopes.Acrs,
+            IdServer.Config.DefaultScopes.ConfigurationsScope,
+            IdServer.Config.DefaultScopes.AuthenticationSchemeProviders,
+            IdServer.Config.DefaultScopes.AuthenticationMethods,
+            IdServer.Config.DefaultScopes.RegistrationWorkflows,
+            IdServer.Config.DefaultScopes.ApiResources,
+            IdServer.Config.DefaultScopes.Auditing,
+            IdServer.Config.DefaultScopes.Scopes,
+            IdServer.Config.DefaultScopes.CertificateAuthorities,
+            IdServer.Config.DefaultScopes.Clients,
+            IdServer.Config.DefaultScopes.Realms,
+            IdServer.Config.DefaultScopes.Groups
         };
         webApplicationBuilder.AddSidIdentityServer(o =>
         {
@@ -58,20 +58,20 @@ public static class SwaggerConfig
         };
         var scopes = new List<Scope>
         {
-            Constants.DefaultScopes.Provisioning,
-            Constants.DefaultScopes.Users,
-            Constants.DefaultScopes.Acrs,
-            Constants.DefaultScopes.ConfigurationsScope,
-            Constants.DefaultScopes.AuthenticationSchemeProviders,
-            Constants.DefaultScopes.AuthenticationMethods,
-            Constants.DefaultScopes.RegistrationWorkflows,
-            Constants.DefaultScopes.ApiResources,
-            Constants.DefaultScopes.Auditing,
-            Constants.DefaultScopes.Scopes,
-            Constants.DefaultScopes.CertificateAuthorities,
-            Constants.DefaultScopes.Clients,
-            Constants.DefaultScopes.Realms,
-            Constants.DefaultScopes.Groups
+            IdServer.Config.DefaultScopes.Provisioning,
+            IdServer.Config.DefaultScopes.Users,
+            IdServer.Config.DefaultScopes.Acrs,
+            IdServer.Config.DefaultScopes.ConfigurationsScope,
+            IdServer.Config.DefaultScopes.AuthenticationSchemeProviders,
+            IdServer.Config.DefaultScopes.AuthenticationMethods,
+            IdServer.Config.DefaultScopes.RegistrationWorkflows,
+            IdServer.Config.DefaultScopes.ApiResources,
+            IdServer.Config.DefaultScopes.Auditing,
+            IdServer.Config.DefaultScopes.Scopes,
+            IdServer.Config.DefaultScopes.CertificateAuthorities,
+            IdServer.Config.DefaultScopes.Clients,
+            IdServer.Config.DefaultScopes.Realms,
+            IdServer.Config.DefaultScopes.Groups
         };
         webApplicationBuilder.AddSidIdentityServer(o =>
         {

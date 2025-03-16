@@ -76,7 +76,7 @@ namespace SimpleIdServer.IdServer.Api.Register
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        await CheckAccessToken(prefix, Constants.DefaultScopes.Register.Name);
+                        await CheckAccessToken(prefix, Config.DefaultScopes.Register.Name);
                         var client = await Build(request, cancellationToken);
                         await _validator.Validate(prefix, client, cancellationToken);
                         _clientRepository.Add(client);

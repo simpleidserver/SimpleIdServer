@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.UI
 {
-    [Authorize(Constants.Policies.Authenticated)]
+    [Authorize(Constants.AuthenticatedPolicyName)]
     public class ConsentsController : Controller
     {
         private readonly IUserRepository _userRepository;
