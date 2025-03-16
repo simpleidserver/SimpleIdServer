@@ -96,7 +96,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public async virtual Task<IActionResult> Profile([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -107,7 +107,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpPost]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public async Task<IActionResult> UpdatePicture([FromResult] string prefix, IFormFile file, CancellationToken cancellationToken)
         {
             using (var transaction = _transactionBuilder.Build())
@@ -124,7 +124,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public async virtual Task<IActionResult> RejectConsent([FromRoute] string prefix, string consentId, CancellationToken cancellationToken)
         {
             using (var transaction = _transactionBuilder.Build())
@@ -143,7 +143,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public async virtual Task<IActionResult> RejectUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
             using(var transaction = _transactionBuilder.Build())
@@ -168,7 +168,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public async virtual Task<IActionResult> ConfirmUmaPendingRequest(string ticketId, CancellationToken cancellationToken)
         {
             using (var transaction = _transactionBuilder.Build())
@@ -195,7 +195,7 @@ namespace SimpleIdServer.IdServer.UI
         #region Account Linking
 
         [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public virtual IActionResult Link(string scheme, string returnUrl)
         {
             if(string.IsNullOrWhiteSpace(scheme))
@@ -218,7 +218,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public async virtual Task<IActionResult> LinkCallback([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -272,7 +272,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpPost]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         [ValidateAntiForgeryToken]
         public async virtual Task<IActionResult> Unlink([FromRoute] string prefix, UnlinkProfileViewModel viewModel, CancellationToken cancellationToken)
         {
@@ -298,7 +298,7 @@ namespace SimpleIdServer.IdServer.UI
         #endregion
 
         [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public async virtual Task<IActionResult> GetOTP([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -310,7 +310,7 @@ namespace SimpleIdServer.IdServer.UI
         }
 
         [HttpGet]
-        [Authorize(Constants.Policies.Authenticated)]
+        [Authorize(Constants.AuthenticatedPolicyName)]
         public async virtual Task<IActionResult> RegisterCredential([FromRoute] string prefix, string name, string redirectUrl)
         {
             prefix = prefix ?? Constants.DefaultRealm;
@@ -378,7 +378,7 @@ namespace SimpleIdServer.IdServer.UI
             });
             var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
             viewModel.Name = user.Name;
-            var claimPicture = user.OAuthUserClaims.FirstOrDefault(c => c.Name == Constants.StandardClaims.Picture.Name);
+            var claimPicture = user.OAuthUserClaims.FirstOrDefault(c => c.Name == Config.DefaultClaimMappers.Picture.Name);
             if (claimPicture != null)
                 viewModel.Picture = claimPicture.Value;
             viewModel.HasOtpKey = user.ActiveOTP != null;

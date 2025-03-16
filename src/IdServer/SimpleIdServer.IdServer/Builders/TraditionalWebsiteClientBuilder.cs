@@ -4,14 +4,13 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -41,9 +40,9 @@ namespace SimpleIdServer.IdServer.Builders
         /// Allows client to use CIBA grant-type.
         /// </summary>
         /// <returns></returns>
-        public TraditionalWebsiteClientBuilder EnableCIBAGrantType(string deliveryMode = StandardNotificationModes.Poll, string notificationEdp = null, int? interval = null)
+        public TraditionalWebsiteClientBuilder EnableCIBAGrantType(string deliveryMode = DefaultNotificationModes.Poll, string notificationEdp = null, int? interval = null)
         {
-            if (deliveryMode != StandardNotificationModes.Poll && string.IsNullOrWhiteSpace(notificationEdp)) throw new ArgumentException("the notification endpoint must be specified");
+            if (deliveryMode != DefaultNotificationModes.Poll && string.IsNullOrWhiteSpace(notificationEdp)) throw new ArgumentException("the notification endpoint must be specified");
             _client.GrantTypes.Add(CIBAHandler.GRANT_TYPE);
             _client.BCTokenDeliveryMode = deliveryMode;
             _client.BCUserCodeParameter = true;
@@ -129,11 +128,11 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public TraditionalWebsiteClientBuilder EnableAccessToGrantsApi()
         {
-            if (!_client.Scopes.Any(s => s.Name == DefaultScopes.GrantManagementQuery.Name))
-                _client.Scopes.Add(DefaultScopes.GrantManagementQuery);
+            if (!_client.Scopes.Any(s => s.Name == Config.DefaultScopes.GrantManagementQuery.Name))
+                _client.Scopes.Add(Config.DefaultScopes.GrantManagementQuery);
 
-            if (!_client.Scopes.Any(s => s.Name == DefaultScopes.GrantManagementRevoke.Name))
-                _client.Scopes.Add(DefaultScopes.GrantManagementRevoke);
+            if (!_client.Scopes.Any(s => s.Name == Config.DefaultScopes.GrantManagementRevoke.Name))
+                _client.Scopes.Add(Config.DefaultScopes.GrantManagementRevoke);
 
             return this;
         }
@@ -145,7 +144,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public TraditionalWebsiteClientBuilder EnableOfflineAccess()
         {
-            AddScope(Constants.DefaultScopes.OfflineAccessScope);
+            AddScope(Config.DefaultScopes.OfflineAccessScope);
             if (!_client.GrantTypes.Contains(RefreshTokenHandler.GRANT_TYPE))
                 _client.GrantTypes.Add(RefreshTokenHandler.GRANT_TYPE);
             return this;
@@ -190,7 +189,7 @@ namespace SimpleIdServer.IdServer.Builders
         {
             var jsonWebKey = signingCredentials.SerializePublicJWK();
             jsonWebKey.Alg = alg;
-            _client.Add(signingCredentials.Kid, jsonWebKey, Constants.JWKUsages.Sig, securityKey);
+            _client.Add(signingCredentials.Kid, jsonWebKey, DefaultTokenSecurityAlgs.JwkUsages.Sig, securityKey);
             return this;
         }
 
@@ -204,7 +203,7 @@ namespace SimpleIdServer.IdServer.Builders
         {
             var jsonWebKey = credentials.SerializePublicJWK();
             jsonWebKey.Alg = credentials.Alg;
-            _client.Add(credentials.Key.KeyId, jsonWebKey, Constants.JWKUsages.Enc, keyType);
+            _client.Add(credentials.Key.KeyId, jsonWebKey, DefaultTokenSecurityAlgs.JwkUsages.Enc, keyType);
             return this;
         }
 
@@ -304,7 +303,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public TraditionalWebsiteClientBuilder UsePingDeliveryMode(int interval = 5)
         {
-            _client.BCTokenDeliveryMode = StandardNotificationModes.Ping;
+            _client.BCTokenDeliveryMode = DefaultNotificationModes.Ping;
             _client.BCIntervalSeconds = interval;
             return this;
         }
@@ -316,7 +315,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public TraditionalWebsiteClientBuilder UsePollDeliveryMode(int interval = 5)
         {
-            _client.BCTokenDeliveryMode = StandardNotificationModes.Poll;
+            _client.BCTokenDeliveryMode = DefaultNotificationModes.Poll;
             _client.BCIntervalSeconds = interval;
             return this;
         }
@@ -328,7 +327,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public TraditionalWebsiteClientBuilder UsePushDeliveryMode()
         {
-            _client.BCTokenDeliveryMode = StandardNotificationModes.Push;
+            _client.BCTokenDeliveryMode = DefaultNotificationModes.Push;
             return this;
         }
 

@@ -28,7 +28,7 @@ namespace SimpleIdServer.IdServer.UI
         public byte[] GenerateQRCode(User user, UserCredential credential)
         {
             var alg = Enum.GetName(typeof(OTPAlgs), credential.OTPAlg).ToLowerInvariant();
-            var url = $"otpauth://{alg}/{_options.OTPIssuer}:{user.Name}?secret={credential.Value}&issuer={_options.OTPIssuer}&algorithm=SHA1";
+            var url = $"otpauth://{alg}/{_options.OtpIssuer}:{user.Name}?secret={credential.Value}&issuer={_options.OtpIssuer}&algorithm=SHA1";
             if (credential.OTPAlg == OTPAlgs.HOTP)
                 url = $"{url}&counter={credential.OTPCounter}";
             if (credential.OTPAlg == OTPAlgs.TOTP)

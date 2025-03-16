@@ -53,7 +53,7 @@
 
             @switch(SelectedKeyType.Usage)
             {
-                case SimpleIdServer.IdServer.Constants.JWKUsages.Sig:
+                case SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.JwkUsages.Sig:
                     <RadzenTemplateForm Submit=@GenerateSigKey TItem="SigKeyGenerationForm" Data=@sigKeyGeneration>
                         <!-- Key Identifier -->
                         <div>
@@ -84,7 +84,7 @@
                         <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@Global.Generate" />
                     </RadzenTemplateForm>
                     break;
-                case SimpleIdServer.IdServer.Constants.JWKUsages.Enc:
+                case SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.JwkUsages.Enc:
                     <RadzenTemplateForm Submit=@GenerateEncKey TItem="EncKeyGenerationForm" Data=@encKeyGeneration>
                         <!-- Key Identifier -->
                         <div>
@@ -116,7 +116,7 @@
                         <div>
                             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Encryption</RadzenText>
                             <RadzenDropDown Name="Enc" Class="w-100"
-                                    Data=@SimpleIdServer.IdServer.Constants.AllEncryptions
+                                    Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllEncs
                                     TValue="string"
                                     @bind-Value=@encKeyGeneration.Enc />
                             <RadzenRequiredValidator Component="Enc" Text="@Global.EncryptionRequired"></RadzenRequiredValidator>
@@ -148,7 +148,7 @@
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Algorithm</RadzenText>
                     <RadzenDropDown Name="Alg" Class="w-100"
-                                    Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                                    Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllSigAlgs
                                     TValue="string"
                                     Disabled=true
                                     @bind-Value=@generatedSigKey.Alg />
@@ -191,7 +191,7 @@
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Algorithm</RadzenText>
                     <RadzenDropDown Name="Alg" Class="w-100"
-                                    Data=@SimpleIdServer.IdServer.Constants.AllEncAlgs
+                                    Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllEncAlgs
                                     TValue="string"
                                     Disabled=true
                                 @bind-Value=@generatedEncKey.Alg />
@@ -200,7 +200,7 @@
                 <div>
                     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Encryption</RadzenText>
                     <RadzenDropDown Name="Alg" Class="w-100"
-                                Data=@SimpleIdServer.IdServer.Constants.AllEncryptions
+                                Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllEncs
                                 TValue="string"
                                 Disabled=true
                                 @bind-Value=@generatedEncKey.Enc />
@@ -296,8 +296,8 @@
 
     ICollection<KeyType> KeyTypes { get; set;} = new List<KeyType>
     {
-        new KeyType { Name = Global.SignatureKey, ShortDescription = Global.SignatureKeyParameters, Description = Global.GenerateSignatureKeyHelper, Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Sig, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SigKey.png" },
-        new KeyType { Name = Global.EncryptionKey, ShortDescription = Global.Jwe, Description = Global.GenerateEncryptionKeyHelper, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/EncKey.png", Usage = SimpleIdServer.IdServer.Constants.JWKUsages.Enc }
+        new KeyType { Name = Global.SignatureKey, ShortDescription = Global.SignatureKeyParameters, Description = Global.GenerateSignatureKeyHelper, Usage = SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.JwkUsages.Sig, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/SigKey.png" },
+        new KeyType { Name = Global.EncryptionKey, ShortDescription = Global.Jwe, Description = Global.GenerateEncryptionKeyHelper, PictureUrl = "_content/SimpleIdServer.IdServer.Website/images/EncKey.png", Usage = SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.JwkUsages.Enc }
     };
 
     KeyType? SelectedKeyType { get; set; } = null;

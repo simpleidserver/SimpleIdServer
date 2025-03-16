@@ -26,7 +26,7 @@ public class ConfigurationDefsController : BaseController
 	public async Task<IActionResult> GetAll([FromRoute] string prefix)
     {
         prefix = prefix ?? IdServer.Constants.DefaultRealm;
-        await CheckAccessToken(prefix, IdServer.Constants.DefaultScopes.ConfigurationsScope.Name);
+        await CheckAccessToken(prefix, IdServer.Config.DefaultScopes.ConfigurationsScope.Name);
         var confDefs = await _configurationDefinitionStore.GetAll(CancellationToken.None);
         return Ok(confDefs.Select(d => Build(d)));
     }

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System.Security.Cryptography.X509Certificates;
 namespace SimpleIdServer.IdServer.Saml.Idp.Extensions;
@@ -44,7 +45,7 @@ public static class ClientExtensions
         var securityKey = new X509SecurityKey(sigCertificate, keyId);
         var signingCredentials = new SigningCredentials(securityKey, alg);
         var jsonWebKey = signingCredentials.SerializePublicJWK();
-        client.Add(keyId, jsonWebKey, IdServer.Constants.JWKUsages.Sig, SecurityKeyTypes.CERTIFICATE);
+        client.Add(keyId, jsonWebKey, DefaultTokenSecurityAlgs.JwkUsages.Sig, SecurityKeyTypes.CERTIFICATE);
         parameters.Add(SAML2_SIG_CERTIFICATE_NAME, keyId);
         client.Parameters = parameters;
     }

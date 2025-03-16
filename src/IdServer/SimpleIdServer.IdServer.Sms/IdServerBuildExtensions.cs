@@ -2,24 +2,19 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using FormBuilder;
-using FormBuilder.Builders;
-using FormBuilder.Repositories;
-using FormBuilder.Stores;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Sms.Services;
-using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IdServerBuildExtensions
 {
-    public static IdServerBuilder AddSmsAuthentication(this IdServerBuilder idServerBuilder, bool isInMemory = false, bool isDefaultAuthMethod = false)
+    // Adds SMS Authentication services to the IdServer configuration.
+    public static IdServerBuilder AddSmsAuthentication(this IdServerBuilder idServerBuilder, bool isDefaultAuthMethod = false)
     {
         idServerBuilder.Services.AddTransient<IUserNotificationService, SmsUserNotificationService>();
         idServerBuilder.Services.AddTransient<ISmsUserNotificationService, SmsUserNotificationService>();
@@ -29,54 +24,18 @@ public static class IdServerBuildExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, SmsRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, SmsAuthWorkflowLayout>();
         idServerBuilder.AutomaticConfigurationOptions.Add<IdServerSmsOptions>();
-        if (isInMemory)
+        if (isDefaultAuthMethod)
         {
-            Seed(idServerBuilder, isDefaultAuthMethod);
+            idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
+            {
+                o.DefaultAcrValue = SimpleIdServer.IdServer.Sms.Constants.AMR;
+            });
+            idServerBuilder.SidAuthCookie.Callback = (o) =>
+            {
+                o.LoginPath = $"/{SimpleIdServer.IdServer.Sms.Constants.AMR}/Authenticate";
+            };
         }
 
         return idServerBuilder;
     }
-
-    private static void Seed(IdServerBuilder idServerBuilder, bool isDefaultAuthMethod)
-    {
-        using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
-        {
-            var newAcr = BuildAcr();
-            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
-            acrStore.Add(newAcr);
-
-            var formStore = serviceProvider.GetService<IFormStore>();
-            formStore.Add(StandardSmsAuthForms.SmsForm);
-            formStore.Add(StandardSmsRegisterForms.SmsForm);
-            formStore.SaveChanges(CancellationToken.None).Wait();
-
-            var workflowStore = serviceProvider.GetService<IWorkflowStore>();
-            workflowStore.Add(StandardSmsAuthWorkflows.DefaultWorkflow);
-            workflowStore.SaveChanges(CancellationToken.None).Wait();
-
-            if (isDefaultAuthMethod)
-            {
-                idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
-                {
-                    o.DefaultAcrValue = newAcr.Name;
-                });
-                idServerBuilder.SidAuthCookie.Callback = (o) =>
-                {
-                    o.LoginPath = $"/{SimpleIdServer.IdServer.Sms.Constants.AMR}/Authenticate";
-                };
-            }
-        }
-    }
-
-    private static AuthenticationContextClassReference BuildAcr() => new AuthenticationContextClassReference
-    {
-        Id = Guid.NewGuid().ToString(),
-        Name = "sms",
-        DisplayName = "sms",
-        UpdateDateTime = DateTime.UtcNow,
-        Realms = new List<Realm>
-        {
-            StandardRealms.Master
-        }
-    };
 }

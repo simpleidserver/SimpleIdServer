@@ -150,8 +150,8 @@ namespace SimpleIdServer.IdServer.Jobs
 
         protected virtual Dictionary<string, Func<BCAuthorize, NotificationParameter, Task>> GetNotificationMethods() => new Dictionary<string, Func<BCAuthorize, NotificationParameter, Task>>
         {
-            { Constants.StandardNotificationModes.Ping, HandlePingNotification },
-            { Constants.StandardNotificationModes.Push, HandlePushNotification }
+            { Config.DefaultNotificationModes.Ping, HandlePingNotification },
+            { Config.DefaultNotificationModes.Push, HandlePushNotification }
         };
 
         protected class NotificationParameter

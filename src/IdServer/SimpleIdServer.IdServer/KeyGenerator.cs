@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace SimpleIdServer.IdServer;
 
 public static class KeyGenerator
 {
-    public static SerializedFileKey GenerateRSASigningCredentials(Domains.Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.RsaSha256)
+    public static SerializedFileKey GenerateRSASigningCredentials(Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.RsaSha256)
     {
         var sig = ClientKeyGenerator.GenerateRSASignatureKey(keyid, alg);
         var pem = PemConverter.ConvertFromSecurityKey(sig.Key);
@@ -24,14 +25,14 @@ public static class KeyGenerator
             KeyId = sig.Kid,
             PrivateKeyPem = pem.PrivateKey,
             PublicKeyPem = pem.PublicKey,
-            Usage = Constants.JWKUsages.Sig,
+            Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig,
             IsSymmetric = false
         };
         result.Realms.Add(realm);
         return result;
     }
 
-    public static SerializedFileKey GenerateECDSASigningCredentials(Domains.Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.EcdsaSha256)
+    public static SerializedFileKey GenerateECDSASigningCredentials(Realm realm, string keyid = "keyId", string alg = SecurityAlgorithms.EcdsaSha256)
     {
         var sig = ClientKeyGenerator.GenerateECDsaSignatureKey(keyid, alg);
         var pem = PemConverter.ConvertFromSecurityKey(sig.Key);
@@ -44,14 +45,14 @@ public static class KeyGenerator
             KeyId = sig.Kid,
             PrivateKeyPem = pem.PrivateKey,
             PublicKeyPem = pem.PublicKey,
-            Usage = Constants.JWKUsages.Sig,
+            Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig,
             IsSymmetric = false
         };
         result.Realms.Add(realm);
         return result;
     }
 
-    public static SerializedFileKey GenerateX509SigningCredentials(Domains.Realm realm, string keyId = "keyId")
+    public static SerializedFileKey GenerateX509SigningCredentials(Realm realm, string keyId = "keyId")
     {
         var certificate = KeyGenerator.GenerateSelfSignedCertificate();
         var securityKey = new X509SecurityKey(certificate, keyId);
@@ -65,7 +66,7 @@ public static class KeyGenerator
             KeyId = keyId,
             PrivateKeyPem = pem.PrivateKey,
             PublicKeyPem = pem.PublicKey,
-            Usage = Constants.JWKUsages.Sig,
+            Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig,
             IsSymmetric = false,
             Realms = new List<Domains.Realm>
             {

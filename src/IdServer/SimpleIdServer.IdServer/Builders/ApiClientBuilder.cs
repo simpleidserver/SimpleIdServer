@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers.Models;
 using System;
@@ -33,7 +34,7 @@ namespace SimpleIdServer.IdServer.Builders
         {
             var jsonWebKey = signingCredentials.SerializePublicJWK();
             jsonWebKey.Alg = alg;
-            _client.Add(signingCredentials.Kid, jsonWebKey, Constants.JWKUsages.Sig, securityKey);
+            _client.Add(signingCredentials.Kid, jsonWebKey, DefaultTokenSecurityAlgs.JwkUsages.Sig, securityKey);
             return this;
         }
 
@@ -237,7 +238,7 @@ namespace SimpleIdServer.IdServer.Builders
             _client.SerializedJsonWebKeys.Add(new ClientJsonWebKey
             {
                 Kid = keyId,
-                Usage = Constants.JWKUsages.Sig,
+                Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig,
                 Alg = SecurityAlgorithms.RsaSha256,
                 KeyType = SecurityKeyTypes.CERTIFICATE,
                 SerializedJsonWebKey = JsonWebKeySerializer.Write(jwk)
@@ -262,7 +263,7 @@ namespace SimpleIdServer.IdServer.Builders
         /// <returns></returns>
         public ApiClientBuilder ActAsUMAResourceServer()
         {
-            AddScope(Constants.DefaultScopes.UmaProtection);
+            AddScope(Config.DefaultScopes.UmaProtection);
             return this;
         }
 

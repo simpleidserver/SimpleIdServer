@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -25,11 +26,11 @@ public class AuthenticationSchemeProviderBuilder
             Description = description,
             CreateDateTime = DateTime.UtcNow,
             UpdateDateTime = DateTime.UtcNow,
-            Mappers = Constants.GetDefaultIdProviderMappers(),
+            Mappers = DefaultAuthSchemeProviderMapper.All,
             AuthSchemeProviderDefinition = definition,
             Realms = new List<Domains.Realm>
             {
-                Constants.StandardRealms.Master
+                Config.DefaultRealms.Master
             }
         });
     }

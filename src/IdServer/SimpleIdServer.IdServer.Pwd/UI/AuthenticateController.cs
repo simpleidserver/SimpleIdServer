@@ -22,7 +22,7 @@ using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.UI;
 
-[Area(Constants.Areas.Password)]
+[Area(Constants.AreaPwd)]
 public class AuthenticateController : BaseAuthenticationMethodController<AuthenticatePasswordViewModel>
 {
     private readonly IConfiguration _configuration;
@@ -55,7 +55,7 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         _configuration = configuration;
     }
 
-    protected override string Amr => Constants.Areas.Password;
+    protected override string Amr => Constants.AreaPwd;
 
     protected override bool IsExternalIdProvidersDisplayed => true;
 

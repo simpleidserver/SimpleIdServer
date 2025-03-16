@@ -50,7 +50,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.Groups.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                 var result = await _groupRepository.Search(prefix, request, cancellationToken);
                 return new OkObjectResult(result);
             }
@@ -67,7 +67,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.Groups.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                 var result = await _groupRepository.Get(prefix, id, cancellationToken);
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
                 var splittedFullPath = result.FullPath.Split('.');
@@ -94,7 +94,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
             prefix = prefix ?? Constants.DefaultRealm;
             try
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.Groups.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                 var result = await _groupRepository.Get(prefix, id, cancellationToken);
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
                 var children = await _groupRepository.GetAllByFullPath(prefix, id, result.FullPath, cancellationToken);
@@ -125,7 +125,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     using (var transaction = _transactionBuilder.Build())
                     {
                         activity?.SetTag("realm", prefix);
-                        await CheckAccessToken(prefix, Constants.DefaultScopes.Groups.Name);
+                        await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.GetAllByFullPath(prefix, request.FullPath, cancellationToken);
                         _groupRepository.DeleteRange(result);
                         activity?.SetStatus(ActivityStatusCode.Ok, $"Groups {request.FullPath} are removed");
@@ -153,7 +153,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     using (var transaction = _transactionBuilder.Build())
                     {
                         activity?.SetTag("realm", prefix);
-                        await CheckAccessToken(prefix, Constants.DefaultScopes.Groups.Name);
+                        await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var fullPath = request.Name;
                         if (!string.IsNullOrWhiteSpace(request.ParentGroupId))
                         {
@@ -213,7 +213,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     using (var transaction = _transactionBuilder.Build())
                     {
                         activity?.SetTag("realm", prefix);
-                        await CheckAccessToken(prefix, Constants.DefaultScopes.Groups.Name);
+                        await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.Get(prefix, id, cancellationToken);
                         if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
                         var scope = await _scopeRepository.GetByName(prefix, request.Scope, cancellationToken);
@@ -251,7 +251,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
                     using (var transaction = _transactionBuilder.Build())
                     {
                         activity?.SetTag("realm", prefix);
-                        await CheckAccessToken(prefix, Constants.DefaultScopes.Groups.Name);
+                        await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.Get(prefix, id, cancellationToken);
                         if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
                         var role = result.Roles.SingleOrDefault(r => r.Id == roleId);

@@ -18,14 +18,14 @@ public static class WsFederationConfig
         };
         var scopes = new List<Scope>
         {
-            Constants.DefaultScopes.SAMLProfile
+            IdServer.Config.DefaultScopes.SAMLProfile
         };
         webApplicationBuilder.AddSidIdentityServer()
             .AddDeveloperSigningCredential()
             .AddInMemoryClients(clients)
             .AddInMemoryScopes(scopes)
             .AddInMemoryUsers(Config.Users)
-            .AddPwdAuthentication(true, true)
+            .AddPwdAuthentication(true)
             .AddWsFederation();
         var app = webApplicationBuilder.Build();
         app.UseSid();

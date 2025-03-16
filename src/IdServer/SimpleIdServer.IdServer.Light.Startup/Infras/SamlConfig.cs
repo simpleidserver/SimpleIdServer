@@ -18,14 +18,14 @@ public static class SamlConfig
         };
         var scopes = new List<Scope>
         {
-            Constants.DefaultScopes.SAMLProfile
+            IdServer.Config.DefaultScopes.SAMLProfile
         };
         webApplicationBuilder.AddSidIdentityServer()
             .AddDeveloperSigningCredential()
             .AddInMemoryClients(clients)
             .AddInMemoryScopes(scopes)
             .AddInMemoryUsers(Config.Users)
-            .AddPwdAuthentication(true, true)
+            .AddPwdAuthentication(true)
             .AddSamlIdp();
 
         var app = webApplicationBuilder.Build();

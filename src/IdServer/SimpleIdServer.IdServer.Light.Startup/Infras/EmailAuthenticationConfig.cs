@@ -17,7 +17,7 @@ public static class EmailAuthenticationConfig
             .AddDeveloperSigningCredential()
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddEmailAuthentication(true, true);
+            .AddEmailAuthentication(true);
 
         var app = webApplicationBuilder.Build();
         app.UseSid();
@@ -34,7 +34,7 @@ public static class EmailAuthenticationConfig
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
             .AddInMemoryRealms(Config.Realms)
-            .AddEmailAuthentication(true, true)
+            .AddEmailAuthentication(true)
             .EnableRealm();
 
         var app = webApplicationBuilder.Build();

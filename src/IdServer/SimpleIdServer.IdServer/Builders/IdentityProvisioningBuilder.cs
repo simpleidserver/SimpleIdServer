@@ -26,7 +26,7 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 Definition = definition
             };
-            if (realm == null) result.Realms.Add(Constants.StandardRealms.Master);
+            if (realm == null) result.Realms.Add(Config.DefaultRealms.Master);
             else result.Realms.Add(realm);
             return new IdentityProvisioningBuilder(result);
         }

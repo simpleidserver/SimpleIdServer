@@ -86,9 +86,9 @@ namespace SimpleIdServer.IdServer.UI
             };
             try
             {
-                var issuer = $"{Request.GetAbsoluteUriWithVirtualPath()}/{Constants.EndPoints.BCCallback}";
+                var issuer = $"{Request.GetAbsoluteUriWithVirtualPath()}/{Config.DefaultEndpoints.BCCallback}";
                 if(!string.IsNullOrWhiteSpace(prefix))                
-                    issuer = $"{Request.GetAbsoluteUriWithVirtualPath()}/{prefix}/{Constants.EndPoints.BCCallback}";
+                    issuer = $"{Request.GetAbsoluteUriWithVirtualPath()}/{prefix}/{Config.DefaultEndpoints.BCCallback}";
 
                 var queries = ExtractQuery(confirmConsentsViewModel.ReturnUrl);
                 viewModel = await BuildViewModel(prefix, queries, viewModel.ReturnUrl, cancellationToken);

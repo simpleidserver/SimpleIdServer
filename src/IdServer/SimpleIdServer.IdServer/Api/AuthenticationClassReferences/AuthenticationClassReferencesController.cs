@@ -64,7 +64,7 @@ public class AuthenticationClassReferencesController : BaseController
         try
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.DefaultScopes.Acrs.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
             var result = await _authenticationContextClassReferenceRepository.GetAll(prefix, cancellationToken);
             return new OkObjectResult(result);
         }
@@ -79,7 +79,7 @@ public class AuthenticationClassReferencesController : BaseController
     public async Task<IActionResult> GetAllForms([FromRoute] string prefix, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        await CheckAccessToken(prefix, Constants.DefaultScopes.Acrs.Name);
+        await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
         var result = await _formStore.GetByCategory(prefix, FormCategories.Authentication, cancellationToken);
         return new OkObjectResult(result);
     }
@@ -90,7 +90,7 @@ public class AuthenticationClassReferencesController : BaseController
         try
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.DefaultScopes.Acrs.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
             var result = _workflowLayoutServices.Where(w => w.Category == FormCategories.Authentication).Select(w => w.Get());
             return new OkObjectResult(result);
         }
@@ -107,7 +107,7 @@ public class AuthenticationClassReferencesController : BaseController
         try
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            await CheckAccessToken(prefix, Constants.DefaultScopes.Acrs.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
             var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
             if (acr == null) return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
             return new OkObjectResult(acr);
@@ -129,7 +129,7 @@ public class AuthenticationClassReferencesController : BaseController
                 using (var transaction = _transactionBuilder.Build())
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    await CheckAccessToken(prefix, Constants.DefaultScopes.Acrs.Name);
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
                     await Validate();
                     var realm = await _realmRepository.Get(prefix, cancellationToken);
                     var record = new AuthenticationContextClassReference
@@ -188,7 +188,7 @@ public class AuthenticationClassReferencesController : BaseController
             using (var transaction = _transactionBuilder.Build())
             {
                 prefix = prefix ?? Constants.DefaultRealm;
-                await CheckAccessToken(prefix, Constants.DefaultScopes.Acrs.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
                 var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
                 if (acr == null)
                 {

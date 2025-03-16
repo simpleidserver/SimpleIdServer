@@ -19,7 +19,7 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
     {
         public ClaimsJwsPayloadEnricher()
         {
-            AllUserClaims = Constants.AllUserClaims.ToList();
+            AllUserClaims = Config.DefaultUserClaims.All.ToList();
         }
 
         protected List<string> AllUserClaims { get; private set; }

@@ -32,7 +32,7 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
             var clientId = context.Request.RequestData.GetClientIdFromAuthorizationRequest();
             var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
             context.SetClient(await AuthenticateClient(context.Realm, clientId, cancellationToken));
-            var unsupportedScopes = scopes.Where(s => s != Constants.DefaultScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
+            var unsupportedScopes = scopes.Where(s => s != Config.DefaultScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
                 throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedScopes, string.Join(",", unsupportedScopes)));
 

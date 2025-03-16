@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.Scim.Domains;
@@ -39,7 +40,7 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
     {
         return _dbContext.SerializedFileKeys
             .Include(s => s.Realms)
-            .Where(s => s.Usage == Constants.JWKUsages.Sig && s.Realms.Any(r => r.Name == realm))
+            .Where(s => s.Usage == DefaultTokenSecurityAlgs.JwkUsages.Sig && s.Realms.Any(r => r.Name == realm))
             .ToListAsync(cancellationToken);
     }
 
@@ -47,7 +48,7 @@ public class SerializedFileKeyStore : IFileSerializedKeyStore
     {
         return _dbContext.SerializedFileKeys
             .Include(s => s.Realms)
-            .Where(s => s.Usage == Constants.JWKUsages.Enc && s.Realms.Any(r => r.Name == realm))
+            .Where(s => s.Usage == DefaultTokenSecurityAlgs.JwkUsages.Enc && s.Realms.Any(r => r.Name == realm))
             .ToListAsync(cancellationToken);
     }
 

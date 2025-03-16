@@ -17,7 +17,7 @@ public static class SmsAuthenticationConfig
             .AddDeveloperSigningCredential()
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddSmsAuthentication(true, true);
+            .AddSmsAuthentication(true);
 
         var app = webApplicationBuilder.Build();
         app.UseSid();
@@ -34,7 +34,7 @@ public static class SmsAuthenticationConfig
             .AddInMemoryRealms(Config.Realms)
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddSmsAuthentication(true, true)
+            .AddSmsAuthentication(true)
             .EnableRealm();
 
         var app = webApplicationBuilder.Build();

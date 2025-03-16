@@ -1,11 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using DataSeeder;
 using FormBuilder;
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.VerifiablePresentation;
-using SimpleIdServer.IdServer.VerifiablePresentation.Apis.Authorization;
+using SimpleIdServer.IdServer.VerifiablePresentation.Migrations;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -22,6 +22,13 @@ namespace Microsoft.Extensions.DependencyInjection
             idServerBuilder.Services.AddTransient<IAuthenticationMethodService, VpAuthenticationMethodService>();
             idServerBuilder.Services.AddDid();
             idServerBuilder.Services.AddTransient<IWorkflowLayoutService, VpRegisterWorkflowLayout>();
+            idServerBuilder.Services.AddTransient<IDataSeeder, InitVpDataseeder>();
+            idServerBuilder.AddRoute("getPresentationDefinition", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.PresentationDefinitions + "/{id}", new { controller = "PresentationDefinitions", action = "Get" });
+            idServerBuilder.AddRoute("vpAuthorizeCallback", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizeCallback, new { controller = "VpAuthorization", action = "Callback" });
+            idServerBuilder.AddRoute("vpQrCode", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizeQrCode + "/{id}", new { controller = "VpAuthorization", action = "GetQRCode" });
+            idServerBuilder.AddRoute("vpRegisterStatus", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpRegisterStatus + "/{id}", new { controller = "VpRegister", action = "Status" });
+            idServerBuilder.AddRoute("vpEndRegister", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpEndRegister, new { controller = "VpRegister", action = "EndRegister" });
+            idServerBuilder.AddRoute("vpAuthorizePost", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizePost, new { controller = "VpAuthorize", action = "Post" });
             return idServerBuilder;
         }
     }

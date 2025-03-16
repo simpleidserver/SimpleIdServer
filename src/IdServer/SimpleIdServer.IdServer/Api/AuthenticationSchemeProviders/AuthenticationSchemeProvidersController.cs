@@ -3,6 +3,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -51,7 +52,7 @@ public class AuthenticationSchemeProvidersController : BaseController
 		prefix = prefix ?? Constants.DefaultRealm;
 		try
 		{
-            await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
             var result = await _authenticationSchemeProviderRepository.Search(prefix, request, cancellationToken);
 			return new OkObjectResult(new SearchResult<AuthenticationSchemeProviderResult>
 			{
@@ -71,7 +72,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
             var result = await _authenticationSchemeProviderDefinitionRepository.GetAll(cancellationToken);
             return new OkObjectResult(result);
         }
@@ -89,7 +90,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
                 var result = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
                 _authenticationSchemeProviderRepository.Remove(result);
@@ -109,7 +110,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
             var result = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
             if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthSchemeProvider, id));
             var optionKey = $"{result.Name}:{result.AuthSchemeProviderDefinition.OptionsName}";
@@ -132,7 +133,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
                 Validate();
                 var instance = await _authenticationSchemeProviderRepository.Get(prefix, request.Name, cancellationToken);
                 if (instance != null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.AuthSchemeProviderWithSameNameExists);
@@ -145,7 +146,7 @@ public class AuthenticationSchemeProvidersController : BaseController
                     CreateDateTime = DateTime.UtcNow,
                     Description = request.Description,
                     DisplayName = request.DisplayName,
-                    Mappers = Constants.GetDefaultIdProviderMappers(),
+                    Mappers = DefaultAuthSchemeProviderMapper.All,
                     Name = request.Name,
                     UpdateDateTime = DateTime.UtcNow
                 };
@@ -176,7 +177,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
                 var instance = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
                 if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
                 instance.UpdateDateTime = DateTime.UtcNow;
@@ -201,7 +202,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
                 var instance = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
                 if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
                 instance.UpdateDateTime = DateTime.UtcNow;
@@ -225,7 +226,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
                 var instance = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
                 if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
                 instance.UpdateDateTime = DateTime.UtcNow;
@@ -263,7 +264,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
                 var result = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
                 if (result == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownAuthSchemeProvider, id));
                 result.Mappers = result.Mappers.Where(m => m.Id != mapperId).ToList();
@@ -286,7 +287,7 @@ public class AuthenticationSchemeProvidersController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, Constants.DefaultScopes.AuthenticationSchemeProviders.Name);
+                await CheckAccessToken(prefix, Config.DefaultScopes.AuthenticationSchemeProviders.Name);
                 var instance = await _authenticationSchemeProviderRepository.Get(prefix, id, cancellationToken);
                 if (instance == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownAuthSchemeProvider, id));
                 instance.UpdateDateTime = DateTime.UtcNow;

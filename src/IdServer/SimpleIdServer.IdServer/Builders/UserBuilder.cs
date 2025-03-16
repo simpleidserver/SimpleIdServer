@@ -40,7 +40,7 @@ namespace SimpleIdServer.IdServer.Builders
                 IsActive = true,
                 Value = PasswordHelper.ComputeHash(password, isBase64Encoded)
             });
-            if (realm == null) result._user.Realms.Add(new RealmUser { RealmsName = Constants.StandardRealms.Master.Name });
+            if (realm == null) result._user.Realms.Add(new RealmUser { RealmsName = Config.DefaultRealms.Master.Name });
             else result._user.Realms.Add(new RealmUser { RealmsName = realm.Name });
 
             if (!string.IsNullOrEmpty(name)) result.SetFirstname(name);
@@ -88,13 +88,13 @@ namespace SimpleIdServer.IdServer.Builders
 
         public UserBuilder SetPicture(string picture)
         {
-            _user.UpdateClaim(UserClaims.Picture, picture);
+            _user.UpdateClaim(Config.DefaultUserClaims.Picture, picture);
             return this;
         }
 
         public UserBuilder AddRole(string role)
         {
-            _user.AddClaim(UserClaims.Role, role);
+            _user.AddClaim(Config.DefaultUserClaims.Role, role);
             return this;
         }
 

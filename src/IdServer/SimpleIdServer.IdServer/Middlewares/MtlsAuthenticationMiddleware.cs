@@ -31,7 +31,7 @@ namespace SimpleIdServer.IdServer.Middlewares
         {
             if (_options.MtlsEnabled)
             {
-                if (context.Request.Path.ToString().Contains($"/{Constants.EndPoints.MtlsPrefix}"))
+                if (context.Request.Path.ToString().Contains($"/{Config.DefaultEndpoints.MtlsPrefix}"))
                 {
                     var result = await Authenticate(context);
                     if (!result.Succeeded)

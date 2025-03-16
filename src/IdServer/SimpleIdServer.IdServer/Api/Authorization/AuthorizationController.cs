@@ -69,7 +69,7 @@ public class AuthorizationController : Controller
         {
             var jObjBody = Request.Query.ToJObject();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            var claimAmrs = User.Claims.FirstOrDefault(c => c.Type == Constants.UserClaims.Amrs);
+            var claimAmrs = User.Claims.FirstOrDefault(c => c.Type == Config.DefaultUserClaims.Amrs);
             var userSubject = claimName == null ? string.Empty : claimName.Value;
             var userAmrs = claimAmrs == null ? new List<string>() : claimAmrs.Value.Split(" ").ToList();
             var referer = string.Empty;
@@ -135,7 +135,7 @@ public class AuthorizationController : Controller
                 var issuer = Request.GetAbsoluteUriWithVirtualPath();
                 if (!string.IsNullOrWhiteSpace(prefix))
                     issuer = $"{issuer}/{prefix}";
-                var returnUrl = $"{issuer}/{Constants.EndPoints.Authorization}{queryCollection.ToQueryString()}";
+                var returnUrl = $"{issuer}/{Config.DefaultEndpoints.Authorization}{queryCollection.ToQueryString()}";
                 var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
                 var url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
                 {

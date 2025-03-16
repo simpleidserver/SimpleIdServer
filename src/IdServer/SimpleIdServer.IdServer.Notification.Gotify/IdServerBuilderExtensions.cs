@@ -13,6 +13,7 @@ public static class IdServerBuilderExtensions
     {
         idServerBuilder.Services.AddTransient<IUserNotificationService, GotifyUserNotificationService>();
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, GotifyAuthenticationService>();
+        idServerBuilder.AutomaticConfigurationOptions.Add<GotifyOptions>();
         return idServerBuilder;
     }
 }

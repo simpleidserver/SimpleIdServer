@@ -21,9 +21,9 @@ public class IdServerHostOptions
     /// </summary>
     public string Authority { get; set; } = "https://localhost:5000";
     /// <summary>
-    /// OAUTH2.0 client's default scopes.
+    /// Enable force https.
     /// </summary>
-    public ICollection<string> DefaultScopes { get; set; } = new List<string>();
+    public bool ForceHttps { get; set; } = false;
     /// <summary>
     /// Client secret expiration time in seconds.
     /// </summary>
@@ -51,11 +51,15 @@ public class IdServerHostOptions
     /// <summary>
     /// Trusted parties used to validate the software statement.
     /// </summary>
-    public ICollection<SoftwareStatementTrustedParty> SoftwareStatementTrustedParties { get; set; } = new List<SoftwareStatementTrustedParty>();
+    public List<SoftwareStatementTrustedParty> SoftwareStatementTrustedParties { get; set; } = new List<SoftwareStatementTrustedParty>();
     /// <summary>
     /// Mututal TLS is enabled.
     /// </summary>
     public bool MtlsEnabled { get; internal set; } = false;
+    /// <summary>
+    /// OAUTH2.0 client's default scopes.
+    /// </summary>
+    public List<string> DefaultScopes { get; set; } = new List<string>();
     /// <summary>
     /// Default Token Expiration Time in seconds.
     /// </summary>
@@ -72,15 +76,6 @@ public class IdServerHostOptions
     /// Default expiration time of the authorization request callback.
     /// </summary>
     public double DefaultAuthorizationRequestCallbackExpirationTimeInSeconds { get; set; } = 60 * 30;
-    /// <summary>
-    /// Default OTP issuer.
-    /// </summary>
-    public string OTPIssuer { get; set; } = "SimpleIdServer";
-    /// <summary>
-    /// If true then "scope" claim is expressed as a list of space-delimited case sensistive strings"
-    /// If false then "scope" claim is expressed as an array of string.
-    /// </summary>
-    public bool IsScopeClaimConcatenationEnabled { get; set; } = false;
     /// <summary>
     /// Default authentication method used by the client.
     /// </summary>
@@ -114,13 +109,26 @@ public class IdServerHostOptions
     /// </summary>
     public double? DefaultMaxAge { get; set; } = null;
     /// <summary>
+    /// Default acr value.
+    /// </summary>
+    public string DefaultAcrValue { get; set; } = Config.DefaultAcrs.FirstLevelAssurance.Name;
+    /// <summary>
+    /// Get the default token claim format.
+    /// </summary>
+    public string DefaultClaimTokenFormat { get; set; } = OpenIDClaimTokenFormat.NAME;
+    /// <summary>
+    /// Default OTP issuer.
+    /// </summary>
+    public string OtpIssuer { get; set; } = "SimpleIdServer";
+    /// <summary>
+    /// If true then "scope" claim is expressed as a list of space-delimited case sensistive strings"
+    /// If false then "scope" claim is expressed as an array of string.
+    /// </summary>
+    public bool IsScopeClaimConcatenationEnabled { get; set; } = false;
+    /// <summary>
     /// Customizable parameters.
     /// </summary>
     public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
-    /// <summary>
-    /// Default acr value.
-    /// </summary>
-    public string DefaultAcrValue { get; set; } = Constants.StandardAcrs.FirstLevelAssurance.Name;
     /// <summary>
     /// Enable or disable realm.
     /// </summary>
@@ -154,10 +162,6 @@ public class IdServerHostOptions
     ///  Default value is false.
     /// </summary>
     public bool GrantManagementActionRequired { get; set; } = false;
-    /// <summary>
-    /// Get the default token claim format.
-    /// </summary>
-    public string DefaultClaimTokenFormat { get; set; } = OpenIDClaimTokenFormat.NAME;
     /// <summary>
     /// Validity of permission ticket in seconds.
     /// </summary>
@@ -197,12 +201,11 @@ public class IdServerHostOptions
     /// <summary>
     /// Lifetime of a DPoP in seconds.
     /// </summary>
-    public double DPoPLifetimeSeconds { get; set; } = 5 * 60;
+    public double DpopLifetimeSeconds { get; set; } = 5 * 60;
     /// <summary>
     /// Defint the time in MS to end the user's session.
     /// </summary>
     public int EndSessionRedirectionTimeInMS { get; set; } = 3 * 1000;
-
     /// <summary>
     /// Set if the password is encoded in base64.
     /// </summary>

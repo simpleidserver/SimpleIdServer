@@ -114,7 +114,7 @@ public class RecurringJobsController : BaseController
 
         try
         {
-            await CheckAccessToken(prefix, Constants.DefaultScopes.RecurringJobs.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.RecurringJobs.Name);
         }
         catch (OAuthException ex)
         {
@@ -147,7 +147,7 @@ public class RecurringJobsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.DefaultScopes.RecurringJobs.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.RecurringJobs.Name);
         }
         catch (OAuthException ex)
         {
@@ -173,7 +173,7 @@ public class RecurringJobsController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, Constants.DefaultScopes.RecurringJobs.Name);
+            await CheckAccessToken(prefix, Config.DefaultScopes.RecurringJobs.Name);
         }
         catch (OAuthException ex)
         {

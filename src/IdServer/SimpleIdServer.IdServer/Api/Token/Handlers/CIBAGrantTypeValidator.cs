@@ -29,8 +29,8 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public async Task<Domains.BCAuthorize> Validate(HandlerContext context, CancellationToken cancellationToken)
         {
             Client openidClient = context.Client;
-            if (openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Ping
-                && openidClient.BCTokenDeliveryMode != Constants.StandardNotificationModes.Poll)
+            if (openidClient.BCTokenDeliveryMode != Config.DefaultNotificationModes.Ping
+                && openidClient.BCTokenDeliveryMode != Config.DefaultNotificationModes.Poll)
             {
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.OnlyPingOrPollModeCanBeUsed);
             }

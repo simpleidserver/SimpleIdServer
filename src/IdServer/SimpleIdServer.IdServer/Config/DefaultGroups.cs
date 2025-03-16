@@ -4,12 +4,17 @@
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Config;
 
 public static class DefaultGroups
 {
+    public static List<string> AllFullPath => new List<string>
+    {
+        AdministratorGroup.FullPath,
+        AdministratorReadonlyGroup.FullPath,
+    };
+
     public static Group AdministratorGroup = new Group
     {
         Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
@@ -20,7 +25,7 @@ public static class DefaultGroups
         {
             new GroupRealm
             {
-                RealmsName = StandardRealms.Master.Name
+                RealmsName = Config.DefaultRealms.Master.Name
             }
         },
         Name = "administrator",
@@ -39,7 +44,7 @@ public static class DefaultGroups
         {
             new GroupRealm
             {
-                RealmsName = StandardRealms.Master.Name
+                RealmsName = Config.DefaultRealms.Master.Name
             }
         },
         Name = "administrator-ro",

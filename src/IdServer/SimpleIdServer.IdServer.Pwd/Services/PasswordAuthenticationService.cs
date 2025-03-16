@@ -31,7 +31,7 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
         _options = options.Value;
     }
 
-    public override string Amr => Constants.Areas.Password;
+    public override string Amr => Constants.AreaPwd;
 
     protected override async Task<User> GetUser(string authenticatedUserId, AuthenticatePasswordViewModel viewModel, string realm, CancellationToken cancellationToken)
     {
@@ -61,7 +61,7 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
         }
         else
         {
-            var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.Areas.Password && c.IsActive);
+            var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.AreaPwd && c.IsActive);
             var hash = PasswordHelper.ComputeHash(viewModel.Password, _options.IsPasswordEncodeInBase64);
             if (credential == null || credential.Value != hash) return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
         }

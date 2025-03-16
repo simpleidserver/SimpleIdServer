@@ -8,7 +8,7 @@ public class OpenidFederationOptions
     /// <summary>
     /// Key Identifier of the signature key, used to sign all the response.
     /// </summary>
-    public string TokenSignedKid { get; set; } = SimpleIdServer.IdServer.Constants.StandardKeys.First().KeyId;
+    public string TokenSignedKid { get; set; } = Config.DefaultKeys.All.First().KeyId;
     /// <summary>
     /// Enable or disable the OPENID federation.
     /// </summary>

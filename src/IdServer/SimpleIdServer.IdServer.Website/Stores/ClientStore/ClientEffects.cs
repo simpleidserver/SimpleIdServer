@@ -80,7 +80,7 @@ public class ClientEffects
     public async Task Handle(AddSpaClientAction action, IDispatcher dispatcher)
     {
         var newClientBuilder = ClientBuilder.BuildUserAgentClient(action.ClientId, Guid.NewGuid().ToString(), null, action.RedirectionUrls.ToArray())
-                            .AddScope(new Domains.Scope { Name = Constants.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.DefaultScopes.Profile.Name });
+                            .AddScope(new Domains.Scope { Name = Config.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Config.DefaultScopes.Profile.Name });
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         var newClient = newClientBuilder.Build();
@@ -101,7 +101,7 @@ public class ClientEffects
     public async Task Handle(AddWebsiteApplicationAction action, IDispatcher dispatcher)
     {
         var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
-                .AddScope(new Domains.Scope { Name = Constants.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.DefaultScopes.Profile.Name });
+                .AddScope(new Domains.Scope { Name = Config.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Config.DefaultScopes.Profile.Name });
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         var newClient = newClientBuilder.Build();
@@ -112,7 +112,7 @@ public class ClientEffects
     public async Task Handle(AddHighlySecuredWebsiteApplicationAction action, IDispatcher dispatcher)
     {
         var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
-                .AddScope(new Domains.Scope { Name = Constants.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.DefaultScopes.Profile.Name });
+                .AddScope(new Domains.Scope { Name = Config.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Config.DefaultScopes.Profile.Name });
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
 
@@ -141,7 +141,7 @@ public class ClientEffects
     public async Task Handle(AddHighlySecuredWebsiteApplicationWithGrantMgtSupportAction action, IDispatcher dispatcher)
     {
         var newClientBuilder = ClientBuilder.BuildTraditionalWebsiteClient(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
-                .AddScope(new Domains.Scope { Name = Constants.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.DefaultScopes.Profile.Name });
+                .AddScope(new Domains.Scope { Name = Config.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Config.DefaultScopes.Profile.Name });
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
 
@@ -163,7 +163,7 @@ public class ClientEffects
         }
 
         // Grant management
-        newClientBuilder.AddScope(new Domains.Scope { Name = Constants.DefaultScopes.GrantManagementQuery.Name }, new Domains.Scope { Name = Constants.DefaultScopes.GrantManagementRevoke.Name });
+        newClientBuilder.AddScope(new Domains.Scope { Name = Config.DefaultScopes.GrantManagementQuery.Name }, new Domains.Scope { Name = Config.DefaultScopes.GrantManagementRevoke.Name });
         var authDataTypes = string.IsNullOrWhiteSpace(action.AuthDataTypes) || action.AuthDataTypes == null ? null : action.AuthDataTypes.Split(';');
         if (authDataTypes != null)
             newClientBuilder.AddAuthDataTypes(authDataTypes);
@@ -176,7 +176,7 @@ public class ClientEffects
     public async Task Handle(AddMobileApplicationAction action, IDispatcher dispatcher)
     {
         var newClientBuilder = ClientBuilder.BuildMobileApplication(action.ClientId, Guid.NewGuid().ToString(), null, action.RedirectionUrls.ToArray())
-                .AddScope(new Domains.Scope { Name = Constants.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.DefaultScopes.Profile.Name });
+                .AddScope(new Domains.Scope { Name = Config.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Config.DefaultScopes.Profile.Name });
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         var newClient = newClientBuilder.Build();
@@ -187,7 +187,7 @@ public class ClientEffects
     public async Task Handle(AddExternalDeviceApplicationAction action, IDispatcher dispatcher)
     {
         var newClientBuilder = ClientBuilder.BuildExternalAuthDeviceClient(action.ClientId, action.SubjectName, null)
-                .AddScope(new Domains.Scope { Name = Constants.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.DefaultScopes.Profile.Name });
+                .AddScope(new Domains.Scope { Name = Config.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Config.DefaultScopes.Profile.Name });
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         var newClient = newClientBuilder.Build();
@@ -198,7 +198,7 @@ public class ClientEffects
     public async Task Handle(AddDeviceApplicationAction action, IDispatcher dispatcher)
     {
         var newClientBuilder = ClientBuilder.BuildDeviceClient(action.ClientId, action.ClientSecret, null)
-                .AddScope(new Domains.Scope { Name = Constants.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.DefaultScopes.Profile.Name });
+                .AddScope(new Domains.Scope { Name = Config.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Config.DefaultScopes.Profile.Name });
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         var newClient = newClientBuilder.Build();
@@ -209,7 +209,7 @@ public class ClientEffects
     public async Task Handle(AddCredentialIssuerApplicationAction action, IDispatcher dispatcher)
     {
         var newClientBuilder = ClientBuilder.BuildCredentialIssuer(action.ClientId, action.ClientSecret, null, action.RedirectionUrls.ToArray())
-                .AddScope(new Domains.Scope { Name = Constants.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Constants.DefaultScopes.Profile.Name });
+                .AddScope(new Domains.Scope { Name = Config.DefaultScopes.OpenIdScope.Name }, new Domains.Scope { Name = Config.DefaultScopes.Profile.Name });
         if (!string.IsNullOrWhiteSpace(action.ClientName))
             newClientBuilder.SetClientName(action.ClientName, CultureInfo.CurrentCulture.TwoLetterISOLanguageName);
         var newClient = newClientBuilder.Build();

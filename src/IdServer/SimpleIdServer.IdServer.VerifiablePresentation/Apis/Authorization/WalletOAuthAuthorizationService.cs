@@ -29,7 +29,7 @@ public class WalletOAuthAuthorizationService : IWalletOAuthAuthorizationService
         var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
         var nonce = context.Request.RequestData.GetNonceFromAuthorizationRequest();
         var state = context.Request.RequestData.GetStateFromAuthorizationRequest();
-        var clientId = $"{context.GetIssuer()}/{IdServer.Constants.EndPoints.Authorization}";
+        var clientId = $"{context.GetIssuer()}/{IdServer.Config.DefaultEndpoints.Authorization}";
         var redirectUri = $"{context.GetIssuer()}/{Constants.Endpoints.VpAuthorizePost}";
         var descriptor = new SecurityTokenDescriptor
         {

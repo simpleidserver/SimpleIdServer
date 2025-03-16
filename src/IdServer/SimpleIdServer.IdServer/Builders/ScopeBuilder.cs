@@ -24,7 +24,7 @@ namespace SimpleIdServer.IdServer.Builders
                 IsExposedInConfigurationEdp = isExposed,
                 Realms = new List<Domains.Realm>
                 {
-                    Constants.StandardRealms.Master
+                    Config.DefaultRealms.Master
                 }
             });
         }
@@ -42,7 +42,7 @@ namespace SimpleIdServer.IdServer.Builders
                 UpdateDateTime = DateTime.UtcNow,
                 Realms = new List<Domains.Realm>
                 {
-                    realm ?? Constants.StandardRealms.Master
+                    realm ?? Config.DefaultRealms.Master
                 },
                 Clients = new List<Client>
                 { 

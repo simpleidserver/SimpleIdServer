@@ -12,13 +12,13 @@ namespace System.Security.Cryptography.X509Certificates
         public static List<KeyValuePair<SubjectAlternativeNameTypes, string>> GetSubjectAlternativeName(this X509Certificate2 certificate)
         {
             var lst = new List<KeyValuePair<SubjectAlternativeNameTypes, string>>();
-            var result = certificate.GetExtension(Constants.CertificateOIDS.SubjectAlternativeName);
+            var result = certificate.GetExtension(Constants.SubjectAlternativeNameOid);
             if (result == null)
             {
                 return lst;
             }
 
-            var content = new AsnEncodedData(Constants.CertificateOIDS.SubjectAlternativeName, result).Format(false);
+            var content = new AsnEncodedData(Constants.SubjectAlternativeNameOid, result).Format(false);
             var splitted = content.Split(',');
             foreach(var str in splitted)
             {

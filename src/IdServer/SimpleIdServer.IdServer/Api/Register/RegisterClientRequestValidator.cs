@@ -3,6 +3,7 @@
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Authenticate;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -175,16 +176,16 @@ namespace SimpleIdServer.IdServer.Api.Register
 
         protected void CheckSignature(string alg, string errorMessage)
         {
-            if (!string.IsNullOrWhiteSpace(alg) && !Constants.AllSigningAlgs.Contains(alg))
+            if (!string.IsNullOrWhiteSpace(alg) && !DefaultTokenSecurityAlgs.AllSigAlgs.Contains(alg))
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, errorMessage);
         }
 
         protected void CheckEncryption(string alg, string enc, string unsupportedAlgMsg, string unsupportedEncMsg, string parameterName)
         {
-            if (!string.IsNullOrWhiteSpace(alg) && !Constants.AllEncAlgs.Contains(alg))
+            if (!string.IsNullOrWhiteSpace(alg) && !DefaultTokenSecurityAlgs.AllEncAlgs.Contains(alg))
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, unsupportedAlgMsg);
 
-            if (!string.IsNullOrWhiteSpace(enc) && !Constants.AllEncryptions.Contains(enc))
+            if (!string.IsNullOrWhiteSpace(enc) && !DefaultTokenSecurityAlgs.AllEncs.Contains(enc))
                 throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, unsupportedEncMsg);
 
             if (!string.IsNullOrWhiteSpace(enc) && string.IsNullOrWhiteSpace(alg))
@@ -195,11 +196,11 @@ namespace SimpleIdServer.IdServer.Api.Register
         {
             if (!string.IsNullOrWhiteSpace(request.BCTokenDeliveryMode))
             {
-                if (!Constants.AllStandardNotificationModes.Contains(request.BCTokenDeliveryMode))
+                if (!DefaultNotificationModes.All.Contains(request.BCTokenDeliveryMode))
                     throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, Global.InvalidBcDeliveryMode);
 
-                if (request.BCTokenDeliveryMode == Constants.StandardNotificationModes.Ping ||
-                    request.BCTokenDeliveryMode == Constants.StandardNotificationModes.Push)
+                if (request.BCTokenDeliveryMode == Config.DefaultNotificationModes.Ping ||
+                    request.BCTokenDeliveryMode == Config.DefaultNotificationModes.Push)
                 {
                     if (string.IsNullOrWhiteSpace(request.BCClientNotificationEndpoint))
                         throw new OAuthException(ErrorCodes.INVALID_CLIENT_METADATA, string.Format(Global.MissingParameter, OAuthClientParameters.BCClientNotificationEndpoint));

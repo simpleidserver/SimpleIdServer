@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Federation;
 
@@ -15,9 +14,9 @@ public static class IdServerFederationConstants
             Id = Guid.NewGuid().ToString(),
             Type = ScopeTypes.APIRESOURCE,
             Name = "federation_entities",
-            Realms = new List<Domains.Realm>
+            Realms = new List<Realm>
             {
-                StandardRealms.Master
+                Config.DefaultRealms.Master
             },
             Protocol = ScopeProtocols.OAUTH,
             IsExposedInConfigurationEdp = true,

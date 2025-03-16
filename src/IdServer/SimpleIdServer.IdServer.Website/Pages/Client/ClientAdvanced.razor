@@ -25,7 +25,7 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="TokenSignedResponseAlg" Class="w-100"
-                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                        Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllSigAlgs
                         TValue="string"
                         @bind-Value=@updateAdvancedClient.TokenSignedResponseAlg />
                     </div>
@@ -38,7 +38,7 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="IdTokenSignedResponseAlg" Class="w-100"
-                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                        Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllSigAlgs
                         TValue="string"
                         @bind-Value=@updateAdvancedClient.IdTokenSignedResponseAlg />
                     </div>
@@ -51,7 +51,7 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="AuthorizationSignedResponseAlg" Class="w-100"
-                        Data=@SimpleIdServer.IdServer.Constants.AllSigningAlgs
+                        Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllSigAlgs
                         TValue="string"
                         @bind-Value=@updateAdvancedClient.AuthorizationSignedResponseAlg />
                     </div>

@@ -111,7 +111,7 @@ public class SamlSSOController : Controller
             var url = Url.Action("Index", "Authenticate", new
             {
                 returnUrl = _dataProtector.Protect(returnUrl),
-                area = Constants.Areas.Password
+                area = Constants.AreaPwd
             });
             return Redirect(url);
         }

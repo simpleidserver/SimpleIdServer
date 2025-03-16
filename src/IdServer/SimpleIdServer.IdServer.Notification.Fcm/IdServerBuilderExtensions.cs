@@ -19,6 +19,7 @@ public static class IdServerBuilderExtensions
     {
         idServerBuilder.Services.AddTransient<IUserNotificationService, FcmUserNotificationService>();
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, FcmAuthenticationService>();
+        idServerBuilder.AutomaticConfigurationOptions.Add<FcmOptions>();
         return idServerBuilder;
     }
 }

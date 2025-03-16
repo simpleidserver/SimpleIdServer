@@ -18,7 +18,7 @@ public static class MobileAuthenticationConfig
             .AddInMemoryRealms(Config.Realms)
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddMobileAuthentication(null, true, true);
+            .AddMobileAuthentication(null, true);
 
         var app = webApplicationBuilder.Build();
         app.UseSid();

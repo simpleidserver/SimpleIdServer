@@ -1,1 +1,4 @@
 => vérifier si l'authentification avec ws-federation fonctionne	:	DONE
+=> faire fonctionner avec sqlserver et le reste					:	TODO
+=> comprendre comment configurer les formulaires et workflows par défault	:	TODO
+=> ajouter pour chaque projet d'authentification un script de migration		:	TODO

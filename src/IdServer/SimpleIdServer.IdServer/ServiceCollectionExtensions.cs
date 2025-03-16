@@ -27,6 +27,7 @@ using SimpleIdServer.IdServer.Api.Configuration;
 using SimpleIdServer.IdServer.Api.DeviceAuthorization;
 using SimpleIdServer.IdServer.Api.Jwks;
 using SimpleIdServer.IdServer.Api.OpenIdConfiguration;
+using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Api.Register;
 using SimpleIdServer.IdServer.Api.Token;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
@@ -43,8 +44,10 @@ using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Console.Services;
+using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
@@ -53,6 +56,7 @@ using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Stores.Default;
@@ -98,19 +102,22 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
         var mvcBuilder = services.AddControllersWithViews();
         var dataProtectionBuilder = services.AddDataProtection();
+        services.AddDataseeder();
         services.AddDistributedMemoryCache();
         services.AddDidKey();
         ConfigureBlazorAndLocalization(services);
         ConfigureIdentityServer(services);
         var formBuilder = ConfigureFormBuilder(services);
-        ConfigureHangfire(services);
+        var sidHangfire = new SidHangfire();
+        ConfigureHangfire(services, sidHangfire);
         var autoConfig = ConfigureCentralizedConfiguration(app);
         ConfigureConsoleNotification(services);
         services.AddHttpContextAccessor();
         var sidAuthCookie = new SidAuthCookie();
         var authBuilder = ConfigureAuth(services, sidAuthCookie);
-        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie);
-        ConfigureMassTransit(result);
+        var sidMasstransit = new SidMasstransit();
+        ConfigureMassTransit(services, sidMasstransit);
+        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie, sidHangfire, sidMasstransit);
         return result;
     }
 
@@ -174,12 +181,12 @@ public static class ServiceCollectionExtensions
         return formBuilder;
     }
 
-    private static void ConfigureHangfire(IServiceCollection services)
+    private static void ConfigureHangfire(IServiceCollection services, SidHangfire sidHangfire)
     {
         services.AddHangfire(o => {
             o.UseRecommendedSerializerSettings();
             o.UseIgnoredAssemblyVersionTypeResolver();
-            o.UseInMemoryStorage();
+            sidHangfire.Callback(o);
         });
     }
 
@@ -192,15 +199,19 @@ public static class ServiceCollectionExtensions
         });
     }
 
-    private static void ConfigureMassTransit(IdServerBuilder idserverBuilder)
+    private static void ConfigureMassTransit(IServiceCollection services, SidMasstransit sidMasstransit)
     {
-        idserverBuilder.UseMassTransit(o =>
+        services.AddMassTransitTestHarness((o) =>
         {
-            o.UsingInMemory((ctx, cfg) =>
-            {
-                cfg.UsePublishMessageScheduler();
-                cfg.ConfigureEndpoints(ctx);
-            });
+            o.AddPublishMessageScheduler();
+            o.AddHangfireConsumers();
+            o.AddConsumer<ExtractUsersFaultConsumer>();
+            o.AddConsumer<ImportUsersFaultConsumer>();
+            o.AddConsumer<IdServerEventsConsumer>();
+            o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
+            o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();
+            o.AddConsumer<RemoveRealmCommandConsumer, RemoveRealmConsumerDefinition>();
+            sidMasstransit.Callback(o);
         });
     }
 
@@ -212,7 +223,7 @@ public static class ServiceCollectionExtensions
         services.AddAuthorization();
         services.Configure<AuthorizationOptions>(o =>
         {
-            o.AddPolicy(Constants.Policies.Authenticated, p => p.RequireAuthenticatedUser());
+            o.AddPolicy(Constants.AuthenticatedPolicyName, p => p.RequireAuthenticatedUser());
         });
         var authBuilder = services
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -274,7 +285,7 @@ public static class ServiceCollectionExtensions
     /// <returns>The services collection.</returns>
     public static IServiceCollection AddJsonSeeding(this IServiceCollection services, IConfiguration configuration)
     {
-        string jsonSeedsFilePath = configuration.GetValue<string>(Constants.ConfigurationSections.JsonSeedsFilePath);
+        string jsonSeedsFilePath = configuration.GetValue<string>(ConfigurationSections.JsonSeedsFilePath);
         services.AddOptionsWithValidateOnStart<JsonSeedingOptions>()
             .Configure(options =>
             {
@@ -556,9 +567,39 @@ public class SidAuthCookie
     {
         Callback = (o) =>
         {
-            o.LoginPath = $"/{Constants.Areas.Password}/Authenticate";
+            o.LoginPath = $"/{Constants.AreaPwd}/Authenticate";
         };
     }
 
     internal Action<CookieAuthenticationOptions> Callback { get; set; }
+}
+
+public class SidHangfire
+{
+    public SidHangfire()
+    {
+        Callback = (o) =>
+        {
+            o.UseInMemoryStorage();
+        };
+    }
+
+    internal Action<IGlobalConfiguration> Callback { get; set; }
+}
+
+public class SidMasstransit
+{
+    public SidMasstransit()
+    {
+        Callback = (o) =>
+        {
+            o.UsingInMemory((ctx, cfg) =>
+            {
+                cfg.UsePublishMessageScheduler();
+                cfg.ConfigureEndpoints(ctx);
+            });
+        };
+    }
+
+    internal Action<IBusRegistrationConfigurator> Callback { get; set; }
 }

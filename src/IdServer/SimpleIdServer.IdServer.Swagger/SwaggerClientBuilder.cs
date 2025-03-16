@@ -10,20 +10,20 @@ public static class SwaggerClientBuilder
     {
         var scopes = new List<Scope>
         {
-            Constants.DefaultScopes.Provisioning,
-            Constants.DefaultScopes.Users,
-            Constants.DefaultScopes.Acrs,
-            Constants.DefaultScopes.ConfigurationsScope,
-            Constants.DefaultScopes.AuthenticationSchemeProviders,
-            Constants.DefaultScopes.AuthenticationMethods,
-            Constants.DefaultScopes.RegistrationWorkflows,
-            Constants.DefaultScopes.ApiResources,
-            Constants.DefaultScopes.Auditing,
-            Constants.DefaultScopes.Scopes,
-            Constants.DefaultScopes.CertificateAuthorities,
-            Constants.DefaultScopes.Clients,
-            Constants.DefaultScopes.Realms,
-            Constants.DefaultScopes.Groups
+            Config.DefaultScopes.Provisioning,
+            Config.DefaultScopes.Users,
+            Config.DefaultScopes.Acrs,
+            Config.DefaultScopes.ConfigurationsScope,
+            Config.DefaultScopes.AuthenticationSchemeProviders,
+            Config.DefaultScopes.AuthenticationMethods,
+            Config.DefaultScopes.RegistrationWorkflows,
+            Config.DefaultScopes.ApiResources,
+            Config.DefaultScopes.Auditing,
+            Config.DefaultScopes.Scopes,
+            Config.DefaultScopes.CertificateAuthorities,
+            Config.DefaultScopes.Clients,
+            Config.DefaultScopes.Realms,
+            Config.DefaultScopes.Groups
         };
         scopes.AddRange(additionalScopes);
         return ClientBuilder.BuildTraditionalWebsiteClient(clientId, password, null, redirectUrls).AddScope(scopes.ToArray()).Build();

@@ -4,6 +4,7 @@
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers.Models;
 using System.Collections.Generic;
@@ -85,7 +86,7 @@ namespace SimpleIdServer.IdServer.Builders
         {
             var jsonWebKey = credentials.SerializePublicJWK();
             jsonWebKey.Alg = credentials.Alg;
-            _client.Add(credentials.Key.KeyId, jsonWebKey, Constants.JWKUsages.Enc, keyType);
+            _client.Add(credentials.Key.KeyId, jsonWebKey, DefaultTokenSecurityAlgs.JwkUsages.Enc, keyType);
             return this;
         }
 

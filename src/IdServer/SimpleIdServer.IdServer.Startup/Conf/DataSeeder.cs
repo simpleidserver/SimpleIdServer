@@ -160,7 +160,7 @@ public class DataSeeder
 
     private static Realm SeedRealms(StoreDbContext dbContext)
     {
-        var masterRealm = dbContext.Realms.FirstOrDefault(r => r.Name == SimpleIdServer.IdServer.Constants.StandardRealms.Master.Name) ?? SimpleIdServer.IdServer.Constants.StandardRealms.Master;
+        var masterRealm = dbContext.Realms.FirstOrDefault(r => r.Name == SimpleIdServer.IdServer.Config.DefaultRealms.Master.Name) ?? SimpleIdServer.IdServer.Config.DefaultRealms.Master;
         if (!dbContext.Realms.Any())
             dbContext.Realms.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Realms);
         return masterRealm;
@@ -347,16 +347,16 @@ public class DataSeeder
                 admRoGroup.Roles.Add(scope);
         }
 
-        var existingAdministratorRole = dbContext.Scopes.FirstOrDefault(s => s.Name == SimpleIdServer.IdServer.Constants.DefaultScopes.WebsiteAdministratorRole.Name);
+        var existingAdministratorRole = dbContext.Scopes.FirstOrDefault(s => s.Name == SimpleIdServer.IdServer.Config.DefaultScopes.WebsiteAdministratorRole.Name);
         if (existingAdministratorRole == null)
         {
-            existingAdministratorRole = SimpleIdServer.IdServer.Constants.DefaultScopes.WebsiteAdministratorRole;
+            existingAdministratorRole = SimpleIdServer.IdServer.Config.DefaultScopes.WebsiteAdministratorRole;
             existingAdministratorRole.Realms.Clear();
             existingAdministratorRole.Realms.Add(masterRealm);
             dbContext.Scopes.Add(existingAdministratorRole);
         }
 
-        if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Constants.DefaultScopes.WebsiteAdministratorRole.Name))
+        if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Config.DefaultScopes.WebsiteAdministratorRole.Name))
             admGroup.Roles.Add(existingAdministratorRole);
 
         if (fastFedAdmGroup == null)
@@ -383,14 +383,14 @@ public class DataSeeder
             .Any(c => c.Name == "user");
         var existingAdministratorUser = dbContext.Users
             .Include(u => u.Groups).ThenInclude(u => u.Group)
-            .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser.Name);
+            .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Config.DefaultUsers.Administrator.Name);
         var existingAdministratorRoUser = dbContext.Users
             .Include(u => u.Groups).ThenInclude(u => u.Group)
-            .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser.Name);
+            .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Config.DefaultUsers.ReadonlyAdministrator.Name);
         if (!isUserExists)
             dbContext.Users.Add(UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build());
         if (existingAdministratorRoUser == null)
-            dbContext.Users.Add(SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorReadonlyUser);
+            dbContext.Users.Add(SimpleIdServer.IdServer.Config.DefaultUsers.ReadonlyAdministrator);
         else if (!existingAdministratorRoUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorReadonlyGroup.Name))
         {
             existingAdministratorRoUser.Groups.Add(new GroupUser
@@ -401,7 +401,7 @@ public class DataSeeder
 
         if (existingAdministratorUser == null)
         {
-            var user = SimpleIdServer.IdServer.Constants.StandardUsers.AdministratorUser;
+            var user = SimpleIdServer.IdServer.Config.DefaultUsers.Administrator;
             user.Groups.Add(new GroupUser
             {
                 Group = fastFedGroup
@@ -432,8 +432,8 @@ public class DataSeeder
     {
         if (!dbContext.SerializedFileKeys.Any())
         {
-            dbContext.SerializedFileKeys.AddRange(SimpleIdServer.IdServer.Constants.StandardKeys);
-            dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Constants.StandardRealms.Master));
+            dbContext.SerializedFileKeys.AddRange(SimpleIdServer.IdServer.Config.DefaultKeys);
+            dbContext.SerializedFileKeys.Add(WsFederationKeyGenerator.GenerateWsFederationSigningCredentials(SimpleIdServer.IdServer.Config.DefaultRealms.Master));
         }
     }
 
@@ -459,7 +459,7 @@ public class DataSeeder
     {
         if (!dbContext.Acrs.Any())
         {
-            var firstLevelAssurance = SimpleIdServer.IdServer.Constants.StandardAcrs.FirstLevelAssurance;
+            var firstLevelAssurance = SimpleIdServer.IdServer.Config.DefaultAcrs.FirstLevelAssurance;
             firstLevelAssurance.AuthenticationWorkflow = completePwdAuthWorkflowId;
             dbContext.Acrs.Add(firstLevelAssurance);
             dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
@@ -471,7 +471,7 @@ public class DataSeeder
                 AuthenticationWorkflow = StandardEmailAuthWorkflows.DefaultWorkflow.Id,
                 Realms = new List<Realm>
                 {
-                    SimpleIdServer.IdServer.Constants.StandardRealms.Master
+                    SimpleIdServer.IdServer.Config.DefaultRealms.Master
                 }
             });
             dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
@@ -483,7 +483,7 @@ public class DataSeeder
                 AuthenticationWorkflow = StandardSmsAuthWorkflows.DefaultWorkflow.Id,
                 Realms = new List<Realm>
                 {
-                    SimpleIdServer.IdServer.Constants.StandardRealms.Master
+                    SimpleIdServer.IdServer.Config.DefaultRealms.Master
                 }
             });
             dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
@@ -495,7 +495,7 @@ public class DataSeeder
                 AuthenticationWorkflow = pwdEmailAuthWorkflowId,
                 Realms = new List<Realm>
                     {
-                        SimpleIdServer.IdServer.Constants.StandardRealms.Master
+                        SimpleIdServer.IdServer.Config.DefaultRealms.Master
                     }
             });
         }

@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
@@ -72,7 +73,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
         {
             await ValidateClient();
             var scopes = context.Request.RequestData.GetScopes();
-            var unexpectedScopes = scopes.Where(s => s != Constants.DefaultScopes.OpenIdScope.Name);
+            var unexpectedScopes = scopes.Where(s => s != Config.DefaultScopes.OpenIdScope.Name);
             if (unexpectedScopes.Any()) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.ScopeDifferentToOpenidCannotBeSelfIssued);
             var result = await CommonValidationAuthorizationRequest(context, cancellationToken);
             return result;
@@ -167,7 +168,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
 
             if (claims != null)
             {
-                var idtokenClaims = claims.Where(cl => cl.Type == AuthorizationClaimTypes.IdToken && cl.IsEssential && Constants.AllUserClaims.Contains(cl.Name));
+                var idtokenClaims = claims.Where(cl => cl.Type == AuthorizationClaimTypes.IdToken && cl.IsEssential && Config.DefaultUserClaims.All.Contains(cl.Name));
                 var invalidClaims = idtokenClaims.Where(icl => !context.User.Claims.Any(cl => cl.Type == icl.Name && (icl.Values == null || !icl.Values.Any() || icl.Values.Contains(cl.Value))));
                 if (invalidClaims.Any())
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.InvalidClaims, string.Join(",", invalidClaims.Select(i => i.Name))));
@@ -202,7 +203,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
             if (!grantRequest.Scopes.Any() && !grantRequest.Audiences.Any() && !authDetails.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameters, $"{AuthorizationRequestParameters.Scope},{AuthorizationRequestParameters.Resource},{AuthorizationRequestParameters.AuthorizationDetails}"));
 
-            var unsupportedScopes = grantRequest.Scopes.Where(s => s != Constants.DefaultScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
+            var unsupportedScopes = grantRequest.Scopes.Where(s => s != Config.DefaultScopes.OpenIdScope.Name && !context.Client.Scopes.Any(sc => sc.Name == s));
             if (unsupportedScopes.Any())
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnsupportedScopes, string.Join(",", unsupportedScopes)));
 
@@ -256,10 +257,10 @@ namespace SimpleIdServer.IdServer.Api.Authorization.Validators
                 if (_options.GrantManagementActionRequired && string.IsNullOrWhiteSpace(grantManagementAction))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, AuthorizationRequestParameters.GrantManagementAction));
 
-                if (!string.IsNullOrWhiteSpace(grantManagementAction) && !Constants.AllStandardGrantManagementActions.Contains(grantManagementAction))
+                if (!string.IsNullOrWhiteSpace(grantManagementAction) && !DefaultGrantManagementActions.All.Contains(grantManagementAction))
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.InvalidGrantManagementAction, grantManagementAction));
 
-                if (!context.IsComingFromConsentScreen() && !string.IsNullOrWhiteSpace(grantId) && grantManagementAction == Constants.StandardGrantManagementActions.Create)
+                if (!context.IsComingFromConsentScreen() && !string.IsNullOrWhiteSpace(grantId) && grantManagementAction == DefaultGrantManagementActions.Create)
                     throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.GrantIdCannotBeSpecified);
 
                 if (!string.IsNullOrWhiteSpace(grantId) && string.IsNullOrWhiteSpace(grantManagementAction))

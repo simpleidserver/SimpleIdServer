@@ -18,7 +18,7 @@ public static class PwdAuthenticationConfig
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
             .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
-            .AddPwdAuthentication(true, true);
+            .AddPwdAuthentication(true);
 
         var app = webApplicationBuilder.Build();
         app.UseSid();
@@ -36,7 +36,7 @@ public static class PwdAuthenticationConfig
             .AddInMemoryLanguages(Config.Languages)
             .AddInMemoryRealms(Config.Realms)
             .AddInMemoryAuthenticationSchemes(Config.AuthenticationSchemes, Config.AuthenticationSchemeDefinitions)
-            .AddPwdAuthentication(true, true)
+            .AddPwdAuthentication(true)
             .EnableRealm();
 
         var app = webApplicationBuilder.Build();

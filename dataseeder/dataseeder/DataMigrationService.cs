@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace EfdataSeeder;
+namespace DataSeeder;
 
 public interface IDataMigrationService
 {

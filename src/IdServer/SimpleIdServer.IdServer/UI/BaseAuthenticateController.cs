@@ -175,7 +175,7 @@ public class BaseAuthenticateController : BaseController
         await AddSession(realm, claims, user, client, token, rememberLogin);
         var offset = DateTimeOffset.UtcNow.AddSeconds(expirationTimeInSeconds);
         if (amrs != null)
-            claims.Add(new Claim(Constants.UserClaims.Amrs, string.Join(" ", amrs)));
+            claims.Add(new Claim(Config.DefaultUserClaims.Amrs, string.Join(" ", amrs)));
         var claimsIdentity = new ClaimsIdentity(claims, currentAmr);
         var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
         if (rememberLogin)

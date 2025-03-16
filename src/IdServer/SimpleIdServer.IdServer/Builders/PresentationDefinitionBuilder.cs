@@ -23,7 +23,7 @@ public class PresentationDefinitionBuilder
             Id = Guid.NewGuid().ToString(),
             PublicId = id,
             Name = name,
-            RealmName = realm?.Name ?? IdServer.Constants.StandardRealms.Master.Name
+            RealmName = realm?.Name ?? IdServer.Config.DefaultRealms.Master.Name
         };
         return new PresentationDefinitionBuilder(presentationDefinition);
     }

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.DPoP;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
@@ -51,7 +52,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             }
 
             var handler = new DPoPHandler();
-            var validationResult = handler.Validate(dpopProof, Constants.AllSigningAlgs, context.Request.HttpMethod, $"{context.GetIssuer()}/{Constants.EndPoints.Token}", _options.DPoPLifetimeSeconds);
+            var validationResult = handler.Validate(dpopProof, DefaultTokenSecurityAlgs.AllSigAlgs, context.Request.HttpMethod, $"{context.GetIssuer()}/{Config.DefaultEndpoints.Token}", _options.DpopLifetimeSeconds);
             if (!validationResult.IsValid) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, validationResult.ErrorMessage);
             await ValidateNonce(context, validationResult.Jwt);
             context.SetDPOPProof(validationResult.Jwt);

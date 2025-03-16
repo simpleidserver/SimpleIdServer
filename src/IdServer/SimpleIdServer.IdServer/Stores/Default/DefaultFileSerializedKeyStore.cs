@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,13 +35,13 @@ public class DefaultFileSerializedKeyStore : IFileSerializedKeyStore
 
     public Task<List<SerializedFileKey>> GetAllSig(string realm, CancellationToken cancellationToken)
     {
-        var result = _serializedFileKeys.Where(s => s.Usage == Constants.JWKUsages.Sig && s.Realms.Any(r => r.Name == realm)).ToList();
+        var result = _serializedFileKeys.Where(s => s.Usage == DefaultTokenSecurityAlgs.JwkUsages.Sig && s.Realms.Any(r => r.Name == realm)).ToList();
         return Task.FromResult(result);
     }
 
     public Task<List<SerializedFileKey>> GetAllEnc(string realm, CancellationToken cancellationToken)
     {
-        var result = _serializedFileKeys.Where(s => s.Usage == Constants.JWKUsages.Enc && s.Realms.Any(r => r.Name == realm)).ToList();
+        var result = _serializedFileKeys.Where(s => s.Usage == DefaultTokenSecurityAlgs.JwkUsages.Enc && s.Realms.Any(r => r.Name == realm)).ToList();
         return Task.FromResult(result);
     }
 

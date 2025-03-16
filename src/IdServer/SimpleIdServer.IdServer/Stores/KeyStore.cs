@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -129,7 +130,7 @@ namespace SimpleIdServer.IdServer.Stores
                 {
                     Id = Guid.NewGuid().ToString(),
                     KeyId = credentials.Key.KeyId,
-                    Usage = Constants.JWKUsages.Sig,
+                    Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig,
                     Alg = credentials.Algorithm,
                     CreateDateTime = DateTime.UtcNow,
                     UpdateDateTime = DateTime.UtcNow,
@@ -146,7 +147,7 @@ namespace SimpleIdServer.IdServer.Stores
                     KeyId = credentials.Key.KeyId,
                     PrivateKeyPem = pem.PrivateKey,
                     PublicKeyPem = pem.PublicKey,
-                    Usage = Constants.JWKUsages.Sig,
+                    Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig,
                     Alg = credentials.Algorithm,
                     CreateDateTime = DateTime.UtcNow,
                     UpdateDateTime = DateTime.UtcNow,
@@ -168,7 +169,7 @@ namespace SimpleIdServer.IdServer.Stores
                 {
                     Id = Guid.NewGuid().ToString(),
                     KeyId = credentials.Key.KeyId,
-                    Usage = Constants.JWKUsages.Sig,
+                    Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig,
                     Alg = credentials.Alg,
                     Enc = credentials.Enc,
                     CreateDateTime = DateTime.UtcNow,
@@ -186,7 +187,7 @@ namespace SimpleIdServer.IdServer.Stores
                     KeyId = credentials.Key.KeyId,
                     PrivateKeyPem = pem.PrivateKey,
                     PublicKeyPem = pem.PublicKey,
-                    Usage = Constants.JWKUsages.Enc,
+                    Usage = DefaultTokenSecurityAlgs.JwkUsages.Enc,
                     Alg = credentials.Alg,
                     Enc = credentials.Enc,
                     CreateDateTime = DateTime.UtcNow,

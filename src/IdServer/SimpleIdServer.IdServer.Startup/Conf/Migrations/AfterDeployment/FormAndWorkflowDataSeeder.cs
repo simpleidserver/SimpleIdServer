@@ -3,6 +3,7 @@
 
 using FormBuilder.Builders;
 using Microsoft.EntityFrameworkCore;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Store.EF;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,7 +44,7 @@ public class FormAndWorkflowDataSeeder : EfdataSeeder.DataSeeder<StoreDbContext,
         // Fetch standard ACRS from the master realm and update their authentication workflow.
         var acrs = await DbContext.Acrs
             .Include(r => r.Realms)
-            .Where(a => Constants.StandardAcrNames.Contains(a.Name) && a.Realms.Any(r => r.Name == Constants.DefaultRealm))
+            .Where(a => DefaultAcrs.AllNames.Contains(a.Name) && a.Realms.Any(r => r.Name == Constants.DefaultRealm))
             .ToListAsync(cancellationToken);
         acrs.ForEach(a => a.AuthenticationWorkflow = DataSeeder.completePwdAuthWorkflowId);
     }

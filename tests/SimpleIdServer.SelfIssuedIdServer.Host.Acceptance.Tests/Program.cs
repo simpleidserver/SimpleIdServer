@@ -33,7 +33,7 @@ builder.Services.AddSidIdentityServer()
     .UseInMemoryEFStore(o =>
     {
         o.AddInMemoryRealms(IdServerConfiguration.Realms);
-        o.AddInMemoryKeys(SimpleIdServer.IdServer.Constants.StandardRealms.Master, new List<SigningCredentials>
+        o.AddInMemoryKeys(SimpleIdServer.IdServer.Config.DefaultRealms.Master, new List<SigningCredentials>
         {
             new SigningCredentials(BuildRsaSecurityKey("keyid"), SecurityAlgorithms.RsaSha256),
             new SigningCredentials(BuildRsaSecurityKey("keyid2"), SecurityAlgorithms.RsaSha384),
@@ -49,8 +49,8 @@ builder.Services.AddSidIdentityServer()
             new EncryptingCredentials(BuildRsaSecurityKey("keyid4"), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
         });
     })
-    .AddBackChannelAuthentication();
-builder.Services.AddFormBuilder().UseEF();
+    .EnableCiba();
+builder.Services.AddFormBuilder().UseEf();
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
 var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));
 builder.Services.AddDidKey();
