@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using DataSeeder;
 using FormBuilder;
 using Hangfire;
 using MassTransit;
@@ -55,6 +56,7 @@ using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Migrations;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Seeding;
@@ -100,6 +102,7 @@ public static class ServiceCollectionExtensions
         Tracing.Init();
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
+        ConfigureDataSeeders(services);
         var mvcBuilder = services.AddControllersWithViews();
         var dataProtectionBuilder = services.AddDataProtection();
         services.AddDataseeder();
@@ -119,6 +122,14 @@ public static class ServiceCollectionExtensions
         ConfigureMassTransit(services, sidMasstransit);
         var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie, sidHangfire, sidMasstransit);
         return result;
+    }
+
+    private static void ConfigureDataSeeders(IServiceCollection services)
+    {
+        services.AddTransient<IDataSeeder, InitSerializedFileKeyDataSeeder>();
+        services.AddTransient<IDataSeeder, InitLanguageDataSeeder>();
+        services.AddTransient<IDataSeeder, InitRealmDataSeeder>();
+        services.AddTransient<IDataSeeder, InitScopeDataSeeder>();
     }
 
     private static void ConfigureIdentityServer(IServiceCollection services)

@@ -14,7 +14,7 @@ public class InitOtpAuthDataseeder : BaseAuthDataSeeder
 {
     private readonly ITransactionBuilder _transactionBuilder;
 
-    protected InitOtpAuthDataseeder(
+    public InitOtpAuthDataseeder(
         ITransactionBuilder transactionBuilder,
         IAuthenticationContextClassReferenceRepository acrRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository,

@@ -20,14 +20,6 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddStoreWithFactory(this IServiceCollection services, Action<DbContextOptionsBuilder>? action = null)
-    {
-        RegisterDepedencies(services);
-        if (action != null) services.AddDbContextFactory<StoreDbContext>(action);
-        else services.AddDbContextFactory<StoreDbContext>(o => o.UseInMemoryDatabase("identityServer"));
-        return services;
-    }
-
     private static void RegisterDepedencies(IServiceCollection services)
     {
         services.AddTransient<IClientRepository, ClientRepository>();
@@ -64,5 +56,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFederationEntityStore, FederationEntityStore>();
         services.AddTransient<IRecurringJobStatusRepository, RecurringJobStatusRepository>();
         services.AddTransient<IDataSeederExecutionHistoryRepository, DataSeederExecutionHistoryRepository>();
+        services.AddTransient<IDbMigrateService, IdServerDbMigrateService>();
     }
 }

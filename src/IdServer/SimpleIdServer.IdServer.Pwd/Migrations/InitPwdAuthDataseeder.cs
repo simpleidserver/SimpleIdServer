@@ -15,7 +15,7 @@ public abstract class InitPwdAuthDataseeder : BaseAuthDataSeeder
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
 
-    protected InitPwdAuthDataseeder(
+    public InitPwdAuthDataseeder(
         ITransactionBuilder transactionBuilder,
         IRegistrationWorkflowRepository registrationWorkflowRepository,
         IAuthenticationContextClassReferenceRepository acrRepository,

@@ -15,7 +15,7 @@ public class InitSmsAuthDataseeder : BaseAuthDataSeeder
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
 
-    protected InitSmsAuthDataseeder(
+    public InitSmsAuthDataseeder(
         ITransactionBuilder transactionBuilder,
         IRegistrationWorkflowRepository registrationWorkflowRepository,
         IAuthenticationContextClassReferenceRepository acrRepository,

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using DataSeeder;
 using FormBuilder;
 using Hangfire;
 using MassTransit;
@@ -12,10 +13,10 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using SimpleIdServer.Configuration;
-using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jobs;
+using SimpleIdServer.IdServer.Migrations;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Stores.Default;
@@ -88,7 +89,6 @@ public class IdServerBuilder
     {
         var keys = new List<SerializedFileKey>();
         keys.AddRange(DefaultKeys.All);
-        keys.Add(KeyGenerator.GenerateX509SigningCredentials(DefaultRealms.Master, "certificate"));
         Services.AddSingleton<IFileSerializedKeyStore>(new DefaultFileSerializedKeyStore(keys));
         return this;
     }
@@ -316,6 +316,17 @@ public class IdServerBuilder
         {
             o.RequiredPushedAuthorizationRequest = true;
         });
+        return this;
+    }
+
+    /// <summary>
+    /// Seeds administration data including groups and users initialization.
+    /// </summary>
+    public IdServerBuilder SeedAdministrationData()
+    {
+        _serviceCollection.AddTransient<IDataSeeder, InitAdministrativeScopeDataSeeder>();
+        _serviceCollection.AddTransient<IDataSeeder, InitGroupDataSeeder>();
+        _serviceCollection.AddTransient<IDataSeeder, InitUserDataSeeder>();
         return this;
     }
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,53 @@ public static class DefaultScopes
         Role.Name,
         WebsiteAdministratorRole.Name
     };
+
+    public static List<Scope> All => new List<Scope>
+    {
+        Profile,
+        ConfigurationsScope,
+        Email,
+        Address,
+        Phone,
+        Role,
+        OpenIdScope,
+        OfflineAccessScope,
+        ScimScope,
+        GrantManagementQuery,
+        GrantManagementRevoke,
+        UmaProtection,
+        Users,
+        AuthenticationSchemeProviders,
+        AuthenticationMethods,
+        RegistrationWorkflows,
+        Register,
+        SAMLProfile,
+        Provisioning,
+        CredentialConfigurations,
+        CredentialInstances,
+        DeferredCreds,
+        Acrs,
+        Workflows,
+        ApiResources,
+        Auditing,
+        Scopes,
+        CertificateAuthorities,
+        RecurringJobs,
+        Clients,
+        Forms,
+        Realms,
+        Groups
+    };
+
+    public static List<Scope> AdministrativeScopes
+    {
+        get
+        {
+            var scopes = new List<Scope> { WebsiteAdministratorRole };
+            scopes.AddRange(RealmRoleBuilder.BuildAdministrativeRole(DefaultRealms.Master));
+            return scopes;
+        }
+    }
 
     public static Scope Profile = new Scope
     {

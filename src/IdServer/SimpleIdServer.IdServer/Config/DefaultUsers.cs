@@ -14,6 +14,12 @@ public static class DefaultUsers
         ReadonlyAdministrator.Name
     };
 
+    public static List<User> All => new List<User>
+    {
+        Administrator,
+        ReadonlyAdministrator
+    };
+
     public static User Administrator = UserBuilder.Create("administrator", "password", "Administrator").SetFirstname("Administrator").SetEmail("adm@email.com").SetPhoneNumber("0485").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(DefaultGroups.AdministratorGroup).GenerateRandomTOTPKey().Build();
     public static User ReadonlyAdministrator = UserBuilder.Create("administrator-ro", "password", "AdministratorRo").SetFirstname("AdministratorRo").SetEmail("adm-ro@email.com").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").AddGroup(DefaultGroups.AdministratorReadonlyGroup).GenerateRandomTOTPKey().Build();
 }

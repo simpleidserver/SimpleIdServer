@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Startup Layer", "02. Startup Layer", "{68306EFF-55D9-497B-9482-FEB81C485914}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Startup Layer", "01. Startup Layer", "{68306EFF-55D9-497B-9482-FEB81C485914}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00. Core Layer", "00. Core Layer", "{4796A22B-91A9-42AF-87CA-F69392696B0A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "04. Testing Layer", "04. Testing Layer", "{033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Testing Layer", "03. Testing Layer", "{033E4EF3-2FB5-450A-9B35-616D9B0D6EAA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer", "src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj", "{2C314EA3-9950-4805-8CB1-35F4A86FA997}"
 EndProject
@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.OpenIdConnec
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.Scim.Client", "src\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj", "{8E4A021B-6525-4326-B290-CFA57FFEFFEA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03. Migrations", "03. Migrations", "{DA65BA14-7FA4-4D99-A11D-C67F75F03771}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02. Migrations", "02. Migrations", "{DA65BA14-7FA4-4D99-A11D-C67F75F03771}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleIdServer.IdServer.PostgreMigrations", "src\IdServer\SimpleIdServer.IdServer.PostgreMigrations\SimpleIdServer.IdServer.PostgreMigrations.csproj", "{B188D040-77C3-4C6D-A5CE-A1D65F6935A1}"
 EndProject
@@ -148,8 +148,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Light.Startup", "src\IdServer\SimpleIdServer.IdServer.Light.Startup\SimpleIdServer.IdServer.Light.Startup.csproj", "{615AC50D-D2DE-6025-B4BE-F74FDC618BA6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataSeeder", "dataseeder\dataseeder\DataSeeder.csproj", "{C848D125-9A81-C3BE-CE53-CAAD54F15A47}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EfdataSeeder", "dataseeder\efdataseeder\EfdataSeeder.csproj", "{BD980D1A-0313-3CCB-6AB0-39F7B1FC5F15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -393,10 +391,6 @@ Global
 		{C848D125-9A81-C3BE-CE53-CAAD54F15A47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C848D125-9A81-C3BE-CE53-CAAD54F15A47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C848D125-9A81-C3BE-CE53-CAAD54F15A47}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD980D1A-0313-3CCB-6AB0-39F7B1FC5F15}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD980D1A-0313-3CCB-6AB0-39F7B1FC5F15}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD980D1A-0313-3CCB-6AB0-39F7B1FC5F15}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD980D1A-0313-3CCB-6AB0-39F7B1FC5F15}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -471,7 +465,6 @@ Global
 		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{615AC50D-D2DE-6025-B4BE-F74FDC618BA6} = {68306EFF-55D9-497B-9482-FEB81C485914}
 		{C848D125-9A81-C3BE-CE53-CAAD54F15A47} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
-		{BD980D1A-0313-3CCB-6AB0-39F7B1FC5F15} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

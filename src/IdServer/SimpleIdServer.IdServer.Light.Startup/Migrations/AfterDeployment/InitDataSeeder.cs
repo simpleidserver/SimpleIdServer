@@ -1,4 +1,6 @@
-﻿using DataSeeder;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using DataSeeder;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Stores;
 using System.Threading;
@@ -12,8 +14,14 @@ public class InitDataSeeder : BaseAfterDeploymentDataSeeder
     private readonly IClientRepository _clientRepository;
     private readonly IScopeRepository _scopeRepository;
 
-    protected InitDataSeeder(IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
+    public InitDataSeeder(ITransactionBuilder transactionBuilder,
+        IClientRepository clientRepository,
+        IScopeRepository scopeRepository,
+        IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
     {
+        _transactionBuilder = transactionBuilder;
+        _clientRepository = clientRepository;
+        _scopeRepository = scopeRepository;
     }
 
     public override string Name => nameof(InitDataSeeder);

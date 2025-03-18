@@ -8,8 +8,16 @@ namespace SimpleIdServer.IdServer.Config;
 
 public static class DefaultKeys
 {
-    public static List<SerializedFileKey> All => new List<SerializedFileKey>
+    public static List<SerializedFileKey> All
     {
-        KeyGenerator.GenerateRSASigningCredentials(DefaultRealms.Master, "rsa-1")
-    };
+        get
+        {
+            var result = new List<SerializedFileKey>
+            {
+                KeyGenerator.GenerateRSASigningCredentials(DefaultRealms.Master, "rsa-1"),
+                KeyGenerator.GenerateX509SigningCredentials(DefaultRealms.Master, "certificate")
+            };
+            return result;
+        }
+    }
 }

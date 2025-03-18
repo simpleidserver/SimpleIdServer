@@ -15,7 +15,7 @@ public class InitEmailAuthDataseeder : BaseAuthDataSeeder
 {
     private readonly ITransactionBuilder _transactionBuilder;
 
-    protected InitEmailAuthDataseeder(
+    public InitEmailAuthDataseeder(
         ITransactionBuilder transactionBuilder,
         IAuthenticationContextClassReferenceRepository acrRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository,

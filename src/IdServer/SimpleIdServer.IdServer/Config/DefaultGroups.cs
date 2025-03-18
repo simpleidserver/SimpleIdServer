@@ -15,6 +15,12 @@ public static class DefaultGroups
         AdministratorReadonlyGroup.FullPath,
     };
 
+    public static List<Group> All => new List<Group>
+    {
+        AdministratorGroup,
+        AdministratorReadonlyGroup
+    };
+
     public static Group AdministratorGroup = new Group
     {
         Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
@@ -25,7 +31,7 @@ public static class DefaultGroups
         {
             new GroupRealm
             {
-                RealmsName = Config.DefaultRealms.Master.Name
+                RealmsName = DefaultRealms.Master.Name
             }
         },
         Name = "administrator",
@@ -44,7 +50,7 @@ public static class DefaultGroups
         {
             new GroupRealm
             {
-                RealmsName = Config.DefaultRealms.Master.Name
+                RealmsName = DefaultRealms.Master.Name
             }
         },
         Name = "administrator-ro",

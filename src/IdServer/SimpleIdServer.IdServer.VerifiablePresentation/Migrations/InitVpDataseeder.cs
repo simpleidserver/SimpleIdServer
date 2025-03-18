@@ -13,7 +13,7 @@ public class InitVpDataseeder : BaseAuthDataSeeder
 {
     private readonly ITransactionBuilder _transactionBuilder;
 
-    protected InitVpDataseeder(
+    public InitVpDataseeder(
         ITransactionBuilder transactionBuilder,
         IAuthenticationContextClassReferenceRepository acrRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository,

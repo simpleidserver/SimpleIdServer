@@ -15,7 +15,7 @@ public class InitWebauthnAuthDataseeder : BaseAuthDataSeeder
 {
     private readonly ITransactionBuilder _transactionBuilder;
 
-    protected InitWebauthnAuthDataseeder(
+    public InitWebauthnAuthDataseeder(
         ITransactionBuilder transactionBuilder,
         IAuthenticationContextClassReferenceRepository acrRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository,

@@ -10,6 +10,7 @@ public static class ServiceProviderExtensions
         {
             var dataMigrationService = scope.ServiceProvider.GetService<IDataMigrationService>();
             dataMigrationService.MigrateBeforeDeployment(CancellationToken.None).Wait();
+            dataMigrationService.Migrate(CancellationToken.None).Wait();
             dataMigrationService.MigrateAfterDeployment(CancellationToken.None).Wait();
         }
     }

@@ -19,6 +19,7 @@ public class LanguageRepository : ILanguageRepository
     public void Add(Language language)
     {
         _dbContext.Languages.Add(language);
+        _dbContext.Translations.AddRange(language.Descriptions);
     }
 
     public async Task<List<Language>> GetAll(CancellationToken cancellationToken)

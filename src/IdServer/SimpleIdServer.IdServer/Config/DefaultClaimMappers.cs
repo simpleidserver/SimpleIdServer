@@ -1,11 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Domains;
-using static SimpleIdServer.IdServer.Constants;
 using System.Collections.Generic;
 using System.Security.Claims;
-using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace SimpleIdServer.IdServer.Config;
 

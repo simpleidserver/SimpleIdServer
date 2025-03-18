@@ -15,7 +15,6 @@ public static class IdServerBuilderExtensions
     {
         builder.Services.AddEfStore(idserverCb);
         builder.FormBuilder.UseEf(formbuilderCb);
-        builder.Services.AddEfStore();
         if (builder.DataProtectionBuilder != null)
         {
             builder.DataProtectionBuilder.PersistKeysToDbContext<StoreDbContext>();

@@ -38,11 +38,25 @@ public static class ClientCredentialsConfig
     {
         webApplicationBuilder.Services.AddTransient<IDataSeeder, InitDataSeeder>();
         webApplicationBuilder.AddSidIdentityServer()
-            .UseEfStore(db => db.UseSqlite("Data Source=Application.db;"), db => db.UseSqlite("Data Source=Application.db;"));
+            .UseEfStore(db =>
+            {
+                db.UseSqlite("Data Source=Application.db;", o =>
+                {
+                    o.MigrationsAssembly("SimpleIdServer.IdServer.SqliteMigrations");
+                    o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                });
+            }, db =>
+            {
+                db.UseSqlite("Data Source=Application.db;", o =>
+                {
+                    o.MigrationsAssembly("FormBuilder.SqliteMigrations");
+                    o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
+                });
+            });
 
         var app = webApplicationBuilder.Build();
-        app.UseSid();
         app.Services.SeedData();
+        app.UseSid();
         app.Run();
     }
 }

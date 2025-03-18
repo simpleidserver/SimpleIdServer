@@ -15,7 +15,7 @@ public class InitMobileAuthDataseeder : BaseAuthDataSeeder
 {
     private readonly ITransactionBuilder _transactionBuilder;
 
-    protected InitMobileAuthDataseeder(
+    public InitMobileAuthDataseeder(
         ITransactionBuilder transactionBuilder,
         IAuthenticationContextClassReferenceRepository acrRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository,
