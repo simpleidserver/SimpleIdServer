@@ -41,7 +41,7 @@ public static class SwaggerConfig
             .AddInMemoryClients(clients)
             .AddInMemoryScopes(scopes)
             .AddInMemoryUsers(Config.Users)
-            .AddPwdAuthentication(true, true)
+            .AddPwdAuthentication(true)
             .AddSwagger();
         var app = webApplicationBuilder.Build();
         app.UseSid();
@@ -82,7 +82,7 @@ public static class SwaggerConfig
             .AddInMemoryScopes(scopes)
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryRealms(Config.Realms)
-            .AddPwdAuthentication(true, true)
+            .AddPwdAuthentication(true)
             .EnableRealm()
             .AddSwagger();
         var app = webApplicationBuilder.Build();

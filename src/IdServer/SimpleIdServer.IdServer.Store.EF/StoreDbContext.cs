@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using EfdataSeeder;
+using DataSeeder;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.Configuration.Models;
@@ -12,7 +12,7 @@ using SimpleIdServer.OpenidFederation.Domains;
 
 namespace SimpleIdServer.IdServer.Store.EF
 {
-    public class StoreDbContext : DataSeederDbContext<StoreDbContext>, IDataProtectionKeyContext
+    public class StoreDbContext : DbContext, IDataProtectionKeyContext
     {
         public StoreDbContext(DbContextOptions<StoreDbContext> options) : base(options) { }
 
@@ -56,68 +56,71 @@ namespace SimpleIdServer.IdServer.Store.EF
         public DbSet<MessageBusErrorMessage> MessageBusErrorMessages { get; set; }
         public DbSet<FederationEntity> FederationEntities { get; set; }
         public DbSet<RecurringJobStatus> RecurringJobStatusLst { get; set; }
+        public DbSet<DataSeederExecutionHistory> ExecutionHistories { get; set; }
 
-        protected override void Update(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.ApplyConfiguration(new LanguageConfiguration());
-            builder.ApplyConfiguration(new ClientConfiguration());
-            builder.ApplyConfiguration(new ConsentConfiguration());
-            builder.ApplyConfiguration(new ScopeClaimConfiguration());
-            builder.ApplyConfiguration(new ScopeConfiguration());
-            builder.ApplyConfiguration(new TranslationConfiguration());
-            builder.ApplyConfiguration(new UserClaimConfiguration());
-            builder.ApplyConfiguration(new UserConfiguration());
-            builder.ApplyConfiguration(new UserCredentialConfiguration());
-            builder.ApplyConfiguration(new UserExternalAuthProviderConfiguration());
-            builder.ApplyConfiguration(new UserSessionConfiguration());
-            builder.ApplyConfiguration(new ClientJsonWebKeyConfiguration());
-            builder.ApplyConfiguration(new TokenConfiguration());
-            builder.ApplyConfiguration(new AuthenticationContextClassReferenceConfiguration());
-            builder.ApplyConfiguration(new AuthenticationSchemeProviderConfiguration());
-            builder.ApplyConfiguration(new AuthenticationSchemeProviderMapperConfiguration());
-            builder.ApplyConfiguration(new AuthenticationSchemeProviderDefinitionConfiguration());
-            builder.ApplyConfiguration(new ClaimProviderConfiguration());
-            builder.ApplyConfiguration(new BCAuthorizeConfiguration());
-            builder.ApplyConfiguration(new BCAuthorizeHistoryConfiguration());
-            builder.ApplyConfiguration(new UserDeviceConfiguration());
-            builder.ApplyConfiguration(new ApiResourceConfiguration());
-            builder.ApplyConfiguration(new AuthorizedScopeConfiguration());
-            builder.ApplyConfiguration(new UMAPendingRequestConfiguration());
-            builder.ApplyConfiguration(new UMAPermissionTicketConfiguration());
-            builder.ApplyConfiguration(new UMAPermissionTicketRecordConfiguration());
-            builder.ApplyConfiguration(new UmaResourceConfiguration());
-            builder.ApplyConfiguration(new UMAResourcePermissionClaimConfiguration());
-            builder.ApplyConfiguration(new UMAResourcePermissionConfiguration());
-            builder.ApplyConfiguration(new RealmConfiguration());
-            builder.ApplyConfiguration(new SerializedFileKeyConfiguration());
-            builder.ApplyConfiguration(new AuditEventConfiguration());
-            builder.ApplyConfiguration(new CertificateAuthorityConfiguration());
-            builder.ApplyConfiguration(new ClientCertificateConfiguration());
-            builder.ApplyConfiguration(new IdentityProvisioningConfiguration());
-            builder.ApplyConfiguration(new IdentityProvisioningDefinitionConfiguration());
-            builder.ApplyConfiguration(new IdentityProvisioningMappingRuleConfiguration());
-            builder.ApplyConfiguration(new IdentityProvisioningHistoryConfiguration());
-            builder.ApplyConfiguration(new ExtractedRepresentationConfiguration());
-            builder.ApplyConfiguration(new RealmUserConfiguration());
-            builder.ApplyConfiguration(new GroupConfiguration());
-            builder.ApplyConfiguration(new DeviceAuthCodeConfiguration());
-            builder.ApplyConfiguration(new ConfigurationDefinitionConfiguration());
-            builder.ApplyConfiguration(new ConfigurationDefinitionRecordConfiguration());
-            builder.ApplyConfiguration(new ConfigurationDefinitionRecordValueConfiguration());
-            builder.ApplyConfiguration(new ConfigurationKeyPairValueRecordConfiguration());
-            builder.ApplyConfiguration(new RegistrationWorkflowConfiguration());
-            builder.ApplyConfiguration(new AuthorizedResourceConfiguration());
-            builder.ApplyConfiguration(new ExtractedRepresentationStagingConfiguration());
-            builder.ApplyConfiguration(new GroupRealmConfiguration());
-            builder.ApplyConfiguration(new GroupUserConfiguration());
-            builder.ApplyConfiguration(new GotifySessionConfiguration());
-            builder.ApplyConfiguration(new PresentationDefinitionConfiguration());
-            builder.ApplyConfiguration(new PresentationDefinitionFormatConfiguration());
-            builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConfiguration());
-            builder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConstraintConfiguration());
-            builder.ApplyConfiguration(new MessageBusErrorMessageConfiguration());
-            builder.ApplyConfiguration(new FederationEntityConfiguration());
-            builder.ApplyConfiguration(new RecurringJobStatusConfiguration());
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfiguration(new LanguageConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientConfiguration());
+            modelBuilder.ApplyConfiguration(new ConsentConfiguration());
+            modelBuilder.ApplyConfiguration(new ScopeClaimConfiguration());
+            modelBuilder.ApplyConfiguration(new ScopeConfiguration());
+            modelBuilder.ApplyConfiguration(new TranslationConfiguration());
+            modelBuilder.ApplyConfiguration(new UserClaimConfiguration());
+            modelBuilder.ApplyConfiguration(new UserConfiguration());
+            modelBuilder.ApplyConfiguration(new UserCredentialConfiguration());
+            modelBuilder.ApplyConfiguration(new UserExternalAuthProviderConfiguration());
+            modelBuilder.ApplyConfiguration(new UserSessionConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientJsonWebKeyConfiguration());
+            modelBuilder.ApplyConfiguration(new TokenConfiguration());
+            modelBuilder.ApplyConfiguration(new AuthenticationContextClassReferenceConfiguration());
+            modelBuilder.ApplyConfiguration(new AuthenticationSchemeProviderConfiguration());
+            modelBuilder.ApplyConfiguration(new AuthenticationSchemeProviderMapperConfiguration());
+            modelBuilder.ApplyConfiguration(new AuthenticationSchemeProviderDefinitionConfiguration());
+            modelBuilder.ApplyConfiguration(new ClaimProviderConfiguration());
+            modelBuilder.ApplyConfiguration(new BCAuthorizeConfiguration());
+            modelBuilder.ApplyConfiguration(new BCAuthorizeHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new UserDeviceConfiguration());
+            modelBuilder.ApplyConfiguration(new ApiResourceConfiguration());
+            modelBuilder.ApplyConfiguration(new AuthorizedScopeConfiguration());
+            modelBuilder.ApplyConfiguration(new UMAPendingRequestConfiguration());
+            modelBuilder.ApplyConfiguration(new UMAPermissionTicketConfiguration());
+            modelBuilder.ApplyConfiguration(new UMAPermissionTicketRecordConfiguration());
+            modelBuilder.ApplyConfiguration(new UmaResourceConfiguration());
+            modelBuilder.ApplyConfiguration(new UMAResourcePermissionClaimConfiguration());
+            modelBuilder.ApplyConfiguration(new UMAResourcePermissionConfiguration());
+            modelBuilder.ApplyConfiguration(new RealmConfiguration());
+            modelBuilder.ApplyConfiguration(new SerializedFileKeyConfiguration());
+            modelBuilder.ApplyConfiguration(new AuditEventConfiguration());
+            modelBuilder.ApplyConfiguration(new CertificateAuthorityConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientCertificateConfiguration());
+            modelBuilder.ApplyConfiguration(new IdentityProvisioningConfiguration());
+            modelBuilder.ApplyConfiguration(new IdentityProvisioningDefinitionConfiguration());
+            modelBuilder.ApplyConfiguration(new IdentityProvisioningMappingRuleConfiguration());
+            modelBuilder.ApplyConfiguration(new IdentityProvisioningHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new ExtractedRepresentationConfiguration());
+            modelBuilder.ApplyConfiguration(new RealmUserConfiguration());
+            modelBuilder.ApplyConfiguration(new GroupConfiguration());
+            modelBuilder.ApplyConfiguration(new DeviceAuthCodeConfiguration());
+            modelBuilder.ApplyConfiguration(new ConfigurationDefinitionConfiguration());
+            modelBuilder.ApplyConfiguration(new ConfigurationDefinitionRecordConfiguration());
+            modelBuilder.ApplyConfiguration(new ConfigurationDefinitionRecordValueConfiguration());
+            modelBuilder.ApplyConfiguration(new ConfigurationKeyPairValueRecordConfiguration());
+            modelBuilder.ApplyConfiguration(new RegistrationWorkflowConfiguration());
+            modelBuilder.ApplyConfiguration(new AuthorizedResourceConfiguration());
+            modelBuilder.ApplyConfiguration(new ExtractedRepresentationStagingConfiguration());
+            modelBuilder.ApplyConfiguration(new GroupRealmConfiguration());
+            modelBuilder.ApplyConfiguration(new GroupUserConfiguration());
+            modelBuilder.ApplyConfiguration(new GotifySessionConfiguration());
+            modelBuilder.ApplyConfiguration(new PresentationDefinitionConfiguration());
+            modelBuilder.ApplyConfiguration(new PresentationDefinitionFormatConfiguration());
+            modelBuilder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConfiguration());
+            modelBuilder.ApplyConfiguration(new PresentationDefinitionInputDescriptorConstraintConfiguration());
+            modelBuilder.ApplyConfiguration(new MessageBusErrorMessageConfiguration());
+            modelBuilder.ApplyConfiguration(new FederationEntityConfiguration());
+            modelBuilder.ApplyConfiguration(new RecurringJobStatusConfiguration());
+            modelBuilder.ApplyConfiguration(new DataSeederExecutionHistoryConfiguration());
         }
     }
 }

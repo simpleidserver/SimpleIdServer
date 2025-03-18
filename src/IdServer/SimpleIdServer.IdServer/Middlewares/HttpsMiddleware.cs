@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Startup.Infrastructures;
+namespace SimpleIdServer.IdServer.Middlewares;
 
 public class HttpsMiddleware
 {

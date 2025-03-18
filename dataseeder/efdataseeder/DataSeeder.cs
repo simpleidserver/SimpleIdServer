@@ -17,6 +17,15 @@ public abstract class DataSeeder<T, U> : IDataSeeder where T : DataSeederDbConte
 
     public abstract bool IsBeforeDeployment { get; }
 
+    public void Migrate()
+    {
+        var isInMemory = DbContext.Database.IsInMemory();
+        if (!isInMemory)
+        {
+            DbContext.Database.Migrate();
+        }
+    }
+
     public async Task Apply(CancellationToken cancellationToken)
     {
         if (!TableExists<DataSeederExecutionHistory>(DbContext))

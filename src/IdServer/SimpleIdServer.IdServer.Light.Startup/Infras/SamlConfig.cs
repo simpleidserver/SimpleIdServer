@@ -25,7 +25,7 @@ public static class SamlConfig
             .AddInMemoryClients(clients)
             .AddInMemoryScopes(scopes)
             .AddInMemoryUsers(Config.Users)
-            .AddPwdAuthentication(true, true)
+            .AddPwdAuthentication(true)
             .AddSamlIdp();
 
         var app = webApplicationBuilder.Build();

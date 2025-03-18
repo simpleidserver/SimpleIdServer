@@ -1,23 +1,29 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder;
+using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Certificate;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Config;
-using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Stores.Default;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -31,8 +37,11 @@ public class IdServerBuilder
     private readonly IMvcBuilder _mvcBuilder;
     private readonly AutomaticConfigurationOptions _automaticConfigurationOptions;
     private readonly SidAuthCookie _sidAuthCookie;
+    private readonly SidHangfire _sidHangfire;
+    private readonly SidMasstransit _sidMasstransit;
+    private HttpsConnectionAdapterOptions _httpsConnectionAdapterOptions;
 
-    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie)
+    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie, SidHangfire sidHangfire, SidMasstransit sidMasstransit)
     {
         _serviceCollection = serviceCollection;
         _authBuilder = authBuilder;
@@ -41,6 +50,8 @@ public class IdServerBuilder
         _mvcBuilder = mvcBuilder;
         _automaticConfigurationOptions = automaticConfigurationOptions;
         _sidAuthCookie = sidAuthCookie;
+        _sidHangfire = sidHangfire;
+        _sidMasstransit = sidMasstransit;
         _sidRoutesStore = new SidRoutesStore();
         _serviceCollection.AddSingleton(_sidRoutesStore);
 
@@ -57,6 +68,17 @@ public class IdServerBuilder
     internal AutomaticConfigurationOptions AutomaticConfigurationOptions => _automaticConfigurationOptions;
 
     internal SidAuthCookie SidAuthCookie => _sidAuthCookie;
+
+
+    /// <summary>
+    /// Ignores server certificate validation errors. 
+    /// WARNING: Use only for development purposes.
+    /// </summary>
+    public IdServerBuilder IgnoreCertificateError()
+    {
+        ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
+        return this;
+    }
 
     /// <summary>
     /// Adds a developer signing credential by registering a DefaultFileSerializedKeyStore with the standard keys.
@@ -131,10 +153,73 @@ public class IdServerBuilder
         return this;
     }
 
-    #region Authentication & Authorization
-
-    public IdServerBuilder AddMutualAuthentication(Action<CertificateAuthenticationOptions> callback = null)
+    /// <summary>
+    /// When FAPI2.0 is enabled then TLS connections shall be set up to use TLS version 1.2 or later.
+    /// </summary>
+    /// <param name="ssl"></param>
+    /// <returns></returns>
+    public IdServerBuilder EnableFapiSecurityProfile(SslProtocols ssl = SslProtocols.Tls12)
     {
+        Action<HttpsConnectionAdapterOptions> cb = (o) =>
+        {
+            o.SslProtocols = ssl;
+        };
+        if(_httpsConnectionAdapterOptions != null)
+        {
+            cb(_httpsConnectionAdapterOptions);
+        }
+        Services.Configure<KestrelServerOptions>(options =>
+        {
+            options.ConfigureHttpsDefaults((o) =>
+            {
+                _httpsConnectionAdapterOptions = o;
+                cb(o);
+            });
+        });
+        return this;
+    }
+
+    
+    /// <summary>
+    /// Enables mTLS authentication by configuring Kestrel HTTPS options and setting up certificate forwarding.
+    /// </summary>
+    public IdServerBuilder EnableMtlsAuthentication(ClientCertificateMode clientCertificate = ClientCertificateMode.AllowCertificate, Action<CertificateAuthenticationOptions> callback = null)
+    {
+        Action<HttpsConnectionAdapterOptions> cb = (o) =>
+        {
+            o.ClientCertificateMode = clientCertificate;
+        };
+        if (_httpsConnectionAdapterOptions != null)
+        {
+            cb(_httpsConnectionAdapterOptions);
+        }
+        else
+        {
+            Services.Configure<KestrelServerOptions>(options =>
+            {
+                options.ConfigureHttpsDefaults((o) =>
+                {
+                    _httpsConnectionAdapterOptions = o;
+                    cb(o);
+                });
+            });
+        }
+
+        Services.AddCertificateForwarding(options =>
+        {
+            options.CertificateHeader = "ssl-client-cert";
+            options.HeaderConverter = (headerValue) =>
+            {
+                X509Certificate2? clientCertificate = null;
+
+                if (!string.IsNullOrWhiteSpace(headerValue))
+                {
+                    clientCertificate = X509Certificate2.CreateFromPem(WebUtility.UrlDecode(headerValue));
+                }
+
+                return clientCertificate!;
+            };
+        });
         Services.Configure<IdServerHostOptions>(o =>
         {
             o.MtlsEnabled = true;
@@ -143,28 +228,20 @@ public class IdServerBuilder
         return this;
     }
 
-    public IdServerBuilder AddMutualAuthenticationSelfSigned()
+    /// <summary>
+    /// Configures HTTP header forwarding for client IP and protocol information.
+    /// </summary>
+    public IdServerBuilder ForwardHttpHeader()
     {
-        Services.Configure<IdServerHostOptions>(o =>
+        Services.Configure<ForwardedHeadersOptions>(options =>
         {
-            o.MtlsEnabled = true;
-        });
-        _authBuilder.AddCertificate(SimpleIdServer.IdServer.Constants.DefaultCertificateAuthenticationScheme, o =>
-        {
-            o.AllowedCertificateTypes = CertificateTypes.SelfSigned;
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
         });
         return this;
     }
 
-    #endregion
-
-    #region CIBA
-
-    /// <summary>
-    /// Add back channel authentication (CIBA).
-    /// </summary>
-    /// <returns></returns>
-    public IdServerBuilder AddBackChannelAuthentication()
+    // Enables the Back-Channel Authentication (CIBA) functionality.
+    public IdServerBuilder EnableCiba()
     {
         _serviceCollection.AddTransient<BCNotificationJob>();
         _serviceCollection.Configure<IdServerHostOptions>(o =>
@@ -174,9 +251,45 @@ public class IdServerBuilder
         return this;
     }
 
-    #endregion
+    /// <summary>
+    /// Configure hangfire.
+    /// </summary>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    public IdServerBuilder ConfigureHangfire(Action<IGlobalConfiguration> cb)
+    {
+        _sidHangfire.Callback = cb;
+        return this;
+    }
 
-    #region Other
+    /// <summary>
+    /// Configure the key value storage.
+    /// </summary>
+    /// <returns></returns>
+    public IdServerBuilder ConfigureKeyValueStore(Action<AutomaticConfigurationOptions> cb)
+    {
+        cb(_automaticConfigurationOptions);
+        return this;
+    }
+
+    /// <summary>
+    /// Use in memory implementation of mass transit.
+    /// </summary>
+    /// <returns></returns>
+    public IdServerBuilder ConfigureMasstransit(Action<IBusRegistrationConfigurator> cb)
+    {
+        _sidMasstransit.Callback = cb;
+        return this;
+    }
+
+    /// <summary>
+    /// Configures the authentication cookie options by setting a callback.
+    /// </summary>
+    public IdServerBuilder ConfigureAuthCookie(Action<CookieAuthenticationOptions> cb)
+    {
+        _sidAuthCookie.Callback = cb;
+        return this;
+    }
 
     /// <summary>
     /// Enable realm.
@@ -191,6 +304,8 @@ public class IdServerBuilder
         return this;
     }
 
+    #region Other
+
     /// <summary>
     /// Authorization server accepts authorization request data only via PAR.
     /// </summary>
@@ -200,27 +315,6 @@ public class IdServerBuilder
         _serviceCollection.Configure<IdServerHostOptions>(o =>
         {
             o.RequiredPushedAuthorizationRequest = true;
-        });
-        return this;
-    }
-
-    /// <summary>
-    /// Use in memory implementation of mass transit.
-    /// </summary>
-    /// <returns></returns>
-    public IdServerBuilder UseMassTransit(Action<IBusRegistrationConfigurator> cb)
-    {
-        _serviceCollection.AddMassTransitTestHarness((o) =>
-        {
-            o.AddPublishMessageScheduler();
-            o.AddHangfireConsumers();
-            o.AddConsumer<ExtractUsersFaultConsumer>();
-            o.AddConsumer<ImportUsersFaultConsumer>();
-            o.AddConsumer<IdServerEventsConsumer>();
-            o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
-            o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();
-            o.AddConsumer<RemoveRealmCommandConsumer, RemoveRealmConsumerDefinition>();
-            cb(o);
         });
         return this;
     }
@@ -235,10 +329,5 @@ public class IdServerBuilder
             Name = routeName,
             RelativePattern = relativePattern
         });
-    }
-
-    internal void Commit()
-    {
-        // TODO : Add the logic to update the record.
     }
 }

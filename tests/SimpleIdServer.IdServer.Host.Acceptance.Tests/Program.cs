@@ -78,7 +78,7 @@ builder.Services.AddSidIdentityServer(o =>
     })
     .AddConsoleNotification()
     .AddPwdAuthentication()
-    .AddBackChannelAuthentication()
+    .EnableCiba()
     .AddOpenidFederation(o =>
     {
         o.IsFederationEnabled = true;

@@ -1,15 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using DataSeeder;
 using FormBuilder;
-using FormBuilder.Builders;
-using FormBuilder.Repositories;
-using FormBuilder.Stores;
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Otp;
+using SimpleIdServer.IdServer.Otp.Migrations;
 using SimpleIdServer.IdServer.Otp.Services;
-using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -20,62 +17,27 @@ public static class IdServerBuilderExtensions
     /// Configures OTP authentication for the IdServer by registering the required services.
     /// </summary>
     /// <param name="idServerBuilder">The IdServer builder instance used to set up authentication.</param>
-    /// <param name="isInMemory">If true, seeds in-memory OTP forms and workflows.</param>
     /// <param name="isDefaultAuthMethod">If true, configures OTP as the default authentication method.</param>
     /// <returns>The updated IdServerBuilder with OTP authentication configured.</returns>
-    public static IdServerBuilder AddOtpAuthentication(this IdServerBuilder idServerBuilder, bool isInMemory = false, bool isDefaultAuthMethod = false)
+    public static IdServerBuilder AddOtpAuthentication(this IdServerBuilder idServerBuilder, bool isDefaultAuthMethod = false)
     {
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, OtpAuthenticationMethodService>();
         idServerBuilder.Services.AddTransient<IOtpAuthenticationService, OtpAuthenticationService>();
         idServerBuilder.Services.AddTransient<IUserAuthenticationService, OtpAuthenticationService>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, OtpAuthWorkflowLayout>();
-        if (isInMemory)
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitOtpAuthDataseeder>();
+        if (isDefaultAuthMethod)
         {
-            Seed(idServerBuilder, isDefaultAuthMethod);
+            idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
+            {
+                o.DefaultAcrValue = "otp";
+            });
+            idServerBuilder.SidAuthCookie.Callback = (o) =>
+            {
+                o.LoginPath = $"/{SimpleIdServer.IdServer.Otp.Constants.Amr}/Authenticate";
+            };
         }
 
         return idServerBuilder;
     }
-
-    private static void Seed(IdServerBuilder idServerBuilder, bool isDefaultAuthMethod)
-    {
-        using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
-        {
-            var newAcr = BuildAcr();
-            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
-            acrStore.Add(newAcr);
-
-            var formStore = serviceProvider.GetService<IFormStore>();
-            formStore.Add(StandardOtpAuthForms.OtpForm);
-            formStore.SaveChanges(CancellationToken.None).Wait();
-
-            var workflowStore = serviceProvider.GetService<IWorkflowStore>();
-            workflowStore.Add(StandardOtpAuthWorkflows.DefaultWorkflow);
-            workflowStore.SaveChanges(CancellationToken.None).Wait();
-
-            if (isDefaultAuthMethod)
-            {
-                idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
-                {
-                    o.DefaultAcrValue = newAcr.Name;
-                });
-                idServerBuilder.SidAuthCookie.Callback = (o) =>
-                {
-                    o.LoginPath = $"/{SimpleIdServer.IdServer.Otp.Constants.Amr}/Authenticate";
-                };
-            }
-        }
-    }
-
-    private static AuthenticationContextClassReference BuildAcr() => new AuthenticationContextClassReference
-    {
-        Id = Guid.NewGuid().ToString(),
-        Name = "otp",
-        DisplayName = "otp",
-        UpdateDateTime = DateTime.UtcNow,
-        Realms = new List<Realm>
-        {
-            SimpleIdServer.IdServer.Config.DefaultRealms.Master
-        }
-    };
 }

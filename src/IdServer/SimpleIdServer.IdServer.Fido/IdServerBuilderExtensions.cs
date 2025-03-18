@@ -1,49 +1,62 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using DataSeeder;
 using Fido2NetLib;
 using FormBuilder;
-using FormBuilder.Builders;
-using FormBuilder.Repositories;
-using FormBuilder.Stores;
 using SimpleIdServer.IdServer;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido;
+using SimpleIdServer.IdServer.Fido.Migrations;
 using SimpleIdServer.IdServer.Fido.Services;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Stores;
 using Constants = SimpleIdServer.IdServer.Fido.Constants;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IdServerBuilderExtensions
 {
-    public static IdServerBuilder AddMobileAuthentication(this IdServerBuilder idServerBuilder, Action<Fido2Configuration> fidoCallback = null, bool isInMemory = false, bool isDefaultAuthMethod = false)
+    public static IdServerBuilder AddMobileAuthentication(this IdServerBuilder idServerBuilder, Action<Fido2Configuration> fidoCallback = null, bool isDefaultAuthMethod = false)
     {
         AddFido(idServerBuilder, fidoCallback);
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, MobileAuthenticationService>();
         idServerBuilder.Services.AddTransient<IMobileAuthenticationService, UserMobileAuthenticationService>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, MobileAuthWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, MobileRegisterWorkflowLayout>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitMobileAuthDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<MobileOptions>();
-        if (isInMemory)
+        if (isDefaultAuthMethod)
         {
-            SeedMobile(idServerBuilder, isDefaultAuthMethod);
+            idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
+            {
+                o.DefaultAcrValue = Constants.MobileAMR;
+            });
+            idServerBuilder.SidAuthCookie.Callback = (o) =>
+            {
+                o.LoginPath = $"/{Constants.MobileAMR}/Authenticate";
+            };
         }
 
         return idServerBuilder;
     }
 
-    public static IdServerBuilder AddWebauthnAuthentication(this IdServerBuilder idServerBuilder, Action<Fido2Configuration> fidoCallback = null, bool isInMemory = false, bool isDefaultAuthMethod = false)
+    public static IdServerBuilder AddWebauthnAuthentication(this IdServerBuilder idServerBuilder, Action<Fido2Configuration> fidoCallback = null, bool isDefaultAuthMethod = false)
     {
         AddFido(idServerBuilder, fidoCallback);
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, WebauthnAuthenticationService>();
         idServerBuilder.Services.AddTransient<IWebauthnAuthenticationService, UserWebauthnAuthenticationService>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, WebauthRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, WebauthWorkflowLayout>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitWebauthnAuthDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<WebauthnOptions>();
-        if (isInMemory)
+        if (isDefaultAuthMethod)
         {
-            SeedWebauthn(idServerBuilder, isDefaultAuthMethod);
+            idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
+            {
+                o.DefaultAcrValue = Constants.AMR;
+            });
+            idServerBuilder.SidAuthCookie.Callback = (o) =>
+            {
+                o.LoginPath = $"/{Constants.AMR}/Authenticate";
+            };
         }
 
         return idServerBuilder;
@@ -80,90 +93,4 @@ public static class IdServerBuilderExtensions
             idServerBuilder.AddRoute("readLoginQRCode", Constants.EndPoints.ReadLoginQRCode + "/{sessionId}", new { controller = "U2FLogin", action = "ReadQRCode" });
         }
     }
-
-    private static void SeedMobile(IdServerBuilder idServerBuilder, bool isDefaultAuthMethod)
-    {
-        using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
-        {
-            var acr = BuildMobileAcr();
-            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
-            acrStore.Add(acr);
-
-            var formStore = serviceProvider.GetService<IFormStore>();
-            formStore.Add(StandardFidoAuthForms.MobileForm);
-            formStore.Add(StandardFidoRegisterForms.MobileForm);
-            formStore.SaveChanges(CancellationToken.None).Wait();
-
-            var workflowStore = serviceProvider.GetService<IWorkflowStore>();
-            workflowStore.Add(StandardFidoAuthWorkflows.DefaultMobileWorkflow);
-            workflowStore.SaveChanges(CancellationToken.None).Wait();
-
-            if (isDefaultAuthMethod)
-            {
-                idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
-                {
-                    o.DefaultAcrValue = acr.Name;
-                });
-                idServerBuilder.SidAuthCookie.Callback = (o) =>
-                {
-                    o.LoginPath = $"/{Constants.MobileAMR}/Authenticate";
-                };
-            }
-        }
-    }
-
-    private static void SeedWebauthn(IdServerBuilder idServerBuilder, bool isDefaultAuthMethod)
-    {
-        using (var serviceProvider = idServerBuilder.Services.BuildServiceProvider())
-        {
-            var acr = BuildWebauthnAcr();
-            var acrStore = serviceProvider.GetService<IAuthenticationContextClassReferenceRepository>();
-            acrStore.Add(acr);
-
-            var formStore = serviceProvider.GetService<IFormStore>();
-            formStore.Add(StandardFidoAuthForms.WebauthnForm);
-            formStore.Add(StandardFidoRegisterForms.WebauthnForm);
-            formStore.SaveChanges(CancellationToken.None).Wait();
-
-            var workflowStore = serviceProvider.GetService<IWorkflowStore>();
-            workflowStore.Add(StandardFidoAuthWorkflows.DefaultWebauthnWorkflow);
-            workflowStore.SaveChanges(CancellationToken.None).Wait();
-
-            if (isDefaultAuthMethod)
-            {
-                idServerBuilder.Services.Configure<IdServerHostOptions>(o =>
-                {
-                    o.DefaultAcrValue = acr.Name;
-                });
-                idServerBuilder.SidAuthCookie.Callback = (o) =>
-                {
-                    o.LoginPath = $"/{Constants.AMR}/Authenticate";
-                };
-            }
-        }
-    }
-
-    private static AuthenticationContextClassReference BuildMobileAcr() => new AuthenticationContextClassReference
-    {
-        Id = Guid.NewGuid().ToString(),
-        Name = "mobile",
-        DisplayName = "mobile",
-        UpdateDateTime = DateTime.UtcNow,
-        Realms = new List<Realm>
-        {
-            SimpleIdServer.IdServer.Config.DefaultRealms.Master
-        }
-    };
-
-    private static AuthenticationContextClassReference BuildWebauthnAcr() => new AuthenticationContextClassReference
-    {
-        Id = Guid.NewGuid().ToString(),
-        Name = "webauthn",
-        DisplayName = "webauthn",
-        UpdateDateTime = DateTime.UtcNow,
-        Realms = new List<Realm>
-        {
-            SimpleIdServer.IdServer.Config.DefaultRealms.Master
-        }
-    };
 }

@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Hangfire;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Infastructures;
@@ -22,9 +22,21 @@ public static class WebApplicationExtensions
     public static WebApplication UseSid(this WebApplication webApplication, bool cookiesAlwaysSecure = true)
     {
         var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
+        if(opts.ForceHttps) webApplication.UseMiddleware<HttpsMiddleware>();
         var usePrefix = opts.UseRealm;
         if(usePrefix) webApplication.UseMiddleware<RealmMiddleware>();
         var sidRoutesStore = webApplication.Services.GetRequiredService<ISidRoutesStore>();
+        var certificateForwardingOptions = webApplication.Services.GetService<IOptions<CertificateForwardingOptions>>();
+        if(certificateForwardingOptions != null)
+        {
+            webApplication.UseCertificateForwarding();
+        }
+
+        var forwardedHeadersOptions = webApplication.Services.GetService<IOptions<ForwardedHeadersOptions>>();
+        {
+            webApplication.UseForwardedHeaders();
+        }
+
         webApplication.MapBlazorHub();
         webApplication.UseSidRequestLocalization();
         webApplication.UseMiddleware<LanguageMiddleware>();

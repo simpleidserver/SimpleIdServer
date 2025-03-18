@@ -17,7 +17,7 @@ public static class OtpAuthenticationConfig
             .AddDeveloperSigningCredential()
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddOtpAuthentication(true, true);
+            .AddOtpAuthentication(true);
 
         var app = webApplicationBuilder.Build();
         app.UseSid();
@@ -34,7 +34,7 @@ public static class OtpAuthenticationConfig
             .AddInMemoryRealms(Config.Realms)
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddOtpAuthentication(true, true)
+            .AddOtpAuthentication(true)
             .EnableRealm();
 
         var app = webApplicationBuilder.Build();

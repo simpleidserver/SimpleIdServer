@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
 using EfdataSeeder;
-using FormBuilder;
 using Hangfire;
 using Hangfire.MySql;
 using Hangfire.PostgreSql;
@@ -10,192 +9,153 @@ using Hangfire.SQLite;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Server.Kestrel.Https;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
-using SimpleIdServer.Did.Encoders;
-using SimpleIdServer.Did.Key;
-using SimpleIdServer.IdServer.Console;
-using SimpleIdServer.IdServer.Email;
-using SimpleIdServer.IdServer.Fido;
-using SimpleIdServer.IdServer.Notification.Gotify;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Provisioning.LDAP;
-using SimpleIdServer.IdServer.Provisioning.SCIM;
-using SimpleIdServer.IdServer.Pwd;
-using SimpleIdServer.IdServer.Sms;
 using SimpleIdServer.IdServer.Startup.Conf.Migrations.AfterDeployment;
 using SimpleIdServer.IdServer.Startup.Conf.Migrations.BeforeDeployment;
 using SimpleIdServer.IdServer.Startup.Configurations;
-using SimpleIdServer.IdServer.Startup.Converters;
-using SimpleIdServer.IdServer.Store.EF;
-using SimpleIdServer.IdServer.Swagger;
 using SimpleIdServer.IdServer.TokenTypes;
-using SimpleIdServer.IdServer.UI;
-using SimpleIdServer.IdServer.VerifiablePresentation;
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Transactions;
 
 namespace SimpleIdServer.IdServer.Startup.Conf;
 
 public class SidServerSetup
 {
-    public static void ConfigureIdServer(WebApplicationBuilder builder, IdentityServerConfiguration configuration)
+    public static void ConfigureIdServer(WebApplicationBuilder webApplicationBuilder, IdentityServerConfiguration configuration)
     {
-        var services = builder.Services;
-        var section = builder.Configuration.GetSection(nameof(ScimClientOptions));
+        var section = webApplicationBuilder.Configuration.GetSection(nameof(ScimClientOptions));
         var conf = section.Get<ScimClientOptions>();
-        services.AddServerSideBlazor().AddCircuitOptions(o =>
-        {
-            o.DetailedErrors = true;
-        }).AddHubOptions(o =>
-        {
-            o.MaximumReceiveMessageSize = 102400000;
-        });
-        var idServerBuilder = services.AddSidIdentityServer(callback: cb =>
-        {
-            cb.DefaultAuthenticationWorkflowId = DataSeeder.completePwdAuthWorkflowId;
-            if (!string.IsNullOrWhiteSpace(configuration.SessionCookieNamePrefix))
-                cb.SessionCookieName = configuration.SessionCookieNamePrefix;
-            cb.Authority = configuration.Authority;
-            cb.ScimClientOptions = conf;
-        }, cookie: c =>
-        {
-            if (!string.IsNullOrWhiteSpace(configuration.AuthCookieNamePrefix))
-                c.Cookie.Name = configuration.AuthCookieNamePrefix;
-        })
-            .UseEfStore(o => ConfigureStorage(builder, o))
-            .AddSwagger(o =>
+        var idServerBuilder = webApplicationBuilder.AddSidIdentityServer(c =>
             {
-                o.IncludeDocumentation<AccessTokenTypeService>();
-                o.AddOAuthSecurity();
+                c.ForceHttps = configuration.ForceHttps;
+                c.Authority = configuration.Authority;
+                c.ScimClientOptions = conf;
+                if (!string.IsNullOrWhiteSpace(configuration.SessionCookieNamePrefix))
+                {
+                    c.SessionCookieName = configuration.SessionCookieNamePrefix;
+                }
             })
-            .AddConsoleNotification()
-            .AddVpAuthentication()
-            .AddBackChannelAuthentication()
+            .IgnoreCertificateError()
+            .EnableFapiSecurityProfile()
             .AddPwdAuthentication()
             .AddEmailAuthentication()
             .AddOtpAuthentication()
             .AddSmsAuthentication()
-            .AddFcmNotification()
-            .AddGotifyNotification()
-            .AddSamlIdp()
-            .AddFidoAuthentication(f =>
+            .AddMobileAuthentication(o =>
             {
+                // TODO : Simplify ???
                 var authority = configuration.Authority;
                 var url = new Uri(authority);
-                f.ServerName = "SimpleIdServer";
-                f.ServerDomain = url.Host;
-                f.Origins = new HashSet<string> { authority };
+                o.ServerName = "SimpleIdServer";
+                o.ServerDomain = url.Host;
+                o.Origins = new HashSet<string> { authority };
             })
-            .AddSCIMProvisioning()
-            .AddLdapProvisioning()
-            .AddMutualAuthentication(m =>
-            {
-                m.AllowedCertificateTypes = CertificateTypes.All;
-                m.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
-            })
+            .AddWebauthnAuthentication()
+            .AddVpAuthentication()
+            .AddSamlIdp()
+            .AddWsFederation()
             .AddOpenidFederation(o =>
             {
                 o.IsFederationEnabled = true;
-            });
-        var isRealmEnabled = configuration.IsRealmEnabled;
-        if (isRealmEnabled) idServerBuilder.EnableRealm();
-        var cookieName = "XSFR-TOKEN";
-        services.AddAntiforgery(c =>
-        {
-            c.Cookie.Name = cookieName;
-        });
-        services.AddFormBuilder(o =>
-        {
-            o.AntiforgeryCookieName = cookieName;
-        }).UseEF((db) =>
-        {
-            ConfigureFormBuilderStorage(builder, db);
-        });
-        services.AddDidKey(o =>
-        {
-            o.PublicKeyFormat = Ed25519VerificationKey2020Standard.TYPE;
-        });
-        ConfigureDistributedCache(builder);
-        ConfigureMessageBroker(builder, idServerBuilder);
-        ConfigureHangfire(builder);
-    }
-
-    public static void ConfigureHangfire(WebApplicationBuilder builder)
-    {
-        var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
-        var conf = section.Get<StorageConfiguration>();
-        var services = builder.Services;
-        services.AddHangfire(o => {
-            o.UseRecommendedSerializerSettings();
-            o.UseIgnoredAssemblyVersionTypeResolver();
-            switch(conf.Type)
+            })
+            .AddScimProvisioning()
+            .AddLdapProvisioning()
+            .AddFcmNotification()
+            .AddGotifyNotification()
+            .AddSwagger(opt =>
             {
-                case StorageTypes.INMEMORY:
-                    o.UseInMemoryStorage();
-                    break;
-                case StorageTypes.SQLSERVER:
-                    o.UseSqlServerStorage(conf.ConnectionString);
-                    break;
-                case StorageTypes.POSTGRE:
-                    o.UsePostgreSqlStorage(conf.ConnectionString);
-                    break;
-                case StorageTypes.MYSQL:
-                    o.UseStorage(new MySqlStorage(conf.ConnectionString, new MySqlStorageOptions
-                    {
-                        TransactionIsolationLevel = IsolationLevel.ReadCommitted,
-                        QueuePollInterval = TimeSpan.FromSeconds(15),
-                        JobExpirationCheckInterval = TimeSpan.FromHours(1),
-                        CountersAggregateInterval = TimeSpan.FromMinutes(5),
-                        PrepareSchemaIfNecessary = true,
-                        DashboardJobListLimit = 50000,
-                        TransactionTimeout = TimeSpan.FromMinutes(1),
-                        TablesPrefix = "Hangfire"
-                    }));
-                    break;
-                case StorageTypes.SQLITE:
-                    o.UseSQLiteStorage(conf.ConnectionString);
-                    break;
-            }
-        });
-    }
-
-    public static void ConfigureDataseeder(WebApplicationBuilder builder)
-    {
-        builder.Services.AddEfdataSeeder();
-        builder.Services.AddTransient<IDataSeeder, FormAndWorkflowDataSeeder>();
-        builder.Services.AddTransient<IDataSeeder, ClientTypeDataSeeder>();
-    }
-
-    public static void ConfigureCentralizedConfiguration(WebApplicationBuilder builder)
-    {
-        var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
-        var conf = section.Get<StorageConfiguration>();
-        builder.AddAutomaticConfiguration(o =>
+                opt.IncludeDocumentation<AccessTokenTypeService>();
+            })
+            .ConfigureHangfire((c) =>
+            {
+                ConfigureHangfire(webApplicationBuilder, c);
+            })
+            // TODO : Add redis !!
+            .ConfigureKeyValueStore((c) =>
+            {
+            })
+            .ConfigureMasstransit(o =>
+            {
+                ConfigureMessageBroker(webApplicationBuilder, o);
+            })
+            .ConfigureAuthCookie(o =>
+            {
+                if (!string.IsNullOrWhiteSpace(configuration.AuthCookieNamePrefix))
+                {
+                    o.Cookie.Name = configuration.AuthCookieNamePrefix;
+                }
+            })
+            .UseEfStore((c) =>
+            {
+                ConfigureIdserverStorage(webApplicationBuilder, c);
+            }, (c) =>
+            {
+                ConfigureFormbuilderStorage(webApplicationBuilder, c);
+            });
+        if (configuration.IsForwardedEnabled)
         {
-            o.Add<FacebookOptionsLite>();
-            o.Add<GoogleOptionsLite>();
-            o.Add<LDAPRepresentationsExtractionJobOptions>();
-            o.Add<SCIMRepresentationsExtractionJobOptions>();
-            o.Add<IdServerEmailOptions>();
-            o.Add<IdServerSmsOptions>();
-            o.Add<IdServerPasswordOptions>();
-            o.Add<WebauthnOptions>();
-            o.Add<MobileOptions>();
-            o.Add<IdServerConsoleOptions>();
-            o.Add<GotifyOptions>();
-            o.Add<IdServerVpOptions>();
-            o.Add<UserLockingOptions>();
-            o.Add<SimpleIdServer.IdServer.Notification.Fcm.FcmOptions>();
-            o.UseEFConnector();
-        });
+            idServerBuilder.ForwardHttpHeader();
+        }
+
+        if (configuration.IsMtlsAuthenticationEnabled)
+        {
+            idServerBuilder.EnableMtlsAuthentication(configuration.ClientCertificateMode ?? ClientCertificateMode.AllowCertificate, callback: cb =>
+            {
+                cb.AllowedCertificateTypes = CertificateTypes.All;
+                cb.RevocationMode = X509RevocationMode.NoCheck;
+            });
+        }
+
+        if (configuration.IsRealmEnabled)
+        {
+            idServerBuilder.EnableRealm();
+        }
+
+        ConfigureDistributedCache(webApplicationBuilder);
     }
 
-    private static void ConfigureStorage(WebApplicationBuilder builder, DbContextOptionsBuilder b)
+    private static void ConfigureHangfire(WebApplicationBuilder webApplicationBuilder, IGlobalConfiguration configuration)
+    {
+        var section = webApplicationBuilder.Configuration.GetSection(nameof(StorageConfiguration));
+        var conf = section.Get<StorageConfiguration>();
+        switch (conf.Type)
+        {
+            case StorageTypes.INMEMORY:
+                configuration.UseInMemoryStorage();
+                break;
+            case StorageTypes.SQLSERVER:
+                configuration.UseSqlServerStorage(conf.ConnectionString);
+                break;
+            case StorageTypes.POSTGRE:
+                configuration.UsePostgreSqlStorage(conf.ConnectionString);
+                break;
+            case StorageTypes.MYSQL:
+                o.UseStorage(new MySqlStorage(conf.ConnectionString, new MySqlStorageOptions
+                {
+                    TransactionIsolationLevel = IsolationLevel.ReadCommitted,
+                    QueuePollInterval = TimeSpan.FromSeconds(15),
+                    JobExpirationCheckInterval = TimeSpan.FromHours(1),
+                    CountersAggregateInterval = TimeSpan.FromMinutes(5),
+                    PrepareSchemaIfNecessary = true,
+                    DashboardJobListLimit = 50000,
+                    TransactionTimeout = TimeSpan.FromMinutes(1),
+                    TablesPrefix = "Hangfire"
+                }));
+                break;
+            case StorageTypes.SQLITE:
+                configuration.UseSQLiteStorage(conf.ConnectionString);
+                break;
+        }
+    }
+
+    private static void ConfigureIdserverStorage(WebApplicationBuilder builder, DbContextOptionsBuilder b)
     {
         var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
         var conf = section.Get<StorageConfiguration>();
@@ -231,13 +191,12 @@ public class SidServerSetup
                     o.MigrationsAssembly("SimpleIdServer.IdServer.SqliteMigrations");
                     o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 });
-                // SQLITE creates an ambient transaction.
                 b.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.AmbientTransactionWarning));
                 break;
         }
     }
 
-    private static void ConfigureFormBuilderStorage(WebApplicationBuilder builder, DbContextOptionsBuilder b)
+    private static void ConfigureFormbuilderStorage(WebApplicationBuilder builder, DbContextOptionsBuilder b)
     {
         var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
         var conf = section.Get<StorageConfiguration>();
@@ -273,7 +232,6 @@ public class SidServerSetup
                     o.MigrationsAssembly("FormBuilder.SqliteMigrations");
                     o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 });
-                // SQLITE creates an ambient transaction.
                 b.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.AmbientTransactionWarning));
                 break;
         }
@@ -317,7 +275,6 @@ public class SidServerSetup
                 });
                 break;
             case DistributedCacheTypes.SQLITE:
-                // Note : we cannot use the same database, because the library Neosmart, checks if the database contains only two tables and one index.
                 builder.Services.AddSqliteCache(options =>
                 {
                     options.CachePath = conf.ConnectionString;
@@ -326,7 +283,7 @@ public class SidServerSetup
         }
     }
 
-    private static void ConfigureMessageBroker(WebApplicationBuilder builder, IdServerBuilder idServerBuilder)
+    private static void ConfigureMessageBroker(WebApplicationBuilder builder, IBusRegistrationConfigurator configurator)
     {
         var section = builder.Configuration.GetSection(nameof(MessageBrokerOptions));
         var conf = section.Get<MessageBrokerOptions>();
@@ -342,15 +299,18 @@ public class SidServerSetup
                         options.Username = conf.Username;
                         options.Password = conf.Password;
                     });
-                idServerBuilder.UseMassTransit(o =>
+                configurator.UsingSqlServer((ctx, cfg) =>
                 {
-                    o.UsingSqlServer((ctx, cfg) =>
-                    {
-                        cfg.UsePublishMessageScheduler();
-                        cfg.ConfigureEndpoints(ctx);
-                    });
+                    cfg.UsePublishMessageScheduler();
+                    cfg.ConfigureEndpoints(ctx);
                 });
                 break;
         }
+    }
+
+    public static void ConfigureDataseeder(WebApplicationBuilder builder)
+    {
+        builder.Services.AddTransient<IDataSeeder, FormAndWorkflowDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ClientTypeDataSeeder>();
     }
 }

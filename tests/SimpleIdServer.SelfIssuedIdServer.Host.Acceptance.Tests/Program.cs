@@ -49,8 +49,8 @@ builder.Services.AddSidIdentityServer()
             new EncryptingCredentials(BuildRsaSecurityKey("keyid4"), SecurityAlgorithms.RsaPKCS1, SecurityAlgorithms.Aes128CbcHmacSha256)
         });
     })
-    .AddBackChannelAuthentication();
-builder.Services.AddFormBuilder().UseEF();
+    .EnableCiba();
+builder.Services.AddFormBuilder().UseEf();
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
 var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));
 builder.Services.AddDidKey();

@@ -25,7 +25,7 @@ public static class WsFederationConfig
             .AddInMemoryClients(clients)
             .AddInMemoryScopes(scopes)
             .AddInMemoryUsers(Config.Users)
-            .AddPwdAuthentication(true, true)
+            .AddPwdAuthentication(true)
             .AddWsFederation();
         var app = webApplicationBuilder.Build();
         app.UseSid();

@@ -18,7 +18,7 @@ public static class WebauthnAuthenticationConfig
             .AddInMemoryRealms(Config.Realms)
             .AddInMemoryUsers(Config.Users)
             .AddInMemoryLanguages(Config.Languages)
-            .AddWebauthnAuthentication(null, true, true);
+            .AddWebauthnAuthentication(null, true);
 
         var app = webApplicationBuilder.Build();
         app.UseSid();
