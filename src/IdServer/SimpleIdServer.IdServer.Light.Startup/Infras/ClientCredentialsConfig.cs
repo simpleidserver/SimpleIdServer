@@ -21,7 +21,7 @@ public static class ClientCredentialsConfig
             ClientBuilder.BuildApiClient("client", "secret").AddScope(scope).Build()
         };
         var scopes = new List<Scope>
-        {
+        { 
             scope
         };
         webApplicationBuilder.AddSidIdentityServer()

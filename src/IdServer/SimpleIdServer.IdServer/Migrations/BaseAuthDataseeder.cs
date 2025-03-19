@@ -28,16 +28,16 @@ public abstract class BaseAuthDataSeeder : BaseAfterDeploymentDataSeeder
         _workflowStore = workflowStore;
     }
 
-    protected async Task<bool> TryAddAcr(string realm, AuthenticationContextClassReference acr, CancellationToken cancellationToken)
+    protected async Task<AuthenticationContextClassReference> TryAddAcr(string realm, AuthenticationContextClassReference acr, CancellationToken cancellationToken)
     {
        var existingAcr = await _acrRepository.GetByName(realm, acr.Name, cancellationToken);
        if (existingAcr != null)
        {
-           return false;
+           return existingAcr;
        }
        
        _acrRepository.Add(acr);
-        return true;
+        return acr;
     }
 
     protected async Task<bool> TryAddForm(string realm, FormRecord formRecord, CancellationToken cancellationToken)

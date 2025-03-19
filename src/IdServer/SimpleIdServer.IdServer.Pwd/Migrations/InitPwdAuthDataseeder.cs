@@ -34,7 +34,7 @@ public abstract class InitPwdAuthDataseeder : BaseAuthDataSeeder
         using (var transaction = _transactionBuilder.Build())
         {
             Config.DefaultAcrs.FirstLevelAssurance.AuthenticationWorkflow = StandardPwdAuthWorkflows.completePwdAuthWorkflowId;
-            await TryAddAcr(Constants.DefaultRealm, Config.DefaultAcrs.FirstLevelAssurance, cancellationToken);
+            var existingAcr = await TryAddAcr(Constants.DefaultRealm, Config.DefaultAcrs.FirstLevelAssurance, cancellationToken);
             await TryAddForm(Constants.DefaultRealm, StandardPwdAuthForms.PwdForm, cancellationToken);
             await TryAddForm(Constants.DefaultRealm, StandardPwdAuthForms.ResetForm, cancellationToken);
             await TryAddForm(Constants.DefaultRealm, StandardPwdAuthForms.ConfirmResetForm, cancellationToken);
@@ -47,7 +47,12 @@ public abstract class InitPwdAuthDataseeder : BaseAuthDataSeeder
             {
                 _registrationWorkflowRepository.Add(RegistrationWorkflowBuilder.New(Constants.AreaPwd, StandardPwdRegistrationWorkflows.workflowId).Build());
             }
+            else
+            {
+                existingRegistrationWorkflow.WorkflowId = StandardPwdRegistrationWorkflows.workflowId;
+            }
 
+            existingAcr.AuthenticationWorkflow = StandardPwdAuthWorkflows.completePwdAuthWorkflowId;
             await transaction.Commit(cancellationToken);
             await Commit(cancellationToken);
         }

@@ -1,6 +1,5 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+﻿// Copyright (c) SimpleIdServer. AllClients rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using EfdataSeeder;
 using FormBuilder.Builders;
 using FormBuilder.EF;
 using FormBuilder.Models;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.Configuration;
-using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Email;
@@ -138,20 +136,13 @@ public class DataSeeder
             var masterRealm = SeedRealms(dbContext);
             var unsupportedScopes = SeedScopes(dbContext, masterRealm);
             SeedClients(dbContext, unsupportedScopes, masterRealm);
-            SeedUmaPendings(dbContext);
-            SeedUmaResources(dbContext);
             SeedGotifySessions(dbContext);
-            SeedLanguages(dbContext);
             SeedAuthSchemes(dbContext);
             SeedIdProvisioning(dbContext, scimBaseUrl);
-            SeedRegistrationWorkflows(dbContext);
-            var groups = SeedGroups(dbContext, masterRealm);
-            SeedUsers(dbContext, groups.adminGroup, groups.adminRoGroup, groups.fastFedGroup);
             SeedSerializedFileKeys(dbContext);
             SeedCertificateAuthorities(dbContext);
             SeedPresentationDefinitions(dbContext);
             SeedFederationEntities(dbContext);
-            SeedAcrs(dbContext);
             SeedConfigurations(dbContext);
             MigrationService.EnableIsolationLevel(dbContext);
             dbContext.SaveChanges();
@@ -218,41 +209,10 @@ public class DataSeeder
         }
     }
 
-    private static void SeedUmaPendings(StoreDbContext dbContext)
-    {
-        if (!dbContext.UmaPendingRequest.Any())
-            dbContext.UmaPendingRequest.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.PendingRequests);
-    }
-
-    private static void SeedUmaResources(StoreDbContext dbContext)
-    {
-        if (!dbContext.UmaResources.Any())
-            dbContext.UmaResources.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Resources);
-    }
-
     private static void SeedGotifySessions(StoreDbContext dbContext)
     {
         if (!dbContext.GotifySessions.Any())
             dbContext.GotifySessions.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Sessions);
-    }
-
-    private static void SeedLanguages(StoreDbContext dbContext)
-    {
-        foreach (var language in SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.Languages)
-        {
-            if (!dbContext.Languages.Any(l => l.Code == language.Code))
-                dbContext.Languages.Add(language);
-            var keys = language.Descriptions.Select(d => d.Key);
-            var existingTranslations = dbContext.Translations.Where(t => keys.Contains(t.Key)).ToList();
-            var unknownTranslations = language.Descriptions.Where(d => !existingTranslations.Any(t => t.Key == d.Key && t.Language == d.Language));
-            dbContext.Translations.AddRange(unknownTranslations);
-            foreach (var existingTranslation in existingTranslations)
-            {
-                var tr = language.Descriptions.SingleOrDefault(d => d.Key == existingTranslation.Key && d.Language == existingTranslation.Language);
-                if (tr == null) continue;
-                existingTranslation.Value = tr.Value;
-            }
-        }
     }
 
     private static void SeedAuthSchemes(StoreDbContext dbContext)
@@ -293,141 +253,6 @@ public class DataSeeder
             dbContext.IdentityProvisioningLst.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.GetIdentityProvisiongLst(scimBaseUrl));
     }
 
-    private static void SeedRegistrationWorkflows(StoreDbContext dbContext)
-    {
-        if (!dbContext.RegistrationWorkflows.Any())
-            dbContext.RegistrationWorkflows.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.RegistrationWorkflows);
-    }
-
-    private static (Group adminGroup, Group adminRoGroup, Group fastFedGroup) SeedGroups(StoreDbContext dbContext, Realm masterRealm)
-    {
-        var admGroup = dbContext.Groups.Include(g => g.Realms)
-            .Include(g => g.Roles)
-            .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorGroup.Name);
-        var admRoGroup = dbContext.Groups.Include(g => g.Realms)
-            .Include(g => g.Roles)
-            .FirstOrDefault(g => g.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorReadonlyGroup.Name);
-        var fastFedAdmGroup = dbContext.Groups.Include(g => g.Realms)
-            .Include(g => g.Roles)
-            .FirstOrDefault(g => g.Name == IdServerConfiguration.FastFedAdministratorGroup.Name);
-
-        if (admGroup == null)
-        {
-            admGroup = SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorGroup;
-            admGroup.Realms = new List<GroupRealm>();
-            masterRealm.Groups.Add(new GroupRealm
-            {
-                Group = admGroup
-            });
-        }
-
-        if (admRoGroup == null)
-        {
-            admRoGroup = SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorReadonlyGroup;
-            admRoGroup.Realms = new List<GroupRealm>();
-            masterRealm.Groups.Add(new GroupRealm
-            {
-                Group = admRoGroup
-            });
-        }
-
-        var scopes = RealmRoleBuilder.BuildAdministrativeRole(masterRealm);
-        var allScopeNames = dbContext.Scopes.Select(s => s.Name);
-        var unknownScopes = scopes.Where(s => !allScopeNames.Contains(s.Name));
-        dbContext.Scopes.AddRange(unknownScopes);
-        foreach (var scope in unknownScopes)
-        {
-            if (!admGroup.Roles.Any(r => r.Name == scope.Name))
-                admGroup.Roles.Add(scope);
-        }
-
-        foreach (var scope in unknownScopes.Where(s => s.Action == ComponentActions.View))
-        {
-            if (!admRoGroup.Roles.Any(r => r.Name == scope.Name))
-                admRoGroup.Roles.Add(scope);
-        }
-
-        var existingAdministratorRole = dbContext.Scopes.FirstOrDefault(s => s.Name == SimpleIdServer.IdServer.Config.DefaultScopes.WebsiteAdministratorRole.Name);
-        if (existingAdministratorRole == null)
-        {
-            existingAdministratorRole = SimpleIdServer.IdServer.Config.DefaultScopes.WebsiteAdministratorRole;
-            existingAdministratorRole.Realms.Clear();
-            existingAdministratorRole.Realms.Add(masterRealm);
-            dbContext.Scopes.Add(existingAdministratorRole);
-        }
-
-        if (!admGroup.Roles.Any(r => r.Name == SimpleIdServer.IdServer.Config.DefaultScopes.WebsiteAdministratorRole.Name))
-            admGroup.Roles.Add(existingAdministratorRole);
-
-        if (fastFedAdmGroup == null)
-        {
-            var grp = IdServerConfiguration.FastFedAdministratorGroup;
-            foreach (var role in grp.Roles)
-            {
-                role.Realms = new List<Realm>
-                {
-                    masterRealm
-                };
-            }
-
-            dbContext.Groups.Add(grp);
-            fastFedAdmGroup = grp;
-        }
-
-        return (admGroup, admRoGroup, fastFedAdmGroup);
-    }
-
-    private static void SeedUsers(StoreDbContext dbContext, Group adminGroup, Group adminRoGroup, Group fastFedGroup)
-    {
-        var isUserExists = dbContext.Users
-            .Any(c => c.Name == "user");
-        var existingAdministratorUser = dbContext.Users
-            .Include(u => u.Groups).ThenInclude(u => u.Group)
-            .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Config.DefaultUsers.Administrator.Name);
-        var existingAdministratorRoUser = dbContext.Users
-            .Include(u => u.Groups).ThenInclude(u => u.Group)
-            .FirstOrDefault(u => u.Name == SimpleIdServer.IdServer.Config.DefaultUsers.ReadonlyAdministrator.Name);
-        if (!isUserExists)
-            dbContext.Users.Add(UserBuilder.Create("user", "password", "User").SetPicture("https://cdn-icons-png.flaticon.com/512/149/149071.png").Build());
-        if (existingAdministratorRoUser == null)
-            dbContext.Users.Add(SimpleIdServer.IdServer.Config.DefaultUsers.ReadonlyAdministrator);
-        else if (!existingAdministratorRoUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorReadonlyGroup.Name))
-        {
-            existingAdministratorRoUser.Groups.Add(new GroupUser
-            {
-                Group = adminRoGroup
-            });
-        }
-
-        if (existingAdministratorUser == null)
-        {
-            var user = SimpleIdServer.IdServer.Config.DefaultUsers.Administrator;
-            user.Groups.Add(new GroupUser
-            {
-                Group = fastFedGroup
-            });
-            dbContext.Users.Add(user);
-        }
-        else
-        {
-            if (!existingAdministratorUser.Groups.Any(g => g.Group.Name == SimpleIdServer.IdServer.Constants.DefaultGroups.AdministratorGroup.Name))
-            {
-                existingAdministratorUser.Groups.Add(new GroupUser
-                {
-                    Group = adminGroup
-                });
-            }
-
-            if (!existingAdministratorUser.Groups.Any(g => g.Group.Name == IdServerConfiguration.FastFedAdministratorGroup.Name))
-            {
-                existingAdministratorUser.Groups.Add(new GroupUser
-                {
-                    Group = fastFedGroup
-                });
-            }
-        }
-    }
-
     private static void SeedSerializedFileKeys(StoreDbContext dbContext)
     {
         if (!dbContext.SerializedFileKeys.Any())
@@ -453,52 +278,6 @@ public class DataSeeder
     {
         if (!dbContext.FederationEntities.Any())
             dbContext.FederationEntities.AddRange(SimpleIdServer.IdServer.Startup.Conf.IdServerConfiguration.FederationEntities);
-    }
-
-    private static void SeedAcrs(StoreDbContext dbContext)
-    {
-        if (!dbContext.Acrs.Any())
-        {
-            var firstLevelAssurance = SimpleIdServer.IdServer.Config.DefaultAcrs.FirstLevelAssurance;
-            firstLevelAssurance.AuthenticationWorkflow = completePwdAuthWorkflowId;
-            dbContext.Acrs.Add(firstLevelAssurance);
-            dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "email",
-                DisplayName = "Email authentication",
-                UpdateDateTime = DateTime.UtcNow,
-                AuthenticationWorkflow = StandardEmailAuthWorkflows.DefaultWorkflow.Id,
-                Realms = new List<Realm>
-                {
-                    SimpleIdServer.IdServer.Config.DefaultRealms.Master
-                }
-            });
-            dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "sms",
-                DisplayName = "Sms authentication",
-                UpdateDateTime = DateTime.UtcNow,
-                AuthenticationWorkflow = StandardSmsAuthWorkflows.DefaultWorkflow.Id,
-                Realms = new List<Realm>
-                {
-                    SimpleIdServer.IdServer.Config.DefaultRealms.Master
-                }
-            });
-            dbContext.Acrs.Add(new SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "pwd-email",
-                DisplayName = "Password and email authentication",
-                UpdateDateTime = DateTime.UtcNow,
-                AuthenticationWorkflow = pwdEmailAuthWorkflowId,
-                Realms = new List<Realm>
-                    {
-                        SimpleIdServer.IdServer.Config.DefaultRealms.Master
-                    }
-            });
-        }
     }
 
     private static void SeedConfigurations(StoreDbContext dbContext)

@@ -1,4 +1,4 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+﻿// Copyright (c) SimpleIdServer. AllClients rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
 using Hangfire;
@@ -14,7 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Startup.Conf.Migrations.AfterDeployment;
 using SimpleIdServer.IdServer.Startup.Conf.Migrations.BeforeDeployment;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.TokenTypes;

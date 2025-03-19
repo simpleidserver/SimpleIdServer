@@ -28,9 +28,9 @@ public class AuthenticationSchemeProviderBuilder
             UpdateDateTime = DateTime.UtcNow,
             Mappers = DefaultAuthSchemeProviderMapper.All,
             AuthSchemeProviderDefinition = definition,
-            Realms = new List<Domains.Realm>
+            Realms = new List<Realm>
             {
-                Config.DefaultRealms.Master
+                DefaultRealms.Master
             }
         });
     }
