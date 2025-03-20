@@ -25,8 +25,11 @@ public class ConfigureScimProvisioningDataSeeder : BaseProvisioningDataseeder
     {
         using (var transaction = _transactionBuilder.Build())
         {
+            ScimDefinition.Instances = new List<IdentityProvisioning>
+            {
+                ScimInstance
+            };
             await TryAddProvisioningDef(ScimDefinition, cancellationToken);
-            await TryAddProvisioningInstance(ScimInstance, cancellationToken);
             await transaction.Commit(cancellationToken);
         }
     }

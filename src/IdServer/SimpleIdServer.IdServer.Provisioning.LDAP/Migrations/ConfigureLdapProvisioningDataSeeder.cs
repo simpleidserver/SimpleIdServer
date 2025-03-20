@@ -24,8 +24,11 @@ public class ConfigureLdapProvisioningDataSeeder : BaseProvisioningDataseeder
     {
         using (var transaction = _transactionBuilder.Build())
         {
+            LdapDefinition.Instances = new List<IdentityProvisioning>
+            {
+                LdapInstance
+            };
             await TryAddProvisioningDef(LdapDefinition, cancellationToken);
-            await TryAddProvisioningInstance(LdapInstance, cancellationToken);
             await transaction.Commit(cancellationToken);
         }
     }

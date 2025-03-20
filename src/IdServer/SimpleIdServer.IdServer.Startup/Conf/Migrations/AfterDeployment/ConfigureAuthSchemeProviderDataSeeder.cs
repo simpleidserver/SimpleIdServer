@@ -8,6 +8,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Startup.Converters;
 using SimpleIdServer.IdServer.Stores;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,6 +40,26 @@ public class ConfigureAuthSchemeProviderDataSeeder : BaseAfterDeploymentDataSeed
     {
         using (var transaction = _transactionBuilder.Build())
         {
+            var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
+            var existingDefinitions = await _authenticationSchemeProviderDefinitionRepository.GetAll(cancellationToken);
+            var existingInstances = await _authenticationSchemeProviderRepository.GetAll(Constants.DefaultRealm, cancellationToken);
+            var unknownDefinitions = AllAuthSchemeProviderDefinitions.Where(a => !existingDefinitions.Any(e => e.Name == a.Name)).ToList();
+            var unknownInstances = AllAuthSchemeProviders.Where(a => !existingInstances.Any(e => e.Name == a.Name)).ToList();
+            foreach(var unknownDefinition in unknownDefinitions)
+            {
+                _authenticationSchemeProviderDefinitionRepository.Add(unknownDefinition);
+                existingDefinitions.Add(unknownDefinition);
+            }
+
+            foreach(var unknownInstance in unknownInstances)
+            {
+                unknownInstance.Realms = new List<Realm>
+                {
+                    masterRealm
+                };
+                unknownInstance.AuthSchemeProviderDefinition = existingDefinitions.First(e => e.Name == unknownInstance.Name);
+                _authenticationSchemeProviderRepository.Add(unknownInstance);
+            }
 
             await transaction.Commit(cancellationToken);
         }

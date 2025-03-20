@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Federation.Migrations;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Stores;
@@ -41,7 +42,7 @@ public class FederationEntitiesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, IdServerFederationConstants.StandardScopes.FederationEntities.Name);
+            await CheckAccessToken(prefix, ConfigureIdServerFederationDataseeder.FederationEntitiesScope.Name);
             if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, IdServer.Resources.Global.InvalidIncomingRequest);
             if (string.IsNullOrWhiteSpace(request.Url)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, "url"));
             var federationEntity = await _federationEntityStore.GetByUrl(prefix, request.Url, cancellationToken);
@@ -91,7 +92,7 @@ public class FederationEntitiesController : BaseController
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await CheckAccessToken(prefix, IdServerFederationConstants.StandardScopes.FederationEntities.Name);
+                await CheckAccessToken(prefix, ConfigureIdServerFederationDataseeder.FederationEntitiesScope.Name);
                 var federationEntity = await _federationEntityStore.Get(id, cancellationToken);
                 if (federationEntity == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, Resources.Global.FederationEntityUnknown);
                 _federationEntityStore.Remove(federationEntity);
@@ -112,7 +113,7 @@ public class FederationEntitiesController : BaseController
         prefix = prefix ?? Constants.DefaultRealm;
         try
         {
-            await CheckAccessToken(prefix, IdServerFederationConstants.StandardScopes.FederationEntities.Name);
+            await CheckAccessToken(prefix, ConfigureIdServerFederationDataseeder.FederationEntitiesScope.Name);
             var result = await _federationEntityStore.Search(prefix, request, cancellationToken);
             return new OkObjectResult(result);
         }

@@ -11,7 +11,7 @@ public static class OpenidFederationConfig
     {
         webApplicationBuilder.AddSidIdentityServer()
             .AddDeveloperSigningCredential()
-            .AddOpenidFederation(null, true);
+            .AddOpenidFederation(null);
         var app = webApplicationBuilder.Build();
         app.UseSid();
         app.Run();

@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Startup.Conf.Migrations.BeforeDeployment;
-
+/*
 public class ClientTypeDataSeeder : EfdataSeeder.DataSeeder<StoreDbContext, StoreDbContext>
 {
     public ClientTypeDataSeeder(StoreDbContext dbContext) : base(dbContext)
@@ -46,3 +46,4 @@ public class ClientTypeDataSeeder : EfdataSeeder.DataSeeder<StoreDbContext, Stor
         public string? ClientType { get; set; }
     }
 }
+*/

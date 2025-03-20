@@ -45,7 +45,7 @@ public class InitAdministrativeClientDataseeder : BaseClientDataseeder
         using (var transaction = _transactionBuilder.Build())
         {
             var newClient = BuildAdministrativeClient(_redirectUrls.ToArray(), _postLogoutUrls, _backChannelLogoutUrl, _additionalScopes.ToArray());
-            await TryAddClient(newClient);
+            await TryAddClient(newClient, cancellationToken);
             await transaction.Commit(cancellationToken);
         }
     }

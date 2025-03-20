@@ -3,29 +3,22 @@
 
 using DataSeeder;
 using SimpleIdServer.IdServer.Config;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.IdServer.Migrations;
 
-public class InitAdministrativeScopeDataSeeder : BaseAfterDeploymentDataSeeder
+public class InitAdministrativeScopeDataSeeder : BaseScopeDataseeder
 {
-    private readonly IRealmRepository _realmRepository;
-    private readonly IScopeRepository _scopeRepository;
     private readonly ITransactionBuilder _transactionBuilder;
 
     public InitAdministrativeScopeDataSeeder(
+        ITransactionBuilder transactionBuilder,
         IRealmRepository realmRepository,
         IScopeRepository scopeRepository,
-        ITransactionBuilder transactionBuilder,
-        IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
+        IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(realmRepository, scopeRepository, dataSeederExecutionHistoryRepository)
     {
-        _realmRepository = realmRepository;
-        _scopeRepository = scopeRepository;
         _transactionBuilder = transactionBuilder;
     }
 
@@ -35,17 +28,9 @@ public class InitAdministrativeScopeDataSeeder : BaseAfterDeploymentDataSeeder
     {
         using (var transaction = _transactionBuilder.Build())
         {
-            var names = DefaultScopes.AdministrativeScopes.Select(s => s.Name).ToList();
-            var existingScopes = await _scopeRepository.GetByNames(Constants.DefaultRealm, names, cancellationToken);
-            var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
-            var unknownScopes = DefaultScopes.AdministrativeScopes.Where(s => !existingScopes.Any(es => es.Name == s.Name)).ToList();
-            foreach (var unknownScope in unknownScopes)
+            foreach(var scope in DefaultScopes.AdministrativeScopes)
             {
-                unknownScope.Realms = new List<Realm>
-                {
-                    masterRealm
-                };
-                _scopeRepository.Add(unknownScope);
+                await TryAddScope(scope, cancellationToken);
             }
 
             await transaction.Commit(cancellationToken);

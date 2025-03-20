@@ -65,4 +65,10 @@ public class IdentityProvisioningStore : IIdentityProvisioningStore
     {
 
     }
+
+    public Task<IdentityProvisioningDefinition> GetDefinitionByName(string name, CancellationToken cancellationToken)
+    {
+        return _dbContext.IdentityProvisioningDefinitions
+                    .SingleOrDefaultAsync(p => p.Name == name, cancellationToken);
+    }
 }

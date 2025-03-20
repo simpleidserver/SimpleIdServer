@@ -79,6 +79,15 @@ public class CertificateAuthorityRepository : ICertificateAuthorityRepository
         };
     }
 
+    public async Task<CertificateAuthority> GetBySubjectName(string realm, string subjectName, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.Client.Queryable<SugarCertificateAuthority>()
+            .Includes(r => r.ClientCertificates)
+            .Includes(r => r.Realms)
+            .FirstAsync(c => c.SubjectName == subjectName && c.Realms.Any(r => r.RealmsName == realm), cancellationToken);
+        return result?.ToDomain();
+    }
+
     private SugarCertificateAuthority Transform(CertificateAuthority certificateAuthority)
     {
         return new SugarCertificateAuthority

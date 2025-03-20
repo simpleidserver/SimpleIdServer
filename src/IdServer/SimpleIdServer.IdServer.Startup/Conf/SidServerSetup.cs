@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. AllClients rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
+using DataSeeder;
 using Hangfire;
 using Hangfire.MySql;
 using Hangfire.PostgreSql;
@@ -13,8 +14,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
+using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Startup.Conf.Migrations.BeforeDeployment;
+using SimpleIdServer.IdServer.Startup.Conf.Migrations.AfterDeployment;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.TokenTypes;
 using System;
@@ -90,6 +92,12 @@ public class SidServerSetup
                     o.Cookie.Name = configuration.AuthCookieNamePrefix;
                 }
             })
+            .SeedAdministrationData(
+                new List<string> { "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*" },
+                new List<string> { "https://localhost:5002/signout-callback-oidc", "https://website.sid.svc.cluster.local/signout-callback-oidc", "https://website.simpleidserver.com/signout-callback-oidc" },
+                "https://localhost:5002/bc-logout",
+                new List<Scope>())
+            .SeedSwagger(new List<string> { "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html" })
             .UseEfStore((c) =>
             {
                 ConfigureIdserverStorage(webApplicationBuilder, c);
@@ -117,6 +125,7 @@ public class SidServerSetup
         }
 
         ConfigureDistributedCache(webApplicationBuilder);
+        ConfigureDataseeder(webApplicationBuilder);
     }
 
     private static void ConfigureHangfire(WebApplicationBuilder webApplicationBuilder, IGlobalConfiguration configuration)
@@ -135,7 +144,7 @@ public class SidServerSetup
                 configuration.UsePostgreSqlStorage(conf.ConnectionString);
                 break;
             case StorageTypes.MYSQL:
-                o.UseStorage(new MySqlStorage(conf.ConnectionString, new MySqlStorageOptions
+                configuration.UseStorage(new MySqlStorage(conf.ConnectionString, new MySqlStorageOptions
                 {
                     TransactionIsolationLevel = IsolationLevel.ReadCommitted,
                     QueuePollInterval = TimeSpan.FromSeconds(15),
@@ -306,9 +315,11 @@ public class SidServerSetup
         }
     }
 
-    public static void ConfigureDataseeder(WebApplicationBuilder builder)
+    private static void ConfigureDataseeder(WebApplicationBuilder builder)
     {
-        builder.Services.AddTransient<IDataSeeder, FormAndWorkflowDataSeeder>();
-        builder.Services.AddTransient<IDataSeeder, ClientTypeDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureAuthSchemeProviderDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureCredentialIssuerDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureFastfedDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureGotifyDataseeder>();
     }
 }

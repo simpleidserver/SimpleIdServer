@@ -19,17 +19,20 @@ public class ConfigureCredentialIssuerDataSeeder : BaseAfterDeploymentDataSeeder
     private readonly IClientRepository _clientRepository;
     private readonly IRealmRepository _realmRepository;
     private readonly IScopeRepository _scopeRepository;
+    private readonly IPresentationDefinitionStore _presentationDefinitionStore;
 
     public ConfigureCredentialIssuerDataSeeder(ITransactionBuilder transactionBuilder,
         IClientRepository clientRepository,
         IRealmRepository realmRepository,
         IScopeRepository scopeRepository,
+        IPresentationDefinitionStore presentationDefinitionStore,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
     {
         _transactionBuilder = transactionBuilder;
         _clientRepository = clientRepository;
         _realmRepository = realmRepository;
         _scopeRepository = scopeRepository;
+        _presentationDefinitionStore = presentationDefinitionStore;
     }
 
     public override string Name => nameof(ConfigureCredentialIssuerDataSeeder);
@@ -43,6 +46,8 @@ public class ConfigureCredentialIssuerDataSeeder : BaseAfterDeploymentDataSeeder
             var clientIds = AllClients.Select(c => c.ClientId).ToList();
             var existingScopes = await _scopeRepository.GetByNames(Constants.DefaultRealm, scopeNames, cancellationToken);
             var existingClients = await _clientRepository.GetByClientIds(Constants.DefaultRealm, clientIds, cancellationToken);
+            var university = UniversityDegree;
+            var existingPresentation = await _presentationDefinitionStore.GetByPublicId(university.PublicId, Constants.DefaultRealm, cancellationToken);
             foreach (var scope in AllScopes)
             {
                 var existingScope = existingScopes.SingleOrDefault(s => s.Name == scope.Name);
@@ -71,6 +76,11 @@ public class ConfigureCredentialIssuerDataSeeder : BaseAfterDeploymentDataSeeder
                 };
                 client.Scopes = existingScopes.Where(s => client.Scopes.Any(cs => cs.Name == s.Name)).ToList();
                 _clientRepository.Add(client);
+            }
+
+            if(existingPresentation == null)
+            {
+                _presentationDefinitionStore.Add(university);
             }
 
             await transaction.Commit(cancellationToken);
@@ -141,4 +151,6 @@ public class ConfigureCredentialIssuerDataSeeder : BaseAfterDeploymentDataSeeder
         CreateDateTime = DateTime.UtcNow,
         UpdateDateTime = DateTime.UtcNow
     };
+
+    private static PresentationDefinition UniversityDegree = PresentationDefinitionBuilder.New("universitydegree_vp", "University Degree").AddLdpVcInputDescriptor("UniversityDegree", "UniversityDegree", "UniversityDegree").Build();
 }

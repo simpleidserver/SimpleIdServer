@@ -126,9 +126,10 @@ public static class ServiceCollectionExtensions
 
     private static void ConfigureDataSeeders(IServiceCollection services)
     {
-        services.AddTransient<IDataSeeder, InitSerializedFileKeyDataSeeder>();
-        services.AddTransient<IDataSeeder, InitLanguageDataSeeder>();
         services.AddTransient<IDataSeeder, InitRealmDataSeeder>();
+        services.AddTransient<IDataSeeder, InitSerializedFileKeyDataSeeder>();
+        services.AddTransient<IDataSeeder, InitCertificateAuthoritiesDataseeder>();
+        services.AddTransient<IDataSeeder, InitLanguageDataSeeder>();
         services.AddTransient<IDataSeeder, InitScopeDataSeeder>();
     }
 

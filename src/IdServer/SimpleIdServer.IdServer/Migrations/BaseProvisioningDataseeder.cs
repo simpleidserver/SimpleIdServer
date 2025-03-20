@@ -3,7 +3,6 @@
 using DataSeeder;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,23 +25,6 @@ public abstract class BaseProvisioningDataseeder : BaseAfterDeploymentDataSeeder
         if (existingProvisioningDef == null)
         {
             _identityProvisioningStore.Add(definition);
-            return true;
-        }
-
-        return false;
-    }
-
-    protected async Task<bool> TryAddProvisioningInstance(IdentityProvisioning instance, CancellationToken cancellationToken)
-    {
-        var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
-        var existingProvisioningIntance = await _identityProvisioningStore.GetByName(Constants.DefaultRealm, instance.Name, cancellationToken);
-        if (existingProvisioningIntance == null)
-        {
-            instance.Realms = new List<Realm>
-            {
-                masterRealm
-            };
-            _identityProvisioningStore.Add(instance);
             return true;
         }
 

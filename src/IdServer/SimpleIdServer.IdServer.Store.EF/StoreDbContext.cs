@@ -121,6 +121,7 @@ namespace SimpleIdServer.IdServer.Store.EF
             modelBuilder.ApplyConfiguration(new FederationEntityConfiguration());
             modelBuilder.ApplyConfiguration(new RecurringJobStatusConfiguration());
             modelBuilder.ApplyConfiguration(new DataSeederExecutionHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new DistributedCacheConfiguration());
         }
     }
 }

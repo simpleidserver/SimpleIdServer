@@ -26,6 +26,11 @@ public class DefaultCertificateAuthorityRepository : ICertificateAuthorityReposi
         return Task.FromResult(_cas.SingleOrDefault(c => c.Id == id && c.Realms.Any(r => r.Name == realm)));
     }
 
+    public Task<CertificateAuthority> GetBySubjectName(string realm, string subjectName, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_cas.SingleOrDefault(c => c.SubjectName == subjectName && c.Realms.Any(r => r.Name == realm)));
+    }
+
     public async Task<SearchResult<CertificateAuthority>> Search(string realm, SearchRequest request, CancellationToken cancellationToken)
     {
         IQueryable<CertificateAuthority> query = _cas.AsQueryable()

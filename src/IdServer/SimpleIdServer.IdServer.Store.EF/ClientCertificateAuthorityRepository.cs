@@ -65,4 +65,12 @@ public class CertificateAuthorityRepository : ICertificateAuthorityRepository
     {
 
     }
+
+    public Task<CertificateAuthority> GetBySubjectName(string realm, string subjectName, CancellationToken cancellationToken)
+    {
+        return _dbContext.CertificateAuthorities
+            .Include(r => r.ClientCertificates)
+            .Include(r => r.Realms)
+            .SingleOrDefaultAsync(c => c.SubjectName == subjectName && c.Realms.Any(r => r.Name == realm), cancellationToken);
+    }
 }

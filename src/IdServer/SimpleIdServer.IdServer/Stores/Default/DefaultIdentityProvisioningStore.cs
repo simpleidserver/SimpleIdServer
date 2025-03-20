@@ -63,6 +63,7 @@ public class DefaultIdentityProvisioningStore : IIdentityProvisioningStore
 
     public void Update(IdentityProvisioning identityProvisioning)
     {
+
     }
 
     public void Add(IdentityProvisioningDefinition identityProvisioningDefinition)
@@ -72,5 +73,10 @@ public class DefaultIdentityProvisioningStore : IIdentityProvisioningStore
 
     public void Update(IdentityProvisioningDefinition identityProvisioningDefinition)
     {
+    }
+
+    public Task<IdentityProvisioningDefinition> GetDefinitionByName(string name, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_definitions.SingleOrDefault(p => p.Name == name ));
     }
 }
