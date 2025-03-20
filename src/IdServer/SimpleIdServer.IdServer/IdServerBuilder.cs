@@ -322,11 +322,21 @@ public class IdServerBuilder
     /// <summary>
     /// Seeds administration data including groups and users initialization.
     /// </summary>
-    public IdServerBuilder SeedAdministrationData()
+    public IdServerBuilder SeedAdministrationData(List<string> redirectUrls, List<string> postLogoutUrls, string backchannelLogoutUrl, List<Scope> additionalScopes)
     {
         _serviceCollection.AddTransient<IDataSeeder, InitAdministrativeScopeDataSeeder>();
         _serviceCollection.AddTransient<IDataSeeder, InitGroupDataSeeder>();
         _serviceCollection.AddTransient<IDataSeeder, InitUserDataSeeder>();
+        _serviceCollection.AddTransient<IDataSeeder>((s) =>
+        {
+            var scope = s.CreateScope();
+            var transactionBuidler = scope.ServiceProvider.GetRequiredService<ITransactionBuilder>();
+            var realmRepository = scope.ServiceProvider.GetRequiredService<IRealmRepository>();
+            var scopeRepository = scope.ServiceProvider.GetRequiredService<IScopeRepository>();
+            var clientRepository = scope.ServiceProvider.GetRequiredService<IClientRepository>();
+            var dataseederRepository = scope.ServiceProvider.GetRequiredService<IDataSeederExecutionHistoryRepository>();
+            return new InitAdministrativeClientDataseeder(redirectUrls, postLogoutUrls, backchannelLogoutUrl, additionalScopes, transactionBuidler, realmRepository, scopeRepository, clientRepository, dataseederRepository);
+        });
         return this;
     }
 

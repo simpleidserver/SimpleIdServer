@@ -126,12 +126,6 @@ public class IdServerConfiguration
             SimpleIdServer.IdServer.Federation.IdServerFederationConstants.StandardScopes.FederationEntities).Build()
     };
 
-    // TODO : Move to a configuration file !!
-    public static ICollection<CertificateAuthority> CertificateAuthorities = new List<CertificateAuthority>
-    {
-        CertificateAuthorityBuilder.Create("CN=simpleIdServerCA", SimpleIdServer.IdServer.Config.DefaultRealms.Master).Build()
-    };
-
     public static List<GotifySession> Sessions = new List<GotifySession>
     {
         new GotifySession { ApplicationToken = "AvSdAw5ILVOdc7g", ClientToken = "CY2St_LANPO5L7P" },

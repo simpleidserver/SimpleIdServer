@@ -1,7 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using DataSeeder;
 using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Provisioning.LDAP;
+using SimpleIdServer.IdServer.Provisioning.LDAP.Migrations;
 using SimpleIdServer.IdServer.Provisioning.LDAP.Services;
 using SimpleIdServer.IdServer.UI.Services;
 
@@ -18,6 +20,7 @@ public static class IdServerBuilderExtensions
     {
         builder.Services.AddTransient<IIdProviderAuthService, LDAPAuthenticationService>();
         builder.Services.AddTransient<IProvisioningService, LDAPProvisioningService>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureLdapProvisioningDataSeeder>();
         builder.AutomaticConfigurationOptions.Add<LDAPRepresentationsExtractionJobOptions>();
         return builder;
     }

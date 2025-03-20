@@ -1,0 +1,51 @@
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using DataSeeder;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Stores;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace SimpleIdServer.IdServer.Migrations;
+
+public abstract class BaseProvisioningDataseeder : BaseAfterDeploymentDataSeeder
+{
+    private readonly IIdentityProvisioningStore _identityProvisioningStore;
+    private readonly IRealmRepository _realmRepository;
+
+    protected BaseProvisioningDataseeder(IIdentityProvisioningStore identityProvisioningStore, IRealmRepository realmRepository, IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
+    {
+        _identityProvisioningStore = identityProvisioningStore;
+        _realmRepository = realmRepository;
+    }
+
+    protected async Task<bool> TryAddProvisioningDef(IdentityProvisioningDefinition definition, CancellationToken cancellationToken)
+    {
+        var existingProvisioningDef = await _identityProvisioningStore.GetDefinitionByName(definition.Name, cancellationToken);
+        if (existingProvisioningDef == null)
+        {
+            _identityProvisioningStore.Add(definition);
+            return true;
+        }
+
+        return false;
+    }
+
+    protected async Task<bool> TryAddProvisioningInstance(IdentityProvisioning instance, CancellationToken cancellationToken)
+    {
+        var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
+        var existingProvisioningIntance = await _identityProvisioningStore.GetByName(Constants.DefaultRealm, instance.Name, cancellationToken);
+        if (existingProvisioningIntance == null)
+        {
+            instance.Realms = new List<Realm>
+            {
+                masterRealm
+            };
+            _identityProvisioningStore.Add(instance);
+            return true;
+        }
+
+        return false;
+    }
+}

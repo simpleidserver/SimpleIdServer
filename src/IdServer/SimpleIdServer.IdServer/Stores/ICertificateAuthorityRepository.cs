@@ -11,6 +11,7 @@ public interface ICertificateAuthorityRepository
 {
     Task<CertificateAuthority> Get(string id, CancellationToken cancellationToken);
     Task<CertificateAuthority> Get(string realm, string id, CancellationToken cancellationToken);
+    Task<CertificateAuthority> GetBySubjectName(string realm, string subjectName, CancellationToken cancellationToken);
     Task<SearchResult<CertificateAuthority>> Search(string realm, SearchRequest request, CancellationToken cancellationToken);
     void Add(CertificateAuthority certificateAuthority);
     void Delete(CertificateAuthority certificateAuthority);
