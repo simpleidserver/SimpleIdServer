@@ -2091,4 +2091,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="UserUnblocked" xml:space="preserve">
     <value>User is unblocked</value>
   </data>
+  <data name="RealmOptionIsDisabled" xml:space="preserve">
+    <value>The realm option is disabled</value>
+  </data>
 </root>

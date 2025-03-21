@@ -24,7 +24,7 @@ public class LanguageEffects
     public async Task Handle(GetLanguagesAction action, IDispatcher dispatcher)
     {
         var url = GetLanguagesUrl();
-        var httpClient = await _websiteHttpClientFactory.Build();
+        var httpClient = await _websiteHttpClientFactory.Build(action.Realm);
         var requestMessage = new HttpRequestMessage
         {
             RequestUri = new Uri(url),
@@ -41,7 +41,10 @@ public class LanguageEffects
 
 public class GetLanguagesAction
 {
-    
+    public string Realm
+    {
+        get; set;
+    }
 }
 
 public class GetLanguagesSuccessAction

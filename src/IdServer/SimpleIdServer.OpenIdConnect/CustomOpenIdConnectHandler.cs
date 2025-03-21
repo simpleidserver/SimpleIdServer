@@ -1474,7 +1474,7 @@ namespace SimpleIdServer.OpenIdConnect
         {
             if (this.Options.IsRealmEnabled)
             {
-                var realm = _realmStore.Realm ?? "master";
+                var realm = string.IsNullOrWhiteSpace(_realmStore.Realm) ? "master" : _realmStore.Realm;
                 if (!RealmConfigurationManagers.ContainsKey(realm))
                 {
                     var metadataAdr = Options.Authority;

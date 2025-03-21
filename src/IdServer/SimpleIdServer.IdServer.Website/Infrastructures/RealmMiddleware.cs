@@ -19,10 +19,12 @@ public class RealmMiddleware
         "/logout",
         "/Culture",
         "/login",
+        "/auth",
         "/callback",
         "/signout-callback-oidc",
         "/oidccallback",
-        "/bc-logout"
+        "/bc-logout",
+        "/availablerealms"
     };
     private static List<string> _excludedFileExtensions = new List<string>
     {
@@ -73,7 +75,8 @@ public class RealmMiddleware
         if(!existingRealms.Any(r => r.Name == currentRealm))
         {
             EnsureCookiesAreRemoved(context, currentRealm);
-            ReturnNotFound(context);
+            var redirectUrl = $"{context.Request.GetAbsoluteUriWithVirtualPath()}/availablerealms";
+            context.Response.Redirect(redirectUrl);
             return;
         }
 

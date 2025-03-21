@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using DataSeeder;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Migrations;
 using SimpleIdServer.IdServer.Stores;
@@ -11,10 +12,12 @@ namespace SimpleIdServer.IdServer.Federation.Migrations;
 public class ConfigureIdServerFederationDataseeder : BaseScopeDataseeder
 {
     private readonly ITransactionBuilder _transactionBuilder;
+    private readonly IClientRepository _clientRepository;
 
-    public ConfigureIdServerFederationDataseeder(ITransactionBuilder transctionBuilder, IRealmRepository realmRepository, IScopeRepository scopeRepository, IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(realmRepository, scopeRepository, dataSeederExecutionHistoryRepository)
+    public ConfigureIdServerFederationDataseeder(ITransactionBuilder transctionBuilder, IClientRepository clientRepository, IRealmRepository realmRepository, IScopeRepository scopeRepository, IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(realmRepository, scopeRepository, dataSeederExecutionHistoryRepository)
     {
         _transactionBuilder = transctionBuilder;
+        _clientRepository = clientRepository;
     }
 
     public override string Name => nameof(ConfigureIdServerFederationDataseeder);
@@ -23,7 +26,13 @@ public class ConfigureIdServerFederationDataseeder : BaseScopeDataseeder
     {
         using (var transaction = _transactionBuilder.Build())
         {
-            await TryAddScope(FederationEntitiesScope, cancellationToken);
+            var existingScope = await TryAddScope(FederationEntitiesScope, cancellationToken);
+            var existingClient = await _clientRepository.GetByClientId(Constants.DefaultRealm, DefaultClients.SidAdminClientId, cancellationToken);
+            if (existingClient != null)
+            {
+                existingClient.Scopes.Add(existingScope);
+            }
+
             await transaction.Commit(cancellationToken);
         }
     }

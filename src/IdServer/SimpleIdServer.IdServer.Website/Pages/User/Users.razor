@@ -1,4 +1,6 @@
 ﻿@page "/users"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @inject IState<SearchUsersState> userState
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService 

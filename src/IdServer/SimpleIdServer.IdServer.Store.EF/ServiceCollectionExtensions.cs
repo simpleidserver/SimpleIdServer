@@ -6,6 +6,7 @@ using SimpleIdServer.Configuration;
 using SimpleIdServer.IdServer.Store.EF;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.OpenidFederation.Stores;
+using SimpleIdServer.Scim.Domains;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -57,5 +58,6 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IRecurringJobStatusRepository, RecurringJobStatusRepository>();
         services.AddTransient<IDataSeederExecutionHistoryRepository, DataSeederExecutionHistoryRepository>();
         services.AddTransient<IDbMigrateService, IdServerDbMigrateService>();
+        services.AddTransient<IDbMigrateService, FormbuilderDbMigrateService>();
     }
 }

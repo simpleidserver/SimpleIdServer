@@ -1,11 +1,12 @@
 ﻿@page "/scopes/{id}/mappers/{mapperId}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Shared.Common
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
 @using SimpleIdServer.IdServer.Website.Stores.UserStore;
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
-@layout MainLayout
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 @inject NavigationManager navigationManager

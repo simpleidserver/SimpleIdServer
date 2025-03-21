@@ -10,7 +10,7 @@ using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Pwd.Migrations;
 
-public abstract class InitPwdAuthDataseeder : BaseAuthDataSeeder
+public class InitPwdAuthDataseeder : BaseAuthDataSeeder
 {
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;

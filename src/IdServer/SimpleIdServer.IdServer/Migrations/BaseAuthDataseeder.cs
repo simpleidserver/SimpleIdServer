@@ -5,6 +5,7 @@ using FormBuilder.Stores;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -48,12 +49,15 @@ public abstract class BaseAuthDataSeeder : BaseAfterDeploymentDataSeeder
             return false;
         }
 
-        existingForm.AvailableStyles.Add(new FormStyle
+        formRecord.AvailableStyles = new List<FormStyle>
         {
-            Id = Guid.NewGuid().ToString(),
-            Content = cssStyle,
-            IsActive = true
-        });
+            new FormStyle
+            {
+                Id = Guid.NewGuid().ToString(),
+                Content = cssStyle,
+                IsActive = true
+            }
+        };
         _formStore.Add(formRecord);
         return true;
     }

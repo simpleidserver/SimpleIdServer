@@ -19,6 +19,8 @@ public class ConfigureGotifyDataseeder : BaseAfterDeploymentDataSeeder
         IGotiySessionStore gotiySessionStore,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
     {
+        _transactionBuilder = transactionBuilder;
+        _gotiySessionStore = gotiySessionStore;
     }
 
     public override string Name => nameof(ConfigureGotifyDataseeder);

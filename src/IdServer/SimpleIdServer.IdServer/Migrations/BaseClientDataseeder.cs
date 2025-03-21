@@ -36,7 +36,7 @@ public abstract class BaseClientDataseeder : BaseAfterDeploymentDataSeeder
         }
 
         var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
-        var existingScopes = await _scopeRepository.GetByNames(Constants.DefaultRealm, existingClient.Scopes.Select(s => s.Name).ToList(), cancellationToken);
+        var existingScopes = await _scopeRepository.GetByNames(Constants.DefaultRealm, client.Scopes.Select(s => s.Name).ToList(), cancellationToken);
         client.Realms = new List<Realm>
         {
             masterRealm

@@ -36,7 +36,7 @@ public class InitGroupDataSeeder : BaseAfterDeploymentDataSeeder
         using (var transactionBuilder = _transactionBuilder.Build())
         {
             var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
-            foreach(var group in DefaultGroups.All)
+            foreach (var group in DefaultGroups.All)
             {
                 var existingGroup = await _groupRepository.Get(Constants.DefaultRealm, group.Id, cancellationToken);
                 if (existingGroup != null)

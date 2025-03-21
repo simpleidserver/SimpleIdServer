@@ -1,10 +1,12 @@
-﻿@using SimpleIdServer.IdServer.Website.Resources;
+﻿@using Fluxor.Blazor.Web.Components
+@using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @inject IState<RealmsState> realmsState
 @inject IDispatcher dispatcher
 @inject NavigationManager navigationManager
 @inject Radzen.DialogService dialogService
 @inject IUrlHelper urlHelper
+@inherits FluxorComponent
 
 <RadzenTemplateForm Submit=@SubmitSelectRealm TItem="RealmForm" Data=@realmForm>
     <!-- Realm -->

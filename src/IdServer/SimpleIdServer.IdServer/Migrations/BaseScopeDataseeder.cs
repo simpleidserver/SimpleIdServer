@@ -24,12 +24,12 @@ public abstract class BaseScopeDataseeder : BaseAfterDeploymentDataSeeder
         _scopeRepository = scopeRepository;
     }
 
-    protected async Task<bool> TryAddScope(Scope scope, CancellationToken cancellationToken)
+    protected async Task<Scope> TryAddScope(Scope scope, CancellationToken cancellationToken)
     {
         var existingScope = await _scopeRepository.GetByName(Constants.DefaultRealm, scope.Name, cancellationToken);
         if (existingScope != null)
         {
-            return false;
+            return existingScope;
         }
 
         var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
@@ -38,6 +38,6 @@ public abstract class BaseScopeDataseeder : BaseAfterDeploymentDataSeeder
             masterRealm
         };
         _scopeRepository.Add(scope);
-        return true;
+        return scope;
     }
 }

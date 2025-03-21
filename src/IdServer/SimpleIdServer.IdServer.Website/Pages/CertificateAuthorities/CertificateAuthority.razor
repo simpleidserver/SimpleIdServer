@@ -1,8 +1,9 @@
 ﻿@page "/certificateauthorities/{id}/{action}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.CertificateAuthorityStore;
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
-@layout MainLayout
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject NavigationManager navigationManager
 @inject IState<CertificateAuthorityState> certificateAuthorityState

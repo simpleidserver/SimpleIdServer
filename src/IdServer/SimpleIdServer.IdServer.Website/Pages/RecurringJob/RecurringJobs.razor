@@ -1,4 +1,6 @@
 ﻿@page "/recurringjobs/{action}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using Fluxor.Blazor.Web.Components
 @using Hangfire.Storage.Monitoring
 @using SimpleIdServer.IdServer.Api.RecurringJobs

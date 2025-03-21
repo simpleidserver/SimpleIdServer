@@ -1,4 +1,6 @@
 ﻿@page "/clients/{id}/{action}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
@@ -8,7 +10,6 @@
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
 @inject IUrlHelper urlHelper
-@layout MainLayout
 @inject IState<ClientState> clientState
 @inject IDispatcher dispatcher
 

@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Html;
 @using SimpleIdServer.IdServer.Api.Token.Handlers;
+@using SimpleIdServer.IdServer.Config
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Stores.ClientStore;
 @using SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore;
@@ -25,7 +26,7 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="TokenSignedResponseAlg" Class="w-100"
-                        Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllSigAlgs
+                        Data=@DefaultTokenSecurityAlgs.AllSigAlgs
                         TValue="string"
                         @bind-Value=@updateAdvancedClient.TokenSignedResponseAlg />
                     </div>
@@ -38,7 +39,7 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="IdTokenSignedResponseAlg" Class="w-100"
-                        Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllSigAlgs
+                        Data=@DefaultTokenSecurityAlgs.AllSigAlgs
                         TValue="string"
                         @bind-Value=@updateAdvancedClient.IdTokenSignedResponseAlg />
                     </div>
@@ -51,7 +52,7 @@
                     </div>
                     <div class="col">
                         <RadzenDropDown Name="AuthorizationSignedResponseAlg" Class="w-100"
-                        Data=@SimpleIdServer.IdServer.DefaultTokenSecurityAlgs.AllSigAlgs
+                        Data=@DefaultTokenSecurityAlgs.AllSigAlgs
                         TValue="string"
                         @bind-Value=@updateAdvancedClient.AuthorizationSignedResponseAlg />
                     </div>

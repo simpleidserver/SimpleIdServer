@@ -1,0 +1,103 @@
+﻿@attribute [AllowAnonymous]
+@using SimpleIdServer.IdServer.Helpers
+@using SimpleIdServer.IdServer.Website.Infrastructures
+@using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
+@using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
+@using SimpleIdServer.IdServer.Website.Stores.ConfigurationDefinitionStore;
+@using SimpleIdServer.IdServer.Website.Stores.LanguageStore;
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore;
+@using System.Globalization;
+@using SimpleIdServer.IdServer.Website.Resources;
+@using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
+@inherits Fluxor.Blazor.Web.Components.FluxorLayout
+@inject IState<RealmsState> state
+@inject IState<LanguagesState> languagesState
+@inject ContextMenuService contextMenuService
+@inject IDispatcher dispatcher
+@inject IUrlHelper urlHelper
+@inject DialogService dialogService
+@inject NavigationManager Navigation
+
+<PageTitle>@Global.SidAdminUi</PageTitle>
+
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
+
+<RadzenLayout class="rz-shadow-3">
+    <RadzenHeader>
+        <div class="d-flex align-items-center">
+            <div class="p-2">
+                <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            </div>
+            <div class="p-2">
+                <RadzenImage Path="_content/SimpleIdServer.IdServer.Website/images/SIDLogo.svg" Style="width: 40px" />
+            </div>
+            <div class="p-2">
+                <RadzenText Style="margin: 0; color: white;" Text="SimpleIdServer" TextStyle="TextStyle.DisplayH6" />
+            </div>
+            <div class="ml-auto"></div>
+            <div class="p-2">
+                <RadzenText Style="margin: 0; color: white;" Text="@string.Format(Global.Welcome, userName)" />
+            </div>
+            <div class="p-2">
+                @if (!languagesState.Value.IsLoading)
+                {
+                    <RadzenDropDown Name="UserPropertyName" Class="w-100"
+                                    Data=@languagesState.Value.Languages
+                                    TValue="string"
+                                    @bind-Value=@CurrentLanguage
+                                    TextProperty="Description" ValueProperty="Code" />
+                }
+            </div>
+            <div class="p-2">
+                <RadzenLink Text="@Global.SignOut" Icon="logout" Path="/logout" />
+            </div>
+        </div>
+    </RadzenHeader>
+    <RadzenBody>
+        <div class="p-2">
+            @Body
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+    bool sidebarExpanded = true;
+    bool isLoading = true;
+    string activeRealm;
+    string userName { get; set; }
+    @inject AuthenticationStateProvider GetAuthenticationStateAsync
+    @inject IRealmStore realmStore
+
+    public string CurrentLanguage
+    {
+        get => CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+        set
+        {
+            if (CultureInfo.CurrentCulture.TwoLetterISOLanguageName != value)
+            {
+                var uri = new Uri(Navigation.Uri)
+                    .GetComponents(UriComponents.PathAndQuery, UriFormat.Unescaped);
+                var cultureEscaped = Uri.EscapeDataString(value);
+                var uriEscaped = Uri.EscapeDataString(uri);
+
+                Navigation.NavigateTo(
+                    $"Culture/Set?culture={cultureEscaped}&redirectUri={uriEscaped}",
+                    forceLoad: true);
+            }
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if (firstRender)
+        {
+            this.activeRealm = realmStore.Realm;
+            var authState = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
+            userName = authState.User.Identity.Name;
+        }
+    }
+}

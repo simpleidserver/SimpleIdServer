@@ -18,9 +18,9 @@ var identityServerConfiguration = webApplicationBuilder.Configuration.Get<Identi
 SidServerSetup.ConfigureIdServer(webApplicationBuilder, identityServerConfiguration);
 
 var app = webApplicationBuilder.Build();
+app.Services.SeedData();
 app.UseCors("AllowAll");
 app.UseSid()
     .UseSidSwagger()
     .UseSidSwaggerUi();
-app.Services.SeedData();
 app.Run();

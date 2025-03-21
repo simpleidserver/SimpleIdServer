@@ -1,0 +1,43 @@
+﻿@page "/availablerealms"
+@layout SimpleIdServer.IdServer.Website.Shared.EmptyLayout
+@using Fluxor.Blazor.Web.Components
+@using Microsoft.Extensions.Options
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.LanguageStore
+@using SimpleIdServer.IdServer.Website.Stores.RealmStore
+@inject IDispatcher dispatcher
+@inject IState<RealmsState> realmsState
+@inject IOptions<IdServerWebsiteOptions> options
+@inherits FluxorComponent
+
+@if (options.Value.IsReamEnabled)
+{
+    <RadzenCardLoader IsLoading="@realmsState.Value.IsLoading">
+        <SelectRealmDialog></SelectRealmDialog>
+    </RadzenCardLoader>
+}
+else
+{
+    <RadzenAlert AlertStyle="AlertStyle.Danger" ShowIcon="false" Variant="Variant.Flat" Shade="Shade.Lighter">
+        @Global.RealmOptionIsDisabled
+    </RadzenAlert>
+}
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if(firstRender)
+        {
+            dispatcher.Dispatch(new GetAllRealmAction
+            {
+                Realm = Constants.DefaultRealm
+            });
+            dispatcher.Dispatch(new GetLanguagesAction
+            {
+                Realm = Constants.DefaultRealm
+            });
+        }
+    }
+}

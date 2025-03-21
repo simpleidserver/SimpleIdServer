@@ -1,4 +1,6 @@
 ﻿@page "/acrs/{action}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using SimpleIdServer.IdServer.Website.Resources
 @inject IUrlHelper urlHelper
 @inject NavigationManager navigationManager

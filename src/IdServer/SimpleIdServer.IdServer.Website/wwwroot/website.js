@@ -9,3 +9,7 @@
   anchorElement.remove();
   URL.revokeObjectURL(url);
 }
+
+window.navigateToUrl = (url) => {
+    window.location.href = url;
+};

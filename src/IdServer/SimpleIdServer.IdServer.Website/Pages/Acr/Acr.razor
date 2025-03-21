@@ -1,4 +1,6 @@
 ﻿@page "/acrs/workflows/{id}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using FormBuilder.Components.Workflow
 @using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore

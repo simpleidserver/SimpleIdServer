@@ -44,7 +44,7 @@ public class SidServerSetup
             })
             .IgnoreCertificateError()
             .EnableFapiSecurityProfile()
-            .AddPwdAuthentication()
+            .AddPwdAuthentication(true)
             .AddEmailAuthentication()
             .AddOtpAuthentication()
             .AddSmsAuthentication()
@@ -85,19 +85,14 @@ public class SidServerSetup
             {
                 ConfigureMessageBroker(webApplicationBuilder, o);
             })
-            .ConfigureAuthCookie(o =>
-            {
-                if (!string.IsNullOrWhiteSpace(configuration.AuthCookieNamePrefix))
-                {
-                    o.Cookie.Name = configuration.AuthCookieNamePrefix;
-                }
-            })
             .SeedAdministrationData(
                 new List<string> { "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*" },
                 new List<string> { "https://localhost:5002/signout-callback-oidc", "https://website.sid.svc.cluster.local/signout-callback-oidc", "https://website.simpleidserver.com/signout-callback-oidc" },
                 "https://localhost:5002/bc-logout",
                 new List<Scope>())
-            .SeedSwagger(new List<string> { "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html" })
+            .SeedSwagger(
+                new List<string> { "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html" }
+            )
             .UseEfStore((c) =>
             {
                 ConfigureIdserverStorage(webApplicationBuilder, c);
@@ -321,5 +316,6 @@ public class SidServerSetup
         builder.Services.AddTransient<IDataSeeder, ConfigureCredentialIssuerDataSeeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureFastfedDataSeeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureGotifyDataseeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureFederationDataseeder>();
     }
 }

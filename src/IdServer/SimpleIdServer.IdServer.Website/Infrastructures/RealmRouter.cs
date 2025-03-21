@@ -20,6 +20,10 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
     private Dictionary<Type, Dictionary<string, string>> _routeableComponents;
     private CancellationTokenSource _onNavigateCts;
     private Task _previousOnNavigateTask = Task.CompletedTask;
+    private List<string> _excludedRoutes = new List<string>
+    {
+        "availablerealms"
+    };
 
     [Inject] private IOptions<IdServerWebsiteOptions> Options { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
@@ -116,7 +120,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         Type handlerContext = null;
         var relativePath = NavigationManager.ToBaseRelativePath(_locationAbsolute);
         string pathWithoutRealm = locationPath;
-        if (!Options.Value.IsReamEnabled)
+        if (!Options.Value.IsReamEnabled || _excludedRoutes.Contains(pathWithoutRealm))
         {
             if (!pathWithoutRealm.StartsWith("/"))
                 pathWithoutRealm = $"/{locationPath}";

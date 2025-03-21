@@ -5,7 +5,7 @@
 		<Description>Identity server website</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Radzen.Blazor" Version="5.5.1" />
+		<PackageReference Include="Radzen.Blazor" Version="6.3.2" />
 		<PackageReference Include="Fluxor" Version="6.1.0" />
 		<PackageReference Include="Fluxor.Blazor.Web" Version="6.1.0" />
 		<PackageReference Include="Fluxor.Blazor.Web.ReduxDevTools" Version="6.1.0" />

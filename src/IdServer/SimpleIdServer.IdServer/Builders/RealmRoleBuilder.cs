@@ -32,6 +32,12 @@ public class RealmRoleBuilder
         return realmScopes;
     }
 
+    public static List<Scope> BuildAdministrativeRoleRo(Realm realm)
+    {
+        var realmScopes = BuildScopes(realm, true);
+        return realmScopes;
+    }
+
     private static List<Scope> BuildScopes(Realm realm, bool isReadOnly = false)
         => _allComponents.SelectMany(c => BuildComponentScopes(c, realm, isReadOnly)).ToList();
 

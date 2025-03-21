@@ -66,6 +66,14 @@ public static class DefaultScopes
         }
     }
 
+    public static List<Scope> AdministrativeRoScopes
+    {
+        get
+        {
+            return RealmRoleBuilder.BuildAdministrativeRoleRo(DefaultRealms.Master);
+        }
+    }
+
     public static Scope Profile = new Scope
     {
         Id = Guid.NewGuid().ToString(),

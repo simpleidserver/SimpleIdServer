@@ -57,7 +57,7 @@ public class ConfigureAuthSchemeProviderDataSeeder : BaseAfterDeploymentDataSeed
                 {
                     masterRealm
                 };
-                unknownInstance.AuthSchemeProviderDefinition = existingDefinitions.First(e => e.Name == unknownInstance.Name);
+                unknownInstance.AuthSchemeProviderDefinition = existingDefinitions.First(e => e.Name == unknownInstance.AuthSchemeProviderDefinition.Name);
                 _authenticationSchemeProviderRepository.Add(unknownInstance);
             }
 

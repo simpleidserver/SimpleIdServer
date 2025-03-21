@@ -1,4 +1,6 @@
 ﻿@page "/identityprovisioning/{id}/mappingrules/{mapperId}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using SimpleIdServer.IdServer.Api.Provisioning;
 @using SimpleIdServer.IdServer.Website.Resources;
 @using SimpleIdServer.IdServer.Website.Shared.Common
@@ -10,7 +12,6 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<IdentityProvisioningMappingRuleState> identityProvisioningMappingRuleState;
 @inject IState<UpdateIdentityProvisioningState> updateIdentityProvisioningState;
-@layout MainLayout
 @inject ContextMenuService contextMenuService
 @inject DialogService dialogService
 @inject NavigationManager navigationManager

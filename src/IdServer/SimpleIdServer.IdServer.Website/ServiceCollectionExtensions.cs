@@ -5,7 +5,6 @@ using Fluxor.Blazor.Web.ReduxDevTools;
 using FormBuilder.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -133,16 +132,16 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddAuthorization(config =>
             {
-                var policyBuilder = new AuthorizationPolicyBuilder().RequireAuthenticatedUser();
-
-                if (!string.IsNullOrEmpty(defaultSecurityOptions.RequiredRole))
+                config.AddPolicy("Authenticated", p =>
                 {
-                    string[] roles = defaultSecurityOptions.RequiredRole
-                        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.RemoveEmptyEntries);
-                    policyBuilder.RequireRole(roles);
-                }
-
-                config.FallbackPolicy = policyBuilder.Build();
+                    p.RequireAuthenticatedUser();
+                    if (!string.IsNullOrEmpty(defaultSecurityOptions.RequiredRole))
+                    {
+                        string[] roles = defaultSecurityOptions.RequiredRole
+                            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.RemoveEmptyEntries);
+                        p.RequireRole(roles);
+                    }
+                });
             });
 
             services.AddSingleton(defaultSecurityOptions);

@@ -1,4 +1,6 @@
 ﻿@page "/identityprovisioning/{id}/{action}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using SimpleIdServer.IdServer.Website.Shared.Dialogs
 @using SimpleIdServer.IdServer.Website.Stores.RealmStore;
 @using SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore;
@@ -7,7 +9,6 @@
 @inject NotificationService notificationService
 @inject NavigationManager navigationManager
 @inject DialogService dialogService
-@layout MainLayout
 @inject IUrlHelper urlHelper
 @inject IState<IdentityProvisioningState> identityProvisioningState
 @inject IDispatcher dispatcher

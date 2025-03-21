@@ -1,4 +1,6 @@
 ﻿@page "/realm/{action}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Website.Infrastructures
@@ -88,8 +90,9 @@
         {
             SubscribeToAction<DeleteCurrentRealmSuccessAction>(async (act) =>
             {
-                await dialogService.Confirm(Global.RefreshPage, Global.RealmRemoved, new ConfirmOptions { OkButtonText = Global.Yes });
-                navigationManager.NavigateTo(navigationManager.Uri, true);
+                var confirmationResult = await dialogService.Confirm(Global.RefreshPage, Global.RealmRemoved, new ConfirmOptions { OkButtonText = Global.Yes, CancelButtonText = Global.No });
+                if (confirmationResult == null || !confirmationResult.Value) return;
+                navigationManager.NavigateTo("/availablerealms", true);
             });
         }
     }

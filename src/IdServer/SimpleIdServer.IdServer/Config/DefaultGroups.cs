@@ -21,26 +21,35 @@ public static class DefaultGroups
         AdministratorReadonlyGroup
     };
 
-    public static Group AdministratorGroup = new Group
+    public static Group AdministratorGroup
     {
-        Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
-        CreateDateTime = DateTime.UtcNow,
-        UpdateDateTime = DateTime.UtcNow,
-        FullPath = "administrator",
-        Realms = new List<GroupRealm>
+        get
         {
-            new GroupRealm
+            var roles = new List<Scope>
             {
-                RealmsName = DefaultRealms.Master.Name
-            }
-        },
-        Name = "administrator",
-        Description = "Administration role",
-        Roles = new List<Scope>
-        {
-            DefaultScopes.WebsiteAdministratorRole
+                DefaultScopes.WebsiteAdministratorRole
+            };
+            roles.AddRange(DefaultScopes.AdministrativeScopes);
+            return new Group
+            {
+                Id = "9795f2aa-3a86-4e21-a098-d0443e0391d4",
+                CreateDateTime = DateTime.UtcNow,
+                UpdateDateTime = DateTime.UtcNow,
+                FullPath = "administrator",
+                Realms = new List<GroupRealm>
+                {
+                    new GroupRealm
+                    {
+                        RealmsName = DefaultRealms.Master.Name
+                    }
+                },
+                Name = "administrator",
+                Description = "Administration role",
+                Roles = roles
+            };
         }
-    };
+    }
+
     public static Group AdministratorReadonlyGroup = new Group
     {
         Id = "7a3014a3-5985-4986-bfcc-8e574fb6da27",
@@ -54,6 +63,7 @@ public static class DefaultGroups
             }
         },
         Name = "administrator-ro",
-        Description = "Administration role readonly"
+        Description = "Administration role readonly",
+        Roles = DefaultScopes.AdministrativeRoScopes
     };
 }

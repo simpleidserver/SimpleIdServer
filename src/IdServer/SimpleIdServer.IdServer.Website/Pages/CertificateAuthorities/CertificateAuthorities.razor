@@ -1,4 +1,6 @@
 ﻿@page "/certificateauthorities"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @using Microsoft.AspNetCore.Html;
 @using SimpleIdServer.IdServer.Website.Resources;
