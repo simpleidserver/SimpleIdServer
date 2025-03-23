@@ -178,6 +178,15 @@ namespace SimpleIdServer.IdServer.Startup.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Sessions.
+        /// </summary>
+        public static string Sessions {
+            get {
+                return ResourceManager.GetString("Sessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Unexpected error.
         /// </summary>
         public static string UnexpectedError {

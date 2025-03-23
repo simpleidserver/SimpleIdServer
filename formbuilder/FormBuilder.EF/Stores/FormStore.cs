@@ -38,12 +38,13 @@ public class FormStore : IFormStore
     public Task<List<FormRecord>> GetLatestPublishedVersionByCorrelationids(List<string> correlationIds, CancellationToken cancellationToken)
         => _dbContext.Forms.OrderByDescending(f => f.VersionNumber).Where(f => correlationIds.Contains(f.CorrelationId) && f.Status == RecordVersionStatus.Published).GroupBy(f => f.CorrelationId).Select(s => s.First()).ToListAsync(cancellationToken);
 
-    public Task<FormRecord> GetLatestPublishedVersionByCorrelationId(string correlationId, CancellationToken cancellationToken)
+    public async Task<FormRecord> GetLatestPublishedVersionByCorrelationId(string correlationId, CancellationToken cancellationToken)
     {
-        return _dbContext.Forms
+        var result = await _dbContext.Forms
             .Include(f => f.AvailableStyles)
             .OrderByDescending(f => f.VersionNumber)
             .FirstOrDefaultAsync(f => f.Status == RecordVersionStatus.Published && f.CorrelationId == correlationId, cancellationToken);
+        return result;
     }
 
     public Task<FormRecord> GetLatestPublishedVersionByCorrelationId(string realm, string correlationId, CancellationToken cancellationToken)

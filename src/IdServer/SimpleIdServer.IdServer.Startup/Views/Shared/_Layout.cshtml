@@ -1,4 +1,5 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@using SimpleIdServer.IdServer.Resources
 @using SimpleIdServer.IdServer.Startup.Resources
 @using Microsoft.Extensions.Options
 @using System.Globalization
@@ -37,6 +38,11 @@
                         </a>
                     </li>
                 }
+                <li class="nav-item">
+                    <a class="nav-link" href="@Url.Action("Index", "Sessions", new { prefix = string.Empty })">
+                        @LayoutResource.Sessions
+                    </a>
+                </li>
                 @RenderSection("SubMenu", required: false)
             </ul>
             <ul class="navbar-nav">

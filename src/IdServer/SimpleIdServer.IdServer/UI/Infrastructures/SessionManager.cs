@@ -115,7 +115,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
         public async Task<RevokeSessionResult> Revoke(HttpRequest request, string user, string realm, CancellationToken cancellationToken)
         {
             realm = realm ?? Constants.DefaultRealm;
-            var sessionCookieName = _options.GetSessionCookieName(_realmStore.Realm, user);
+            var sessionCookieName = _options.GetSessionCookieName(realm, user);
             var kvp = request.Cookies.SingleOrDefault(c => c.Key == sessionCookieName);
             IEnumerable<string> frontChannelLogouts = new List<string>();
             if (!string.IsNullOrWhiteSpace(kvp.Key))

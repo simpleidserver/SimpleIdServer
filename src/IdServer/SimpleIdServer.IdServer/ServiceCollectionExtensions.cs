@@ -200,6 +200,7 @@ public static class ServiceCollectionExtensions
             o.UseIgnoredAssemblyVersionTypeResolver();
             sidHangfire.Callback(o);
         });
+        services.AddHangfireServer();
     }
 
     private static AutomaticConfigurationOptions ConfigureCentralizedConfiguration(WebApplicationBuilder app)
@@ -271,9 +272,11 @@ public static class ServiceCollectionExtensions
                     if (!string.IsNullOrWhiteSpace(nameIdentifier))
                     {
                         var realmStore = ctx.HttpContext.RequestServices.GetRequiredService<IRealmStore>();
+                        var realm = realmStore.Realm;
+                        if (ctx.Properties != null && ctx.Properties.Items.ContainsKey(Constants.RealmKey)) realm = ctx.Properties.Items[Constants.RealmKey];
                         ctx.Options.CookieManager.DeleteCookie(
                                 ctx.HttpContext,
-                                $"{IdServerCookieAuthenticationHandler.GetCookieName(realmStore.Realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
+                                $"{IdServerCookieAuthenticationHandler.GetCookieName(realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
                                 ctx.CookieOptions);
                     }
                     return Task.CompletedTask;

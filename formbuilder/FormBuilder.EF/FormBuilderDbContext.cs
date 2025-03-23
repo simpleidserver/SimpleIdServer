@@ -13,6 +13,7 @@ public class FormBuilderDbContext : DbContext
 
     public DbSet<WorkflowRecord> Workflows { get; set; }
     public DbSet<FormRecord> Forms { get; set; }
+    public DbSet<FormStyle> FormStyle { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

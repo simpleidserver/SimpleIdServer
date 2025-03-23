@@ -436,9 +436,13 @@ namespace SimpleIdServer.IdServer.Auth
         protected override async Task HandleSignOutAsync(AuthenticationProperties properties)
         {
             properties = properties ?? new AuthenticationProperties();
+            var realm = _realmStore.Realm;
+            if(properties.Items?.ContainsKey(Constants.RealmKey) == true)
+            {
+                realm = properties.Items[Constants.RealmKey];
+            }
 
             _signOutCalled = true;
-
             // Process the request cookie to initialize members like _sessionKey.
             await EnsureCookieTicket();
             var cookieOptions = BuildCookieOptions();
@@ -458,7 +462,7 @@ namespace SimpleIdServer.IdServer.Auth
 
             Options.CookieManager.DeleteCookie(
                 Context,
-                GetCookieName()!,
+                GetCookieName(realm, Options.Cookie.Name)!,
                 context.CookieOptions);
 
             // Only honor the ReturnUrl query string parameter on the logout path

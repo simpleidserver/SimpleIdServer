@@ -156,6 +156,9 @@
   <data name="selected_language" xml:space="preserve">
     <value>Language is {0}</value>
   </data>
+  <data name="Sessions" xml:space="preserve">
+    <value>Sessions</value>
+  </data>
   <data name="UnexpectedError" xml:space="preserve">
     <value>Unexpected error</value>
   </data>

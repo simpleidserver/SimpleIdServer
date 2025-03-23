@@ -9,6 +9,7 @@ public static class Constants
     public const string AuthenticatedPolicyName = "authenticated";
     public const string AreaPwd = "pwd";
     public const string LogoutUserKey = "otherUser";
+    public const string RealmKey = "realm";
     public const string DefaultExternalCookieAuthenticationScheme = "ExternalCookies";
     public const string DefaultCertificateAuthenticationScheme = "Certificate";
     public const string AuthorizationHeaderName = "Authorization";
