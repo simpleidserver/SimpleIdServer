@@ -1,7 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using NUnit.Framework;
-using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.Configuration.Models;
 using System.Globalization;
 
 namespace SimpleIdServer.Configuration.Tests;
@@ -13,7 +13,7 @@ public class ConfigurationDefinitionExtractorFixture
     {
         CultureInfo.CurrentCulture = new CultureInfo("en");
         // ACT
-        var configurationDefinition = ConfigurationDefinitionExtractor.Extract<UserOptions>();
+        var configurationDefinition = ConfigurationDefinitionExtractor.Extract(typeof(UserOptions));
 
         // ASSERT
         var firstNameDefinition = configurationDefinition.Records.Single(r => r.Name == nameof(UserOptions.FirstName));

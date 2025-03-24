@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.Configuration;
+using SimpleIdServer.Configuration.Models;
 using SimpleIdServer.IdServer.Store.SqlSugar.Models;
-using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Store.SqlSugar
 {
@@ -48,6 +48,25 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 Name = keyValue.Name,
                 Value = keyValue.Value,
             };
+        }
+
+        public async Task AddOrUpdate(ConfigurationKeyPairValueRecord keyValue, CancellationToken cancellationToken)
+        {
+            var result = await _dbContext.Client.Queryable<SugarConfigurationKeyPairValueRecord>()
+                .FirstAsync(c => c.Name == keyValue.Name, cancellationToken);
+            if (result == null)
+            {
+                result = new SugarConfigurationKeyPairValueRecord
+                {
+                    Name = keyValue.Name,
+                    Value = keyValue.Value
+                };
+                _dbContext.Client.Insertable(Transform(keyValue)).ExecuteCommand();
+            }
+            else
+            {
+                _dbContext.Client.Updateable(Transform(keyValue)).ExecuteCommand();
+            }
         }
     }
 }

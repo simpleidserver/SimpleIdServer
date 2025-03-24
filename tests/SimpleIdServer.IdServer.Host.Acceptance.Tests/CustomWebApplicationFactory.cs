@@ -110,10 +110,10 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
         public FakeHttpMessageHandler(
             ScenarioContext scenarioContext)
         {
-            var firstJsonWebKey = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential.SerializePublicJWK();
+            var firstJsonWebKey = IdServerConfiguration.RpSigningCredential.SerializePublicJWK();
             firstJsonWebKey.Alg = SecurityAlgorithms.RsaSha256;
             firstJsonWebKey.Use = "sig";
-            var secondJsonWebKey = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpJwtSigningCredential.SerializePublicJWK();
+            var secondJsonWebKey = IdServerConfiguration.RpJwtSigningCredential.SerializePublicJWK();
             secondJsonWebKey.Alg = SecurityAlgorithms.RsaSha256;
             secondJsonWebKey.Use = "sig";
             var client = new Domains.Client
@@ -151,15 +151,15 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests
                 IsConsentDisabled = true,
                 TokenEndPointAuthMethod = "private_key_jwt"
             };
-            client.Add(OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential.Kid, firstJsonWebKey, "sig", SecurityKeyTypes.RSA);
-            client.Add(OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpJwtSigningCredential.Kid, secondJsonWebKey, "sig", SecurityKeyTypes.RSA);
+            client.Add(IdServerConfiguration.RpSigningCredential.Kid, firstJsonWebKey, "sig", SecurityKeyTypes.RSA);
+            client.Add(IdServerConfiguration.RpJwtSigningCredential.Kid, secondJsonWebKey, "sig", SecurityKeyTypes.RSA);
             _scenarioContext = scenarioContext;
             _rpOpts = new RpFederationOptions
             {
                 Client = client,
                 IsFederationEnabled = false,
                 OrganizationName = null,
-                SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
+                SigningCredentials = IdServerConfiguration.RpSigningCredential
             };
             _taOpts = new RpFederationOptions
             {

@@ -52,7 +52,7 @@ public class SidSamlClientProvisioningService : ISamlClientProvisioningService
                 Id = Guid.NewGuid().ToString(),
                 ClientSecret = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientType = "SAML",
+                ClientType = ClientTypes.SAML,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
                 Parameters = new JsonObject

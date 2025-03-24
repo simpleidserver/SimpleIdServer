@@ -13,7 +13,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 
-namespace SimpleIdServer.OAuth.Host.Acceptance.Tests;
+namespace SimpleIdServer.IdServer.Host.Acceptance.Tests;
 
 public class IdServerConfiguration
 {

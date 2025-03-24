@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using Moq;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Stores;
-using SimpleIdServer.OAuth.Host.Acceptance.Tests;
 using SimpleIdServer.OpenidFederation;
 using System;
 using System.Collections.Generic;
@@ -167,7 +166,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                     Client = client,
                     IsFederationEnabled = false,
                     OrganizationName = null,
-                    SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
+                    SigningCredentials = Tests.IdServerConfiguration.RpSigningCredential
                 };
                 var rpFederationEntityBuilder = new RpFederationEntityBuilder(Microsoft.Extensions.Options.Options.Create(rpOpts), new FakeRPFederationEntityStore());
                 var result = rpFederationEntityBuilder.BuildSelfIssued(new OpenidFederation.Builders.BuildFederationEntityRequest
@@ -227,7 +226,7 @@ namespace SimpleIdServer.IdServer.Host.Acceptance.Tests.Steps
                     Client = client,
                     IsFederationEnabled = false,
                     OrganizationName = null,
-                    SigningCredentials = OAuth.Host.Acceptance.Tests.IdServerConfiguration.RpSigningCredential
+                    SigningCredentials = IdServerConfiguration.RpSigningCredential
                 };
                 var rpFederationEntityBuilder = new RpFederationEntityBuilder(Microsoft.Extensions.Options.Options.Create(rpOpts), new FakeRPFederationEntityStore());
                 var result = rpFederationEntityBuilder.BuildSelfIssued(new OpenidFederation.Builders.BuildFederationEntityRequest
