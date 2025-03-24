@@ -1,8 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Bogus.DataSets;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Conf;
 
@@ -19,6 +21,7 @@ SidServerSetup.ConfigureIdServer(webApplicationBuilder, identityServerConfigurat
 
 var app = webApplicationBuilder.Build();
 app.Services.SeedData();
+var hostedServices = app.Services.GetServices<IHostedService>();
 app.UseCors("AllowAll");
 app.UseSid()
     .UseSidSwagger()

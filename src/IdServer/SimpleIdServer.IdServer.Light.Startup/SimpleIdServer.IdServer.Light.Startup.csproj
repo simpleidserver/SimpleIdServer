@@ -34,7 +34,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
-	  <PackageReference Include="Hangfire.SqlServer" Version="1.8.15" />
+	  <PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
 	  <PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />
 	  <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
 	  <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
@@ -51,7 +51,7 @@
 	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.6" />
 	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="8.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.10" />
-	  <PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.3.0" />
+	  <PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.4.0" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

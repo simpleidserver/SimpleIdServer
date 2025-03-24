@@ -45,7 +45,7 @@
 	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.6" />
 	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="8.0.0" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.10" />
-	  <PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.3.0" />
+	  <PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.4.0" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
 		<PrivateAssets>all</PrivateAssets>
 		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

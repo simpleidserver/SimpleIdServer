@@ -18,6 +18,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Startup.Conf.Migrations.AfterDeployment;
 using SimpleIdServer.IdServer.Startup.Configurations;
+using SimpleIdServer.IdServer.Startup.Consumers;
 using SimpleIdServer.IdServer.TokenTypes;
 using System;
 using System.Collections.Generic;
@@ -81,10 +82,11 @@ public class SidServerSetup
             .ConfigureKeyValueStore((c) =>
             {
             })
-            .ConfigureMasstransit(o =>
+            .EnableMasstransit(o =>
             {
+                o.AddConsumer<IdServerEventsConsumer>();
                 ConfigureMessageBroker(webApplicationBuilder, o);
-            })
+            }, () => ConfigureMessageBrokerMigration(webApplicationBuilder))
             .SeedAdministrationData(
                 new List<string> { "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*" },
                 new List<string> { "https://localhost:5002/signout-callback-oidc", "https://website.sid.svc.cluster.local/signout-callback-oidc", "https://website.simpleidserver.com/signout-callback-oidc" },
@@ -288,20 +290,36 @@ public class SidServerSetup
         switch (conf.Transport)
         {
             case TransportTypes.SQLSERVER:
-
-                builder.Services.AddSqlServerMigrationHostedService(create: true, delete: false);
-                builder.Services.AddOptions<SqlTransportOptions>()
-                    .Configure(options =>
-                    {
-                        options.ConnectionString = conf.ConnectionString;
-                        options.Username = conf.Username;
-                        options.Password = conf.Password;
-                    });
                 configurator.UsingSqlServer((ctx, cfg) =>
                 {
                     cfg.UsePublishMessageScheduler();
                     cfg.ConfigureEndpoints(ctx);
                 });
+                break;
+            default:
+                configurator.UsingInMemory((ctx, cfg) =>
+                {
+                    cfg.UsePublishMessageScheduler();
+                    cfg.ConfigureEndpoints(ctx);
+                });
+                break;
+        }
+    }
+
+    private static void ConfigureMessageBrokerMigration(WebApplicationBuilder builder)
+    {
+        var section = builder.Configuration.GetSection(nameof(MessageBrokerOptions));
+        var conf = section.Get<MessageBrokerOptions>();
+        switch (conf.Transport)
+        {
+            case TransportTypes.SQLSERVER:
+                builder.Services.AddSqlServerMigrationHostedService(create: true, delete: false);
+                builder.Services.AddOptions<SqlTransportOptions>()
+                    .Configure(options =>
+                    {
+                        options.ConnectionString = conf.ConnectionString;
+                        options.Database = conf.Database;
+                    });
                 break;
         }
     }

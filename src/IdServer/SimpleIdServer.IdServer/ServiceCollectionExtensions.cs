@@ -118,9 +118,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         var sidAuthCookie = new SidAuthCookie();
         var authBuilder = ConfigureAuth(services, sidAuthCookie);
-        var sidMasstransit = new SidMasstransit();
-        ConfigureMassTransit(services, sidMasstransit);
-        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie, sidHangfire, sidMasstransit);
+        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie, sidHangfire);
         return result;
     }
 
@@ -209,22 +207,6 @@ public static class ServiceCollectionExtensions
         {
             o.Add<UserLockingOptions>();
             o.Add<IdServerConsoleOptions>();
-        });
-    }
-
-    private static void ConfigureMassTransit(IServiceCollection services, SidMasstransit sidMasstransit)
-    {
-        services.AddMassTransitTestHarness((o) =>
-        {
-            o.AddPublishMessageScheduler();
-            o.AddHangfireConsumers();
-            o.AddConsumer<ExtractUsersFaultConsumer>();
-            o.AddConsumer<ImportUsersFaultConsumer>();
-            o.AddConsumer<IdServerEventsConsumer>();
-            o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
-            o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();
-            o.AddConsumer<RemoveRealmCommandConsumer, RemoveRealmConsumerDefinition>();
-            sidMasstransit.Callback(o);
         });
     }
 
@@ -600,21 +582,4 @@ public class SidHangfire
     }
 
     internal Action<IGlobalConfiguration> Callback { get; set; }
-}
-
-public class SidMasstransit
-{
-    public SidMasstransit()
-    {
-        Callback = (o) =>
-        {
-            o.UsingInMemory((ctx, cfg) =>
-            {
-                cfg.UsePublishMessageScheduler();
-                cfg.ConfigureEndpoints(ctx);
-            });
-        };
-    }
-
-    internal Action<IBusRegistrationConfigurator> Callback { get; set; }
 }

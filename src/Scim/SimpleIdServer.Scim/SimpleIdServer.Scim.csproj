@@ -6,7 +6,7 @@
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-	<PackageReference Include="MassTransit" Version="8.2.1" />
+	<PackageReference Include="MassTransit" Version="8.4.0" />
 	<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
   </ItemGroup>
   <ItemGroup>

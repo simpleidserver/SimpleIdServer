@@ -13,11 +13,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using SimpleIdServer.Configuration;
+using SimpleIdServer.IdServer.Api.Realms;
 using SimpleIdServer.IdServer.Config;
+using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Migrations;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Stores.Default;
 using System;
@@ -39,10 +42,9 @@ public class IdServerBuilder
     private readonly AutomaticConfigurationOptions _automaticConfigurationOptions;
     private readonly SidAuthCookie _sidAuthCookie;
     private readonly SidHangfire _sidHangfire;
-    private readonly SidMasstransit _sidMasstransit;
     private HttpsConnectionAdapterOptions _httpsConnectionAdapterOptions;
 
-    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie, SidHangfire sidHangfire, SidMasstransit sidMasstransit)
+    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie, SidHangfire sidHangfire)
     {
         _serviceCollection = serviceCollection;
         _authBuilder = authBuilder;
@@ -52,10 +54,8 @@ public class IdServerBuilder
         _automaticConfigurationOptions = automaticConfigurationOptions;
         _sidAuthCookie = sidAuthCookie;
         _sidHangfire = sidHangfire;
-        _sidMasstransit = sidMasstransit;
         _sidRoutesStore = new SidRoutesStore();
         _serviceCollection.AddSingleton(_sidRoutesStore);
-
     }
 
     internal IServiceCollection Services => _serviceCollection;
@@ -276,9 +276,25 @@ public class IdServerBuilder
     /// Use in memory implementation of mass transit.
     /// </summary>
     /// <returns></returns>
-    public IdServerBuilder ConfigureMasstransit(Action<IBusRegistrationConfigurator> cb)
+    public IdServerBuilder EnableMasstransit(Action<IBusRegistrationConfigurator> cb, Action migrationServiceCb = null)
     {
-        _sidMasstransit.Callback = cb;
+        if(migrationServiceCb != null)
+        {
+            migrationServiceCb();
+        }
+
+        _serviceCollection.AddMassTransitTestHarness((o) =>
+        {
+            o.AddPublishMessageScheduler();
+            o.AddHangfireConsumers();
+            o.AddConsumer<ExtractUsersFaultConsumer>();
+            o.AddConsumer<ImportUsersFaultConsumer>();
+            o.AddConsumer<IdServerEventsConsumer>();
+            o.AddConsumer<ExtractUsersConsumer, ExtractUsersConsumerDefinition>();
+            o.AddConsumer<ImportUsersConsumer, ImportUsersConsumerDefinition>();
+            o.AddConsumer<RemoveRealmCommandConsumer, RemoveRealmConsumerDefinition>();
+            cb(o);
+        });
         return this;
     }
 
@@ -289,6 +305,21 @@ public class IdServerBuilder
     {
         _sidAuthCookie.Callback = cb;
         return this;
+    }
+
+    /// <summary>
+    /// Enables the in-memory MassTransit transport, configuring the publish message scheduler and endpoints.
+    /// </summary>
+    public IdServerBuilder EnableInMemoryMasstransit()
+    {
+        return EnableMasstransit(cb =>
+        {
+            cb.UsingInMemory((ctx, cfg) =>
+            {
+                cfg.UsePublishMessageScheduler();
+                cfg.ConfigureEndpoints(ctx);
+            });
+        });
     }
 
     /// <summary>
