@@ -81,15 +81,17 @@ namespace Microsoft.Extensions.DependencyInjection;
 public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Configure the Identity Server.
+    /// Configures and sets up the Identity Server with all required services and dependencies.
     /// </summary>
-    /// <param name="services"></param>
-    /// <param name="options"></param>
-    /// <returns></returns>
+    /// <param name="app">The WebApplicationBuilder instance to configure services.</param>
+    /// <param name="callback">Optional callback action to configure IdServerHostOptions.</param>
+    /// <param name="skipMasstransitRegistration">If true, skips the automatic registration of in-memory Masstransit configuration.</param>
+    /// <returns>An IdServerBuilder instance that allows further configuration of the Identity Server.</returns>
     public static IdServerBuilder AddSidIdentityServer
     (
         this WebApplicationBuilder app,
-        Action<IdServerHostOptions>? callback = null
+        Action<IdServerHostOptions>? callback = null,
+        bool skipMasstransitRegistration = false
     )
     {
         var services = app.Services;
@@ -119,6 +121,11 @@ public static class ServiceCollectionExtensions
         var sidAuthCookie = new SidAuthCookie();
         var authBuilder = ConfigureAuth(services, sidAuthCookie);
         var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie, sidHangfire);
+        if(!skipMasstransitRegistration)
+        {
+            result.EnableInMemoryMasstransit();
+        }
+
         return result;
     }
 
@@ -540,6 +547,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IIdentityProvisioningStore>(new DefaultIdentityProvisioningStore(new List<IdentityProvisioningDefinition>()));
         services.AddSingleton<IProvisioningStagingStore>(new DefaultProvisioningStagingStore(new List<ExtractedRepresentationStaging>()));
         services.AddTransient<ITransactionBuilder, DefaultTranslationBuilder>();
+        services.AddTransient<IDataSeederExecutionHistoryRepository, DefaultDataSeederExecutionHistoryRepository>();
         return services;
 
     }

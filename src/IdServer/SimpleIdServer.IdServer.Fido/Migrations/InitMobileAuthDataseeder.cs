@@ -48,6 +48,7 @@ public class InitMobileAuthDataseeder : BaseAuthDataSeeder
         Name = "mobile",
         DisplayName = "mobile",
         UpdateDateTime = DateTime.UtcNow,
+        AuthenticationWorkflow = StandardFidoAuthWorkflows.mobileWorkflowId,
         Realms = new List<Realm>
         {
             SimpleIdServer.IdServer.Config.DefaultRealms.Master

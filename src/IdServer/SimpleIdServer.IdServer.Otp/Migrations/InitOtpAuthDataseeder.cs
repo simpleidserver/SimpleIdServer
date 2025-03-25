@@ -46,6 +46,7 @@ public class InitOtpAuthDataseeder : BaseAuthDataSeeder
         Name = "otp",
         DisplayName = "otp",
         UpdateDateTime = DateTime.UtcNow,
+        AuthenticationWorkflow = StandardOtpAuthWorkflows.workflowId,
         Realms = new List<Realm>
         {
             Config.DefaultRealms.Master

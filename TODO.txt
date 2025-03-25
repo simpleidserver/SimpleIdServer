@@ -1,6 +1,8 @@
-=> vérifier si l'authentification avec ws-federation fonctionne	:	DONE
-=> comprendre comment configurer les formulaires et workflows par défault	:		OK
-=> ajouter pour chaque projet d'authentification un script de migration		:		OK
-=> ajouter script de migration poiur les langues							:		OK
-=> faire fonctionner avec sqlserver et le reste								:		TODO
-=> faire fonctionner "IdServer.Startup"										:		TODO
+=> préparer le projet SimpleIdServer.IdServer.Ui.Startup
+=> quand inmemory alors désactiver certains fichiers de migrations
+=> => {SimpleIdServer.IdServer.Migrations.InitRealmDataSeeder}
+=> => {SimpleIdServer.IdServer.Migrations.InitSerializedFileKeyDataSeeder}
+=> => {SimpleIdServer.IdServer.Migrations.InitCertificateAuthoritiesDataseeder}
+=> => {SimpleIdServer.IdServer.Migrations.InitLanguageDataSeeder}
+=> => {SimpleIdServer.IdServer.Migrations.InitScopeDataSeeder}
+=> => {SimpleIdServer.IdServer.Pwd.Migrations.InitPwdAuthDataseeder}

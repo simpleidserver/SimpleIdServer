@@ -145,6 +145,7 @@ const config = {
       prism: {
         theme: lightTheme,
         darkTheme: darkTheme,
+        additionalLanguages: ['csharp', 'batch']
       }
 	})
 };

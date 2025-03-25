@@ -25,6 +25,7 @@ using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.Stores.Default;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
@@ -87,6 +88,7 @@ public class IdServerBuilder
     /// </summary>
     public IdServerBuilder AddDeveloperSigningCredential()
     {
+        RemoveDataseeder<InitSerializedFileKeyDataSeeder>();
         var keys = new List<SerializedFileKey>();
         keys.AddRange(DefaultKeys.All);
         Services.AddSingleton<IFileSerializedKeyStore>(new DefaultFileSerializedKeyStore(keys));
@@ -125,6 +127,7 @@ public class IdServerBuilder
     /// </summary>
     public IdServerBuilder AddInMemoryLanguages(List<SimpleIdServer.IdServer.Domains.Language> languages)
     {
+        RemoveDataseeder<InitLanguageDataSeeder>();
         Services.AddSingleton<ILanguageRepository>(new DefaultLanguageRepository(languages));
         return this;
     }
@@ -278,6 +281,11 @@ public class IdServerBuilder
     /// <returns></returns>
     public IdServerBuilder EnableMasstransit(Action<IBusRegistrationConfigurator> cb, Action migrationServiceCb = null)
     {
+        if(_serviceCollection.Any(s => s.ServiceType == typeof(IBus)))
+        {
+            throw new InvalidOperationException("MassTransit is already configured by the AddSidIdentityServer operation. To disable this configuration, set the skipMassTransitRegistration parameter to true.");
+        }
+
         if(migrationServiceCb != null)
         {
             migrationServiceCb();
@@ -310,7 +318,7 @@ public class IdServerBuilder
     /// <summary>
     /// Enables the in-memory MassTransit transport, configuring the publish message scheduler and endpoints.
     /// </summary>
-    public IdServerBuilder EnableInMemoryMasstransit()
+    internal IdServerBuilder EnableInMemoryMasstransit()
     {
         return EnableMasstransit(cb =>
         {
@@ -381,5 +389,14 @@ public class IdServerBuilder
             Name = routeName,
             RelativePattern = relativePattern
         });
+    }
+
+    private void RemoveDataseeder<T>() where T : IDataSeeder
+    {
+        var service = _serviceCollection.SingleOrDefault(s => s.ImplementationType == typeof(T));
+        if(service != null)
+        {
+            _serviceCollection.Remove(service);
+        }
     }
 }

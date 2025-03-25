@@ -16,7 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton(BuildProtectedSessionStorage());
 builder.AddSidIdentityServer()
     .UseEfStore(e => e.UseInMemoryDatabase("idserver"), e => e.UseInMemoryDatabase("formbuilder"))
-    .EnableInMemoryMasstransit()
     .EnableCiba();
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
 var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));

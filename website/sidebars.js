@@ -17,11 +17,20 @@ const sidebars = {
     'overview',
     {
       type: 'category',
+      label: 'Quick Start (Identity server)',
+      items: [
+        'quickstartidserver/createminopenidserver',
+        'quickstartidserver/createidserverwithui',
+      ]
+    },
+    {
+      type: 'category',
       label: 'Installation',
       items: [
-        'installation/quickstart',
-        'installation/dotnettemplate',
-        'installation/hosting'
+        'installation/copyandpaste',
+        'installation/docker',
+        'installation/kubernetes',
+        'installation/hosting',
       ]
     },
     'glossary',

@@ -31,8 +31,7 @@ builder.AddSidIdentityServer(o =>
         cb.AllowedCertificateTypes = CertificateTypes.All;
         cb.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;
     })
-    .EnableCiba()
-    .EnableInMemoryMasstransit();
+    .EnableCiba();
 
 var antiforgeryService = builder.Services.First(s => s.ServiceType == typeof(IAntiforgery));
 var memoryDistribution = builder.Services.First(s => s.ServiceType == typeof(IDistributedCache));

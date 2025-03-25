@@ -48,6 +48,7 @@ public class InitWebauthnAuthDataseeder : BaseAuthDataSeeder
         Name = "webauthn",
         DisplayName = "webauthn",
         UpdateDateTime = DateTime.UtcNow,
+        AuthenticationWorkflow = StandardFidoAuthWorkflows.webauthnWorkflowId,
         Realms = new List<Realm>
         {
             Config.DefaultRealms.Master

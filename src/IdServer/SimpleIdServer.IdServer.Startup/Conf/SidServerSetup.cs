@@ -45,7 +45,7 @@ public class SidServerSetup
                 {
                     c.SessionCookieName = configuration.SessionCookieNamePrefix;
                 }
-            })
+            }, true)
             .IgnoreCertificateError()
             .EnableFapiSecurityProfile()
             .AddPwdAuthentication(true)

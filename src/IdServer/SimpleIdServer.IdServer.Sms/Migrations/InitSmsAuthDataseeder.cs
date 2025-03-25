@@ -50,6 +50,7 @@ public class InitSmsAuthDataseeder : BaseAuthDataSeeder
         Name = "sms",
         DisplayName = "sms",
         UpdateDateTime = DateTime.UtcNow,
+        AuthenticationWorkflow = StandardSmsAuthWorkflows.workflowId,
         Realms = new List<Realm>
         {
             SimpleIdServer.IdServer.Config.DefaultRealms.Master

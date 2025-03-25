@@ -1,4 +1,4 @@
-# DOTNET Template
+# Dotnet Template
 
 Install SimpleIdServer templates.
 

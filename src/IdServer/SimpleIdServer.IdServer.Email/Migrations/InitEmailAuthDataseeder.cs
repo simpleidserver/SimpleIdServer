@@ -48,6 +48,7 @@ public class InitEmailAuthDataseeder : BaseAuthDataSeeder
         Name = "email",
         DisplayName = "Email",
         UpdateDateTime = DateTime.UtcNow,
+        AuthenticationWorkflow = StandardEmailAuthWorkflows.workflowId,
         Realms = new List<Realm>
         {
             Config.DefaultRealms.Master
