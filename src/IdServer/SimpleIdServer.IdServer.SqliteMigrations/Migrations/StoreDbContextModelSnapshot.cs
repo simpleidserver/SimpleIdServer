@@ -1202,20 +1202,6 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.HasAnnotation("Relational:JsonPropertyName", "serialized_jwks");
                 });
 
-            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecordValue", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ConfigurationDefinitionRecordValues", (string)null);
-                });
-
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
                 {
                     b.Property<string>("Id")
@@ -1317,6 +1303,30 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("DeviceAuthCodes");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.DistributedCache", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(449)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset?>("AbsoluteExpiration")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("ExpiresAtTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long?>("SlidingExpirationInSeconds")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte[]>("Value")
+                        .IsRequired()
+                        .HasColumnType("BLOB");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DistributedCache", (string)null);
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ExtractedRepresentation", b =>
@@ -2485,12 +2495,6 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Property<string>("ClientId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ConfigurationDefinitionRecordValueId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ConfigurationDefinitionRecordValueId1")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Key")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -2504,10 +2508,6 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ClientId");
-
-                    b.HasIndex("ConfigurationDefinitionRecordValueId");
-
-                    b.HasIndex("ConfigurationDefinitionRecordValueId1");
 
                     b.ToTable("Translations");
                 });
@@ -2677,7 +2677,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
 
             modelBuilder.Entity("ConfigurationDefinitionRecordValueTranslation", b =>
                 {
-                    b.HasOne("SimpleIdServer.IdServer.Domains.ConfigurationDefinitionRecordValue", null)
+                    b.HasOne("SimpleIdServer.Configuration.Models.ConfigurationDefinitionRecordValue", null)
                         .WithMany()
                         .HasForeignKey("ConfigurationDefinitionRecordValueId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3139,14 +3139,6 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .WithMany("Translations")
                         .HasForeignKey("ClientId")
                         .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("SimpleIdServer.Configuration.Models.ConfigurationDefinitionRecordValue", null)
-                        .WithMany("Names")
-                        .HasForeignKey("ConfigurationDefinitionRecordValueId");
-
-                    b.HasOne("SimpleIdServer.Configuration.Models.ConfigurationDefinitionRecordValue", null)
-                        .WithMany("Translations")
-                        .HasForeignKey("ConfigurationDefinitionRecordValueId1");
                 });
 
             modelBuilder.Entity("TranslationUMAResource", b =>
@@ -3172,13 +3164,6 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.Configuration.Models.ConfigurationDefinitionRecord", b =>
                 {
                     b.Navigation("Values");
-                });
-
-            modelBuilder.Entity("SimpleIdServer.Configuration.Models.ConfigurationDefinitionRecordValue", b =>
-                {
-                    b.Navigation("Names");
-
-                    b.Navigation("Translations");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", b =>

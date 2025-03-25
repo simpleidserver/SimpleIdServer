@@ -14,9 +14,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
+using SimpleIdServer.Configuration;
+using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Startup.Conf.Migrations.AfterDeployment;
+using SimpleIdServer.IdServer.Startup.Conf.Migrations.BeforeDeployment;
 using SimpleIdServer.IdServer.Startup.Configurations;
 using SimpleIdServer.IdServer.Startup.Consumers;
 using SimpleIdServer.IdServer.TokenTypes;
@@ -78,9 +81,9 @@ public class SidServerSetup
             {
                 ConfigureHangfire(webApplicationBuilder, c);
             })
-            // TODO : Add redis !!
             .ConfigureKeyValueStore((c) =>
             {
+                ConfigureKeyValue(webApplicationBuilder, c);
             })
             .EnableMasstransit(o =>
             {
@@ -155,6 +158,18 @@ public class SidServerSetup
                 break;
             case StorageTypes.SQLITE:
                 configuration.UseSQLiteStorage(conf.ConnectionString);
+                break;
+        }
+    }
+
+    private static void ConfigureKeyValue(WebApplicationBuilder webApplicationBuilder, AutomaticConfigurationOptions options)
+    {
+        var section = webApplicationBuilder.Configuration.GetSection(nameof(KeyValueConfiguration));
+        var conf = section.Get<KeyValueConfiguration>();
+        switch(conf.Type)
+        {
+            case KeyValueTypes.REDIS:
+                options.UseRedisConnector(conf.ConnectionString);
                 break;
         }
     }
@@ -326,6 +341,8 @@ public class SidServerSetup
 
     private static void ConfigureDataseeder(WebApplicationBuilder builder)
     {
+        builder.Services.AddTransient<IDataSeeder, DropDistributedCacheDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ClientTypeDataSeeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureAuthSchemeProviderDataSeeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureCredentialIssuerDataSeeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureFastfedDataSeeder>();

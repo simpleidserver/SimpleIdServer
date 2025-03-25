@@ -10,7 +10,6 @@ public class ConfigurationDefinitionRecordValueConfiguration : IEntityTypeConfig
 {
     public void Configure(EntityTypeBuilder<ConfigurationDefinitionRecordValue> builder)
     {
-        builder.ToTable("ConfigurationDefinitionRecordValues");
         builder.HasKey(v => v.Id);
         builder.Ignore(v => v.Translations);
         builder.HasMany(v => v.Translations).WithMany();

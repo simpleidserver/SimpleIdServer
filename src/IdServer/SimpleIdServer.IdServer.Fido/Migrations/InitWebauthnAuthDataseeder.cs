@@ -20,7 +20,8 @@ public class InitWebauthnAuthDataseeder : BaseAuthDataSeeder
         IAuthenticationContextClassReferenceRepository acrRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository,
         IFormStore formStore,
-        IWorkflowStore workflowStore) : base(acrRepository, dataSeederExecutionHistoryRepository, formStore, workflowStore)
+        IWorkflowStore workflowStore,
+        IRealmRepository realmRepository) : base(acrRepository, dataSeederExecutionHistoryRepository, formStore, workflowStore, realmRepository)
     {
         _transactionBuilder = transactionBuilder;
     }

@@ -17,16 +17,19 @@ public abstract class BaseAuthDataSeeder : BaseAfterDeploymentDataSeeder
     private readonly IAuthenticationContextClassReferenceRepository _acrRepository;
     private readonly IFormStore _formStore;
     private readonly IWorkflowStore _workflowStore;
+    private readonly IRealmRepository _realmRepository;
 
     protected BaseAuthDataSeeder(
         IAuthenticationContextClassReferenceRepository acrRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository,
         IFormStore formStore,
-        IWorkflowStore workflowStore) : base(dataSeederExecutionHistoryRepository)
+        IWorkflowStore workflowStore,
+        IRealmRepository realmRepository) : base(dataSeederExecutionHistoryRepository)
     {
         _acrRepository = acrRepository;
         _formStore = formStore;
         _workflowStore = workflowStore;
+        _realmRepository = realmRepository;
     }
 
     protected async Task<AuthenticationContextClassReference> TryAddAcr(string realm, AuthenticationContextClassReference acr, CancellationToken cancellationToken)
@@ -36,8 +39,10 @@ public abstract class BaseAuthDataSeeder : BaseAfterDeploymentDataSeeder
        {
            return existingAcr;
        }
-       
-       _acrRepository.Add(acr);
+
+        var masterRealm = await _realmRepository.Get(realm, cancellationToken);
+        acr.Realms = new List<Realm> { masterRealm };
+        _acrRepository.Add(acr);
         return acr;
     }
 
@@ -49,6 +54,7 @@ public abstract class BaseAuthDataSeeder : BaseAfterDeploymentDataSeeder
             return false;
         }
 
+        formRecord.Realm = realm;
         formRecord.AvailableStyles = new List<FormStyle>
         {
             new FormStyle
@@ -69,6 +75,7 @@ public abstract class BaseAuthDataSeeder : BaseAfterDeploymentDataSeeder
         {
             return false;
         }
+
         _workflowStore.Add(workflow);
         return true;
     }

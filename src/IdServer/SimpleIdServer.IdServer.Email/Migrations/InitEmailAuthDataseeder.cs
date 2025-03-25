@@ -17,10 +17,11 @@ public class InitEmailAuthDataseeder : BaseAuthDataSeeder
 
     public InitEmailAuthDataseeder(
         ITransactionBuilder transactionBuilder,
+        IRealmRepository realmRepository,
         IAuthenticationContextClassReferenceRepository acrRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository,
         IFormStore formStore,
-        IWorkflowStore workflowStore) : base(acrRepository, dataSeederExecutionHistoryRepository, formStore, workflowStore)
+        IWorkflowStore workflowStore) : base(acrRepository, dataSeederExecutionHistoryRepository, formStore, workflowStore, realmRepository)
     {
         _transactionBuilder = transactionBuilder;
     }

@@ -18,7 +18,16 @@ public abstract class BaseDataSeeder : IDataSeeder
 
     public async Task Apply(CancellationToken cancellationToken)
     {
-        var executionHistory = await _dataSeederExecutionHistoryRepository.Get(Name, cancellationToken);
+        DataSeederExecutionHistory executionHistory = null;
+        try
+        {
+            executionHistory = await _dataSeederExecutionHistoryRepository.Get(Name, cancellationToken);
+        }
+        catch
+        {
+            return;
+        }
+        
         if (executionHistory != null)
         {
             return;
