@@ -26,5 +26,6 @@ builder.AddSidIdentityServer()
     });
 
 var app = builder.Build();
+app.Services.SeedData();
 app.UseSid();
 app.Run();

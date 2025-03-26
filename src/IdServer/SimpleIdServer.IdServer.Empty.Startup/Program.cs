@@ -22,5 +22,6 @@ builder.AddSidIdentityServer()
     .AddInMemoryScopes(scopes);
 
 var app = builder.Build();
+app.Services.SeedData();
 app.UseSid();
 app.Run();

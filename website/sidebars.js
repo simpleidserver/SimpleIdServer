@@ -17,10 +17,23 @@ const sidebars = {
     'overview',
     {
       type: 'category',
-      label: 'Quick Start (Identity server)',
+      label: 'Identity server',
       items: [
-        'quickstartidserver/createminopenidserver',
-        'quickstartidserver/createidserverwithui',
+        {
+          type: 'category',
+          label: 'Quick Start',
+          items: [
+            'idserver/quickstart/createminopenidserver',
+            'idserver/quickstart/createidserverwithui'
+          ]
+        },
+        {
+          type: 'category',
+          label: 'Persistence',
+          items: [
+            'idserver/persistence/index',
+            'idserver/persistence/entityframework'          ]
+        }
       ]
     },
     {

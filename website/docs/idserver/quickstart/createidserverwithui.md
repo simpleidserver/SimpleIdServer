@@ -4,7 +4,7 @@ In this article, we’ll walk through the process of configuring a minimalist id
 
 ## Step 1: Create the Solution
 
-To begin, you can either manually download the code from the [SimpleIdServer repository](#) or use the following .NET CLI command to scaffold the solution directly from the SimpleIdServer template:
+To begin, you can either manually download the code from the [SimpleIdServer repository](https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/IdserverUi) or use the following .NET CLI command to scaffold the solution directly from the SimpleIdServer template:
 
 ```batch title="cmd.exe"
 dotnet new idserverui
@@ -87,7 +87,9 @@ If you forget your password, click the "Forgot Password" link on the login page.
 
 ![Reset password](./imgs/resetpwd.png)
 
-Note: By default, no notification method (e.g., email) is configured. In this case, set the email field to console. After clicking `Send link`, a reset link will appear in the console output. Copy this link into your browser to access the password reset page:
+:::note
+By default, no notification method (e.g., email) is configured. In this case, set the email field to console. After clicking `Send link`, a reset link will appear in the console output. Copy this link into your browser to access the password reset page:
+:::
 
 ![Confirm reset password](./imgs/resetpwdconfirmation.png)
 
