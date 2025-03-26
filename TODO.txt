@@ -1,8 +1,16 @@
-=> préparer le projet SimpleIdServer.IdServer.Ui.Startup
-=> quand inmemory alors désactiver certains fichiers de migrations
-=> => {SimpleIdServer.IdServer.Migrations.InitRealmDataSeeder}
-=> => {SimpleIdServer.IdServer.Migrations.InitSerializedFileKeyDataSeeder}
-=> => {SimpleIdServer.IdServer.Migrations.InitCertificateAuthoritiesDataseeder}
-=> => {SimpleIdServer.IdServer.Migrations.InitLanguageDataSeeder}
-=> => {SimpleIdServer.IdServer.Migrations.InitScopeDataSeeder}
-=> => {SimpleIdServer.IdServer.Pwd.Migrations.InitPwdAuthDataseeder}
+=> préparer les templates & publier nuget package
+=> ajouter de la documentation pour configurer la persistence de sid
+=> avoir ce menu :
+=> => Identity server
+=> => => Quick start
+=> => => Store (
+		toutes les entités liées au serveur identité (user, client), clef & valeur utilisée pour configurer chaque nuget extension comme login & pwd
+		), form builder (stocke le processus d'authentification ainsi que la composition d'un formulaire).
+		
+=> => => méthodes d'authentification
+=> => => => pwd
+=> => => => otp etc...
+=> => => deployment : 
+=> => => => proxy and load balancer
+=> => => => data protection
+=> => => => distributed caching

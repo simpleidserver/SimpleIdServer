@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+	</PropertyGroup>
+	<ItemGroup>
+	  <PackageReference Include="SimpleIdServer.IdServer.SqlServerMigrations" Version="6.0.0-ci-local" />
+	</ItemGroup>
+</Project>

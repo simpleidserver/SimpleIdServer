@@ -1,0 +1,18 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "OpenId",
+    "Oauth"
+  ],
+  "name": "Identity Server with UI",
+  "identity": "SimpleIdServer.IdServer.Ui.Startup",
+  "groupIdentity": "SimpleIdServer.IdServer.Ui.Startup",
+  "shortName": "idserverui",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "SimpleIdServer.IdServer.Ui.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.IdServer.Ui.Startup.csproj" } ]
+}

@@ -171,8 +171,12 @@ task compile -depends clean {
 }
 
 task buildTemplate {
-	$IdServerPathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup"
-	$IdServerPathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup"
+	$IdServerPathFullSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup"
+	$IdServerPathFullTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup"
+	$IdServerPathEmptySource = "$source_dir/IdServer/SimpleIdServer.IdServer.Empty.Startup"
+	$IdServerPathEmptyTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Empty.Startup"
+	$IdServerPathUiSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Ui.Startup"
+	$IdServerPathUiTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Ui.Startup"
 	$IdServerWebsitePathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup"
 	$IdServerWebsitePathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup"
 	$ScimPathSource = "$source_dir/Scim/SimpleIdServer.Scim.Startup"
@@ -186,7 +190,9 @@ task buildTemplate {
 	$FastFedIdentityProviderPathSource = "$source_dir/FastFed/SimpleIdServer.FastFed.IdentityProvider.Startup"
 	$FastFedIdentityProviderPathTarget = "$source_dir/Templates/templates/SimpleIdServer.FastFed.IdentityProvider.Startup"
 		
-	CopyFolder $IdServerPathSource $IdServerPathTarget
+	CopyFolder $IdServerPathFullSource $IdServerPathFullTarget
+	CopyFolder $IdServerPathEmptySource $IdServerPathEmptyTarget
+	CopyFolder $IdServerPathUiSource $IdServerPathUiTarget
 	CopyFolder $IdServerWebsitePathSource $IdServerWebsitePathTarget
 	CopyFolder $ScimPathSource $ScimPathTarget
 	CopyFolder $CredentialIssuerPathSource $CredentialIssuerPathTarget
@@ -280,9 +286,9 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $base_dir\formbuilder\FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $base_dir\formbuilder\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }	
 	
-	exec { dotnet pack $base_dir\efdataseeder\EfdataSeeder.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $base_dir\dataseeder\dataseeder\DataSeeder.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	
 	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
 }

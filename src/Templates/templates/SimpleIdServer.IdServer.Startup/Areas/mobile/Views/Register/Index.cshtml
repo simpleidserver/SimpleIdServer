@@ -3,9 +3,7 @@
 @using FormBuilder.Helpers
 @using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Options;
-@using SimpleIdServer.IdServer.Fido.UI.ViewModels
 @using SimpleIdServer.IdServer.Options;
-@using SimpleIdServer.IdServer.Startup.Resources;
 @using System.Text.Json
 @model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
 @inject IOptions<FormBuilderOptions> options
@@ -18,7 +16,8 @@
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
     var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
-    var vm = JsonSerializer.Deserialize<SimpleIdServer.IdServer.Fido.UI.ViewModels.RegisterMobileViewModel>(Model.Input.ToString());
+    var beginRegisterUrl = Model.Input["BeginRegisterUrl"].ToString();
+    var registerStatusUrl = Model.Input["RegisterStatusUrl"].ToString();
 }
 
 <component type="typeof(WorkflowViewer)"
@@ -41,8 +40,8 @@
         let csharpReference;
 
         var init = function() {
-            var beginRegisterUrl = "@vm.BeginRegisterUrl";
-            var registerStatusUrl = "@vm.RegisterStatusUrl";
+            var beginRegisterUrl = "@beginRegisterUrl";
+            var registerStatusUrl = "@registerStatusUrl";
             var isCreated = "IsCreated";
             var isInitialized = false;
 
@@ -99,7 +98,7 @@
                     displayError(responseJson);
                     return;
                 }
-                
+
                 const sessionId = response.headers.get('SessionId');
                 const qrCode = response.headers.get('QRCode');
                 let nextRegistrationRedirectUrl = response.headers.get('NextRegistrationRedirectUrl');
@@ -127,7 +126,7 @@
             }
 
             tryListenForm();
-        };                
+        };
 
         setCsharpReference = function (ref) {
             csharpReference = ref;

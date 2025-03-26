@@ -1,0 +1,18 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "OpenId",
+    "Oauth"
+  ],
+  "name": "Minimal identity server",
+  "identity": "SimpleIdServer.IdServer.Empty.Startup",
+  "groupIdentity": "SimpleIdServer.IdServer.Empty.Startup",
+  "shortName": "idserverempty",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "SimpleIdServer.IdServer.Empty.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.IdServer.Empty.Startup.csproj" } ]
+}

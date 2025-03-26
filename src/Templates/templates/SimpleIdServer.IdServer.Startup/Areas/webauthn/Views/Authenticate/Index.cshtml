@@ -3,7 +3,6 @@
 @using FormBuilder.Helpers
 @using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Options
-@using SimpleIdServer.IdServer.Fido.UI.ViewModels
 @using System.Text.Json
 @model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
 @inject IOptions<FormBuilderOptions> options
@@ -18,7 +17,8 @@
     var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
-    var vm = JsonSerializer.Deserialize<AuthenticateWebauthnViewModel>(Model.Input.ToString());
+    var beginLoginUrl = Model.Input["BeginLoginUrl"].ToString();
+    var endLoginUrl = Model.Input["EndLoginUrl"].ToString();
 }
 
 <component type="typeof(WorkflowViewer)"
@@ -36,13 +36,13 @@
     <link rel="stylesheet" href="@path" />
 }
 
-@section Scripts {    
+@section Scripts {
     <script type="text/javascript">
         let csharpReference;
 
         var init = function () {
-            var beginLoginUrl = "@vm.BeginLoginUrl";
-            var endLoginUrl = "@vm.EndLoginUrl";
+            var beginLoginUrl = "@beginLoginUrl";
+            var endLoginUrl = "@endLoginUrl";
             var makeAssertionsUrl = "@makeAssertionsOptionsUrl";
             var authenticateUrl = "@authenticateUrl";
             var isInitialized = false;

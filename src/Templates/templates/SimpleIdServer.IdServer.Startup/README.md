@@ -38,3 +38,13 @@ Sqlite :
   "Type": "SQLITE",
   "ConnectionString": "Data Source=Sid.db"
 }
+
+Connect to docker instance (SQLSERVER): 
+
+/opt/mssql-tools18/bin
+./sqlcmd -S localhost -U sa -P tJWBx3ccNJ6dyp1wxoA99qqQ -C
+
+Install redis :
+
+docker run -d --name redis-server -p 6379:6379 redis
+docker exec -it redis-server redis-cli

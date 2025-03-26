@@ -56,10 +56,7 @@ app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseEndpoints(edps =>
-{
-    edps.MapBlazorHub();
-    edps.MapFallbackToPage("/_Host");
-    edps.MapControllers();
-});
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
+app.MapControllers();
 app.Run();

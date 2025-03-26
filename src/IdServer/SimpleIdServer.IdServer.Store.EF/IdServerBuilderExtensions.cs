@@ -4,10 +4,9 @@
 using FormBuilder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Store.EF;
 
-namespace SimpleIdServer.IdServer;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IdServerBuilderExtensions
 {
