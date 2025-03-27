@@ -1,0 +1,11 @@
+@using System.Web
+@attribute [AllowAnonymous]
+@inject NavigationManager _navigationManager
+@inject IJSRuntime JSRuntime
+
+@code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JSRuntime.InvokeVoidAsync("navigateToUrl", "/auth?returnUrl=" + HttpUtility.UrlEncode(_navigationManager.Uri));
+    }
+}

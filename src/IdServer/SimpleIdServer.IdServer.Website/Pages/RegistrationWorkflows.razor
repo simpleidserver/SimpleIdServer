@@ -1,4 +1,6 @@
 ﻿@page "/registrationworkflows"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @using Microsoft.Extensions.Options;
 @using SimpleIdServer.IdServer.Helpers
@@ -104,6 +106,7 @@
     bool selectAll = false;
     string activeRealm;
     RadzenDataGrid<SelectableRegistrationWorkflow> registrationWorkflowsGrid;
+    [Inject] private IRealmStore realmStore { get; set; }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -201,7 +204,7 @@
 
     async Task<string> GetRealm()
     {
-        var realmStr = !string.IsNullOrWhiteSpace(RealmContext.Instance()?.Realm) ? RealmContext.Instance()?.Realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+        var realmStr = !string.IsNullOrWhiteSpace(realmStore.Realm) ? realmStore.Realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
         return realmStr;
     }
 }

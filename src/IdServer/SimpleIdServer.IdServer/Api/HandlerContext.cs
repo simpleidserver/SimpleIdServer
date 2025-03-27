@@ -195,15 +195,13 @@ namespace SimpleIdServer.IdServer.Api
             return GetIssuer(result, Options.UseRealm);
         }
 
-        public bool IsComingFromConsentScreen()
+        public string GetIssuer(string result, bool useRealm)
         {
-            var consentsUrl = $"{GetIssuer()}/Consents";
-            return Request.Referer == null ? false : Request.Referer.StartsWith(consentsUrl);
+            return GetIssuer(Realm, result, useRealm);
         }
 
-        public static string GetIssuer(string result, bool useRealm)
+        public static string GetIssuer(string realm, string result, bool useRealm)
         {
-            var realm = RealmContext.Instance().Realm;
             if (!string.IsNullOrWhiteSpace(realm) && useRealm)
             {
                 if (!result.EndsWith("/"))
@@ -213,6 +211,12 @@ namespace SimpleIdServer.IdServer.Api
             }
 
             return result;
+        }
+
+        public bool IsComingFromConsentScreen()
+        {
+            var consentsUrl = $"{GetIssuer()}/Consents";
+            return Request.Referer == null ? false : Request.Referer.StartsWith(consentsUrl);
         }
 
         public void SetClient(Client client) => Client = client;

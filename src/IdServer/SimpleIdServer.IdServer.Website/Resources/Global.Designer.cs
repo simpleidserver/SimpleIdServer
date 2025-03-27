@@ -3411,6 +3411,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The realm option is disabled.
+        /// </summary>
+        public static string RealmOptionIsDisabled {
+            get {
+                return ResourceManager.GetString("RealmOptionIsDisabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Realm permissions.
         /// </summary>
         public static string RealmPermissions {

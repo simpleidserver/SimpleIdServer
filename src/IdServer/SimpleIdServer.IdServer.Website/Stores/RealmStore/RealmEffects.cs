@@ -17,19 +17,21 @@ public class RealmEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _options;
+    private readonly IRealmStore _realmStore;
 
-    public RealmEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options)
+    public RealmEffects(IWebsiteHttpClientFactory websiteHttpClientFactory, IOptions<IdServerWebsiteOptions> options, IRealmStore realmStore)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _options = options.Value;
+        _realmStore = realmStore;
     }
 
 
     [EffectMethod]
     public async Task Handle(GetAllRealmAction action, IDispatcher dispatcher)
     {
-        var url = await GetBaseUrl();
-        var httpClient = await _websiteHttpClientFactory.Build();
+        var url = await GetBaseUrl(action.Realm);
+        var httpClient = await _websiteHttpClientFactory.Build(GetRealm(action.Realm));
         var requestMessage = new HttpRequestMessage
         {
             RequestUri = new Uri(url),
@@ -86,7 +88,7 @@ public class RealmEffects
     {
         var url = await GetBaseUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
-        var realm = RealmContext.Instance()?.Realm;
+        var realm = _realmStore.Realm;
         var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
         var requestMessage = new HttpRequestMessage
         {
@@ -98,22 +100,28 @@ public class RealmEffects
         dispatcher.Dispatch(new DeleteCurrentRealmSuccessAction());
     }
 
-    private async Task<string> GetBaseUrl()
+    private async Task<string> GetBaseUrl(string realm = null)
     {
         if (_options.IsReamEnabled)
         {
-            var realm = RealmContext.Instance()?.Realm;
-            var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+            var realmStr = GetRealm(realm);
             return $"{_options.IdServerBaseUrl}/{realmStr}/realms";
         }
 
         return $"{_options.IdServerBaseUrl}/realms";
     }
+
+    private string GetRealm(string realm = null)
+    {
+        realm = string.IsNullOrWhiteSpace(realm) ? _realmStore.Realm : realm;
+        var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+        return realmStr;
+    }
 }
 
 public class GetAllRealmAction
 {
-    public IEnumerable<Domains.Realm> Realms { get; set; }
+    public string Realm { get; set; }
 }
 
 public class GetAllRealmSuccessAction

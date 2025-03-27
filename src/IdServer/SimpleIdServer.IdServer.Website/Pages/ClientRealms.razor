@@ -74,7 +74,7 @@
                         <RadzenCheckBox @bind-Value=@selectAllAssigned Change="@(args => ToggleAssignedAll(args))" TValue="bool" />
                     </HeaderTemplate>
                     <Template Context="data">
-                        @if(data.Name != RealmContext.Instance()?.Realm)
+                        @if (data.Name != realmStore.Realm)
                         {
                             <RadzenCheckBox @bind-Value=@data.IsSelected Change="@(args => ToggleAvailableChanged(args, data))" TValue="bool" />
                         }
@@ -95,6 +95,7 @@
         public string Name { get; set; }
     }
 
+    [Inject] private IRealmStore realmStore { get; set; }
     List<SelecteableRealm> AvailableRealms { get; set;} = new List<SelecteableRealm>();
     List<SelecteableRealm> AssignedRealms { get; set; } = new List<SelecteableRealm>();
     int NbAssigned { get; set; }
@@ -159,7 +160,7 @@
 
     void ToggleAssignedAll(bool isSelected)
     {
-        foreach (var assignedRealm in AssignedRealms.Where(r => r.Name != RealmContext.Instance()?.Realm))
+        foreach (var assignedRealm in AssignedRealms.Where(r => r.Name != realmStore.Realm))
             assignedRealm.IsSelected = isSelected;
     }
 

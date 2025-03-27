@@ -1,4 +1,6 @@
 ﻿@page "/acrs"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 @using Microsoft.AspNetCore.Http;
 @using Microsoft.Extensions.Options;
@@ -120,6 +122,7 @@
 
 @code {
     RadzenDataGrid<SelectableAcr> acrsGrid;
+    [Inject] private IRealmStore realmStore { get; set; }
     bool selectAll = false;
     string activeRealm;
 
@@ -203,13 +206,13 @@
     string GetDemoUrl(SelectableAcr selectableAcr)
     {
         var realm = string.Empty;
-        if (!string.IsNullOrWhiteSpace(RealmContext.Instance()?.Realm)) realm = $"&realm={RealmContext.Instance()?.Realm}";
+        if (!string.IsNullOrWhiteSpace(realmStore.Realm)) realm = $"&realm={realmStore.Realm}";
         return $"/login?acrValues={selectableAcr.Value.Name}{realm}";
     }
 
     async Task<string> GetRealm()
     {
-        var realmStr = !string.IsNullOrWhiteSpace(RealmContext.Instance()?.Realm) ? RealmContext.Instance()?.Realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
+        var realmStr = !string.IsNullOrWhiteSpace(realmStore.Realm) ? realmStore.Realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
         return realmStr;
     }
 

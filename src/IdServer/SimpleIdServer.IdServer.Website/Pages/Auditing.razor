@@ -1,4 +1,6 @@
 ﻿@page "/auditing"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @inherits Fluxor.Blazor.Web.Components.FluxorComponent
 @inject IState<SearchAuditingRecordsState> searchAuditingRecordsState
 @inject IDispatcher dispatcher

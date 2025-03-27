@@ -1,4 +1,6 @@
 ﻿@page "/authentications/idproviders/{id}/mappers/{mapperId}"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @inherits FluxorComponent
 @using Fluxor.Blazor.Web.Components;
 @using SimpleIdServer.IdServer.Api.AuthenticationSchemeProviders;

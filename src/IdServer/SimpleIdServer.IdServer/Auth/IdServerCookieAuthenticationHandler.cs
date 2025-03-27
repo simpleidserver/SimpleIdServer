@@ -49,6 +49,7 @@ namespace SimpleIdServer.IdServer.Auth
         private Task<AuthenticateResult> _readCookieTask;
         private AuthenticationTicket _refreshTicket;
         private readonly IUserSessionResitory _userSessionResitory;
+        private readonly IRealmStore _realmStore;
         private readonly IdServerHostOptions _options;
 
         /// <summary>
@@ -61,12 +62,14 @@ namespace SimpleIdServer.IdServer.Auth
         public IdServerCookieAuthenticationHandler(
             IUserSessionResitory userSessionResitory, 
             IOptions<IdServerHostOptions> idServerHostOptions,
+            IRealmStore realmStore,
             IOptionsMonitor<CookieAuthenticationOptions> options, 
             ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
             _userSessionResitory = userSessionResitory;
             _options = idServerHostOptions.Value;
+            _realmStore = realmStore;
         }
 
         /// <summary>
@@ -213,13 +216,13 @@ namespace SimpleIdServer.IdServer.Auth
             string sessionCookieName = null;
             if (string.IsNullOrWhiteSpace(sessionId))
             {
-                sessionCookieName = _options.GetSessionCookieName(nameIdentifier);
+                sessionCookieName = _options.GetSessionCookieName(_realmStore.Realm, nameIdentifier);
                 sessionId = Options.CookieManager.GetRequestCookie(Context, sessionCookieName);
             }
 
             if(!string.IsNullOrWhiteSpace(sessionId))
             {
-                var realm = RealmContext.Instance().Realm;
+                var realm = _realmStore.Realm;
                 realm = realm ?? Constants.DefaultRealm;
                 var userSession = await _userSessionResitory.GetById(sessionId, realm, CancellationToken.None);
                 if (userSession == null || !userSession.IsActive())
@@ -531,7 +534,7 @@ namespace SimpleIdServer.IdServer.Auth
             }
 
             var loginPath = Options.LoginPath;
-            var realm = RealmContext.Instance().Realm;
+            var realm = _realmStore.Realm;
             if (!string.IsNullOrWhiteSpace(realm))
                 loginPath = $"/{realm}{loginPath}";
             var loginUri = loginPath + QueryString.Create(Options.ReturnUrlParameter, redirectUri);
@@ -547,9 +550,14 @@ namespace SimpleIdServer.IdServer.Auth
 
         private string GetCookieName() => GetCookieName(Options.Cookie.Name);
 
-        public static string GetCookieName(string cookieName)
+        public string GetCookieName(string cookieName)
         {
-            var realm = RealmContext.Instance().Realm;
+            var realm = _realmStore.Realm;
+            return GetCookieName(realm, cookieName);
+        }
+
+        public static string GetCookieName(string realm, string cookieName)
+        {
             if (string.IsNullOrWhiteSpace(realm)) return cookieName;
             return $"{cookieName}.{realm}";
         }

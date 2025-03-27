@@ -28,6 +28,16 @@ public class LoginController : Controller
         _logger = logger;
     }
 
+    [Route("auth")]
+    public IActionResult Index(string returnUrl)
+    {
+        var props = new AuthenticationProperties
+        {
+            RedirectUri = returnUrl
+        };
+        return Challenge(props, "oidc");
+    }
+
     [Route("login")]
     public IActionResult Login(string acrValues, string realm = null)
     {

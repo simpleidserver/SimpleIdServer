@@ -25,9 +25,14 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
     private CancellationTokenSource _onNavigateCts;
     private Task _previousOnNavigateTask = Task.CompletedTask;
     private IRoutingStateProvider? RoutingStateProvider { get; set; }
+    private List<string> _excludedRoutes = new List<string>
+    {
+        "availablerealms"
+    };
 
     [Inject] private IOptions<IdServerWebsiteOptions> Options { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
+    [Inject] private IRealmStore RealmStore { get; set; }
     [Inject] IServiceProvider ServiceProvider { get; set; }
     [Inject] private IScrollToLocationHash ScrollToLocationHash { get; set; }
     [Inject] private INavigationInterception NavigationInterception { get; set; }
@@ -124,7 +129,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         Type handlerContext = null;
         var relativePath = NavigationManager.ToBaseRelativePath(_locationAbsolute);
         string pathWithoutRealm = locationPath;
-        if (!options.Value.IsReamEnabled)
+        if (!options.Value.IsReamEnabled || _excludedRoutes.Contains(pathWithoutRealm))
         {
             if (!pathWithoutRealm.StartsWith("/"))
                 pathWithoutRealm = $"/{locationPath}";
@@ -168,7 +173,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
     {
         if (Options.Value.IsReamEnabled)
         {
-            var realm = RealmContext.Instance()?.Realm;
+            var realm = RealmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{Options.Value.IdServerBaseUrl}/{realmStr}/realms";
         }

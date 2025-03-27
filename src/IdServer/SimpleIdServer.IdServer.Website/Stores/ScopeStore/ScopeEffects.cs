@@ -15,13 +15,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
+        private readonly IRealmStore _realmStore;
 
         public ScopeEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options)
+            IOptions<IdServerWebsiteOptions> options,
+            IRealmStore realmStore)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
+            _realmStore = realmStore;
         }
 
 
@@ -273,7 +276,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
         {
             if (_options.IsReamEnabled)
             {
-                var realm = RealmContext.Instance()?.Realm;
+                var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/scopes";
             }

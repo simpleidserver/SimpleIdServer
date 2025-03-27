@@ -7,17 +7,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
+using SimpleIdServer.IdServer.Helpers;
 
 namespace SimpleIdServer.IdServer.Website.Controllers
 {
     public class LogoutController : Controller
     {
         private readonly IDistributedCache _distributedCache;
+        private readonly IRealmStore _realmStore;
         private readonly IdServerWebsiteOptions _options;
 
-        public LogoutController(IDistributedCache distributedCache, IOptions<IdServerWebsiteOptions> options)
+        public LogoutController(IDistributedCache distributedCache, IRealmStore realmStore, IOptions<IdServerWebsiteOptions> options)
         {
             _distributedCache = distributedCache;
+            _realmStore = realmStore;
             _options = options.Value;
         }
 
@@ -35,7 +38,7 @@ namespace SimpleIdServer.IdServer.Website.Controllers
         public IActionResult OidcSignoutCallback()
         {
             var redirectUri = "~/";
-            if (_options.IsReamEnabled) redirectUri = $"~/{IdServer.Helpers.RealmContext.Instance().Realm}/clients";
+            if (_options.IsReamEnabled) redirectUri = $"~/{_realmStore.Realm}/clients";
             return SignOut(new AuthenticationProperties
             {
                 RedirectUri = Url.Content(redirectUri)

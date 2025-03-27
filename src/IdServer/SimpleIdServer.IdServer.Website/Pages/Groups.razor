@@ -1,4 +1,6 @@
 ﻿@page "/groups"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @inject IState<SearchGroupsState> searchGroupsState
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService

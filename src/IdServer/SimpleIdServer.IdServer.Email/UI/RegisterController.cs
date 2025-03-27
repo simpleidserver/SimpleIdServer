@@ -30,7 +30,8 @@ public class RegisterController : BaseOTPRegisterController<IdServerEmailOptions
         IConfiguration configuration, 
         IEmailUserNotificationService userNotificationService,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder)
+        IJwtBuilder jwtBuilder,
+        IRealmStore realmStore) : base(options, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, tokenRepository, jwtBuilder, realmStore)
     {
         _authenticationHelper = authenticationHelper;
     }

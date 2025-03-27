@@ -12,6 +12,7 @@ using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using System;
@@ -36,6 +37,7 @@ public class AuthorizationController : Controller
     private readonly IResponseModeHandler _responseModeHandler;
     private readonly IDataProtector _dataProtector;
     private readonly IBusControl _busControl;
+    private readonly IRealmStore _realmStore;
     private readonly IdServerHostOptions _options;
     private readonly CookieAuthenticationOptions _cookieAuthOptions;
 
@@ -45,6 +47,7 @@ public class AuthorizationController : Controller
         IResponseModeHandler responseModeHandler, 
         IDataProtectionProvider dataProtectionProvider, 
         IBusControl busControl,
+        IRealmStore realmStore,
         IOptions<IdServerHostOptions> options,
         IOptions<CookieAuthenticationOptions> cookieAuthOptions)
     {
@@ -53,6 +56,7 @@ public class AuthorizationController : Controller
         _responseModeHandler = responseModeHandler;
         _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
         _busControl = busControl;
+        _realmStore = realmStore;
         _options = options.Value;
         _cookieAuthOptions = cookieAuthOptions.Value;
     }
@@ -100,7 +104,7 @@ public class AuthorizationController : Controller
                         }
                     }
 
-                    Response.Cookies.Delete(IdServerCookieAuthenticationHandler.GetCookieName(_cookieAuthOptions.Cookie.Name));
+                    Response.Cookies.Delete(IdServerCookieAuthenticationHandler.GetCookieName(_realmStore.Realm, _cookieAuthOptions.Cookie.Name));
                 }
 
                 if(redirectActionAuthorizationResponse.AmrAuthInfo != null)

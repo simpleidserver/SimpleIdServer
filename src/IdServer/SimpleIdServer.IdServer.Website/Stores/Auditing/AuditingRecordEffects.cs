@@ -5,7 +5,6 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.Auditing;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 
@@ -14,14 +13,17 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
     public class AuditingRecordEffects
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
+        private readonly IRealmStore _realmStore;
         private readonly IdServerWebsiteOptions _options;
 
         public AuditingRecordEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options)
+            IOptions<IdServerWebsiteOptions> options,
+            IRealmStore realmStore)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
+            _realmStore = realmStore;
         }
 
         [EffectMethod]
@@ -54,7 +56,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
         {
             if (_options.IsReamEnabled)
             {
-                var realm = RealmContext.Instance()?.Realm;
+                var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/auditing";
             }

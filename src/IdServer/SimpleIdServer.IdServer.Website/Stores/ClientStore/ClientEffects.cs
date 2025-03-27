@@ -24,13 +24,16 @@ public class ClientEffects
 {
     private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
     private readonly IdServerWebsiteOptions _configuration;
+    private readonly IRealmStore _realmStore;
 
     public ClientEffects(
         IWebsiteHttpClientFactory websiteHttpClientFactory, 
-        IOptions<IdServerWebsiteOptions> configuration)
+        IOptions<IdServerWebsiteOptions> configuration,
+        IRealmStore realmStore)
     {
         _websiteHttpClientFactory = websiteHttpClientFactory;
         _configuration = configuration.Value;
+        _realmStore = realmStore;
     }
 
     [EffectMethod]
@@ -778,7 +781,7 @@ public class ClientEffects
     {
         if (_configuration.IsReamEnabled)
         {
-            var realm = RealmContext.Instance()?.Realm;
+            var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_configuration.IdServerBaseUrl}/{realmStr}/{subUrl}";
         }

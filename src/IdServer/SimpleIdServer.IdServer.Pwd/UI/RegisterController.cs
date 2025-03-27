@@ -23,7 +23,8 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         IUserRepository userRepository,
         ITokenRepository tokenRepository,
         ITransactionBuilder transactionBuilder,
-        IJwtBuilder jwtBuilder) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder)
+        IJwtBuilder jwtBuilder,
+        IRealmStore realmStore) : base(options, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, realmStore)
     {
     }
 

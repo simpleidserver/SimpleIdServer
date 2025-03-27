@@ -1,4 +1,6 @@
 ﻿@page "/authentications/authmethods/{amr}/options"
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@attribute [Authorize("Authenticated")]
 @inject IState<AuthMethodState> authMethodState
 @inject IDispatcher dispatcher
 @inject NotificationService notificationService

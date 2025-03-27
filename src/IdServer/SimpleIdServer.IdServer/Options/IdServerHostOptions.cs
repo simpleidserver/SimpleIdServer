@@ -231,18 +231,16 @@ namespace SimpleIdServer.IdServer.Options
 
         public IEnumerable<T> GetObjectArrayParameter<T>(string name) => JsonSerializer.Deserialize<IEnumerable<T>>(Parameters[name]);
 
-        public string GetSessionCookieName(string userName)
+        public string GetSessionCookieName(string realm, string userName)
         {
-            var realm = RealmContext.Instance().Realm;
             userName = userName.SanitizeNameIdentifier();
             if (!string.IsNullOrWhiteSpace(realm))
                 return $"{SessionCookieName}.{realm}-{userName}";
             return $"{SessionCookieName}-{userName}";
         }
 
-        public string GetRegistrationCookieName()
+        public string GetRegistrationCookieName(string realm)
         {
-            var realm = RealmContext.Instance().Realm;
             if (!string.IsNullOrWhiteSpace(realm))
                 return $"{RegistrationCookieName}.{realm}";
             return RegistrationCookieName;

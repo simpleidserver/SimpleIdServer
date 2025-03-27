@@ -18,13 +18,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
+        private readonly IRealmStore _realmStore;
 
         public IdentityProvisioningEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options)
+            IOptions<IdServerWebsiteOptions> options,
+            IRealmStore realmStore)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
+            _realmStore = realmStore;
         }
 
         [EffectMethod]
@@ -302,7 +305,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             var baseUrl = $"{_options.IdServerBaseUrl}/errormessages";
             if (_options.IsReamEnabled)
             {
-                var realm = RealmContext.Instance()?.Realm;
+                var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 baseUrl = $"{_options.IdServerBaseUrl}/{realmStr}/errormessages";
             }
@@ -326,7 +329,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         {
             if(_options.IsReamEnabled)
             {
-                var realm = RealmContext.Instance()?.Realm;
+                var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/provisioning";
             }

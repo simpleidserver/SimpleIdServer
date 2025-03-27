@@ -705,7 +705,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                        var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                        var issuer = HandlerContext.GetIssuer(prefix, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                         var sessions = await _userSessionRepository.GetActive(id, prefix, cancellationToken);
@@ -751,7 +751,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Constants.StandardScopes.Users.Name);
-                        var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                        var issuer = HandlerContext.GetIssuer(prefix, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                         var session = await _userSessionRepository.GetById(sessionId, prefix, cancellationToken);

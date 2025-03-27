@@ -18,14 +18,16 @@ namespace SimpleIdServer.IdServer.Website
 
     public class WebsiteHttpClientFactory : IWebsiteHttpClientFactory
     {
+        private readonly IRealmStore _realmStore;
         private readonly DefaultSecurityOptions _securityOptions;
         private readonly IdServerWebsiteOptions _idServerWebsiteOptions;
         private readonly HttpClient _httpClient;
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
         private ConcurrentDictionary<string, GetAccessTokenResult> _accessTokens = new ConcurrentDictionary<string, GetAccessTokenResult>();
 
-        public WebsiteHttpClientFactory(DefaultSecurityOptions securityOptions, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
+        public WebsiteHttpClientFactory(IRealmStore realmStore, DefaultSecurityOptions securityOptions, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
         {
+            _realmStore = realmStore;
             _securityOptions = securityOptions;
             _idServerWebsiteOptions = idServerWebsiteOptions.Value;
             var handler = new HttpClientHandler
@@ -64,7 +66,7 @@ namespace SimpleIdServer.IdServer.Website
         {
             var realm = currentRealm;
             if(string.IsNullOrWhiteSpace(realm))
-                realm = _idServerWebsiteOptions.IsReamEnabled ? (RealmContext.Instance()?.Realm ?? Constants.DefaultRealm) : string.Empty;
+                realm = _idServerWebsiteOptions.IsReamEnabled ? (_realmStore.Realm ?? Constants.DefaultRealm) : string.Empty;
 
             GetAccessTokenResult accessToken = null;
             if(_accessTokens.ContainsKey(realm))

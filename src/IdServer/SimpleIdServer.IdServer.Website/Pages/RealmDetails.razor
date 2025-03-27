@@ -106,13 +106,14 @@
 </RadzenRow>
 
 @code {
+    [Inject] private IRealmStore realmStore { get; set; }
     string activeRealm;
     string GetOpenIdConnectUrl() => $"{GetBaseUrl()}/.well-known/openid-configuration";
     string GetIdServerSwaggerUrl() => $"{GetBaseUrl()}/swagger";
     string GetFederationMetadataUrl() => $"{GetBaseUrl()}/FederationMetadata/2007-06/FederationMetadata.xml";
     string GetSamlMetadataUrl() => $"{GetBaseUrl()}/saml/metadata";
     string GetSCIMSchemasUrl() => $"{Options.Value.SCIMUrl}/Schemas";
-    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{RealmContext.Instance().Realm}" : Options.Value.IdServerBaseUrl;
+    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{realmStore.Realm}" : Options.Value.IdServerBaseUrl;
 
     protected override void OnAfterRender(bool firstRender)
     {

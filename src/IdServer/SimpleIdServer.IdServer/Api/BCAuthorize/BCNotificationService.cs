@@ -70,21 +70,21 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
             var notificationService = _notificationServices.First(n => n.Name == notificationMode);
             var queries = message.Serialize(_urlEncoder);
             var data = queries.ToDictionary(c => c.Key, c => c.Value);
-            var backChannelUrl = BuildBackChannelUrl(handlerContext.Request.IssuerName);
+            var backChannelUrl = BuildBackChannelUrl(handlerContext.Realm, handlerContext.Request.IssuerName);
             data.Add("bc_channel", backChannelUrl);
-            await notificationService.Send("Consent", $"Accept or refuse the consent : {BuildBackChannelConsentUrl(handlerContext.UrlHelper, handlerContext.Request.IssuerName, queries)}", data, handlerContext.User);
+            await notificationService.Send("Consent", $"Accept or refuse the consent : {BuildBackChannelConsentUrl(handlerContext.UrlHelper, handlerContext.Realm, handlerContext.Request.IssuerName, queries)}", data, handlerContext.User);
         }
 
-        protected string BuildBackChannelConsentUrl(IUrlHelper urlHelper, string issuer, List<KeyValuePair<string, string>> queries)
+        protected string BuildBackChannelConsentUrl(IUrlHelper urlHelper, string realm, string issuer, List<KeyValuePair<string, string>> queries)
         {
-            var queryCollection = new QueryBuilder(queries);
-            var returnUrl = $"{HandlerContext.GetIssuer(issuer, _options.UseRealm)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
+            var queryCollection = new QueryBuilder(queries); 
+            var returnUrl = $"{HandlerContext.GetIssuer(realm, issuer, _options.UseRealm)}/{Constants.EndPoints.BCCallback}{queryCollection.ToQueryString()}";
             return $"{issuer}{urlHelper.Action("Index", "BackChannelConsents", new
             {
                 returnUrl = _dataProtector.Protect(returnUrl)
             })}";
         }
 
-        protected string BuildBackChannelUrl(string issuer) => $"{HandlerContext.GetIssuer(issuer, _options.UseRealm)}/{Constants.EndPoints.BCCallback}";
+        protected string BuildBackChannelUrl(string realm, string issuer) => $"{HandlerContext.GetIssuer(realm, issuer, _options.UseRealm)}/{Constants.EndPoints.BCCallback}";
     }
 }

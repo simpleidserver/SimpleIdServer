@@ -1,13 +1,11 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Fluxor;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.AuthenticationClassReferences;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -18,13 +16,16 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
     {
         private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
         private readonly IdServerWebsiteOptions _options;
+        private readonly IRealmStore _realmStore;
 
         public AcrEffects(
             IWebsiteHttpClientFactory websiteHttpClientFactory, 
-            IOptions<IdServerWebsiteOptions> options)
+            IOptions<IdServerWebsiteOptions> options,
+            IRealmStore realmStore)
         {
             _websiteHttpClientFactory = websiteHttpClientFactory;
             _options = options.Value;
+            _realmStore = realmStore;
         }
 
 
@@ -117,7 +118,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
         {
             if(_options.IsReamEnabled)
             {
-                var realm = RealmContext.Instance()?.Realm;
+                var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
                 return $"{_options.IdServerBaseUrl}/{realmStr}/acrs";
             }
