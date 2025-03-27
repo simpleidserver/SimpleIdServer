@@ -33,6 +33,5 @@ public class Language
     [JsonPropertyName(LanguageNames.Description)]
     public string? Description { get; set; } = null;
 
-    [JsonIgnore]
     public ICollection<Translation> Descriptions { get; set; } = new List<Translation>();
 }

@@ -35,7 +35,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
     public class RevokeSessionResult
     {
         public IEnumerable<string> FrontChannelLogouts { get; set; }
-        public string SessionCookieName { get; set;}
+        public string SessionCookieName { get; set; }
     }
 
     public class SessionManager : ISessionManager
@@ -47,14 +47,16 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
         private readonly IUserSessionResitory _userSessionRepository;
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IRecurringJobManager _recurringJobManager;
+        private readonly IRealmStore _realmStore;
 
         public SessionManager(
-            IOptionsMonitor<IdServerHostOptions> options, 
+            IOptionsMonitor<IdServerHostOptions> options,
             IDataProtectionProvider dataProtectionProvider,
             IClientRepository clientRepository,
             IUserSessionResitory userSessionRepository,
             ITransactionBuilder transactionBuilder,
-            IRecurringJobManager recurringJobManager)
+            IRecurringJobManager recurringJobManager,
+            IRealmStore realmStore)
         {
             _options = options.CurrentValue;
             _ticketDataFormat = new TicketDataFormat(dataProtectionProvider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", CookieAuthenticationDefaults.AuthenticationScheme, "v2"));
@@ -62,25 +64,27 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
             _userSessionRepository = userSessionRepository;
             _transactionBuilder = transactionBuilder;
             _recurringJobManager = recurringJobManager;
+            _realmStore = realmStore;
         }
 
         public AuthenticationTicket FetchTicket(HttpContext context, string name)
         {
-            var cookie = context.Request.Cookies.FirstOrDefault(c => c.Key.StartsWith($"{COOKIE_NAME}-{name.SanitizeNameIdentifier()}"));
+            var cookieName = $"{IdServerCookieAuthenticationHandler.GetCookieName(_realmStore.Realm, COOKIE_NAME)}-{name.SanitizeNameIdentifier()}";
+            var cookie = context.Request.Cookies.FirstOrDefault(c => c.Key.StartsWith(cookieName));
             if (cookie.Equals(default(KeyValuePair<string, string>))) return null;
             return _ticketDataFormat.Unprotect(cookie.Value);
         }
 
         public IEnumerable<AuthenticationTicket> FetchTickets(HttpContext context)
         {
-            var filteredCookies = context.Request.Cookies.Where(c => c.Key.StartsWith($"{IdServerCookieAuthenticationHandler.GetCookieName(COOKIE_NAME)}-"));
+            var filteredCookies = context.Request.Cookies.Where(c => c.Key.StartsWith($"{IdServerCookieAuthenticationHandler.GetCookieName(_realmStore.Realm, COOKIE_NAME)}-"));
             var result = new List<AuthenticationTicket>();
             foreach (var filterCookie in filteredCookies)
             {
                 try
                 {
                     var ticket = _ticketDataFormat.Unprotect(filterCookie.Value);
-                    if(ticket != null) result.Add(ticket);
+                    if (ticket != null) result.Add(ticket);
                 }
                 catch (Exception) { }
             }
@@ -111,7 +115,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
         public async Task<RevokeSessionResult> Revoke(HttpRequest request, string user, string realm, CancellationToken cancellationToken)
         {
             realm = realm ?? Constants.DefaultRealm;
-            var sessionCookieName = _options.GetSessionCookieName(user);
+            var sessionCookieName = _options.GetSessionCookieName(realm, user);
             var kvp = request.Cookies.SingleOrDefault(c => c.Key == sessionCookieName);
             IEnumerable<string> frontChannelLogouts = new List<string>();
             if (!string.IsNullOrWhiteSpace(kvp.Key))
@@ -142,7 +146,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },

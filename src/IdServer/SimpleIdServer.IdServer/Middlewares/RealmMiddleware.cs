@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
@@ -18,9 +19,9 @@ public class RealmMiddleware
     private readonly RequestDelegate _next;
     private readonly IServiceProvider _serviceProvider;
     private static List<string> _includedPathLst = new List<string>
-{
-    "/signin-"
-};
+    {
+        "/signin-"
+    };
 
     public RealmMiddleware(RequestDelegate next, IServiceProvider serviceProvider)
     {

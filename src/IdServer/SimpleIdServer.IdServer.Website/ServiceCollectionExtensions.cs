@@ -39,12 +39,13 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<IUrlHelper, UrlHelper>();
             services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
             services.AddScoped<IGroupService, GroupEffects>();
-            services.AddScoped<IRealmStore, RealmStore>();
+            services.AddScoped<IRealmStore, CookieRealmStore>();
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
             services.AddScoped<ContextMenuService>();
             services.AddScoped<TooltipService>();
-            services.AddSingleton<IWebsiteHttpClientFactory, WebsiteHttpClientFactory>();
+            services.AddScoped<IWebsiteHttpClientFactory, WebsiteHttpClientFactory>();
+            services.AddSingleton<IAccessTokenStore, AccessTokenStore>();
             if (callbackOptions == null) services.Configure<IdServerWebsiteOptions>((o) => { });
             else services.Configure(callbackOptions);
             var b = services.AddDataProtection();

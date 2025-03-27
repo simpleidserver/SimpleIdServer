@@ -7,8 +7,3 @@ public interface IRealmStore
 {
     string Realm { get; set; }
 }
-
-public class RealmStore : IRealmStore
-{
-    public string Realm { get; set; }
-}

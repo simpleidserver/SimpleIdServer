@@ -33,6 +33,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private readonly IDistributedCache _distributedCache;
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IEnumerable<IAuthenticationMethodService> _authenticationMethodServices;
+        private readonly IRealmStore _realmStore;
         private readonly IdServerHostOptions _idServerHostOptions;
 
         public U2FRegisterController(
@@ -45,6 +46,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             IEnumerable<IAuthenticationMethodService> authenticationMethodServices,
             ITokenRepository tokenRepository,
             IJwtBuilder jwtBuilder,
+            IRealmStore realmStore,
             IOptions<IdServerHostOptions> idServerHostOptions) : base(tokenRepository, jwtBuilder)
         {
             _configuration = configuration;
@@ -54,6 +56,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             _distributedCache = distributedCache;
             _transactionBuilder = transactionBuilder;
             _authenticationMethodServices = authenticationMethodServices;
+            _realmStore = realmStore;
             _idServerHostOptions = idServerHostOptions.Value;
         }
 
@@ -228,7 +231,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
 
         protected async Task<(BeginU2FRegisterResult, ContentResult)> CommonBegin(string prefix, BeginU2FRegisterRequest request, CancellationToken cancellationToken)
         {
-            var cookieName = _idServerHostOptions.GetRegistrationCookieName();
+            var cookieName = _idServerHostOptions.GetRegistrationCookieName(_realmStore.Realm);
             var cookieValue = string.Empty;
             if(Request.Cookies.ContainsKey(cookieName)) cookieValue = Request.Cookies[cookieName];
             var fidoOptions = GetOptions(request.CredentialType);
@@ -326,7 +329,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         private async Task<UserRegistrationProgress> GetRegistrationProgress(RegistrationSessionRecord sessionRecord = null)
         {
             var cookieValue = string.Empty;
-            var cookieName = _idServerHostOptions.GetRegistrationCookieName();
+            var cookieName = _idServerHostOptions.GetRegistrationCookieName(_realmStore.Realm);
             if (!Request.Cookies.ContainsKey(cookieName))
             {
                 if (sessionRecord == null || string.IsNullOrWhiteSpace(sessionRecord.RegistrationCookieKey)) return null;

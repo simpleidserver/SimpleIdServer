@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using System.Net;
 
 namespace SimpleIdServer.IdServer.Website.Middlewares;
@@ -21,6 +22,7 @@ public class RealmMiddleware
         "/auth",
         "/callback",
         "/signout-callback-oidc",
+        "/signin-oidc",
         "/oidccallback",
         "/bc-logout",
         "/availablerealms"
@@ -34,24 +36,21 @@ public class RealmMiddleware
     private readonly RequestDelegate _next;
     private readonly IdServerWebsiteOptions _options;
     private readonly ILogger<RealmMiddleware> _logger;
-    private readonly IWebsiteHttpClientFactory _websiteHttpClientFactory;
 
     public RealmMiddleware(
-        RequestDelegate next, 
-        IOptions<IdServerWebsiteOptions> options, 
-        ILogger<RealmMiddleware> logger,
-        IWebsiteHttpClientFactory websiteHttpClientFactory)
+        RequestDelegate next,
+        IOptions<IdServerWebsiteOptions> options,
+        ILogger<RealmMiddleware> logger)
     {
         _next = next;
         _options = options.Value;
         _logger = logger;
-        _websiteHttpClientFactory = websiteHttpClientFactory;
     }
 
-    public async Task InvokeAsync(HttpContext context, IRealmStore realmStore)
+    public async Task InvokeAsync(HttpContext context, IRealmStore realmStore, IWebsiteHttpClientFactory websiteHttpClientFactory)
     {
         var path = context.Request.Path.Value;
-        if(_excludedFileExtensions.Any(r => path.EndsWith(r)) 
+        if (_excludedFileExtensions.Any(r => path.EndsWith(r))
             || _excludedRoutes.Any(r => path.StartsWith(r))
             || !_options.IsReamEnabled)
         {
@@ -59,22 +58,22 @@ public class RealmMiddleware
             return;
         }
 
-        if(string.IsNullOrWhiteSpace(path))
+        if (string.IsNullOrWhiteSpace(path))
         {
             ReturnNotFound(context);
             return;
         }
 
         var splitted = path.Split('/').Where(p => !string.IsNullOrWhiteSpace(p));
-        if(splitted.Count() < 2)
+        if (splitted.Count() < 2)
         {
             ReturnNotFound(context);
             return;
         }
 
         var currentRealm = splitted.First();
-        var existingRealms = await GetRealms(currentRealm);
-        if(!existingRealms.Any(r => r.Name == currentRealm))
+        var existingRealms = await GetRealms(currentRealm, websiteHttpClientFactory);
+        if (!existingRealms.Any(r => r.Name == currentRealm))
         {
             EnsureCookiesAreRemoved(context, currentRealm);
             var redirectUrl = $"{context.Request.GetAbsoluteUriWithVirtualPath()}/availablerealms";
@@ -83,6 +82,9 @@ public class RealmMiddleware
         }
 
         realmStore.Realm = currentRealm;
+        context.Response.Cookies.Append(
+            CookieRealmStore.DefaultRealmCookieName,
+            currentRealm);
         await _next.Invoke(context);
     }
 
@@ -101,12 +103,12 @@ public class RealmMiddleware
         context.Response.StatusCode = (int)HttpStatusCode.NotFound;
     }
 
-    private async Task<IEnumerable<Realm>> GetRealms(string currentRealm)
+    private async Task<IEnumerable<Realm>> GetRealms(string currentRealm, IWebsiteHttpClientFactory websiteHttpClientFactory)
     {
         try
         {
             var url = await GetBaseUrl(currentRealm);
-            var httpClient = await _websiteHttpClientFactory.Build(currentRealm);
+            var httpClient = await websiteHttpClientFactory.Build(currentRealm);
             var requestMessage = new HttpRequestMessage
             {
                 RequestUri = new Uri(url),
@@ -117,7 +119,7 @@ public class RealmMiddleware
             var realms = SidJsonSerializer.Deserialize<IEnumerable<Realm>>(json);
             return realms;
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             _logger.LogError(ex.ToString());
             return new List<Realm>();

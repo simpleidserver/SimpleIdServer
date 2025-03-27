@@ -1,10 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using MassTransit.Configuration;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
@@ -16,15 +14,12 @@ namespace SimpleIdServer.IdServer.Website.Infrastructures;
 
 public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
 {
-    string _baseUri;
     string _locationAbsolute;
     bool _navigationInterceptionEnabled;
     private RenderHandle _renderHandle;
     private Dictionary<Type, Dictionary<string, string>> _routeableComponents;
-    internal static IServiceProvider _serviceProvider;
     private CancellationTokenSource _onNavigateCts;
     private Task _previousOnNavigateTask = Task.CompletedTask;
-    private IRoutingStateProvider? RoutingStateProvider { get; set; }
     private List<string> _excludedRoutes = new List<string>
     {
         "availablerealms"
@@ -32,10 +27,9 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
 
     [Inject] private IOptions<IdServerWebsiteOptions> Options { get; set; }
     [Inject] private NavigationManager NavigationManager { get; set; }
-    [Inject] private IRealmStore RealmStore { get; set; }
-    [Inject] IServiceProvider ServiceProvider { get; set; }
-    [Inject] private IScrollToLocationHash ScrollToLocationHash { get; set; }
     [Inject] private INavigationInterception NavigationInterception { get; set; }
+    [Inject] private IRealmStore RealmStore { get; set; }
+    [Inject] private IWebsiteHttpClientFactory WebsiteHttpClientFactory { get; set; }
     [Parameter] public Assembly AppAssembly { get; set; }
     [Parameter] public RenderFragment<RouteData> Found { get; set; }
     [Parameter] public RenderFragment NotFound { get; set; }
@@ -47,10 +41,8 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
     {
         _renderHandle = renderHandle;
         _routeableComponents = GetRouteableComponents();
-        _baseUri = NavigationManager.BaseUri;
         _locationAbsolute = NavigationManager.Uri;
         NavigationManager.LocationChanged += OnLocationChanged;
-        RoutingStateProvider = ServiceProvider.GetService<IRoutingStateProvider>();
     }
 
     public async Task SetParametersAsync(ParameterView parameters)
@@ -94,7 +86,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         }
 
         _onNavigateCts = new CancellationTokenSource();
-        var navigateContext = new CustomNavigationContext(locationPath,  _onNavigateCts.Token);
+        var navigateContext = new CustomNavigationContext(locationPath, _onNavigateCts.Token);
         var cancellationTcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         navigateContext.CancellationToken.Register(state =>
             ((TaskCompletionSource)state).SetResult(), cancellationTcs);
@@ -124,19 +116,18 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         }
 
 
-        var options = _serviceProvider.GetRequiredService<IOptions<IdServerWebsiteOptions>>();
         var routeParameters = new Dictionary<string, object>();
         Type handlerContext = null;
         var relativePath = NavigationManager.ToBaseRelativePath(_locationAbsolute);
         string pathWithoutRealm = locationPath;
-        if (!options.Value.IsReamEnabled || _excludedRoutes.Contains(pathWithoutRealm))
+        if (!Options.Value.IsReamEnabled || _excludedRoutes.Contains(pathWithoutRealm))
         {
             if (!pathWithoutRealm.StartsWith("/"))
                 pathWithoutRealm = $"/{locationPath}";
         }
         else
         {
-            var realms = await GetRealms(options);
+            var realms = await GetRealms(Options);
             var realm = string.IsNullOrWhiteSpace(locationPath) ? Constants.DefaultRealm : locationPath.Split("/").First();
             if (realms.Any(r => r.Name == realm))
                 pathWithoutRealm = locationPath.Replace(realm, string.Empty);
@@ -144,7 +135,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
 
         if (!IsMatch(pathWithoutRealm, _routeableComponents, out routeParameters, out handlerContext))
         {
-            if(!isNavigationIntercepted)
+            if (!isNavigationIntercepted)
             {
                 _renderHandle.Render(NotFound);
                 return;
@@ -183,9 +174,8 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
 
     private async Task<IEnumerable<Realm>> GetRealms(IOptions<IdServerWebsiteOptions> options)
     {
-        var httpClientFactory = _serviceProvider.GetRequiredService<IWebsiteHttpClientFactory>();
         var url = await GetBaseUrl();
-        var httpClient = await httpClientFactory.Build();
+        var httpClient = await WebsiteHttpClientFactory.Build();
         var requestMessage = new HttpRequestMessage
         {
             RequestUri = new Uri(url),
@@ -207,7 +197,7 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         var kvp = context.Value.First(c => Regex.IsMatch(path, c.Value));
         var templateElements = kvp.Key.Split("/");
         var urlElements = path.Split("/");
-        for(var i = 0; i < templateElements.Count(); i++)
+        for (var i = 0; i < templateElements.Count(); i++)
         {
             var elt = templateElements[i];
             if (Regex.IsMatch(elt, "^{\\w*}$"))
@@ -222,13 +212,13 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         var assembly = typeof(RealmRouter).Assembly;
         var components = new List<Type>();
         var dic = new Dictionary<Type, Dictionary<string, string>>();
-        foreach(var type in assembly.ExportedTypes)
+        foreach (var type in assembly.ExportedTypes)
         {
-            if(typeof(IComponent).IsAssignableFrom(type) && type.IsDefined(typeof(RouteAttribute)))
+            if (typeof(IComponent).IsAssignableFrom(type) && type.IsDefined(typeof(RouteAttribute)))
             {
                 var routeAttributes = type.GetCustomAttributes<RouteAttribute>(inherit: false);
                 var templates = routeAttributes.ToDictionary(r => r.Template, r => $"^{Regex.Replace(r.Template, "{\\w*}", "(\\d|\\w|-)*")}$");
-                if(!templates.ContainsKey(@"/"))
+                if (!templates.ContainsKey(@"/"))
                     dic.Add(type, templates);
             }
         }

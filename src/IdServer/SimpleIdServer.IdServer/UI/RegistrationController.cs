@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
@@ -21,18 +22,21 @@ public class RegistrationController : BaseController
 {
 	private readonly IRegistrationWorkflowRepository _registrationWorkflowRepository;
 	private readonly IDistributedCache _distributedCache;
-	private readonly IdServerHostOptions _options;
+    private readonly IRealmStore _realmStore;
+    private readonly IdServerHostOptions _options;
 
 	public RegistrationController(
 		IRegistrationWorkflowRepository registrationWorkflowRepository, 
 		IDistributedCache distributedCache, 
+		IRealmStore realmStore,
 		ITokenRepository tokenRepository,
 		IJwtBuilder jwtBuilder,
 		IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
 	{
 		_registrationWorkflowRepository = registrationWorkflowRepository;
 		_distributedCache = distributedCache;
-		_options = options.Value;
+		_realmStore = realmStore;
+        _options = options.Value;
 	}
 
 	[HttpGet]
@@ -44,8 +48,8 @@ public class RegistrationController : BaseController
 		else registrationWorkflow = await _registrationWorkflowRepository.GetByName(prefix, workflowName, CancellationToken.None);
 		if(registrationWorkflow == null) return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, Global.UnknownRegistrationWorkflow);
 		var amr = registrationWorkflow.Steps.First();
-		var cookieName = _options.GetRegistrationCookieName();
-		var registrationProgressId = Guid.NewGuid().ToString();
+        var cookieName = _options.GetRegistrationCookieName(_realmStore.Realm);
+        var registrationProgressId = Guid.NewGuid().ToString();
 		var registrationProgress = new UserRegistrationProgress 
 		{ 
 			RegistrationProgressId = registrationProgressId, 

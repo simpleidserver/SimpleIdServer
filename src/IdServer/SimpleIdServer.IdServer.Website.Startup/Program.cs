@@ -45,21 +45,18 @@ if (!app.Environment.IsDevelopment())
 
 app.Services.AddSIDWebsite();
 app.UseStaticFiles();
+app.UseSidWebsite();
 app.UseRequestLocalization(e =>
 {
     e.SetDefaultCulture("en");
-    e.AddSupportedCultures("en");
-    e.AddSupportedUICultures("en");
+    e.AddSupportedCultures("en", "fr");
+    e.AddSupportedUICultures("en", "fr");
 });
-app.UseSidWebsite();
 app.UseRouting();
 app.UseCookiePolicy();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseEndpoints(edps =>
-{
-    edps.MapBlazorHub();
-    edps.MapFallbackToPage("/_Host");
-    edps.MapControllers();
-});
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
+app.MapControllers();
 app.Run();

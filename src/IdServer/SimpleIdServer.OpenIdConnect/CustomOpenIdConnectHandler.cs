@@ -37,6 +37,7 @@ namespace SimpleIdServer.OpenIdConnect
     {
         private Dictionary<string, ConfigurationManager<OpenIdConnectConfiguration>> RealmConfigurationManagers = new Dictionary<string, ConfigurationManager<OpenIdConnectConfiguration>>();
         private Dictionary<string, OpenIdConnectConfiguration> RealmOpenidConfigurations = new Dictionary<string, OpenIdConnectConfiguration>();
+        private readonly IRealmStore _realmStore;
         private const string NonceProperty = "N";
         private const string HeaderValueEpocDate = "Thu, 01 Jan 1970 00:00:00 GMT";
         private const string PushedAuthorizationRequestEndpoint = "pushed_authorization_request_endpoint";
@@ -54,7 +55,7 @@ namespace SimpleIdServer.OpenIdConnect
         private SecurityKey _dPoPSecurityKey;
         private DateTime? _lastDPoPSecurityKeyRotationDateTime = null;
         private OpenIdConnectConfiguration? _configuration;
-        protected HttpClient Backchannel => Options.Backchannel; 
+        protected HttpClient Backchannel => Options.Backchannel;
         protected new OpenIdConnectEvents Events
         {
             get { return (OpenIdConnectEvents)base.Events; }
@@ -68,15 +69,16 @@ namespace SimpleIdServer.OpenIdConnect
             public OpenIdConnectMessage OpenIdConnectMessage { get; set; }
         }
 
-        public CustomOpenIdConnectHandler(IOptionsMonitor<CustomOpenIdConnectOptions> options, ILoggerFactory logger, HtmlEncoder htmlEncoder, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
+        public CustomOpenIdConnectHandler(IRealmStore realmStore, IOptionsMonitor<CustomOpenIdConnectOptions> options, ILoggerFactory logger, HtmlEncoder htmlEncoder, UrlEncoder encoder, ISystemClock clock) : base(options, logger, encoder, clock)
         {
+            _realmStore = realmStore;
         }
 
         public override Task<bool> ShouldHandleRequestAsync()
         {
-            if(Options.IsRealmEnabled)
+            if (Options.IsRealmEnabled)
             {
-                return Task.FromResult($"/{RealmContext.Instance().Realm}{Options.CallbackPath}" == Request.Path);
+                return Task.FromResult($"/{_realmStore.Realm}{Options.CallbackPath}" == Request.Path);
             }
 
             return Task.FromResult(Options.CallbackPath == Request.Path);
@@ -663,7 +665,7 @@ namespace SimpleIdServer.OpenIdConnect
                     ValidateLifetime = false,
                     IssuerSigningKey = jsonWebKey
                 });
-                if(!validationResult.IsValid)
+                if (!validationResult.IsValid)
                     return new AuthorizationExtractionResult { IsValid = false, ErrorResult = CustomHandlerRequestResults.ResponseSignatureIsInvalid };
                 return new AuthorizationExtractionResult { IsValid = true, OpenIdConnectMessage = new OpenIdConnectMessage(validationResult.Claims.Select(c => new KeyValuePair<string, string[]>(c.Key, new string[] { c.Value.ToString() }))) };
             }
@@ -847,7 +849,7 @@ namespace SimpleIdServer.OpenIdConnect
                 ClientId = Options.ClientId,
                 EnableTelemetryParameters = !Options.DisableTelemetry,
                 IssuerAddress = configuration?.AuthorizationEndpoint ?? string.Empty,
-                RedirectUri = properties.GetParameter<string>(OpenIdConnectParameterNames.RedirectUri) ?? BuildRedirectUri(Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath),
+                RedirectUri = properties.GetParameter<string>(OpenIdConnectParameterNames.RedirectUri) ?? BuildRedirectUri(Options.IsRealmEnabled ? $"/{_realmStore.Realm}{Options.CallbackPath}" : Options.CallbackPath),
                 Resource = Options.Resource,
                 ResponseType = Options.ResponseType,
                 Prompt = properties.GetParameter<string>(OpenIdConnectParameterNames.Prompt) ?? Options.Prompt,
@@ -898,7 +900,7 @@ namespace SimpleIdServer.OpenIdConnect
                 WriteNonceCookie(message.Nonce);
             }
 
-            Options.CorrelationCookie.Path = Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath;
+            Options.CorrelationCookie.Path = Options.IsRealmEnabled ? $"/{_realmStore.Realm}{Options.CallbackPath}" : Options.CallbackPath;
             GenerateCorrelationId(properties);
 
             var redirectContext = new RedirectContext(Context, Scheme, Options, properties)
@@ -970,7 +972,7 @@ namespace SimpleIdServer.OpenIdConnect
                 throw new ArgumentNullException(nameof(nonce));
             }
 
-            Options.NonceCookie.Path = Options.IsRealmEnabled ? $"/{RealmContext.Instance().Realm}{Options.CallbackPath}" : Options.CallbackPath;
+            Options.NonceCookie.Path = Options.IsRealmEnabled ? $"/{_realmStore.Realm}{Options.CallbackPath}" : Options.CallbackPath;
             var cookieOptions = Options.NonceCookie.Build(Context, Clock.UtcNow);
 
             Response.Cookies.Append(
@@ -1057,7 +1059,7 @@ namespace SimpleIdServer.OpenIdConnect
             if (Options.ClientAuthenticationType == ClientAuthenticationTypes.CLIENT_SECRET_POST)
                 tokenEndpointRequest.ClientSecret = Options.ClientSecret;
 
-            if(Options.ClientAuthenticationType == ClientAuthenticationTypes.PRIVATE_KEY_JWT)
+            if (Options.ClientAuthenticationType == ClientAuthenticationTypes.PRIVATE_KEY_JWT)
             {
                 var descriptor = new SecurityTokenDescriptor
                 {
@@ -1284,7 +1286,7 @@ namespace SimpleIdServer.OpenIdConnect
                     };
                     var handler = new JsonWebTokenHandler();
                     var request = handler.CreateToken(descriptor);
-                    if(Options.RequestType == RequestTypes.REQUEST)
+                    if (Options.RequestType == RequestTypes.REQUEST)
                     {
                         message.Parameters.Clear();
                         message.ClientId = clientId;
@@ -1321,7 +1323,7 @@ namespace SimpleIdServer.OpenIdConnect
             if ((Options.RequestType == RequestTypes.REQUEST || Options.RequestType == RequestTypes.PAR) && Options.SigningCredentials == null)
                 throw new InvalidOperationException("SigningCredentials is required when request type is equals to request");
 
-            if(!configuration.AdditionalData.ContainsKey(PushedAuthorizationRequestEndpoint) && Options.RequestType == RequestTypes.PAR)
+            if (!configuration.AdditionalData.ContainsKey(PushedAuthorizationRequestEndpoint) && Options.RequestType == RequestTypes.PAR)
                 throw new InvalidOperationException("Identity Server doesn't support PAR request");
 
             if (configuration.AdditionalData.ContainsKey(RequirePushedAuthorizationRequests) && bool.TryParse(configuration.AdditionalData[RequirePushedAuthorizationRequests].ToString(), out bool requiredPushedAuthorizationRequests) && requiredPushedAuthorizationRequests && Options.RequestType != RequestTypes.PAR)
@@ -1367,7 +1369,7 @@ namespace SimpleIdServer.OpenIdConnect
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpointRequest.TokenEndpoint ?? configuration?.TokenEndpoint);
             requestMessage.Content = new FormUrlEncodedContent(tokenEndpointRequest.Parameters);
             HttpResponseMessage responseMessage = null;
-            switch(Options.ClientAuthenticationType)
+            switch (Options.ClientAuthenticationType)
             {
                 case ClientAuthenticationTypes.CLIENT_SECRET_POST:
                 case ClientAuthenticationTypes.PRIVATE_KEY_JWT:
@@ -1472,7 +1474,7 @@ namespace SimpleIdServer.OpenIdConnect
         {
             if (this.Options.IsRealmEnabled)
             {
-                var realm = RealmContext.Instance().Realm ?? "master";
+                var realm = string.IsNullOrWhiteSpace(_realmStore.Realm) ? "master" : _realmStore.Realm;
                 if (!RealmConfigurationManagers.ContainsKey(realm))
                 {
                     var metadataAdr = Options.Authority;
@@ -1490,7 +1492,7 @@ namespace SimpleIdServer.OpenIdConnect
                     RealmConfigurationManagers.Add(realm, configurationManager);
                 }
 
-                if(!RealmOpenidConfigurations.ContainsKey(realm))
+                if (!RealmOpenidConfigurations.ContainsKey(realm))
                 {
                     var configuration = await RealmConfigurationManagers[realm].GetConfigurationAsync(Context.RequestAborted);
                     RealmOpenidConfigurations.Add(realm, configuration);

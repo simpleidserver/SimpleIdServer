@@ -3,7 +3,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Middlewares;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,6 +15,7 @@ namespace SimpleIdServer.Configuration;
 public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposable
 {
     private bool _isDisposed = false;
+    private readonly IRealmStore _realmStore;
     private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly AutomaticConfigurationOptions _options;
     private readonly IKeyValueConnector _connector;
@@ -23,8 +23,9 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
     private Task? _pollTask;
     private ConfigurationReloadToken _reloadToken = new ConfigurationReloadToken();
 
-    public AutomaticConfigurationProvider(AutomaticConfigurationOptions options, IKeyValueConnector connector)
+    public AutomaticConfigurationProvider(IRealmStore realmStore, AutomaticConfigurationOptions options, IKeyValueConnector connector)
     {
+        _realmStore = realmStore;
         _options = options;
         _connector = connector;
         Data = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
@@ -35,20 +36,20 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
     public virtual bool TryGet(string key, out string? value)
     {
         value = null;
-        if (string.IsNullOrWhiteSpace(RealmContext.Instance().Realm)) return false;
+        if (string.IsNullOrWhiteSpace(_realmStore.Realm)) return false;
         var record = _options.ConfigurationDefinitions.SingleOrDefault(d => key.Contains(d.Name));
         if (record == null) return false;
-        key = $"{RealmContext.Instance().Realm}:{key}";
+        key = $"{_realmStore.Realm}:{key}";
         var result = Data.TryGetValue(key, out value);
         return result;
     }
 
     public virtual void Set(string key, string? value)
     {
-        if (string.IsNullOrWhiteSpace(RealmContext.Instance().Realm)) return;
+        if (string.IsNullOrWhiteSpace(_realmStore.Realm)) return;
         var record = _options.ConfigurationDefinitions.SingleOrDefault(d => key.Contains(d.Name));
         if (record == null) return;
-        key = $"{RealmContext.Instance().Realm}:{key}";
+        key = $"{_realmStore.Realm}:{key}";
         _connector.Set(key, value, CancellationToken.None).Wait();
         if (!Data.ContainsKey(key)) Data.Add(key, value);
         else Data[key] = value;
@@ -78,8 +79,8 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
         }
         else
         {
-            var realm = RealmContext.Instance().Realm;
-            if(!string.IsNullOrWhiteSpace(realm)) parentPath = $"{realm}:{parentPath}";
+            var realm = _realmStore.Realm;
+            if (!string.IsNullOrWhiteSpace(realm)) parentPath = $"{realm}:{parentPath}";
             Debug.Assert(ConfigurationPath.KeyDelimiter == ":");
 
             foreach (KeyValuePair<string, string?> kv in Data)
@@ -116,7 +117,7 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
 
     private async Task PoolConfigurations(CancellationToken cancellationToken)
     {
-        while(!cancellationToken.IsCancellationRequested)
+        while (!cancellationToken.IsCancellationRequested)
         {
             await LoadConfigurations(cancellationToken);
             await Task.Delay(_refreshIntervalInSeconds * 1000);
@@ -136,7 +137,7 @@ public class AutomaticConfigurationProvider : IConfigurationProvider, IDisposabl
                 Data = newData;
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
 
         }

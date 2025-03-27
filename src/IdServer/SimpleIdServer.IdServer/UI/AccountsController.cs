@@ -24,12 +24,14 @@ namespace SimpleIdServer.IdServer.UI
         private readonly ISessionManager _sessionManager;
         private readonly IDataProtector _dataProtector;
         private readonly IBusControl _busControl;
+        private readonly IRealmStore _realmStore;
 
-        public AccountsController(ISessionManager sessionManager, IDataProtectionProvider dataProtectionProvider, IBusControl busControl)
+        public AccountsController(ISessionManager sessionManager, IDataProtectionProvider dataProtectionProvider, IBusControl busControl, IRealmStore realmStore)
         {
             _sessionManager = sessionManager;
             _dataProtector = dataProtectionProvider.CreateProtector("Authorization");
             _busControl = busControl;
+            _realmStore = realmStore;
         }
 
         public async Task<IActionResult> Index(string returnUrl)
@@ -43,7 +45,7 @@ namespace SimpleIdServer.IdServer.UI
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Index(ChooseSessionViewModel chooseSessionViewModel, CancellationToken cancellationToken)
         {
-            var realm = RealmContext.Instance().Realm ?? Constants.DefaultRealm;
+            var realm = _realmStore.Realm ?? Constants.DefaultRealm;
             AccountsIndexViewModel accounts = null;
             try
             {

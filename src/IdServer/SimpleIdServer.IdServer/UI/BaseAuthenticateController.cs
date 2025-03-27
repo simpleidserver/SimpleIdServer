@@ -212,7 +212,7 @@ namespace SimpleIdServer.IdServer.UI
                 }
 
                 var sub = claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-                Response.Cookies.Append(_options.GetSessionCookieName(sub), session.SessionId, cookieOptions);
+                Response.Cookies.Append(_options.GetSessionCookieName(realm, sub), session.SessionId, cookieOptions);
             }
         }
 

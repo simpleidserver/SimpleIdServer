@@ -3,7 +3,6 @@
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Helpers;
-using System.Collections.Concurrent;
 using System.Globalization;
 using System.Text.Json.Nodes;
 
@@ -18,17 +17,18 @@ namespace SimpleIdServer.IdServer.Website
 
     public class WebsiteHttpClientFactory : IWebsiteHttpClientFactory
     {
-        private readonly IRealmStore _realmStore;
         private readonly DefaultSecurityOptions _securityOptions;
         private readonly IdServerWebsiteOptions _idServerWebsiteOptions;
         private readonly HttpClient _httpClient;
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
-        private ConcurrentDictionary<string, GetAccessTokenResult> _accessTokens = new ConcurrentDictionary<string, GetAccessTokenResult>();
+        private readonly IRealmStore _realmStore;
+        private readonly IAccessTokenStore _accessTokenStore;
 
-        public WebsiteHttpClientFactory(IRealmStore realmStore, DefaultSecurityOptions securityOptions, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
+        public WebsiteHttpClientFactory(IRealmStore realmStore, DefaultSecurityOptions securityOptions, IAccessTokenStore accessTokenStore, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
         {
             _realmStore = realmStore;
             _securityOptions = securityOptions;
+            _accessTokenStore = accessTokenStore;
             _idServerWebsiteOptions = idServerWebsiteOptions.Value;
             var handler = new HttpClientHandler
             {
@@ -59,20 +59,26 @@ namespace SimpleIdServer.IdServer.Website
 
         public void RemoveAccessToken(string realm)
         {
-            _accessTokens.TryRemove(realm, out GetAccessTokenResult r);
+            _accessTokenStore.AccessTokens.TryRemove(realm, out GetAccessTokenResult r);
         }
 
         private async Task<GetAccessTokenResult> GetAccessToken(string currentRealm = null)
         {
             var realm = currentRealm;
-            if(string.IsNullOrWhiteSpace(realm))
-                realm = _idServerWebsiteOptions.IsReamEnabled ? (_realmStore.Realm ?? Constants.DefaultRealm) : string.Empty;
+            if (string.IsNullOrWhiteSpace(realm))
+            {
+                if (_idServerWebsiteOptions.IsReamEnabled)
+                {
+                    realm = _realmStore.Realm ?? Constants.DefaultRealm;
+                }
+                else realm = string.Empty;
+            }
 
             GetAccessTokenResult accessToken = null;
-            if(_accessTokens.ContainsKey(realm))
-                accessToken = _accessTokens[realm];
+            if (_accessTokenStore.AccessTokens.ContainsKey(realm))
+                accessToken = _accessTokenStore.AccessTokens[realm];
             if (accessToken != null && accessToken.IsValid) return accessToken;
-            if (accessToken != null && !accessToken.IsValid) _accessTokens.TryRemove(realm, out GetAccessTokenResult r); 
+            if (accessToken != null && !accessToken.IsValid) _accessTokenStore.AccessTokens.TryRemove(realm, out GetAccessTokenResult r);
             var content = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
@@ -95,23 +101,10 @@ namespace SimpleIdServer.IdServer.Website
             var json = await httpResult.Content.ReadAsStringAsync();
             var at = JsonObject.Parse(json)["access_token"].GetValue<string>();
             JsonWebToken jwt = null;
-            if (_jsonWebTokenHandler.CanReadToken(at)) jwt = _jsonWebTokenHandler.ReadJsonWebToken(at);            
+            if (_jsonWebTokenHandler.CanReadToken(at)) jwt = _jsonWebTokenHandler.ReadJsonWebToken(at);
             accessToken = new GetAccessTokenResult(at, jwt);
-            _accessTokens.TryAdd(realm, accessToken);
+            _accessTokenStore.AccessTokens.TryAdd(realm, accessToken);
             return accessToken;
-        }
-
-        private record GetAccessTokenResult
-        {
-            public GetAccessTokenResult(string accessToken, JsonWebToken jwt)
-            {
-                AccessToken = accessToken;
-                Jwt = jwt;
-            }
-
-            public string AccessToken { get; private set; }
-            public JsonWebToken Jwt { get; private set; }
-            public bool IsValid => Jwt != null && Jwt.ValidTo >= DateTime.UtcNow;
         }
     }
 }

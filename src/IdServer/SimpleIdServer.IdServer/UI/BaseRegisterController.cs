@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
@@ -25,22 +26,25 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         IUserRepository userRepository,
         ITokenRepository tokenRepository,
         ITransactionBuilder transactionBuilder,
-        IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
+        IJwtBuilder jwtBuilder,
+        IRealmStore  realmStore) : base(tokenRepository, jwtBuilder)
     {
         Options = options.Value;
         DistributedCache = distributedCache;
         UserRepository = userRepository;
         TransactionBuilder = transactionBuilder;
+        RealmStore = realmStore;
     }
 
     protected IdServerHostOptions Options { get; }
     protected IDistributedCache DistributedCache { get; }
     protected IUserRepository UserRepository { get; }
     protected ITransactionBuilder TransactionBuilder { get; }
+    private IRealmStore RealmStore { get; }
 
     protected async Task<UserRegistrationProgress> GetRegistrationProgress()
     {
-        var cookieName = Options.GetRegistrationCookieName();
+        var cookieName = Options.GetRegistrationCookieName(RealmStore.Realm);
         if (!Request.Cookies.ContainsKey(cookieName)) return null;
         var cookieValue = Request.Cookies[cookieName];
         var json = await DistributedCache.GetStringAsync(cookieValue);

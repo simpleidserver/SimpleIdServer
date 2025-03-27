@@ -15,13 +15,13 @@ using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Jobs;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.AuthProviders;
+using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -31,7 +31,6 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
-using SimpleIdServer.IdServer.UI.Infrastructures;
 
 namespace SimpleIdServer.IdServer.UI
 {
@@ -52,6 +51,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly ISessionHelper _sessionHelper;
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly ISessionManager _sessionManager;
+        private readonly IRealmStore _realmStore;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(IOptions<IdServerHostOptions> options,
@@ -69,6 +69,7 @@ namespace SimpleIdServer.IdServer.UI
             ISessionHelper sessionHelper,
             ITransactionBuilder transactionBuilder,
             ISessionManager sessionManager,
+            IRealmStore realmStore,
             ILogger<HomeController> logger)
         {
             _options = options.Value;
@@ -86,6 +87,7 @@ namespace SimpleIdServer.IdServer.UI
             _sessionHelper = sessionHelper;
             _transactionBuilder = transactionBuilder;
             _sessionManager = sessionManager;
+            _realmStore = realmStore;
             _logger = logger;
         }
 
@@ -310,7 +312,7 @@ namespace SimpleIdServer.IdServer.UI
         public async virtual Task<IActionResult> RegisterCredential([FromRoute] string prefix, string name, string redirectUrl)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            var cookieName = _options.GetRegistrationCookieName();
+            var cookieName = _options.GetRegistrationCookieName(_realmStore.Realm);
             if (Request.Cookies.ContainsKey(cookieName)) Response.Cookies.Delete(cookieName);
             var registrationProgress = new UserRegistrationProgress
             {
@@ -472,7 +474,7 @@ namespace SimpleIdServer.IdServer.UI
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },

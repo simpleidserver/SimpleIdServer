@@ -1,8 +1,10 @@
 ﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Options;
 @using SimpleIdServer.IdServer.Startup.Resources;
 @model SimpleIdServer.IdServer.Fido.UI.ViewModels.AuthenticateWebauthnViewModel;
 @inject IOptions<IdServerHostOptions> configuration
+@inject IRealmStore realmStore
 
 @{
     ViewBag.Title = AuthenticateSmsResource.title;
@@ -10,7 +12,7 @@
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
     var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
-    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
+    var realm = realmStore?.Realm;
     var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 

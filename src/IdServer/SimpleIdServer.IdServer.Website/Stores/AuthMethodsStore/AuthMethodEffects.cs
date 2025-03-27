@@ -136,7 +136,7 @@ public class AuthMethodEffects
     {
         if(_options.IsReamEnabled)
         {
-            var realm = RealmContext.Instance()?.Realm;
+            var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
             return $"{_options.IdServerBaseUrl}/{realmStr}/authmethods";
         }
