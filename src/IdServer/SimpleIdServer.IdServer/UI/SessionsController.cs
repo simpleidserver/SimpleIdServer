@@ -41,7 +41,8 @@ public class SessionsController : Controller
         Response.Cookies.Delete(sessionResult.SessionCookieName);
         var items = new Dictionary<string, string>
         {
-            { Constants.LogoutUserKey, request.User }
+            { Constants.LogoutUserKey, request.User },
+            { Constants.RealmKey, request.Realm }
         };
         await HttpContext.SignOutAsync(new AuthenticationProperties(items));
         await _busControl.Publish(new UserLogoutSuccessEvent
@@ -49,9 +50,7 @@ public class SessionsController : Controller
             UserName = request.User,
             Realm = request.Realm
         });
-        var sessions = await GetSessions();
-        sessions = sessions.Where(s => s.Realm != request.Realm || s.Name != request.User).ToList();
-        return View(sessions);
+        return RedirectToAction(nameof(Index));
     }
 
     private async Task<List<SessionViewModel>> GetSessions()

@@ -145,10 +145,12 @@ namespace Microsoft.Extensions.DependencyInjection
                         if (!string.IsNullOrWhiteSpace(nameIdentifier))
                         {
                             var realmStore = ctx.HttpContext.RequestServices.GetRequiredService<IRealmStore>();
+                            var realm = realmStore.Realm;
+                            if (ctx.Properties != null && ctx.Properties.Items.ContainsKey(Constants.RealmKey)) realm = ctx.Properties.Items[Constants.RealmKey];
                             ctx.Options.CookieManager.DeleteCookie(
-                                    ctx.HttpContext,
-                                    $"{IdServerCookieAuthenticationHandler.GetCookieName(realmStore.Realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
-                                    ctx.CookieOptions);
+                               ctx.HttpContext,
+                                $"{IdServerCookieAuthenticationHandler.GetCookieName(realm, ctx.Options.Cookie.Name)}-{nameIdentifier.SanitizeNameIdentifier()}",
+                               ctx.CookieOptions);
                         }
 
                         return Task.CompletedTask;

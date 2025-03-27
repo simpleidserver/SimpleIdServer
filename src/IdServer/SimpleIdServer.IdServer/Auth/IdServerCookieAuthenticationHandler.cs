@@ -60,10 +60,10 @@ namespace SimpleIdServer.IdServer.Auth
         /// <param name="encoder">The <see cref="UrlEncoder"/>.</param>
         /// <param name="clock">The <see cref="ISystemClock"/>.</param>
         public IdServerCookieAuthenticationHandler(
-            IUserSessionResitory userSessionResitory, 
+            IUserSessionResitory userSessionResitory,
             IOptions<IdServerHostOptions> idServerHostOptions,
             IRealmStore realmStore,
-            IOptionsMonitor<CookieAuthenticationOptions> options, 
+            IOptionsMonitor<CookieAuthenticationOptions> options,
             ILoggerFactory logger, UrlEncoder encoder, ISystemClock clock)
             : base(options, logger, encoder, clock)
         {
@@ -220,7 +220,7 @@ namespace SimpleIdServer.IdServer.Auth
                 sessionId = Options.CookieManager.GetRequestCookie(Context, sessionCookieName);
             }
 
-            if(!string.IsNullOrWhiteSpace(sessionId))
+            if (!string.IsNullOrWhiteSpace(sessionId))
             {
                 var realm = _realmStore.Realm;
                 realm = realm ?? Constants.DefaultRealm;
@@ -243,7 +243,7 @@ namespace SimpleIdServer.IdServer.Auth
                         Context,
                         GetCookieName()!,
                         context.CookieOptions);
-                    if(!string.IsNullOrWhiteSpace(sessionCookieName)) Options.CookieManager.DeleteCookie(Context, sessionCookieName, context.CookieOptions);
+                    if (!string.IsNullOrWhiteSpace(sessionCookieName)) Options.CookieManager.DeleteCookie(Context, sessionCookieName, context.CookieOptions);
                     return AuthenticateResults.ExpiredTicket;
                 }
             }
@@ -436,9 +436,13 @@ namespace SimpleIdServer.IdServer.Auth
         protected override async Task HandleSignOutAsync(AuthenticationProperties properties)
         {
             properties = properties ?? new AuthenticationProperties();
+            var realm = _realmStore.Realm;
+            if (properties.Items?.ContainsKey(Constants.RealmKey) == true)
+            {
+                realm = properties.Items[Constants.RealmKey];
+            }
 
             _signOutCalled = true;
-
             // Process the request cookie to initialize members like _sessionKey.
             await EnsureCookieTicket();
             var cookieOptions = BuildCookieOptions();
@@ -458,7 +462,7 @@ namespace SimpleIdServer.IdServer.Auth
 
             Options.CookieManager.DeleteCookie(
                 Context,
-                GetCookieName()!,
+                GetCookieName(realm, Options.Cookie.Name)!,
                 context.CookieOptions);
 
             // Only honor the ReturnUrl query string parameter on the logout path

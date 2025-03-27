@@ -109,7 +109,7 @@ namespace SimpleIdServer.IdServer.UI
             var state = jObjBody.GetStateFromRpInitiatedLogoutRequest();
             try
             {
-                var subject = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+                var subject = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                 if (string.IsNullOrWhiteSpace(postLogoutRedirectUri))
                 {
                     Response.Cookies.Delete(_options.GetSessionCookieName(_realmStore.Realm, subject));

@@ -567,7 +567,8 @@ namespace Microsoft.AspNetCore.Builder
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");
             webApplication.MapControllerRoute(
                 name: "default",
-                pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{controller=Home}/{action=Index}/{id?}");
+                pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{controller=Home}/{action=Index}/{id?}",
+                constraints: new { controller = new NotEqualConstraint("Sessions") });
 
             if(usePrefix)
             {
