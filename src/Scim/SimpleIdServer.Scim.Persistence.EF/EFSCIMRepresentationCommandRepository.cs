@@ -81,7 +81,7 @@ public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandR
     public async Task<List<SCIMRepresentationAttribute>> FindGraphAttributes(IEnumerable<string> representationIds, List<string> values, string schemaAttributeId, string sourceRepresentationId = null, CancellationToken cancellationToken = default(CancellationToken))
     {
         var parentIds = await _scimDbContext.SCIMRepresentationAttributeLst.AsNoTracking()
-            .Where(a => a.SchemaAttributeId == schemaAttributeId && representationIds.Contains(a.RepresentationId) && values.Contains(a.ValueString) || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
+            .Where(a => a.SchemaAttributeId == schemaAttributeId && (representationIds.Contains(a.RepresentationId) && values.Contains(a.ValueString)) || (sourceRepresentationId != null && a.ValueString == sourceRepresentationId))
             .Select(r => r.ParentAttributeId)
             .AsNoTracking()
             .Distinct()
