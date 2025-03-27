@@ -1,4 +1,5 @@
-﻿// Copyright (c) SimpleIdServer. All rights reserved.
+﻿
+// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Domains.DTOs;
@@ -33,5 +34,6 @@ public class Language
     [JsonPropertyName(LanguageNames.Description)]
     public string? Description { get; set; } = null;
 
+    [JsonIgnore]
     public ICollection<Translation> Descriptions { get; set; } = new List<Translation>();
 }
