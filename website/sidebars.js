@@ -29,10 +29,18 @@ const sidebars = {
         },
         {
           type: 'category',
+          label: 'Authentication',
+          items: [
+            'idserver/auth/pwd'
+          ]
+        },
+        {
+          type: 'category',
           label: 'Persistence',
           items: [
             'idserver/persistence/index',
-            'idserver/persistence/entityframework'          ]
+            'idserver/persistence/entityframework'          
+          ]
         }
       ]
     },
