@@ -1,11 +1,13 @@
 ﻿@model SimpleIdServer.IdServer.UI.ViewModels.AuthenticatePasswordViewModel
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Startup.Resources
+@inject IRealmStore realmStore
 
 @{
     ViewBag.Title = AuthenticatePasswordResource.title;
     Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
     var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
-    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
+    var realm = realmStore?.Realm;
     var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 

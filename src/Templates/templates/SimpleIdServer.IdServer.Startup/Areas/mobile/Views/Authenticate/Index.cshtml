@@ -1,14 +1,16 @@
 ﻿@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Options;
 @using SimpleIdServer.IdServer.Startup.Resources;
 @model SimpleIdServer.IdServer.Fido.UI.ViewModels.AuthenticateMobileViewModel;
 @inject IOptions<IdServerHostOptions> configuration
+@inject IRealmStore realmStore
 
 @{
     ViewBag.Title = AuthenticateMobileResource.auth_title;
     Layout = "~/Views/Shared/_AuthenticateLayout.cshtml";
     var returnUrl = Microsoft.AspNetCore.Http.Extensions.UriHelper.GetDisplayUrl(Context.Request);
-    var realm = SimpleIdServer.IdServer.Helpers.RealmContext.Instance()?.Realm;
+    var realm = realmStore?.Realm;
     var registationUrl = $"{(string.IsNullOrWhiteSpace(realm) ? "/" : $"/{realm}/")}Registration?redirectUrl={returnUrl}&workflowName={Model.RegistrationWorkflow?.Name}";
 }
 
