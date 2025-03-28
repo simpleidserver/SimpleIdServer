@@ -19,6 +19,12 @@ public class WorkflowStore : IWorkflowStore
             .Include(w => w.Steps)
             .SingleOrDefaultAsync(w => w.Id == id && w.Realm == realm, cancellationToken);
 
+    public Task<WorkflowRecord> GetByName(string realm, string name, CancellationToken cancellationToken)
+        => _dbContext.Workflows
+            .Include(w => w.Links)
+            .Include(w => w.Steps)
+            .SingleOrDefaultAsync(w => w.Name == name && w.Realm == realm, cancellationToken);
+
     public Task<List<WorkflowRecord>> GetAll(string realm, CancellationToken cancellationToken)
         => _dbContext.Workflows
             .Include(w => w.Links)

@@ -5,6 +5,7 @@ namespace FormBuilder.Models;
 public class WorkflowRecord : ICloneable
 {
     public string Id { get; set; }
+    public string? Name { get; set; }
     public string? Realm { get; set; }
     public DateTime UpdateDateTime { get; set; }
     public List<WorkflowStep> Steps { get; set; } = new List<WorkflowStep>();
@@ -60,6 +61,7 @@ public class WorkflowRecord : ICloneable
         {
             Id = Id,
             Realm = Realm,
+            Name = Name,
             UpdateDateTime = UpdateDateTime,
             Steps = Steps.Select(s => s.Clone() as WorkflowStep).ToList(),
             Links = Links.Select(s => s.Clone() as WorkflowLink).ToList()

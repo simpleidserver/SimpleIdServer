@@ -31,7 +31,9 @@ const sidebars = {
           type: 'category',
           label: 'Authentication',
           items: [
-            'idserver/auth/pwd'
+            'idserver/auth/pwd',
+            'idserver/auth/email',
+            'idserver/auth/sms'
           ]
         },
         {

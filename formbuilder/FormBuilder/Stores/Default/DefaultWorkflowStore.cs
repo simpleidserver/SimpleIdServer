@@ -18,6 +18,12 @@ public class DefaultWorkflowStore : IWorkflowStore
         return Task.FromResult(result);
     }
 
+    public Task<WorkflowRecord> GetByName(string realm, string name, CancellationToken cancellationToken)
+    {
+        var result = _workflows.SingleOrDefault(w => w.Name == name && w.Realm == realm);
+        return Task.FromResult(result);
+    }
+
     public Task<List<WorkflowRecord>> GetAll(string realm, CancellationToken cancellationToken)
     {
         var result = _workflows.Where(w => w.Realm == realm).ToList();

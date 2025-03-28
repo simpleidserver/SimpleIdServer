@@ -13,9 +13,9 @@ public class WorkflowBuilder
         _workflowLinks = new List<WorkflowLinkBuilder>();
     }
 
-    public static WorkflowBuilder New(string id)
+    public static WorkflowBuilder New(string id, string name = null)
     {
-        return new WorkflowBuilder(new WorkflowRecord { Id = id, Realm = "master" });
+        return new WorkflowBuilder(new WorkflowRecord { Id = id, Realm = "master", Name = name });
     }
 
     public WorkflowBuilder AddStep(FormRecord record)

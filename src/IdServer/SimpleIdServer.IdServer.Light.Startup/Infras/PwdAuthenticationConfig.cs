@@ -3,6 +3,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SimpleIdServer.IdServer.Pwd;
 
 namespace SimpleIdServer.IdServer.Light.Startup.Infras;
 
@@ -21,6 +22,7 @@ public static class PwdAuthenticationConfig
             .AddPwdAuthentication(true);
 
         var app = webApplicationBuilder.Build();
+        app.Services.SeedData();
         app.UseSid();
         app.Run();
     }

@@ -1,6 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using FormBuilder.Builders;
 using SimpleIdServer.Configuration;
 
 namespace SimpleIdServer.IdServer.Pwd;
@@ -32,6 +31,4 @@ public class IdServerPasswordOptions
     /// </summary>
     [ConfigurationRecord("Can reset the password", null, order: 4)]
     public bool CanResetPassword { get; set; } = true;
-    [ConfigurationRecord("Identifier workflow of the reset confirmation", null, order: 5)]
-    public string ConfirmResetPasswordWorkflowId { get; set; } = StandardPwdAuthWorkflows.confirmResetPwdWorkflowId;
 }

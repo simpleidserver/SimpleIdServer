@@ -21,7 +21,7 @@ public static class StandardPwdAuthWorkflows
         .AddResetPwd()
         .Build(DateTime.UtcNow);
 
-    public static WorkflowRecord DefaultConfirmResetPwdWorkflow = WorkflowBuilder.New(confirmResetPwdWorkflowId)
+    public static WorkflowRecord DefaultConfirmResetPwdWorkflow = WorkflowBuilder.New(confirmResetPwdWorkflowId, "resetPwd")
         .AddConfirmResetPwd()
         .Build(DateTime.UtcNow);
 

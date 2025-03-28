@@ -20,6 +20,7 @@ public static class SmsAuthenticationConfig
             .AddSmsAuthentication(true);
 
         var app = webApplicationBuilder.Build();
+        app.Services.SeedData();
         app.UseSid();
         app.Run();
     }
@@ -38,6 +39,7 @@ public static class SmsAuthenticationConfig
             .EnableRealm();
 
         var app = webApplicationBuilder.Build();
+        app.Services.SeedData();
         app.UseSid();
         app.Run();
     }

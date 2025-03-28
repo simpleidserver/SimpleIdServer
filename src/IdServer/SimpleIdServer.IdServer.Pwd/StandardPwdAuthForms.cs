@@ -56,10 +56,30 @@ public class StandardPwdAuthForms
                         StandardFormComponents.NewAuthenticate()
                     }
                 },
-                // Separator
-                StandardFormComponents.NewSeparator(),
-                // Forget my password
-                StandardFormComponents.NewAnchor(pwdForgetBtnId, LayoutTranslations.ForgetPassword),
+                new FormStackLayoutRecord
+                {
+                    Transformations = new List<ITransformationRule>
+                    {
+                        new PropertyTransformationRule
+                        {
+                            PropertyName = "IsNotVisible",
+                            PropertyValue = "true",
+                            Condition = new ComparisonParameter
+                            {
+                                Source = "$.CanResetPassword",
+                                Operator = ComparisonOperators.EQ,
+                                Value = "false"
+                            }
+                        }
+                    },
+                    Elements = new ObservableCollection<IFormElementRecord>
+                    {                        
+                        // Separator
+                        StandardFormComponents.NewSeparator(),
+                        // Forget my password
+                        StandardFormComponents.NewAnchor(pwdForgetBtnId, LayoutTranslations.ForgetPassword),
+                    }
+                },
                 // Separator
                 StandardFormComponents.NewSeparator(),
                 // Register                    

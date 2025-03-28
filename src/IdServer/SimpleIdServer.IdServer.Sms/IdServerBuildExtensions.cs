@@ -1,11 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using DataSeeder;
 using FormBuilder;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Sms;
+using SimpleIdServer.IdServer.Sms.Migrations;
 using SimpleIdServer.IdServer.Sms.Services;
 using SimpleIdServer.IdServer.UI.Services;
 
@@ -23,6 +25,7 @@ public static class IdServerBuildExtensions
         idServerBuilder.Services.AddTransient<IResetPasswordService, UserSmsResetPasswordService>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, SmsRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, SmsAuthWorkflowLayout>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitSmsAuthDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<IdServerSmsOptions>();
         if (isDefaultAuthMethod)
         {

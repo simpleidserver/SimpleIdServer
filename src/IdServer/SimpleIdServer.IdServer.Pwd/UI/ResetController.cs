@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using FormBuilder;
+using FormBuilder.Builders;
+using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
 using FormBuilder.UIs;
@@ -216,7 +218,8 @@ public class ResetController : BaseController
             ReturnUrl = returnUrl,
             Realm = _realmStore.Realm
         };
-        var result = await BuildWorkflowViewModel(prefix, options.ConfirmResetPasswordWorkflowId, cancellationToken);
+        var workflow = await _workflowStore.GetByName(prefix, StandardPwdAuthWorkflows.DefaultConfirmResetPwdWorkflow.Name, cancellationToken);
+        var result = await BuildWorkflowViewModel(prefix, workflow, cancellationToken);
         result.SetInput(viewModel);
         return View(result);
     }
@@ -281,8 +284,13 @@ public class ResetController : BaseController
 
     private async Task<WorkflowViewModel> BuildWorkflowViewModel(string realm, string workflowId, CancellationToken cancellationToken)
     {
-        var records = await _formStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
         var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
+        return await BuildWorkflowViewModel(realm, workflow, cancellationToken);
+    }
+
+    private async Task<WorkflowViewModel> BuildWorkflowViewModel(string realm, WorkflowRecord workflow, CancellationToken cancellationToken)
+    {
+        var records = await _formStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         var languages = await _languageRepository.GetAll(cancellationToken);
         var amrs = WorkflowHelper.ExtractAmrs(workflow, records);

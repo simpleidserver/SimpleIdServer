@@ -4,4 +4,4 @@ using Microsoft.AspNetCore.Builder;
 using SimpleIdServer.IdServer.Light.Startup.Infras;
 
 var builder = WebApplication.CreateBuilder(args);
-ClientCredentialsConfig.Run(builder);
+SmsAuthenticationConfig.Run(builder);
