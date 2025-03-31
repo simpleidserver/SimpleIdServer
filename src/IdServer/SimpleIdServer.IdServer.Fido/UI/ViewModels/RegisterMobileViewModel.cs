@@ -10,7 +10,6 @@ public class RegisterMobileViewModel : IRegisterViewModel
     public string DisplayName { get; set; } = null!;
     public string BeginRegisterUrl { get; set; } = null!;
     public string RegisterStatusUrl { get; set; } = null!;
-    public bool IsDeveloperModeEnabled { get; set; } = false;
     public bool IsUpdated { get; set; }
     public string? ReturnUrl { get; set; }
     public string StepId { get; set; }

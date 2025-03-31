@@ -93,7 +93,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
                 realm = $"/{viewModel.Realm}/";
             viewModel.BeginLoginUrl = $"{issuer}{realm}{Constants.EndPoints.BeginQRCodeLogin}";
             viewModel.LoginStatusUrl = $"{issuer}{realm}{Constants.EndPoints.LoginStatus}";
-            viewModel.IsDeveloperModeEnabled = options.IsDeveloperModeEnabled;
         }
 
         protected async Task<ValidationStatus> ValidateCredentials(AuthenticateMobileViewModel viewModel, User user, CancellationToken cancellationToken)

@@ -4,6 +4,8 @@ using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
 
 namespace SimpleIdServer.IdServer.Builders;
 
@@ -38,6 +40,19 @@ public class AuthenticationSchemeProviderBuilder
     public AuthenticationSchemeProviderBuilder SetMappers(ICollection<AuthenticationSchemeProviderMapper> mappers)
     {
         _provider.Mappers = mappers;
+        return this;
+    }
+
+    public AuthenticationSchemeProviderBuilder SetSubject(string source)
+    {
+        _provider.Mappers = _provider.Mappers.Where(m => m.MapperType != MappingRuleTypes.SUBJECT).ToList();
+        _provider.Mappers.Add(new AuthenticationSchemeProviderMapper
+        {
+            Id = Guid.NewGuid().ToString(),
+            MapperType = MappingRuleTypes.SUBJECT,
+            Name = "Subject",
+            SourceClaimName = source
+        });
         return this;
     }
 

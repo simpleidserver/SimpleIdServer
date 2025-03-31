@@ -21,6 +21,7 @@ public static class MobileAuthenticationConfig
             .AddMobileAuthentication(null, true);
 
         var app = webApplicationBuilder.Build();
+        app.Services.SeedData();
         app.UseSid();
         app.Run();
     }

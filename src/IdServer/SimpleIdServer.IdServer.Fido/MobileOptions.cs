@@ -12,9 +12,4 @@ public class MobileOptions : IFidoOptions
     /// </summary>
     [ConfigurationRecord("Duration of the authentication/registration process in seconds", null, order: 0)]
     public int U2FExpirationTimeInSeconds { get; set; } = 5 * 60;
-    /// <summary>
-    /// Enable or disable the developer mode.
-    /// </summary>
-    [ConfigurationRecord("Enable the developer mode", null, order: 1)]
-    public bool IsDeveloperModeEnabled { get; set; } = false;
 }

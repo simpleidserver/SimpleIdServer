@@ -33,7 +33,26 @@ const sidebars = {
           items: [
             'idserver/auth/pwd',
             'idserver/auth/email',
-            'idserver/auth/sms'
+            'idserver/auth/sms',
+            'idserver/auth/otp',
+            'idserver/auth/mobile',
+            'idserver/auth/webauth'
+          ]
+        },
+        {
+          type:'category',
+          label: 'External Authentication',
+          items: [
+            'idserver/externalauth/idproviders',
+            'idserver/externalauth/windows'
+          ]
+        },
+        {
+          type:'category',
+          label: 'Protocols',
+          items: [
+            'idserver/protocols/saml',
+            'idserver/protocols/wsfederation'
           ]
         },
         {
@@ -43,7 +62,9 @@ const sidebars = {
             'idserver/persistence/index',
             'idserver/persistence/entityframework'          
           ]
-        }
+        },
+        'idserver/swagger',
+        'idserver/realm'
       ]
     },
     {

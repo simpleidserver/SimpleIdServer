@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.IdServer.Pwd;
 
 namespace SimpleIdServer.IdServer.Light.Startup.Infras;
 

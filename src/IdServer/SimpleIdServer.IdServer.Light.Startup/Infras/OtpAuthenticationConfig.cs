@@ -20,6 +20,7 @@ public static class OtpAuthenticationConfig
             .AddOtpAuthentication(true);
 
         var app = webApplicationBuilder.Build();
+        app.Services.SeedData();
         app.UseSid();
         app.Run();
     }

@@ -1,0 +1,50 @@
+﻿@using Microsoft.AspNetCore.Mvc.ApiExplorer;
+@using SimpleIdServer.IdServer.Helpers
+@using IdserverIdproviders.Resources
+@model IEnumerable<SimpleIdServer.IdServer.UI.ViewModels.SessionViewModel>
+
+@{
+    ViewBag.Title = SessionsResource.title;
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<nav class="navbar navbar-expand-lg bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="~/images/SIDLogo.svg" width="40px" />
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</nav>
+<div id="container">
+    @if(Model.Any())
+    {
+        var grp = Model.GroupBy(g => g.Realm);
+        foreach (var kvp in grp)
+        {
+            <div class="mb-2">
+                <h5>@string.Format(SessionsResource.realm, kvp.Key)</h5>
+                <ul class="list-group">
+                    @foreach (var session in kvp)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <a href="@Url.Action("Index", "Home", new { prefix = kvp.Key })">@session.Name</a>
+                            <form action="@Url.Action("Index", "Sessions", new { realm = kvp.Key, user = session.Name })" method="post">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Realm" value="@kvp.Key" />
+                                <input type="hidden" name="User" value="@session.Name" />
+                                <button type="submit" class="btn btn-danger"><i class="fa-solid fa-trash" style="padding-right:5px"></i>@SessionsResource.revoke</button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-danger">@SessionsResource.no_session</div>
+    }
+</div>

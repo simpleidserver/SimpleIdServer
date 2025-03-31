@@ -29,6 +29,7 @@ public static class SamlConfig
             .AddSamlIdp();
 
         var app = webApplicationBuilder.Build();
+        app.Services.SeedData();
         app.UseSid();
         app.Run();
     }

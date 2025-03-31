@@ -15,7 +15,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
         public string SessionId { get; set; }
         public string BeginLoginUrl { get; set; } = null!;
         public string LoginStatusUrl { get; set; } = null!;
-        public bool IsDeveloperModeEnabled { get; set; } = false;
 
         public override List<string> Validate()
         {

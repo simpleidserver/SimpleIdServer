@@ -1,0 +1,92 @@
+﻿@using SimpleIdServer.IdServer.DTOs
+@using SimpleIdServer.IdServer.Domains;
+@using IdserverSaml.Resources
+@model SimpleIdServer.IdServer.UI.ViewModels.ConsentsIndexViewModel
+
+@{
+    ViewBag.Title = LayoutResource.consents;
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="consentContainer">
+    <div class="card consent">
+        <div class="card-body">
+            <!-- Rejection form -->
+            <form method="post" action="@Url.Action("Reject", "Consents")" id="rejectForm">
+                @Html.AntiForgeryToken()
+                <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
+            </form>
+            <div class="consentinfo">
+                <div class="img">
+                    @Html.UserPicture(User)
+                </div>
+                <div class="separator"></div>
+                <div class="img">
+                    @Html.ClientPicture(Model.PictureUri)
+                </div>
+            </div>
+            <!-- Confirmation form -->
+            @using (Html.BeginForm("Index", "Consents", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <ul class="list-group">
+                        @foreach (var modelState in ViewData.ModelState.Values)
+                        {
+                            foreach (var error in modelState.Errors)
+                            {
+                                <li class="list-group-item list-group-item-danger">@ConsentsResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                            }
+                        }
+                    </ul>
+                }
+
+                <input type="hidden" name="ReturnUrl" value="@Model.ReturnUrl" />
+                <h5>@string.Format(ConsentsResource.consent_client_access, Model.ClientName)</h5>
+                <ul class="list-group">
+                    @if(Model.ScopeNames != null && Model.ScopeNames.Any())
+                    {
+                        <li class="list-group-item"><b>@ConsentsResource.scopes</b> : @string.Join(",", Model.ScopeNames)</li>
+                    }
+
+                    @if(Model.ClaimNames != null && Model.ClaimNames.Any())
+                    {
+                        <li class="list-group-item"><b>@ConsentsResource.claims</b> : @string.Join(",", Model.ClaimNames)</li>
+                    }
+
+                    @if (Model.AuthorizationDetails != null && Model.AuthorizationDetails.Any())
+                    {
+                        foreach (var authDetail in Model.AuthorizationDetails)
+                        {
+                            if (authDetail.Type == AuthorizationDetailsNames.OpenIdCredential)
+                            {
+                                
+                            }
+                            else
+                            {
+                                <li class="list-group-item">
+                                    <b>@authDetail.Type</b> : @string.Join(",", authDetail.Actions)
+                                    @if (authDetail.Locations != null && authDetail.Locations.Any())
+                                    {
+                                        <ul class="list-group">
+                                            @foreach (var location in authDetail.Locations)
+                                            {
+                                                <li class="list-group-item">@location</li>
+                                            }
+                                        </ul>
+                                    }
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+
+                <div>
+                    <button type="submit" class="btn btn-success card-link">@ConsentsResource.confirm</button>
+                    <button type="submit" form="rejectForm" class="btn btn-danger">@ConsentsResource.reject</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
