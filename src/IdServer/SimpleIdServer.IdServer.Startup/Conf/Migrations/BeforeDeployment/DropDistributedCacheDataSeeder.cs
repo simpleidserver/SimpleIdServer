@@ -31,6 +31,11 @@ public class DropDistributedCacheDataSeeder : BaseBeforeDeploymentDataSeeder
 
     protected override async Task Execute(CancellationToken cancellationToken)
     {
+        if(_dbContext.Database.IsInMemory())
+        {
+            return;
+        }
+
         var appliedMigrations = await _dbContext.Database.GetAppliedMigrationsAsync(cancellationToken);
         if(!appliedMigrations.Any(m => _migrationNames.Contains(m)))
         {

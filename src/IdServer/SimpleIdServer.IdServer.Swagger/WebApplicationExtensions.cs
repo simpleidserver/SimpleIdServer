@@ -66,7 +66,7 @@ public static class WebApplicationExtensions
 
         if (string.IsNullOrWhiteSpace(options.OAuthConfigObject.ClientId))
         {
-            options.OAuthClientId("swagger");
+            options.OAuthClientId("swaggerClient");
         }
 
         if (string.IsNullOrWhiteSpace(options.OAuthConfigObject.ClientSecret))

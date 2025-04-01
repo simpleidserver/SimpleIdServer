@@ -28,6 +28,7 @@ public static class WsFederationConfig
             .AddPwdAuthentication(true)
             .AddWsFederation();
         var app = webApplicationBuilder.Build();
+        app.Services.SeedData();
         app.UseSid();
         app.Run();
     }

@@ -1,0 +1,145 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+		<AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer" Version="6.0.*-*" />
+		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="Resources\AccountsResource.Designer.cs">
+	    <DependentUpon>AccountsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateConsoleResource.Designer.cs">
+	    <DependentUpon>AuthenticateConsoleResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateEmailResource.Designer.cs">
+	    <DependentUpon>AuthenticateEmailResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateMobileResource.Designer.cs">
+	    <DependentUpon>AuthenticateMobileResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateOtpResource.Designer.cs">
+	    <DependentUpon>AuthenticateOtpResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticatePasswordResource.Designer.cs">
+	    <DependentUpon>AuthenticatePasswordResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateSmsResource.Designer.cs">
+	    <DependentUpon>AuthenticateSmsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\AuthenticateWebauthnResource.Designer.cs">
+	    <DependentUpon>AuthenticateWebauthnResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\BCConsentsResource.Designer.cs">
+	    <DependentUpon>BCConsentsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\CheckSessionResource.Designer.cs">
+	    <DependentUpon>CheckSessionResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\ConfirmResetPasswordResource.Designer.cs">
+	    <DependentUpon>ConfirmResetPasswordResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\ConsentsResource.Designer.cs">
+	    <DependentUpon>ConsentsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\CredentialsResource.Designer.cs">
+	    <DependentUpon>CredentialsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\DeviceCodeResource.Designer.cs">
+	    <DependentUpon>DeviceCodeResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\ErrorsResource.Designer.cs">
+	    <DependentUpon>ErrorsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\HomeResource.Designer.cs">
+	    <DependentUpon>HomeResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\LayoutResource.Designer.cs">
+	    <DependentUpon>LayoutResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\ProfileResource.Designer.cs">
+	    <DependentUpon>ProfileResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\RegisterEmailResource.Designer.cs">
+	    <DependentUpon>RegisterEmailResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\RegisterPwdResource.Designer.cs">
+	    <DependentUpon>RegisterPwdResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\RegisterSmsResource.Designer.cs">
+	    <DependentUpon>RegisterSmsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\RegisterVpResource.Designer.cs">
+	    <DependentUpon>RegisterVpResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\ResetPasswordResource.Designer.cs">
+	    <DependentUpon>ResetPasswordResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\ScopesResource.Designer.cs">
+	    <DependentUpon>ScopesResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	  <Compile Update="Resources\SessionsResource.Designer.cs">
+	    <DependentUpon>SessionsResource.resx</DependentUpon>
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Update="web.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+</Project>

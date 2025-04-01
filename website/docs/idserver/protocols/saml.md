@@ -57,3 +57,5 @@ app.Services.SeedData();
 app.UseSid();
 app.Run();
 ```
+
+For more detailed reference, you can check out the example project available on GitHub: [SimpleIdServer Sample](https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/IdserverSaml).

@@ -9,6 +9,11 @@ public class LogicalRuleEngine : GenericConditionRule<LogicalParameter>
 
     protected override bool EvaluateInternal(JsonObject input, LogicalParameter parameter, IEnumerable<IConditionRuleEngine> conditionRuleEngines)
     {
+        if (parameter == null || parameter.LeftExpression == null || parameter.RightExpression == null)
+        {
+            return false;
+        }
+
         var leftCondition = conditionRuleEngines.Single(e => e.Type == parameter.LeftExpression.Type).Evaluate(input, parameter.LeftExpression, conditionRuleEngines);
         var rightCondition = conditionRuleEngines.Single(e => e.Type == parameter.RightExpression.Type).Evaluate(input, parameter.RightExpression, conditionRuleEngines);
         bool result = false;

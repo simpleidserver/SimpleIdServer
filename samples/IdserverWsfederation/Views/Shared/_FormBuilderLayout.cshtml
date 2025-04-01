@@ -1,0 +1,81 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@using FormBuilder.Components
+@using IdserverWsfederation.Resources
+@using System.Globalization
+@model SimpleIdServer.IdServer.UI.ViewModels.ILayoutViewModel
+@namespace FormBuilder.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    var returnUrl = string.IsNullOrEmpty(Context.Request.Path) ? "~/" : $"~{Context.Request.Path.Value}{Context.Request.QueryString}";
+    var currentCultureInfo = CultureInfo.DefaultThreadCurrentUICulture;
+    string languagesLabel = LayoutResource.ResourceManager.GetString("languages");
+    if (currentCultureInfo != null && !string.IsNullOrWhiteSpace(currentCultureInfo.Name))
+    {
+        var str = LayoutResource.ResourceManager.GetString(currentCultureInfo.Name);
+        if (!string.IsNullOrWhiteSpace(str))
+        {
+            languagesLabel = string.Format(LayoutResource.ResourceManager.GetString("selected_language"), str);
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+    <link rel="stylesheet" href="@Url.Content("~/lib/bootstrap/css/bootstrap.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/styles/theme.css")" />
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default.css">
+    <link rel="stylesheet" href="_content/FormBuilder/themes.css" />
+    <link rel="stylesheet" href="_content/FormBuilder/style.css" />
+    <link rel="stylesheet" href="FormBuilder.Startup.styles.css" />
+    @RenderSection("Header", required: false)
+</head>
+<body class="orange">
+    <nav class="navbar navbar-expand-lg bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <img src="~/images/SIDLogo.svg" width="40px" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <div class="me-auto"></div>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" data-bs-toggle="dropdown">
+                            @languagesLabel
+                        </a>
+                        <div class="dropdown-menu">
+                            @foreach (var language in Model.Languages)
+                            {
+                                <form asp-controller="Home" asp-action="SwitchLanguage" asp-area="" method="post">
+                                    <input type="hidden" name="culture" value="@language.Code" />
+                                    <input type="hidden" name="returnUrl" value="@returnUrl" />
+                                    <button type="submit" class="dropdown-item" href="#">@language.Description</button>
+                                </form>
+                            }
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    @RenderBody()
+    <script src="_framework/blazor.server.js"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/jquery/jquery.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/popper.js/umd/popper.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/bootstrap/js/bootstrap.js")"></script>
+    <script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+    <script src="_content/FormBuilder/lib.js"></script>
+    <script src="_content/BlazorMonaco/jsInterop.js"></script>
+    <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/loader.js"></script>
+    <script src="_content/BlazorMonaco/lib/monaco-editor/min/vs/editor/editor.main.js"></script>
+    <script type="text/javascript" src="@Url.Content("~/lib/helpers.js")"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

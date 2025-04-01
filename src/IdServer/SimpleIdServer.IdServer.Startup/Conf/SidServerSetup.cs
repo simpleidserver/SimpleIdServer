@@ -47,14 +47,12 @@ public class SidServerSetup
                 }
             }, true)
             .IgnoreCertificateError()
-            .EnableFapiSecurityProfile()
             .AddPwdAuthentication(true)
             .AddEmailAuthentication()
             .AddOtpAuthentication()
             .AddSmsAuthentication()
             .AddMobileAuthentication(o =>
             {
-                // TODO : Simplify ???
                 var authority = configuration.Authority;
                 var url = new Uri(authority);
                 o.ServerName = "SimpleIdServer";
@@ -110,9 +108,9 @@ public class SidServerSetup
             idServerBuilder.ForwardHttpHeader();
         }
 
-        if (configuration.IsMtlsAuthenticationEnabled)
+        if (configuration.IsFapiEnabled)
         {
-            idServerBuilder.EnableMtlsAuthentication(configuration.ClientCertificateMode ?? ClientCertificateMode.AllowCertificate, callback: cb =>
+            idServerBuilder.EnableFapiSecurityProfile(clientCertificate: configuration.ClientCertificateMode ?? ClientCertificateMode.AllowCertificate, callback: cb =>
             {
                 cb.AllowedCertificateTypes = CertificateTypes.All;
                 cb.RevocationMode = X509RevocationMode.NoCheck;

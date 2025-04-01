@@ -9,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using Moq;
 using SimpleIdServer.Did.Key;
-using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Host.Acceptance.Tests;
 using SimpleIdServer.IdServer.Host.Acceptance.Tests.Config;
 using System.Linq;
@@ -26,7 +25,7 @@ builder.AddSidIdentityServer(o =>
         o.IsFederationEnabled = true;
         o.TokenSignedKid = "keyid";
     })
-    .EnableMtlsAuthentication(callback: cb =>
+    .EnableFapiSecurityProfile(callback: cb =>
     {
         cb.AllowedCertificateTypes = CertificateTypes.All;
         cb.RevocationMode = System.Security.Cryptography.X509Certificates.X509RevocationMode.NoCheck;

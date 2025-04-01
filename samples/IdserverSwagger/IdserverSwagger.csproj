@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="SimpleIdServer.IdServer" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="6.0.*-*" />
+		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+	</ItemGroup>
+	<Target Name="CopyReferenceFiles" BeforeTargets="Build">
+		<ItemGroup>
+			<XmlReferenceFiles Condition="Exists('$(OutputPath)%(Filename).dll')" Include="%(Reference.RelativeDir)%(Reference.Filename).xml" />
+		</ItemGroup>
+		<Message Text="Copying reference files to $(OutputPath)" Importance="High" />
+		<Copy SourceFiles="@(XmlReferenceFiles)" DestinationFolder="$(OutputPath)" Condition="Exists('%(RootDir)%(Directory)%(Filename)%(Extension)')" />
+	</Target>
+</Project>

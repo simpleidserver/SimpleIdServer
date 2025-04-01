@@ -12,6 +12,6 @@ public class IdentityServerConfiguration
     public ClientCertificateMode? ClientCertificateMode { get; set; }
     public string Authority { get; set; }
     public bool IsForwardedEnabled { get; set; }
-    public bool IsMtlsAuthenticationEnabled { get; set; }
+    public bool IsFapiEnabled { get; set; }
     public bool ForceHttps { get; set; }
 }

@@ -1,0 +1,17 @@
+﻿@using Microsoft.AspNetCore.Mvc.ApiExplorer;
+@using IdserverWsfederation.Resources
+@model SimpleIdServer.IdServer.UI.ViewModels.DisconnectViewModel
+
+@{
+    ViewBag.Title = LayoutResource.Disconnected;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h6>@LayoutResource.YouAreDisconnected</h6>
+
+@foreach (var frontChannelLogout in Model.FrontChannelLogoutUrls)
+{
+    <iframe src="@frontChannelLogout" style="display: none"></iframe>
+}
+
+<a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-1">@LayoutResource.back</a>

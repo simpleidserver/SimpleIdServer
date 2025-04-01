@@ -38,7 +38,6 @@ public class MetadataController : BaseWsFederationController
             configuration.KeyInfos.Add(new KeyInfo(sigKey.Key));
 
         configuration.SigningCredentials = GetSigningCredentials(sigKeys);
-
         var xml = Serialize(configuration);
         return new ContentResult
         {

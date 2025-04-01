@@ -1,0 +1,66 @@
+﻿@using SimpleIdServer.IdServer.Domains;
+@using IdserverWsfederation.Resources
+@model SimpleIdServer.IdServer.UI.ViewModels.DeviceCodeViewModel
+
+@{
+    ViewBag.Title = LayoutResource.deviceauth;
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="consentContainer">
+    <div class="card consent">
+        <div class="card-body">
+            @if(Model.IsConfirmed)
+            {                
+                <div class="alert alert-success">
+                   @DeviceCodeResource.confirmed
+                </div>
+            }
+            else
+            {
+                <div class="consentinfo">
+                    <div class="img">
+                        @Html.UserPicture(User)
+                    </div>
+                    <div class="separator"></div>
+                    <div class="img">
+                        @Html.ClientPicture(Model.PictureUri)
+                    </div>
+                </div>
+                <!-- Confirmation form -->
+                @using (Html.BeginForm("Index", "Device", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <ul class="list-group">
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                foreach (var error in modelState.Errors)
+                                {
+                                    <li class="list-group-item list-group-item-danger">@DeviceCodeResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                                }
+                            }
+                        </ul>
+                    }
+
+                    <h5>@string.Format(DeviceCodeResource.consent_client_access, Model.ClientName)</h5>
+                    <ul class="list-group">
+                        @if (Model.Scopes != null && Model.Scopes.Any())
+                        {
+                            <li class="list-group-item"><b>@DeviceCodeResource.scopes</b> : @string.Join(",", Model.Scopes)</li>
+                        }
+                    </ul>
+
+                    <div class="input-group mb-3 mt-3">
+                        <input type="text" value="@Model.UserCode" name="UserCode" class="form-control" placeholder="@DeviceCodeResource.usercode">
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-success card-link">@DeviceCodeResource.confirm</button>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

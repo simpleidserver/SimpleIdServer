@@ -161,53 +161,21 @@ public class IdServerBuilder
     /// </summary>
     /// <param name="ssl"></param>
     /// <returns></returns>
-    public IdServerBuilder EnableFapiSecurityProfile(SslProtocols ssl = SslProtocols.Tls12)
+    public IdServerBuilder EnableFapiSecurityProfile(SslProtocols ssl = SslProtocols.Tls12, ClientCertificateMode clientCertificate = ClientCertificateMode.AllowCertificate, Action<CertificateAuthenticationOptions> callback = null)
     {
         Action<HttpsConnectionAdapterOptions> cb = (o) =>
         {
             o.SslProtocols = ssl;
         };
-        if(_httpsConnectionAdapterOptions != null)
-        {
-            cb(_httpsConnectionAdapterOptions);
-        }
         Services.Configure<KestrelServerOptions>(options =>
         {
             options.ConfigureHttpsDefaults((o) =>
             {
-                _httpsConnectionAdapterOptions = o;
+                o.SslProtocols = ssl;
+                o.ClientCertificateMode = clientCertificate;
                 cb(o);
             });
         });
-        return this;
-    }
-
-    
-    /// <summary>
-    /// Enables mTLS authentication by configuring Kestrel HTTPS options and setting up certificate forwarding.
-    /// </summary>
-    public IdServerBuilder EnableMtlsAuthentication(ClientCertificateMode clientCertificate = ClientCertificateMode.AllowCertificate, Action<CertificateAuthenticationOptions> callback = null)
-    {
-        Action<HttpsConnectionAdapterOptions> cb = (o) =>
-        {
-            o.ClientCertificateMode = clientCertificate;
-        };
-        if (_httpsConnectionAdapterOptions != null)
-        {
-            cb(_httpsConnectionAdapterOptions);
-        }
-        else
-        {
-            Services.Configure<KestrelServerOptions>(options =>
-            {
-                options.ConfigureHttpsDefaults((o) =>
-                {
-                    _httpsConnectionAdapterOptions = o;
-                    cb(o);
-                });
-            });
-        }
-
         Services.AddCertificateForwarding(options =>
         {
             options.CertificateHeader = "ssl-client-cert";
@@ -227,7 +195,10 @@ public class IdServerBuilder
         {
             o.MtlsEnabled = true;
         });
-        _authBuilder.AddCertificate(SimpleIdServer.IdServer.Constants.DefaultCertificateAuthenticationScheme, callback != null ? callback : o => { });
+        _authBuilder.AddCertificate(SimpleIdServer.IdServer.Constants.DefaultCertificateAuthenticationScheme, callback != null ? callback : o => 
+        {
+            o.AllowedCertificateTypes = CertificateTypes.All;
+        });
         return this;
     }
 

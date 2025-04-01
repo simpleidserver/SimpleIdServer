@@ -24,6 +24,11 @@ public class ClientTypeDataSeeder : BaseBeforeDeploymentDataSeeder
 
     protected override async Task Execute(CancellationToken cancellationToken)
     {
+        if(_dbcontext.Database.IsInMemory())
+        {
+            return;
+        }
+
         var oldClients = await _dbcontext.Database.SqlQueryRaw<OldClient>("SELECT * FROM Clients").ToListAsync(cancellationToken);
         oldClients.ForEach(c =>
         {

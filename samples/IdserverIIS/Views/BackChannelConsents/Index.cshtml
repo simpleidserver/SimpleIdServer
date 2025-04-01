@@ -1,0 +1,74 @@
+﻿@using IdserverIIS.Resources
+@using SimpleIdServer.IdServer.UI.ViewModels
+@model SimpleIdServer.IdServer.UI.ViewModels.BCConsentsIndexViewModel
+
+@{
+    ViewBag.Title = LayoutResource.consents;
+    Layout = "~/Views/Shared/_CommonLayout.cshtml";
+}
+
+<div class="consentContainer">
+    <div class="card consent">
+        <div class="card-body">
+            @if(Model.IsConfirmed)
+            {
+                <div class="alert alert-success">
+                    @(Model.ConfirmationStatus == ConfirmationStatus.CONFIRMED ? BCConsentsResource.consent_confirmed : BCConsentsResource.consent_rejected)
+                </div>
+            }
+            else
+            {
+                <form method="post" action="@Url.Action("Reject", "BackChannelConsents")" id="rejectForm">
+                    @Html.AntiForgeryToken()
+                    <input name="ReturnUrl" type="hidden" value="@Model.ReturnUrl" />
+                    <input name="IsRejected" type="hidden" value="true" />
+                </form>
+                @using (Html.BeginForm("Index", "BackChannelConsents", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    @if (!ViewData.ModelState.IsValid)
+                    {
+                        <ul class="list-group">
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                foreach (var error in modelState.Errors)
+                                {
+                                    <li class="list-group-item list-group-item-danger">@BCConsentsResource.ResourceManager.GetString(error.ErrorMessage)</li>
+                                }
+                            }
+                        </ul>
+                    }
+
+                    <input type="hidden" value="@Model.ReturnUrl" name="ReturnUrl" />
+                    <input name="IsRejected" type="hidden" value="false" />
+
+                    <h5>@string.Format(BCConsentsResource.consent_client_access, Model.ClientName)</h5>
+                    <ul class="list-group">
+                        @if (!string.IsNullOrWhiteSpace(Model.BindingMessage))
+                        {
+                            <li class="list-group-item"><b>@BCConsentsResource.message</b> : @Model.BindingMessage</li>
+                        }
+
+                        @if(Model.Scopes == null || !Model.Scopes.Any())
+                        {                            
+                            <li class="list-group-item"><b>@BCConsentsResource.scopes</b> : @string.Join(",", Model.Scopes)</li>
+                        }
+
+                        @if(Model.AuthorizationDetails != null && Model.AuthorizationDetails.Any())
+                        {
+                            foreach(var authDetail in Model.AuthorizationDetails)
+                            {
+                                <li class="list-group-item"><b>@authDetail.Type</b> : @string.Join(",", authDetail.Actions)</li>
+                            }
+                        }
+                    </ul>
+
+                    <div>
+                        <button type="submit" class="btn btn-success card-link">@BCConsentsResource.confirm</button>
+                        <button type="submit" form="rejectForm" class="btn btn-danger">@BCConsentsResource.reject</button>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>

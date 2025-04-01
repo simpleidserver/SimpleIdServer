@@ -20,12 +20,14 @@ To make the Google authentication provider configurable via your administration 
 
 The `ConfigurationRecordAttribute` is a key part of this configuration. It not only marks a property as editable but also provides metadata for its display and validation. Here are the properties of the attribute:
 
-* **DisplayName**: The display name of the property.
-* **Description**: A description providing more context about the property.
-* **Order**: The order in which the property appears in the administration interface.
-* **IsRequired** : Indicates whether the property is mandatory.
-* **CustomType** : For native types (such as string, boolean, int, etc.), if the property is not associated with one of the predefined enumeration values, this should be set to null. Otherwise, assign one of these values: : `OTPVALUE`, `PASSWORD`, `NOTIFICATIONMODE`. 
-* **DisplayCondition** : An expression that the administration site evaluates to determine whether the field should be displayed. For example, the expression `AuthenticationType=CLIENT_SECRET_POST` means the property is shown only if `AuthenticationType` equals `CLIENT_SECRET_POST`.
+| Property | Description |
+| -------- | ----------- |
+| DisplayName | The display name of the property. |
+| Description | A description providing more context about the property. |
+| Order | The order in which the property appears in the administration interface. |
+| IsRequired | Indicates whether the property is mandatory. |
+| CustomType | For native types (such as string, boolean, int, etc.), if the property is not associated with one of the predefined enumeration values, this should be set to null. Otherwise, assign one of these values: `OTPVALUE`, `PASSWORD`, `NOTIFICATIONMODE`.  |
+| DisplayCondition | An expression that the administration site evaluates to determine whether the field should be displayed. For example, the expression `AuthenticationType=CLIENT_SECRET_POST` means the property is shown only if `AuthenticationType` equals `CLIENT_SECRET_POST`. |
 
 Below is the C# code for GoogleOptionsLite:
 
@@ -90,8 +92,6 @@ app.UseSid();
 app.Run();
 ```
 
-For more detailed reference, you can check out the example project available on GitHub: [SimpleIdServer Sample](https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/IdserverIdproviders).
-
 Once configured, the external providers will be displayed on the login page, offering a seamless and flexible authentication experience.
 
 ![Identity providers](./imgs/idproviders.png)"
@@ -110,3 +110,5 @@ Here is an example configuration:
   }
 }
 ```
+
+For more detailed reference, you can check out the example project available on GitHub: [SimpleIdServer Sample](https://github.com/simpleidserver/SimpleIdServer/tree/master/samples/IdserverIdproviders).

@@ -64,7 +64,16 @@ const sidebars = {
           ]
         },
         'idserver/swagger',
-        'idserver/realm'
+        'idserver/realm',
+        'idserver/fapi2',
+        {
+          type: 'category',
+          label: 'Hosting',
+          items: [
+            'idserver/hosting/iis',
+            'idserver/hosting/nginx'
+          ]
+        }
       ]
     },
     {
