@@ -4119,6 +4119,102 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="When group displayName is updated then information must be propagated")]
+        [Xunit.TraitAttribute("FeatureTitle", "Groups")]
+        [Xunit.TraitAttribute("Description", "When group displayName is updated then information must be propagated")]
+        public void WhenGroupDisplayNameIsUpdatedThenInformationMustBePropagated()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("When group displayName is updated then information must be propagated", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 1395
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+                TechTalk.SpecFlow.Table table147 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table147.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:User\", \"urn:ietf:params:scim:schemas:ext" +
+                                "ension:enterprise:2.0:User\" ]"});
+                table147.AddRow(new string[] {
+                            "userName",
+                            "firstUser"});
+                table147.AddRow(new string[] {
+                            "externalId",
+                            "externalid"});
+                table147.AddRow(new string[] {
+                            "name",
+                            "{ \"formatted\" : \"formatted\", \"familyName\": \"familyName\", \"givenName\": \"givenName\"" +
+                                " }"});
+                table147.AddRow(new string[] {
+                            "employeeNumber",
+                            "number"});
+                table147.AddRow(new string[] {
+                            "displayName",
+                            "firstUserDisplayName"});
+#line 1396
+ testRunner.When("execute HTTP POST JSON request \'http://localhost/Users\'", ((string)(null)), table147, "When ");
+#line hidden
+#line 1404
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 1405
+ testRunner.And("extract \'id\' from JSON body into \'firstUserId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table148 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table148.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:schemas:core:2.0:Group\" ]"});
+                table148.AddRow(new string[] {
+                            "displayName",
+                            "FirstGroup"});
+                table148.AddRow(new string[] {
+                            "members",
+                            "[ { \"value\": \"$firstUserId$\" } ]"});
+#line 1408
+ testRunner.And("execute HTTP POST JSON request \'http://localhost/Groups\'", ((string)(null)), table148, "And ");
+#line hidden
+#line 1413
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 1414
+ testRunner.And("extract \'id\' from JSON body into \'firstGroupId\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table149 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table149.AddRow(new string[] {
+                            "schemas",
+                            "[ \"urn:ietf:params:scim:api:messages:2.0:PatchOp\" ]"});
+                table149.AddRow(new string[] {
+                            "Operations",
+                            "[ { \"op\": \"replace\", \"path\": \"displayName\", \"value\": \"changed\" } ]"});
+#line 1416
+ testRunner.And("execute HTTP PATCH JSON request \'http://localhost/Users/$firstUserId$\'", ((string)(null)), table149, "And ");
+#line hidden
+#line 1421
+ testRunner.And("execute HTTP GET request \'http://localhost/Groups/$firstGroupId$\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 1422
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 1424
+ testRunner.Then("JSON \'members[0].display\'=\'changed\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

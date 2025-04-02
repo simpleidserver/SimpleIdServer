@@ -16,6 +16,16 @@ using System.Linq;
 
 void ConfigureServices(IServiceCollection services)
 {
+    var groupSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:Group", "Group", SCIMResourceTypes.Group, "Group", true)
+                .AddStringAttribute("displayName")
+                .AddComplexAttribute("members", c =>
+                {
+                    c.AddStringAttribute("value");
+                    c.AddStringAttribute("$ref");
+                    c.AddStringAttribute("display");
+                    c.AddStringAttribute("type", mutability: SCIMSchemaAttributeMutabilities.IMMUTABLE);
+                }, multiValued: true)
+                .Build();
     var userSchema = SCIMSchemaBuilder.Create("urn:ietf:params:scim:schemas:core:2.0:User", "User", SCIMResourceTypes.User, "User Account", true)
        .AddStringAttribute("userName", required: true, mutability: SCIMSchemaAttributeMutabilities.READWRITE, caseExact: true, uniqueness: SCIMSchemaAttributeUniqueness.SERVER)
        .AddComplexAttribute("name", c =>
@@ -26,6 +36,7 @@ void ConfigureServices(IServiceCollection services)
        }, description: "The components of the user's real name.")
        .AddStringAttribute("roles", multiValued: true)
        .AddDecimalAttribute("age")
+       .AddStringAttribute("displayName")
        .AddDateTimeAttribute("birthDate")
        .AddBooleanAttribute("active")
        .AddStringAttribute("duplicateAttr")
@@ -113,7 +124,7 @@ void ConfigureServices(IServiceCollection services)
         {
             userSchema,
             enterpriseUser,
-            StandardSchemas.GroupSchema,
+            groupSchema,
             entitlementSchema,
             customUserSchema
         };
@@ -125,14 +136,14 @@ void ConfigureServices(IServiceCollection services)
                 SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
                 SourceResourceType = userSchema.ResourceType,
                 SourceAttributeSelector = "groups",
-                TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
-                TargetAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id
+                TargetResourceType = groupSchema.ResourceType,
+                TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
             },
             new SCIMAttributeMapping
             {
                 Id = Guid.NewGuid().ToString(),
-                SourceAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id,
-                SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+                SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+                SourceResourceType = groupSchema.ResourceType,
                 SourceAttributeSelector = "members",
                 TargetResourceType = userSchema.ResourceType,
                 TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
@@ -141,10 +152,10 @@ void ConfigureServices(IServiceCollection services)
             new SCIMAttributeMapping
             {
                 Id = Guid.NewGuid().ToString(),
-                SourceAttributeId = StandardSchemas.GroupSchema.Attributes.First(a => a.Name == "members").Id,
-                SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+                SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+                SourceResourceType = groupSchema.ResourceType,
                 SourceAttributeSelector = "members",
-                TargetResourceType = StandardSchemas.GroupSchema.ResourceType
+                TargetResourceType = groupSchema.ResourceType
             },
             new SCIMAttributeMapping
             {

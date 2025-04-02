@@ -141,6 +141,12 @@ namespace SimpleIdServer.Scim.Helpers
 
             var syncIndirectReferences = await SyncIndirectReferences(newSourceScimRepresentation, allAdded, allRemoved, propagatedAttribute, selfReferenceAttribute, mappedSchemas, sync, updateAllReference);
             sync.AddRange(syncIndirectReferences);
+            var r = await UpdateDisplayName(newSourceScimRepresentation, patchOperations, sync, CancellationToken.None);
+            if(r != null)
+            {
+                sync.Add(r);
+            }
+
             return sync;
         }
 
@@ -315,6 +321,58 @@ namespace SimpleIdServer.Scim.Helpers
             }
 
             return references;
+        }
+
+        protected async Task<RepresentationSyncResult> UpdateDisplayName(SCIMRepresentation newSourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, List<RepresentationSyncResult> sync, CancellationToken cancellationToken)
+        {
+            var attributeMappingLst = await _scimAttributeMappingQueryRepository.GetByTargetResourceType(newSourceScimRepresentation.ResourceType);
+            if(!attributeMappingLst.Any())
+            {
+                return null;
+            }
+
+            var updateDisplayName = patchOperations.FirstOrDefault(p => p.Operation == SCIMPatchOperations.REPLACE && IsDisplayName(p.Attr.SchemaAttribute.Name));
+            if(updateDisplayName == null)
+            {
+                return null;
+            }
+
+            var mappedSchemas = (await _scimSchemaCommandRepository.FindSCIMSchemaByResourceTypes(attributeMappingLst.Select(a => a.SourceResourceType).Distinct())).ToList();
+            var attrIds = attributeMappingLst.Select(m =>
+            {
+                var attr = mappedSchemas.First(s => s.ResourceType == m.SourceResourceType).GetChildren(m.SourceAttributeId);
+                if(attr == null)
+                {
+                    return null;
+                }
+
+                var displayName = attr.SingleOrDefault(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Display)?.Id;
+                var value = attr.SingleOrDefault(a => a.Name == SCIMConstants.StandardSCIMReferenceProperties.Value)?.Id;
+                if(displayName == null || value == null)
+                {
+                    return null;
+                }
+
+                return new
+                {
+                    display = displayName,
+                    value = value
+                };
+            }).Where(m => m != null).ToList();
+
+            var result = new RepresentationSyncResult();
+            foreach (var record in attrIds)
+            {
+                var attrs = await _scimRepresentationCommandRepository.FindGraphAttributes(newSourceScimRepresentation.Id, record.value, cancellationToken: cancellationToken);
+                var displayAttrs = attrs.Where(a => a.SchemaAttributeId == record.display);
+                foreach (var attr in displayAttrs)
+                {
+                    attr.ValueString = updateDisplayName.Attr.ValueString;
+                    result.UpdateReferenceAttributes(new List<SCIMRepresentationAttribute> { attr }, sync);
+                }
+            }
+
+            return result;
         }
 
         protected virtual async Task<List<SCIMRepresentation>> GetChildren(List<SCIMRepresentation> scimRepresentations, SCIMAttributeMapping selfReferenceAttribute) 
