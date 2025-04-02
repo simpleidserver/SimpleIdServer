@@ -1391,3 +1391,34 @@ Scenario: When user is removed from the group then no group information is retur
 	And extract JSON from body
 
 	Then '$.groups' length is equals to '0'
+	
+Scenario: When group displayName is updated then information must be propagated
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | firstUser                                                                                                      |
+	| externalId     | externalid                                                                                                     |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+	| displayName	 | firstUserDisplayName                                                                                           |
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstUserId'
+
+
+	And execute HTTP POST JSON request 'http://localhost/Groups'
+	| Key         | Value                                               |
+	| schemas     | [ "urn:ietf:params:scim:schemas:core:2.0:Group" ]   |
+	| displayName | FirstGroup											|
+	| members     | [ { "value": "$firstUserId$" } ]					|
+	And extract JSON from body
+	And extract 'id' from JSON body into 'firstGroupId'
+
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$firstUserId$'
+	| Key         | Value                                                              |
+	| schemas     | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]                |
+	| Operations  | [ { "op": "replace", "path": "displayName", "value": "changed" } ] |	
+	
+	And execute HTTP GET request 'http://localhost/Groups/$firstGroupId$'	
+	And extract JSON from body
+	
+	Then JSON 'members[0].display'='changed'
