@@ -3,7 +3,7 @@
 This article outlines the process of deploying an identity server on IIS, offering a clear roadmap from publishing your application to troubleshooting common issues. 
 The guide is divided into several chapters for easy navigation.
 
-Deploying an identity server on IIS can streamline your authentication process for web applications. This guide provides detailed steps for deploying the server, ensuring your environment is correctly configured and any issues are promptly addressed. For further technical details, visiting official documentation such as MSDN is recommended.
+Deploying an identity server on IIS can streamline your authentication process for web applications. This guide provides detailed steps for deploying the server, ensuring your environment is correctly configured and any issues are promptly addressed. For further technical details, visiting official documentation such as [MSDN](https://learn.microsoft.com/en-us/aspnet/core/tutorials/publish-to-iis?view=aspnetcore-9.0&tabs=visual-studio) is recommended.
 
 ## Publishing the Identity Server
 
@@ -65,6 +65,12 @@ To resolve this issue:
 * **Verify User Permissions**: Ensure that the application pool user is a member of the Cryptographic Operators group.
 
 These adjustments should prevent the cryptographic exception from occurring.
+
+:::note
+
+If the application is deployed on Azure, add the application setting WEBSITE_LOAD_PROFILE and set its value to 1.
+
+:::
 
 ## Enabling Blazor Server Requirements on IIS
 
