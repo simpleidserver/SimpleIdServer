@@ -6,9 +6,7 @@ using FormBuilder.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Radzen;
@@ -26,15 +24,14 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IdserverAdminBuilder AddIdserverAdmin(this IServiceCollection services, Action<IdServerWebsiteOptions>? callbackOptions = null, string issuer)
+    private static string _clientId = "SIDS-manager";
+    private static string _clientSecret = "password";
+
+    public static IdserverAdminBuilder AddIdserverAdmin(this IServiceCollection services, string issuer, Action<IdServerWebsiteOptions>? callbackOptions = null)
     {
-        var opts = new IdServerWebsiteOptions
-        {
-            Issuer = issuer,
-        };
-        if (callbackOptions != null) callbackOptions(opts);
-        services.AddRazorPages();
-        services.AddServerSideBlazor();
+        services.AddControllers();
+        // services.AddRazorPages();
+        // services.AddServerSideBlazor();
         services.AddFluxor(o =>
         {
             o.ScanAssemblies(typeof(ServiceCollectionExtensions).Assembly);
@@ -43,6 +40,7 @@ public static class ServiceCollectionExtensions
                 rdt.Name = "SimpleIdServer";
             });
         });
+        services.AddDistributedMemoryCache();
         services.AddLocalization();
         services.RemoveAll<IUriProvider>();
         services.AddFormBuilderUi();
@@ -59,10 +57,16 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ContextMenuService>();
         services.AddScoped<TooltipService>();
         services.AddSingleton<IAccessTokenStore, AccessTokenStore>();
-        if (callbackOptions == null) services.Configure<IdServerWebsiteOptions>((o) => { });
-        else services.Configure(callbackOptions);
+        services.Configure<IdServerWebsiteOptions>(o =>
+        {
+            o.ClientId = _clientId;
+            o.ClientSecret = _clientSecret;
+            o.Issuer = issuer;
+            o.IgnoreCertificateError = false;
+        });
+        if (callbackOptions != null) services.Configure(callbackOptions);
         var b = services.AddDataProtection();
-        var adminOpenidAuth = new AdminOpenidAuth();
+        var adminOpenidAuth = new AdminOpenidAuth(_clientId, _clientSecret);
         var adminAuthz = new AdminAuthz();
         var adminCookieAuth = new AdminCookieAuth();
         ConfigureSecurity(services, adminOpenidAuth, adminAuthz, adminCookieAuth, issuer);
@@ -120,11 +124,12 @@ public static class ServiceCollectionExtensions
 
 internal class AdminOpenidAuth
 {
-    public AdminOpenidAuth()
+    public AdminOpenidAuth(string clientId, string clientSecret)
     {
+        ClientId = clientId;
+        ClientSecret = clientSecret;
+        IgnoreCertificateError = false;
         Scopes = new List<string> { "openid", "profile", "role" };
-        ClientId = "SIDS-manager";
-        ClientSecret = "password";
         Callback = (o) =>
         {
             if (IgnoreCertificateError)

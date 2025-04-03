@@ -14,16 +14,13 @@ namespace SimpleIdServer.IdServer.Website.Controllers;
 
 public class LoginController : Controller
 {
-    private readonly DefaultSecurityOptions _defaultSecurityOptions;
     private readonly IdServerWebsiteOptions _options;
     private readonly ILogger<LoginController> _logger;
 
     public LoginController(
-        DefaultSecurityOptions defaultSecurityOptions,
         IOptions<IdServerWebsiteOptions> options,
         ILogger<LoginController> logger)
     {
-        _defaultSecurityOptions = defaultSecurityOptions;
         _options = options.Value;
         _logger = logger;
     }
@@ -57,7 +54,7 @@ public class LoginController : Controller
     public async Task<IActionResult> Callback(string realm)
     {
         _logger.LogInformation("Execute callback");
-        var issuer = _defaultSecurityOptions.Issuer;
+        var issuer = _options.Issuer;
         if(_options.IsReamEnabled) issuer = $"{issuer}/{realm}";
         var tokenEndpoint = $"{issuer}/token";
         var userInfoEndpoint = $"{issuer}/userinfo";
@@ -94,11 +91,11 @@ public class LoginController : Controller
         {
             var tokenEndpointRequest = new OpenIdConnectMessage
             {
-                ClientId = _defaultSecurityOptions.ClientId,
+                ClientId = _options.ClientId,
                 Code = authorizationResponse.Code,
                 GrantType = OpenIdConnectGrantTypes.AuthorizationCode,
                 RedirectUri = redirectUri,
-                ClientSecret = _defaultSecurityOptions.ClientSecret
+                ClientSecret = _options.ClientSecret
             };
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpoint);
             requestMessage.Content = new FormUrlEncodedContent(tokenEndpointRequest.Parameters);
@@ -130,7 +127,7 @@ public class LoginController : Controller
 
     private HttpClient BuildHttpClient()
     {
-        if (!_defaultSecurityOptions.IgnoreCertificateError) return new HttpClient();
+        if (!_options.IgnoreCertificateError) return new HttpClient();
         var handler = new HttpClientHandler
         {
             ServerCertificateCustomValidationCallback = (httpRequestMessage, cert, cetChain, policyErrors) =>

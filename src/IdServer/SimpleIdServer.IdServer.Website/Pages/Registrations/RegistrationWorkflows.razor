@@ -199,7 +199,7 @@
 
     string GetDemoUrl(SelectableRegistrationWorkflow workflow)
     {
-        return Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{activeRealm}/registration?workflowName={workflow.RegistrationWorkflow.Name}" : $"{Options.Value.IdServerBaseUrl}/registration?workflowName={workflow.RegistrationWorkflow.Name}";
+        return Options.Value.IsReamEnabled ? $"{Options.Value.Issuer}/{activeRealm}/registration?workflowName={workflow.RegistrationWorkflow.Name}" : $"{Options.Value.Issuer}/registration?workflowName={workflow.RegistrationWorkflow.Name}";
     }
 
     async Task<string> GetRealm()

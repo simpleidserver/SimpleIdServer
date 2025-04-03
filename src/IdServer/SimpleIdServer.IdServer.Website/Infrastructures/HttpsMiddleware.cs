@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Http;
 
-namespace SimpleIdServer.IdServer.Website.Infrastructures;
+namespace SimpleIdServer.IdServer.Website.Middlewares;
 
 public class HttpsMiddleware
 {

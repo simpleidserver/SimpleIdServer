@@ -10,4 +10,7 @@ public class IdServerWebsiteOptions
     internal bool IsReamEnabled { get; set; } = true;
     internal string Issuer { get; set; } = "https://localhost:5001";
     internal bool ForceHttps { get; set; } = false;
+    internal string ClientId { get; set; }
+    internal string ClientSecret { get; set; }
+    internal bool IgnoreCertificateError { get; set; }
 }

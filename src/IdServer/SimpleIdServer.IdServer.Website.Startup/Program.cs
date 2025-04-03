@@ -1,33 +1,31 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+using SimpleIdServer.IdServer.Website.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Configuration.AddJsonFile("appsettings.json")
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddEnvironmentVariables();
-var dataProtectionPath = builder.Configuration["dataProtectionPath"]?.ToString();
-var isRealmEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
-var forceHttpsStr = builder.Configuration["forceHttps"];
-var adminBuilder = builder.Services.AddIdserverAdmin(o =>
+.AddEnvironmentVariables();
+var idserverAdminConfiguration = builder.Configuration.Get<IdentityServerAdminConfiguration>();
+var adminBuilder = builder.Services.AddIdserverAdmin(idserverAdminConfiguration.IdserverBaseUrl, o =>
 {
-    o.ScimUrl = builder.Configuration["ScimBaseUrl"];
-}, builder.Configuration["IdServerBaseUrl"]);
-if(!string.IsNullOrWhiteSpace(dataProtectionPath))
+    o.ScimUrl = idserverAdminConfiguration.ScimBaseUrl;
+});
+if(!string.IsNullOrWhiteSpace(idserverAdminConfiguration.DataProtectionPath))
 {
-    adminBuilder.PersistDataprotection(dataProtectionPath);
+    adminBuilder.PersistDataprotection(idserverAdminConfiguration.DataProtectionPath);
 }
 
-if(isRealmEnabled)
+if(idserverAdminConfiguration.IsRealmEnabled)
 {
     adminBuilder.EnableRealm();
 }
 
-if (!string.IsNullOrWhiteSpace(forceHttpsStr) && bool.TryParse(forceHttpsStr, out bool r))
+if (idserverAdminConfiguration.ForceHttps)
 {
     adminBuilder.ForceHttps();
 }
 
+adminBuilder.UpdateOpenid(idserverAdminConfiguration.ClientId, idserverAdminConfiguration.ClientSecret, idserverAdminConfiguration.Scopes, idserverAdminConfiguration.IgnoreCertificateError);
 var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {

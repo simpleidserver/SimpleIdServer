@@ -75,7 +75,7 @@
     string GetFederationMetadataUrl() => $"{GetBaseUrl()}/FederationMetadata/2007-06/FederationMetadata.xml";
     string GetSamlMetadataUrl() => $"{GetBaseUrl()}/saml/metadata";
     [Inject] private IRealmStore realmStore { get; set; }
-    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.IdServerBaseUrl}/{realmStore.Realm}" : Options.Value.IdServerBaseUrl;
+    string GetBaseUrl() => Options.Value.IsReamEnabled ? $"{Options.Value.Issuer}/{realmStore.Realm}" : Options.Value.Issuer;
 
     [Parameter]
     public AddClientSuccessAction Client { get; set; }

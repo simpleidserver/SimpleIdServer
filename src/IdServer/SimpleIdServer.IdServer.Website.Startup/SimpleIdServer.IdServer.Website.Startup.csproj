@@ -5,6 +5,13 @@
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Infrastructures\**" />
+	  <Content Remove="Infrastructures\**" />
+	  <EmbeddedResource Remove="Infrastructures\**" />
+	  <None Remove="Infrastructures\**" />
+	</ItemGroup>
 	
 	<ItemGroup>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
@@ -12,9 +19,5 @@
 	
 	<ItemGroup>
 		<ProjectReference Include="..\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj" />
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <Folder Include="Infrastructures\" />
 	</ItemGroup>
 </Project>

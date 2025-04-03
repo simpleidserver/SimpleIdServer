@@ -17,17 +17,15 @@ namespace SimpleIdServer.IdServer.Website
 
     public class WebsiteHttpClientFactory : IWebsiteHttpClientFactory
     {
-        private readonly DefaultSecurityOptions _securityOptions;
         private readonly IdServerWebsiteOptions _idServerWebsiteOptions;
         private readonly HttpClient _httpClient;
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
         private readonly IRealmStore _realmStore;
         private readonly IAccessTokenStore _accessTokenStore;
 
-        public WebsiteHttpClientFactory(IRealmStore realmStore, DefaultSecurityOptions securityOptions, IAccessTokenStore accessTokenStore, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
+        public WebsiteHttpClientFactory(IRealmStore realmStore, IAccessTokenStore accessTokenStore, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
         {
             _realmStore = realmStore;
-            _securityOptions = securityOptions;
             _accessTokenStore = accessTokenStore;
             _idServerWebsiteOptions = idServerWebsiteOptions.Value;
             var handler = new HttpClientHandler
@@ -81,12 +79,12 @@ namespace SimpleIdServer.IdServer.Website
             if (accessToken != null && !accessToken.IsValid) _accessTokenStore.AccessTokens.TryRemove(realm, out GetAccessTokenResult r); 
             var content = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>("client_id", _securityOptions.ClientId),
-                new KeyValuePair<string, string>("client_secret", _securityOptions.ClientSecret),
+                new KeyValuePair<string, string>("client_id", _idServerWebsiteOptions.ClientId),
+                new KeyValuePair<string, string>("client_secret", _idServerWebsiteOptions.ClientSecret),
                 new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities workflows forms recurringjobs"),
                 new KeyValuePair<string, string>("grant_type", "client_credentials")
             };
-            var url = _securityOptions.Issuer;
+            var url = _idServerWebsiteOptions.Issuer;
             if (!string.IsNullOrWhiteSpace(realm))
                 url += $"/{realm}";
             url += "/token";
