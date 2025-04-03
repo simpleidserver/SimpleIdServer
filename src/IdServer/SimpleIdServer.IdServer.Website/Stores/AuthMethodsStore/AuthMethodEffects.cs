@@ -138,10 +138,10 @@ public class AuthMethodEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/authmethods";
+            return $"{_options.Issuer}/{realmStr}/authmethods";
         }
 
-        return $"{_options.IdServerBaseUrl}/authmethods";
+        return $"{_options.Issuer}/authmethods";
     }
 }
 

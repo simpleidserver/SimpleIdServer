@@ -151,10 +151,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return $"{_options.IdServerBaseUrl}/{realmStr}/acrs";
+                return $"{_options.Issuer}/{realmStr}/acrs";
             }
 
-            return $"{_options.IdServerBaseUrl}/acrs";
+            return $"{_options.Issuer}/acrs";
         }
     }
 

@@ -106,10 +106,10 @@ public class FederationEntityEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/federationentities";
+            return $"{_options.Issuer}/{realmStr}/federationentities";
         }
 
-        return $"{_options.IdServerBaseUrl}/federationentities";
+        return $"{_options.Issuer}/federationentities";
     }
 }
 

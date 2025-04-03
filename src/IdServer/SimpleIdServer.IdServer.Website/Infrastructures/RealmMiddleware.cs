@@ -130,9 +130,9 @@ public class RealmMiddleware
         if (_options.IsReamEnabled)
         {
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/realms";
+            return $"{_options.Issuer}/{realmStr}/realms";
         }
 
-        return $"{_options.IdServerBaseUrl}/realms";
+        return $"{_options.Issuer}/realms";
     }
 }

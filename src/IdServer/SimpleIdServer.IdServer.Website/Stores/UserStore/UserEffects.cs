@@ -442,10 +442,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             if(_options.IsReamEnabled)
             {
                 var realm = await GetRealm();
-                return $"{_options.IdServerBaseUrl}/{realm}";
+                return $"{_options.Issuer}/{realm}";
             }
 
-            return $"{_options.IdServerBaseUrl}";
+            return $"{_options.Issuer}";
         }
 
         private async Task<string> GetRealm()

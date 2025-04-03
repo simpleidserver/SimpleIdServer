@@ -278,10 +278,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.ScopeStore
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return $"{_options.IdServerBaseUrl}/{realmStr}/scopes";
+                return $"{_options.Issuer}/{realmStr}/scopes";
             }
 
-            return $"{_options.IdServerBaseUrl}/scopes";
+            return $"{_options.Issuer}/scopes";
         }
 
         private async Task<SearchResult<Domains.Scope>> SearchScopes(BaseSearchScopesAction action, bool isRole)

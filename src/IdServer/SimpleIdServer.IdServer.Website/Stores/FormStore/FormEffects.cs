@@ -116,10 +116,10 @@ public class FormEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_configuration.IdServerBaseUrl}/{realmStr}/forms";
+            return $"{_configuration.Issuer}/{realmStr}/forms";
         }
 
-        return $"{_configuration.IdServerBaseUrl}/forms";
+        return $"{_configuration.Issuer}/forms";
     }
 }
 

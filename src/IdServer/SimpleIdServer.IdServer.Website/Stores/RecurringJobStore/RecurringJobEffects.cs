@@ -125,10 +125,10 @@ public class RecurringJobEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/recurringjobs";
+            return $"{_options.Issuer}/{realmStr}/recurringjobs";
         }
 
-        return $"{_options.IdServerBaseUrl}/recurringjobs";
+        return $"{_options.Issuer}/recurringjobs";
     }
 }
 

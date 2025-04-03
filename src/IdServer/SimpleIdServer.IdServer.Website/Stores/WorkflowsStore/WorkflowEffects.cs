@@ -66,10 +66,10 @@ public class WorkflowEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/workflows";
+            return $"{_options.Issuer}/{realmStr}/workflows";
         }
 
-        return $"{_options.IdServerBaseUrl}/workflows";
+        return $"{_options.Issuer}/workflows";
     }
 }
 

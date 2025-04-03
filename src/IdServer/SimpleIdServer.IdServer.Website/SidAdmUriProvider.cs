@@ -16,5 +16,5 @@ public class SidAdmUriProvider : UriProvider
     }
 
     public override string GetAbsoluteUriWithVirtualPath()
-        => _options.IdServerBaseUrl;
+        => _options.Issuer;
 }

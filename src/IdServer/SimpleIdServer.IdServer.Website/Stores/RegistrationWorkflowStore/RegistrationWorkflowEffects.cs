@@ -193,10 +193,10 @@ public class RegistrationWorkflowEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/registrationworkflows";
+            return $"{_options.Issuer}/{realmStr}/registrationworkflows";
         }
 
-        return $"{_options.IdServerBaseUrl}/registrationworkflows";
+        return $"{_options.Issuer}/registrationworkflows";
     }
 }
 

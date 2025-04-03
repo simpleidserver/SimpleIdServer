@@ -234,10 +234,10 @@ public class CertificateAuthorityEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/cas";
+            return $"{_options.Issuer}/{realmStr}/cas";
         }
 
-        return $"{_options.IdServerBaseUrl}/cas";
+        return $"{_options.Issuer}/cas";
     }
 }
 

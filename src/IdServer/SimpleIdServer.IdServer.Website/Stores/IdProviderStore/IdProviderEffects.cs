@@ -268,10 +268,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdProviderStore
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return $"{_options.IdServerBaseUrl}/{realmStr}/idproviders";
+                return $"{_options.Issuer}/{realmStr}/idproviders";
             }
 
-            return $"{_options.IdServerBaseUrl}/idproviders";
+            return $"{_options.Issuer}/idproviders";
         }
     }
 

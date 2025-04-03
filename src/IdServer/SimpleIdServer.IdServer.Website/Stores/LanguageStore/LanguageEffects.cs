@@ -36,7 +36,7 @@ public class LanguageEffects
         dispatcher.Dispatch(new GetLanguagesSuccessAction { Languages = languages });
     }
 
-    private string GetLanguagesUrl() => $"{_options.IdServerBaseUrl}/languages";
+    private string GetLanguagesUrl() => $"{_options.Issuer}/languages";
 }
 
 public class GetLanguagesAction

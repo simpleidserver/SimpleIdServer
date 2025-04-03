@@ -58,10 +58,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.Auditing
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return $"{_options.IdServerBaseUrl}/{realmStr}/auditing";
+                return $"{_options.Issuer}/{realmStr}/auditing";
             }
 
-            return $"{_options.IdServerBaseUrl}/auditing";
+            return $"{_options.Issuer}/auditing";
         }
     }
 

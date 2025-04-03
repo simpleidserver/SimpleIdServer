@@ -157,10 +157,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.ApiResourceStore
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return $"{_options.IdServerBaseUrl}/{realmStr}/{subUrl}";
+                return $"{_options.Issuer}/{realmStr}/{subUrl}";
             }
 
-            return $"{_options.IdServerBaseUrl}/{subUrl}";
+            return $"{_options.Issuer}/{subUrl}";
         }
     }
 

@@ -44,10 +44,10 @@ public class ConfigurationDefinitionEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/confdefs";
+            return $"{_options.Issuer}/{realmStr}/confdefs";
         }
 
-        return $"{_options.IdServerBaseUrl}/confdefs";
+        return $"{_options.Issuer}/confdefs";
     }
 }
 

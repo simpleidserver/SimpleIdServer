@@ -166,10 +166,10 @@ public class RealmRouter : IComponent, IHandleAfterRender, IDisposable
         {
             var realm = RealmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{Options.Value.IdServerBaseUrl}/{realmStr}/realms";
+            return $"{Options.Value.Issuer}/{realmStr}/realms";
         }
 
-        return $"{Options.Value.IdServerBaseUrl}/realms";
+        return $"{Options.Value.Issuer}/realms";
     }
 
     private async Task<IEnumerable<Realm>> GetRealms(IOptions<IdServerWebsiteOptions> options)

@@ -45,10 +45,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.StatisticStore
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return $"{_options.IdServerBaseUrl}/{realmStr}/stats";
+                return $"{_options.Issuer}/{realmStr}/stats";
             }
 
-            return $"{_options.IdServerBaseUrl}/stats";
+            return $"{_options.Issuer}/stats";
         }
     }
 

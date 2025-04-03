@@ -302,12 +302,12 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
         [EffectMethod]
         public async Task Handle(RelaunchIdentityProvisioningErrorsAction action, IDispatcher dispatcher)
         {
-            var baseUrl = $"{_options.IdServerBaseUrl}/errormessages";
+            var baseUrl = $"{_options.Issuer}/errormessages";
             if (_options.IsReamEnabled)
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                baseUrl = $"{_options.IdServerBaseUrl}/{realmStr}/errormessages";
+                baseUrl = $"{_options.Issuer}/{realmStr}/errormessages";
             }
 
             var httpClient = await _websiteHttpClientFactory.Build();
@@ -331,10 +331,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdentityProvisioningStore
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return $"{_options.IdServerBaseUrl}/{realmStr}/provisioning";
+                return $"{_options.Issuer}/{realmStr}/provisioning";
             }
 
-            return $"{_options.IdServerBaseUrl}/provisioning";
+            return $"{_options.Issuer}/provisioning";
         }
     }
 

@@ -49,10 +49,10 @@ namespace SimpleIdServer.IdServer.Website.Stores.IdServerConfigurationStore
             {
                 var realm = _realmStore.Realm;
                 var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-                return $"{_options.IdServerBaseUrl}/{realmStr}";
+                return $"{_options.Issuer}/{realmStr}";
             }
 
-            return _options.IdServerBaseUrl;
+            return _options.Issuer;
         }
     }
 

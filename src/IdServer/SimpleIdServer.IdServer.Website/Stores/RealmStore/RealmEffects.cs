@@ -105,10 +105,10 @@ public class RealmEffects
         if (_options.IsReamEnabled)
         {
             var realmStr = GetRealm(realm);
-            return $"{_options.IdServerBaseUrl}/{realmStr}/realms";
+            return $"{_options.Issuer}/{realmStr}/realms";
         }
 
-        return $"{_options.IdServerBaseUrl}/realms";
+        return $"{_options.Issuer}/realms";
     }
 
     private string GetRealm(string realm = null)

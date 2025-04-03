@@ -207,10 +207,10 @@ public class GroupEffects : IGroupService
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_options.IdServerBaseUrl}/{realmStr}/groups";
+            return $"{_options.Issuer}/{realmStr}/groups";
         }
 
-        return $"{_options.IdServerBaseUrl}/groups";
+        return $"{_options.Issuer}/groups";
     }
 }
 

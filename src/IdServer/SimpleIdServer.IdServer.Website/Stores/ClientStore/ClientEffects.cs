@@ -783,10 +783,10 @@ public class ClientEffects
         {
             var realm = _realmStore.Realm;
             var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
-            return $"{_configuration.IdServerBaseUrl}/{realmStr}/{subUrl}";
+            return $"{_configuration.Issuer}/{realmStr}/{subUrl}";
         }
 
-        return $"{_configuration.IdServerBaseUrl}/{subUrl}";
+        return $"{_configuration.Issuer}/{subUrl}";
     }
 }
 
