@@ -13,21 +13,18 @@ public static class ApplicationBuilderExtensions
     public static IApplicationBuilder UseIdserverAdmin(this WebApplication builder)
     {
         var options = builder.Services.GetRequiredService<IOptions<IdServerWebsiteOptions>>().Value;
-        // builder.UseStaticFiles();
-        // builder.UseMiddleware<RealmMiddleware>();
+        builder.UseStaticFiles();
+        builder.UseMiddleware<RealmMiddleware>();
         if (options.ForceHttps)
         {
             builder.UseMiddleware<HttpsMiddleware>();
         }
 
         UseRequestLocalization(builder, options);
-        // builder.UseRouting();
-        // builder.UseCookiePolicy();
-        // builder.UseAuthentication();
-        // builder.UseAuthorization();
-        // builder.MapBlazorHub();
-        // builder.MapFallbackToPage("/_Host");
-        // builder.MapControllers();
+        builder.UseCookiePolicy();
+        builder.UseAuthentication();
+        builder.UseAuthorization();
+        builder.MapControllers();
         return builder;
     }
 
