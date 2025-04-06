@@ -7,7 +7,7 @@ public class IdServerWebsiteOptions
 {
     public string DefaultLanguage { get; set; } = "en";
     public string ScimUrl { get; set; } = "https://localhost:5003";
-    internal bool IsReamEnabled { get; set; } = true;
+    internal bool IsReamEnabled { get; set; } = false;
     internal string Issuer { get; set; } = "https://localhost:5001";
     internal bool ForceHttps { get; set; } = false;
     internal string ClientId { get; set; }

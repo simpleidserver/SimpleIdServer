@@ -177,8 +177,10 @@ task buildTemplate {
 	$IdServerPathEmptyTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Empty.Startup"
 	$IdServerPathUiSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Ui.Startup"
 	$IdServerPathUiTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Ui.Startup"
-	$IdServerWebsitePathSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup"
-	$IdServerWebsitePathTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup"
+	$IdserverAdminSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Website.Startup"
+	$IdserverAdminTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Website.Startup"
+	$IdserverAdminEmptySource = "$source_dir/IdServer/SimpleIdServer.IdServerAdmin.Empty.Startup"
+	$IdserverAdminEmptyTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServerAdmin.Empty.Startup"
 	$ScimPathSource = "$source_dir/Scim/SimpleIdServer.Scim.Startup"
 	$ScimPathTarget = "$source_dir/Templates/templates/SimpleIdServer.Scim.Startup"
 	$CredentialIssuerPathSource = "$source_dir/CredentialIssuer/SimpleIdServer.CredentialIssuer.Startup"
@@ -193,7 +195,8 @@ task buildTemplate {
 	CopyFolder $IdServerPathFullSource $IdServerPathFullTarget
 	CopyFolder $IdServerPathEmptySource $IdServerPathEmptyTarget
 	CopyFolder $IdServerPathUiSource $IdServerPathUiTarget
-	CopyFolder $IdServerWebsitePathSource $IdServerWebsitePathTarget
+	CopyFolder $IdserverAdminSource $IdserverAdminTarget
+	CopyFolder $IdserverAdminEmptySource $IdserverAdminEmptyTarget
 	CopyFolder $ScimPathSource $ScimPathTarget
 	CopyFolder $CredentialIssuerPathSource $CredentialIssuerPathTarget
 	CopyFolder $CredentialIssuerWebsitePathSource $CredentialIssuerWebsitePathTarget

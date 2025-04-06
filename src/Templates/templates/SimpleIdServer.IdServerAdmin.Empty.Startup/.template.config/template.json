@@ -1,0 +1,20 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "IdServer",
+    "Website"
+  ],
+  "name": "Empty administration website",
+  "identity": "SimpleIdServer.IdServerAdmin.Empty.Startup",
+  "groupIdentity": "SimpleIdServer.IdServerAdmin.Empty.Startup",
+  "shortName": "idserveradminempty",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+  },
+  "sourceName": "SimpleIdServer.IdServerAdmin.Empty.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.IdServerAdmin.Empty.Startup.csproj" } ]
+}

@@ -78,6 +78,13 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'Administration website',
+      items: [
+        'idserveradmin/quickstart'
+      ]
+    },
+    {
+      type: 'category',
       label: 'Installation',
       items: [
         'installation/copyandpaste',

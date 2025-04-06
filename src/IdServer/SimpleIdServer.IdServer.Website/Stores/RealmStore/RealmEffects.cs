@@ -113,6 +113,11 @@ public class RealmEffects
 
     private string GetRealm(string realm = null)
     {
+        if (!_options.IsReamEnabled)
+        {
+            return null;
+        }
+
         realm = string.IsNullOrWhiteSpace(realm) ? _realmStore.Realm : realm;
         var realmStr = !string.IsNullOrWhiteSpace(realm) ? realm : SimpleIdServer.IdServer.Constants.DefaultRealm;
         return realmStr;

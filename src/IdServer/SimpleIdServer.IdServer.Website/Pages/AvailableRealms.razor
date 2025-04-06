@@ -30,13 +30,17 @@ else
         await base.OnAfterRenderAsync(firstRender);
         if(firstRender)
         {
-            dispatcher.Dispatch(new GetAllRealmAction
-            {
-                Realm = Constants.DefaultRealm
-            });
+            if(options.Value.IsReamEnabled)
+            {                
+                dispatcher.Dispatch(new GetAllRealmAction
+                {
+                    Realm = Constants.DefaultRealm
+                });
+            }
+
             dispatcher.Dispatch(new GetLanguagesAction
             {
-                Realm = Constants.DefaultRealm
+                Realm = options.Value.IsReamEnabled ? Constants.DefaultRealm : null
             });
         }
     }

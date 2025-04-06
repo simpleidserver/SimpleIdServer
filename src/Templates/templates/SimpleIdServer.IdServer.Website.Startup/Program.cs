@@ -1,62 +1,36 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.DataProtection;
+using SimpleIdServer.IdServer.Website.Startup;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Configuration.AddJsonFile("appsettings.json")
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddEnvironmentVariables();
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-var dataProtectionPath = builder.Configuration["dataProtectionPath"]?.ToString();
-var isRealmEnabled = bool.Parse(builder.Configuration["IsRealmEnabled"]);
-var cookieName = CookieAuthenticationDefaults.CookiePrefix + Uri.EscapeDataString("AdminWebsite");
-builder.Services.AddSIDWebsite(o =>
+.AddEnvironmentVariables();
+var idserverAdminConfiguration = builder.Configuration.Get<IdentityServerAdminConfiguration>();
+var adminBuilder = builder.Services.AddIdserverAdmin(idserverAdminConfiguration.IdserverBaseUrl, o =>
 {
-    o.IdServerBaseUrl = builder.Configuration["IdServerBaseUrl"];
-    o.SCIMUrl = builder.Configuration["ScimBaseUrl"];
-    o.IsReamEnabled = isRealmEnabled;
-}, (c) =>
-{
-    if(!string.IsNullOrWhiteSpace(dataProtectionPath))
-    {
-        c.PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath));
-    }
+    o.ScimUrl = idserverAdminConfiguration.ScimBaseUrl;
 });
-bool forceHttps = false;
-var forceHttpsStr = builder.Configuration["forceHttps"];
-if (!string.IsNullOrWhiteSpace(forceHttpsStr) && bool.TryParse(forceHttpsStr, out bool r))
-    forceHttps = r;
+if(!string.IsNullOrWhiteSpace(idserverAdminConfiguration.DataProtectionPath))
+{
+    adminBuilder.PersistDataprotection(idserverAdminConfiguration.DataProtectionPath);
+}
 
-builder.Services.AddDefaultSecurity(builder.Configuration, isRealmEnabled, cookieName);
-builder.Services.AddLocalization();
+if(idserverAdminConfiguration.IsRealmEnabled)
+{
+    adminBuilder.EnableRealm();
+}
 
+if (idserverAdminConfiguration.ForceHttps)
+{
+    adminBuilder.ForceHttps();
+}
+
+adminBuilder.UpdateOpenid(idserverAdminConfiguration.ClientId, idserverAdminConfiguration.ClientSecret, idserverAdminConfiguration.Scopes, idserverAdminConfiguration.IgnoreCertificateError);
 var app = builder.Build();
-
-if (forceHttps)
-    app.SetHttpsScheme();
-
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
 }
 
-app.Services.AddSIDWebsite();
-app.UseStaticFiles();
-app.UseSidWebsite();
-app.UseRequestLocalization(e =>
-{
-    e.SetDefaultCulture("en");
-    e.AddSupportedCultures("en", "fr");
-    e.AddSupportedUICultures("en", "fr");
-});
-app.UseRouting();
-app.UseCookiePolicy();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-app.MapControllers();
+app.UseIdserverAdmin();
 app.Run();
