@@ -19,12 +19,12 @@ namespace SimpleIdServer.Scim.Queries
 {
     public class SearchRepresentationsQueryHandler : ISearchRepresentationsQueryHandler
     {
-        private readonly SCIMHostOptions _options;
+        private readonly ScimHostOptions _options;
         private readonly ILogger<SearchRepresentationsQueryHandler> _logger;
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
         private readonly ISCIMRepresentationQueryRepository _scimRepresentationQueryRepository;
 
-        public SearchRepresentationsQueryHandler(ILogger<SearchRepresentationsQueryHandler> logger, IOptionsMonitor<SCIMHostOptions> options, ISCIMSchemaQueryRepository scimSchemaQueryRepository, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository)
+        public SearchRepresentationsQueryHandler(ILogger<SearchRepresentationsQueryHandler> logger, IOptionsMonitor<ScimHostOptions> options, ISCIMSchemaQueryRepository scimSchemaQueryRepository, ISCIMRepresentationQueryRepository scimRepresentationQueryRepository)
         {
             _options = options.CurrentValue;
             _logger = logger;

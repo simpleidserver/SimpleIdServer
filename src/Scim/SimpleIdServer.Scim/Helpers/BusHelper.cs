@@ -19,12 +19,12 @@ namespace SimpleIdServer.Scim.Helpers
 
     public class BusHelper : IBusHelper
     {
-        private readonly SCIMHostOptions _options;
+        private readonly ScimHostOptions _options;
         private readonly IBusControl _busControl;
         private readonly IMessageDataRepository _messageDataRepository;
 
         public BusHelper(
-            IOptionsMonitor<SCIMHostOptions> options, 
+            IOptionsMonitor<ScimHostOptions> options, 
             IBusControl busControl, 
             IMessageDataRepository messageDataRepository)
         {

@@ -40,7 +40,7 @@ namespace SimpleIdServer.Scim.Api
         private readonly ISearchRepresentationsQueryHandler _searchRepresentationsQueryHandler;
         private readonly IGetRepresentationQueryHandler _getRepresentationQueryHandler;
         private readonly IAttributeReferenceEnricher _attributeReferenceEnricher;
-        private readonly SCIMHostOptions _options;
+        private readonly ScimHostOptions _options;
         private readonly ILogger _logger;
         private readonly IBusHelper _busControl;
         private readonly IResourceTypeResolver _resourceTypeResolver;
@@ -55,7 +55,7 @@ namespace SimpleIdServer.Scim.Api
             ISearchRepresentationsQueryHandler searchRepresentationsQueryHandler,
             IGetRepresentationQueryHandler getRepresentationQueryHandler, 
             IAttributeReferenceEnricher attributeReferenceEnricher, 
-            IOptionsMonitor<SCIMHostOptions> options, 
+            IOptionsMonitor<ScimHostOptions> options, 
             ILogger logger,
             IBusHelper busControl, 
             IResourceTypeResolver resourceTypeResolver, 
@@ -80,7 +80,7 @@ namespace SimpleIdServer.Scim.Api
 
         public string ResourceType => _resourceType;
         protected virtual bool IsPublishEvtsEnabled => true;
-        protected SCIMHostOptions Options => _options;
+        protected ScimHostOptions Options => _options;
 
         /// <summary>
         /// Search representations according to the filter, sort and pagination parameters (HTTP GET).

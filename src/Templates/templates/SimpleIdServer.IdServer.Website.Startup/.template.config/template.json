@@ -7,7 +7,7 @@
   "name": "Identity Server website",
   "identity": "SimpleIdServer.IdServer.Website.Startup",
   "groupIdentity": "SimpleIdServer.IdServer.Website.Startup",
-  "shortName": "idserverwebsite",
+  "shortName": "idserveradmin",
   "tags": {
     "language": "C#",
     "type": "project"

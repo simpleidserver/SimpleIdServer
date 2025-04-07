@@ -6,7 +6,7 @@ namespace Microsoft.AspNetCore.Mvc
 {
     public static class MvcOptionsExtensions
     {
-        public static MvcOptions AddSCIMValueProviders(this MvcOptions mvcOptions)
+        public static MvcOptions AddScimValueProviders(this MvcOptions mvcOptions)
         {
             mvcOptions.ValueProviderFactories.Insert(0, new SeparatedQueryStringValueProviderFactory(","));
             return mvcOptions;

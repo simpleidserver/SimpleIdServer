@@ -25,7 +25,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
         private readonly IRepresentationReferenceSync _representationReferenceSync;
         private readonly IRepresentationHelper _representationHelper;
         private readonly IRepresentationVersionBuilder _representationVersionBuilder;
-        private readonly SCIMHostOptions _options;
+        private readonly ScimHostOptions _options;
 
         public PatchRepresentationCommandHandler(
             ISCIMSchemaCommandRepository scimSchemaCommandRepository,
@@ -34,7 +34,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             IRepresentationReferenceSync representationReferenceSync,
             IRepresentationHelper representationHelper,
             IRepresentationVersionBuilder representationVersionBuilder,
-            IOptions<SCIMHostOptions> options,
+            IOptions<ScimHostOptions> options,
             IBusHelper busControl) : base(busControl)
         {
             _scimSchemaCommandRepository = scimSchemaCommandRepository;

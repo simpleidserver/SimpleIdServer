@@ -71,7 +71,8 @@ const sidebars = {
           label: 'Hosting',
           items: [
             'idserver/hosting/iis',
-            'idserver/hosting/nginx'
+            'idserver/hosting/nginx',
+            'idserver/hosting/loadbalancing'
           ]
         }
       ]
@@ -80,7 +81,10 @@ const sidebars = {
       type: 'category',
       label: 'Administration website',
       items: [
-        'idserveradmin/quickstart'
+        'idserveradmin/quickstart',
+        'idserveradmin/realm',
+        'idserveradmin/hosting',
+        'idserveradmin/loadbalancing'
       ]
     },
     {

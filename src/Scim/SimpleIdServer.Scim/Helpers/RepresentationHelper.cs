@@ -30,9 +30,9 @@ namespace SimpleIdServer.Scim.Helpers
     public class RepresentationHelper : IRepresentationHelper
     {
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
-        public readonly SCIMHostOptions _options;
+        public readonly ScimHostOptions _options;
 
-        public RepresentationHelper(ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IOptions<SCIMHostOptions> options)
+        public RepresentationHelper(ISCIMRepresentationCommandRepository scimRepresentationCommandRepository, IOptions<ScimHostOptions> options)
         {
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _options = options.Value;

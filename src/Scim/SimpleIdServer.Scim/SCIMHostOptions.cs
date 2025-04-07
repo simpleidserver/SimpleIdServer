@@ -4,9 +4,9 @@ using System;
 
 namespace SimpleIdServer.Scim
 {
-    public class SCIMHostOptions
+    public class ScimHostOptions
     {
-        public SCIMHostOptions()
+        public ScimHostOptions()
         {
             AuthenticationScheme = SCIMConstants.AuthenticationScheme;
             SCIMIdClaimName = "scim_id";
@@ -84,8 +84,8 @@ namespace SimpleIdServer.Scim
         /// <summary>
         /// Enable or disable realm.
         /// </summary>
-        public bool EnableRealm { get; set; } = false;
+        internal bool EnableRealm { get; set; } = false;
         public bool IsFullRepresentationReturned { get; set; }
-        public bool IsBigMessagePublished { get; set; }
+        internal bool IsBigMessagePublished { get; set; }
     }
 }

@@ -10,4 +10,7 @@
     <ProjectReference Include="..\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+  	<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+  </ItemGroup>
 </Project>

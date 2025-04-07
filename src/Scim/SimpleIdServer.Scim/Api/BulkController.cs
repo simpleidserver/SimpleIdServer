@@ -31,14 +31,14 @@ namespace SimpleIdServer.Scim.Api
     [TypeFilter(typeof(ActivatorActionFilter), Arguments = new object[] { "IsBulkEnabled" })]
     public class BulkController : Controller
     {
-        private readonly SCIMHostOptions _options;
+        private readonly ScimHostOptions _options;
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
         private readonly ISCIMSchemaQueryRepository _scimSchemaQueryRepository;
 
         public BulkController(
-            IOptionsMonitor<SCIMHostOptions> options, 
+            IOptionsMonitor<ScimHostOptions> options, 
             ILogger<BulkController> logger, 
             IServiceScopeFactory serviceScopeFactory, 
             ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository, 

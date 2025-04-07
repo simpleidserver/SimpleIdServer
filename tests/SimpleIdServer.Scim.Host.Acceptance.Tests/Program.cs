@@ -195,7 +195,7 @@ void ConfigureServices(IServiceCollection services)
     // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
     services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
     services.AddSingleton<IMessageDataRepository>(new InMemoryMessageDataRepository());
-    services.AddSIDScim(o =>
+    services.AddScim(o =>
     {
         o.MaxOperations = 3;
         o.IgnoreUnsupportedCanonicalValues = false;

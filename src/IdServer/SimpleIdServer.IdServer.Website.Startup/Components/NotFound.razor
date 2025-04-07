@@ -1,0 +1,7 @@
+﻿@page "/{*path:regex(^((?!\\.js|\\.css|\\.png|\\.woff2|\\.svg).)*$)}"
+
+<h3>NotFound</h3>
+
+@code {
+    [Parameter] public string? path { get; set; }
+}

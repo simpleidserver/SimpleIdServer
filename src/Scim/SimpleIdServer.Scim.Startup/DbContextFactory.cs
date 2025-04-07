@@ -11,7 +11,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations
         public SCIMDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<SCIMDbContext>();
-            var efOptions = Options.Create(new SCIMEFOptions());
+            var efOptions = Options.Create(new ScimEfOptions());
             var connectionString = "server=localhost;port=3306;database=idserver;user=root;password=password";
             optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), o =>
             {
@@ -38,7 +38,7 @@ namespace SimpleIdServer.Scim.SqliteMigrations
 
             return new SCIMDbContext(
                 dbContextOptions: optionsBuilder.Options,
-                options: new OptionsWrapper<SCIMEFOptions>(new SCIMEFOptions { DefaultSchema = "scim" }));
+                options: new OptionsWrapper<ScimEfOptions>(new ScimEfOptions { DefaultSchema = "scim" }));
         }
     }
     */

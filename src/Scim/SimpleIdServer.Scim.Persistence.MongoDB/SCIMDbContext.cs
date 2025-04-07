@@ -20,6 +20,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 		}
 
 		internal IMongoDatabase Database { get; private set; }
+		internal MongoDbOptions Options => _options;
 
 		public IMongoCollection<SCIMRepresentationModel> SCIMRepresentationLst =>
 			Database.GetCollection<SCIMRepresentationModel>(_options.CollectionRepresentations);
@@ -84,43 +85,5 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 				cm.AutoMap();
 			});
 		}
-
-		internal static void RegisterMappings403()
-		{
-            BsonClassMap.RegisterClassMap<ProvisioningConfiguration>(cm =>
-            {
-                cm.AutoMap();
-            });
-            BsonClassMap.RegisterClassMap<SCIMAttributeMapping>(cm =>
-            {
-                cm.AutoMap();
-            });
-            BsonClassMap.RegisterClassMap<SCIMRepresentationAttribute>(cm =>
-            {
-                cm.AutoMap();
-                cm.UnmapMember(c => c.CachedChildren);
-            });
-            BsonClassMap.RegisterClassMap<SCIMRepresentation>(cm =>
-            {
-                cm.AutoMap();
-                cm.SetIsRootClass(true);
-                cm.UnmapMember(c => c.Schemas);
-                cm.UnmapMember(c => c.HierarchicalAttributes);
-            });
-            BsonClassMap.RegisterClassMap<SCIMRepresentationModel>(cm =>
-            {
-                cm.AutoMap();
-            });
-            BsonClassMap.RegisterClassMap<SCIMSchema>(cm =>
-            {
-                cm.AutoMap();
-                cm.UnmapMember(c => c.Representations);
-                cm.UnmapMember(c => c.HierarchicalAttributes);
-            });
-            BsonClassMap.RegisterClassMap<SCIMSchemaAttribute>(cm =>
-            {
-                cm.AutoMap();
-            });
-        }
 	}
 }

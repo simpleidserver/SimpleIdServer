@@ -15,12 +15,12 @@ namespace SimpleIdServer.Scim.Api
 {
     public class ServiceProviderConfigController : Controller
     {
-        private readonly SCIMHostOptions _options;
+        private readonly ScimHostOptions _options;
         private readonly IUriProvider _uriProvider;
         private readonly ILogger _logger;
         private readonly IRepresentationVersionBuilder _representationVersionBuilder;
 
-        public ServiceProviderConfigController(IOptionsMonitor<SCIMHostOptions> options, IUriProvider uriProvider, ILogger<ServiceProviderConfigController> logger, IRepresentationVersionBuilder representationVersionBuilder)
+        public ServiceProviderConfigController(IOptionsMonitor<ScimHostOptions> options, IUriProvider uriProvider, ILogger<ServiceProviderConfigController> logger, IRepresentationVersionBuilder representationVersionBuilder)
         {
             _options = options.CurrentValue;
             _uriProvider = uriProvider;

@@ -13,9 +13,9 @@ namespace SimpleIdServer.Scim.Infrastructure
     {
         private readonly bool _isEnabled = true;
 
-        public ActivatorActionFilter(IOptions<SCIMHostOptions> options, string propertyName)
+        public ActivatorActionFilter(IOptions<ScimHostOptions> options, string propertyName)
         {
-            var propertyInfo = typeof(SCIMHostOptions).GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            var propertyInfo = typeof(ScimHostOptions).GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
             if(propertyInfo != null)
             {
                 var val = propertyInfo.GetValue(options.Value);

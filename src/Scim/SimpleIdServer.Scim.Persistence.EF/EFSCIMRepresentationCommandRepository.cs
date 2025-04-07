@@ -16,9 +16,9 @@ namespace SimpleIdServer.Scim.Persistence.EF;
 public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandRepository
 {
     private readonly SCIMDbContext _scimDbContext;
-    private readonly SCIMEFOptions _options;
+    private readonly ScimEfOptions _options;
 
-    public EFSCIMRepresentationCommandRepository(SCIMDbContext scimDbContext, IOptions<SCIMEFOptions> options)
+    public EFSCIMRepresentationCommandRepository(SCIMDbContext scimDbContext, IOptions<ScimEfOptions> options)
     {
         _scimDbContext = scimDbContext;
         _options = options.Value;
@@ -217,7 +217,7 @@ public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandR
 
     public async Task BulkDelete(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, string currentRepresentationId, bool isReference = false)
     {
-        if(_scimDbContext.Database.IsInMemory())
+        if(_scimDbContext.Database.IsInMemory() || _options.IgnoreBulkOperation)
         {
             var ids = scimRepresentationAttributes.Select(a => a.Id).ToList();
             var attrs = await _scimDbContext.SCIMRepresentationAttributeLst.Where(a => ids.Contains(a.Id)).ToListAsync(); ;
@@ -241,6 +241,36 @@ public class EFSCIMRepresentationCommandRepository : ISCIMRepresentationCommandR
 
     public async Task BulkUpdate(IEnumerable<SCIMRepresentationAttribute> scimRepresentationAttributes, bool isReference = false)
     {
+        if(_scimDbContext.Database.IsInMemory() || _options.IgnoreBulkOperation)
+        {
+            var updatedAttributes = scimRepresentationAttributes.ToDictionary(keySelector: x => x.Id);
+            var attributeIds = updatedAttributes.Keys.ToHashSet();
+
+            // Retrieve the entities to update
+            var entitiesToUpdate = _scimDbContext.SCIMRepresentationAttributeLst
+                .Where(attr => attributeIds.Contains(attr.Id))
+                .ToList();
+
+            // Update the properties of the retrieved entities
+            foreach (var entity in entitiesToUpdate)
+            {
+                var valueFound = updatedAttributes.TryGetValue(entity.Id, out var updatedAttribute);
+                if (!valueFound) continue;
+
+                entity.ValueString = updatedAttribute.ValueString;
+                entity.ValueDecimal = updatedAttribute.ValueDecimal;
+                entity.ValueBoolean = updatedAttribute.ValueBoolean;
+                entity.ValueBinary = updatedAttribute.ValueBinary;
+                entity.ValueReference = updatedAttribute.ValueReference;
+                entity.ValueInteger = updatedAttribute.ValueInteger;
+                entity.ValueDateTime = updatedAttribute.ValueDateTime;
+                entity.ComputedValueIndex = updatedAttribute.ComputedValueIndex;
+            }
+
+            _scimDbContext.UpdateRange(entitiesToUpdate);
+            return;
+        }
+
         scimRepresentationAttributes = scimRepresentationAttributes.Where(r => !string.IsNullOrWhiteSpace(r.RepresentationId)).ToList();
         foreach (var attr in scimRepresentationAttributes)
             attr.SchemaAttributeId = attr.SchemaAttribute?.Id;

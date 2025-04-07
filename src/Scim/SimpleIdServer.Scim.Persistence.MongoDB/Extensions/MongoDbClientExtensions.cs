@@ -7,49 +7,49 @@ using SimpleIdServer.Scim.Persistence.MongoDB.Models;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
+namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
+
+public static class MongoDbClientExtensions
 {
-    public static class MongoDbClientExtensions
+	public static void EnsureMongoDbSCIMDatabaseIsCreated(MongoDbOptions options, List<SCIMSchema> initialSchemas, List<SCIMAttributeMapping> initialAttributeMapping, List<Realm> realms)
 	{
-		public static void EnsureMongoDbSCIMDatabaseIsCreated(MongoDbOptions options, List<SCIMSchema> initialSchemas, List<SCIMAttributeMapping> initialAttributeMapping, List<Realm> realms)
-		{
-			var mongoClient = new MongoClient(options.ConnectionString);
-			var db = mongoClient.GetDatabase(options.Database);
-			EnsureCollectionIsCreated<SCIMRepresentationModel>(db, options.CollectionRepresentations);
+		var mongoClient = new MongoClient(options.ConnectionString);
+		var db = mongoClient.GetDatabase(options.Database);
+		EnsureCollectionIsCreated<SCIMRepresentationModel>(db, options.CollectionRepresentations);
             EnsureCollectionIsCreated<SCIMRepresentationAttribute>(db, options.CollectionRepresentationAttributes);
             EnsureCollectionIsCreated<ProvisioningConfiguration>(db, options.CollectionProvisioningLst);
             EnsureSCIMRepresentationAttributeIndexesAreCreated(db, options.CollectionRepresentationAttributes);
             var schemasCollection = EnsureCollectionIsCreated<SCIMSchema>(db, options.CollectionSchemas);
-			var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMapping>(db, options.CollectionMappings);
+		var mappingsCollection = EnsureCollectionIsCreated<SCIMAttributeMapping>(db, options.CollectionMappings);
             var realmsCollection = EnsureCollectionIsCreated<Realm>(db, options.CollectionRealms);
             var query = schemasCollection.AsQueryable();
-			if (query.Count() == 0)
+		if (query.Count() == 0)
+		{
+			if (initialSchemas != null)
 			{
-				if (initialSchemas != null)
-				{
-					schemasCollection.InsertMany(initialSchemas);
-				}
-				else
-				{
-					var schemas = new List<SCIMSchema>
-					{
-						StandardSchemas.GroupSchema,
-						StandardSchemas.UserSchema
-                    };
-					schemasCollection.InsertMany(schemas);
-				}
+				schemasCollection.InsertMany(initialSchemas);
 			}
-
-			if (mappingsCollection.AsQueryable().Count() == 0)
+			else
 			{
-				if (initialAttributeMapping != null)
+				var schemas = new List<SCIMSchema>
 				{
-					mappingsCollection.InsertMany(initialAttributeMapping);
-				}
-				else
+					StandardSchemas.GroupSchema,
+					StandardSchemas.UserSchema
+                };
+				schemasCollection.InsertMany(schemas);
+			}
+		}
+
+		if (mappingsCollection.AsQueryable().Count() == 0)
+		{
+			if (initialAttributeMapping != null)
+			{
+				mappingsCollection.InsertMany(initialAttributeMapping);
+			}
+			else
                 {
-					mappingsCollection.InsertMany(SCIMConstants.StandardAttributeMapping);
-				}
+				mappingsCollection.InsertMany(SCIMConstants.StandardAttributeMapping);
+			}
             }
 
             if (realmsCollection.AsQueryable().Count() == 0)
@@ -65,15 +65,15 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             }
         }
 
-		private static void EnsureSCIMRepresentationAttributeIndexesAreCreated(IMongoDatabase db, string name)
+	private static void EnsureSCIMRepresentationAttributeIndexesAreCreated(IMongoDatabase db, string name)
         {
-			var compoundIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId).Ascending(a => a.SchemaAttributeId).Ascending(a => a.ValueString);
-			var representationIdIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId);
+		var compoundIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId).Ascending(a => a.SchemaAttributeId).Ascending(a => a.ValueString);
+		var representationIdIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId);
             EnsureIndexCreated(db, "RepresentationId_1_SchemaAttributeId_1_ValueString_1", name, compoundIndex);
             EnsureIndexCreated(db, "RepresentationId_1", name, representationIdIndex);
         }
 
-		private static async void EnsureIndexCreated(IMongoDatabase db, string indexName, string name, IndexKeysDefinition<SCIMRepresentationAttribute> indexDefinition)
+	private static async void EnsureIndexCreated(IMongoDatabase db, string indexName, string name, IndexKeysDefinition<SCIMRepresentationAttribute> indexDefinition)
         {
             var collection = db.GetCollection<SCIMRepresentationAttribute>(name);
             var indexes = await collection.Indexes.List().ToListAsync();
@@ -81,21 +81,20 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             collection.Indexes.CreateOne(indexDefinition);
         }
 
-		private static IMongoCollection<T> EnsureCollectionIsCreated<T>(IMongoDatabase db, string name)
+	private static IMongoCollection<T> EnsureCollectionIsCreated<T>(IMongoDatabase db, string name)
+	{
+		if (!CollectionExists(db, name))
 		{
-			if (!CollectionExists(db, name))
-			{
-				db.CreateCollection(name);
-			}
-
-			return db.GetCollection<T>(name);
+			db.CreateCollection(name);
 		}
 
-		private static bool CollectionExists(IMongoDatabase db, string collectionName)
-		{
-			var filter = new BsonDocument("name", collectionName);
-			var collections = db.ListCollections(new ListCollectionsOptions { Filter = filter });
-			return collections.Any();
-		}
+		return db.GetCollection<T>(name);
+	}
+
+	private static bool CollectionExists(IMongoDatabase db, string collectionName)
+	{
+		var filter = new BsonDocument("name", collectionName);
+		var collections = db.ListCollections(new ListCollectionsOptions { Filter = filter });
+		return collections.Any();
 	}
 }
