@@ -1,4 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -6,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Serializers
 {
-    internal class IgnoreEmptyOthConverter : JsonConverter<JsonWebKey>
+    public class IgnoreEmptyOthJsonConverter : JsonConverter<JsonWebKey>
     {
         public override JsonWebKey Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
@@ -17,7 +19,8 @@ namespace SimpleIdServer.IdServer.Serializers
         {
             if (value.Oth != null && value.Oth.Count == 0)
             {
-                var json = JsonSerializer.Serialize(value, options);
+                // The "options" parameter should not be passed. If it is, the IgnoreEmptyOthJsonConverter instance must be removed; otherwise, it will cause an infinite loop.
+                var json = JsonSerializer.Serialize(value);
                 var jsonObject = JsonNode.Parse(json).AsObject();
                 jsonObject.Remove("oth");
                 jsonObject.WriteTo(writer);

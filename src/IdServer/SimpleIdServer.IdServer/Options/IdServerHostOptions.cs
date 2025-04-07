@@ -245,6 +245,13 @@ namespace SimpleIdServer.IdServer.Options
                 return $"{RegistrationCookieName}.{realm}";
             return RegistrationCookieName;
         }
+
+        /// <summary>
+        /// Indicates whether the empty "oth" attribute should be ignored in the JWKS endpoint.
+        /// This may help resolve the following error in NextAuth.js when decoding the token:<br />
+        /// RSA JWK "oth" (Other Primes Info) Parameter value is not supported.
+        /// </summary>
+        public bool IgnoreEmptyOthInJwksEntpoint { get; set; } = false;
     }
 
     public class UICulture
