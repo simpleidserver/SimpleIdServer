@@ -89,6 +89,14 @@ const sidebars = {
     },
     {
       type: 'category',
+      label: 'SCIM2.0',
+      items: [
+        'scim/quickstart',
+        'scim/swagger'
+      ]
+    },
+    {
+      type: 'category',
       label: 'Installation',
       items: [
         'installation/copyandpaste',

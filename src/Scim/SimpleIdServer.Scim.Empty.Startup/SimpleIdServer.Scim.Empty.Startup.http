@@ -1,6 +1,0 @@
-@SimpleIdServer.Scim.Empty.Startup_HostAddress = http://localhost:5249
-
-GET {{SimpleIdServer.Scim.Empty.Startup_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

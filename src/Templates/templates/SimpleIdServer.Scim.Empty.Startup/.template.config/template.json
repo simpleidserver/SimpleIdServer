@@ -1,0 +1,19 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "SCIM"
+  ],
+  "name": "Empty SCIM Server",
+  "identity": "SimpleIdServer.Scim.Empty.Startup",
+  "groupIdentity": "SimpleIdServer.Scim.Empty.Startup",
+  "shortName": "scimempty",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+  },
+  "sourceName": "SimpleIdServer.Scim.Empty.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.Scim.Empty.Startup.csproj" } ]
+}

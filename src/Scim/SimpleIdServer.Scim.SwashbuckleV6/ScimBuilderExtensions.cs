@@ -18,7 +18,7 @@ public static class ScimBuilderExtensions
 {
     public static ScimBuilder EnableSwagger(this ScimBuilder scimBuilder)
     {
-        scimBuilder.ServiceCollection.AddSwaggerGen(c =>
+        scimBuilder.Services.AddSwaggerGen(c =>
         {
             c.SchemaFilter<EnumDocumentFilter>();
             var currentAssembly = Assembly.GetExecutingAssembly();
@@ -31,9 +31,9 @@ public static class ScimBuilderExtensions
                 c.IncludeXmlComments(d);
             });
         });
-        scimBuilder.ServiceCollection.RemoveAll<IApiDescriptionGroupCollectionProvider>();
-        scimBuilder.ServiceCollection.AddSingleton<IApiDescriptionGroupCollectionProvider, ScimApiDescriptionGroupCollectionProvider>();
-        scimBuilder.ServiceCollection.AddTransient<ISchemaGenerator, SCIMSchemaGenerator>();
+        scimBuilder.Services.RemoveAll<IApiDescriptionGroupCollectionProvider>();
+        scimBuilder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, ScimApiDescriptionGroupCollectionProvider>();
+        scimBuilder.Services.AddTransient<ISchemaGenerator, SCIMSchemaGenerator>();
         return scimBuilder;
     }
 }

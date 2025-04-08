@@ -12,7 +12,7 @@ public static class ScimBuilderExtensions
 {
     public static ScimBuilder UseEfStore(this ScimBuilder builder, Action<DbContextOptionsBuilder> dbContextOptsCallback = null, Action<ScimEfOptions> optionsCallback = null)
     {
-        var services = builder.ServiceCollection;
+        var services = builder.Services;
         services.AddTransient<ISCIMRepresentationCommandRepository, EFSCIMRepresentationCommandRepository>();
         services.AddTransient<ISCIMRepresentationQueryRepository, EFSCIMRepresentationQueryRepository>();
         services.AddTransient<ISCIMSchemaQueryRepository, EFSCIMSchemaQueryRepository>();

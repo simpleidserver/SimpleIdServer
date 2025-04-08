@@ -6,7 +6,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddIdserverAdmin("https://localhost:5001");
+builder.Services.AddIdserverAdmin("https://localhost:5001")
+    .EnableRealm();
 var app = builder.Build();
 
 app.UseIdserverAdmin();

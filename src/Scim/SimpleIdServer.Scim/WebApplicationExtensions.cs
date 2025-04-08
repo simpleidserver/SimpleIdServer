@@ -3,21 +3,32 @@
 
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Infrastructure;
+using System;
+using System.Collections.Generic;
 
 namespace Microsoft.AspNetCore.Builder;
 
 public static class WebApplicationExtensions
 {
-    public static WebApplication UseScim(this WebApplication webApp)
+    public static WebApplication UseScim(this WebApplication webApp, List<string> additionalRoutes = null)
     {
         webApp.UseAuthentication();
         webApp.UseAuthorization();
-        var usePrefix = webApp.Services.GetRequiredService<ScimHostOptions>().EnableRealm;
+        var usePrefix = webApp.Services.GetRequiredService<IOptions<ScimHostOptions>>().Value.EnableRealm;
         webApp.UseMvc(o =>
         {
+            if(additionalRoutes != null)
+            {
+                foreach (var additionalRoute in additionalRoutes)
+                {
+                    o.UseStandardScimEdp(additionalRoute, usePrefix);
+                }
+            }
+
             o.ScimMapControllerRoute("getResourceTypes",
                 pattern: SCIMEndpoints.ResourceType,
                 defaults: new { controller = "ResourceTypes", action = "GetAll" });
@@ -39,8 +50,8 @@ public static class WebApplicationExtensions
                 pattern: $"{(usePrefix ? "{prefix}/" : string.Empty)}{SCIMEndpoints.Bulk}",
                 defaults: new { controller = "Bulk", action = "Index" });
 
-            webApp.UseStandardScimEdp(SCIMEndpoints.User, usePrefix);
-            webApp.UseStandardScimEdp(SCIMEndpoints.Group, usePrefix);
+            o.UseStandardScimEdp(SCIMEndpoints.User, usePrefix);
+            o.UseStandardScimEdp(SCIMEndpoints.Group, usePrefix);
 
             o.MapRoute("catchAllGet",
                 template: "{*url}",
@@ -58,32 +69,6 @@ public static class WebApplicationExtensions
                 template: "{*url}",
                 defaults: new { controller = "Default", action = "Patch" });
         });
-        return webApp;
-    }
-
-    public static IRouteBuilder UseStandardScimEdp(this IRouteBuilder webApp, string controllerName, bool usePrefix)
-    {
-        webApp.ScimMapControllerRoute($"get{controllerName}",
-            pattern: $"{(usePrefix ? "{prefix}/" : string.Empty)}{controllerName}",
-            defaults: new { controller = controllerName, action = "GetAll" });
-        webApp.ScimMapControllerRoute($"search{controllerName}",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + controllerName + "/.search",
-            defaults: new { controller = controllerName, action = "Search" });
-        webApp.ScimMapControllerRoute($"getUnique{controllerName}",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + controllerName + "/{id}",
-            defaults: new { controller = controllerName, action = "Get" });
-        webApp.ScimMapControllerRoute($"add{controllerName}",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + controllerName,
-            defaults: new { controller = controllerName, action = "Add" });
-        webApp.ScimMapControllerRoute($"delete{controllerName}",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + controllerName + "/{id}",
-            defaults: new { controller = controllerName, action = "Delete" });
-        webApp.ScimMapControllerRoute($"update{controllerName}",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + controllerName + "/{id}",
-            defaults: new { controller = controllerName, action = "Update" });
-        webApp.ScimMapControllerRoute($"patch{controllerName}",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + controllerName + "/{id}",
-            defaults: new { controller = controllerName, action = "Patch" });
         return webApp;
     }
 }

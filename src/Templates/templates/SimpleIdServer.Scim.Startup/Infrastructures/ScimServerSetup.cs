@@ -24,7 +24,7 @@ public class ScimServerSetup
         var builder = webApplicationBuilder.Services.AddScim(o =>
             {
                 o.IgnoreUnsupportedCanonicalValues = false;
-            },true)
+            })
             .UpdateApiKeys(apiKeysConfiguration)
             .EnableSwagger()
             .ConfigureMassTransit(cb => ConfigureMessageBroker(webApplicationBuilder, cb, massTransitConf));

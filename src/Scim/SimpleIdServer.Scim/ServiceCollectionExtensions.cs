@@ -1,6 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using AspNetCore.Authentication.ApiKey;
 using MassTransit;
+using MassTransit.MessageData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -20,9 +22,18 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static ScimBuilder AddScim(this IServiceCollection services, bool skipMasstransitRegistration = false)
+    public static ScimBuilder AddScim(this IServiceCollection services, Action<ScimHostOptions> options = null, bool skipMasstransitRegistration = false, bool skipAuth = false)
     {
         var builder = new ScimBuilder(services);
+        if(options != null)
+        {
+            services.Configure(options);
+        }
+        else
+        {
+            services.Configure<ScimHostOptions>((o) => { });
+        }
+
         services.Configure<RouteOptions>(opt =>
         {
             opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
@@ -32,28 +43,33 @@ public static class ServiceCollectionExtensions
             o.EnableEndpointRouting = false;
             o.AddScimValueProviders();
         }).AddNewtonsoftJson();
-        if(skipMasstransitRegistration)
+        if(!skipMasstransitRegistration)
         {
+            var repository = new InMemoryMessageDataRepository();
+            services.AddSingleton<IMessageDataRepository>(repository);
             services.AddMassTransit((o) =>
             {
-                o.UsingInMemory();
+                o.UsingInMemory((context, cfg) =>
+                {
+                    cfg.UseMessageData(repository);
+                    cfg.ConfigureEndpoints(context);
+                });
             });
         }
-        services.AddCommandHandlers()
-            .AddQueryHandlers()
-            .AddScimRepository()
-            .AddHelpers()
-            .AddInfrastructure();
+        services.ConfigureCommands()
+            .ConfigureQueries()
+            .ConfigureRepositories()
+            .ConfigureHelpers()
+            .ConfigureInfrastructures();
+        if(!skipAuth)
+        {
+            services.ConfigureAuth();
+        }
+
         return builder;
     }
 
-    public static ScimBuilder AddScim(this IServiceCollection services, Action<ScimHostOptions> options)
-    {
-        services.Configure(options);
-        return services.AddScim();
-    }
-
-    private static IServiceCollection AddCommandHandlers(this IServiceCollection services)
+    private static IServiceCollection ConfigureCommands(this IServiceCollection services)
     {
         services.AddTransient<IAddRepresentationCommandHandler, AddRepresentationCommandHandler>();
         services.AddTransient<IDeleteRepresentationCommandHandler, DeleteRepresentationCommandHandler>();
@@ -63,14 +79,14 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddQueryHandlers(this IServiceCollection services)
+    private static IServiceCollection ConfigureQueries(this IServiceCollection services)
     {
         services.AddTransient<ISearchRepresentationsQueryHandler, SearchRepresentationsQueryHandler>();
         services.AddTransient<IGetRepresentationQueryHandler, GetRepresentationQueryHandler>();
         return services;
     }
 
-    private static IServiceCollection AddScimRepository(this IServiceCollection services)
+    private static IServiceCollection ConfigureRepositories(this IServiceCollection services)
     {
         var representations = new List<SCIMRepresentation>();
         var representationAttributes = new List<SCIMRepresentationAttribute>();
@@ -91,7 +107,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddHelpers(this IServiceCollection services)
+    private static IServiceCollection ConfigureHelpers(this IServiceCollection services)
     {
         services.AddTransient<IRepresentationVersionBuilder, IncrementalRepresentationVersionBuilder>();
         services.AddTransient<IAttributeReferenceEnricher, AttributeReferenceEnricher>();
@@ -104,7 +120,7 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    private static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    private static IServiceCollection ConfigureInfrastructures(this IServiceCollection services)
     {
         foreach (var assm in AppDomain.CurrentDomain.GetAssemblies())
         {
@@ -112,6 +128,19 @@ public static class ServiceCollectionExtensions
         }
 
         services.AddSingleton<IScimEndpointStore, ScimEndpointStore>();
+        return services;
+    }
+
+    private static IServiceCollection ConfigureAuth(this IServiceCollection services)
+    {
+        services.AddSingleton(ApiKeysConfiguration.Default);
+        services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
+            .AddApiKeyInHeaderOrQueryParams<ApiKeyProvider>(options =>
+            {
+                options.Realm = "Sample Web API";
+                options.KeyName = "Authorization";
+            });
+        services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
         return services;
     }
 }

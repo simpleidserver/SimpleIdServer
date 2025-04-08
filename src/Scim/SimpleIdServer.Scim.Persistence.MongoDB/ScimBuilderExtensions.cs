@@ -12,7 +12,7 @@ public static class ScimBuilderExtensions
 {
 	public static ScimBuilder UseMongodbStorage(this ScimBuilder builder, Action<MongoDbOptions> mongoDbSetup)
 	{
-		var services = builder.ServiceCollection;
+		var services = builder.Services;
 		SCIMDbContext.RegisterMappings();
 		services.Configure(mongoDbSetup);
 		var options = new MongoDbOptions();

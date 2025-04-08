@@ -182,6 +182,7 @@ void ConfigureServices(IServiceCollection services)
         o.EnableEndpointRouting = false;
         o.ValueProviderFactories.Insert(0, new SeparatedQueryStringValueProviderFactory(","));
     }).AddNewtonsoftJson(o => { });
+    services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
     services.AddAuthorization(opts =>
     {
         opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
@@ -192,28 +193,23 @@ void ConfigureServices(IServiceCollection services)
         opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
         opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
     });
-    // services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
-    services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
     services.AddSingleton<IMessageDataRepository>(new InMemoryMessageDataRepository());
     services.AddScim(o =>
     {
         o.MaxOperations = 3;
         o.IgnoreUnsupportedCanonicalValues = false;
         o.MergeExtensionAttributes = true;
-    })
-        .AddSchemas(schemas)
-        .AddAttributeMapping(attributesMapping);
+    }, skipAuth: true)
+        .AddInMemorySchemas(schemas)
+        .AddInMemoryAttributeMappings(attributesMapping);
 }
 
 void Configure(WebApplication app)
 {
-    app.UseAuthentication();
-    app.UseAuthorization();
-    app.UseMvc(o =>
+    app.UseScim(new List<string>
     {
-        o.UseStandardScimEdp("CustomUsers", false);
-        o.UseStandardScimEdp("Entitlements", false);
-        o.UseScim();
+        "CustomUsers",
+        "Entitlements"
     });
 }
 
