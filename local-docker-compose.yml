@@ -58,6 +58,7 @@ services:
       SCIMBaseUrl: "https://scim.localhost.com"
       Authority: "https://idserver.localhost.com"
       SCIM__SCIMRepresentationsExtractionJobOptions__SCIMEdp: "https://scim.localhost.com"
+      IgnoreEmptyOthInJwksEntpoint: false
     depends_on:
       - db
       - scim
