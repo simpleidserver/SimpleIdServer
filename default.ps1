@@ -183,6 +183,8 @@ task buildTemplate {
 	$IdserverAdminEmptyTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServerAdmin.Empty.Startup"
 	$ScimPathSource = "$source_dir/Scim/SimpleIdServer.Scim.Startup"
 	$ScimPathTarget = "$source_dir/Templates/templates/SimpleIdServer.Scim.Startup"
+	$ScimEmptyPathSource = "$source_dir/Scim/SimpleIdServer.Scim.Empty.Startup"
+	$ScimEmptyPathTarget = "$source_dir/Templates/templates/SimpleIdServer.Scim.Empty.Startup"
 	$CredentialIssuerPathSource = "$source_dir/CredentialIssuer/SimpleIdServer.CredentialIssuer.Startup"
 	$CredentialIssuerPathTarget = "$source_dir/Templates/templates/SimpleIdServer.CredentialIssuer.Startup"
 	$CredentialIssuerWebsitePathSource = "$source_dir/CredentialIssuer/SimpleIdServer.CredentialIssuer.Website.Startup"
@@ -198,6 +200,7 @@ task buildTemplate {
 	CopyFolder $IdserverAdminSource $IdserverAdminTarget
 	CopyFolder $IdserverAdminEmptySource $IdserverAdminEmptyTarget
 	CopyFolder $ScimPathSource $ScimPathTarget
+	CopyFolder $ScimEmptyPathSource $ScimEmptyPathTarget
 	CopyFolder $CredentialIssuerPathSource $CredentialIssuerPathTarget
 	CopyFolder $CredentialIssuerWebsitePathSource $CredentialIssuerWebsitePathTarget
 	CopyFolder $FastFedApplicationProviderPathSource $FastFedApplicationProviderPathTarget
