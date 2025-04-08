@@ -1,0 +1,117 @@
+{
+  "id": "urn:ietf:params:scim:schemas:2.0:Entitlements",
+  "name": "Entitlement",
+  "description": "",
+  "attributes": [
+    {
+      "name": "value",
+      "type": "string",
+      "multiValued": false,
+      "description": "",
+      "required": true,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default",
+      "uniqueness": "server"
+    },
+    {
+      "name": "display",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default",
+      "uniqueness": "server"
+    },
+    {
+      "name": "type",
+      "type": "string",
+      "multiValued": false,
+      "required": false,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default",
+      "uniqueness": "server"
+    },
+    {
+      "name": "enabled",
+      "type": "boolean",
+      "multiValued": false,
+      "required": true,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default"
+    },
+    {
+      "name": "contains",
+      "type": "string",
+      "multiValued": true,
+      "description": "",
+      "required": false,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default"
+    },
+    {
+      "name": "containedBy",
+      "type": "string",
+      "multiValued": true,
+      "description": "",
+      "required": false,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default"
+    },
+    {
+      "name": "limitedAssignmentsPermitted",
+      "type": "boolean",
+      "multiValued": false,
+      "description": "",
+      "required": false,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default"
+    },
+    {
+      "name": "totalAssignmentsPermitted",
+      "type": "integer",
+      "multiValued": false,
+      "description": "",
+      "required": true,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default"
+    },
+    {
+      "name": "totalAssignmentsUsed",
+      "type": "integer",
+      "multiValued": false,
+      "description": "",
+      "required": true,
+      "caseExact": false,
+      "mutability": "readOnly",
+      "returned": "default"
+    },
+    {
+      "name": "organizationType",
+      "type": "integer",
+      "multiValued": false,
+      "description": "",
+      "required": true,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default"
+    },
+    {
+      "name": "organizationId",
+      "type": "integer",
+      "multiValued": false,
+      "description": "",
+      "required": true,
+      "caseExact": false,
+      "mutability": "readWrite",
+      "returned": "default"
+    }
+  ]
+}

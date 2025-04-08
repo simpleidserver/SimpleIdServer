@@ -73,4 +73,10 @@ public class ScimBuilder
         Services.AddSingleton<ISCIMAttributeMappingQueryRepository>(new DefaultAttributeMappingQueryRepository(attributeMappingLst));
         return this;
     }
+
+    public ScimBuilder AddInMemoryRealms(List<Realm> realms)
+    {
+        Services.AddSingleton<IRealmRepository>(new DefaultRealmRepository(realms));
+        return this;
+    }
 }

@@ -17,6 +17,15 @@ const sidebars = {
     'overview',
     {
       type: 'category',
+      label: 'Installation',
+      items: [
+        'installation/copyandpaste',
+        'installation/docker',
+        'installation/kubernetes'
+      ]
+    },
+    {
+      type: 'category',
       label: 'Identity server',
       items: [
         {
@@ -92,77 +101,22 @@ const sidebars = {
       label: 'SCIM2.0',
       items: [
         'scim/quickstart',
-        'scim/swagger'
-      ]
-    },
-    {
-      type: 'category',
-      label: 'Installation',
-      items: [
-        'installation/copyandpaste',
-        'installation/docker',
-        'installation/kubernetes',
-        'installation/hosting',
-      ]
-    },
-    'glossary',
-    {
-      type: 'category',
-      label: 'Identity and Access Management',
-      items: [
-        'iam/authmethods',
-        'iam/externalidproviders',
         {
           type: 'category',
-          label: 'Identity Provisioning',
+          label: 'Persistence',
           items: [
-            'iam/automaticidentityprovisioning',
-            'iam/manualidentityprovisioning'
+            'scim/persistence/entityframework',
+            'scim/persistence/mongodb'          
           ]
         },
-        {
-          type: 'category',
-          label: 'Security protocols',
-          items: [
-            'iam/openid',
-            'iam/saml2',
-            'iam/wsfederation'
-          ]
-        },
-        'iam/storage',
-        'iam/configuration',
-        'iam/caching'
+        'scim/swagger',
+        'scim/realm',
+        'scim/integrationevents',
+        'scim/hosting',
+        'scim/loadbalancing'
       ]
     },
-    'scim20',
-    'mobileapplication',
-    {
-      type: 'category',
-      label: 'Advanced settings',
-      items: [
-        'advancedsettings/auditing',
-        'advancedsettings/realm',
-        'advancedsettings/pki',
-        'advancedsettings/configuration'
-      ]
-    },
-    {
-      type: 'category',
-      label: 'Migrations',
-      items: [
-        'migrations/403to404',
-        'migrations/500to501'
-      ]
-    },
-    {
-      type:'category',
-      label: 'Developer',
-      items: [
-        'developer/idserver',
-        'developer/adminwebsite',
-        'developer/addlanguage'
-      ]
-    }
+    'mobileapplication'
   ],
   tutorials: [
     'tutorial/overview',    
