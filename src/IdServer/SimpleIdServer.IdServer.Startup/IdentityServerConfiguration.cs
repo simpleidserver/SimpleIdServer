@@ -15,11 +15,4 @@ public class IdentityServerConfiguration
     public bool IsForwardedEnabled { get; set; }
     public bool IsClientCertificateForwarded { get; set; }
     public bool ForceHttps { get; set; }
-
-    /// <summary>
-    /// Indicates whether the empty "oth" attribute should be ignored in the JWKS endpoint.
-    /// This may help resolve the following error in NextAuth.js when decoding the token:<br />
-    /// RSA JWK "oth" (Other Primes Info) Parameter value is not supported.
-    /// </summary>
-    public bool IgnoreEmptyOthInJwksEntpoint { get; set; } = false;
 }

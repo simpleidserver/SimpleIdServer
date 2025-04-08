@@ -18,16 +18,14 @@ namespace SimpleIdServer.IdServer.Api.Jwks
     public class JwksRequestHandler : IJwksRequestHandler
     {
         private readonly IKeyStore _keyStore;
-        private readonly IdServerHostOptions _idServerOptions;
         private static readonly JsonSerializerOptions _ignoreEmptyOth = new()
         {
             Converters = { new IgnoreEmptyOthJsonConverter() }
         };
 
-        public JwksRequestHandler(IKeyStore keyStore, IOptions<IdServerHostOptions> idServerOptions)
+        public JwksRequestHandler(IKeyStore keyStore)
         {
             _keyStore = keyStore;
-            _idServerOptions = idServerOptions.Value;
         }
 
         public JwksResult Get(string realm)
@@ -49,8 +47,7 @@ namespace SimpleIdServer.IdServer.Api.Jwks
             JsonObject ConvertSigningKey(SigningCredentials signingCredentials)
             {
                 var publicJwk = signingCredentials.SerializePublicJWK();
-                JsonSerializerOptions jsonSeedingOptions = _idServerOptions.IgnoreEmptyOthInJwksEntpoint ? _ignoreEmptyOth : null;
-                return JsonNode.Parse(JsonSerializer.Serialize(publicJwk, jsonSeedingOptions)).AsObject();
+                return JsonNode.Parse(JsonSerializer.Serialize(publicJwk, _ignoreEmptyOth)).AsObject();
             }
 
             JsonObject ConvertEncryptionKey(EncryptingCredentials encryptingCredentials)

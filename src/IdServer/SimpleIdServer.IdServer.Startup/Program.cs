@@ -187,7 +187,6 @@ void ConfigureIdServer(IServiceCollection services)
                 cb.SessionCookieName = identityServerConfiguration.SessionCookieNamePrefix;
             cb.Authority = identityServerConfiguration.Authority;
             cb.ScimClientOptions = conf;
-            cb.IgnoreEmptyOthInJwksEntpoint = identityServerConfiguration.IgnoreEmptyOthInJwksEntpoint;
         }, cookie: c =>
         {
             if (!string.IsNullOrWhiteSpace(identityServerConfiguration.AuthCookieNamePrefix))
