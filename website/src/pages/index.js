@@ -2,6 +2,7 @@ import React from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
+import HomepageOpensource from '@site/src/components/HomepageOpensource';
 import HomepageOpenStandards from '../components/HomepageOpenStandards';
 
 function HomepageHeader() {
@@ -68,6 +69,7 @@ export default function Home() {
       description="Description will go into a meta tag in <head />">
       <HomepageHeader />
       <main>
+        <HomepageOpensource />
         <HomepageFeatures />
         <HomepageOpenStandards />
       </main>
