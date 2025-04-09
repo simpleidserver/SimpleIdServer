@@ -24,7 +24,7 @@ import DocsCard from '@site/src/components/global/DocsCard';
     </DocsCard>
 </DocsCards>
 
-# Applications compliant with FAPI 2.0
+## Applications compliant with FAPI 2.0
 
 According to the [specification](https://openid.bitbucket.io/fapi/fapi-2_0-security-profile.html), there is no mechanism that would allow `public clients` to be secured to the same degree.
 
@@ -40,7 +40,7 @@ According to the [specification](https://openid.bitbucket.io/fapi/fapi-2_0-secur
     </DocsCard>
 </DocsCards>
 
-# Credential issuer
+## Credential issuer
 
 <DocsCards>
     <DocsCard header="Credential issuer" href="credentialissuer">
@@ -48,7 +48,7 @@ According to the [specification](https://openid.bitbucket.io/fapi/fapi-2_0-secur
     </DocsCard>
 </DocsCards>
 
-# Other applications
+## Other applications
 
 <DocsCards>
     <DocsCard header="WS-Federation RP" href="wsfederation">

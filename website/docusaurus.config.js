@@ -64,11 +64,13 @@ const config = {
       })
     ]
   ],
-  themes: ['@docusaurus/theme-mermaid'],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       metadata: [{name: 'keywords', content: 'openid, oauth2, scim, fapi, iam, identity, access, simpleidserver'}],
+      colorMode: {
+        disableSwitch: true
+      },
       // Replace with your project's social card
       navbar: {
         title: 'SimpleIdServer',
@@ -147,7 +149,22 @@ const config = {
         darkTheme: darkTheme,
         additionalLanguages: ['csharp', 'batch']
       }
-	})
+	}),
+  scripts: [
+    {
+      src: 'https://cdn.tailwindcss.com',
+      async: true
+    },
+    {
+      src: '/website.js',
+      async: true
+    }
+  ],
+  stylesheets: [
+    {
+      href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+    }
+  ]
 };
 
 module.exports = config;

@@ -1,16 +1,3 @@
-=> préparer les templates & publier nuget package
-=> ajouter de la documentation pour configurer la persistence de sid
-=> avoir ce menu :
-=> => Identity server
-=> => => Quick start
-=> => => Store (
-		toutes les entités liées au serveur identité (user, client), clef & valeur utilisée pour configurer chaque nuget extension comme login & pwd
-		), form builder (stocke le processus d'authentification ainsi que la composition d'un formulaire).
-		
-=> => => méthodes d'authentification
-=> => => => pwd
-=> => => => otp etc...
-=> => => deployment : 
-=> => => => proxy and load balancer
-=> => => => data protection
-=> => => => distributed caching
+Développer le landing page du site marketing d'un site IAM. 
+=> => ajouter dans la page d'introduction un petit chapitre sur la technologie et comme quoi open-source
+=> => modifier le footer qui doit être orange

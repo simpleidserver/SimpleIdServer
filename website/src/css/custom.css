@@ -3,7 +3,6 @@
  * bundles Infima by default. Infima is a CSS framework designed to
  * work well for content-centric websites.
  */
-
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #ff8434ff;
@@ -32,170 +31,142 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
-
-.footer--dark {
-  --ifm-footer-background-color: #ee5f00ff;
+.hero-gradient {
+  background: linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(255,255,255,1) 100%);
 }
-
-/* Flex table */
-.table-container {
-  display: block;
-  margin: 2em auto;
+        
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
 }
-
-.flag-icon {
-  margin-right: 0.1em;
-}
-
-.flex-table {
-  display: flex;
-  border-bottom: solid 1px #d9d9d9;
-  flex-flow: row wrap;
-  transition: 0.5s;
-  &:first-of-type {
-    border-top: solid 1px #d9d9d9;
-    color: white;
-  }
-  &:first-of-type a {
-    color: white;
-  }
-  &:first-of-type .flex-row {
-    background: var(--ifm-color-primary-lightest);
-    border-color: #d9d9d9;
-  }
-  &.row:nth-child(odd) .flex-row {
-    background: #d9d9d9;
-  }
-  &:hover {
-    background: #F5F5F5;
-    transition: 500ms;
-  }
-}
-
-.flex-row, .flex-group {
-  padding: 0.5em 0.5em;
-}
-
-.flex-row {
-  width: calc(100% / 4);
-  text-align: center;
-}
-
-.flex-group {
-  color: white;
-  width: 100%;
-  background-color: var(--ifm-color-primary-lightest);
-}
-
-.rowspan {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.gy-5 {
-  --bs-gutter-y: 3rem;
-}
-
-.mb-5 {
-  padding-bottom: calc(3 * var(--spacers));
-}
-
-.pt-3 {
-  padding-top: var(--spacers);
-}
-
-.row {
-  margin-top: calc(-1 * var(--bs-gutter-y));
-  margin-right: calc(-.5 * var(--bs-gutter-x));
-  margin-left: calc(-.5 * var(--bs-gutter-x));
-}
-
-.row>* {
-  padding-right: calc(var(--bs-gutter-x) * .5);
-  padding-left: calc(var(--bs-gutter-x) * .5);
-  margin-top: var(--bs-gutter-y);
-}
-
-.column {
-  display: flex;
-  flex-flow: column wrap;
-  width: 75%;
-  padding: 0;
-  .flex-row {
+        
+.standard-icon {
+    width: 60px;
+    height: 60px;
     display: flex;
-    flex-flow: row wrap;
-    width: 100%;
-    padding: 0;
-    border: 0;
-    border-bottom: solid 1px #d9d9d9;
-    &:hover {
-      background: #F5F5F5;
-      transition: 500ms;
-    }
-  }
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    margin-bottom: 1rem;
 }
 
-.flex-cell {
-  width: calc(100% / 3);
-  text-align: center;
-  padding: 0.5em 0.5em;
-  border-right: solid 1px #d9d9d9;
+/* Carousel styles */
+.carousel {
+    position: relative;
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    border-radius: 8px;
 }
 
-@media all and (max-width: 767px) {
-  .flex-row {
-    width: calc(100% / 3);
-    
-   &.first {
-     width: 100%;
-   }
-  }
-
-  .column {
+.carousel-inner {
+    position: relative;
     width: 100%;
-  }
+    height: 100%;
 }
 
-@media all and (max-width: 430px) {  
-  .flex-table {
-    .flex-row {
-      border-bottom: 0;
-    }
-    .flex-row:last-of-type {
-      border-bottom: solid 1px #d9d9d9;
-    }
-  }
-  
-  .header {
-    .flex-row {
-      border-bottom: solid 1px;
-    }
-  }
-  
-  .flex-row {
+.carousel-item {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    
-   &.first {
-     width: 100%;
-     border-bottom: solid 1px #d9d9d9;
-   }
-  }
-
-  .column {
-    width: 100%;
-    .flex-row {
-      border-bottom: solid 1px #d9d9d9;
-    }
-  }
-
-  .flex-cell {
-    width: 100%; 
-  }
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
 }
 
-.greencheck {
-  width: 20px;
-  height: 20px;
+.carousel-item.active {
+    opacity: 1;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Fix the css style*/
+h1 {
+    font-size: var(--ifm-h1-font-size) !important;
+}
+
+h2 {
+    font-size: var(--ifm-h2-font-size) !important;
+}
+
+h3 {
+    font-size: var(--ifm-h3-font-size) !important;
+}
+
+h4 {
+    font-size: var(--ifm-h4-font-size) !important;
+}
+
+h5 {
+    font-size: var(--ifm-h5-font-size) !important;
+}
+
+h6 {
+    font-size: var(--ifm-h6-font-size) !important;
+}
+
+ul {
+    list-style: disc !important;
+}
+
+ol {
+    list-style: decimal !important;
+}
+
+ul, ol {
+    margin: 0 0 var(--ifm-list-margin) !important;
+    padding-left: var(--ifm-list-left-padding) !important;
+}
+
+.menu__list {
+    list-style: none !important;
+    margin: 0  !important;
+    padding-left: 0  !important;
+}
+
+.menu__list .menu__list {
+    padding-left: var(--ifm-menu-link-padding-horizontal) !important;
+}
+
+.menu__link {
+    padding: var(--ifm-menu-link-padding-vertical) var(--ifm-menu-link-padding-horizontal) !important;
+}
+
+.markdown > pre,
+  .markdown > ul,
+  .markdown > p {
+    margin-bottom: var(--ifm-leading) !important;
+}
+
+.markdown li {
+    word-wrap: break-word !important;
+}
+
+.markdown li > p {
+      margin-top: var(--ifm-list-paragraph-margin) !important;
+}
+
+.markdown li + li {
+      margin-top: var(--ifm-list-item-margin) !important;
+}
+
+.dropdown__menu {    
+    left: 0 !important;
+    list-style: none !important;
+    padding: 0.5rem !important;
+}
+
+.table-of-contents, .table-of-contents ul {
+    list-style: none !important;
+    padding-left: var(--ifm-toc-padding-horizontal) !important;
+}
+
+.clean-list {
+    list-style: none !important;
+    padding-left: 0 !important;
 }

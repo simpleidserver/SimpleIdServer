@@ -1,83 +1,76 @@
 import React from 'react';
-import styles from './styles.module.css';
-const OpenId = require('@site/static/img/openid.svg').default;
-const OAuth = require('@site/static/img/oauth.svg').default;
-const Fido = require('@site/static/img/fido.svg').default;
-const Saml = require('@site/static/img/saml.svg').default;
-const Docker = require('@site/static/img/docker.svg').default;
 
 export default function HomepageOpenStandards() {
-    return (<section>
-        <div className="container mb-5">
-            <h1>Open Standards</h1>
-            <div className="row gy-5">
-                <div className="col col--6">
-                    <div class="card">
-                        <div className="text--center">
-                            <OpenId className={styles.standardSvg} />
+    return (
+        <section id="standards" className="py-20 bg-gray-50">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="lg:text-center">
+                    <h2 className="text-base text-primary-600 font-semibold tracking-wide uppercase">Supported Standards</h2>
+                    <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                        Industry-Standard Protocols
+                    </p>
+                    <p className="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+                        SimpleIdServer supports all major identity and access management standards for seamless integration.
+                    </p>
+                </div>    
+                <div className="mt-16">
+                    <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                        <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="standard-icon bg-blue-100 text-blue-600">
+                                <i className="fas fa-id-card fa-2x"></i>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">OpenID Connect</h3>
+                            <p className="mt-2 text-gray-600">
+                                SimpleIdServer is certified OpenID Provider supporting all core OpenID Connect flows including Authorization Code, Implicit, Hybrid and Client Credentials.
+                            </p>
                         </div>
-                        <div className="text--center padding-horiz--md">
-                            <h3>OPENID</h3>
-                            <p>OpenID is a widely used federated identity standard for web-based applications.</p>
+                        <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="standard-icon bg-green-100 text-green-600">
+                                <i className="fas fa-lock fa-2x"></i>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">OAuth 2.0</h3>
+                            <p className="mt-2 text-gray-600">
+                                Full OAuth 2.0 implementation with support for all grant types including PKCE, Device Code, and Token Exchange.
+                            </p>
                         </div>
-                    </div>
-                </div>
-                <div className="col col--6">
-                    <div class="card">
-                        <div className="text--center">
-                            <OAuth className={styles.standardSvg} />
+                        <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="standard-icon bg-purple-100 text-purple-600">
+                                <i className="fas fa-fingerprint fa-2x"></i>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">FIDO2/WebAuthn</h3>
+                            <p className="mt-2 text-gray-600">
+                                Passwordless authentication with FIDO2 standards. Supports security keys, biometrics, and platform authenticators.
+                            </p>
                         </div>
-                        <div className="text--center padding-horiz--md">
-                            <h3>OAUTH</h3>
-                            <p>OAuth is utilized to authenticate an individual using a mobile device or to authenticate software—identity is not exclusive to humans.</p>
+                        <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="standard-icon bg-yellow-100 text-yellow-600">
+                                <i className="fas fa-exchange-alt fa-2x"></i>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">SAML 2.0</h3>
+                            <p className="mt-2 text-gray-600">
+                                Enterprise-grade SAML 2.0 support for both Identity Provider (IdP) and Service Provider (SP) roles with metadata exchange.
+                            </p>
                         </div>
-                    </div>
-                </div>
-                <div className="col col--6">
-                    <div class="card">
-                        <div className="text--center">
-                            <Fido className={styles.standardSvg} />
+                        <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="standard-icon bg-red-100 text-red-600">
+                                <i className="fas fa-users-cog fa-2x"></i>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">SCIM 2.0</h3>
+                            <p className="mt-2 text-gray-600">
+                                System for Cross-domain Identity Management for automated user provisioning and synchronization across systems.
+                            </p>
                         </div>
-                        <div className="text--center padding-horiz--md">
-                            <h3>FIDO</h3>
-                            <p>A set of standards enables the hardware, operating system, browser, and identity provider to authenticate a person using phishing-resistant, client-side biometrics.</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="col col--6">
-                    <div class="card">
-                        <div className="text--center">
-                            <Saml className={styles.standardSvg} />
-                        </div>
-                        <div className="text--center padding-horiz--md">
-                            <h3>SAML</h3>
-                            <p>SAML, the XML federation predecessor of OpenID Connect, is primarily used by SaaS and older web-based enterprise applications for Single Sign-On (SSO).</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="col col--6">
-                    <div class="card pt-3">
-                        <div className="text--center">
-                            <img src="/img/scim.webp" className={styles.standardImg} />
-                        </div>
-                        <div className="text--center padding-horiz--md">
-                            <h3>SCIM2.0</h3>
-                            <p>The SCIM protocol is an application-level REST protocol for provisioning and managing identity data on the web.</p>
-                        </div>
-                    </div>
-                </div>
-                <div className="col col--6">
-                    <div class="card pt-3">
-                        <div className="text--center">
-                            <img src="/img/logo-ebsi.png" className={styles.standardImg} />
-                        </div>
-                        <div className="text--center padding-horiz--md">
-                            <h3>EBSI</h3>
-                            <p>The first public sector blockchain infrastructure in Europe is used by public institutions from different countries to build and issue verifiable credentials, such as diplomas and driving licenses.</p>
+                        <div className="bg-white p-8 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
+                            <div className="standard-icon bg-indigo-100 text-indigo-600">
+                                <i className="fas fa-link fa-2x"></i>
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-900">EBSI</h3>
+                            <p className="mt-2 text-gray-600">
+                                European Blockchain Services Infrastructure support for decentralized identity and verifiable credentials.
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>);
+        </section>);
 }
