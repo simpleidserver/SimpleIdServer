@@ -21,7 +21,8 @@ const sidebars = {
       items: [
         'installation/copyandpaste',
         'installation/docker',
-        'installation/kubernetes'
+        'installation/kubernetes',
+        'installation/template'
       ]
     },
     {

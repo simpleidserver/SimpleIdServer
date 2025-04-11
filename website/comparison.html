@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparatif IAM 2024 | SimpleIdServer vs Duende vs Openiddict</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(14,165,233,0.1) 0%, rgba(255,255,255,1) 100%);
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comparison-table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+        
+        .comparison-table th, .comparison-table td {
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .comparison-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .check-icon {
+            color: #10b981;
+        }
+        
+        .x-icon {
+            color: #ef4444;
+        }
+        
+        .partial-icon {
+            color: #f59e0b;
+        }
+        
+        .sticky-header {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .tab-button.active {
+            border-bottom: 3px solid #0ea5e9;
+            color: #0ea5e9;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-lock-open text-primary-500 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-primary-700">IAM Comparison 2024</span>
+                    </div>
+                </div>
+                <div class="hidden sm:ml-6 sm:flex sm:items-center">
+                    <a href="#comparison" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600">Comparaison</a>
+                    <a href="#conclusion" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600">Conclusion</a>
+                    <a href="#resources" class="px-3 py-2 text-sm font-medium text-gray-700 hover:text-primary-600">Ressources</a>
+                    <button class="ml-4 bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                        Télécharger le PDF
+                    </button>
+                </div>
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Open main menu</span>
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-20 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="lg:grid lg:grid-cols-12 lg:gap-8">
+                <div class="px-4 sm:px-0 sm:text-center md:max-w-2xl md:mx-auto lg:col-span-7 lg:text-left lg:flex lg:items-center">
+                    <div>
+                        <div class="text-sm font-semibold text-primary-600 tracking-wide uppercase mb-2">Mise à jour du 25 septembre 2024</div>
+                        <h1 class="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
+                            <span class="block">Comparatif des solutions</span>
+                            <span class="block text-primary-600">IAM en 2024</span>
+                        </h1>
+                        <p class="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                            Analyse détaillée des fonctionnalités entre SimpleIdServer, Duende IdentityServer et Openiddict. Découvrez quelle solution correspond le mieux à vos besoins.
+                        </p>
+                        <div class="mt-8 sm:flex sm:justify-center lg:justify-start">
+                            <div class="rounded-md shadow">
+                                <a href="#comparison" class="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-500 hover:bg-primary-600 md:py-4 md:text-lg md:px-10">
+                                    Voir la comparaison
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>                
+                <div class="mt-12 lg:mt-0 lg:col-span-5">
+                    <div class="bg-white p-6 rounded-xl shadow-xl">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-gray-900">Solutions comparées</h3>
+                            <span class="text-xs bg-primary-100 text-primary-800 px-2 py-1 rounded-full">25/09/2024</span>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                    <i class="fas fa-server text-blue-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-sm font-medium text-gray-900">SimpleIdServer</h4>
+                                    <p class="text-xs text-gray-500">v2.4.0</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                    <i class="fas fa-shield-alt text-purple-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-sm font-medium text-gray-900">Duende IdentityServer</h4>
+                                    <p class="text-xs text-gray-500">v6.3.0</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-center p-4 border border-gray-200 rounded-lg hover:border-primary-300 transition-colors">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                                    <i class="fas fa-key text-green-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-sm font-medium text-gray-900">Openiddict</h4>
+                                    <p class="text-xs text-gray-500">v4.0.0</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 pt-6 border-t border-gray-200">
+                            <p class="text-xs text-gray-500 text-center">
+                                Comparaison réalisée par des experts indépendants. Données vérifiées le 25/09/2024.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Section -->
+    <section id="comparison" class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                    Comparaison détaillée
+                </h2>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
+                    Analyse des fonctionnalités clés des trois solutions IAM
+                </p>
+            </div>
+            
+            <!-- Tabs Navigation -->
+            <div class="sticky-header py-4 mb-6">
+                <div class="flex border-b border-gray-200 overflow-x-auto">
+                    <button class="tab-button px-6 py-3 text-sm font-medium text-gray-500 hover:text-primary-600 active" data-tab="standards">
+                        Standards
+                    </button>
+                    <button class="tab-button px-6 py-3 text-sm font-medium text-gray-500 hover:text-primary-600" data-tab="features">
+                        Fonctionnalités
+                    </button>
+                    <button class="tab-button px-6 py-3 text-sm font-medium text-gray-500 hover:text-primary-600" data-tab="security">
+                        Sécurité
+                    </button>
+                    <button class="tab-button px-6 py-3 text-sm font-medium text-gray-500 hover:text-primary-600" data-tab="technical">
+                        Technique
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Standards Tab -->
+            <div id="standards" class="tab-content active">
+                <div class="overflow-x-auto">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Standard / Protocole</th>
+                                <th>SimpleIdServer</th>
+                                <th>Duende</th>
+                                <th>Openiddict</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left font-medium">OpenID Connect</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">OAuth 2.0</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">FAPI 2.0</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">SAML 2.0</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">WS-Federation</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">LDAP</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">SCIM</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">FIDO2/WebAuthn</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">CIBA (Client Initiated Backchannel Authentication)</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Features Tab -->
+            <div id="features" class="tab-content">
+                <div class="overflow-x-auto">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Fonctionnalité</th>
+                                <th>SimpleIdServer</th>
+                                <th>Duende</th>
+                                <th>Openiddict</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left font-medium">Single Sign-On (SSO)</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Multi-Factor Authentication</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle partial-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Gestion des utilisateurs</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Gestion des rôles et permissions</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Passwordless Authentication</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Interface d'administration</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">API Access Management</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Reporting et analytics</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Support multi-locataire</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle partial-icon"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Security Tab -->
+            <div id="security" class="tab-content">
+                <div class="overflow-x-auto">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Aspect sécurité</th>
+                                <th>SimpleIdServer</th>
+                                <th>Duende</th>
+                                <th>Openiddict</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left font-medium">Certification FIPS 140-2</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Détection des attaques</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Protection contre le phishing</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Chiffrement des données au repos</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Journalisation des événements de sécurité</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle partial-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Revue de sécurité indépendante</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Protection DDoS intégrée</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Technical Tab -->
+            <div id="technical" class="tab-content">
+                <div class="overflow-x-auto">
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left">Aspect technique</th>
+                                <th>SimpleIdServer</th>
+                                <th>Duende</th>
+                                <th>Openiddict</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-left font-medium">Open Source</td>
+                                <td><i class="fas fa-check-circle check-icon"></i> (Apache 2.0)</td>
+                                <td><i class="fas fa-check-circle partial-icon"></i> (Partiel, licence commerciale)</td>
+                                <td><i class="fas fa-check-circle check-icon"></i> (Apache 2.0)</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Support .NET</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Déploiement conteneurisé</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">SaaS disponible</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Support Kubernetes</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Base de données supportées</td>
+                                <td>SQL Server, PostgreSQL, MySQL</td>
+                                <td>SQL Server, PostgreSQL</td>
+                                <td>SQL Server, SQLite, PostgreSQL, MySQL</td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Support commercial</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-times-circle x-icon"></i></td>
+                            </tr>
+                            <tr>
+                                <td class="text-left font-medium">Documentation complète</td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle check-icon"></i></td>
+                                <td><i class="fas fa-check-circle partial-icon"></i></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conclusion Section -->
+    <section id="conclusion" class="py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                    Analyse et recommandations
+                </h2>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
+                    Synthèse des résultats de notre comparaison
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+                <!-- SimpleIdServer Card -->
+                <div class="bg-white p-6 rounded-lg shadow-md feature-card">
+                    <div class="flex items-center mb-4">
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-server text-blue-600"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">SimpleIdServer</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-medium text-gray-900">Points forts</h4>
+                            <ul class="mt-2 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Seule solution supportant FAPI 2.0</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Solution la plus complète en termes de standards</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Open source avec licence permissive</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Points faibles</h4>
+                            <ul class="mt-2 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start">
+                                    <i class="fas fa-times text-red-500 mt-1 mr-2"></i>
+                                    <span>Moins mature que Duende</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-times text-red-500 mt-1 mr-2"></i>
+                                    <span>Communauté plus petite</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="pt-4 border-t border-gray-200">
+                            <p class="text-sm font-medium text-gray-900">Recommandé pour :</p>
+                            <p class="text-sm text-gray-600 mt-1">Organisations ayant besoin d'une solution complète et moderne, en particulier celles soumises à des régulations strictes nécessitant FAPI 2.0.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Duende Card -->
+                <div class="bg-white p-6 rounded-lg shadow-md feature-card">
+                    <div class="flex items-center mb-4">
+                        <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-shield-alt text-purple-600"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Duende IdentityServer</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-medium text-gray-900">Points forts</h4>
+                            <ul class="mt-2 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Solution la plus mature et stable</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Large communauté et support commercial</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Documentation excellente</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Points faibles</h4>
+                            <ul class="mt-2 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start">
+                                    <i class="fas fa-times text-red-500 mt-1 mr-2"></i>
+                                    <span>Pas de support pour FAPI 2.0</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-times text-red-500 mt-1 mr-2"></i>
+                                    <span>Licence commerciale pour certains usages</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="pt-4 border-t border-gray-200">
+                            <p class="text-sm font-medium text-gray-900">Recommandé pour :</p>
+                            <p class="text-sm text-gray-600 mt-1">Entreprises cherchant une solution éprouvée avec un bon support, sans besoin spécifique de FAPI 2.0.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Openiddict Card -->
+                <div class="bg-white p-6 rounded-lg shadow-md feature-card">
+                    <div class="flex items-center mb-4">
+                        <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-key text-green-600"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Openiddict</h3>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <h4 class="font-medium text-gray-900">Points forts</h4>
+                            <ul class="mt-2 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Léger et facile à intégrer</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Open source avec licence permissive</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>Supporte plusieurs bases de données</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-900">Points faibles</h4>
+                            <ul class="mt-2 space-y-2 text-sm text-gray-600">
+                                <li class="flex items-start">
+                                    <i class="fas fa-times text-red-500 mt-1 mr-2"></i>
+                                    <span>Fonctionnalités limitées</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-times text-red-500 mt-1 mr-2"></i>
+                                    <span>Pas de support pour les standards avancés</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fas fa-times text-red-500 mt-1 mr-2"></i>
+                                    <span>Pas de solution SaaS ou managée</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="pt-4 border-t border-gray-200">
+                            <p class="text-sm font-medium text-gray-900">Recommandé pour :</p>
+                            <p class="text-sm text-gray-600 mt-1">Applications simples ayant besoin d'une solution OIDC/OAuth légère sans besoins avancés.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 bg-white p-6 rounded-lg shadow-md">
+                <h3 class="text-lg font-bold text-gray-900 mb-4">Conclusion générale</h3>
+                <div class="prose max-w-none text-gray-600">
+                    <p>Notre analyse du 25 septembre 2024 montre que <strong>SimpleIdServer</strong> se distingue comme la solution la plus complète en termes de support des standards modernes, notamment avec son implémentation exclusive de FAPI 2.0 parmi les trois solutions comparées.</p>
+                    
+                    <p class="mt-4"><strong>Duende IdentityServer</strong> reste la solution la plus mature et la mieux documentée, idéale pour les entreprises cherchant une solution stable avec un bon support commercial, bien qu'elle manque de support pour certains standards récents comme FAPI 2.0.</p>
+                    
+                    <p class="mt-4"><strong>Openiddict</strong> est une option légère et flexible pour les applications ayant des besoins simples en matière d'authentification, mais ne convient pas pour des déploiements nécessitant des fonctionnalités avancées ou une solution complète d'IAM.</p>
+                    
+                    <p class="mt-4 font-medium text-gray-900">Pour les organisations soumises à des régulations strictes ou anticipant des besoins futurs en matière de sécurité financière (Open Banking, etc.), SimpleIdServer avec son support de FAPI 2.0 représente le choix le plus stratégique.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Resources Section -->
+    <section id="resources" class="py-12 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                    Ressources supplémentaires
+                </h2>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
+                    Documentation et liens utiles pour approfondir
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-8 md:grid-cols-3">
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-file-pdf text-primary-600"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Rapport complet</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">Téléchargez notre analyse détaillée au format PDF avec toutes les données techniques et nos recommandations.</p>
+                    <button class="w-full bg-primary-500 hover:bg-primary-600 text-white px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out">
+                        <i class="fas fa-download mr-2"></i> Télécharger le PDF
+                    </button>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-external-link-alt text-blue-600"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Sites officiels</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="https://github.com/simpleidserver/SimpleIdServer" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600">
+                                <i class="fab fa-github mr-2"></i> SimpleIdServer GitHub
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://duendesoftware.com/" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600">
+                                <i class="fas fa-globe mr-2"></i> Duende IdentityServer
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/openiddict/openiddict-core" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600">
+                                <i class="fab fa-github mr-2"></i> Openiddict GitHub
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="flex items-center mb-4">
+                        <div class="h-10 w-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-book text-purple-600"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900">Documentation</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <li>
+                            <a href="https://simpleidserver.gitbook.io/simpleidserver/" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600">
+                                <i class="fas fa-book-open mr-2"></i> Docs SimpleIdServer
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://docs.duendesoftware.com/" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600">
+                                <i class="fas fa-book-open mr-2"></i> Docs Duende
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://documentation.openiddict.com/" target="_blank" class="flex items-center text-sm text-gray-600 hover:text-primary-600">
+                                <i class="fas fa-book-open mr-2"></i> Docs Openiddict
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="bg-primary-700 py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl mx-auto text-center">
+            <h2 class="text-3xl font-extrabold text-white sm:text-4xl">
+                Besoin d'aide pour choisir ?
+            </h2>
+            <p class="mt-4 text-lg text-primary-100">
+                Notre équipe d'experts peut vous aider à sélectionner la solution IAM qui correspond à vos besoins.
+            </p>
+            <div class="mt-8 flex justify-center">
+                <div class="inline-flex rounded-md shadow">
+                    <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-white hover:bg-gray-50">
+                        <i class="fas fa-envelope mr-2"></i> Contactez-nous
+                    </a>
+                </div>
+                <div class="ml-3 inline-flex">
+                    <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-800">
+                        <i class="fas fa-phone-alt mr-2"></i> +33 1 23 45 67 89
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                        Comparatif
+                    </h3>
+                    <ul class="mt-4 space-y-4">
+                        <li>
+                            <a href="#standards" class="text-base text-gray-500 hover:text-gray-900">
+                                Standards
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#features" class="text-base text-gray-500 hover:text-gray-900">
+                                Fonctionnalités
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#security" class="text-base text-gray-500 hover:text-gray-900">
+                                Sécurité
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#technical" class="text-base text-gray-500 hover:text-gray-900">
+                                Technique
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                        Solutions
+                    </h3>
+                    <ul class="mt-4 space-y-4">
+                        <li>
+                            <a href="https://github.com/simpleidserver/SimpleIdServer" target="_blank" class="text-base text-gray-500 hover:text-gray-900">
+                                SimpleIdServer
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://duendesoftware.com/" target="_blank" class="text-base text-gray-500 hover:text-gray-900">
+                                Duende
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/openiddict/openiddict-core" target="_blank" class="text-base text-gray-500 hover:text-gray-900">
+                                Openiddict
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                        À propos
+                    </h3>
+                    <ul class="mt-4 space-y-4">
+                        <li>
+                            <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                                Méthodologie
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                                Mises à jour
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                                Confidentialité
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">
+                        Contact
+                    </h3>
+                    <ul class="mt-4 space-y-4">
+                        <li>
+                            <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                                <i class="fas fa-envelope mr-2"></i> Email
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                                <i class="fab fa-twitter mr-2"></i> Twitter
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="text-base text-gray-500 hover:text-gray-900">
+                                <i class="fab fa-linkedin mr-2"></i> LinkedIn
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-200 pt-8">
+                <p class="text-base text-gray-400 text-center">
+                    &copy; 2024 Comparatif IAM. Tous droits réservés. Mise à jour du 25 septembre 2024.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Tab functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all buttons and contents
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked button and corresponding content
+                    this.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Carousel functionality
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            if (carouselItems.length > 0) {
+                let currentIndex = 0;
+                
+                function showNextSlide() {
+                    // Hide current slide
+                    carouselItems[currentIndex].classList.remove('active');
+                    
+                    // Calculate next index
+                    currentIndex = (currentIndex + 1) % carouselItems.length;
+                    
+                    // Show next slide
+                    carouselItems[currentIndex].classList.add('active');
+                }
+                
+                // Start the carousel
+                setInterval(showNextSlide, 5000); // Change slide every 5 seconds
+            }
+        });
+    </script>
+</body>
+</html>

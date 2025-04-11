@@ -83,6 +83,7 @@ const config = {
           { type: 'doc', docId: 'download', label: 'Download', position: 'left' },
           { type: 'doc', docId: 'consultancy', label: 'Consultancy', position: 'left' },
           { type: 'doc', docId: 'tutorial/overview', label: 'Tutorial', position: 'left' },
+          { type: 'doc', docId: 'comparison', label: 'Comparison', position: 'left' },
           { type: 'doc', docId: 'contactus', label: 'Contact us', position: 'left' },
           {
             type: 'docsVersionDropdown',

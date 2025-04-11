@@ -6,7 +6,7 @@ In this setup, the domain `sid.svc.cluster.local` is used to represent the domai
 
 To achieve this, edit your hosts file and add the following entry:
 
-```
+```txt title="hosts"
 127.0.0.1 sid.svc.cluster.local scim.sid.svc.cluster.local idserver.sid.svc.cluster.local website.sid.svc.cluster.local credentialissuer.sid.svc.cluster.local credentialissuerwebsite.sid.svc.cluster.local
 ```
 
@@ -15,7 +15,7 @@ Next, ensure that you have `Minikube` installed on your local machine. You can d
 Download the [Kubernetes archive file](https://github.com/simpleidserver/SimpleIdServer/releases/latest/download/Kubernetes.zip) and extract its contents into a directory.
  Open a command prompt and navigate to this directory. Execute the following commands to start the solution:
 
-```
+```batch title="cmd.exe"
 minikube start
 minikube addons enable ingress
 eval $(minikube -p minikube docker-env)

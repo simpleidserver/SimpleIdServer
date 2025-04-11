@@ -1,19 +1,5 @@
-
 document.addEventListener('DOMContentLoaded', function() {
-    let currentIndex = 0;
-    function showNextSlide() {
-        const carouselItems = document.querySelectorAll('.carousel-item');
-        if(carouselItems.length === 0) {
-            return;
-        }
-        
-        carouselItems[currentIndex].classList.remove('active');
-        currentIndex = (currentIndex + 1) % carouselItems.length;
-        carouselItems[currentIndex].classList.add('active');
-    }
-
-    function initTailwind()
-    {
+    function initTailwind() {
         try {
             tailwind.config = {
                 theme: {
@@ -40,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(initTailwind, 100);
         }
     }
-
-    setInterval(showNextSlide, 5000);
+    
     initTailwind();
 });

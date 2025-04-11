@@ -7,6 +7,7 @@
 :root {
   --ifm-color-primary: #ff8434ff;
   --ifm-color-primary-dark: #ee5f00ff;
+  --ifm-link-color: rgb(255, 132, 52);
   --ifm-color-primary-darker: #e25a00ff;
   --ifm-color-primary-darkest: #cd5200ff;
   --ifm-color-primary-light: #ff9d5cff;
@@ -17,6 +18,14 @@
   --bs-gutter-y: 0;
   --bs-gutter-x: 1.5rem;
   --spacers: 1rem;
+}
+
+article a {
+    color: var(--ifm-link-color);
+}
+
+.footer--dark {
+    background-color: rgb(234 88 12) !important;
 }
 
 .hero-gradient {
@@ -89,6 +98,167 @@
 
 .tech-badge i {
     margin-right: 0.375rem;
+}
+
+/* Installation carousel */
+.installation-carousel {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 12px;
+    background-color: #1e293b;
+    color: white;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.installation-carousel-inner {
+    position: relative;
+    width: 100%;
+    height: 350px;
+}
+
+.installation-item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    text-align: center;
+}
+
+.installation-item a {
+    pointer-events: none;
+}
+
+.installation-item.active {
+    opacity: 1;
+}
+
+.installation-item.active a {
+    pointer-events: initial !important;
+}
+
+.command-box {
+    background-color: #0f172a;
+    padding: 1.5rem 2rem;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 1.25rem;
+    color: #f8fafc;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 600px;
+    overflow-x: auto;
+    white-space: nowrap;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.command-box i {
+    margin-right: 0.5rem;
+    color: #94a3b8;
+}
+        
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.carousel-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #64748b;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.carousel-indicator.active {
+    background-color: #f97316;
+}
+        
+.mobile-link {
+    display: inline-flex;
+    align-items: center;
+    color: white;
+    text-decoration: none;
+    background-color: #0f172a;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.mobile-link:hover {
+    background-color: #1e293b;
+    transform: translateY(-2px);
+}
+
+.mobile-link i {
+    margin-right: 0.75rem;
+    font-size: 1.5rem;
+    color: #f97316;
+}
+
+/* Price */        
+.price-tag {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #f97316;
+}
+
+/* comparison */ 
+.comparison-table, .comparison-table tr, .comparison-table td {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.comparison-table {
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+.feature-cell {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.check-icon {
+    color: #10b981;
+    font-size: 1.25rem;
+}
+.x-icon {
+    color: #ef4444;
+    font-size: 1.25rem;
+}
+.partial-icon {
+    color: #f59e0b;
+    font-size: 1.25rem;
+}
+
+.check-icon {
+    color: #10b981;
+}
+
+.x-icon {
+    color: #ef4444;
+}
+
+.partial-icon {
+    color: #f59e0b;
 }
 
 /* Fix the docusaurus style */

@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
+import HomepageEnterprise from '@site/src/components/HomepageEnterprise';
 import HomepageOpensource from '@site/src/components/HomepageOpensource';
+import HomepageInstallation from '@site/src/components/HomepageInstallation';
 import HomepageOpenStandards from '../components/HomepageOpenStandards';
 
 function HomepageHeader() {
@@ -61,7 +63,79 @@ function HomepageHeader() {
   );
 }
 
+function init() {
+    let currentIndex = 0;
+    let installationIndex = 0;
+    let installationInterval;
+    function showNextSlide() {
+        const carouselItems = document.querySelectorAll('.carousel-item');
+        if(carouselItems.length === 0) {
+            return;
+        }
+        
+        carouselItems[currentIndex].classList.remove('active');
+        currentIndex = (currentIndex + 1) % carouselItems.length;
+        carouselItems[currentIndex].classList.add('active');
+    }
+
+    function initIndicators() {
+        const indicators = document.querySelectorAll('.carousel-indicator');
+        if(indicators.length === 0) {
+            setInterval(initIndicators, 100);
+            return;
+        }
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                const installationItems = document.querySelectorAll('.installation-item');
+                const indicators = document.querySelectorAll('.carousel-indicator');
+                showInstallationSlide(index, installationItems, indicators);
+                initInstallationSlide();
+            });
+        });
+    }
+
+    function showInstallationSlide(index, installationItems, indicators) {
+        installationItems.forEach(item => item.classList.remove('active'));
+        indicators.forEach(indicator => indicator.classList.remove('active'));
+        installationItems[index].classList.add('active');
+        indicators[index].classList.add('active');
+        installationIndex = index;
+    }
+
+    function initInstallationSlide() {
+        if(installationInterval) {
+            clearInterval(installationInterval);
+        }
+
+        installationInterval = setInterval(() => {
+            const installationItems = document.querySelectorAll('.installation-item');
+            const indicators = document.querySelectorAll('.carousel-indicator');
+            if(installationItems.length === 0 || indicators.length === 0) {
+                return;
+            }
+    
+            const nextIndex = (installationIndex + 1) % installationItems.length;
+            showInstallationSlide(nextIndex, installationItems, indicators);
+        }, 5000);
+    }
+
+    var interval = setInterval(showNextSlide, 3000);
+    initInstallationSlide();
+    initIndicators();
+    return () => {
+        clearInterval(interval);
+        if(installationInterval) {
+            clearInterval(installationInterval);
+        }
+    };
+}
+
 export default function Home() {
+    useEffect(() => {
+      return init();
+    }, []);
+
   const {siteConfig} = useDocusaurusContext();
   return (
     <Layout
@@ -70,6 +144,8 @@ export default function Home() {
       <HomepageHeader />
       <main>
         <HomepageOpensource />
+        <HomepageEnterprise />
+        <HomepageInstallation />
         <HomepageFeatures />
         <HomepageOpenStandards />
       </main>

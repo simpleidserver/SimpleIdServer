@@ -33,10 +33,14 @@ Procedure :
 
 1. Download the [zip file](https://github.com/simpleidserver/SimpleIdServer/releases/latest/download/SimpleIdServer-Linux-x64.zip) using the following command:
 
-`wget https://github.com/simpleidserver/SimpleIdServer/releases/latest/download/SimpleIdServer-Linux-x64.zip`
+```batch title="cmd.exe"
+wget https://github.com/simpleidserver/SimpleIdServer/releases/latest/download/SimpleIdServer-Linux-x64.zip
+```
 
 2. Extract the contents into a directory using the following command:
 
-`unzip SimpleIdServer-Linux-x64.zip -d SimpleIdServer-Linux-x64`
+```batch title="cmd.exe"
+unzip SimpleIdServer-Linux-x64.zip -d SimpleIdServer-Linux-x64
+```
 
 3. In the subdirectories, you will find two scripts. Use `run.sh` to launch the service and `install-daemon.sh` to install the server as a daemon service.

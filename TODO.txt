@@ -1,3 +1,6 @@
-Développer le landing page du site marketing d'un site IAM. 
-=> => ajouter dans la page d'introduction un petit chapitre sur la technologie et comme quoi open-source
-=> => modifier le footer qui doit être orange
+=> => modifier le footer qui doit être orange					:	OK
+=> => mettre à jour la documentation sur les templates			:	OK
+=> modifier écran de téléchargement								:	OK
+=> => ajouter tableau comparatif entre plusieurs applications	: 	OK
+=> => ajouter sur le site principal quelques lignes de commandes pour installer la solution : dotnet new scim : créer une solution scim, dotnet new sidempty, sidui etc...	:	OK
+
