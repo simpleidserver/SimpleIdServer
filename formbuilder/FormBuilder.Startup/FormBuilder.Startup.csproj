@@ -19,6 +19,7 @@
 	  <ProjectReference Include="..\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj" />
 	  <ProjectReference Include="..\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj" />
 	  <ProjectReference Include="..\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj" />
+	  <ProjectReference Include="..\FormBuilder.Tailwindcss\FormBuilder.Tailwindcss.csproj" />
 	  <ProjectReference Include="..\FormBuilder\FormBuilder.csproj" />
 	</ItemGroup>
 	<ItemGroup>

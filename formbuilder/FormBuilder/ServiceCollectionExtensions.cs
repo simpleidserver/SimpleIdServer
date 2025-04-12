@@ -69,6 +69,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IWorkflowLinkActionFactory, WorkflowLinkActionFactory>();
         services.AddTransient<IUrlEvaluatorFactory, UrlEvaluatorFactory>();
         services.AddTransient<IConditionRuleEngineFactory, ConditionRuleEngineFactory>();
+        services.AddTransient<IHtmlClassResolver, HtmlClassResolver>();
 
         services.AddTransient<ITransformer, DirectTargetUrlTransformer>();
         services.AddTransient<ITransformer, RegexTransformer>();

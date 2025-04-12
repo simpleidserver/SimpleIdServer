@@ -1,6 +1,7 @@
 ﻿using FormBuilder.Startup.Fakers;
 using FormBuilder.Startup.Workflows;
 using Microsoft.EntityFrameworkCore;
+using FormBuilder;
 
 namespace FormBuilder.Startup.Config;
 
@@ -10,7 +11,7 @@ public class FormBuilderSetup
     {
         var section = builder.Configuration.GetSection(nameof(StorageConfiguration));
         var conf = section.Get<StorageConfiguration>();
-        builder.Services.AddFormBuilder().UseEF((db) =>
+        builder.Services.AddFormBuilder().UseEf((db) =>
         {
             ConfigureStorage(conf, db);
         });

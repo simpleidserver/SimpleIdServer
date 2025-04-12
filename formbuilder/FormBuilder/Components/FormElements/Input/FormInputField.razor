@@ -1,22 +1,23 @@
 ﻿@using FormBuilder.Components.Drag
 @using FormBuilder.Helpers
 @inject ITranslationHelper translationHelper
-
+@inject IHtmlClassResolver htmlClassResolver
 
 <DraggableFormElement IsViewSettingsDisabled="@IsViewSettingsDisabled" IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormInputDialog" TRecord="FormInputFieldRecord" Record="@Value">
      <Children>
         @if (Value.FormType != FormInputTypes.HIDDEN)
         {
-            <RadzenFormField Variant="Variant.Outlined" Text="@translationHelper.Translate(Value, InputData, !IsEditModeEnabled)" class="fullWidth">
-                @if(Value.FormType == FormInputTypes.TEXT)
-                {                    
-                    <RadzenTextBox Name="@Value.Name" @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenTextBox>
+            <div class="@htmlClassResolver.Resolve(Value, FormInputElementNames.Container, Context)">
+                <RadzenLabel class="@htmlClassResolver.Resolve(Value, FormInputElementNames.Label, Context)" Text="@translationHelper.Translate(Value, InputData, !IsEditModeEnabled)"></RadzenLabel>
+                @if (Value.FormType == FormInputTypes.TEXT)
+                {
+                    <RadzenTextBox class="@htmlClassResolver.Resolve(Value, FormInputElementNames.TextBox, Context)" Name="@Value.Name" @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenTextBox>
                 }
-                else 
-                {                    
-                    <RadzenPassword Name="@Value.Name" @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenPassword>
+                else
+                {
+                    <RadzenPassword class="@htmlClassResolver.Resolve(Value, FormInputElementNames.Password, Context)" Name="@Value.Name" @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenPassword>
                 }
-            </RadzenFormField>
+            </div>
         }
         else
         {

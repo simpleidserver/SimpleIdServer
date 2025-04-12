@@ -1,8 +1,6 @@
-﻿using FormBuilder.Components.FormElements.StackLayout;
-using FormBuilder.Models;
+﻿using FormBuilder.Models;
 using FormBuilder.Models.Rules;
 using System.Text.Json.Nodes;
-using System.Xml.Linq;
 
 namespace FormBuilder.Components.FormElements.Image;
 
@@ -16,6 +14,7 @@ public class ImageRecord : IFormElementRecord
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<ITransformationRule> Transformations { get; set; }
     public string CssStyle { get; set; }
+    public List<HtmlClassRecord> Classes { get; set; } = new List<HtmlClassRecord>();
 
     public void Apply(JsonNode node)
     {

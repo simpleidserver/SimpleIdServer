@@ -25,7 +25,7 @@ export default function HomepageEnterprise() {
                                         <h3 class="text-2xl font-bold text-gray-900">Enterprise License</h3>
                                         <div class="mt-2">
                                             <span class="price-tag">$5,000</span>
-                                            <span class="text-gray-500">/month</span>
+                                            <span class="text-gray-500">/year</span>
                                         </div>
                                     </div>
                                 </div>

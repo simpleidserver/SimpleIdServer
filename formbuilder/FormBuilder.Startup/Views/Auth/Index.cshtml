@@ -1,5 +1,6 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @using FormBuilder.Helpers
+@using FormBuilder.Tailwindcss
 @using Microsoft.Extensions.Options
 @using FormBuilder.Components
 @using FormBuilder.Components.Workflow
@@ -15,7 +16,8 @@
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
-    var path = uriProvider.GetActiveLastFormCssUrl(step.FormRecordCorrelationId);
+    var cssPath = uriProvider.GetActiveLastFormCssUrl(step.FormRecordCorrelationId, TailwindCssTemplate.Name);
+    var jsPath = uriProvider.GetActiveLastFormJsUrl(step.FormRecordCorrelationId, TailwindCssTemplate.Name);
 }
 
 <component type="typeof(WorkflowViewer)" 
@@ -26,10 +28,12 @@
     param-AntiforgeryToken="@Model.AntiforgeryToken"
     param-CurrentStepId="@Model.CurrentStepId" 
     param-ErrorMessages="@Model.ErrorMessages" 
-    param-SuccessMessages="@Model.SuccessMessages" />
+    param-SuccessMessages="@Model.SuccessMessages"
+    param-TemplateName="@TailwindCssTemplate.Name"/>
 
 @section Header {
-    <link rel="stylesheet" href="@path" />
+    <script src="@jsPath"></script>
+    <link rel="stylesheet" href="@cssPath" />
 }
 
 @section Scripts {

@@ -4,6 +4,9 @@
 
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="DividerDialog" TRecord="DividerLayoutRecord" Record="@Value">
      <Children>
-        <div class="divider"><p class="text">@translationHelper.Translate(Value, InputData, !IsEditModeEnabled)</p></div>
+        <div class="@ContainerClass">
+            <hr class="@LineClass" />
+            <span class="@TextClass">@translationHelper.Translate(Value, InputData, !IsEditModeEnabled)</span>
+         </div>
     </Children>
 </DraggableFormElement>

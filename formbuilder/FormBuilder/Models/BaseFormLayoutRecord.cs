@@ -4,13 +4,14 @@ using System.Text.Json.Nodes;
 
 namespace FormBuilder.Models;
 
-public abstract class BaseFormLayoutRecord : IFormElementRecord
+public abstract class BaseFormLayoutRecord : IFormElementRecord, IFormRecordCollection
 {
     public string Id { get; set; }
     public string CorrelationId { get; set; }
     public string CssStyle { get; set; } = "";
     public abstract string Type { get; }
-    public ObservableCollection<IFormElementRecord> Elements { get; set; }
+    public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();
+    public List<HtmlClassRecord> Classes { get; set; } = new List<HtmlClassRecord>();
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
     public List<ITransformationRule> Transformations { get; set; }

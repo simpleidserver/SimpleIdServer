@@ -13,6 +13,7 @@ public class WorkflowContext
     public WorkflowDefinition Definition { get; private set; }
     public WorkflowExecution Execution { get; private set; }
     public FormEditorContext FormEditorContext { get; private set; }
+    public string TemplateName { get; set; }
     public List<string> FilteredJsonPath { get; set; } = new List<string>();
 
     public static WorkflowContext CreateEmptyWorkflow(List<FormRecord> records)
@@ -70,12 +71,13 @@ public class WorkflowContext
         return result;
     }
 
-    public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> records, string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, JsonObject inputData, List<string> supportedLanguageCodes)
+    public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> records, string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, JsonObject inputData, List<string> supportedLanguageCodes, string templateName)
     {
         var clonedWorkflow = workflow.Clone() as WorkflowRecord;
         var clonedRecords = records.Select(x => x.Clone() as FormRecord).ToList();
         var result = new WorkflowContext
         {
+            TemplateName = templateName,
             Definition = new WorkflowDefinition(clonedWorkflow, clonedRecords),
             Execution = new WorkflowExecution(currentStepId, errorMessages, successMessages, antiforgeryTokenRecord, supportedLanguageCodes),
             FormEditorContext = new FormEditorContext(null)

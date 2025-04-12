@@ -30,6 +30,10 @@ app.Use(async (context, next) =>
     var cookie = context.Request.Headers;
     await next.Invoke();
 });
+app.UseRequestLocalization(a =>
+{
+    a.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en");
+});
 app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI();

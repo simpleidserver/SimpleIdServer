@@ -1,7 +1,6 @@
 ﻿using FormBuilder.Models;
 using Radzen.Blazor;
 using System.Text.Json.Nodes;
-using System.Xml.Linq;
 
 namespace FormBuilder.Components.FormElements.Title;
 
@@ -11,6 +10,7 @@ public class TitleRecord : IFormElementRecord
     public string Id { get; set; }
     public string CorrelationId {  get; set; }
     public string CssStyle { get; set; }
+    public List<HtmlClassRecord> Classes { get; set; } = new List<HtmlClassRecord>();
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
     public TextStyle Style { get; set; } = TextStyle.H5;
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();

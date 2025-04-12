@@ -1,5 +1,7 @@
 ﻿using FormBuilder.EF;
+using FormBuilder.Models;
 using FormBuilder.Startup.Workflows;
+using FormBuilder.Tailwindcss;
 using Microsoft.EntityFrameworkCore;
 
 namespace FormBuilder.Startup.Config;
@@ -31,12 +33,27 @@ public class DataSeeder
         var allForms = AllForms.GetAllForms();
         foreach (var form in allForms)
         {
-            form.AvailableStyles.Add(new FormBuilder.Models.FormStyle
+            var styles = new List<FormStyle>();
+            // Enable radzen.
+            // form.AvailableStyles.AddRange(RadzenTemplate.BuildDefault());
+            // Enable tailwindcs : https://flowbite.com/blocks/marketing/login/
+            form.AvailableStyles.Add(new FormStyle
             {
+                Category = FormStyleCategories.Lib,
+                Value = "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4",
                 Id = Guid.NewGuid().ToString(),
-                Content = content,
-                IsActive = true
+                IsActive = true,
+                TemplateName = TailwindCssTemplate.Name,
+                Language = FormStyleLanguages.Javascript
             });
+            // form.AvailableStyles.Add(new FormStyle
+            // {
+            //     Id = Guid.NewGuid().ToString(),
+            //     Value = content,
+            //     IsActive = true,
+            //     TemplateName = TailwindCssTemplate.Name,
+            //     Category = FormStyleCategories.Custom
+            // });
         }
 
         dbContext.Forms.AddRange(allForms);

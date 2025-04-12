@@ -6,65 +6,70 @@
 @using System.Collections.Specialized
 @using global::FormBuilder.Models
 @inject IRenderFormElementsHelper renderFormsElementsHelper
+@inject IHtmlClassResolver htmlClassResolver
 @implements IDisposable
 
-<div class="form">
-    <div class="@($"form-content {(!IsEditModeEnabled ? "view" : "editor")}")">
-        @{
-            if (Context.Definition.Workflow != null && Context.Definition.Records != null)
-            {
-                var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep);
-                var authSteps = new List<WorkflowStep>();
-                authSteps.AddRange(Context.Definition.Workflow.GetAllParentMainLinks(Context.Execution.CurrentStepId));
-                authSteps.Add(Context.Definition.Workflow.Steps.Single(s => s.Id == Context.Execution.CurrentStepId));
-                authSteps.AddRange(Context.Definition.Workflow.GetAllChildrenMainLinks(Context.Execution.CurrentStepId));
-                var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => formsActingAsStep.FirstOrDefault(st => st.CorrelationId == s.FormRecordCorrelationId))
-                    .Where(s => s != null && authSteps.Any(a => a.FormRecordCorrelationId == s.CorrelationId))
-                    .Select(s => s.Name);
-                var currentFormRecord = Context.GetCurrentFormRecord();
-                if (IsNavigationDisplayed)
-                {
-                    <RadzenSteps ShowStepsButtons="false">
-                        <Steps>
-                            @foreach (var stepName in workflowFormsActingAsStep)
-                            {
-                                <RadzenStepsItem Text="@stepName" Disabled="@(stepName != currentFormRecord.Name)" Selected="@(stepName == currentFormRecord.Name)"></RadzenStepsItem>
-                            }
-                        </Steps>
-                    </RadzenSteps>
+<div class="@ContainerClass">
+    <div class="@ContentClass">
+        <div class="@FormContainerClass">
+            <div class="@FormContentClass">
+                @{
+                    if (Context.Definition.Workflow != null && Context.Definition.Records != null)
+                    {
+                        var formsActingAsStep = Context.Definition.Records.Where(s => s.ActAsStep);
+                        var authSteps = new List<WorkflowStep>();
+                        authSteps.AddRange(Context.Definition.Workflow.GetAllParentMainLinks(Context.Execution.CurrentStepId));
+                        authSteps.Add(Context.Definition.Workflow.Steps.Single(s => s.Id == Context.Execution.CurrentStepId));
+                        authSteps.AddRange(Context.Definition.Workflow.GetAllChildrenMainLinks(Context.Execution.CurrentStepId));
+                        var workflowFormsActingAsStep = Context.Definition.Workflow.Steps.Select(s => formsActingAsStep.FirstOrDefault(st => st.CorrelationId == s.FormRecordCorrelationId))
+                        .Where(s => s != null && authSteps.Any(a => a.FormRecordCorrelationId == s.CorrelationId))
+                        .Select(s => s.Name);
+                        var currentFormRecord = Context.GetCurrentFormRecord();
+                        if (IsNavigationDisplayed)
+                        {
+                            <RadzenSteps ShowStepsButtons="false">
+                                <Steps>
+                                    @foreach (var stepName in workflowFormsActingAsStep)
+                                    {
+                                        <RadzenStepsItem Text="@stepName" Disabled="@(stepName != currentFormRecord.Name)" Selected="@(stepName == currentFormRecord.Name)"></RadzenStepsItem>
+                                    }
+                                </Steps>
+                            </RadzenSteps>
+                        }
+                    }
                 }
-            }
-        }
 
-        @if (Context.Execution != null)
-        {
-            if (Context.Execution.ErrorMessages != null)
-            {
-                @foreach (var errorMessage in Context.Execution.ErrorMessages)
+                @if (Context.Execution != null)
                 {
-                    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
-                        @errorMessage
-                    </RadzenAlert>
-                }
-            }
+                    if (Context.Execution.ErrorMessages != null)
+                    {
+                        @foreach (var errorMessage in Context.Execution.ErrorMessages)
+                        {
+                            <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                                @errorMessage
+                            </RadzenAlert>
+                        }
+                    }
 
-            if (Context.Execution.SuccessMessages != null)
-            {
-                @foreach (var successMessage in Context.Execution.SuccessMessages)
+                    if (Context.Execution.SuccessMessages != null)
+                    {
+                        @foreach (var successMessage in Context.Execution.SuccessMessages)
+                        {
+                            <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+                                @successMessage
+                            </RadzenAlert>
+                        }
+                    }
+                }
+
+                @if (Form?.Elements != null)
                 {
-                    <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
-                        @successMessage
-                    </RadzenAlert>
+                    <RadzenStack class="">
+                        @CustomRender
+                    </RadzenStack>
                 }
-            }
-        }
-
-        @if (Form?.Elements != null)
-        {
-            <RadzenStack>
-                @CustomRender
-            </RadzenStack>
-        }
+            </div>
+        </div>
     </div>
 </div>
 
@@ -76,6 +81,52 @@
     [Parameter] public bool IsNavigationDisplayed { get; set; }
     [Parameter] public WorkflowContext Context { get; set; }
     private FormRecord Form { get; set; } = null;
+
+    string ContainerClass
+    {
+        get
+        {
+            var result = "form";
+            var resolvedClass = htmlClassResolver.Resolve(Form, FormElementNames.Container, Context);
+            if (!string.IsNullOrWhiteSpace(resolvedClass))
+            {
+                result += $" {resolvedClass}";
+            }
+
+            return result;
+        }
+    }
+
+    string ContentClass
+    {
+        get
+        {
+            var result = $"form-content {(!IsEditModeEnabled ? "view" : "editor")}";
+            var resolvedClass = htmlClassResolver.Resolve(Form, FormElementNames.Content, Context);
+            if (!string.IsNullOrWhiteSpace(resolvedClass))
+            {
+                result += $" {resolvedClass}";
+            }
+
+            return result;
+        }
+    }
+
+    string FormContainerClass
+    {
+        get
+        {
+            return htmlClassResolver.Resolve(Form, FormElementNames.FormContainer, Context);
+        }
+    }
+
+    string FormContentClass
+    {
+        get
+        {
+            return htmlClassResolver.Resolve(Form, FormElementNames.FormContent, Context);
+        }
+    }
 
     public void Dispose()
     {

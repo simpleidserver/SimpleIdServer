@@ -10,15 +10,16 @@ namespace FormBuilder.Startup.Controllers;
 
 public class AuthController : BaseWorkflowController
 {
-    private const string _workflowId = "loginPwd";
+    private const string _workflowId = "sampleWorkflow";
+    private const string _stepName = "pwd";
 
     public AuthController(IAntiforgery antiforgery, IWorkflowStore workflowStore, IFormStore formStore, IOptions<FormBuilderOptions> options) : base(antiforgery, workflowStore, formStore, options)
     {
     }
 
-    public async Task<IActionResult> Index(string stepId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Index(CancellationToken cancellationToken)
     {
-        var viewModel = await BuildViewModel(stepId, cancellationToken);
+        var viewModel = await BuildViewModel(cancellationToken);
         return View(viewModel);
     }
 
@@ -28,7 +29,7 @@ public class AuthController : BaseWorkflowController
     {
         if(string.IsNullOrWhiteSpace(viewModel.Login))
         {
-            var vm = await BuildViewModel(viewModel.StepId, cancellationToken);
+            var vm = await BuildViewModel(cancellationToken);
             vm.ErrorMessages = new List<string>
             {
                 "The login is required"
@@ -48,9 +49,9 @@ public class AuthController : BaseWorkflowController
         return NoContent();
     }
 
-    private async Task<WorkflowViewModel> BuildViewModel(string stepName, CancellationToken cancellationToken)
+    private async Task<WorkflowViewModel> BuildViewModel(CancellationToken cancellationToken)
     {
-        var viewModel = await Get("master", _workflowId, stepName, cancellationToken);
+        var viewModel = await Get("master", _workflowId, _stepName, cancellationToken);
         var authViewModel = new AuthViewModel
         {
             // Login = "hello",
