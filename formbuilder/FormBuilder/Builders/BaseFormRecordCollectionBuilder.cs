@@ -1,4 +1,6 @@
-﻿using FormBuilder.Components.FormElements.Input;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
 
@@ -44,6 +46,42 @@ public class BaseFormRecordCollectionBuilder<B, T>
     {
         var builder = new FormInputBuilder(name, FormInputTypes.TEXT);
         if(cb != null)
+        {
+            cb(builder);
+        }
+
+        Record.Elements.Add(builder.Build());
+        return this as B;
+    }
+
+    public B AddPasswordField(string name, Action<FormPasswordBuilder> cb = null)
+    {
+        var builder = new FormPasswordBuilder(name);
+        if (cb != null)
+        {
+            cb(builder);
+        }
+
+        Record.Elements.Add(builder.Build());
+        return this as B;
+    }
+
+    public B AddCheckbox(string name, Action<FormCheckboxRecordBuilder> cb = null)
+    {
+        var builder = new FormCheckboxRecordBuilder(name);
+        if (cb != null)
+        {
+            cb(builder);
+        }
+
+        Record.Elements.Add(builder.Build());
+        return this as B;
+    }
+
+    public B AddButton(string name, Action<FormButtonRecordBuilder> cb = null)
+    {
+        var builder = new FormButtonRecordBuilder(name);
+        if (cb != null)
         {
             cb(builder);
         }

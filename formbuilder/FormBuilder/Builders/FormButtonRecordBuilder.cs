@@ -1,31 +1,32 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using FormBuilder.Components.FormElements.Divider;
+using FormBuilder.Components.FormElements.Button;
 using FormBuilder.Conditions;
 using FormBuilder.Models;
 
 namespace FormBuilder.Builders;
 
-public class DividerLayoutRecordBuilder
+public class FormButtonRecordBuilder
 {
-    private readonly DividerLayoutRecord _record;
+    private readonly FormButtonRecord _record;
 
-    internal DividerLayoutRecordBuilder()
+    internal FormButtonRecordBuilder(string name)
     {
-        _record = new DividerLayoutRecord
+        _record = new FormButtonRecord
         {
             Id = Guid.NewGuid().ToString(),
+            Name = name,
             CorrelationId = Guid.NewGuid().ToString()
         };
     }
 
-    public DividerLayoutRecordBuilder AddTranslation(string language, string value, IConditionParameter conditionParameter = null)
+    public FormButtonRecordBuilder AddTranslation(string language, string value, IConditionParameter conditionParameter = null)
     {
         _record.Labels.Add(new LabelTranslation(language, value, conditionParameter));
         return this;
     }
 
-    internal DividerLayoutRecord Build()
+    internal FormButtonRecord Build()
     {
         return _record;
     }

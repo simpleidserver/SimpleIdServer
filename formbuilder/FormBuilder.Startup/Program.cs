@@ -24,16 +24,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-DataSeeder.SeedData(app);
-app.Use(async (context, next) =>
-{
-    var cookie = context.Request.Headers;
-    await next.Invoke();
-});
-app.UseRequestLocalization(a =>
-{
-    a.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en");
-});
+FormBuilder.Startup.Config.DataSeeder.SeedData(app);
+app.Services.SeedData();
 app.UseHttpsRedirection();
 app.UseSwagger();
 app.UseSwaggerUI();

@@ -1,4 +1,7 @@
-﻿using FormBuilder;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using DataSeeder;
+using FormBuilder;
 using FormBuilder.Components.FormElements.Anchor;
 using FormBuilder.Components.FormElements.Back;
 using FormBuilder.Components.FormElements.Button;
@@ -16,6 +19,7 @@ using FormBuilder.Factories;
 using FormBuilder.Helpers;
 using FormBuilder.Link;
 using FormBuilder.Link.Services;
+using FormBuilder.Radzen;
 using FormBuilder.Repositories;
 using FormBuilder.Rules;
 using FormBuilder.Services;
@@ -44,6 +48,7 @@ public static class ServiceCollectionExtensions
         else services.Configure<FormBuilderOptions>(cb);
         services.AddTransient<IFormBuilderJsService, FormBuilderJsService>();
         services.AddTransient<INavigationHistoryService, NavigationHistoryService>();
+        services.AddTransient<IDataSeeder, ConfigureRadzenTemplateDataSeeder>();
 
         services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();

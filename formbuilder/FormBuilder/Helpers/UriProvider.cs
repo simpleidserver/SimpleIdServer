@@ -4,9 +4,8 @@ namespace FormBuilder.Helpers;
 
 public interface IUriProvider
 {
-    string GetActiveFormCssUrl(string id);
-    string GetActiveLastFormCssUrl(string correlationId, string templateName = RadzenTemplate.Name);
-    string GetActiveLastFormJsUrl(string correlationId, string templateName = RadzenTemplate.Name);
+    string GetActiveLastFormCssUrl(string templateId);
+    string GetActiveLastFormJsUrl(string templateId);
     string GetFormUrl(string id);
     string GetFormPublishUrl(string id);
     string GetWorkflowUrl(string id);
@@ -24,14 +23,11 @@ public class UriProvider : IUriProvider
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string GetActiveFormCssUrl(string id)
-        => $"{GetAbsoluteUriWithVirtualPath()}/forms/{id}/styles/active";
+    public string GetActiveLastFormCssUrl(string templateId)
+        => $"{GetAbsoluteUriWithVirtualPath()}/templates/{templateId}/css";
 
-    public string GetActiveLastFormCssUrl(string correlationId, string templateName = RadzenTemplate.Name)
-        => $"{GetAbsoluteUriWithVirtualPath()}/forms/last/{correlationId}/{templateName}/css/active";
-
-    public string GetActiveLastFormJsUrl(string correlationId, string templateName = RadzenTemplate.Name)
-        => $"{GetAbsoluteUriWithVirtualPath()}/forms/last/{correlationId}/{templateName}/js/active";
+    public string GetActiveLastFormJsUrl(string templateId)
+        => $"{GetAbsoluteUriWithVirtualPath()}/templates/{templateId}/js";
 
     public string GetFormUrl(string id)
         => $"{GetAbsoluteUriWithVirtualPath()}/forms/{id}";

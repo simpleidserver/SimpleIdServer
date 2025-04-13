@@ -7,8 +7,6 @@ public class AllForms
     public static List<FormRecord> GetAllForms()
         => new List<FormRecord>
         {
-            MobileAuthForms.MobileAuthForm,
-            PwdAuthForms.LoginPwdAuthForm,
-            PwdAuthForms.ResetPwdForm
+            PwdAuthForms.LoginPwdAuthForm
         };
 }

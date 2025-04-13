@@ -1,10 +1,12 @@
-﻿using System.Collections.ObjectModel;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using System.Collections.ObjectModel;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace FormBuilder.Models;
 
-public class FormRecord : BaseVersionRecord, ICloneable, IElement, IFormRecordCollection
+public class FormRecord : BaseVersionRecord, ICloneable, IFormRecordCollection
 {
     [JsonPropertyName("id")]
     public string Id { get; set; }
@@ -12,20 +14,7 @@ public class FormRecord : BaseVersionRecord, ICloneable, IElement, IFormRecordCo
     public string? Category { get; set; }
     public string? Realm { get; set; }
     public bool ActAsStep { get; set; }
-    public List<HtmlClassRecord> Classes { get; set; } = new List<HtmlClassRecord>();
     public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();
-    [JsonIgnore]
-    public virtual List<FormStyle> AvailableStyles { get; set; } = new List<FormStyle>();
-
-    public IEnumerable<FormStyle> GetActiveCssStyles(string templateName)
-    {
-        return AvailableStyles.Where(s => s.IsActive && s.TemplateName == templateName && s.Language == FormStyleLanguages.Css);
-    }
-
-    public IEnumerable<FormStyle> GetActiveJsStyles(string templateName)
-    {
-        return AvailableStyles.Where(s => s.IsActive && s.TemplateName == templateName && s.Language == FormStyleLanguages.Javascript);
-    }
 
     public object Clone()
     {
@@ -43,13 +32,6 @@ public class FormRecord : BaseVersionRecord, ICloneable, IElement, IFormRecordCo
             Status = Status,
             UpdateDateTime = UpdateDateTime,
             VersionNumber = VersionNumber,
-            AvailableStyles = AvailableStyles.Select(a => a.Clone() as FormStyle).ToList(),
-            Classes = Classes.Select(c => new HtmlClassRecord
-            {
-                Element = c.Element,
-                TemplateName = c.TemplateName,
-                Value = c.Value
-            }).ToList(),
             Elements = elements
         };
     }

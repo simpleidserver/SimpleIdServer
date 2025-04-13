@@ -1,4 +1,6 @@
-﻿using FormBuilder.Models.Rules;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Models.Rules;
 using System.Collections.ObjectModel;
 using System.Text.Json.Nodes;
 
@@ -11,7 +13,6 @@ public abstract class BaseFormLayoutRecord : IFormElementRecord, IFormRecordColl
     public string CssStyle { get; set; } = "";
     public abstract string Type { get; }
     public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();
-    public List<HtmlClassRecord> Classes { get; set; } = new List<HtmlClassRecord>();
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
     public List<ITransformationRule> Transformations { get; set; }

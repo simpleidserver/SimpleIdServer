@@ -1,7 +1,4 @@
-﻿using FormBuilder.Startup.Fakers;
-using FormBuilder.Startup.Workflows;
-using Microsoft.EntityFrameworkCore;
-using FormBuilder;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace FormBuilder.Startup.Config;
 
@@ -15,10 +12,6 @@ public class FormBuilderSetup
         {
             ConfigureStorage(conf, db);
         });
-        builder.Services.AddTransient<IFakerDataService, PwdAuthFakerDataService>();
-        builder.Services.AddTransient<IFakerDataService, MobileAuthFakerDataService>();
-        builder.Services.AddTransient<IWorkflowLayoutService, MobileAuthWorkflowLayout>();
-        builder.Services.AddTransient<IWorkflowLayoutService, PwdAuthWorkflowLayout>();
         builder.Services.Configure<FormBuilderStartupOptions>(cb => cb.AntiforgeryCookieName = cookieName);
     }
 

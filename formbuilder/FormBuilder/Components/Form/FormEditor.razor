@@ -194,6 +194,7 @@
 
     private async Task LoadCss()
     {
+        /*
         var url = uriProvider.GetActiveFormCssUrl(Form.Id);
         using (var httpClient = new HttpClient())
         {
@@ -203,7 +204,8 @@
                 await formBuilderJsService.RefreshCss(Css);
             }
             catch { }
-        }
+            }
+        */
     }
 
     private void RefreshForm(FormRecord form)

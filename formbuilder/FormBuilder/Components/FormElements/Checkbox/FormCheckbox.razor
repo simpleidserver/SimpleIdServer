@@ -1,13 +1,14 @@
 ﻿@using FormBuilder.Components.Drag
 @using FormBuilder.Helpers
 @inject ITranslationHelper translationHelper
+@inject IHtmlClassResolver htmlClassResolver
 
 
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="FormCheckboxDialog" TRecord="FormCheckboxRecord" Record="@Value">
      <Children>
-        <div>
-            <RadzenCheckBox Name="@Value.Name" @bind-Value="@Value.Value"></RadzenCheckBox>
-            <RadzenLabel>@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty, InputData, !IsEditModeEnabled)</RadzenLabel>
+        <div class="@htmlClassResolver.Resolve(Value, CheckboxElementNames.Container, Context)">
+            <RadzenCheckBox class="@htmlClassResolver.Resolve(Value, CheckboxElementNames.Checkbox, Context)" Name="@Value.Name" @bind-Value="@Value.Value"></RadzenCheckBox>
+            <RadzenLabel class="@htmlClassResolver.Resolve(Value, CheckboxElementNames.Label, Context)">@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty, InputData, !IsEditModeEnabled)</RadzenLabel>
         </div>
      </Children>
 </DraggableFormElement>
