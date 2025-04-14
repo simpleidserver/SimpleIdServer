@@ -4,6 +4,6 @@
 
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="BackButtonDialog" TRecord="BackButtonRecord" Record="@Value">
     <Children>
-        <RadzenButton Click="@(async() => await HandleBack())" Text="Back" class="fullWidth"></RadzenButton>
+        <RadzenButton Click="@(async() => await HandleBack())" Text="Back" class="@BtnClass"></RadzenButton>
     </Children>
 </DraggableFormElement>

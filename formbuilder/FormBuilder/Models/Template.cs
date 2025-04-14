@@ -39,13 +39,29 @@ public class Template
         get; set;
     } = new List<TemplateStyle>();
 
+    public List<TemplateStyle> CssStyles
+    {
+        get
+        {
+            return Styles.Where(s => s.Language == TemplateStyleLanguages.Css).ToList();
+        }
+    }
+
+    public List<TemplateStyle> JsStyles
+    {
+        get
+        {
+            return Styles.Where(s => s.Language == TemplateStyleLanguages.Javascript).ToList();
+        }
+    }
+
     public void SetWindowClass(string name, string className, TemplateWindowDisplayTypes displayType)
     {
         Windows.Add(new TemplateWindow
         {
             Name = name,
             Value = className,
-            Element = nameof(TemplateWindow),
+            Element = nameof(FormRecord),
             DisplayType = displayType
         });
     }

@@ -14,11 +14,14 @@ public class ImageRecord : IFormElementRecord
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<ITransformationRule> Transformations { get; set; }
     public string CssStyle { get; set; }
-    public List<HtmlClassRecord> Classes { get; set; } = new List<HtmlClassRecord>();
 
     public void Apply(JsonNode node)
     {
-        if (node == null) return;
+        if (node == null)
+        {
+            return;
+        }
+
         Url = node.ToString();
     }
 

@@ -28,3 +28,34 @@
 .form-content.view {
     padding: 10px;
 }
+
+.divider {
+    width: 100%;
+    white-space: nowrap;
+    align-self: stretch;
+    align-items: center;
+    display: flex;
+    color: #cccccc;
+}
+
+.divider:before {
+    content: "";
+    border-inline-end-width: 0;
+    border-style: solid;
+    border-top-width: 1px;
+    flex-grow: 1;
+    width: 100%;
+    height: 1px;
+    border:1px solid #cccccc;
+}
+
+.divider:after {
+    content: "";
+    border-inline-end-width: 0;
+    border-style: solid;
+    border-top-width: 1px;
+    flex-grow: 1;
+    width: 100%;
+    height: 1px;
+    border:1px solid #cccccc;
+}

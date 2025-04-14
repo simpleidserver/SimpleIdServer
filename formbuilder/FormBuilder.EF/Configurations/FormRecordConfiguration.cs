@@ -1,4 +1,6 @@
-﻿using FormBuilder.Models;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Collections.ObjectModel;
@@ -14,9 +16,5 @@ public class FormRecordConfiguration : IEntityTypeConfiguration<FormRecord>
         builder.Property(w => w.Elements).HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                 v => string.IsNullOrWhiteSpace(v) ? null : new ObservableCollection<IFormElementRecord>(JsonSerializer.Deserialize<List<IFormElementRecord>>(v, (JsonSerializerOptions)null)));
-        builder.Property(w => w.Classes).HasConversion(
-                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
-                v => string.IsNullOrWhiteSpace(v) ? null : new List<HtmlClassRecord>(JsonSerializer.Deserialize<List<HtmlClassRecord>>(v, (JsonSerializerOptions)null)));
-        builder.HasMany(f => f.AvailableStyles).WithOne().HasForeignKey(f => f.FormId).OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -1,4 +1,6 @@
-﻿using FormBuilder.Models;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Models;
 using FormBuilder.Stores;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Dynamic.Core;
@@ -18,13 +20,13 @@ public class FormStore : IFormStore
         => _dbContext.Forms.Add(record);
 
     public Task<FormRecord> Get(string id, CancellationToken cancellationToken)
-        => _dbContext.Forms.Include(f => f.AvailableStyles).SingleOrDefaultAsync(f => f.Id == id, cancellationToken);
+        => _dbContext.Forms.SingleOrDefaultAsync(f => f.Id == id, cancellationToken);
 
     public Task<FormRecord> Get(string realm, string id, CancellationToken cancellationToken)
-        => _dbContext.Forms.Include(f => f.AvailableStyles).SingleOrDefaultAsync(f => f.Id == id && f.Realm == realm, cancellationToken);
+        => _dbContext.Forms.SingleOrDefaultAsync(f => f.Id == id && f.Realm == realm, cancellationToken);
 
     public Task<List<FormRecord>> GetAll(string realm, CancellationToken cancellationToken)
-        => _dbContext.Forms.Include(f => f.AvailableStyles).Where(f => f.Realm == realm).ToListAsync(cancellationToken);
+        => _dbContext.Forms.Where(f => f.Realm == realm).ToListAsync(cancellationToken);
 
     public Task<List<FormRecord>> GetAll(CancellationToken cancellationToken)
         => _dbContext.Forms.ToListAsync(cancellationToken);
@@ -41,7 +43,6 @@ public class FormStore : IFormStore
     public async Task<FormRecord> GetLatestPublishedVersionByCorrelationId(string correlationId, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Forms
-            .Include(f => f.AvailableStyles)
             .OrderByDescending(f => f.VersionNumber)
             .FirstOrDefaultAsync(f => f.Status == RecordVersionStatus.Published && f.CorrelationId == correlationId, cancellationToken);
         return result;
@@ -54,7 +55,6 @@ public class FormStore : IFormStore
     public Task<FormRecord> GetLatestVersionByCorrelationId(string realm, string correlationId, CancellationToken cancellationToken)
     {
         return _dbContext.Forms
-            .Include(f => f.AvailableStyles)
             .OrderByDescending(f => f.VersionNumber).FirstOrDefaultAsync(f => f.CorrelationId == correlationId && f.Realm == realm, cancellationToken);
     }
 

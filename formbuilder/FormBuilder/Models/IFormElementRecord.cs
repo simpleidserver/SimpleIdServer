@@ -27,7 +27,7 @@ namespace FormBuilder.Models;
 [JsonDerivedType(typeof(TitleRecord), typeDiscriminator: "Title")]
 [JsonDerivedType(typeof(ImageRecord), typeDiscriminator: "Image")]
 [JsonDerivedType(typeof(BackButtonRecord), typeDiscriminator: "BackButton")]
-public interface IFormElementRecord : IElement
+public interface IFormElementRecord
 {
     string Id { get; set; }
     string CorrelationId { get; set; }

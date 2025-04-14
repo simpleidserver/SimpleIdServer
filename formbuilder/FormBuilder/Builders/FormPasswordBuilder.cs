@@ -22,35 +22,8 @@ public class FormPasswordBuilder
         return this;
     }
 
-    public FormPasswordBuilder SetContainerHtmlClass(string value, string templateName)
-    {
-        return SetEltHtmlClass(FormPasswordElementNames.Container, value, templateName);
-    }
-
-    public FormPasswordBuilder SetLabelHtmlClass(string value, string templateName)
-    {
-        return SetEltHtmlClass(FormPasswordElementNames.Label, value, templateName);
-    }
-
-    public FormPasswordBuilder SetPasswordHtmlClass(string value, string templateName)
-    {
-        return SetEltHtmlClass(FormPasswordElementNames.Password, value, templateName);
-    }
-
     internal FormPasswordFieldRecord Build()
     {
         return _pwdRecord;
-    }
-
-    private FormPasswordBuilder SetEltHtmlClass(string elt, string value, string templateName)
-    {
-        var htmlClass = new HtmlClassRecord
-        {
-            Element = elt,
-            Value = value,
-            TemplateName = templateName
-        };
-        _pwdRecord.Classes.Add(htmlClass);
-        return this;
     }
 }

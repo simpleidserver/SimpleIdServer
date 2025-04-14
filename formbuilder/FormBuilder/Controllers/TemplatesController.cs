@@ -1,7 +1,5 @@
-﻿using FormBuilder.Models;
-using FormBuilder.Stores;
+﻿using FormBuilder.Stores;
 using Microsoft.AspNetCore.Mvc;
-using System.Text;
 
 namespace FormBuilder.Controllers;
 
@@ -17,58 +15,39 @@ public class TemplatesController : Controller
         _httpClientFactory = httpClientFactory;
     }
 
-    [HttpGet("{templateId}/css")]
-    public async Task<IActionResult> GetCss(string templateId, CancellationToken cancellationToken)
+    [HttpGet("{templateId}/css/{styleId}")]
+    public async Task<IActionResult> GetCss(string templateId, string styleId, CancellationToken cancellationToken)
     {
         var form = await _templateStore.Get(templateId, cancellationToken);
-        if (form == null) return new NoContentResult();
-        return Content(TransformCss(form), "text/css");
+        if (form == null)
+        {
+            return new NoContentResult();
+        }
+
+        var style = form.CssStyles.SingleOrDefault(s => s.Id == styleId);
+        if (style == null)
+        {
+            return new NoContentResult();
+        }
+
+        return Content(style.Value, "text/css");
     }
 
-    [HttpGet("{templateId}/js")]
-    public async Task<IActionResult> GetActiveJs(string templateId, CancellationToken cancellationToken)
+    [HttpGet("{templateId}/js/{styleId}")]
+    public async Task<IActionResult> GetJs(string templateId, string styleId, CancellationToken cancellationToken)
     {
         var form = await _templateStore.Get(templateId, cancellationToken);
-        if (form == null) return new NoContentResult();
-        var js = await TransformJs(form);
-        return Content(js, "application/javascript; charset=utf-8");
-    }
-
-    private static string TransformCss(Template template)
-    {
-        var strBuilder = new StringBuilder();
-        foreach(var externalCss in template.Styles.Where(s => s.Category == TemplateStyleCategories.Lib))
+        if (form == null)
         {
-            strBuilder.AppendLine($"@import url('{externalCss.Value}');");
+            return new NoContentResult();
         }
 
-        var customCss = template.Styles.SingleOrDefault(s => s.Category == TemplateStyleCategories.Custom);
-        if (customCss != null) 
+        var style = form.JsStyles.SingleOrDefault(s => s.Id == styleId);
+        if (style == null)
         {
-            strBuilder.AppendLine(customCss.Value);
-        }
-        
-        return strBuilder.ToString();
-    }
-
-    private async Task<string> TransformJs(Template template)
-    {
-        var strBuilder = new StringBuilder();
-        using (var httpClient = _httpClientFactory.CreateClient("JsClient"))
-        {
-            foreach (var externalCss in template.Styles.Where(s => s.Category == TemplateStyleCategories.Lib))
-            {
-                var script = await httpClient.GetStringAsync(externalCss.Value);
-                strBuilder.AppendLine(script);
-            }
+            return new NoContentResult();
         }
 
-        var customCss = template.Styles.SingleOrDefault(s => s.Category == TemplateStyleCategories.Custom);
-        if (customCss != null)
-        {
-            strBuilder.AppendLine(customCss.Value);
-        }
-
-        return strBuilder.ToString();
+        return Content(style.Value, "application/javascript; charset=utf-8");
     }
 }

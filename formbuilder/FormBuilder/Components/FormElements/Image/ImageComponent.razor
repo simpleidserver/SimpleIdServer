@@ -4,8 +4,8 @@
 
 <DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="ImageDialog" TRecord="ImageRecord" Record="@Value">
     <Children>
-        <div class="picture-container">
-            <RadzenImage Style=@Value.CssStyle class="picture" Path="@Value.Url" />
+        <div class=@ContainerClass>
+            <RadzenImage class="@ImageClass" Path="@Value.Url" />
         </div>
     </Children>
 </DraggableFormElement>

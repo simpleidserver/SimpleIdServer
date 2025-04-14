@@ -1,3 +1,4 @@
+using DataSeeder;
 using FormBuilder.Startup.Config;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDataseeder();
+builder.Services.AddTransient<IDataSeederExecutionHistoryRepository, DefaultDataSeederExecutionHistoryRepository>();
 builder.Services.AddAntiforgery(c =>
 {
     c.Cookie.Name = cookieName;

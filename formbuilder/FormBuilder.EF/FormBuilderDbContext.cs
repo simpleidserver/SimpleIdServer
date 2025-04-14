@@ -13,7 +13,7 @@ public class FormBuilderDbContext : DbContext
 
     public DbSet<WorkflowRecord> Workflows { get; set; }
     public DbSet<FormRecord> Forms { get; set; }
-    public DbSet<FormStyle> FormStyle { get; set; }
+    public DbSet<Template> Templates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -22,6 +22,6 @@ public class FormBuilderDbContext : DbContext
         modelBuilder.ApplyConfiguration(new WorkflowStepConfiguration());
         modelBuilder.ApplyConfiguration(new WorkflowLinkConfiguration());
         modelBuilder.ApplyConfiguration(new FormRecordConfiguration());
-        modelBuilder.ApplyConfiguration(new FormStyleConfiguration());
+        modelBuilder.ApplyConfiguration(new TemplateConfiguration());
     }
 }

@@ -1,7 +1,9 @@
 ﻿@using System.Text.Json.Nodes
+@using FormBuilder.DefaultTemplate
 @using FormBuilder.Models
 @using FormBuilder.Components.Form
 @using FormBuilder.Services
+@using FormBuilder.Stores
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
 <RadzenDialog />
@@ -20,9 +22,9 @@
     [Parameter] public List<string> ErrorMessages { get; set; }
     [Parameter] public List<string> SuccessMessages { get; set; }
     [Parameter] public List<string> SupportedLanguageCodes { get; set; }
-    [Parameter] public string TemplateName { get; set; } = RadzenTemplate.Name;
-    [Inject] private INavigationHistoryService navigationHistoryService { get; set; }
+    [Parameter] public Template Template { get; set; }
     [Inject] public IJSRuntime jsRuntime { get; set; }
+    [Inject] private INavigationHistoryService navigationHistoryService { get; set; }
     private WorkflowContext Context { get; set; }
 
     [JSInvokable]
@@ -34,7 +36,7 @@
         };
         StateHasChanged();
     }
-    
+
     [JSInvokable]
     public void SetSuccessMessage(string successMessage)
     {
@@ -52,7 +54,7 @@
         else Input.Add(key, value);
         StateHasChanged();
     }
-    
+
     [JSInvokable]
     public void ClearErrorMessages()
     {
@@ -80,9 +82,9 @@
         if (Context == null)
         {
             var step = Workflow?.Steps?.SingleOrDefault(s => s.Id == CurrentStepId);
-            Context = WorkflowContext.CreateWorkflow(Workflow, FormRecords, CurrentStepId, ErrorMessages, SuccessMessages, AntiforgeryToken, Input, SupportedLanguageCodes, TemplateName);
+            Context = WorkflowContext.CreateWorkflow(Workflow, FormRecords, CurrentStepId, ErrorMessages, SuccessMessages, AntiforgeryToken, Input, SupportedLanguageCodes, Template);
         }
-    }
+    } 
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

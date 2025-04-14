@@ -27,14 +27,7 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     {
         get
         {
-            var result = "fullWidth";
-            var resolvedClass = htmlClassResolver.Resolve(Value, AnchorElementNames.Btn, Context);
-            if(!string.IsNullOrWhiteSpace(resolvedClass))
-            {
-                result += " " + resolvedClass;
-            }
-
-            return result;
+            return htmlClassResolver.Resolve(Value, AnchorElementNames.Btn, Context);
         }
     }
 

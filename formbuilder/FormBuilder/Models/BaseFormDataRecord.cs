@@ -9,7 +9,6 @@ public abstract class BaseFormDataRecord : IFormElementRecord
     public string FieldType { get; set; }
     public Dictionary<string, object> Parameters { get; set; }
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();
-    public List<HtmlClassRecord> Classes { get; set; } = new List<HtmlClassRecord>();
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<ITransformationRule> Transformations { get; set; } = new List<ITransformationRule>();
     public string Id { get; set; }

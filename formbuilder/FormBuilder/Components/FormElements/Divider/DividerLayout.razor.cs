@@ -25,22 +25,7 @@ public partial class DividerLayout : IGenericFormElement<DividerLayoutRecord>
     {
         get
         {
-            var result = "divider-container";
-            var resolvedClass = htmlClassResolver.Resolve(Value, DividerElementNames.Container, Context);
-            if (!string.IsNullOrWhiteSpace(resolvedClass))
-            {
-                result += $" {resolvedClass}";
-            }
-
-            return result;
-        }
-    }
-
-    public string LineClass
-    {
-        get
-        {
-            return htmlClassResolver.Resolve(Value, DividerElementNames.Line, Context);
+            return htmlClassResolver.Resolve(Value, DividerElementNames.Container, Context);
         }
     }
 
@@ -48,14 +33,8 @@ public partial class DividerLayout : IGenericFormElement<DividerLayoutRecord>
     {
         get
         {
-            var result = "text";
-            var resolvedClass = htmlClassResolver.Resolve(Value, DividerElementNames.Text, Context);
-            if (!string.IsNullOrWhiteSpace(resolvedClass))
-            {
-                result += $" {resolvedClass}";
-            }
-
-            return result;
+            
+            return htmlClassResolver.Resolve(Value, DividerElementNames.Text, Context);
         }
     }
 }

@@ -14,8 +14,9 @@ public class BaseWorkflowController : Controller
     private readonly ITemplateStore _templateStore;
     private readonly FormBuilderOptions _options;
 
-    public BaseWorkflowController(IAntiforgery antiforgery, IWorkflowStore workflowStore, IFormStore formStore, IOptions<FormBuilderOptions> options)
+    public BaseWorkflowController(ITemplateStore templateStore, IAntiforgery antiforgery, IWorkflowStore workflowStore, IFormStore formStore, IOptions<FormBuilderOptions> options)
     {
+        _templateStore = templateStore;
         _antiforgery = antiforgery;
         _workflowStore = workflowStore;
         _formStore = formStore;
@@ -24,7 +25,9 @@ public class BaseWorkflowController : Controller
 
     protected async Task<WorkflowViewModel> Get(string realm, string workflowId, string stepId, CancellationToken cancellationToken)
     {
-        var templateStore = await _templateStore.GetActive(realm, cancellationToken);
+        // var template = await _templateStore.GetActive(realm, cancellationToken);
+        var template = (await _templateStore.GetByName("TailwindCss", cancellationToken)).First();
+        // var template = (await _templateStore.GetByName("Radzen", cancellationToken)).First();
         var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
         var records = await _formStore.GetAll(realm, cancellationToken);
         var step = workflow.GetStep(stepId);
@@ -33,6 +36,7 @@ public class BaseWorkflowController : Controller
         {
             CurrentStepId= step.Id,
             Workflow = workflow,
+            Template = template,
             AntiforgeryToken = new AntiforgeryTokenRecord
             {
                 FormValue = tokenSet.RequestToken,

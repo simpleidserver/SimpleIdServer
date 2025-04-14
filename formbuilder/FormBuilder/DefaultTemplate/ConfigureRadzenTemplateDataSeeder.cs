@@ -3,7 +3,7 @@
 using DataSeeder;
 using FormBuilder.Stores;
 
-namespace FormBuilder.Radzen;
+namespace FormBuilder.DefaultTemplate;
 
 public class ConfigureRadzenTemplateDataSeeder : BaseAfterDeploymentDataSeeder
 {

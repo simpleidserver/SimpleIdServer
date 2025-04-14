@@ -16,8 +16,7 @@ public class FormInputBuilder
         {
             Id = Guid.NewGuid().ToString(),
             Name = name,
-            FormType = type,
-            Classes = new List<HtmlClassRecord>()
+            FormType = type
         };
     }
 
@@ -72,7 +71,6 @@ public class FormInputBuilder
             Value = value,
             TemplateName = templateName
         };
-        _formInput.Classes.Add(htmlClass);
         return this;
     }
 }

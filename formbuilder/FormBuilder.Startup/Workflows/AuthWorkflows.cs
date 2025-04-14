@@ -13,8 +13,18 @@ public class AuthWorkflows
         {
             new WorkflowStep
             {
+                Id = "emailStep",
+                FormRecordCorrelationId = "email"
+            },
+            new WorkflowStep
+            {
                 Id = "pwdStep",
                 FormRecordCorrelationId = "pwd"
+            },
+            new WorkflowStep
+            {
+                Id = "smsStep",
+                FormRecordCorrelationId = "sms"
             }
         }
     };

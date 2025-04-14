@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FormBuilder.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace FormBuilder.Helpers;
 
 public interface IUriProvider
 {
-    string GetActiveLastFormCssUrl(string templateId);
-    string GetActiveLastFormJsUrl(string templateId);
+    string GetCssUrl(string templateId, TemplateStyle style);
+    string GetJsUrl(string templateId, TemplateStyle style);
     string GetFormUrl(string id);
     string GetFormPublishUrl(string id);
     string GetWorkflowUrl(string id);
@@ -23,11 +24,25 @@ public class UriProvider : IUriProvider
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string GetActiveLastFormCssUrl(string templateId)
-        => $"{GetAbsoluteUriWithVirtualPath()}/templates/{templateId}/css";
+    public string GetCssUrl(string templateId, TemplateStyle style)
+    {
+        if(style.Category == TemplateStyleCategories.Lib)
+        {
+            return style.Value;
+        }
 
-    public string GetActiveLastFormJsUrl(string templateId)
-        => $"{GetAbsoluteUriWithVirtualPath()}/templates/{templateId}/js";
+        return $"{GetAbsoluteUriWithVirtualPath()}/templates/{templateId}/css/{style.Id}";
+    }
+
+    public string GetJsUrl(string templateId, TemplateStyle style)
+    {
+        if (style.Category == TemplateStyleCategories.Lib)
+        {
+            return style.Value;
+        }
+
+        return $"{GetAbsoluteUriWithVirtualPath()}/templates/{templateId}/js/{style.Id}";
+    }
 
     public string GetFormUrl(string id)
         => $"{GetAbsoluteUriWithVirtualPath()}/forms/{id}";

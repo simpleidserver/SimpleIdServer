@@ -1,4 +1,6 @@
-﻿using FormBuilder.Components.FormElements.Anchor;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Components.FormElements.Anchor;
 using FormBuilder.Conditions;
 using FormBuilder.Models;
 
@@ -20,28 +22,6 @@ public class FormAnchorRecordBuilder
     public FormAnchorRecordBuilder AddTranslation(string language, string value, IConditionParameter conditionParameter = null)
     {
         _record.Labels.Add(new LabelTranslation(language, value, conditionParameter));
-        return this;
-    }
-
-    public FormAnchorRecordBuilder SetAnchorClass(string value, string templateName)
-    {
-        _record.Classes.Add(new HtmlClassRecord
-        {
-            Element = AnchorElementNames.Anchor,
-            TemplateName = templateName,
-            Value = value
-        });
-        return this;
-    }
-
-    public FormAnchorRecordBuilder SetBtnClass(string value, string templateName)
-    {
-        _record.Classes.Add(new HtmlClassRecord
-        {
-            Element = AnchorElementNames.Btn,
-            TemplateName = templateName,
-            Value = value
-        });
         return this;
     }
 

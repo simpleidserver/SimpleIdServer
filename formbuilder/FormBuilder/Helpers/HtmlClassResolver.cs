@@ -1,20 +1,28 @@
-﻿using FormBuilder.Components;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Components;
 using FormBuilder.Models;
 
 namespace FormBuilder.Helpers;
 
 public interface IHtmlClassResolver
 {
-    string Resolve(IElement record, string eltName, WorkflowContext context);
+    string Resolve<T>(T record, string eltName, WorkflowContext context) where T : class;
 }
 
 public class HtmlClassResolver : IHtmlClassResolver
 {
-    public string Resolve(IElement record, string eltName, WorkflowContext context)
+    public string Resolve<T>(T record, string eltName, WorkflowContext context) where T : class
     {
-        var cl = record.Classes
-            .SingleOrDefault(c => c.Element == eltName && c.TemplateName == context.TemplateName)
-            ?.Value;
-        return cl ?? string.Empty;
+        if(typeof(T) == typeof(FormRecord))
+        {
+            var elt = context.Template.Windows.SingleOrDefault(e => e.Element == typeof(T).Name && e.Name == eltName);
+            return elt?.Value ?? string.Empty;
+        }
+        else
+        {
+            var elt = context.Template.Elements.SingleOrDefault(e => e.Element == typeof(T).Name && e.Name == eltName);
+            return elt?.Value ?? string.Empty;
+        }
     }
 }

@@ -71,9 +71,7 @@ public class FormRecord : BaseVersionRecord, ICloneable, IFormRecordCollection
     public override BaseVersionRecord NewDraft(DateTime currentDateTime)
     {
         var clonedElements = JsonSerializer.Deserialize<List<IFormElementRecord>>(JsonSerializer.Serialize(Elements));
-        var availableStyles = AvailableStyles?.Select(s => (FormStyle)s.Clone()).ToList() ?? new List<FormStyle>();
         clonedElements.ForEach(c => c.Id = Guid.NewGuid().ToString());
-        availableStyles.ForEach(c => c.Id = Guid.NewGuid().ToString());
         return new FormRecord
         {
             Id = Guid.NewGuid().ToString(),
@@ -81,7 +79,6 @@ public class FormRecord : BaseVersionRecord, ICloneable, IFormRecordCollection
             Name = Name,
             Category = Category,
             ActAsStep = ActAsStep,
-            AvailableStyles = availableStyles, 
             UpdateDateTime = currentDateTime,
             Status = RecordVersionStatus.Draft,
             Realm = Realm,

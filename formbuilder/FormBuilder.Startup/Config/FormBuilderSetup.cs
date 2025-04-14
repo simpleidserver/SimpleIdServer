@@ -11,7 +11,7 @@ public class FormBuilderSetup
         builder.Services.AddFormBuilder().UseEf((db) =>
         {
             ConfigureStorage(conf, db);
-        });
+        }).AddTailwindcss();
         builder.Services.Configure<FormBuilderStartupOptions>(cb => cb.AntiforgeryCookieName = cookieName);
     }
 
