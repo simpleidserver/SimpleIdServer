@@ -39,7 +39,8 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
         IFormStore formStore,
         IWorkflowStore workflowStore,
         ILanguageRepository languageRepository,
-        IRealmStore realmStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore)
+        IRealmStore realmStore,
+        ITemplateStore templateStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore)
     {
         _presentationDefinitionStore = presentationDefinitionStore;
     }

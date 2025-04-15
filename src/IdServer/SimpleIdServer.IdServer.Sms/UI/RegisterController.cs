@@ -47,7 +47,8 @@ public class RegisterController : BaseOTPRegisterController<IdServerSmsOptions, 
         ITransactionBuilder transactionBuilder,
         IJwtBuilder jwtBuilder,
         ILanguageRepository languageRepository,
-        IRealmStore realmStore) : base(logger, options, formOptions, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, antiforgery, formStore, workflowStore, tokenRepository, jwtBuilder, languageRepository, realmStore)
+        IRealmStore realmStore,
+        ITemplateStore templateStore) : base(logger, options, formOptions, distributedCache, userRepository, transactionBuilder, otpAuthenticators, configuration, userNotificationService, antiforgery, formStore, workflowStore, tokenRepository, jwtBuilder, languageRepository, realmStore, templateStore)
     {
         _authenticationHelper = authenticationHelper;
     }

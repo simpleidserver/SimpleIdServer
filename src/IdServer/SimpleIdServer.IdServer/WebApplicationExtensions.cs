@@ -570,6 +570,16 @@ public static class WebApplicationExtensions
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Clients + "/{id}/realms",
             defaults: new { controller = "Clients", action = "UpdateRealms" });
 
+        webApplication.SidMapControllerRoute("getActiveTemplate",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Templates + "/active",
+            defaults: new { controller = "Templates", action = "GetActive" });
+        webApplication.SidMapControllerRoute("getAllTemplates",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Templates,
+            defaults: new { controller = "Templates", action = "GetAll" });
+        webApplication.SidMapControllerRoute("enableTemplate",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Templates + "/{id}",
+            defaults: new { controller = "Templates", action = "Enable" });
+
         webApplication.SidMapControllerRoute("searchGroups",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Groups + "/.search",
             defaults: new { controller = "Groups", action = "Search" });

@@ -32,6 +32,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IEnumerable<IOTPAuthenticator> _otpAuthenticators;
 
         protected BaseOTPAuthenticateController(
+            ITemplateStore templateStore,
             IConfiguration configuration,
             IEnumerable<IUserNotificationService> notificationServices,
             IEnumerable<IOTPAuthenticator> otpAuthenticators,
@@ -56,7 +57,7 @@ namespace SimpleIdServer.IdServer.UI
             IFormStore formStore,
             ILanguageRepository languageRepository,
             IAcrHelper acrHelper,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
         {
             _notificationServices = notificationServices;
             _otpAuthenticators = otpAuthenticators;

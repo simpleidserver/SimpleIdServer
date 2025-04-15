@@ -293,6 +293,7 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $base_dir\formbuilder\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }	
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.Tailwindcss\FormBuilder.Tailwindcss.csproj -c $config --no-build $versionSuffix --output $result_dir }	
 	
 	exec { dotnet pack $base_dir\dataseeder\dataseeder\DataSeeder.csproj -c $config --no-build $versionSuffix --output $result_dir }
 	

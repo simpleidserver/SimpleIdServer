@@ -63,27 +63,67 @@ namespace FormBuilder.SqlServerMigrations.Migrations
                     b.ToTable("Forms");
                 });
 
-            modelBuilder.Entity("FormBuilder.Models.FormStyle", b =>
+            modelBuilder.Entity("FormBuilder.Models.Template", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Content")
+                    b.Property<string>("Elements")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("FormId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Styles")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Windows")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FormId");
+                    b.ToTable("Templates");
+                });
 
-                    b.ToTable("FormStyle");
+            modelBuilder.Entity("FormBuilder.Models.TemplateStyle", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TemplateId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("TemplateId1")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("TemplateId1");
+
+                    b.ToTable("TemplateStyle");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.WorkflowLink", b =>
@@ -129,6 +169,9 @@ namespace FormBuilder.SqlServerMigrations.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Realm")
                         .HasColumnType("nvarchar(max)");
 
@@ -159,13 +202,15 @@ namespace FormBuilder.SqlServerMigrations.Migrations
                     b.ToTable("WorkflowStep");
                 });
 
-            modelBuilder.Entity("FormBuilder.Models.FormStyle", b =>
+            modelBuilder.Entity("FormBuilder.Models.TemplateStyle", b =>
                 {
-                    b.HasOne("FormBuilder.Models.FormRecord", null)
-                        .WithMany("AvailableStyles")
-                        .HasForeignKey("FormId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("FormBuilder.Models.Template", null)
+                        .WithMany("CssStyles")
+                        .HasForeignKey("TemplateId");
+
+                    b.HasOne("FormBuilder.Models.Template", null)
+                        .WithMany("JsStyles")
+                        .HasForeignKey("TemplateId1");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.WorkflowLink", b =>
@@ -184,9 +229,11 @@ namespace FormBuilder.SqlServerMigrations.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("FormBuilder.Models.FormRecord", b =>
+            modelBuilder.Entity("FormBuilder.Models.Template", b =>
                 {
-                    b.Navigation("AvailableStyles");
+                    b.Navigation("CssStyles");
+
+                    b.Navigation("JsStyles");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.WorkflowRecord", b =>

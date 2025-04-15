@@ -159,6 +159,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. IdserverAdmin", "01. Id
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServerAdmin.Empty.Startup", "src\IdServer\SimpleIdServer.IdServerAdmin.Empty.Startup\SimpleIdServer.IdServerAdmin.Empty.Startup.csproj", "{FEAB7703-836E-BC56-1DAA-D00787CAD82D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormBuilder.Tailwindcss", "formbuilder\FormBuilder.Tailwindcss\FormBuilder.Tailwindcss.csproj", "{BB9E5FF3-C8AC-A5C9-DD55-4C639A66E9C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -413,6 +415,10 @@ Global
 		{FEAB7703-836E-BC56-1DAA-D00787CAD82D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEAB7703-836E-BC56-1DAA-D00787CAD82D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEAB7703-836E-BC56-1DAA-D00787CAD82D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB9E5FF3-C8AC-A5C9-DD55-4C639A66E9C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB9E5FF3-C8AC-A5C9-DD55-4C639A66E9C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB9E5FF3-C8AC-A5C9-DD55-4C639A66E9C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB9E5FF3-C8AC-A5C9-DD55-4C639A66E9C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -492,6 +498,7 @@ Global
 		{78D7AC79-BA12-4EB0-9175-DBF140E28F7C} = {68306EFF-55D9-497B-9482-FEB81C485914}
 		{8D08D0D8-11A4-48E5-B105-690E6F5EBDF5} = {68306EFF-55D9-497B-9482-FEB81C485914}
 		{FEAB7703-836E-BC56-1DAA-D00787CAD82D} = {8D08D0D8-11A4-48E5-B105-690E6F5EBDF5}
+		{BB9E5FF3-C8AC-A5C9-DD55-4C639A66E9C1} = {8653824C-E1CF-422F-BE17-0A271C249D22}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

@@ -1,7 +1,6 @@
 ﻿using FormBuilder.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-
 namespace FormBuilder.Startup
 {
     public class DbContextFactory : IDesignTimeDbContextFactory<FormBuilderDbContext>

@@ -37,6 +37,7 @@ namespace SimpleIdServer.IdServer.UI
 {
     public abstract class BaseAuthenticationMethodController<T> : BaseAuthenticateController where T : BaseAuthenticateViewModel
     {
+        private readonly ITemplateStore _templateStore;
         private readonly IConfiguration _configuration;
         private readonly IAuthenticationSchemeProvider _authenticationSchemeProvider;
         private readonly IUserAuthenticationService _authenticationService;
@@ -46,6 +47,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly FormBuilderOptions _formBuilderOptions;
 
         public BaseAuthenticationMethodController(
+            ITemplateStore templateStore,
             IConfiguration configuration,
             IOptions<IdServerHostOptions> options,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
@@ -70,6 +72,7 @@ namespace SimpleIdServer.IdServer.UI
             IAcrHelper acrHelper,
             IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, authenticationContextClassReferenceRepository, options)
         {
+            _templateStore = templateStore;
             _configuration = configuration;
             _authenticationSchemeProvider = authenticationSchemeProvider;
             _authenticationService = userAuthenticationService;
@@ -119,7 +122,7 @@ namespace SimpleIdServer.IdServer.UI
                     viewModel.Login = login;
                 viewModel.IsAuthInProgress = acrInfo?.Login != null && !string.IsNullOrWhiteSpace(acrInfo?.Login);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
-                var result = await this.BuildViewModel(workflow, forms, cancellationToken);
+                var result = await this.BuildViewModel(prefix, workflow, forms, cancellationToken);
                 result.SetInput(viewModel);
                 if(IsMaximumActiveSessionReached()) result.SetErrorMessage(Global.MaximumNumberActiveSessions);
                 if(acrInfo != null && acrInfo.UserId != null && string.IsNullOrWhiteSpace(viewModel.Login)) result.SetErrorMessage(Global.MissingLogin);
@@ -297,7 +300,7 @@ namespace SimpleIdServer.IdServer.UI
                 var records = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Authentication, token);
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
                 var workflow = await WorkflowStore.Get(prefix, viewModel.WorkflowId, token);
-                var workflowResult = await BuildViewModel(workflow, records, token);
+                var workflowResult = await BuildViewModel(prefix, workflow, records, token);
                 return workflowResult;
             }
         }
@@ -330,8 +333,10 @@ namespace SimpleIdServer.IdServer.UI
             return forms.Single(f => f.CorrelationId == firstStep.FormRecordCorrelationId).Name == Amr;
         }
 
-        private async Task<WorkflowViewModel> BuildViewModel(WorkflowRecord workflow, List<FormRecord> records, CancellationToken cancellationToken)
+        private async Task<WorkflowViewModel> BuildViewModel(string realm, WorkflowRecord workflow, List<FormRecord> records, CancellationToken cancellationToken)
         {
+            realm = realm ?? Constants.DefaultRealm;
+            var template = await _templateStore.GetActive(realm, cancellationToken);
             var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
             var workflowStepFormIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
             var filteredRecords = records.Where(r => workflowStepFormIds.Contains(r.CorrelationId)).ToList();
@@ -344,6 +349,7 @@ namespace SimpleIdServer.IdServer.UI
                 Workflow = workflow,
                 FormRecords = filteredRecords,
                 Languages = languages,
+                Template = template,
                 AntiforgeryToken = new AntiforgeryTokenRecord
                 {
                     CookieName = _formBuilderOptions.AntiforgeryCookieName,

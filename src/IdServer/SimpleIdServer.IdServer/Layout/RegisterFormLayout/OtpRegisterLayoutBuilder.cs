@@ -29,15 +29,6 @@ public class OtpRegisterLayoutBuilder : RegisterLayoutBuilder
             ActAsStep = true,
             Category = FormCategories.Registration,
             Realm = Constants.DefaultRealm,
-            AvailableStyles = new List<FormStyle>
-            {
-                new FormStyle
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Content = FormCssStyle.Get(),
-                    IsActive = true
-                }
-            },
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new OtpRegisterLayoutBuilder(record, valueTranslations);

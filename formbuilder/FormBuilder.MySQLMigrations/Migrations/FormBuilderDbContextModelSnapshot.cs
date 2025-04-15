@@ -63,27 +63,67 @@ namespace FormBuilder.MySQLMigrations.Migrations
                     b.ToTable("Forms");
                 });
 
-            modelBuilder.Entity("FormBuilder.Models.FormStyle", b =>
+            modelBuilder.Entity("FormBuilder.Models.Template", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Content")
+                    b.Property<string>("Elements")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<string>("FormId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Styles")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Windows")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FormId");
+                    b.ToTable("Templates");
+                });
 
-                    b.ToTable("FormStyle");
+            modelBuilder.Entity("FormBuilder.Models.TemplateStyle", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Language")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TemplateId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("TemplateId1")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("TemplateId1");
+
+                    b.ToTable("TemplateStyle");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.WorkflowLink", b =>
@@ -129,6 +169,9 @@ namespace FormBuilder.MySQLMigrations.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Realm")
                         .HasColumnType("longtext");
 
@@ -159,13 +202,15 @@ namespace FormBuilder.MySQLMigrations.Migrations
                     b.ToTable("WorkflowStep");
                 });
 
-            modelBuilder.Entity("FormBuilder.Models.FormStyle", b =>
+            modelBuilder.Entity("FormBuilder.Models.TemplateStyle", b =>
                 {
-                    b.HasOne("FormBuilder.Models.FormRecord", null)
-                        .WithMany("AvailableStyles")
-                        .HasForeignKey("FormId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("FormBuilder.Models.Template", null)
+                        .WithMany("CssStyles")
+                        .HasForeignKey("TemplateId");
+
+                    b.HasOne("FormBuilder.Models.Template", null)
+                        .WithMany("JsStyles")
+                        .HasForeignKey("TemplateId1");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.WorkflowLink", b =>
@@ -184,9 +229,11 @@ namespace FormBuilder.MySQLMigrations.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("FormBuilder.Models.FormRecord", b =>
+            modelBuilder.Entity("FormBuilder.Models.Template", b =>
                 {
-                    b.Navigation("AvailableStyles");
+                    b.Navigation("CssStyles");
+
+                    b.Navigation("JsStyles");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.WorkflowRecord", b =>

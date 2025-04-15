@@ -5,7 +5,6 @@ using FormBuilder.Builders;
 using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
-using FormBuilder.UIs;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,7 +38,8 @@ public class RegisterController : BaseRegisterController<RegisterWebauthnViewMod
         IFormStore formStore,
         IWorkflowStore workflowStore,
         ILanguageRepository languageRepository,
-        IRealmStore realmStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore)
+        IRealmStore realmStore,
+        ITemplateStore templateStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore)
     {
     }
 

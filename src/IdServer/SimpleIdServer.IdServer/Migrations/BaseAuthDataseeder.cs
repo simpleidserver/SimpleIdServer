@@ -55,15 +55,6 @@ public abstract class BaseAuthDataSeeder : BaseAfterDeploymentDataSeeder
         }
 
         formRecord.Realm = realm;
-        formRecord.AvailableStyles = new List<FormStyle>
-        {
-            new FormStyle
-            {
-                Id = Guid.NewGuid().ToString(),
-                Content = cssStyle,
-                IsActive = true
-            }
-        };
         _formStore.Add(formRecord);
         return true;
     }

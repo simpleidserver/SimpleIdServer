@@ -40,7 +40,8 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         IFormStore formStore,
         IWorkflowStore workflowStore,
         ILanguageRepository languageRepository,
-        IRealmStore realmStore) : base(tokenRepository, jwtBuilder)
+        IRealmStore realmStore,
+        ITemplateStore templateStore) : base(tokenRepository, jwtBuilder)
     {
         Options = options.Value;
         FormOptions = formOptions.Value;
@@ -52,6 +53,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         WorkflowStore = workflowStore;
         LanguageRepository = languageRepository;
         RealmStore = realmStore;
+        TemplateStore = templateStore;
     }
 
     protected IdServerHostOptions Options { get; }
@@ -65,6 +67,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
     protected ILanguageRepository LanguageRepository { get; }
     protected abstract string Amr { get; }
     private IRealmStore RealmStore { get; }
+    protected ITemplateStore TemplateStore { get; }
 
     protected async Task<UserRegistrationProgress> GetRegistrationProgress()
     {
@@ -144,6 +147,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             workflow = await WorkflowStore.Get(prefix, registrationProgress.WorkflowId, cancellationToken);
         }
 
+        var template = await TemplateStore.GetActive(prefix, cancellationToken);
         var workflowFormIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
         var filteredRecords = records.Where(r => workflowFormIds.Contains(r.CorrelationId));
         var record = filteredRecords.Single(r => r.Name == Amr);
@@ -155,6 +159,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             Workflow = workflow,
             FormRecords = records,
             Languages = languages,
+            Template = template,
             AntiforgeryToken = new AntiforgeryTokenRecord
             {
                 CookieName = FormOptions.AntiforgeryCookieName,

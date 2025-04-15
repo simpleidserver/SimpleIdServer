@@ -8,21 +8,20 @@ namespace FormBuilder.Helpers;
 public interface IHtmlClassResolver
 {
     string Resolve<T>(T record, string eltName, WorkflowContext context) where T : class;
+    string Resolve(string eltName, WorkflowContext context, TemplateWindowDisplayTypes type);
 }
 
 public class HtmlClassResolver : IHtmlClassResolver
 {
     public string Resolve<T>(T record, string eltName, WorkflowContext context) where T : class
     {
-        if(typeof(T) == typeof(FormRecord))
-        {
-            var elt = context.Template.Windows.SingleOrDefault(e => e.Element == typeof(T).Name && e.Name == eltName);
-            return elt?.Value ?? string.Empty;
-        }
-        else
-        {
-            var elt = context.Template.Elements.SingleOrDefault(e => e.Element == typeof(T).Name && e.Name == eltName);
-            return elt?.Value ?? string.Empty;
-        }
+        var elt = context.Template.Elements.SingleOrDefault(e => e.Element == typeof(T).Name && e.Name == eltName);
+        return elt?.Value ?? string.Empty;
+    }
+
+    public string Resolve(string eltName, WorkflowContext context, TemplateWindowDisplayTypes type)
+    {
+        var elt = context.Template.Windows.SingleOrDefault(e => e.Name == eltName);
+        return elt?.Value ?? string.Empty;
     }
 }

@@ -25,7 +25,7 @@ public class WorkflowContext
         };
     }
 
-    public static WorkflowContext CreateOneStepWorkflow(FormRecord form, WorkflowLayout layout = null)
+    public static WorkflowContext CreateOneStepWorkflow(FormRecord form, WorkflowLayout layout = null, Template template = null)
     {
         var currentStepId = Guid.NewGuid().ToString();
         var workflow = new WorkflowRecord
@@ -47,7 +47,8 @@ public class WorkflowContext
         {
             Definition = new WorkflowDefinition(workflow, records),
             Execution = new WorkflowExecution(currentStepId),
-            FormEditorContext = new FormEditorContext(layout)
+            FormEditorContext = new FormEditorContext(layout),
+            Template = template
         };
         return result;
     }

@@ -53,7 +53,8 @@ public static class DefaultScopes
         Clients,
         Forms,
         Realms,
-        Groups
+        Groups,
+        Templates
     };
 
     public static List<Scope> AdministrativeScopes
@@ -595,5 +596,19 @@ public static class DefaultScopes
         Description = "Administrator",
         CreateDateTime = DateTime.UtcNow,
         UpdateDateTime = DateTime.UtcNow,
+    };
+    public static Scope Templates = new Scope
+    {
+        Id = Guid.NewGuid().ToString(),
+        Type = ScopeTypes.APIRESOURCE,
+        Name = "templates",
+        Realms = new List<Domains.Realm>
+        {
+            DefaultRealms.Master
+        },
+        Protocol = ScopeProtocols.OAUTH,
+        IsExposedInConfigurationEdp = true,
+        CreateDateTime = DateTime.UtcNow,
+        UpdateDateTime = DateTime.UtcNow
     };
 }

@@ -42,29 +42,34 @@ public class TemplateBuilder
         string containerClass, 
         string contentClass, 
         string formContainerClass, 
-        string formContentClass, 
-        string stepperListClass, 
-        string stepperListItemClass, 
-        string stepperListItemActiveClass,
-        string stepperListItemContainerClass, 
-        string stepperListItemNumberClass,
-        string stepperListItemNumberActiveClass,
-        string stepperListItemTextClass,
-        string stepperListItemTextActiveClass)
+        string formContentClass)
     {
         _template.SetWindowClass(FormElementNames.Container, containerClass, TemplateWindowDisplayTypes.MODAL);
         _template.SetWindowClass(FormElementNames.Content, contentClass, TemplateWindowDisplayTypes.MODAL);
         _template.SetWindowClass(FormElementNames.FormContainer, formContainerClass, TemplateWindowDisplayTypes.MODAL);
         _template.SetWindowClass(FormElementNames.FormContent, formContentClass, TemplateWindowDisplayTypes.MODAL);
-        // Stepper.
-        _template.SetWindowClass(FormElementNames.StepperList, stepperListClass, TemplateWindowDisplayTypes.MODAL);
-        _template.SetWindowClass(FormElementNames.StepperListItem, stepperListItemClass, TemplateWindowDisplayTypes.MODAL);
-        _template.SetWindowClass(FormElementNames.StepperListItemActive, stepperListItemActiveClass, TemplateWindowDisplayTypes.MODAL);
-        _template.SetWindowClass(FormElementNames.StepperListItemContainer, stepperListItemContainerClass, TemplateWindowDisplayTypes.MODAL);
-        _template.SetWindowClass(FormElementNames.StepperListItemNumber, stepperListItemNumberClass, TemplateWindowDisplayTypes.MODAL);
-        _template.SetWindowClass(FormElementNames.StepperListItemNumberActive, stepperListItemNumberActiveClass, TemplateWindowDisplayTypes.MODAL);
-        _template.SetWindowClass(FormElementNames.StepperListItemText, stepperListItemTextClass, TemplateWindowDisplayTypes.MODAL);
-        _template.SetWindowClass(FormElementNames.StepperListItemTextActive, stepperListItemTextActiveClass, TemplateWindowDisplayTypes.MODAL);
+        return this;
+    }
+
+
+    public TemplateBuilder SetStepperClasses(
+        string stepperListClass,
+        string stepperListItemClass,
+        string stepperListItemActiveClass,
+        string stepperListItemContainerClass,
+        string stepperListItemNumberClass,
+        string stepperListItemNumberActiveClass,
+        string stepperListItemTextClass,
+        string stepperListItemTextActiveClass)
+    {
+        SetClass(nameof(FormRecord), FormElementNames.StepperList, stepperListClass);
+        SetClass(nameof(FormRecord), FormElementNames.StepperListItem, stepperListItemClass);
+        SetClass(nameof(FormRecord), FormElementNames.StepperListItemActive, stepperListItemActiveClass);
+        SetClass(nameof(FormRecord), FormElementNames.StepperListItemContainer, stepperListItemContainerClass);
+        SetClass(nameof(FormRecord), FormElementNames.StepperListItemNumber, stepperListItemNumberClass);
+        SetClass(nameof(FormRecord), FormElementNames.StepperListItemNumberActive, stepperListItemNumberActiveClass);
+        SetClass(nameof(FormRecord), FormElementNames.StepperListItemText, stepperListItemTextClass);
+        SetClass(nameof(FormRecord), FormElementNames.StepperListItemTextActive, stepperListItemTextActiveClass);
         return this;
     }
 

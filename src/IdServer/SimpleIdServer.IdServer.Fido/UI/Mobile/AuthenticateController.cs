@@ -37,6 +37,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
         private readonly IDistributedCache _distributedCache;
 
         public AuthenticateController(
+            ITemplateStore templateStore,
             IConfiguration configuration, 
             IAuthenticationHelper authenticationHelper,
             IMobileAuthenticationService userAuthenticationService,
@@ -60,7 +61,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IFormStore formStore,
             ILanguageRepository languageRepository,
             IAcrHelper acrHelper,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
         {
             _configuration = configuration;
             _authenticationHelper = authenticationHelper;

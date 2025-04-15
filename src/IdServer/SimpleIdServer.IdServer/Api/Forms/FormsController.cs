@@ -12,7 +12,6 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
-using System;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -101,7 +100,7 @@ public class FormsController : BaseController
             await CheckAccessToken(prefix, Config.DefaultScopes.Forms.Name);
             var existingForm = await _formStore.GetLatestVersionByCorrelationId(prefix, id, cancellationToken);
             if (existingForm == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownForm, id));
-            existingForm.ActiveStyle.Content = cmd.Css;
+            // existingForm.ActiveStyle.Content = cmd.Css;
             await _formStore.SaveChanges(cancellationToken);
             return new NoContentResult();
         }

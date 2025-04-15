@@ -67,7 +67,9 @@
         </RadzenSplitterPane>
         <!-- Editor -->
         <RadzenSplitterPane Size="60%">
-            <FormViewer @ref=formViewer IsEditModeEnabled="true" Context="@context" />
+            <FormViewer @ref=formViewer
+                IsEditModeEnabled="true" 
+                Context="@context" />
         </RadzenSplitterPane>
         <!-- Properties -->
         <RadzenSplitterPane Size="20%">
@@ -101,6 +103,7 @@
 @code {
     [Parameter] public FormRecord Form { get; set; }
     [Parameter] public WorkflowLayout WorkflowLayout { get; set; }
+    [Parameter] public Template Template { get; set; }
     [Parameter] public EventCallback<ActionState<FormRecord, bool>> Saved { get; set; }
     [Parameter] public EventCallback<ActionState<FormRecord, FormRecord>> Published { get; set; }
     [Parameter] public EventCallback<ActionState<string, bool>> CssSaved { get; set; }
@@ -128,7 +131,7 @@
         await base.OnParametersSetAsync();
         if(Form != null)
         {
-            context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout);
+            context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout, Template);
             Serialize();
             await LoadCss();
             Form.Elements.CollectionChanged += HandleChanged;

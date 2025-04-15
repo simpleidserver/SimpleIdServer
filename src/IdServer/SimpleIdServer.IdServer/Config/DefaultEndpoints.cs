@@ -58,4 +58,5 @@ public static class DefaultEndpoints
     public const string Forms = "forms";
     public const string RecurringJobs = "recurringjobs";
     public const string ConfigurationDefs = "confdefs";
+    public const string Templates = "templates";
 }

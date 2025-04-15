@@ -33,7 +33,9 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
     {
         private readonly IDistributedCache _distributedCache;
 
-        public AuthenticateController(IConfiguration configuration,
+        public AuthenticateController(
+            ITemplateStore templateStore, 
+            IConfiguration configuration,
             IAuthenticationHelper authenticationHelper,
             IDistributedCache distributedCache,
             IAuthenticationSchemeProvider authenticationSchemeProvider,
@@ -56,7 +58,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IFormStore formStore,
             ILanguageRepository languageRepository,
             IAcrHelper acrHelper,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
         {
             _distributedCache = distributedCache;
         }

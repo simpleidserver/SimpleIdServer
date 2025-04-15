@@ -21,17 +21,19 @@ internal static class TailwindCssTemplate
                     "bg-gray-50 dark:bg-gray-900",
                     "flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0",
                     "w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700",
-                    "p-6 space-y-4 md:space-y-6 sm:p-8",
-                    // Stepper
+                    "p-6 space-y-4 md:space-y-6 sm:p-8"
+                )
+                .SetStepperClasses(
                     "flex items-center w-full text-sm text-gray-500 font-medium sm:text-base",
                     "flex md:w-full items-center text-gray-600",
-                    "sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:mx-4 xl:after:mx-8",
+                    "sm:after:content-[''] after:w-full after:h-1 after:border-b after:border-gray-200 after:border-1 after:hidden sm:after:inline-block after:m-[4px] xl:after:m-[8px]",
                     "flex items-center whitespace-nowrap after:content-['/'] sm:after:hidden after:mx-2",
                     "w-6 h-6 rounded-full border bg-gray-100 border-gray-200 flex justify-center items-center mr-3 text-sm text-white lg:w-10 lg:h-10",
                     "!bg-indigo-600 !border-indigo-200",
                     "",
                     "!text-indigo-600"
                 )
+                .SetImageClasses(string.Empty, "h-auto max-w-lg mx-auto")
                 .SetDividerClasses("my-4 flex items-center before:mt-0.5 before:flex-1 before:border-t before:border-neutral-300 after:mt-0.5 after:flex-1 after:border-t after:border-neutral-300 dark:before:border-neutral-500 dark:after:border-neutral-500", "absolute px-3 font-medium text-gray-900 -translate-x-1/2 bg-white left-1/2 dark:text-white dark:bg-gray-800")
                 .SetInputTextFieldClasses("mb-4", "block mb-2 text-sm font-medium text-gray-900 dark:text-white", "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500")
                 .SetPasswordFieldClasses("mb-4", "block mb-2 text-sm font-medium text-gray-900 dark:text-white", "bg-gray-50 border border-gray-300 text-gray-900 rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500")

@@ -39,6 +39,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IVersionedFormService, VersionedFormService>();
         services.AddSingleton<IFormStore>(new DefaultFormStore(new List<FormBuilder.Models.FormRecord>()));
         services.AddSingleton<IWorkflowStore>(new DefaultWorkflowStore(new List<FormBuilder.Models.WorkflowRecord>()));
+        services.AddTransient<IDataSeeder, ConfigureRadzenTemplateDataSeeder>();
         return new FormBuilderRegistration(services);
     }
 
@@ -48,7 +49,6 @@ public static class ServiceCollectionExtensions
         else services.Configure<FormBuilderOptions>(cb);
         services.AddTransient<IFormBuilderJsService, FormBuilderJsService>();
         services.AddTransient<INavigationHistoryService, NavigationHistoryService>();
-        services.AddTransient<IDataSeeder, ConfigureRadzenTemplateDataSeeder>();
 
         services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();

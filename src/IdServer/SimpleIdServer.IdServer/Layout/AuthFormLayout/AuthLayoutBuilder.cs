@@ -29,15 +29,6 @@ public class AuthLayoutBuilder
             UpdateDateTime = DateTime.UtcNow,
             Category = FormCategories.Authentication,
             Status = RecordVersionStatus.Published,
-            AvailableStyles = new List<FormStyle>
-            {
-                new FormStyle
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Content = FormCssStyle.Get(),
-                    IsActive = true
-                }
-            },
             Elements = new ObservableCollection<IFormElementRecord>()
         };
         return new AuthLayoutBuilder(record);

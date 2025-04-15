@@ -14,7 +14,6 @@ namespace SimpleIdServer.IdServer.Migrations;
 public class InitAdministrativeClientDataseeder : BaseClientDataseeder
 {
     private readonly ITransactionBuilder _transactionBuilder;
-    private readonly IRealmRepository _realmRepository;
     private readonly List<string> _redirectUrls;
     private readonly List<string> _postLogoutUrls;
     private readonly string _backChannelLogoutUrl;
@@ -80,7 +79,8 @@ public class InitAdministrativeClientDataseeder : BaseClientDataseeder
                 DefaultScopes.Groups,
                 DefaultScopes.WebsiteAdministratorRole,
                 DefaultScopes.Forms,
-                DefaultScopes.RecurringJobs);
+                DefaultScopes.RecurringJobs,
+                DefaultScopes.Templates);
         foreach (var postLogoutUrl in postLogoutUrls)
         {
             builder.AddPostLogoutUri(postLogoutUrl);

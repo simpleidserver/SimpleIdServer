@@ -30,6 +30,11 @@ public class TemplateStore : ITemplateStore
         return _dbcontext.Templates.SingleOrDefaultAsync(t => t.Realm == realm && t.IsActive, cancellationToken);
     }
 
+    public Task<List<Template>> GetAll(string realm, CancellationToken cancellationToken)
+    {
+        return _dbcontext.Templates.Where(t => t.Realm == realm).ToListAsync(cancellationToken);
+    }
+
     public Task<List<Template>> GetByName(string name, CancellationToken cancellationToken)
     {
         return _dbcontext.Templates.Where(t => t.Name == name).ToListAsync(cancellationToken);

@@ -43,7 +43,6 @@ public class IdServerBuilder
     private readonly AutomaticConfigurationOptions _automaticConfigurationOptions;
     private readonly SidAuthCookie _sidAuthCookie;
     private readonly SidHangfire _sidHangfire;
-    private HttpsConnectionAdapterOptions _httpsConnectionAdapterOptions;
 
     public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie, SidHangfire sidHangfire)
     {
@@ -70,6 +69,16 @@ public class IdServerBuilder
     internal AutomaticConfigurationOptions AutomaticConfigurationOptions => _automaticConfigurationOptions;
 
     internal SidAuthCookie SidAuthCookie => _sidAuthCookie;
+
+    /// <summary>
+    /// Configures the FormBuilder by applying the provided callback function.
+    /// This allows customization of the FormBuilderRegistration instance.
+    /// </summary>
+    public IdServerBuilder ConfigureFormBuilder(Action<FormBuilderRegistration> cb)
+    {
+        cb(_formBuilder);
+        return this;
+    }
 
 
     /// <summary>
@@ -347,6 +356,7 @@ public class IdServerBuilder
             var dataseederRepository = scope.ServiceProvider.GetRequiredService<IDataSeederExecutionHistoryRepository>();
             return new InitAdministrativeClientDataseeder(redirectUrls, postLogoutUrls, backchannelLogoutUrl, additionalScopes, transactionBuidler, realmRepository, scopeRepository, clientRepository, dataseederRepository);
         });
+        _serviceCollection.AddTransient<IDataSeeder, AssignTemplateScopeToClientDataSeeder>();
         return this;
     }
 

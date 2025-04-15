@@ -12,6 +12,7 @@
 @using FormBuilder.Models.Layout
 @using FormBuilder.Models
 @using SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore
+@using SimpleIdServer.IdServer.Website.Stores.TemplateStore
 @inject IState<FormState> formState
 @inject IDispatcher dispatcher
 @inject IUrlHelper urlHelper
@@ -40,6 +41,7 @@
         if (!string.IsNullOrWhiteSpace(id))
         {
             dispatcher.Dispatch(new GetAllRegistrationWorkflowLayoutsAction());
+            dispatcher.Dispatch(new GetActiveTemplateAction());
         }
     }
 }

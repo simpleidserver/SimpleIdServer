@@ -53,7 +53,8 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         ITokenRepository tokenRepository,
         IJwtBuilder jwtBuilder,
         ILanguageRepository languageRepository,
-        IRealmStore realmStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore)
+        IRealmStore realmStore,
+        ITemplateStore templateStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore)
     {
         _logger = logger;
         _userRepository = userRepository;
@@ -70,7 +71,11 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         var registrationProgress = await GetRegistrationProgress();
         if (registrationProgress == null && !isAuthenticated)
         {
-            var res = new SidWorkflowViewModel();
+            var template = await TemplateStore.GetActive(prefix, cancellationToken);
+            var res = new SidWorkflowViewModel
+            {
+                Template = template
+            };
             res.SetErrorMessage(Global.NotAllowedToRegister);
             return View(res);
         }
@@ -92,7 +97,11 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         UserRegistrationProgress userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
         {
-            var res = new SidWorkflowViewModel();
+            var template = await TemplateStore.GetActive(prefix, cancellationToken);
+            var res = new SidWorkflowViewModel
+            {
+                Template = template,
+            };
             res.SetErrorMessage(Global.NotAllowedToRegister);
             return View(res);
         }

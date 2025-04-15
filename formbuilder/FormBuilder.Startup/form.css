@@ -56,3 +56,24 @@
 .picture-container .picture {
     width: 150px;
 }
+
+/*Stepper*/
+.steps {
+    flex-direction: row !important;
+    padding: 0px;
+}
+
+.steps .steps-item:not(:last-child) {
+    flex: auto;
+    display: flex;
+    align-items: center;
+}
+
+.steps .steps-item:not(:last-child):after {
+    display: "block";
+    content: "";
+    flex: auto;
+    height: 1px;
+    margin-inline-end: 16px;
+    background-color: var(--rz-base-300);
+}

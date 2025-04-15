@@ -17,6 +17,7 @@ public class PwdAuthForms
 
     public static FormRecord LoginPwdAuthForm =
         FormRecordBuilder.New("pwd", "pwd", Constants.DefaultRealm, true)
+        .AddImage("https://upload.wikimedia.org/wikipedia/commons/a/a2/OpenID_logo_2.svg")
         .AddStackLayout(authPwdFormId, authPwdFormCorrelationId, (c) =>
         {
             c.EnableForm()

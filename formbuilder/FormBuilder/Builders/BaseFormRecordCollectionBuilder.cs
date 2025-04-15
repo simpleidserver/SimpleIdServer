@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Components.FormElements.Image;
 using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
@@ -111,6 +112,18 @@ public class BaseFormRecordCollectionBuilder<B, T>
     {
         var builder = new FormStackLayoutRecordBuilder(id, correlationId);
         if(cb != null)
+        {
+            cb(builder);
+        }
+
+        Record.Elements.Add(builder.Build());
+        return this as B;
+    }
+
+    public B AddImage(string url, string id = null, string correlationId = null, Action<ImageRecordBuilder> cb = null)
+    {
+        var builder = new ImageRecordBuilder(url, id, correlationId);
+        if (cb != null)
         {
             cb(builder);
         }

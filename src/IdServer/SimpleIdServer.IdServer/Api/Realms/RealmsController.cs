@@ -268,10 +268,6 @@ public class RealmsController : BaseController
             form.VersionNumber = 0;
             form.Realm = newRealm;
             form.UpdateDateTime = currentDateTime;
-            form.AvailableStyles.ForEach(s =>
-            {
-                s.Id = Guid.NewGuid().ToString();
-            });
             result.Forms.Add(form);
         }
 

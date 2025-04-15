@@ -7,25 +7,26 @@
 @using FormBuilder.Components
 @using FormBuilder.Models.Layout
 @using FormBuilder.Models
+@using SimpleIdServer.IdServer.Website.Stores.TemplateStore
 @using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
 @inject IState<FormState> formState
+@inject IState<TemplateState> templateState
 @inject IState<WorkflowLayoutListState> workflowLayoutListState
 @inject IDispatcher dispatcher
 @inject IUrlHelper urlHelper
 @inject IUriProvider uriProvider
 @inherits FluxorComponent
 
-<link rel="stylesheet" href="@(uriProvider.GetActiveFormCssUrl(Id))" />
-
 <RadzenText class="mt-3 mb-3 no-margin" Text="@formState.Value.Form?.Name" TextStyle="TextStyle.DisplayH3" />
 
 <RadzenCardLoader Variant="Variant.Filled" IsLoading=@IsLoading>
-    @if (formState.Value.Form != null)
+    @if (formState.Value.Form != null && templateState.Value.Template != null)
     {
         <FormEditor Form=@formState.Value.Form
                     Saved=@HandleSave
                     Published=@HandlePublish
                     WorkflowLayout=@Layout
+                    Template=@templateState.Value.Template
                     CssSaved=@HandleUpdateCss></FormEditor>
     }
 </RadzenCardLoader>
