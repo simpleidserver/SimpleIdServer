@@ -104,6 +104,7 @@
     [Parameter] public FormRecord Form { get; set; }
     [Parameter] public WorkflowLayout WorkflowLayout { get; set; }
     [Parameter] public Template Template { get; set; }
+    [Parameter] public List<string> SupportedLanguageCodes { get; set; }
     [Parameter] public EventCallback<ActionState<FormRecord, bool>> Saved { get; set; }
     [Parameter] public EventCallback<ActionState<FormRecord, FormRecord>> Published { get; set; }
     [Parameter] public EventCallback<ActionState<string, bool>> CssSaved { get; set; }
@@ -131,7 +132,7 @@
         await base.OnParametersSetAsync();
         if(Form != null)
         {
-            context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout, Template);
+            context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout, Template, SupportedLanguageCodes);
             Serialize();
             await LoadCss();
             Form.Elements.CollectionChanged += HandleChanged;
@@ -164,7 +165,9 @@
         };
         return dialogService.OpenAsync<DebugFormDialog>("", new Dictionary<string, object>
         {
-            { nameof(DebugFormDialog.Form), Form }
+            { nameof(DebugFormDialog.Form), Form },
+            { nameof(DebugFormDialog.Template), Template },
+            { nameof(DebugFormDialog.SupportedLanguages), SupportedLanguageCodes }
         }, opts);
     }
 
@@ -215,7 +218,7 @@
     {
         Form.Elements.CollectionChanged -= HandleChanged;
         Form = form;
-        context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout);
+        context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout, Template, SupportedLanguageCodes);
         formViewer.Set(context);
         RefreshJson();
         Form.Elements.CollectionChanged += HandleChanged;

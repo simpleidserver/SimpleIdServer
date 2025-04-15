@@ -47,8 +47,8 @@
         if(FakeData == null) 
         {
             var step = Context.GetCurrentFormRecord();
-            var fakeDataService = fakerDataServiceFactory.Build(step.Name);
-            jsonObj = JsonObject.Parse(JsonSerializer.Serialize(fakeDataService.Generate()));
+            var json = fakerDataServiceFactory.Generate(step.CorrelationId).Result;
+            jsonObj = JsonObject.Parse(JsonSerializer.Serialize(json));
         }
 
         if(!string.IsNullOrWhiteSpace(ParentPath))

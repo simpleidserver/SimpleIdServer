@@ -22,4 +22,12 @@ public record LanguagesState
 
     public List<Language> Languages { get; set; }
     public bool IsLoading { get; set; } = true;
+
+    public List<string> Codes
+    {
+        get
+        {
+            return Languages.Select(l => l.Code).ToList();
+        }
+    }
 }

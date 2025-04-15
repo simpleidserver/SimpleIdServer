@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using FormBuilder;
 using FormBuilder.Helpers;
 using FormBuilder.Models;
 using FormBuilder.Services;
@@ -12,6 +13,7 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -26,7 +28,13 @@ public class FormsController : BaseController
     private readonly IDateTimeHelper _dateTimeHelper;
     private readonly IVersionedFormService _versionedFormService;
 
-    public FormsController(IFormStore formStore, ILogger<FormsController> logger, IDateTimeHelper dateTimeHelper, IVersionedFormService versionedFormService, ITokenRepository tokenRepository, IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
+    public FormsController(
+        IFormStore formStore, 
+        ILogger<FormsController> logger, 
+        IDateTimeHelper dateTimeHelper, 
+        IVersionedFormService versionedFormService, 
+        ITokenRepository tokenRepository, 
+        IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
     {
         _formStore = formStore;
         _logger = logger;

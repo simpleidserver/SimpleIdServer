@@ -25,7 +25,7 @@ public class WorkflowContext
         };
     }
 
-    public static WorkflowContext CreateOneStepWorkflow(FormRecord form, WorkflowLayout layout = null, Template template = null)
+    public static WorkflowContext CreateOneStepWorkflow(FormRecord form, WorkflowLayout layout = null, Template template = null, List<string> supportedLanguages = null, AntiforgeryTokenRecord antiforgeryToken = null)
     {
         var currentStepId = Guid.NewGuid().ToString();
         var workflow = new WorkflowRecord
@@ -46,16 +46,16 @@ public class WorkflowContext
         var result = new WorkflowContext
         {
             Definition = new WorkflowDefinition(workflow, records),
-            Execution = new WorkflowExecution(currentStepId),
+            Execution = new WorkflowExecution(currentStepId, new List<string>(), new List<string>(), antiforgeryToken, supportedLanguages),
             FormEditorContext = new FormEditorContext(layout),
             Template = template
         };
         return result;
     }
 
-    public static WorkflowContext CreateOneStepWorkflow(FormRecord form, JsonObject inputData)
+    public static WorkflowContext CreateOneStepWorkflow(FormRecord form, JsonObject inputData, Template template = null, List<string> supportedLanguages = null)
     {
-        var result = CreateOneStepWorkflow(form);
+        var result = CreateOneStepWorkflow(form, template: template, supportedLanguages: supportedLanguages);
         InitializeWorkflowExecution(result, inputData);
         return result;
     }

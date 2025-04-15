@@ -36,9 +36,8 @@
         var firstStep = Context.GetFirstStep();
         if (firstStep == null) return;
         var stepRecord = Context.Definition.Records.Single(r => r.CorrelationId == firstStep.FormRecordCorrelationId);
-        var fakerDataService = fakerDataServiceFactory.Build(stepRecord.Name);
-        var obj = fakerDataService.Generate();
-        var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
+        var serialized = await fakerDataServiceFactory.Generate(stepRecord.CorrelationId);
+        var json = JsonSerializer.Serialize(JsonObject.Parse(serialized), new JsonSerializerOptions { WriteIndented = true });
         debuggingWorkflowContext = Context.BuildNewContextAndMoveToFirstStep(JsonObject.Parse(json).AsObject());
         await editor.SetValue(json);
     }

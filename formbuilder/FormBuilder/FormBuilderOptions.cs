@@ -9,4 +9,5 @@ public class FormBuilderOptions
     };
 
     public string AntiforgeryCookieName { get; set; } = "XSFR-TOKEN";
+    public string Issuer { get; set; }
 }

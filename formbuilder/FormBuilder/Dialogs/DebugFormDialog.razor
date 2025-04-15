@@ -3,6 +3,7 @@
 @using FormBuilder.Components.Form
 @using FormBuilder.Factories
 @using FormBuilder.Models
+@using FormBuilder.Models.Layout
 @using Radzen
 @using Radzen.Blazor
 @using System.Text.Json.Nodes
@@ -24,6 +25,8 @@
 @code {
     private StandaloneCodeEditor editor;
     [Parameter] public FormRecord Form { get; set; }
+    [Parameter] public Template Template { get; set; }
+    [Parameter] public List<string> SupportedLanguages { get; set; }
     FormRecord copyRecord { get; set; }
     WorkflowContext context { get; set; }
     JsonObject input { get; set; }
@@ -48,7 +51,7 @@
         try
         {
             input = JsonObject.Parse(value).AsObject();
-            context = WorkflowContext.CreateOneStepWorkflow(copyRecord, input);
+            context = WorkflowContext.CreateOneStepWorkflow(copyRecord, input, Template, SupportedLanguages);
         }
         catch
         {
@@ -58,9 +61,8 @@
 
     private async Task GenerateFakeData()
     {
-        var fakerDataService = fakerDataServiceFactory.Build(Form.Name);
-        var obj = fakerDataService.Generate();
-        var json = JsonSerializer.Serialize(obj, new JsonSerializerOptions { WriteIndented = true });
+        var serialized = await fakerDataServiceFactory.Generate(Form.CorrelationId);
+        var json = JsonSerializer.Serialize(JsonObject.Parse(serialized), new JsonSerializerOptions { WriteIndented = true });
         await editor.SetValue(json);
     }
 

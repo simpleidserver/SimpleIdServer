@@ -2,6 +2,6 @@
 
 public interface IFakerDataService
 {
-    string FormRecordName { get; }
+    string CorrelationId { get; }
     object Generate();
 }

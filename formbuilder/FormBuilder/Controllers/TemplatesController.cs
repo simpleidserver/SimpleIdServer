@@ -7,12 +7,10 @@ namespace FormBuilder.Controllers;
 public class TemplatesController : Controller
 {
     private readonly ITemplateStore _templateStore;
-    private readonly IHttpClientFactory _httpClientFactory;
 
-    public TemplatesController(ITemplateStore templateStore, IHttpClientFactory httpClientFactory)
+    public TemplatesController(ITemplateStore templateStore)
     {
         _templateStore = templateStore;
-        _httpClientFactory = httpClientFactory;
     }
 
     [HttpGet("{templateId}/css/{styleId}")]

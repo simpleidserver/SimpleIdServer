@@ -10,8 +10,6 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
-using SimpleIdServer.IdServer.Website.Infrastructures;
-using SimpleIdServer.IdServer.WsFederation;
 using System.Globalization;
 using System.Linq.Dynamic.Core;
 using System.Text;

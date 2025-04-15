@@ -41,7 +41,10 @@ public static class ServiceCollectionExtensions
         services.AddDistributedMemoryCache();
         services.AddLocalization();
         services.RemoveAll<IUriProvider>();
-        services.AddFormBuilderUi();
+        services.AddFormBuilderUi(c =>
+        {
+            c.Issuer = issuer;
+        });
         services.AddHttpContextAccessor();
         services.AddTransient<IUserSessionResitory, UserSessionRepository>();
         services.AddTransient<IUrlHelper, UrlHelper>();

@@ -7,11 +7,13 @@
 @using FormBuilder.Components
 @using FormBuilder.Models.Layout
 @using FormBuilder.Models
+@using SimpleIdServer.IdServer.Website.Stores.LanguageStore
 @using SimpleIdServer.IdServer.Website.Stores.TemplateStore
 @using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
 @inject IState<FormState> formState
 @inject IState<TemplateState> templateState
 @inject IState<WorkflowLayoutListState> workflowLayoutListState
+@inject IState<LanguagesState> languagesState
 @inject IDispatcher dispatcher
 @inject IUrlHelper urlHelper
 @inject IUriProvider uriProvider
@@ -27,6 +29,7 @@
                     Published=@HandlePublish
                     WorkflowLayout=@Layout
                     Template=@templateState.Value.Template
+                    SupportedLanguageCodes="@languagesState.Value.Codes"
                     CssSaved=@HandleUpdateCss></FormEditor>
     }
 </RadzenCardLoader>

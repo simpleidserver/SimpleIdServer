@@ -6,6 +6,7 @@ using FormBuilder;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd;
+using SimpleIdServer.IdServer.Pwd.Fakers;
 using SimpleIdServer.IdServer.Pwd.Migrations;
 using SimpleIdServer.IdServer.Pwd.Services;
 using SimpleIdServer.IdServer.UI.Services;
@@ -32,6 +33,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ResetPwdWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitPwdAuthDataseeder>();
+        idServerBuilder.Services.AddTransient<IFakerDataService, PwdAuthFakerService>();
         idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerPasswordOptions));
         if (isDefaultAuthMethod)
         {

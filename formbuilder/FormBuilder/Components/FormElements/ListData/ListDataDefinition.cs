@@ -27,7 +27,7 @@ public class ListDataDefinition : GenericFormElementDefinition<ListDataRecord>
         var inputData = context.GetCurrentStepInputData();
         if (record.RepetitionRule == null || inputData == null) return;
         var link = context.Definition.Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
-        if (!inputData.ContainsKey("LayoutCurrentLink"))
+        if (!inputData.ContainsKey("LayoutCurrentLink") && link != null)
         {
             inputData.Add("LayoutCurrentLink", link.Id);
         }

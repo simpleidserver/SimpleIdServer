@@ -70,6 +70,17 @@ public class StandardPwdAuthForms
                                 Operator = ComparisonOperators.EQ,
                                 Value = "false"
                             }
+                        },
+                        new PropertyTransformationRule
+                        {
+                            PropertyName = "IsNotVisible",
+                            PropertyValue = "false",
+                            Condition = new ComparisonParameter
+                            {
+                                Source = "$.CanResetPassword",
+                                Operator = ComparisonOperators.EQ,
+                                Value = "true"
+                            }
                         }
                     },
                     Elements = new ObservableCollection<IFormElementRecord>
