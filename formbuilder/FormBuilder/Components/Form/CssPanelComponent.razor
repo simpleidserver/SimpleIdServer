@@ -3,51 +3,209 @@
 @using FormBuilder.Helpers
 @using System.Text.Json
 @using System.Text
+@using FormBuilder.Models
 @using FormBuilder.Services
+@using System.Text.Json.Nodes
 @using static BlazorMonaco.Editor.Global
 
 <RadzenStack>
-    <StandaloneCodeEditor @ref=editor OnDidChangeModelContent="HandleOnEditorContentChanged" ConstructionOptions="EditorConstructionOptions" CssClass="cssEditor" />
+    <RadzenDropDown Data="@AllTemplates" TextProperty="Name" @bind-Value="@SelectedTemplate" />
+    <RadzenTabs @bind-bind-SelectedIndex="@selectedIndex">
+        <Tabs>
+            <!-- CSS class names -->
+            <RadzenTabsItem Text="CSS classes">
+                <RadzenText TextStyle="TextStyle.Subtitle1">CSS classes</RadzenText>
+                <hr />
+                <StandaloneCodeEditor @ref=classesEditor OnDidInit="HandleOnClassesInit" OnDidChangeModelContent="HandleClassesOnEditorContentChanged" ConstructionOptions="EditorJsonConstructionOptions" CssClass="cssEditor" />
+            </RadzenTabsItem>
+            <!-- Javascript scripts -->
+            <RadzenTabsItem Text="Javascript files">
+                <!-- Javascript files -->
+                <RadzenText TextStyle="TextStyle.Subtitle1">Files</RadzenText>
+                <hr />
+                <RadzenStack>
+                    @foreach (var jsFile in SelectedTemplate.JsStyles.Where(j => j.Category == TemplateStyleCategories.Lib))
+                    {
+                        <RadzenFormField Text="URL">
+                            <RadzenTextBox @bind-Value="@jsFile.Value" />
+                        </RadzenFormField>
+                    }
+                </RadzenStack>
+                <!-- Custom javascript script -->
+                <RadzenText TextStyle="TextStyle.Subtitle1">Custom javascript script</RadzenText>
+                <hr />
+                <StandaloneCodeEditor @ref=customJsEditor OnDidInit="HandleOnCustomJsInit" OnDidChangeModelContent="HandleCustomJsOnEditorContentChanged" ConstructionOptions="EditorJsConstructionOptions" CssClass="cssEditor" />
+            </RadzenTabsItem>
+            <!-- CSS -->
+            <RadzenTabsItem Text="CSS files">
+                <!-- CSS files -->
+                <RadzenText TextStyle="TextStyle.Subtitle1">Files</RadzenText>
+                <hr />
+                <RadzenStack>
+                    @foreach (var cssFile in SelectedTemplate.CssStyles.Where(j => j.Category == TemplateStyleCategories.Lib))
+                    {
+                        <RadzenFormField Text="URL">
+                            <RadzenTextBox @bind-Value="@cssFile.Value" />
+                        </RadzenFormField>
+                    }
+                </RadzenStack>
+                <!-- Custom css script-->
+                <RadzenText TextStyle="TextStyle.Subtitle1">Custom css</RadzenText>
+                <hr />
+                <StandaloneCodeEditor @ref=customCssEditor OnDidInit="HandleOnCustomCssInit" OnDidChangeModelContent="HandleCustomCssOnEditorContentChanged" ConstructionOptions="EditorCssConstructionOptions" CssClass="cssEditor" />
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
     <RadzenButton Text="Save" Disabled="@isDisabled" Click="@(async () => await HandleSave())" ButtonStyle="ButtonStyle.Primary" class="fullWidth"></RadzenButton>
 </RadzenStack>
 
 @code {
-    private StandaloneCodeEditor editor;
+    int selectedIndex = 0;
+    private StandaloneCodeEditor classesEditor;
+    private StandaloneCodeEditor customJsEditor;
+    private StandaloneCodeEditor customCssEditor;
     private bool isDisabled { get; set; }
-
+    private Template _selectedTemplate;
     [Parameter] public string FormId { get; set; }
-    [Parameter] public string Css { get; set; }
-    [Parameter] public EventCallback<ActionState<string, bool>> CssSaved { get; set; }
+    [Parameter] public List<Template> AllTemplates 
+    { 
+        get; set; 
+    } = new List<Template>();
+    [Parameter] public Template SelectedTemplate { get; set; }
+    [Parameter] public EventCallback<Template> SelectedTemplateChanged { get; set; }
+    [Parameter] public EventCallback<ActionState<Template, bool>> TemplateSaved { get; set; }
 
     [Inject] public IJSRuntime jSRuntime { get; set; }
     [Inject] public NotificationService notificationService { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
 
-    private async Task HandleOnEditorContentChanged()
+    protected override void OnAfterRender(bool firstRender)
     {
-        Css = await editor.GetValue();
-        var diagnostics = await BlazorMonaco.Editor.Global.GetModelMarkers(jSRuntime, new GetModelMarkersFilter { Owner = "css" });
-        if (diagnostics.Any()) return;
-        await formBuilderJsService.RefreshCss(Css);
+        base.OnAfterRender(firstRender);
     }
 
-    private StandaloneEditorConstructionOptions EditorConstructionOptions(StandaloneCodeEditor editor)
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+    }
+
+    private async Task HandleOnClassesInit()
+    {
+        if(classesEditor != null)
+        {
+            var json = new JsonObject();
+            foreach(var grp in SelectedTemplate.Elements.GroupBy(e => e.Element))
+            {
+                var record = new JsonObject();
+                foreach(var elt in grp.Select(_ => _))
+                {
+                    record.Add(elt.Name, elt.Value);
+                }
+
+                json.Add(grp.Key, record);
+            }
+
+            var str = JsonSerializer.Serialize(json, new JsonSerializerOptions { WriteIndented = true });
+            classesEditor.SetValue(str);
+        }
+    }
+
+    private async Task HandleOnCustomJsInit()
+    {
+        if(SelectedTemplate == null || customJsEditor == null)
+        {
+            return;
+        }
+
+        var jsTemplateStyle = SelectedTemplate.JsStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
+        var js = jsTemplateStyle?.Value ?? "";
+        customJsEditor.SetValue(js);
+    }
+
+    private async Task HandleOnCustomCssInit()
+    {        
+        if(SelectedTemplate == null || customCssEditor == null)
+        {
+            return;
+        }
+
+        var cssTemplateStyle = SelectedTemplate.CssStyles.Single(j => j.Category == TemplateStyleCategories.Custom);
+        var css = cssTemplateStyle?.Value ?? "";
+        customCssEditor.SetValue(css);
+    }
+
+    private async Task HandleClassesOnEditorContentChanged()
+    {
+        var diagnostics = await BlazorMonaco.Editor.Global.GetModelMarkers(jSRuntime, new GetModelMarkersFilter { Owner = "json" });
+        if (diagnostics.Any()) return;
+        var str = await classesEditor.GetValue();
+        var json = JsonObject.Parse(str).AsObject();
+        foreach(var elt in SelectedTemplate.Elements)
+        {
+            if(json.ContainsKey(elt.Element))
+            {
+                var record = json[elt.Element].AsObject();
+                if(record.ContainsKey(elt.Name))
+                {
+                    elt.Value = record[elt.Name].ToString();
+                }
+            }
+        }
+
+        await SelectedTemplateChanged.InvokeAsync(SelectedTemplate);
+    }
+
+
+    private async Task HandleCustomJsOnEditorContentChanged()
+    {
+        var diagnostics = await BlazorMonaco.Editor.Global.GetModelMarkers(jSRuntime, new GetModelMarkersFilter { Owner = "javascript" });
+        if (diagnostics.Any()) return;
+    }
+
+    private async Task HandleCustomCssOnEditorContentChanged()
+    {
+        var cssTemplateStyle = SelectedTemplate.CssStyles.Single(j => j.Category == TemplateStyleCategories.Custom);
+        var css = await customCssEditor.GetValue();
+        await formBuilderJsService.RefreshCss(cssTemplateStyle.Id, css);
+    }
+
+    private StandaloneEditorConstructionOptions EditorJsConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "javascript",
+            Value = ""
+        };
+    }
+
+    private StandaloneEditorConstructionOptions EditorJsonConstructionOptions(StandaloneCodeEditor editor)
+    {
+        return new StandaloneEditorConstructionOptions
+        {
+            AutomaticLayout = true,
+            Language = "json",
+            Value = "{}"
+        };
+    }
+
+    private StandaloneEditorConstructionOptions EditorCssConstructionOptions(StandaloneCodeEditor editor)
     {
         return new StandaloneEditorConstructionOptions
         {
             AutomaticLayout = true,
             Language = "css",
-            Value = Css
+            Value = ""
         };
     }
 
     private async Task HandleSave()
     {
         isDisabled = true;
-        await CssSaved.InvokeAsync(new ActionState<string, bool>(async (b) =>
+        await TemplateSaved.InvokeAsync(new ActionState<Template, bool>(async (b) =>
         {
             notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated" });
             isDisabled = false;
-        }, Css));
+        }, SelectedTemplate));
     }
 }

@@ -6,6 +6,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.TemplateStore;
 
 public class TemplateReducers
 {
+    #region TemplateState
 
     [ReducerMethod]
     public static TemplateState ReduceGetActiveTemplateAction(TemplateState state, GetActiveTemplateAction act) => new(true);
@@ -19,4 +20,23 @@ public class TemplateReducers
             Template = act.Template
         };
     }
+
+    #endregion
+
+    #region TemplatesState
+
+    [ReducerMethod]
+    public static TemplatesState ReduceGetAllTemplatesAction(TemplatesState state, GetAllTemplatesAction act) => new(true);
+
+    [ReducerMethod]
+    public static TemplatesState ReduceGetAllTemplatesSuccessAction(TemplatesState state, GetAllTemplatesSuccessAction act)
+    {
+        return state with
+        {
+            IsLoading = false,
+            Templates = act.Templates
+        };
+    }
+
+    #endregion
 }

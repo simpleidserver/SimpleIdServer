@@ -33,8 +33,8 @@ internal class RadzenTemplate
                 .SetBackClass("fullWidth")
                 .SetButtonClass("fullWidth")
                 .SetImageClasses("picture-container", "picture")
-                .SetInputTextFieldClasses("rz-form-field rz-variant-outlined rz-floating-label", string.Empty, string.Empty)
-                .SetPasswordFieldClasses("rz-form-field rz-variant-outlined rz-floating-label", string.Empty, string.Empty)
+                .SetInputTextFieldClasses("rz-form-field rz-variant-outlined rz-floating-label fullWidth", string.Empty, string.Empty)
+                .SetPasswordFieldClasses("rz-form-field rz-variant-outlined rz-floating-label fullWidth", string.Empty, string.Empty)
                 .SetDividerClasses("divider", string.Empty)
                 .Build();
         }

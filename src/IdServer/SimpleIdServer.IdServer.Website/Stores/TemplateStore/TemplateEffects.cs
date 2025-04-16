@@ -40,6 +40,26 @@ public class TemplateEffects
         dispatcher.Dispatch(new GetActiveTemplateSuccessAction { Template = template });
     }
 
+
+    [EffectMethod]
+    public async Task Handle(GetAllTemplatesAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetTemplatesUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri(baseUrl),
+            Method = HttpMethod.Get
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var templates = JsonSerializer.Deserialize<List<Template>>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+        dispatcher.Dispatch(new GetAllTemplatesSuccessAction { Templates = templates });
+    }
+
     private async Task<string> GetTemplatesUrl()
     {
         if (_options.IsReamEnabled)
@@ -61,4 +81,14 @@ public class GetActiveTemplateAction
 public class GetActiveTemplateSuccessAction
 {
     public Template Template { get; set; }
+}
+
+public class GetAllTemplatesAction
+{
+    
+}
+
+public class GetAllTemplatesSuccessAction
+{
+    public List<Template> Templates { get; set; }
 }

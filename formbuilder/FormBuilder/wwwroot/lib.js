@@ -41,13 +41,14 @@ FormBuilder.submitForm = function (url, json, method) {
     tmpForm.submit();
 }
 
-FormBuilder.refreshCss = function (cssContent) {
-    var styleElement = document.getElementById('dynamic-style');
-    if (!styleElement) {
-        styleElement = document.createElement('style');
-        styleElement.id = 'dynamic-style';
-        document.head.appendChild(styleElement);
+FormBuilder.refreshCss = function (id, cssContent) {
+    var styleElement = document.getElementById(id);
+    if (styleElement) {
+        styleElement.parentElement.removeChild(styleElement);
     }
 
+    styleElement = document.createElement('style');
+    styleElement.id = id;
     styleElement.innerHTML = cssContent;
+    document.head.appendChild(styleElement);
 };

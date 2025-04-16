@@ -12,6 +12,24 @@
 @inject IEnumerable<IFormElementDefinition> definitions
 @inject IJSRuntime jsRuntime
 
+@if (Template != null)
+{
+    @foreach (var cssStyle in Template.CssStyles)
+    {
+        if (
+            (Template.Name == "Radzen" && cssStyle.Category == TemplateStyleCategories.Custom) ||
+            Template.Name != "Radzen")
+        {
+            <link id="@cssStyle.Id" rel="stylesheet" href="@uriProvider.GetCssUrl(Template.Id, cssStyle)" />
+        }
+    }
+
+    @foreach (var jsStyle in Template.JsStyles)
+    {
+        <script id="@jsStyle.Id" src="@uriProvider.GetJsUrl(Template.Id, jsStyle)" type="text/javascript"></script>
+    }
+}
+
 <MonacoCompletion Context="@context" />
 
 @if(context != null)
@@ -68,8 +86,8 @@
         <!-- Editor -->
         <RadzenSplitterPane Size="60%">
             <FormViewer @ref=formViewer
-                IsEditModeEnabled="true" 
-                Context="@context" />
+            IsEditModeEnabled="true" 
+            Context="@context" />
         </RadzenSplitterPane>
         <!-- Properties -->
         <RadzenSplitterPane Size="20%">
@@ -88,7 +106,7 @@
             <div class="panel-content">
                 @if (panelType == FormPanelTypes.CSS)
                 {
-                    <CssPanelComponent CssSaved="@(async(act) => await HandleSaveCss(act))" Css="@Css" FormId="@Form.Id"></CssPanelComponent>
+                    <CssPanelComponent TemplateSaved="@(async(act) => await HandleSaveCss(act))" @bind-SelectedTemplate="@Template" AllTemplates="@AllTemplates" FormId="@Form.Id"></CssPanelComponent>
                 }
 
                 @if (panelType == FormPanelTypes.JSON)
@@ -104,10 +122,11 @@
     [Parameter] public FormRecord Form { get; set; }
     [Parameter] public WorkflowLayout WorkflowLayout { get; set; }
     [Parameter] public Template Template { get; set; }
+    [Parameter] public List<Template> AllTemplates { get; set; }
     [Parameter] public List<string> SupportedLanguageCodes { get; set; }
     [Parameter] public EventCallback<ActionState<FormRecord, bool>> Saved { get; set; }
     [Parameter] public EventCallback<ActionState<FormRecord, FormRecord>> Published { get; set; }
-    [Parameter] public EventCallback<ActionState<string, bool>> CssSaved { get; set; }
+    [Parameter] public EventCallback<ActionState<Template, bool>> TemplateSaved { get; set; }
 
     [Inject] public IUriProvider uriProvider { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
@@ -120,7 +139,6 @@
     private bool isPublishDisabled = false;
     private FormPanelTypes? panelType = null;
     private string SerializedForm { get; set; }
-    private string Css { get; set; }
 
     public void Dispose()
     {
@@ -152,9 +170,9 @@
     private void HandleDragStart(IFormElementDefinition def)
         => context.FormEditorContext.SelectDefinition(def);
 
-    private async Task HandleSaveCss(ActionState<string, bool> actionState)
+    private async Task HandleSaveCss(ActionState<Template, bool> actionState)
     {
-        await CssSaved.InvokeAsync(actionState);
+        await TemplateSaved.InvokeAsync(actionState);
     }
 
     private Task LaunchDebug()

@@ -11,12 +11,12 @@
 @using SimpleIdServer.IdServer.Website.Stores.TemplateStore
 @using SimpleIdServer.IdServer.Website.Stores.WorkflowsStore
 @inject IState<FormState> formState
+@inject IState<TemplatesState> templatesState
 @inject IState<TemplateState> templateState
 @inject IState<WorkflowLayoutListState> workflowLayoutListState
 @inject IState<LanguagesState> languagesState
 @inject IDispatcher dispatcher
 @inject IUrlHelper urlHelper
-@inject IUriProvider uriProvider
 @inherits FluxorComponent
 
 <RadzenText class="mt-3 mb-3 no-margin" Text="@formState.Value.Form?.Name" TextStyle="TextStyle.DisplayH3" />
@@ -29,8 +29,9 @@
                     Published=@HandlePublish
                     WorkflowLayout=@Layout
                     Template=@templateState.Value.Template
+                    AllTemplates="@templatesState.Value.Templates"
                     SupportedLanguageCodes="@languagesState.Value.Codes"
-                    CssSaved=@HandleUpdateCss></FormEditor>
+                    TemplateSaved=@HandleUpdateTemplate></FormEditor>
     }
 </RadzenCardLoader>
 
@@ -101,9 +102,9 @@
         dispatcher.Dispatch(new PublishFormAction { Id = formState.Value.Form.CorrelationId });
     }
 
-    private void HandleUpdateCss(ActionState<string, bool> state)
+    private void HandleUpdateTemplate(ActionState<Template, bool> state)
     {
-        _udpateCss = state;
-        dispatcher.Dispatch(new UpdateFormCssAction { Id = formState.Value.Form.CorrelationId, Css = state.Content });
+        // _udpateCss = state;
+        // dispatcher.Dispatch(new UpdateFormCssAction { Id = formState.Value.Form.CorrelationId, Css = state.Content });
     }
 }
