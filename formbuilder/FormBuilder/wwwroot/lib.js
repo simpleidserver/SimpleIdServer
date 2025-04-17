@@ -43,12 +43,12 @@ FormBuilder.submitForm = function (url, json, method) {
 
 FormBuilder.refreshCss = function (id, cssContent) {
     var styleElement = document.getElementById(id);
-    if (styleElement) {
-        styleElement.parentElement.removeChild(styleElement);
+    if (!styleElement) {
+        return;
     }
 
-    styleElement = document.createElement('style');
+    console.log('update');
+    styleElement.removeAttribute('href');
     styleElement.id = id;
     styleElement.innerHTML = cssContent;
-    document.head.appendChild(styleElement);
 };

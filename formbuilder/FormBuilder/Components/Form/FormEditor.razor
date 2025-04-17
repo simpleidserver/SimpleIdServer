@@ -12,23 +12,39 @@
 @inject IEnumerable<IFormElementDefinition> definitions
 @inject IJSRuntime jsRuntime
 
-@if (Template != null)
-{
-    @foreach (var cssStyle in Template.CssStyles)
+<HeadContent>
+    @if (Template != null)
     {
-        if (
-            (Template.Name == "Radzen" && cssStyle.Category == TemplateStyleCategories.Custom) ||
-            Template.Name != "Radzen")
+        @foreach (var cssStyle in Template.CssStyles)
         {
-            <link id="@cssStyle.Id" rel="stylesheet" href="@uriProvider.GetCssUrl(Template.Id, cssStyle)" />
+            if (Template.Name != "Radzen")
+            {
+                <link id="@cssStyle.Id" rel="stylesheet" href="@uriProvider.GetCssUrl(Template.Id, cssStyle)" />
+            }
+            else if (cssStyle.Category == TemplateStyleCategories.Custom)
+            {
+                <style type="text/css">
+                    @cssStyle.Value
+                </style>
+
+            }
+        }
+
+        @foreach (var jsStyle in Template.JsStyles)
+        {
+            if(jsStyle.Category == TemplateStyleCategories.Lib)
+            {
+                <script id="@jsStyle.Id" src="@uriProvider.GetJsUrl(Template.Id, jsStyle)" type="text/javascript"></script>
+            }
+            else
+            {
+                <style type="text/css">
+                    @jsStyle.Value
+                </style>
+            }
         }
     }
-
-    @foreach (var jsStyle in Template.JsStyles)
-    {
-        <script id="@jsStyle.Id" src="@uriProvider.GetJsUrl(Template.Id, jsStyle)" type="text/javascript"></script>
-    }
-}
+</HeadContent>
 
 <MonacoCompletion Context="@context" />
 
@@ -106,7 +122,7 @@
             <div class="panel-content">
                 @if (panelType == FormPanelTypes.CSS)
                 {
-                    <CssPanelComponent TemplateSaved="@(async(act) => await HandleSaveCss(act))" @bind-SelectedTemplate="@Template" AllTemplates="@AllTemplates" FormId="@Form.Id"></CssPanelComponent>
+                    <CssPanelComponent TemplateSaved="@(async(act) => await HandleSaveCss(act))" @bind-SelectedTemplate="@context.Template" AllTemplates="@AllTemplates" FormId="@Form.Id"></CssPanelComponent>
                 }
 
                 @if (panelType == FormPanelTypes.JSON)
@@ -152,7 +168,6 @@
         {
             context = WorkflowContext.CreateOneStepWorkflow(Form, WorkflowLayout, Template, SupportedLanguageCodes);
             Serialize();
-            await LoadCss();
             Form.Elements.CollectionChanged += HandleChanged;
             StateHasChanged();
         }

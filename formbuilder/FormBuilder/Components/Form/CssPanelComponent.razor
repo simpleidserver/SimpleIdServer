@@ -10,7 +10,7 @@
 
 <RadzenStack>
     <RadzenDropDown Data="@AllTemplates" TextProperty="Name" @bind-Value="@SelectedTemplate" />
-    <RadzenTabs @bind-bind-SelectedIndex="@selectedIndex">
+    <RadzenTabs @bind-SelectedIndex="@selectedIndex">
         <Tabs>
             <!-- CSS class names -->
             <RadzenTabsItem Text="CSS classes">
@@ -52,7 +52,7 @@
                 <!-- Custom css script-->
                 <RadzenText TextStyle="TextStyle.Subtitle1">Custom css</RadzenText>
                 <hr />
-                <StandaloneCodeEditor @ref=customCssEditor OnDidInit="HandleOnCustomCssInit" OnDidChangeModelContent="HandleCustomCssOnEditorContentChanged" ConstructionOptions="EditorCssConstructionOptions" CssClass="cssEditor" />
+                <StandaloneCodeEditor @ref=customCssEditor OnDidInit="HandleOnCustomCssInit" OnDidChangeModelContent="@((e) => HandleCustomCssOnEditorContentChanged())" ConstructionOptions="EditorCssConstructionOptions" CssClass="cssEditor" />
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
@@ -61,6 +61,10 @@
 
 @code {
     int selectedIndex = 0;
+    private string _classes = "{}";
+    private string _js = "";
+    private string _css = "";
+    private Template _template;
     private StandaloneCodeEditor classesEditor;
     private StandaloneCodeEditor customJsEditor;
     private StandaloneCodeEditor customCssEditor;
@@ -71,10 +75,28 @@
     { 
         get; set; 
     } = new List<Template>();
-    [Parameter] public Template SelectedTemplate { get; set; }
+    [Parameter] public Template SelectedTemplate 
+    {
+        get 
+        {
+            return _selectedTemplate;
+        }
+        set
+        {
+            if(_selectedTemplate == value)
+            {
+                return;
+            }
+
+            _selectedTemplate = value;
+            _classes = GetClasses();
+            _js = GetJs();
+            _css = GetCss();
+            Refresh();
+        }
+    }
     [Parameter] public EventCallback<Template> SelectedTemplateChanged { get; set; }
     [Parameter] public EventCallback<ActionState<Template, bool>> TemplateSaved { get; set; }
-
     [Inject] public IJSRuntime jSRuntime { get; set; }
     [Inject] public NotificationService notificationService { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
@@ -91,82 +113,61 @@
 
     private async Task HandleOnClassesInit()
     {
-        if(classesEditor != null)
+        var json = GetClasses();
+        if(json != null)
         {
-            var json = new JsonObject();
-            foreach(var grp in SelectedTemplate.Elements.GroupBy(e => e.Element))
-            {
-                var record = new JsonObject();
-                foreach(var elt in grp.Select(_ => _))
-                {
-                    record.Add(elt.Name, elt.Value);
-                }
-
-                json.Add(grp.Key, record);
-            }
-
-            var str = JsonSerializer.Serialize(json, new JsonSerializerOptions { WriteIndented = true });
-            classesEditor.SetValue(str);
+            classesEditor.SetValue(json);
         }
     }
 
     private async Task HandleOnCustomJsInit()
     {
-        if(SelectedTemplate == null || customJsEditor == null)
+        var js = GetJs();
+        if(js != null)
         {
-            return;
+            customJsEditor.SetValue(js);
         }
-
-        var jsTemplateStyle = SelectedTemplate.JsStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
-        var js = jsTemplateStyle?.Value ?? "";
-        customJsEditor.SetValue(js);
     }
 
     private async Task HandleOnCustomCssInit()
-    {        
-        if(SelectedTemplate == null || customCssEditor == null)
+    {
+        var css = GetCss();
+        if(css != null)
         {
-            return;
+            customCssEditor.SetValue(css);
         }
-
-        var cssTemplateStyle = SelectedTemplate.CssStyles.Single(j => j.Category == TemplateStyleCategories.Custom);
-        var css = cssTemplateStyle?.Value ?? "";
-        customCssEditor.SetValue(css);
     }
 
     private async Task HandleClassesOnEditorContentChanged()
     {
-        var diagnostics = await BlazorMonaco.Editor.Global.GetModelMarkers(jSRuntime, new GetModelMarkersFilter { Owner = "json" });
-        if (diagnostics.Any()) return;
         var str = await classesEditor.GetValue();
-        var json = JsonObject.Parse(str).AsObject();
-        foreach(var elt in SelectedTemplate.Elements)
-        {
-            if(json.ContainsKey(elt.Element))
-            {
-                var record = json[elt.Element].AsObject();
-                if(record.ContainsKey(elt.Name))
-                {
-                    elt.Value = record[elt.Name].ToString();
-                }
-            }
-        }
-
+        ApplyClasses(str);
         await SelectedTemplateChanged.InvokeAsync(SelectedTemplate);
     }
 
-
     private async Task HandleCustomJsOnEditorContentChanged()
     {
-        var diagnostics = await BlazorMonaco.Editor.Global.GetModelMarkers(jSRuntime, new GetModelMarkersFilter { Owner = "javascript" });
-        if (diagnostics.Any()) return;
+        var jsTemplateStyle = SelectedTemplate.JsStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
+        if(jsTemplateStyle == null)
+        {
+            return;
+        }
+
+        jsTemplateStyle.Value = await customJsEditor.GetValue();
+        await SelectedTemplateChanged.InvokeAsync(SelectedTemplate);
     }
 
     private async Task HandleCustomCssOnEditorContentChanged()
     {
-        var cssTemplateStyle = SelectedTemplate.CssStyles.Single(j => j.Category == TemplateStyleCategories.Custom);
-        var css = await customCssEditor.GetValue();
-        await formBuilderJsService.RefreshCss(cssTemplateStyle.Id, css);
+        var cssTemplateStyle = SelectedTemplate.CssStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
+        if(cssTemplateStyle == null)
+        {
+            return;
+        }
+
+        cssTemplateStyle.Value = await customCssEditor.GetValue();
+        await SelectedTemplateChanged.InvokeAsync(SelectedTemplate);
+
     }
 
     private StandaloneEditorConstructionOptions EditorJsConstructionOptions(StandaloneCodeEditor editor)
@@ -175,7 +176,7 @@
         {
             AutomaticLayout = true,
             Language = "javascript",
-            Value = ""
+            Value = _js
         };
     }
 
@@ -185,7 +186,7 @@
         {
             AutomaticLayout = true,
             Language = "json",
-            Value = "{}"
+            Value = _classes
         };
     }
 
@@ -195,8 +196,95 @@
         {
             AutomaticLayout = true,
             Language = "css",
-            Value = ""
+            Value = _css
         };
+    }
+
+    private void Refresh()
+    {
+        if(selectedIndex == 0 && classesEditor != null)
+        {
+            classesEditor.SetValue(_classes);
+        }
+        else if(selectedIndex == 1 && customJsEditor != null)
+        {
+            customJsEditor.SetValue(_js);
+        }
+        else if(customCssEditor != null)
+        {
+            customCssEditor.SetValue(_css);
+        }
+
+        ApplyClasses(_classes);
+        SelectedTemplateChanged.InvokeAsync(SelectedTemplate).Wait();
+    }
+
+    private string GetClasses()
+    {
+        if(classesEditor == null)
+        {
+            return null;
+        }
+
+        var json = new JsonObject();
+        foreach (var grp in SelectedTemplate.Elements.GroupBy(e => e.Element))
+        {
+            var record = new JsonObject();
+            foreach (var elt in grp.Select(_ => _))
+            {
+                record.Add(elt.Name, elt.Value);
+            }
+
+            json.Add(grp.Key, record);
+        }
+
+        var str = JsonSerializer.Serialize(json, new JsonSerializerOptions { WriteIndented = true });
+        return str;
+    }
+
+    private string GetJs()
+    {
+        if (SelectedTemplate == null || customJsEditor == null)
+        {
+            return null;
+        }
+
+        var jsTemplateStyle = SelectedTemplate.JsStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
+        var js = jsTemplateStyle?.Value ?? "";
+        return js;
+    }
+
+    private string GetCss()
+    {
+        if (SelectedTemplate == null || customCssEditor == null)
+        {
+            return null;
+        }
+
+        var cssTemplateStyle = SelectedTemplate.CssStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
+        var css = cssTemplateStyle?.Value ?? "";
+        return css;
+    }
+
+    private void ApplyClasses(string str)
+    {
+        if(string.IsNullOrWhiteSpace(str))
+        {
+            return;
+        }
+
+        var json = JsonObject.Parse(str).AsObject();
+        foreach (var elt in SelectedTemplate.Elements)
+        {
+            if (json.ContainsKey(elt.Element))
+            {
+                var record = json[elt.Element].AsObject();
+                if (record.ContainsKey(elt.Name))
+                {
+                    elt.Value = record[elt.Name].ToString();
+                }
+            }
+        }
     }
 
     private async Task HandleSave()
