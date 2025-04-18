@@ -74,4 +74,38 @@ public class TemplatesController : BaseController
             return BuildError(ex);
         }
     }
+
+    [HttpPut]
+    public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] FormBuilder.Models.Template template, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        try
+        {
+            await CheckAccessToken(prefix, Config.DefaultScopes.Templates.Name);
+            var existingTemplate = await _templateStore.Get(id, cancellationToken);
+            if (existingTemplate == null)
+            {
+                return new NotFoundResult();
+            }
+
+            foreach (var s in template.Styles)
+            {
+                var existingStyle = existingTemplate.Styles.Single(st => st.Id == s.Id);
+                if (existingStyle != null)
+                {
+                    existingStyle.Value = s.Value;
+                }
+            }
+
+            existingTemplate.Windows = template.Windows;
+            existingTemplate.Elements = template.Elements;
+            await _templateStore.SaveChanges(cancellationToken);
+            return new NoContentResult();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
 }

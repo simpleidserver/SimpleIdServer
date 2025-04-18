@@ -7,9 +7,10 @@
     <Children>
         @if(Value.ActAsButton)
         {
-            <RadzenButton class="@BtnClass" 
-                Text="@translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty, !IsEditModeEnabled)" 
-                Click="@(async (e) => await Navigate())"></RadzenButton>
+            <button class="@BtnClass" 
+                    @onclick=@(async (e) => await Navigate())>
+                @translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty, !IsEditModeEnabled)
+            </button>
         }
         else
         {

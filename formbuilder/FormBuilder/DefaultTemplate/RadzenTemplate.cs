@@ -29,9 +29,9 @@ internal class RadzenTemplate
                     "rz-steps-title", 
                     string.Empty
                 )
-                .SetAnchorClass(string.Empty, "fullWidth")
-                .SetBackClass("fullWidth")
-                .SetButtonClass("fullWidth")
+                .SetAnchorClass(string.Empty, "rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default fullWidth")
+                .SetBackClass("rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default fullWidth")
+                .SetButtonClass("rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default fullWidth")
                 .SetImageClasses("picture-container", "picture")
                 .SetInputTextFieldClasses("rz-form-field rz-variant-outlined rz-floating-label fullWidth", string.Empty, string.Empty)
                 .SetPasswordFieldClasses("rz-form-field rz-variant-outlined rz-floating-label fullWidth", string.Empty, string.Empty)

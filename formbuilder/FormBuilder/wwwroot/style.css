@@ -2,12 +2,12 @@
     height: 100%;
 }
 
-.form-content.editor .draggableElement {
+.draggableElement {
     padding: 10px;
 }
 
 /* Drop zone */
-.editableLayoutContainer, .draggableElement {
+.draggableElement {
     border: 1px solid transparent;
     position: relative;
 }

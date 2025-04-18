@@ -133,6 +133,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDataSeeder, InitCertificateAuthoritiesDataseeder>();
         services.AddTransient<IDataSeeder, InitLanguageDataSeeder>();
         services.AddTransient<IDataSeeder, InitScopeDataSeeder>();
+        services.AddTransient<IDataSeeder, InitConsoleAuthDataseeder>();
     }
 
     private static void ConfigureIdentityServer(IServiceCollection services)

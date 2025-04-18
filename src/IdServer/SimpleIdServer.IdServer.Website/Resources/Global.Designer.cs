@@ -4963,6 +4963,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Template is updated.
+        /// </summary>
+        public static string TemplateUpdated {
+            get {
+                return ResourceManager.GetString("TemplateUpdated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à To.
         /// </summary>
         public static string To {

@@ -60,6 +60,38 @@ public class TemplateEffects
         dispatcher.Dispatch(new GetAllTemplatesSuccessAction { Templates = templates });
     }
 
+
+    [EffectMethod]
+    public async Task Handle(SwitchTemplateAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetTemplatesUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{action.TemplateId}/enable"),
+            Method = HttpMethod.Put
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new SwitchTemplateSuccessAction());
+    }
+
+
+    [EffectMethod]
+    public async Task Handle(UpdateTemplateAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetTemplatesUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var t = JsonSerializer.Serialize(action.Template);
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{action.Template.Id}"),
+            Method = HttpMethod.Put,
+            Content = new StringContent(JsonSerializer.Serialize(action.Template), System.Text.Encoding.UTF8, "application/json")
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new UpdateTemplateSuccessAction());
+    }
+
     private async Task<string> GetTemplatesUrl()
     {
         if (_options.IsReamEnabled)
@@ -91,4 +123,27 @@ public class GetAllTemplatesAction
 public class GetAllTemplatesSuccessAction
 {
     public List<Template> Templates { get; set; }
+}
+
+public class SwitchTemplateAction
+{
+    public string TemplateId { get; set; }
+}
+
+public class SwitchTemplateSuccessAction
+{
+
+}
+
+public class  UpdateTemplateAction
+{
+    public Template Template
+    {
+        get; set;
+    }
+}
+
+public class UpdateTemplateSuccessAction
+{
+
 }

@@ -2094,4 +2094,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="RealmOptionIsDisabled" xml:space="preserve">
     <value>The realm option is disabled</value>
   </data>
+  <data name="TemplateUpdated" xml:space="preserve">
+    <value>Template is updated</value>
+  </data>
 </root>

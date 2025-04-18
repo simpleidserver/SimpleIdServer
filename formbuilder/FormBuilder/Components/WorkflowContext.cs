@@ -213,7 +213,8 @@ public class WorkflowContext
         {
             FormEditorContext = new FormEditorContext(null),
             Definition = Definition,
-            Execution = new WorkflowExecution { CurrentStepId = Execution.CurrentStepId }
+            Execution = new WorkflowExecution { CurrentStepId = Execution.CurrentStepId },
+            Template = Template
         };
         InitializeWorkflowExecution(result, input);
         return result;

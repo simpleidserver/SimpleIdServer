@@ -38,9 +38,9 @@
             }
             else
             {
-                <style type="text/css">
+                <script type="text/javascript">
                     @jsStyle.Value
-                </style>
+                </script>
             }
         }
     }
@@ -102,8 +102,8 @@
         <!-- Editor -->
         <RadzenSplitterPane Size="60%">
             <FormViewer @ref=formViewer
-            IsEditModeEnabled="true" 
-            Context="@context" />
+                IsEditModeEnabled="true" 
+                Context="@context" />
         </RadzenSplitterPane>
         <!-- Properties -->
         <RadzenSplitterPane Size="20%">
@@ -122,7 +122,11 @@
             <div class="panel-content">
                 @if (panelType == FormPanelTypes.CSS)
                 {
-                    <CssPanelComponent TemplateSaved="@(async(act) => await HandleSaveCss(act))" @bind-SelectedTemplate="@context.Template" AllTemplates="@AllTemplates" FormId="@Form.Id"></CssPanelComponent>
+                    <CssPanelComponent TemplateSaved="@(async(act) => await HandleTemplateSaved(act))" 
+                        TemplateSwitched="@(async(act) => HandleTemplateSwitched(act))"
+                        @bind-SelectedTemplate="@context.Template" 
+                        AllTemplates="@AllTemplates" 
+                        FormId="@Form.Id"></CssPanelComponent>
                 }
 
                 @if (panelType == FormPanelTypes.JSON)
@@ -143,6 +147,7 @@
     [Parameter] public EventCallback<ActionState<FormRecord, bool>> Saved { get; set; }
     [Parameter] public EventCallback<ActionState<FormRecord, FormRecord>> Published { get; set; }
     [Parameter] public EventCallback<ActionState<Template, bool>> TemplateSaved { get; set; }
+    [Parameter] public EventCallback<Template> TemplateSwitched { get; set; }
 
     [Inject] public IUriProvider uriProvider { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }
@@ -173,8 +178,8 @@
         }
     }
 
-    private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args)
-    => RefreshJson();
+    private void HandleChanged(object sender, NotifyCollectionChangedEventArgs args) 
+        => RefreshJson();
 
     private void HandleJsonChanged(string json)
     {
@@ -185,9 +190,14 @@
     private void HandleDragStart(IFormElementDefinition def)
         => context.FormEditorContext.SelectDefinition(def);
 
-    private async Task HandleSaveCss(ActionState<Template, bool> actionState)
+    private async Task HandleTemplateSaved(ActionState<Template, bool> actionState)
     {
         await TemplateSaved.InvokeAsync(actionState);
+    }
+
+    private async Task HandleTemplateSwitched(Template template)
+    {
+        await TemplateSwitched.InvokeAsync(template);
     }
 
     private Task LaunchDebug()

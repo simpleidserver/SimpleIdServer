@@ -9,7 +9,7 @@
 @using static BlazorMonaco.Editor.Global
 
 <RadzenStack>
-    <RadzenDropDown Data="@AllTemplates" TextProperty="Name" @bind-Value="@SelectedTemplate" />
+    <RadzenDropDown TValue="Template" Data="@AllTemplates" TextProperty="Name" Value="@SelectedTemplate" ValueChanged="@(async (t) => await HandleTemplateChanged(t))" />
     <RadzenTabs @bind-SelectedIndex="@selectedIndex">
         <Tabs>
             <!-- CSS class names -->
@@ -61,9 +61,6 @@
 
 @code {
     int selectedIndex = 0;
-    private string _classes = "{}";
-    private string _js = "";
-    private string _css = "";
     private Template _template;
     private StandaloneCodeEditor classesEditor;
     private StandaloneCodeEditor customJsEditor;
@@ -75,26 +72,8 @@
     { 
         get; set; 
     } = new List<Template>();
-    [Parameter] public Template SelectedTemplate 
-    {
-        get 
-        {
-            return _selectedTemplate;
-        }
-        set
-        {
-            if(_selectedTemplate == value)
-            {
-                return;
-            }
-
-            _selectedTemplate = value;
-            _classes = GetClasses();
-            _js = GetJs();
-            _css = GetCss();
-            Refresh();
-        }
-    }
+    [Parameter] public Template SelectedTemplate { get; set; }
+    [Parameter] public EventCallback<Template> TemplateSwitched { get; set; }
     [Parameter] public EventCallback<Template> SelectedTemplateChanged { get; set; }
     [Parameter] public EventCallback<ActionState<Template, bool>> TemplateSaved { get; set; }
     [Inject] public IJSRuntime jSRuntime { get; set; }
@@ -106,42 +85,87 @@
         base.OnAfterRender(firstRender);
     }
 
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-    }
-
     private async Task HandleOnClassesInit()
     {
-        var json = GetClasses();
-        if(json != null)
+        if (classesEditor == null)
         {
-            classesEditor.SetValue(json);
+            return;
         }
+
+        var json = new JsonObject();
+        foreach (var grp in SelectedTemplate.Elements.GroupBy(e => e.Element))
+        {
+            var record = new JsonObject();
+            foreach (var elt in grp.Select(_ => _))
+            {
+                record.Add(elt.Name, elt.Value);
+            }
+
+            json.Add(grp.Key, record);
+        }
+
+        var str = JsonSerializer.Serialize(json, new JsonSerializerOptions { WriteIndented = true });
+        classesEditor.SetValue(str);
     }
 
     private async Task HandleOnCustomJsInit()
     {
-        var js = GetJs();
-        if(js != null)
+        if (SelectedTemplate == null || customJsEditor == null)
         {
-            customJsEditor.SetValue(js);
+            return;
         }
+
+        var jsTemplateStyle = SelectedTemplate.JsStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
+        var js = jsTemplateStyle?.Value ?? "";
+        customJsEditor.SetValue(js);
     }
 
     private async Task HandleOnCustomCssInit()
     {
-        var css = GetCss();
-        if(css != null)
+        if (SelectedTemplate == null || customCssEditor == null)
         {
-            customCssEditor.SetValue(css);
+            return;
         }
+
+        var cssTemplateStyle = SelectedTemplate.CssStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
+        var css = cssTemplateStyle?.Value ?? "";
+        customCssEditor.SetValue(css);
+    }
+
+    private async Task HandleTemplateChanged(Template template)
+    {
+        if (template == null)
+        {
+            return;
+        }
+
+        await TemplateSwitched.InvokeAsync(template);
     }
 
     private async Task HandleClassesOnEditorContentChanged()
     {
         var str = await classesEditor.GetValue();
-        ApplyClasses(str);
+        if (string.IsNullOrWhiteSpace(str))
+        {
+            return;
+        }
+
+        var json = JsonObject.Parse(str).AsObject();
+        foreach (var elt in SelectedTemplate.Elements)
+        {
+            if (json.ContainsKey(elt.Element))
+            {
+                var record = json[elt.Element].AsObject();
+                if (record.ContainsKey(elt.Name))
+                {
+                    elt.Value = record[elt.Name].ToString();
+                    continue;
+                }
+            }
+
+            elt.Value = string.Empty;
+        }
+
         await SelectedTemplateChanged.InvokeAsync(SelectedTemplate);
     }
 
@@ -176,7 +200,7 @@
         {
             AutomaticLayout = true,
             Language = "javascript",
-            Value = _js
+            Value = ""
         };
     }
 
@@ -186,7 +210,7 @@
         {
             AutomaticLayout = true,
             Language = "json",
-            Value = _classes
+            Value = "{}"
         };
     }
 
@@ -196,95 +220,8 @@
         {
             AutomaticLayout = true,
             Language = "css",
-            Value = _css
+            Value = ""
         };
-    }
-
-    private void Refresh()
-    {
-        if(selectedIndex == 0 && classesEditor != null)
-        {
-            classesEditor.SetValue(_classes);
-        }
-        else if(selectedIndex == 1 && customJsEditor != null)
-        {
-            customJsEditor.SetValue(_js);
-        }
-        else if(customCssEditor != null)
-        {
-            customCssEditor.SetValue(_css);
-        }
-
-        ApplyClasses(_classes);
-        SelectedTemplateChanged.InvokeAsync(SelectedTemplate).Wait();
-    }
-
-    private string GetClasses()
-    {
-        if(classesEditor == null)
-        {
-            return null;
-        }
-
-        var json = new JsonObject();
-        foreach (var grp in SelectedTemplate.Elements.GroupBy(e => e.Element))
-        {
-            var record = new JsonObject();
-            foreach (var elt in grp.Select(_ => _))
-            {
-                record.Add(elt.Name, elt.Value);
-            }
-
-            json.Add(grp.Key, record);
-        }
-
-        var str = JsonSerializer.Serialize(json, new JsonSerializerOptions { WriteIndented = true });
-        return str;
-    }
-
-    private string GetJs()
-    {
-        if (SelectedTemplate == null || customJsEditor == null)
-        {
-            return null;
-        }
-
-        var jsTemplateStyle = SelectedTemplate.JsStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
-        var js = jsTemplateStyle?.Value ?? "";
-        return js;
-    }
-
-    private string GetCss()
-    {
-        if (SelectedTemplate == null || customCssEditor == null)
-        {
-            return null;
-        }
-
-        var cssTemplateStyle = SelectedTemplate.CssStyles.SingleOrDefault(j => j.Category == TemplateStyleCategories.Custom);
-        var css = cssTemplateStyle?.Value ?? "";
-        return css;
-    }
-
-    private void ApplyClasses(string str)
-    {
-        if(string.IsNullOrWhiteSpace(str))
-        {
-            return;
-        }
-
-        var json = JsonObject.Parse(str).AsObject();
-        foreach (var elt in SelectedTemplate.Elements)
-        {
-            if (json.ContainsKey(elt.Element))
-            {
-                var record = json[elt.Element].AsObject();
-                if (record.ContainsKey(elt.Name))
-                {
-                    elt.Value = record[elt.Name].ToString();
-                }
-            }
-        }
     }
 
     private async Task HandleSave()
@@ -292,7 +229,6 @@
         isDisabled = true;
         await TemplateSaved.InvokeAsync(new ActionState<Template, bool>(async (b) =>
         {
-            notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "The css style has been updated" });
             isDisabled = false;
         }, SelectedTemplate));
     }

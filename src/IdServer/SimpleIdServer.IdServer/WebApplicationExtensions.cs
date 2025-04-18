@@ -577,8 +577,11 @@ public static class WebApplicationExtensions
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Templates,
             defaults: new { controller = "Templates", action = "GetAll" });
         webApplication.SidMapControllerRoute("enableTemplate",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Templates + "/{id}",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Templates + "/{id}/enable",
             defaults: new { controller = "Templates", action = "Enable" });
+        webApplication.SidMapControllerRoute("updateTemplate",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Templates + "/{id}",
+            defaults: new { controller = "Templates", action = "Update" });
 
         webApplication.SidMapControllerRoute("searchGroups",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Groups + "/.search",
@@ -626,9 +629,6 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("publishForm",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Forms + "/{id}/publish",
             defaults: new { controller = "Forms", action = "Publish" });
-        webApplication.SidMapControllerRoute("updateCss",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Forms + "/{id}/css",
-            defaults: new { controller = "Forms", action = "UpdateCss" });
 
         webApplication.SidMapControllerRoute("getAllRecurringJobs",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.RecurringJobs,

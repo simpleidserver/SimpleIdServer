@@ -1,4 +1,5 @@
-﻿using FormBuilder.EF;
+﻿/*
+using FormBuilder.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 namespace FormBuilder.Startup
@@ -18,3 +19,4 @@ namespace FormBuilder.Startup
         }
     }
 }
+*/
