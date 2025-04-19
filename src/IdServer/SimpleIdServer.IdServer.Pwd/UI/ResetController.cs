@@ -43,6 +43,7 @@ public class ResetController : BaseController
     private readonly IWorkflowStore _workflowStore;
     private readonly ILanguageRepository _languageRepository;
     private readonly IRealmStore _realmStore;
+    private readonly ITemplateStore _templateStore;
     private readonly ILogger<ResetController> _logger;
     private readonly FormBuilderOptions _formBuilderOptions;
 
@@ -61,6 +62,7 @@ public class ResetController : BaseController
         IWorkflowStore workflowStore,
         ILanguageRepository languageRepository,
         IRealmStore realmStore,
+        ITemplateStore templateStore,
         ILogger<ResetController> logger,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(tokenRepository, jwtBuilder)
     {
@@ -76,6 +78,7 @@ public class ResetController : BaseController
         _workflowStore = workflowStore;
         _languageRepository = languageRepository;
         _realmStore = realmStore;
+        _templateStore = templateStore;
         _logger = logger;
         _formBuilderOptions = formBuilderOptions.Value;
     }
@@ -293,12 +296,14 @@ public class ResetController : BaseController
         var records = await _formStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         var languages = await _languageRepository.GetAll(cancellationToken);
+        var template = await _templateStore.GetActive(realm, cancellationToken);
         var amrs = WorkflowHelper.ExtractAmrs(workflow, records);
         return new SidWorkflowViewModel
         {
             Workflow = workflow,
             FormRecords = records,
             Languages = languages,
+            Template = template,
             AntiforgeryToken = new AntiforgeryTokenRecord
             {
                 CookieName = _formBuilderOptions.AntiforgeryCookieName,

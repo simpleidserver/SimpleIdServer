@@ -86,22 +86,20 @@ public static class StandardFormComponents
 
     public static IFormElementRecord NewPassword(string name)
     {
-        return new FormInputFieldRecord
+        return new FormPasswordFieldRecord
         {
             Id = Guid.NewGuid().ToString(),
             Name = name,
-            FormType = FormInputTypes.PASSWORD,
             Labels = LayoutTranslations.Password
         };
     }
 
     public static IFormElementRecord NewRepeatPassword(string name)
     {
-        return new FormInputFieldRecord
+        return new FormPasswordFieldRecord
         {
             Id = Guid.NewGuid().ToString(),
             Name = name,
-            FormType = FormInputTypes.PASSWORD,
             Labels = LayoutTranslations.RepeatPassword
         };
     }

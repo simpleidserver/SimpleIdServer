@@ -40,6 +40,7 @@ public class RealmsController : BaseController
     private readonly IFormStore _formStore;
     private readonly IWorkflowStore _workflowStore;
     private readonly IDateTimeHelper _dateTimeHelper;
+    private readonly ITemplateStore _templateStore;
     private readonly ILogger<RealmsController> _logger;
 
     public RealmsController(
@@ -57,6 +58,7 @@ public class RealmsController : BaseController
         IFormStore formStore,
         IWorkflowStore workflowStore,
         IDateTimeHelper dateTimeHelper,
+        ITemplateStore templateStore,
         ILogger<RealmsController> logger) : base(tokenRepository, jwtBuilder)
     {
         _busControl = busControl;
@@ -71,6 +73,7 @@ public class RealmsController : BaseController
         _formStore = formStore;
         _workflowStore = workflowStore;
         _dateTimeHelper = dateTimeHelper;
+        _templateStore = templateStore;
         _logger = logger;
     }
 
@@ -115,10 +118,24 @@ public class RealmsController : BaseController
                     var keys = await _fileSerializedKeyStore.GetAll(Constants.DefaultRealm, cancellationToken);
                     var acrs = await _authenticationContextClassReferenceRepository.GetAll(Constants.DefaultRealm, cancellationToken);
                     var forms = await _formStore.GetAll(prefix, cancellationToken);
+                    var templates = await _templateStore.GetAll(Constants.DefaultRealm, cancellationToken);
                     var workflows = await _workflowStore.GetAll(prefix, cancellationToken);
                     var transformationResult = Transform(workflows, forms, request.Name);
 
                     _realmRepository.Add(realm);
+                    foreach(var template in templates)
+                    {
+                        var clone = template.Clone() as FormBuilder.Models.Template;
+                        template.Id = Guid.NewGuid().ToString();
+                        template.Realm = request.Name;
+                        foreach(var style in template.Styles)
+                        {
+                            style.Id = Guid.NewGuid().ToString();
+                        }
+
+                        _templateStore.Add(template);
+                    }
+
                     foreach (var user in users)
                     {
                         user.Realms.Add(new RealmUser { RealmsName = request.Name });
@@ -180,6 +197,7 @@ public class RealmsController : BaseController
 
                     await _formStore.SaveChanges(cancellationToken);
                     await _workflowStore.SaveChanges(cancellationToken);
+                    await _templateStore.SaveChanges(cancellationToken);
                     await transaction.Commit(cancellationToken);
                     activity?.SetStatus(ActivityStatusCode.Ok, $"Realm {request.Name} is added");
                     return new ContentResult

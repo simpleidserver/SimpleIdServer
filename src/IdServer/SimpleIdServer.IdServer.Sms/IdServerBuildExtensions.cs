@@ -26,6 +26,7 @@ public static class IdServerBuildExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, SmsRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, SmsAuthWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitSmsAuthDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitSmsConfigurationDefDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<IdServerSmsOptions>();
         if (isDefaultAuthMethod)
         {

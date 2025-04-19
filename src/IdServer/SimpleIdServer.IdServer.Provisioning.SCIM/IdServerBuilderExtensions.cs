@@ -19,6 +19,7 @@ public static class IdServerBuilderExtensions
     {
         builder.Services.AddTransient<IProvisioningService, SCIMProvisioningService>();
         builder.Services.AddTransient<IDataSeeder, ConfigureScimProvisioningDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, InitScimConfigurationDefDataseeder>();
         builder.AutomaticConfigurationOptions.Add<SCIMRepresentationsExtractionJobOptions>();
         return builder;
     }

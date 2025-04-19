@@ -21,6 +21,7 @@ public static class IdServerBuilderExtensions
         builder.Services.AddTransient<IIdProviderAuthService, LDAPAuthenticationService>();
         builder.Services.AddTransient<IProvisioningService, LDAPProvisioningService>();
         builder.Services.AddTransient<IDataSeeder, ConfigureLdapProvisioningDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, InitLdapConfigurationDefDataseeder>();
         builder.AutomaticConfigurationOptions.Add<LDAPRepresentationsExtractionJobOptions>();
         return builder;
     }

@@ -20,6 +20,5 @@ public class FormInputFieldRecord : BaseFormFieldRecord
 public enum FormInputTypes
 {
     TEXT = 0,
-    HIDDEN = 1,
-    PASSWORD = 2
+    HIDDEN = 1
 }

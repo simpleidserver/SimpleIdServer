@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit.Initializers;
 using SimpleIdServer.Configuration.Models;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store.SqlSugar.Models;
 using SimpleIdServer.IdServer.Stores;
 
@@ -15,6 +14,15 @@ public class ConfigurationDefinitionStore : IConfigurationDefinitionStore
     public ConfigurationDefinitionStore(DbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public async Task<ConfigurationDefinition> Get(string id, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.Client.Queryable<SugarConfigurationDefinition>()
+            .Includes(c => c.ConfigurationDefinitionRecords, r => r.Values, r => r.Translations)
+            .Includes(c => c.ConfigurationDefinitionRecords, r => r.Translations)
+            .SingleAsync(c => c.Id == id);
+        return result?.ToDomain();
     }
 
     public void Add(ConfigurationDefinition cnfigurationDefinition)

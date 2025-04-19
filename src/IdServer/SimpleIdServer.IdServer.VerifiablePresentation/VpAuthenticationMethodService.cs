@@ -11,7 +11,7 @@ public class VpAuthenticationMethodService : IAuthenticationMethodService
 
     public string Name => "Vp";
 
-    public Type? OptionsType => typeof(IdServerVpOptions);
+    public Type? OptionsType => null;
 
     public AuthenticationMethodCapabilities Capabilities => AuthenticationMethodCapabilities.USERREGISTRATION | AuthenticationMethodCapabilities.USERAUTHENTICATION;
 

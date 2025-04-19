@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 namespace FormBuilder.Models;
 
-public class Template
+public class Template : ICloneable
 {
     public string Id
     {
@@ -64,5 +64,36 @@ public class Template
             Element = nameof(FormRecord),
             DisplayType = displayType
         });
+    }
+
+    public object Clone()
+    {
+        return new Template
+        {
+            Id = Id,
+            Name = Name,
+            Realm = Realm,
+            IsActive = IsActive,
+            Elements = Elements.Select(e => new TemplateElement
+            {
+                Element = e.Element,
+                Name = e.Name,
+                Value = e.Value
+            }).ToList(),
+            Windows = Windows.Select(w => new TemplateWindow
+            {
+                Element = w.Element,
+                Name = w.Name,
+                Value = w.Value,
+                DisplayType = w.DisplayType
+            }).ToList(),
+            Styles = Styles.Select(s => new TemplateStyle
+            {
+                Id = s.Id,
+                Value = s.Value,
+                Category = s.Category,
+                Language = s.Language
+            }).ToList()
+        };
     }
 }

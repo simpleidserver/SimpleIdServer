@@ -49,6 +49,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IUserSessionResitory, UserSessionRepository>();
         services.AddTransient<IUrlHelper, UrlHelper>();
         services.AddTransient<IUriProvider, SidAdmUriProvider>();
+        services.AddTransient<ILanguageService, LanguageService>();
         services.AddScoped<IOTPQRCodeGenerator, OTPQRCodeGenerator>();
         services.AddScoped<IGroupService, GroupEffects>();
         services.AddScoped<IRealmStore, CookieRealmStore>();
@@ -58,6 +59,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ContextMenuService>();
         services.AddScoped<TooltipService>();
         services.AddSingleton<IAccessTokenStore, AccessTokenStore>();
+        services.AddSingleton<ILanguageStore, LanguageStore>();
+        services.AddHostedService<LanguageRefreshService>();
         services.Configure<IdServerWebsiteOptions>(o =>
         {
             o.ClientId = _clientId;

@@ -25,7 +25,6 @@
 <MonacoCompletion Context="@Context" />
 
 <div class="header">
-    <RadzenButton Icon="play_arrow" ButtonStyle="ButtonStyle.Secondary" Text="Debug"  Click="@(async () => await LaunchDebug())" />
     <RadzenButton Icon="draft" ButtonStyle="ButtonStyle.Secondary" Text="Json" Click="@(() => ViewJson())" />
     <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
 </div>
@@ -385,18 +384,6 @@
 
     private List<WorkflowLink> GetEmptyLinks()
         => Context.Definition.Workflow.Links.Where(l => l.TargetStepId == null).ToList();
-
-    private async Task LaunchDebug()
-    {
-        var opts = new DialogOptions
-        {
-            Width = "1200px"
-        };
-        await dialogService.OpenAsync<DebugWorkflowDialog>("Debug", new Dictionary<string, object>
-        {
-            { nameof(DebugWorkflowDialog.Context), Context }
-        }, opts);
-    }
 
     private async Task Save()
     {

@@ -46,11 +46,6 @@ public class FormInputBuilder
         return SetEltHtmlClass(FormInputElementNames.TextBox, value, templateName);
     }
 
-    public FormInputBuilder SetPasswordHtmlClass(string value, string templateName)
-    {
-        return SetEltHtmlClass(FormInputElementNames.Password, value, templateName);
-    }
-
     public FormInputBuilder SetTransformations(List<ITransformationRule> transformations)
     {
         _formInput.Transformations = transformations;

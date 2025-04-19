@@ -28,7 +28,18 @@ public abstract class BaseFormLayoutRecord : IFormElementRecord, IFormRecordColl
             elt.ExtractJson(json);
     }
 
-    public IFormElementRecord GetChildByCorrelationId(string correlationId) => Elements.SingleOrDefault(e => e.CorrelationId == correlationId);
+    public IFormElementRecord GetChildByCorrelationId(string correlationId)
+    {
+        var result = Elements.SingleOrDefault(e => e.CorrelationId == correlationId);
+        if (result != null) return result;
+        foreach (var elt in Elements)
+        {
+            var child = elt.GetChildByCorrelationId(correlationId);
+            if (child != null) return child;
+        }
+
+        return null;
+    }
 
     public IFormElementRecord GetChild(string id) => Elements.SingleOrDefault(e => e.Id == id);
 }

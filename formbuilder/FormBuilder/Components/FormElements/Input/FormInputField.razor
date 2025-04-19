@@ -9,14 +9,7 @@
         {
             <div class="@htmlClassResolver.Resolve(Value, FormInputElementNames.Container, Context)">
                 <RadzenLabel class="@htmlClassResolver.Resolve(Value, FormInputElementNames.Label, Context)" Text="@translationHelper.Translate(Value, InputData, !IsEditModeEnabled)"></RadzenLabel>
-                @if (Value.FormType == FormInputTypes.TEXT)
-                {
-                    <RadzenTextBox class="@htmlClassResolver.Resolve(Value, FormInputElementNames.TextBox, Context)" Name="@Value.Name" @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenTextBox>
-                }
-                else
-                {
-                    <RadzenPassword class="@htmlClassResolver.Resolve(Value, FormInputElementNames.Password, Context)" Name="@Value.Name" @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenPassword>
-                }
+                <RadzenTextBox class="@htmlClassResolver.Resolve(Value, FormInputElementNames.TextBox, Context)" Name="@Value.Name" @bind-Value="@Value.Value" Disabled=@Value.Disabled></RadzenTextBox>
             </div>
         }
         else

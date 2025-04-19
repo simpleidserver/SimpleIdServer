@@ -22,6 +22,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, MobileAuthWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, MobileRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitMobileAuthDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitMobileConfigurationDefDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<MobileOptions>();
         if (isDefaultAuthMethod)
         {
@@ -46,6 +47,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, WebauthRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, WebauthWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitWebauthnAuthDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitWebauthnConfigurationDefDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<WebauthnOptions>();
         if (isDefaultAuthMethod)
         {

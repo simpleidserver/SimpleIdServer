@@ -30,6 +30,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailAuthWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitEmailAuthDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitEmailConfigurationDefDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerEmailOptions));
         if (isDefaultAuthMethod)
         {

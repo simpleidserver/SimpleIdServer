@@ -4,6 +4,7 @@
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Notification.Gotify;
+using DataSeeder;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +14,7 @@ public static class IdServerBuilderExtensions
     {
         idServerBuilder.Services.AddTransient<IUserNotificationService, GotifyUserNotificationService>();
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, GotifyAuthenticationService>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitGotifyConfigurationDefDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<GotifyOptions>();
         return idServerBuilder;
     }

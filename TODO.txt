@@ -1,6 +1,10 @@
-=> => modifier le footer qui doit être orange					:	OK
-=> => mettre à jour la documentation sur les templates			:	OK
-=> modifier écran de téléchargement								:	OK
-=> => ajouter tableau comparatif entre plusieurs applications	: 	OK
-=> => ajouter sur le site principal quelques lignes de commandes pour installer la solution : dotnet new scim : créer une solution scim, dotnet new sidempty, sidui etc...	:	OK
+https://flowbite.com/blocks/marketing/login/
+https://www.creative-tim.com/twcomponents/component/login-page-with-tailwind-css
 
+=> corriger problème avec l'éditeur workflow											:	DONE
+=> comprendre pourquoi les options de lockaccount ne sont pas affichées					:	DONE (https://localhost:5002/master/authentications/lockaccount)
+=> impossible de changer la langue sur le site d'administration							:	DONE
+=> vérifier si le style graphique est différent dans un autre realm						:	DONE
+=> supprimer le champ "FormType" = "PASSWORD" de FormInputField							:	DONE
+=> comprendre pourquoi il n'est pas possible d'afficher le workflow						:	DONE
+=> ajouter de la documentation afin d'expliquer comment éditer le style graphique		:	TODO

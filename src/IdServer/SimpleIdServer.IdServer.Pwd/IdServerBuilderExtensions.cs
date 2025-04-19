@@ -33,6 +33,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ResetPwdWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitPwdAuthDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, InitPwdConfigurationDefDataseeder>();
         idServerBuilder.Services.AddTransient<IFakerDataService, PwdAuthFakerService>();
         idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerPasswordOptions));
         if (isDefaultAuthMethod)

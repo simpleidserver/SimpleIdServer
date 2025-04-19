@@ -13,6 +13,14 @@ public class ConfigurationDefinitionStore : IConfigurationDefinitionStore
     public ConfigurationDefinitionStore(StoreDbContext dbContext)
     {
         _dbContext = dbContext;
+
+    }
+
+    public Task<ConfigurationDefinition> Get(string id, CancellationToken cancellationToken)
+    {
+        return _dbContext.Definitions.Include(c => c.Records).ThenInclude(r => r.Values).ThenInclude(r => r.Translations)
+            .Include(c => c.Records).ThenInclude(r => r.Translations)
+            .FirstOrDefaultAsync(d => d.Id == id, cancellationToken);
     }
 
     public void Add(ConfigurationDefinition configurationDefinition)

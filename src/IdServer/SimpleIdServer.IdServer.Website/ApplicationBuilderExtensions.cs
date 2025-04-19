@@ -1,10 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Website;
+using SimpleIdServer.IdServer.Website.Infrastructures;
 using SimpleIdServer.IdServer.Website.Middlewares;
+using System.Globalization;
 
 namespace Microsoft.AspNetCore.Builder;
 
@@ -30,35 +32,28 @@ public static class ApplicationBuilderExtensions
 
     private static async void UseRequestLocalization(this WebApplication webApplication, IdServerWebsiteOptions options)
     {
-        using (var scope = webApplication.Services.CreateScope())
+        var locOptions = new RequestLocalizationOptions
         {
-            var factory = scope.ServiceProvider.GetRequiredService<IWebsiteHttpClientFactory>();
-            var realm = options.IsReamEnabled ? SimpleIdServer.IdServer.Constants.DefaultRealm : null;
-            using (var httpClient = await factory.Build(realm))
-            {
-                var url = $"{options.Issuer}/languages";
-                var requestMessage = new HttpRequestMessage
-                {
-                    RequestUri = new Uri(url),
-                    Method = HttpMethod.Get
-                };
-                var httpResult = await httpClient.SendAsync(requestMessage);
-                if (!httpResult.IsSuccessStatusCode)
-                {
-                    throw new InvalidOperationException($"Cannot retrieve the languages from {url}");
-                }
+            DefaultRequestCulture = new RequestCulture(SimpleIdServer.IdServer.Constants.DefaultLanguage),
+            SupportedCultures = new[] { new CultureInfo(SimpleIdServer.IdServer.Constants.DefaultLanguage) },
+            SupportedUICultures = new[] { new CultureInfo(SimpleIdServer.IdServer.Constants.DefaultLanguage) }
+        };
+        var store = webApplication.Services.GetRequiredService<ILanguageStore>(); 
+        store.LanguagesUpdated += codes =>
+        {
+            var cultures = codes
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => new CultureInfo(c.Trim()))
+                .ToList();
 
-                httpResult.EnsureSuccessStatusCode();
-                var json = await httpResult.Content.ReadAsStringAsync();
-                var languages = SidJsonSerializer.Deserialize<List<Language>>(json);
-                var languageCodes = languages.Select(l => l.Code).ToArray();
-                webApplication.UseRequestLocalization(e =>
-                {
-                    e.SetDefaultCulture(options.DefaultLanguage);
-                    e.AddSupportedCultures(languageCodes);
-                    e.AddSupportedUICultures(languageCodes);
-                });
+            if (cultures.Any())
+            {
+                locOptions.SupportedCultures = cultures;
+                locOptions.SupportedUICultures = cultures;
             }
-        }
+        };
+
+        await store.InitialLoadAsync();
+        webApplication.UseRequestLocalization(locOptions);
     }
 }
