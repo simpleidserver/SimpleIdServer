@@ -5,6 +5,7 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import HomepageEnterprise from '@site/src/components/HomepageEnterprise';
 import HomepageOpensource from '@site/src/components/HomepageOpensource';
 import HomepageInstallation from '@site/src/components/HomepageInstallation';
+import HomepageFullyCustom from '@site/src/components/HomepageFullyCustom';
 import HomepageOpenStandards from '../components/HomepageOpenStandards';
 
 function HomepageHeader() {
@@ -146,6 +147,7 @@ export default function Home() {
         <HomepageOpensource />
         <HomepageEnterprise />
         <HomepageInstallation />
+        <HomepageFullyCustom />
         <HomepageFeatures />
         <HomepageOpenStandards />
       </main>

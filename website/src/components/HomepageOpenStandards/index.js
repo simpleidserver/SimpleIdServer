@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function HomepageOpenStandards() {
     return (
-        <section id="standards" className="py-20 bg-gray-50">
+        <section id="standards" className="py-20 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="lg:text-center">
                     <h2 className="text-base text-primary-600 font-semibold tracking-wide uppercase">Supported Standards</h2>

@@ -74,6 +74,14 @@ const sidebars = {
           ]
         },
         'idserver/swagger',
+        {
+          type: 'category',
+          label: 'CSS templates',
+          items: [
+            'idserver/templates/radzen',
+            'idserver/templates/tailwindcss'
+          ]
+        },
         'idserver/realm',
         'idserver/fapi2',
         {
@@ -95,6 +103,20 @@ const sidebars = {
         'idserveradmin/realm',
         'idserveradmin/hosting',
         'idserveradmin/loadbalancing'
+      ]
+    },
+    {
+      type: 'category',
+      label: 'User guide',
+      items: [
+        {
+          type: 'category',
+          label: 'Authentication',
+          items: [
+            'userguide/authentication/acrs',
+            'userguide/authentication/forms',
+          ]
+        }
       ]
     },
     {

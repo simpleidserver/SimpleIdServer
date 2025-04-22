@@ -23,10 +23,6 @@ export default function HomepageEnterprise() {
                                     </div>
                                     <div class="ml-6">
                                         <h3 class="text-2xl font-bold text-gray-900">Enterprise License</h3>
-                                        <div class="mt-2">
-                                            <span class="price-tag">$5,000</span>
-                                            <span class="text-gray-500">/year</span>
-                                        </div>
                                     </div>
                                 </div>
                                 <p class="mt-6 text-gray-600">
@@ -34,7 +30,7 @@ export default function HomepageEnterprise() {
                                 </p>
                                 <div class="mt-8">
                                     <a href="mailto:agentsimpleidserver@gmail.com" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-primary-500 hover:bg-primary-600">
-                                        Contact Sales
+                                        Request a quote
                                     </a>
                                 </div>
                             </div>
@@ -63,6 +59,14 @@ export default function HomepageEnterprise() {
                                         </div>
                                         <p class="ml-3 text-base text-gray-600">
                                             <span class="font-medium text-gray-900">Custom Development:</span> Get custom features developed specifically for your needs
+                                        </p>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <div class="flex-shrink-0 h-6 w-6 text-primary-500">
+                                            <i class="fas fa-check-circle"></i>
+                                        </div>
+                                        <p class="ml-3 text-base text-gray-600">
+                                            <span class="font-medium text-gray-900">Consultancy:</span> Provide security training courses and help the team protect their application.
                                         </p>
                                     </li>
                                 </ul>

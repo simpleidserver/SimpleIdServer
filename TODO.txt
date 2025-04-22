@@ -7,4 +7,7 @@ https://www.creative-tim.com/twcomponents/component/login-page-with-tailwind-css
 => vérifier si le style graphique est différent dans un autre realm						:	DONE
 => supprimer le champ "FormType" = "PASSWORD" de FormInputField							:	DONE
 => comprendre pourquoi il n'est pas possible d'afficher le workflow						:	DONE
-=> ajouter de la documentation afin d'expliquer comment éditer le style graphique		:	TODO
+=> ajouter de la documentation afin d'expliquer comment éditer le style graphique		:	DONE
+=> modifier la page marketing et inclure formbuilder									:	TODO
+=> modifier la page marketing et ajouter un btn pour demande de quote					:	TODO
+=> vérifier si migration de 5.0.4 vers 6.0.0 se passe correctement						:	TODO
