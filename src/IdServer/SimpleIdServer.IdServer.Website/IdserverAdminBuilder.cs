@@ -92,6 +92,7 @@ public class IdserverAdminBuilder
         {
             o.ClientId = clientId;
             o.ClientSecret = clientSecret;
+            o.IgnoreCertificateError = IgnoreCertificateError;
         });
         scopes = scopes ?? new List<string> { "openid", "profile", "role" };
         _adminOpenidAuth.ClientId = clientId;

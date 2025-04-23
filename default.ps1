@@ -18,7 +18,7 @@ function CopyFolder{
 		$TargetFolderPath
 	)
 	
-	$Excluded = (".template.config", "template.json", "*.csproj", "appsettings.json")
+	$Excluded = (".template.config", "template.json", "*.csproj", "appsettings.json", "sidClient.key", "sidClient.crt")
 	
 	if (Test-Path $TargetFolderPath) {	
 		Get-ChildItem -Path $TargetFolderPath -Recurse -Exclude $Excluded | Remove-Item -recurse -force
@@ -208,96 +208,96 @@ task buildTemplate {
 }
  
 task pack -depends release, compile, buildTemplate {
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.VerifiablePresentation\SimpleIdServer.IdServer.VerifiablePresentation.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Otp\SimpleIdServer.IdServer.Otp.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Provisioning.LDAP\SimpleIdServer.IdServer.Provisioning.LDAP.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Provisioning.SCIM\SimpleIdServer.IdServer.Provisioning.SCIM.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Store.SqlSugar\SimpleIdServer.IdServer.Store.SqlSugar.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Saml.Sp\SimpleIdServer.IdServer.Saml.Sp.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Swagger\SimpleIdServer.IdServer.Swagger.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.SqliteMigrations\SimpleIdServer.IdServer.SqliteMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.PostgreMigrations\SimpleIdServer.IdServer.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.MySQLMigrations\SimpleIdServer.IdServer.MySQLMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Notification.Fcm\SimpleIdServer.IdServer.Notification.Fcm.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Notification.Gotify\SimpleIdServer.IdServer.Notification.Gotify.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenidFederation\SimpleIdServer.OpenidFederation.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenidFederation.Store.EF\SimpleIdServer.OpenidFederation.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Authority.Federation\SimpleIdServer.Authority.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Rp.Federation\SimpleIdServer.Rp.Federation.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.VerifiablePresentation\SimpleIdServer.IdServer.VerifiablePresentation.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Domains\SimpleIdServer.IdServer.Domains.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Otp\SimpleIdServer.IdServer.Otp.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Helpers\SimpleIdServer.IdServer.Helpers.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Sms\SimpleIdServer.IdServer.Sms.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Pwd\SimpleIdServer.IdServer.Pwd.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Provisioning.LDAP\SimpleIdServer.IdServer.Provisioning.LDAP.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Provisioning.SCIM\SimpleIdServer.IdServer.Provisioning.SCIM.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.DPoP\SimpleIdServer.DPoP.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Configuration.Redis\SimpleIdServer.Configuration.Redis.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Store.SqlSugar\SimpleIdServer.IdServer.Store.SqlSugar.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.WsFederation\SimpleIdServer.IdServer.WsFederation.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Saml.Idp\SimpleIdServer.IdServer.Saml.Idp.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Saml.Sp\SimpleIdServer.IdServer.Saml.Sp.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.U2FClient\SimpleIdServer.IdServer.U2FClient.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Swagger\SimpleIdServer.IdServer.Swagger.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.SqliteMigrations\SimpleIdServer.IdServer.SqliteMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.PostgreMigrations\SimpleIdServer.IdServer.PostgreMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.SqlServerMigrations\SimpleIdServer.IdServer.SqlServerMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.MySQLMigrations\SimpleIdServer.IdServer.MySQLMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Notification.Fcm\SimpleIdServer.IdServer.Notification.Fcm.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Notification.Gotify\SimpleIdServer.IdServer.Notification.Gotify.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenidFederation\SimpleIdServer.OpenidFederation.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.OpenidFederation.Store.EF\SimpleIdServer.OpenidFederation.Store.EF.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Authority.Federation\SimpleIdServer.Authority.Federation.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.Rp.Federation\SimpleIdServer.Rp.Federation.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj -c $config --output $result_dir }
 	
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Domains\SimpleIdServer.Scim.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqliteMigrations\SimpleIdServer.Scim.SqliteMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Domains\SimpleIdServer.Scim.Domains.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SwashbuckleV6\SimpleIdServer.Scim.SwashbuckleV6.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqlServerMigrations\SimpleIdServer.Scim.SqlServerMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqliteMigrations\SimpleIdServer.Scim.SqliteMigrations.csproj -c $config --output $result_dir }
 	
-	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Did\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj -c $config $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj -c $config $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Did\SimpleIdServer.Vc\SimpleIdServer.Vc.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Did\SimpleIdServer.Vp\SimpleIdServer.Vp.csproj -c $config --output $result_dir }
 	
-	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer\SimpleIdServer.CredentialIssuer.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Domains\SimpleIdServer.CredentialIssuer.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Store\SimpleIdServer.CredentialIssuer.Store.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website\SimpleIdServer.CredentialIssuer.Website.csproj -c $config --no-build $versionSuffix --output $result_dir }	
+	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer\SimpleIdServer.CredentialIssuer.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Domains\SimpleIdServer.CredentialIssuer.Domains.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Store\SimpleIdServer.CredentialIssuer.Store.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website\SimpleIdServer.CredentialIssuer.Website.csproj -c $config --output $result_dir }	
 	
-	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger\SimpleIdServer.Webfinger.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger.Store.EF\SimpleIdServer.Webfinger.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger\SimpleIdServer.Webfinger.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger.Client\SimpleIdServer.Webfinger.Client.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Webfinger\SimpleIdServer.Webfinger.Store.EF\SimpleIdServer.Webfinger.Store.EF.csproj -c $config --output $result_dir }
 		
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Authentication.Saml\SimpleIdServer.FastFed.Authentication.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }	
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Client\SimpleIdServer.FastFed.Client.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Domains\SimpleIdServer.FastFed.Domains.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Provisioning.Scim\SimpleIdServer.FastFed.Provisioning.Scim.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed\SimpleIdServer.FastFed.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider\SimpleIdServer.FastFed.ApplicationProvider.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml\SimpleIdServer.FastFed.ApplicationProvider.Authentication.Saml.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim\SimpleIdServer.FastFed.ApplicationProvider.Provisioning.Scim.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Authentication.Saml\SimpleIdServer.FastFed.Authentication.Saml.csproj -c $config --output $result_dir }	
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Client\SimpleIdServer.FastFed.Client.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Domains\SimpleIdServer.FastFed.Domains.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider\SimpleIdServer.FastFed.IdentityProvider.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid\SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid\SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Provisioning.Scim\SimpleIdServer.FastFed.Provisioning.Scim.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj -c $config --output $result_dir }
 		
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder\FormBuilder.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.EF\FormBuilder.EF.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj -c $config --no-build $versionSuffix --output $result_dir }	
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.Tailwindcss\FormBuilder.Tailwindcss.csproj -c $config --no-build $versionSuffix --output $result_dir }	
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder\FormBuilder.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.EF\FormBuilder.EF.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj -c $config --output $result_dir }	
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.Tailwindcss\FormBuilder.Tailwindcss.csproj -c $config --output $result_dir }	
 	
-	exec { dotnet pack $base_dir\dataseeder\dataseeder\DataSeeder.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $base_dir\dataseeder\dataseeder\DataSeeder.csproj -c $config --output $result_dir }
 	
-	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --no-build $versionSuffix --output $result_dir }
+	exec { dotnet pack $source_dir\Templates\SimpleIdServer.Templates.csproj -c $config --output $result_dir }
 }
 
 task test {

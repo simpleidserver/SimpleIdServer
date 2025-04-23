@@ -15,6 +15,11 @@ public class TranslationRepository : ITranslationRepository
         _dbContext = dbContext;
     }
 
+    public void Add(Translation translation)
+    {
+        _dbContext.Translations.Add(translation);
+    }
+
     public Task<List<Translation>> GetAllByKey(string key, CancellationToken cancellationToken)
         => _dbContext.Translations.Where(t => t.Key == key).ToListAsync(cancellationToken);
 }

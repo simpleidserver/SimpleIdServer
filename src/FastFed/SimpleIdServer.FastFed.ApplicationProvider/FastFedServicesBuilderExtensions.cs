@@ -27,6 +27,7 @@ public static class FastFedServicesBuilderExtensions
     {
         if (callback == null) builder.Services.Configure<FastFedApplicationProviderOptions>(o => { });
         else builder.Services.Configure(callback);
+        builder.Services.AddMassTransit();
         builder.Services.AddTransient<IFastFedService, FastFedService>();
         builder.Services.AddTransient<IWebfingerClientFactory, WebfingerClientFactory>();
         builder.Services.AddTransient<IWebfingerUrlResolver, WebfingerUrlResolver>();

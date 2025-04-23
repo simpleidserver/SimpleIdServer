@@ -4,16 +4,16 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <ProjectReference Include="FormBuilder.MySQLMigrations.csproj" Version="6.0.*-*" />
-	  <ProjectReference Include="FormBuilder.PostgreMigrations.csproj" Version="6.0.*-*" />
-	  <ProjectReference Include="FormBuilder.SqliteMigrations.csproj" Version="6.0.*-*" />
-	  <ProjectReference Include="FormBuilder.SqlServerMigrations.csproj" Version="6.0.*-*" />
+	  <PackageReference Include="FormBuilder.MySQLMigrations" Version="6.0.*-*" />
+	  <PackageReference Include="FormBuilder.PostgreMigrations" Version="6.0.*-*" />
+	  <PackageReference Include="FormBuilder.SqliteMigrations" Version="6.0.*-*" />
+	  <PackageReference Include="FormBuilder.SqlServerMigrations" Version="6.0.*-*" />
+	  <PackageReference Include="FormBuilder.Tailwindcss" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Did.Key" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.VerifiablePresentation" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Otp" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Console" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Fido" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Notification.Fcm" Version="6.0.*-*" />
@@ -32,6 +32,10 @@
 	  <PackageReference Include="SimpleIdServer.IdServer.Federation" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Configuration" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Configuration.Redis" Version="6.0.*-*" />
+	  <PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
+	  <PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />
+	  <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
+	  <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
 	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
 	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />

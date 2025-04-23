@@ -44,13 +44,13 @@ public class ConfigureFastfedDataSeeder : BaseAfterDeploymentDataSeeder
     {
         using (var transaction = _transactionBuilder.Build())
         {
-            var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
-            var adminUser = await _userRepository.GetBySubject(DefaultUsers.Administrator.Name, Constants.DefaultRealm, cancellationToken);
+            var masterRealm = await _realmRepository.Get(SimpleIdServer.IdServer.Constants.DefaultRealm, cancellationToken);
+            var adminUser = await _userRepository.GetBySubject(DefaultUsers.Administrator.Name, SimpleIdServer.IdServer.Constants.DefaultRealm, cancellationToken);
             var scopeNames = AllClients.SelectMany(c => c.Scopes.Select(s => s.Name)).Distinct().ToList();
             var clientIds = AllClients.Select(c => c.ClientId).ToList();
-            var existingScopes = await _scopeRepository.GetByNames(Constants.DefaultRealm, scopeNames, cancellationToken);
-            var existingGroups = await _groupRepository.GetAllByStrictFullPath(Constants.DefaultRealm, AllGroups.Select(g => g.FullPath).ToList(), cancellationToken);
-            var existingClients = await _clientRepository.GetByClientIds(Constants.DefaultRealm, clientIds, cancellationToken);
+            var existingScopes = await _scopeRepository.GetByNames(SimpleIdServer.IdServer.Constants.DefaultRealm, scopeNames, cancellationToken);
+            var existingGroups = await _groupRepository.GetAllByStrictFullPath(SimpleIdServer.IdServer.Constants.DefaultRealm, AllGroups.Select(g => g.FullPath).ToList(), cancellationToken);
+            var existingClients = await _clientRepository.GetByClientIds(SimpleIdServer.IdServer.Constants.DefaultRealm, clientIds, cancellationToken);
             foreach (var scope in AllScopes)
             {
                 var existingScope = existingScopes.SingleOrDefault(s => s.Name == scope.Name);

@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using DataSeeder;
 using FormBuilder;
+using FormBuilder.Stores;
 using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
@@ -544,6 +545,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IDeviceAuthCodeRepository>(new DefaultDeviceAuthCodeRepository(new List<DeviceAuthCode>()));
         services.AddSingleton<IFileSerializedKeyStore>(new DefaultFileSerializedKeyStore(new List<SerializedFileKey>()));
         services.AddSingleton<IMessageBusErrorStore>(new DefaultMessageBusErrorStore(new List<MessageBusErrorMessage>()));
+        services.AddSingleton<IConfigurationDefinitionStore, DefaultConfigurationDefinitionStore>();
+        services.AddSingleton<ITemplateStore, DefaultTemplateStore>();
         services.AddSingleton<IIdentityProvisioningStore>(new DefaultIdentityProvisioningStore(new List<IdentityProvisioningDefinition>()));
         services.AddSingleton<IProvisioningStagingStore>(new DefaultProvisioningStagingStore(new List<ExtractedRepresentationStaging>()));
         services.AddTransient<ITransactionBuilder, DefaultTranslationBuilder>();

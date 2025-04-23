@@ -13,14 +13,17 @@ public class InitLanguageDataSeeder : BaseAfterDeploymentDataSeeder
 {
     private readonly ILanguageRepository _languageRepository;
     private readonly ITransactionBuilder _transactionBuilder;
+    private readonly ITranslationRepository _translationRepository;
 
     public InitLanguageDataSeeder(
         ILanguageRepository languageRepository,
         ITransactionBuilder transactionBuilder,
+        ITranslationRepository translationRepository,
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
     {
         _languageRepository = languageRepository;
         _transactionBuilder = transactionBuilder;
+        _translationRepository = translationRepository;
     }
 
     public override string Name => nameof(InitLanguageDataSeeder);
@@ -30,10 +33,21 @@ public class InitLanguageDataSeeder : BaseAfterDeploymentDataSeeder
         using (var transaction = _transactionBuilder.Build())
         {
             var existingLanguages = await _languageRepository.GetAll(cancellationToken);
-            var unknownLanguages = DefaultLanguages.All.Where(l => !existingLanguages.Any(el => el.Code == l.Code));
-            foreach (var unknownLanguage in unknownLanguages)
+            foreach(var language in DefaultLanguages.All)
             {
-                _languageRepository.Add(unknownLanguage);
+                var existingLanguage = existingLanguages.SingleOrDefault(l => l.Code == language.Code);
+                if (existingLanguage != null)
+                {
+                    var unknownDescriptions = language.Descriptions.Where(d => !existingLanguage.Descriptions.Any(ed => ed.Language == d.Language));
+                    foreach (var unknownDescription in unknownDescriptions)
+                    {
+                        _translationRepository.Add(unknownDescription);
+                    }
+                }
+                else
+                {
+                    _languageRepository.Add(language);
+                }
             }
 
             await transaction.Commit(cancellationToken);

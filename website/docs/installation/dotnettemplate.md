@@ -8,15 +8,17 @@ dotnet new --install SimpleIdServer.Templates
 
 This will add the following templates
 
-| Command line                 | Description                                                                                      |
-| ---------------------------- | ------------------------------------------------------------------------------------------------ |
-| dotnet new idserver          | Create Identity Server. By default, Entity Framework is configured to use SQLServer              |
-| dotnet new idserverwebsite   | Create Identity Server website. By default, Entity Framework is configured to use SQLServer      |
-| dotnet new scim              | Create SCIM Server.                                                                              |
-| dotnet new credissuer        | Create credential issuer API.                                                                    |
-| dotnet new credissueradminui | Create credential issuer administration UI.                                                      |
-| dotnet new fastfedappprov    | Create FastFed application provider                                                              |
-| dotnet new fastfedidprov     | Create FastFed identity provider                                                                 |
+| Command line                  | Description                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| dotnet new idserver           | Create Identity Server. By default, Entity Framework is configured to use SQLServer              |
+| dotnet new idserveradmin      | Create Identity Server website. By default, Entity Framework is configured to use SQLServer      |
+| dotnet new idserveradminempty | Create an administration website with a minimalistic implementation                              |
+| dotnet new scimempty          | Create SCIM server with a minimalistic implementation                                            |
+| dotnet new scim               | Create SCIM Server.                                                                              |
+| dotnet new credissuer         | Create credential issuer API.                                                                    |
+| dotnet new credissueradminui  | Create credential issuer administration UI.                                                      |
+| dotnet new fastfedappprov     | Create FastFed application provider                                                              |
+| dotnet new fastfedidprov      | Create FastFed identity provider                                                                 |
 
 ## Create Visual Studio Solution
 
@@ -78,7 +80,7 @@ create a web project named `IdServerWebsite` with the `SimpleIdServer.IdServer.W
 
 ```
 cd src
-dotnet new idserverwebsite -n IdServerWebsite
+dotnet new idserveradmin -n IdServerWebsite
 ```
 
 Run the `IdServerWebsite` project, it must listens on the url `https://localhost:5002/master/clients`.

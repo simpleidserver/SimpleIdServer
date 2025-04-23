@@ -41,13 +41,13 @@ public class ConfigureCredentialIssuerDataSeeder : BaseAfterDeploymentDataSeeder
     {
         using(var transaction = _transactionBuilder.Build())
         {
-            var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
+            var masterRealm = await _realmRepository.Get(SimpleIdServer.IdServer.Constants.DefaultRealm, cancellationToken);
             var scopeNames = AllClients.SelectMany(c => c.Scopes.Select(s => s.Name)).Distinct().ToList();
             var clientIds = AllClients.Select(c => c.ClientId).ToList();
-            var existingScopes = await _scopeRepository.GetByNames(Constants.DefaultRealm, scopeNames, cancellationToken);
-            var existingClients = await _clientRepository.GetByClientIds(Constants.DefaultRealm, clientIds, cancellationToken);
+            var existingScopes = await _scopeRepository.GetByNames(SimpleIdServer.IdServer.Constants.DefaultRealm, scopeNames, cancellationToken);
+            var existingClients = await _clientRepository.GetByClientIds(SimpleIdServer.IdServer.Constants.DefaultRealm, clientIds, cancellationToken);
             var university = UniversityDegree;
-            var existingPresentation = await _presentationDefinitionStore.GetByPublicId(university.PublicId, Constants.DefaultRealm, cancellationToken);
+            var existingPresentation = await _presentationDefinitionStore.GetByPublicId(university.PublicId, SimpleIdServer.IdServer.Constants.DefaultRealm, cancellationToken);
             foreach (var scope in AllScopes)
             {
                 var existingScope = existingScopes.SingleOrDefault(s => s.Name == scope.Name);

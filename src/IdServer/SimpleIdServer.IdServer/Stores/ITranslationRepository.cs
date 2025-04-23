@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Stores
+namespace SimpleIdServer.IdServer.Stores;
+
+public interface ITranslationRepository
 {
-    public interface ITranslationRepository
-    {
-        Task<List<Translation>> GetAllByKey(string key, CancellationToken cancellationToken);
-    }
+    void Add(Translation translation);
+    Task<List<Translation>> GetAllByKey(string key, CancellationToken cancellationToken);
 }

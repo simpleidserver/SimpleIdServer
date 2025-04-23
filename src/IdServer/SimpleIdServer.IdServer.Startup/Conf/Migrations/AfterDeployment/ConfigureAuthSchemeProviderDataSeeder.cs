@@ -40,9 +40,9 @@ public class ConfigureAuthSchemeProviderDataSeeder : BaseAfterDeploymentDataSeed
     {
         using (var transaction = _transactionBuilder.Build())
         {
-            var masterRealm = await _realmRepository.Get(Constants.DefaultRealm, cancellationToken);
+            var masterRealm = await _realmRepository.Get(SimpleIdServer.IdServer.Constants.DefaultRealm, cancellationToken);
             var existingDefinitions = await _authenticationSchemeProviderDefinitionRepository.GetAll(cancellationToken);
-            var existingInstances = await _authenticationSchemeProviderRepository.GetAll(Constants.DefaultRealm, cancellationToken);
+            var existingInstances = await _authenticationSchemeProviderRepository.GetAll(SimpleIdServer.IdServer.Constants.DefaultRealm, cancellationToken);
             var unknownDefinitions = AllAuthSchemeProviderDefinitions.Where(a => !existingDefinitions.Any(e => e.Name == a.Name)).ToList();
             var unknownInstances = AllAuthSchemeProviders.Where(a => !existingInstances.Any(e => e.Name == a.Name)).ToList();
             foreach(var unknownDefinition in unknownDefinitions)

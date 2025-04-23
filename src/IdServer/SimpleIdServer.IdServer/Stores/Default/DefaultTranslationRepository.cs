@@ -17,6 +17,11 @@ public class DefaultTranslationRepository : ITranslationRepository
         _translations = translations;
     }
 
+    public void Add(Translation translation)
+    {
+        _translations.Add(translation);
+    }
+
     public Task<List<Translation>> GetAllByKey(string key, CancellationToken cancellationToken)
     {
         var result = _translations.Where(t => t.Key == key).ToList();

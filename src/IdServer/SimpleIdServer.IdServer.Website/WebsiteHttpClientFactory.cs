@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Helpers;
@@ -22,8 +23,9 @@ namespace SimpleIdServer.IdServer.Website
         private readonly JsonWebTokenHandler _jsonWebTokenHandler;
         private readonly IRealmStore _realmStore;
         private readonly IAccessTokenStore _accessTokenStore;
+        private readonly ILogger<WebsiteHttpClientFactory> _logger;
 
-        public WebsiteHttpClientFactory(IRealmStore realmStore, IAccessTokenStore accessTokenStore, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions)
+        public WebsiteHttpClientFactory(IRealmStore realmStore, IAccessTokenStore accessTokenStore, IOptions<IdServerWebsiteOptions> idServerWebsiteOptions, ILogger<WebsiteHttpClientFactory> logger)
         {
             _realmStore = realmStore;
             _accessTokenStore = accessTokenStore;
@@ -36,6 +38,7 @@ namespace SimpleIdServer.IdServer.Website
                 }
             };
             _httpClient = new HttpClient(handler);
+            _logger = logger;
             _jsonWebTokenHandler = new JsonWebTokenHandler();
         }
 
@@ -43,7 +46,7 @@ namespace SimpleIdServer.IdServer.Website
         {
             var token = await GetAccessToken(currentRealm);
             _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.AccessToken);
-            var acceptLanguage = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            var acceptLanguage = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
             if (_httpClient.DefaultRequestHeaders.Contains("Language"))
             {
                 _httpClient.DefaultRequestHeaders.Remove("Language");

@@ -16,10 +16,10 @@ public class Dataseeder
     public static void Seed(WebApplicationBuilder builder, WebApplication app, StorageConfiguration configuration)
     {
         var basePath = Path.Combine(builder.Environment.ContentRootPath, "Schemas");
-        var userSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
-        var eidUserSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMResourceTypes.User);
-        var groupSchema = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
-        var entrepriseUser = SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUser.json"), SCIMResourceTypes.User);
+        var userSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
+        var eidUserSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EIDUserSchema.json"), SCIMResourceTypes.User);
+        var groupSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "GroupSchema.json"), SCIMResourceTypes.Group, true);
+        var entrepriseUser = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "EnterpriseUser.json"), SCIMResourceTypes.User);
         var schemas = new List<SCIMSchema>
         {
             userSchema,
@@ -67,7 +67,7 @@ public class Dataseeder
                 TargetResourceType = StandardSchemas.GroupSchema.ResourceType
             }
         };
-        var realms = SCIMConstants.StandardRealms;
+        var realms = SimpleIdServer.Scim.SCIMConstants.StandardRealms;
         if(configuration.Type == StorageTypes.MONGODB)
         {
             app.Services.EnsureMongoStoreDataMigrated(schemas, attributes, realms);

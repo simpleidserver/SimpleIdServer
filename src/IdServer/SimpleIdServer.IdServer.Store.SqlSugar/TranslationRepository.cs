@@ -16,6 +16,11 @@ public class TranslationRepository : ITranslationRepository
         _dbContext = dbContext;
     }
 
+    public void Add(Translation translation)
+    {
+        _dbContext.Client.InsertNav(SugarTranslation.Transform(translation));
+    }
+
     public async Task<List<Translation>> GetAllByKey(string key, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarTranslation>()

@@ -29,8 +29,8 @@ public class ConfigureFederationDataseeder : BaseAfterDeploymentDataSeeder
     {
         using (var transaction = _transactionBuilder.Build())
         {
-            var existingScope = await _scopeRepository.GetByName(Constants.DefaultRealm, ConfigureIdServerFederationDataseeder.FederationEntitiesScope.Name, cancellationToken);
-            var existingClient = await _clientRepository.GetByClientId(Constants.DefaultRealm, DefaultClients.SidAdminClientId, cancellationToken);
+            var existingScope = await _scopeRepository.GetByName(SimpleIdServer.IdServer.Constants.DefaultRealm, ConfigureIdServerFederationDataseeder.FederationEntitiesScope.Name, cancellationToken);
+            var existingClient = await _clientRepository.GetByClientId(SimpleIdServer.IdServer.Constants.DefaultRealm, DefaultClients.SidAdminClientId, cancellationToken);
             if (existingClient != null && existingScope != null)
             {
                 existingClient.Scopes.Add(existingScope);

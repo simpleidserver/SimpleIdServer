@@ -2,17 +2,22 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Website.Infrastructures;
+using System.Globalization;
 using System.Net;
 
 namespace SimpleIdServer.IdServer.Website.Middlewares;
 
 public class RealmMiddleware
 {
+    private const char _cookieSeparator = '|';
+    private const string _culturePrefix = "c=";
+    private const string _uiCulturePrefix = "uic=";
     private static List<string> _excludedRoutes = new List<string>
     {
         "/_blazor",
@@ -48,6 +53,7 @@ public class RealmMiddleware
 
     public async Task InvokeAsync(HttpContext context, IRealmStore realmStore, IWebsiteHttpClientFactory websiteHttpClientFactory)
     {
+        SetCulture(context);
         var path = context.Request.Path.Value;
         if (_excludedFileExtensions.Any(r => path.EndsWith(r)) 
             || _excludedRoutes.Any(r => path.StartsWith(r))
@@ -123,6 +129,45 @@ public class RealmMiddleware
             _logger.LogError(ex.ToString());
             return new List<Realm>();
         }
+    }
+
+    private static void SetCulture(HttpContext context)
+    {
+        var culture = GetCulture(context);
+        var cultureInfo = CultureInfo.GetCultureInfo(culture);
+        CultureInfo.CurrentCulture = cultureInfo;
+        CultureInfo.CurrentUICulture = cultureInfo;
+    }
+
+    private static string GetCulture(HttpContext context)
+    {
+        var defaultCookieName = CookieRequestCultureProvider.DefaultCookieName;
+        var cookie = context.Request.Cookies[defaultCookieName];
+        if(string.IsNullOrWhiteSpace(cookie))
+        {
+            return SimpleIdServer.IdServer.Constants.DefaultLanguage;
+        }
+
+        Span<Range> parts = stackalloc Range[3];
+        var valueSpan = cookie.AsSpan();
+        if (valueSpan.Split(parts, _cookieSeparator, StringSplitOptions.RemoveEmptyEntries) != 2)
+        {
+            return SimpleIdServer.IdServer.Constants.DefaultLanguage;
+        }
+
+        var potentialUICultureName = valueSpan[parts[1]];
+        if (!potentialUICultureName.StartsWith(_uiCulturePrefix, StringComparison.Ordinal))
+        {
+            return SimpleIdServer.IdServer.Constants.DefaultLanguage;
+        }
+
+        var uiCultureName = potentialUICultureName.Slice(_uiCulturePrefix.Length);
+        if (uiCultureName.IsEmpty)
+        {
+            return SimpleIdServer.IdServer.Constants.DefaultLanguage;
+        }
+
+        return uiCultureName.ToString();
     }
 
     private async Task<string> GetBaseUrl(string realm)

@@ -13,7 +13,14 @@ public static class FastFedServicesBuilderExtensions
         builder.Services.AddMassTransit((o) =>
         {
             o.AddConsumer<SidIntegrationEventsConsumer>();
-            if (massTransitOptions != null) massTransitOptions(o);
+            if (massTransitOptions != null)
+            {
+                massTransitOptions(o);
+            }
+            else
+            {
+                o.UsingInMemory();
+            }
         });
         return builder;
     }

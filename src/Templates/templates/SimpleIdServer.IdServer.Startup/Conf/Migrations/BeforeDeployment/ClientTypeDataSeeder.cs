@@ -47,6 +47,7 @@ public class ClientTypeDataSeeder : BaseBeforeDeploymentDataSeeder
                 client.ClientType = clientType;
             }
         });
+        await _dbcontext.SaveChangesAsync(cancellationToken);
     }
 
     private class OldClient

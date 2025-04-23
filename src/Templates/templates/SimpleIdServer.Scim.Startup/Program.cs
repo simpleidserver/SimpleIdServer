@@ -11,8 +11,8 @@ builder.Configuration
     .AddJsonFile("appsettings.json")
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
     .AddEnvironmentVariables();
-var conf = builder.Configuration.Get<StorageConfiguration>();
-var apiKeysConf = builder.Configuration.Get<ApiKeysConfiguration>();
+var conf = builder.Configuration.GetSection(nameof(StorageConfiguration)).Get<StorageConfiguration>();
+var apiKeysConf = builder.Configuration.GetSection(nameof(ApiKeysConfiguration)).Get<ApiKeysConfiguration>();
 ScimServerSetup.ConfigureScim(builder, conf, apiKeysConf);
 var app = builder.Build();
 Dataseeder.Seed(builder, app, conf);
@@ -22,3 +22,4 @@ app.UseSwaggerUI(c =>
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "SCIM API V1");
 });
 app.UseScim();
+app.Run();

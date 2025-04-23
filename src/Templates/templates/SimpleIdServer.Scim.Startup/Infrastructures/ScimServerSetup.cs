@@ -13,6 +13,7 @@ using SimpleIdServer.Scim.Startup.Configurations;
 using SimpleIdServer.Scim.Startup.Consumers;
 using System;
 using System.IO;
+using SimpleIdServer.Scim;
 
 namespace SimpleIdServer.Scim.Startup.Infrastructures;
 
@@ -24,7 +25,7 @@ public class ScimServerSetup
         var builder = webApplicationBuilder.Services.AddScim(o =>
             {
                 o.IgnoreUnsupportedCanonicalValues = false;
-            })
+            },true)
             .UpdateApiKeys(apiKeysConfiguration)
             .EnableSwagger()
             .ConfigureMassTransit(cb => ConfigureMessageBroker(webApplicationBuilder, cb, massTransitConf));

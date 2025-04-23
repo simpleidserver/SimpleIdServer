@@ -13,6 +13,7 @@ using SimpleIdServer.Scim.Startup.Configurations;
 using SimpleIdServer.Scim.Startup.Consumers;
 using System;
 using System.IO;
+using SimpleIdServer.Scim;
 
 namespace SimpleIdServer.Scim.Startup.Infrastructures;
 

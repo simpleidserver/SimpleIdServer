@@ -229,7 +229,7 @@ spec:
       subdomain: localhost
       containers:
       - name: scim-deploy
-        image: simpleidserver/scim:5.0.3
+        image: simpleidserver/scim:6.0.0
         ports:
           - containerPort: 80
         env:
@@ -238,7 +238,7 @@ spec:
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
               value: "password"
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
-              value: "/certificates/sid.pfx"
+              value: "/certificates/sid.pfx+2.p12"
             - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
               value: "true"
             - name: "StorageConfiguration__Type"
@@ -266,7 +266,7 @@ spec:
       subdomain: localhost
       containers:
       - name: idserver-deploy
-        image: simpleidserver/idserver:5.0.3
+        image: simpleidserver/idserver:6.0.0
         ports:
           - containerPort: 80
         env:
@@ -275,7 +275,7 @@ spec:
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
               value: "password"
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
-              value: "/certificates/sid.pfx"
+              value: "/certificates/sid.pfx+2.p12"
             - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
               value: "true"
             - name: "DistributedCacheConfiguration__ConnectionString"
@@ -309,7 +309,7 @@ spec:
       subdomain: localhost
       containers:
       - name: website-deploy
-        image: simpleidserver/website:5.0.3
+        image: simpleidserver/website:6.0.0
         ports:
           - containerPort: 80
         env:
@@ -318,7 +318,7 @@ spec:
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
               value: "password"
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
-              value: "/certificates/sid.pfx"
+              value: "/certificates/sid.pfx+2.p12"
             - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
               value: "true"
             - name: "DefaultSecurityOptions__Issuer"
@@ -350,7 +350,7 @@ spec:
       subdomain: localhost
       containers:
       - name: credentialissuer-deploy
-        image: simpleidserver/credentialissuer:5.0.3
+        image: simpleidserver/credentialissuer:6.0.0
         ports:
           - containerPort: 80
         env:
@@ -359,7 +359,7 @@ spec:
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
               value: "password"
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
-              value: "/certificates/sid.pfx"
+              value: "/certificates/sid.pfx+2.p12"
             - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
               value: "true"
             - name: "Authorization__Issuer"
@@ -385,7 +385,7 @@ spec:
       subdomain: localhost
       containers:
       - name: credentialissuerwebsite-deploy
-        image: simpleidserver/credentialissuerwebsite:5.0.3
+        image: simpleidserver/credentialissuerwebsite:6.0.0
         ports:
           - containerPort: 80
         env:
@@ -394,7 +394,7 @@ spec:
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Password"
               value: "password"
             - name: "ASPNETCORE_Kestrel__Certificates__Default__Path"
-              value: "/certificates/sid.pfx"
+              value: "/certificates/sid.pfx+2.p12"
             - name: "ASPNETCORE_FORWARDEDHEADERS_ENABLED"
               value: "true"
             - name: "DefaultSecurityOptions__Issuer"

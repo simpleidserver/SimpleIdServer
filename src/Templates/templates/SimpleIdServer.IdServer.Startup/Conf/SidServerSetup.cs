@@ -26,6 +26,7 @@ using SimpleIdServer.IdServer.TokenTypes;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using FormBuilder;
 using System.Transactions;
 
 namespace SimpleIdServer.IdServer.Startup.Conf;
@@ -47,6 +48,10 @@ public class SidServerSetup
                 }
             }, true)
             .IgnoreCertificateError()
+            .ConfigureFormBuilder(c =>
+            {
+                c.AddTailwindcss();
+            })
             .AddPwdAuthentication(true)
             .AddEmailAuthentication()
             .AddOtpAuthentication()

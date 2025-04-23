@@ -13,7 +13,6 @@
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
-    var path = uriProvider.GetActiveLastFormCssUrl(step?.FormRecordCorrelationId);
 }
 
 <component type="typeof(WorkflowViewer)"
@@ -25,8 +24,17 @@
            param-ErrorMessages="@Model.ErrorMessages"
            param-SuccessMessages="@Model.SuccessMessages"
            param-AntiforgeryToken="@Model.AntiforgeryToken"
-           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
+           param-Template="@Model.Template"/>
 
 @section Header {
-    <link rel="stylesheet" href="@path" />
+    @foreach (var cssStyle in Model.Template.CssStyles)
+    {
+        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
+    }
+
+    @foreach (var jsStyle in Model.Template.JsStyles)
+    {
+        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
+    }
 }

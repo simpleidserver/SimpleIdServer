@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using MassTransit;
 using SimpleIdServer.FastFed;
 using SimpleIdServer.FastFed.Apis.FastFedMetadata;
 using SimpleIdServer.FastFed.Client;
@@ -17,6 +18,7 @@ public static class ServiceCollectionExtensions
         if (cb == null) services.Configure<FastFedOptions>(o => { });
         else services.Configure(cb);
         services.AddHttpContextAccessor();
+        services.AddTransient<IRealmStore, RealmStore>();
         services.AddTransient<IIssuerResolver, IssuerResolver>();
         services.AddTransient<IHttpClientFactory, HttpClientFactory>();
         services.AddTransient<IFastFedClientFactory, FastFedClientFactory>();
