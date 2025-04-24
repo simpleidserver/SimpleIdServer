@@ -55,7 +55,7 @@ namespace SimpleIdServer.OpenIdConnect
         private SecurityKey _dPoPSecurityKey;
         private DateTime? _lastDPoPSecurityKeyRotationDateTime = null;
         private OpenIdConnectConfiguration? _configuration;
-        protected HttpClient Backchannel => Options.Backchannel; 
+        protected HttpClient Backchannel => Options.Backchannel;
         protected new OpenIdConnectEvents Events
         {
             get { return (OpenIdConnectEvents)base.Events; }
@@ -76,7 +76,7 @@ namespace SimpleIdServer.OpenIdConnect
 
         public override Task<bool> ShouldHandleRequestAsync()
         {
-            if(Options.IsRealmEnabled)
+            if (Options.IsRealmEnabled)
             {
                 return Task.FromResult($"/{_realmStore.Realm}{Options.CallbackPath}" == Request.Path);
             }
@@ -665,7 +665,7 @@ namespace SimpleIdServer.OpenIdConnect
                     ValidateLifetime = false,
                     IssuerSigningKey = jsonWebKey
                 });
-                if(!validationResult.IsValid)
+                if (!validationResult.IsValid)
                     return new AuthorizationExtractionResult { IsValid = false, ErrorResult = CustomHandlerRequestResults.ResponseSignatureIsInvalid };
                 return new AuthorizationExtractionResult { IsValid = true, OpenIdConnectMessage = new OpenIdConnectMessage(validationResult.Claims.Select(c => new KeyValuePair<string, string[]>(c.Key, new string[] { c.Value.ToString() }))) };
             }
@@ -1059,7 +1059,7 @@ namespace SimpleIdServer.OpenIdConnect
             if (Options.ClientAuthenticationType == ClientAuthenticationTypes.CLIENT_SECRET_POST)
                 tokenEndpointRequest.ClientSecret = Options.ClientSecret;
 
-            if(Options.ClientAuthenticationType == ClientAuthenticationTypes.PRIVATE_KEY_JWT)
+            if (Options.ClientAuthenticationType == ClientAuthenticationTypes.PRIVATE_KEY_JWT)
             {
                 var descriptor = new SecurityTokenDescriptor
                 {
@@ -1286,7 +1286,7 @@ namespace SimpleIdServer.OpenIdConnect
                     };
                     var handler = new JsonWebTokenHandler();
                     var request = handler.CreateToken(descriptor);
-                    if(Options.RequestType == RequestTypes.REQUEST)
+                    if (Options.RequestType == RequestTypes.REQUEST)
                     {
                         message.Parameters.Clear();
                         message.ClientId = clientId;
@@ -1323,7 +1323,7 @@ namespace SimpleIdServer.OpenIdConnect
             if ((Options.RequestType == RequestTypes.REQUEST || Options.RequestType == RequestTypes.PAR) && Options.SigningCredentials == null)
                 throw new InvalidOperationException("SigningCredentials is required when request type is equals to request");
 
-            if(!configuration.AdditionalData.ContainsKey(PushedAuthorizationRequestEndpoint) && Options.RequestType == RequestTypes.PAR)
+            if (!configuration.AdditionalData.ContainsKey(PushedAuthorizationRequestEndpoint) && Options.RequestType == RequestTypes.PAR)
                 throw new InvalidOperationException("Identity Server doesn't support PAR request");
 
             if (configuration.AdditionalData.ContainsKey(RequirePushedAuthorizationRequests) && bool.TryParse(configuration.AdditionalData[RequirePushedAuthorizationRequests].ToString(), out bool requiredPushedAuthorizationRequests) && requiredPushedAuthorizationRequests && Options.RequestType != RequestTypes.PAR)
@@ -1369,7 +1369,7 @@ namespace SimpleIdServer.OpenIdConnect
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, tokenEndpointRequest.TokenEndpoint ?? configuration?.TokenEndpoint);
             requestMessage.Content = new FormUrlEncodedContent(tokenEndpointRequest.Parameters);
             HttpResponseMessage responseMessage = null;
-            switch(Options.ClientAuthenticationType)
+            switch (Options.ClientAuthenticationType)
             {
                 case ClientAuthenticationTypes.CLIENT_SECRET_POST:
                 case ClientAuthenticationTypes.PRIVATE_KEY_JWT:
@@ -1492,7 +1492,7 @@ namespace SimpleIdServer.OpenIdConnect
                     RealmConfigurationManagers.Add(realm, configurationManager);
                 }
 
-                if(!RealmOpenidConfigurations.ContainsKey(realm))
+                if (!RealmOpenidConfigurations.ContainsKey(realm))
                 {
                     var configuration = await RealmConfigurationManagers[realm].GetConfigurationAsync(Context.RequestAborted);
                     RealmOpenidConfigurations.Add(realm, configuration);
