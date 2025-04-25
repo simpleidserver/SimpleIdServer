@@ -103,6 +103,28 @@ public static class AcrReducers
         };
     }
 
+    [ReducerMethod]
+    public static AcrsState ReduceCreateAcrWorkflowAction(AcrsState state, CreateAcrWorkflowAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static AcrsState ReduceCreateAcrWorkflowSuccessAction(AcrsState state, CreateAcrWorkflowSuccessAction action)
+    {
+        var acrs = state.Acrs.ToList();
+        var acr = acrs.Single(a => a.Value.Id == action.Id);
+        acr.Value.AuthenticationWorkflow = action.Workflow.Id;
+        return state with
+        {
+            IsLoading = false,
+            Acrs = acrs
+        };
+    }
+
     #endregion
 
     #region AcrState

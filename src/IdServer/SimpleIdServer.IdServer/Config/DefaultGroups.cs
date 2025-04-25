@@ -25,10 +25,7 @@ public static class DefaultGroups
     {
         get
         {
-            var roles = new List<Scope>
-            {
-                DefaultScopes.WebsiteAdministratorRole
-            };
+            var roles = new List<Scope>();
             roles.AddRange(DefaultScopes.AdministrativeScopes);
             return new Group
             {

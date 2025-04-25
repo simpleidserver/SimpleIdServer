@@ -33,11 +33,6 @@ public class InitAdministrativeScopeDataSeeder : BaseScopeDataseeder
                 await TryAddScope(scope, cancellationToken);
             }
 
-            foreach(var scope in DefaultScopes.AdministrativeRoScopes)
-            {
-                await TryAddScope(scope, cancellationToken);
-            }
-
             await transaction.Commit(cancellationToken);
         }
     }

@@ -28,9 +28,9 @@
             @if(!IsLoading)
             {
                 <WorkflowEditor Forms=@authenticationFormsState.Value.FormRecords 
-                    Workflow=@workflowState.Value.Value 
-                    WorkflowLayouts=@workflowLayoutListState.Value.Values
-                    Saved=@HandleSave></WorkflowEditor>
+                Workflow=@workflowState.Value.Value 
+                WorkflowLayouts=@workflowLayoutListState.Value.Values
+                Saved=@HandleSave></WorkflowEditor>
             }
         </RadzenCardLoader>
     </Authorized>
@@ -59,6 +59,10 @@
             SubscribeToAction<GetAcrSuccessAction>((act) =>
             {
                 dispatcher.Dispatch(new GetWorkflowAction { Id = act.Acr.AuthenticationWorkflow });
+            });
+            SubscribeToAction<GetWorkflowSuccessAction>((act) =>
+            {
+                StateHasChanged();
             });
             SubscribeToAction<UpdateWorkflowSuccessAction>((act) => {                
                 _saveWorkflow.Callback(true);

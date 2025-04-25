@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder;
+using FormBuilder.Builders;
 using FormBuilder.Helpers;
 using FormBuilder.Models;
 using FormBuilder.Repositories;
@@ -211,6 +212,43 @@ public class AuthenticationClassReferencesController : BaseController
                 activity?.SetStatus(ActivityStatusCode.Ok, "Authentication Class Reference has been removed");
                 return new NoContentResult();
             }
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateWorkflow([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using (var transaction = _transactionBuilder.Build())
+            {
+                prefix = prefix ?? Constants.DefaultRealm;
+                await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
+                var existingAcr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
+                if(existingAcr == null)
+                {
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.UNKNOWN_ACR, string.Format(Global.UnknownAcr, id));
+                }
+
+                var workflowId = Guid.NewGuid().ToString();
+                var workflow = WorkflowBuilder.New(workflowId, existingAcr.Name).Build(_dateTimeHelper.GetCurrent());
+                _workflowStore.Add(workflow);
+                existingAcr.AuthenticationWorkflow = workflowId;
+                await _workflowStore.SaveChanges(cancellationToken);
+                await transaction.Commit(cancellationToken);
+                return new ContentResult
+                {
+                    Content = JsonSerializer.Serialize(workflow),
+                    ContentType = "application/json",
+                    StatusCode = (int)HttpStatusCode.OK
+                };
+            }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
         }
     }
 }

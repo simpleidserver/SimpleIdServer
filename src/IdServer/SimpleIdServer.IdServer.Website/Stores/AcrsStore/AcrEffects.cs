@@ -142,7 +142,21 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
             };
             var workflowLayouts = JsonSerializer.Deserialize<List<WorkflowLayout>>(json, settings);
             dispatcher.Dispatch(new GetAllAuthenticationWorkflowLayoutsSuccessAction { WorkflowLayouts = workflowLayouts });
+        }
 
+        [EffectMethod]
+        public async Task Handle(CreateAcrWorkflowAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetBaseUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var httpResult = await httpClient.SendAsync(new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.Id}/workflow"),
+                Method = HttpMethod.Post
+            });
+            var json = await httpResult.Content.ReadAsStringAsync();
+            var workflow = JsonSerializer.Deserialize<WorkflowRecord>(json);
+            dispatcher.Dispatch(new CreateAcrWorkflowSuccessAction { Id = action.Id, Workflow = workflow });
         }
 
         private async Task<string> GetBaseUrl()
@@ -233,5 +247,26 @@ namespace SimpleIdServer.IdServer.Website.Stores.AcrsStore
     public class GetAllAuthenticationWorkflowLayoutsSuccessAction
     {
         public List<WorkflowLayout> WorkflowLayouts { get; set; }
+    }
+    
+    public class CreateAcrWorkflowAction
+    {
+        public string Id
+        {
+            get; set;
+        }
+    }
+
+    public class CreateAcrWorkflowSuccessAction
+    {
+        public string Id
+        {
+            get; set;
+        }
+
+        public WorkflowRecord Workflow
+        {
+            get; set;
+        }
     }
 }

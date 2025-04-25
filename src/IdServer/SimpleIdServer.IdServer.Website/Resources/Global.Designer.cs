@@ -1384,6 +1384,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Create workflow.
+        /// </summary>
+        public static string CreateWorkflow {
+            get {
+                return ResourceManager.GetString("CreateWorkflow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Credential issuer.
         /// </summary>
         public static string CredentialIssuer {

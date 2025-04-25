@@ -19,7 +19,7 @@ internal static class TailwindCssTemplate
                 .AddCustomJs(_jsContent)
                 .SetAuthModalClasses(
                     "bg-gray-50 dark:bg-gray-900 h-full",
-                    "flex flex-col items-center justify-center px-6 py-8 mx-auto h-full lg:py-0",
+                    "flex flex-col items-center px-6 py-8 mx-auto lg:py-0",
                     "w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700",
                     "p-6 space-y-4 md:space-y-6 sm:p-8"
                 )

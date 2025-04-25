@@ -363,6 +363,9 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("getAcr",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.AuthenticationClassReferences + "/{id}",
             defaults: new { controller = "AuthenticationClassReferences", action = "Get" });
+        webApplication.SidMapControllerRoute("createAcrWorkflow",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.AuthenticationClassReferences + "/{id}/workflow",
+            defaults: new { controller = "AuthenticationClassReferences", action = "CreateWorkflow" });
 
 
         webApplication.SidMapControllerRoute("searchIdProviders",

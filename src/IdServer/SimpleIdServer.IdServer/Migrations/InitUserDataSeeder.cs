@@ -14,6 +14,7 @@ public class InitUserDataSeeder : BaseAfterDeploymentDataSeeder
 {
     private readonly IUserRepository _userRepository;
     private readonly ITransactionBuilder _transactionBuilder;
+    private readonly IGroupRepository _groupRepository;
 
     public InitUserDataSeeder(
         IRealmRepository realmRepository,
@@ -23,6 +24,7 @@ public class InitUserDataSeeder : BaseAfterDeploymentDataSeeder
         IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
     {
         _userRepository = userRepository;
+        _groupRepository = groupRepository;
         _transactionBuilder = transactionBuilder;
     }
 

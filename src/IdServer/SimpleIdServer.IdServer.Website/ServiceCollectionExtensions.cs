@@ -29,7 +29,7 @@ public static class ServiceCollectionExtensions
 
     public static IdserverAdminBuilder AddIdserverAdmin(this IServiceCollection services, string issuer, Action<IdServerWebsiteOptions>? callbackOptions = null)
     {
-        services.AddControllers();
+        services.AddControllersWithViews();
         services.AddFluxor(o =>
         {
             o.ScanAssemblies(typeof(ServiceCollectionExtensions).Assembly);

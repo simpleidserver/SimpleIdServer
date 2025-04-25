@@ -65,7 +65,14 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAcr" Filterable="true" Property="Value.Name" Sortable="false" Title="@Global.Name" Width="80px">
                 <Template Context="data">
-                    <RadzenLink Path="@urlHelper.GetUrl($"/acrs/workflows/{data.Value.Id}")">@data.Value.Name</RadzenLink>
+                    @if(string.IsNullOrWhiteSpace(data.Value.AuthenticationWorkflow))
+                    {
+                        @data.Value.Name
+                    }
+                    else
+                    {
+                        <RadzenLink Path="@urlHelper.GetUrl($"/acrs/workflows/{data.Value.Id}")">@data.Value.Name</RadzenLink>
+                    }
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableAcr" Property="Value.DisplayName" Filterable="true" Sortable="false" Title="@Global.DisplayName" Width="80px" />
@@ -82,6 +89,7 @@
 @code {
     RadzenDataGrid<SelectableAcr> acrsGrid;
     [Inject] private IRealmStore realmStore { get; set; }
+    [Inject] private IOptions<IdServerWebsiteOptions> options { get; set; }
     [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
     bool selectAll = false;
     string activeRealm;
@@ -123,24 +131,44 @@
     {
         var authState = authenticationStateTask.Result;
         var user = authState.User;
-        var canManage = user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "/acrs/manage");
+        var realm = !options.Value.IsReamEnabled ? SimpleIdServer.IdServer.Constants.DefaultRealm : realmStore.Realm;
+        var canManage = user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value.Contains($"{realm}/acrs/manage"));
+        var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList() ?? new List<string>();
+        if (!acrIds.Contains(acr.Value.Id))
+        {
+            acrIds.Add(acr.Value.Id);
+        }
+
         var menuItems = new List<ContextMenuItem>();
         if (canManage)
         {
             menuItems.Add(new ContextMenuItem { Text = Global.Delete, Value = 1 });
+            if(acrIds.Count() == 1)
+            {
+                var selectedAcr = acrsState.Value.Acrs.Single(c => c.Value.Id == acrIds.First());
+                if (string.IsNullOrWhiteSpace(selectedAcr.Value.AuthenticationWorkflow))
+                {
+                    menuItems.Add(new ContextMenuItem { Text = Global.CreateWorkflow, Value = 2 });
+                }
+            }
         }
 
-        menuItems.Add(new ContextMenuItem { Text = Global.Demo, Value = 2 });
+        menuItems.Add(new ContextMenuItem { Text = Global.Demo, Value = 3 });
         contextMenuService.Open(args, menuItems, (a) =>
         {
             if (a.Value.Equals(1))
             {
-                var acrIds = acrsState.Value.Acrs?.Where(c => c.IsSelected).Select(c => c.Value.Id)?.ToList();
                 var act = new DeleteSelectedAcrsAction { Ids = acrIds };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();
             }
-            else if(a.Value.Equals(2)) 
+            else if(a.Value.Equals(2))
+            {
+                var act = new CreateAcrWorkflowAction { Id = acrIds.First() };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+            }
+            else if(a.Value.Equals(3)) 
             {
                 var url = GetDemoUrl(acr);
                 navigationManager.NavigateTo(url, true);
