@@ -3,6 +3,7 @@
 
 using DataSeeder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Store.EF;
 using System;
@@ -15,10 +16,15 @@ namespace SimpleIdServer.IdServer.Startup.Conf.Migrations.BeforeDeployment;
 public class ClientTypeDataSeeder : BaseBeforeDeploymentDataSeeder
 {
     private readonly StoreDbContext _dbcontext;
+    private readonly ILogger<StoreDbContext> _logger;
 
-    public ClientTypeDataSeeder(StoreDbContext dbcontext, IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
+    public ClientTypeDataSeeder(
+        StoreDbContext dbcontext,
+        ILogger<StoreDbContext> logger,
+        IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
     {
         _dbcontext = dbcontext;
+        _logger = logger;
     }
     public override string Name => "ClientTypeDataSeeder";
 
@@ -29,25 +35,32 @@ public class ClientTypeDataSeeder : BaseBeforeDeploymentDataSeeder
             return;
         }
 
-        var oldClients = await _dbcontext.Database.SqlQueryRaw<OldClient>("SELECT * FROM Clients").ToListAsync(cancellationToken);
-        oldClients.ForEach(c =>
+        try
         {
-            if (string.IsNullOrWhiteSpace(c.ClientType))
+            var oldClients = await _dbcontext.Database.SqlQueryRaw<OldClient>("SELECT * FROM Clients").ToListAsync(cancellationToken);
+            oldClients.ForEach(c =>
             {
-                return;
-            }
-
-            if (Enum.TryParse<ClientTypes>(c.ClientType, true, out var clientType))
-            {
-                var client = new Client
+                if (string.IsNullOrWhiteSpace(c.ClientType))
                 {
-                    Id = c.Id
-                };
-                _dbcontext.Attach(client);
-                client.ClientType = clientType;
-            }
-        });
-        await _dbcontext.SaveChangesAsync(cancellationToken);
+                    return;
+                }
+
+                if (Enum.TryParse<ClientTypes>(c.ClientType, true, out var clientType))
+                {
+                    var client = new Client
+                    {
+                        Id = c.Id
+                    };
+                    _dbcontext.Attach(client);
+                    client.ClientType = clientType;
+                }
+            });
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+        }
     }
 
     private class OldClient

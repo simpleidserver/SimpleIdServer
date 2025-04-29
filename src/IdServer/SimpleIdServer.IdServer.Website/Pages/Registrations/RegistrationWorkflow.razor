@@ -27,11 +27,23 @@
 
         <RadzenCardLoader Variant="Variant.Filled" IsLoading=@IsLoading>
             @if (!IsLoading)
-            {
-                <WorkflowEditor Forms=@registrationFormsState.Value.FormRecords
-                                Workflow=@workflowState.Value.Value
-                                WorkflowLayouts=@workflowLayoutListState.Value.Values
-                                Saved=@HandleSave></WorkflowEditor>
+            {                
+                <SidAuthorizeView Roles=@("/manualidprovisioning/manage")>
+                    <Authorized>
+                        <WorkflowEditor Forms=@registrationFormsState.Value.FormRecords
+                                        Workflow=@workflowState.Value.Value
+                                        WorkflowLayouts=@workflowLayoutListState.Value.Values
+                                        CanSave=true
+                                        Saved=@HandleSave></WorkflowEditor>
+                    </Authorized>
+                    <NotAuthorized>
+                        <WorkflowEditor Forms=@registrationFormsState.Value.FormRecords
+                                        Workflow=@workflowState.Value.Value
+                                        WorkflowLayouts=@workflowLayoutListState.Value.Values
+                                        CanSave=false
+                                        Saved=@HandleSave></WorkflowEditor>
+                    </NotAuthorized>
+                </SidAuthorizeView>
             }
         </RadzenCardLoader>
     </Authorized>

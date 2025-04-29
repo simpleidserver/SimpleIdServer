@@ -23,7 +23,14 @@
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/acrs/forms")" Text="@Global.Forms" />
             <RadzenBreadCrumbItem Text="@formState.Value.Form?.Name" />
         </RadzenBreadCrumb>
-        <FormEditorComponent Id="@id"></FormEditorComponent>
+        <SidAuthorizeView Roles="/acrs/manage">
+            <Authorized>
+                <FormEditorComponent Id="@id" CanSave=true></FormEditorComponent>
+            </Authorized>
+            <NotAuthorized>
+                <FormEditorComponent Id="@id" CanSave=false></FormEditorComponent>
+            </NotAuthorized>
+        </SidAuthorizeView>
     </Authorized>
     <NotAuthorized>
         @Global.NotAuthorized

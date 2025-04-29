@@ -27,20 +27,21 @@
     @if (formState.Value.Form != null && templateState.Value.Template != null)
     {
         <FormEditor Form=@formState.Value.Form
-        Saved=@HandleSave
-        Published=@HandlePublish
-        WorkflowLayout=@Layout
-        Template=@templateState.Value.Template
-        AllTemplates="@templatesState.Value.Templates"
-        SupportedLanguageCodes="@languagesState.Value.Codes"
-        TemplateSwitched="@HandleTemplateSwitched"
-        TemplateSaved=@HandleUpdateTemplate></FormEditor>
+            Saved=@HandleSave
+            Published=@HandlePublish
+            CanSave=@CanSave
+            WorkflowLayout=@Layout
+            Template=@templateState.Value.Template
+            AllTemplates="@templatesState.Value.Templates"
+            SupportedLanguageCodes="@languagesState.Value.Codes"
+            TemplateSwitched="@HandleTemplateSwitched"
+            TemplateSaved=@HandleUpdateTemplate></FormEditor>
     }
 </RadzenCardLoader>
 
 @code {
-    [Parameter]
-    public string Id { get; set; }
+    [Parameter] public string Id { get; set; }
+    [Parameter] public bool CanSave { get; set; }
     private ActionState<FormRecord, bool> _updateForm;
     private ActionState<FormRecord, FormRecord> _publishForm;
     private ActionState<Template, bool> _updateTemplate;

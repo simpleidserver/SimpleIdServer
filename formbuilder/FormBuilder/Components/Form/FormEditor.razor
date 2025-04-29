@@ -54,8 +54,11 @@
         <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" ButtonStyle="ButtonStyle.Secondary" />
         <RadzenButton Icon="draft" Text="Json" Click="@(() => SwitchPanel(FormPanelTypes.JSON))" ButtonStyle="ButtonStyle.Secondary" />
         <RadzenButton Icon="css" Text="Css" Click="@(() => SwitchPanel(FormPanelTypes.CSS))" ButtonStyle="ButtonStyle.Secondary" />
-        <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
-        <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
+        @if (CanSave)
+        {
+            <RadzenButton Icon="save" Text="Save" Style="margin-left: 5px" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
+            <RadzenButton Icon="publish" Text="Publish" Click="@(async() => await Publish())" Disabled="@isPublishDisabled" />
+        }
     </div>
     <RadzenSplitter>
         <!-- Toolbox -->
@@ -102,8 +105,8 @@
         <!-- Editor -->
         <RadzenSplitterPane Size="60%">
             <FormViewer @ref=formViewer
-                IsEditModeEnabled="true" 
-                Context="@context" />
+            IsEditModeEnabled="true" 
+            Context="@context" />
         </RadzenSplitterPane>
         <!-- Properties -->
         <RadzenSplitterPane Size="20%">
@@ -123,10 +126,10 @@
                 @if (panelType == FormPanelTypes.CSS)
                 {
                     <CssPanelComponent TemplateSaved="@(async(act) => await HandleTemplateSaved(act))" 
-                        TemplateSwitched="@(async(act) => HandleTemplateSwitched(act))"
-                        @bind-SelectedTemplate="@context.Template" 
-                        AllTemplates="@AllTemplates" 
-                        FormId="@Form.Id"></CssPanelComponent>
+                    TemplateSwitched="@(async(act) => HandleTemplateSwitched(act))"
+                    @bind-SelectedTemplate="@context.Template" 
+                    AllTemplates="@AllTemplates" 
+                    FormId="@Form.Id"></CssPanelComponent>
                 }
 
                 @if (panelType == FormPanelTypes.JSON)
@@ -148,6 +151,7 @@
     [Parameter] public EventCallback<ActionState<FormRecord, FormRecord>> Published { get; set; }
     [Parameter] public EventCallback<ActionState<Template, bool>> TemplateSaved { get; set; }
     [Parameter] public EventCallback<Template> TemplateSwitched { get; set; }
+    [Parameter] public bool CanSave { get; set; } = true;
 
     [Inject] public IUriProvider uriProvider { get; set; }
     [Inject] public IFormBuilderJsService formBuilderJsService { get; set; }

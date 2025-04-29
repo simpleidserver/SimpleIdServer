@@ -24,7 +24,14 @@
             <RadzenBreadCrumbItem Path="@urlHelper.GetUrl("/registrations/forms")" Text="@Global.Forms" />
             <RadzenBreadCrumbItem Text="@formState.Value.Form?.Name" />
         </RadzenBreadCrumb>
-        <FormEditorComponent Id="@id"></FormEditorComponent>
+        <SidAuthorizeView Roles="/manualidprovisioning/manage">
+            <Authorized>
+                <FormEditorComponent Id="@id" CanSave=true></FormEditorComponent>
+            </Authorized>
+            <NotAuthorized>
+                <FormEditorComponent Id="@id" CanSave=false></FormEditorComponent>
+            </NotAuthorized>
+        </SidAuthorizeView>
     </Authorized>
     <NotAuthorized>
         @Global.NotAuthorized

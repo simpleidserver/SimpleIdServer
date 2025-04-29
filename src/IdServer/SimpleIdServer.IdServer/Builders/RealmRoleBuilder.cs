@@ -47,7 +47,7 @@ public class RealmRoleBuilder
         {
             new Domains.Scope
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = $"{realm.Name}/{componentName}/view",
                 Name = $"{realm.Name}/{componentName}/view",
                 Component = componentName,
                 Action = ComponentActions.View,
@@ -66,7 +66,7 @@ public class RealmRoleBuilder
         {
             roles.Add(new Domains.Scope
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = $"{realm.Name}/{componentName}/manage",
                 Name = $"{realm.Name}/{componentName}/manage",
                 Component = componentName,
                 Action = ComponentActions.Manage,

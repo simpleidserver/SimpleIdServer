@@ -26,7 +26,10 @@
 
 <div class="header">
     <RadzenButton Icon="draft" ButtonStyle="ButtonStyle.Secondary" Text="Json" Click="@(() => ViewJson())" />
-    <RadzenButton Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
+    @if (CanSave)
+    {
+        <RadzenButton Style="margin-left: 5px" Icon="save" Text="Save" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
+    }
 </div>
 
 <RadzenSplitter>
@@ -62,6 +65,7 @@
     [Parameter] public WorkflowRecord Workflow { get; set; }
     [Parameter] public List<FormRecord> Forms { get; set; }
     [Parameter] public List<WorkflowLayout> WorkflowLayouts { get; set; }
+    [Parameter] public bool CanSave { get; set; } = true;
     [Parameter] public EventCallback<ActionState<WorkflowRecord, bool>> Saved { get; set; }
 
     [Inject] public NotificationService notificationService { get; set; }
