@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+	  <RootNamespace>FormBuilder.Startup</RootNamespace>
+  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.11" />
+		<PackageReference Include="Radzen.Blazor" Version="5.6.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\FormBuilder.EF\SidFormBuilder.EF.csproj" />
+	  <ProjectReference Include="..\FormBuilder.MySQLMigrations\SidFormBuilder.MySQLMigrations.csproj" />
+	  <ProjectReference Include="..\FormBuilder.PostgreMigrations\SidFormBuilder.PostgreMigrations.csproj" />
+	  <ProjectReference Include="..\FormBuilder.SqliteMigrations\SidFormBuilder.SqliteMigrations.csproj" />
+	  <ProjectReference Include="..\FormBuilder.SqlServerMigrations\SidFormBuilder.SqlServerMigrations.csproj" />
+	  <ProjectReference Include="..\FormBuilder.Tailwindcss\SidFormBuilder.Tailwindcss.csproj" />
+	  <ProjectReference Include="..\FormBuilder\SidFormBuilder.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="form.css">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+</Project>

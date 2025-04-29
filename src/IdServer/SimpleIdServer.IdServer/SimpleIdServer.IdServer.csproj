@@ -21,7 +21,7 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\..\..\dataseeder\dataseeder\DataSeeder.csproj" />
-	  <ProjectReference Include="..\..\..\formbuilder\FormBuilder\FormBuilder.csproj" />
+	  <ProjectReference Include="..\..\..\formbuilder\FormBuilder\SidFormBuilder.csproj" />
 	  <ProjectReference Include="..\..\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj" />
 	  <ProjectReference Include="..\..\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj" />

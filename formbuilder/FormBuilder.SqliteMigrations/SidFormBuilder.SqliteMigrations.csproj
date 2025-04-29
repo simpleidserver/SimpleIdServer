@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<RootNamespace>FormBuilder.SqliteMigrations</RootNamespace>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\FormBuilder.EF\SidFormBuilder.EF.csproj" />
+	  <ProjectReference Include="..\FormBuilder.MySQLMigrations\SidFormBuilder.MySQLMigrations.csproj" />
+	</ItemGroup>
+</Project>

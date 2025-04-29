@@ -227,19 +227,19 @@ public class SidServerSetup
             case StorageTypes.SQLSERVER:
                 b.UseSqlServer(conf.ConnectionString, o =>
                 {
-                    o.MigrationsAssembly("FormBuilder.SqlServerMigrations");
+                    o.MigrationsAssembly("SidFormBuilder.SqlServerMigrations");
                 });
                 break;
             case StorageTypes.POSTGRE:
                 b.UseNpgsql(conf.ConnectionString, o =>
                 {
-                    o.MigrationsAssembly("FormBuilder.PostgreMigrations");
+                    o.MigrationsAssembly("SidFormBuilder.PostgreMigrations");
                 });
                 break;
             case StorageTypes.MYSQL:
                 b.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString), o =>
                 {
-                    o.MigrationsAssembly("FormBuilder.MySQLMigrations");
+                    o.MigrationsAssembly("SidFormBuilder.MySQLMigrations");
                 });
                 break;
             case StorageTypes.INMEMORY:
@@ -248,7 +248,7 @@ public class SidServerSetup
             case StorageTypes.SQLITE:
                 b.UseSqlite(conf.ConnectionString, o =>
                 {
-                    o.MigrationsAssembly("FormBuilder.SqliteMigrations");
+                    o.MigrationsAssembly("SidFormBuilder.SqliteMigrations");
                 });
                 b.ConfigureWarnings(x => x.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.AmbientTransactionWarning));
                 break;

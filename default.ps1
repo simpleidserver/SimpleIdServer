@@ -287,13 +287,13 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Provisioning.Scim\SimpleIdServer.FastFed.Provisioning.Scim.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\FastFed\SimpleIdServer.FastFed.Store.EF\SimpleIdServer.FastFed.Store.EF.csproj -c $config --output $result_dir }
 		
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder\FormBuilder.csproj -c $config --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.EF\FormBuilder.EF.csproj -c $config --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj -c $config --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj -c $config --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj -c $config --output $result_dir }
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj -c $config --output $result_dir }	
-	exec { dotnet pack $base_dir\formbuilder\FormBuilder.Tailwindcss\FormBuilder.Tailwindcss.csproj -c $config --output $result_dir }	
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder\SidFormBuilder.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.EF\SidFormBuilder.EF.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.MySQLMigrations\SidFormBuilder.MySQLMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.PostgreMigrations\SidFormBuilder.PostgreMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqliteMigrations\SidFormBuilder.SqliteMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.SqlServerMigrations\SidFormBuilder.SqlServerMigrations.csproj -c $config --output $result_dir }	
+	exec { dotnet pack $base_dir\formbuilder\FormBuilder.Tailwindcss\SidFormBuilder.Tailwindcss.csproj -c $config --output $result_dir }	
 	
 	exec { dotnet pack $base_dir\dataseeder\dataseeder\DataSeeder.csproj -c $config --output $result_dir }
 	

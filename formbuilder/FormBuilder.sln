@@ -3,25 +3,25 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35208.52
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder", "FormBuilder\FormBuilder.csproj", "{D1BB821D-BA39-4B50-9DDD-B1D411B2FC58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder", "FormBuilder\SidFormBuilder.csproj", "{D1BB821D-BA39-4B50-9DDD-B1D411B2FC58}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.Startup", "FormBuilder.Startup\FormBuilder.Startup.csproj", "{7C37A6CA-6027-4BF6-9A90-4ADE8CDE2D2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder.Startup", "FormBuilder.Startup\SidFormBuilder.Startup.csproj", "{7C37A6CA-6027-4BF6-9A90-4ADE8CDE2D2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.Tests", "FormBuilder.Tests\FormBuilder.Tests.csproj", "{9DCD32D4-BA2A-4D75-8C05-4DAC4880E69C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder.Tests", "FormBuilder.Tests\SidFormBuilder.Tests.csproj", "{9DCD32D4-BA2A-4D75-8C05-4DAC4880E69C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.EF", "FormBuilder.EF\FormBuilder.EF.csproj", "{F7262589-9F63-4518-8367-A41406991159}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder.EF", "FormBuilder.EF\SidFormBuilder.EF.csproj", "{F7262589-9F63-4518-8367-A41406991159}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.SqlServerMigrations", "FormBuilder.SqlServerMigrations\FormBuilder.SqlServerMigrations.csproj", "{349A7CD5-422A-DE7E-5EFB-5D2215F33C1B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder.SqlServerMigrations", "FormBuilder.SqlServerMigrations\SidFormBuilder.SqlServerMigrations.csproj", "{349A7CD5-422A-DE7E-5EFB-5D2215F33C1B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Migrations", "01. Migrations", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.SqliteMigrations", "FormBuilder.SqliteMigrations\FormBuilder.SqliteMigrations.csproj", "{09E612F1-2510-804B-831F-051AAB5D1706}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder.SqliteMigrations", "FormBuilder.SqliteMigrations\SidFormBuilder.SqliteMigrations.csproj", "{09E612F1-2510-804B-831F-051AAB5D1706}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.MySQLMigrations", "FormBuilder.MySQLMigrations\FormBuilder.MySQLMigrations.csproj", "{C98BFCAE-A7C6-3E05-CE9F-6BA233EC4669}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder.MySQLMigrations", "FormBuilder.MySQLMigrations\SidFormBuilder.MySQLMigrations.csproj", "{C98BFCAE-A7C6-3E05-CE9F-6BA233EC4669}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.PostgreMigrations", "FormBuilder.PostgreMigrations\FormBuilder.PostgreMigrations.csproj", "{E3423A3E-4F07-10D7-98F4-90966BB91621}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder.PostgreMigrations", "FormBuilder.PostgreMigrations\SidFormBuilder.PostgreMigrations.csproj", "{E3423A3E-4F07-10D7-98F4-90966BB91621}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormBuilder.Tailwindcss", "FormBuilder.Tailwindcss\FormBuilder.Tailwindcss.csproj", "{2E2F75FB-66E5-4D58-BE48-797F853A145D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SidFormBuilder.Tailwindcss", "FormBuilder.Tailwindcss\SidFormBuilder.Tailwindcss.csproj", "{2E2F75FB-66E5-4D58-BE48-797F853A145D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataSeeder", "..\dataseeder\dataseeder\DataSeeder.csproj", "{CCB728BC-B371-708E-5339-FF6657DF453C}"
 EndProject

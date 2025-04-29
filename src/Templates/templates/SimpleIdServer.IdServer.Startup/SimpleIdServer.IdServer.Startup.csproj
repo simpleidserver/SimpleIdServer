@@ -4,11 +4,11 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="FormBuilder.MySQLMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="FormBuilder.PostgreMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="FormBuilder.SqliteMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="FormBuilder.SqlServerMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="FormBuilder.Tailwindcss" Version="6.0.*-*" />
+	  <PackageReference Include="SidFormBuilder.MySQLMigrations" Version="6.0.*-*" />
+	  <PackageReference Include="SidFormBuilder.PostgreMigrations" Version="6.0.*-*" />
+	  <PackageReference Include="SidFormBuilder.SqliteMigrations" Version="6.0.*-*" />
+	  <PackageReference Include="SidFormBuilder.SqlServerMigrations" Version="6.0.*-*" />
+	  <PackageReference Include="SidFormBuilder.Tailwindcss" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.Did.Key" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.VerifiablePresentation" Version="6.0.*-*" />
 	  <PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="6.0.*-*" />
