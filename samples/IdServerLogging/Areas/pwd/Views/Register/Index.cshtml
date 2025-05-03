@@ -1,0 +1,40 @@
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
+
+@{
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+}
+
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
+           param-Template="@Model.Template"/>
+
+@section Header {
+    @foreach (var cssStyle in Model.Template.CssStyles)
+    {
+        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
+    }
+
+    @foreach (var jsStyle in Model.Template.JsStyles)
+    {
+        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
+    }
+}

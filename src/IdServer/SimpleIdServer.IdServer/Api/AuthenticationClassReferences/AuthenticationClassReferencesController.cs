@@ -123,7 +123,7 @@ public class AuthenticationClassReferencesController : BaseController
     [HttpPost]
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddAuthenticationClassReferenceRequest request, CancellationToken cancellationToken)
     {
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add Authentication Class Reference"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add Authentication Class Reference"))
         {
             try
             {
@@ -184,7 +184,7 @@ public class AuthenticationClassReferencesController : BaseController
     [HttpDelete]
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove Authentication Class Reference"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove Authentication Class Reference"))
         {
             using (var transaction = _transactionBuilder.Build())
             {

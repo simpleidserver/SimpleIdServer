@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
 using DataSeeder;
+using FormBuilder;
 using Hangfire;
 using Hangfire.MySql;
 using Hangfire.PostgreSql;
@@ -14,6 +15,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer.Domains;
@@ -26,7 +30,6 @@ using SimpleIdServer.IdServer.TokenTypes;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using FormBuilder;
 using System.Transactions;
 
 namespace SimpleIdServer.IdServer.Startup.Conf;
@@ -35,6 +38,7 @@ public class SidServerSetup
 {
     public static void ConfigureIdServer(WebApplicationBuilder webApplicationBuilder, IdentityServerConfiguration configuration)
     {
+        ConfigureOpenTelemetry(webApplicationBuilder);
         var section = webApplicationBuilder.Configuration.GetSection(nameof(ScimClientOptions));
         var conf = section.Get<ScimClientOptions>();
         var idServerBuilder = webApplicationBuilder.AddSidIdentityServer(c =>
@@ -129,6 +133,27 @@ public class SidServerSetup
 
         ConfigureDistributedCache(webApplicationBuilder);
         ConfigureDataseeder(webApplicationBuilder);
+    }
+
+    private static void ConfigureOpenTelemetry(WebApplicationBuilder webApplicationBuilder)
+    {
+        var telemetry = webApplicationBuilder.Services.AddOpenTelemetry();
+
+        var resourceBuilder = telemetry.ConfigureResource(r => r.AddService(webApplicationBuilder.Environment.ApplicationName));
+        
+        telemetry.WithMetrics(m => m
+            .AddMeter(Counters.ServiceName)
+            .AddPrometheusExporter());
+
+        telemetry.WithTracing(t => t
+            .AddSource(Tracing.Names.UserInfo)
+            .AddSource(Tracing.Names.Api)
+            .AddSource(Tracing.Names.Register)
+            .AddSource(Tracing.Names.Token)
+            .AddSource(Tracing.Names.Authz)
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddConsoleExporter());
     }
 
     private static void ConfigureHangfire(WebApplicationBuilder webApplicationBuilder, IGlobalConfiguration configuration)

@@ -46,7 +46,7 @@ namespace SimpleIdServer.IdServer.Api.Token
         public async Task Handle(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
         {
             string token = null;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Revoke Token"))
+            using (var activity = Tracing.TokenActivitySource.StartActivity("Revoke Token"))
             {
                 try
                 {

@@ -153,7 +153,7 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] CertificateAuthority request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add certificate authority"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add certificate authority"))
         {
             try
             {
@@ -215,7 +215,7 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> Remove([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove certificate authority"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove certificate authority"))
         {
             try
             {
@@ -272,7 +272,7 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> RemoveClientCertificate([FromRoute] string prefix, string id, string clientCertificateId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove client certificate"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove client certificate"))
         {
             try
             {
@@ -316,7 +316,7 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> AddClientCertificate([FromRoute] string prefix, string id, [FromBody] AddClientCertificateRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add client certificate authority"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client certificate authority"))
         {
             try
             {

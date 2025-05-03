@@ -113,7 +113,7 @@ public class ScopesController : BaseController
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove scope"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove scope"))
         {
             try
             {
@@ -140,7 +140,7 @@ public class ScopesController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] Scope scope, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add scope"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add scope"))
         {
             try
             {
@@ -177,7 +177,7 @@ public class ScopesController : BaseController
     public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateScopeRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Update scope"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Update scope"))
         {
             try
             {
@@ -211,7 +211,7 @@ public class ScopesController : BaseController
     public async Task<IActionResult> AddClaimMapper([FromRoute] string prefix, string id, [FromBody] ScopeClaimMapper request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add claim mapping rule"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add claim mapping rule"))
         {
             try
             {
@@ -255,7 +255,7 @@ public class ScopesController : BaseController
     public async Task<IActionResult> RemoveClaimMapper([FromRoute] string prefix, string id, string mapperId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove scope claim mapper"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove scope claim mapper"))
         {
             try
             {
@@ -286,7 +286,7 @@ public class ScopesController : BaseController
     public async Task<IActionResult> UpdateClaimMapper([FromRoute] string prefix, string id, string mapperId, [FromBody] UpdateScopeClaimRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add claim mapping rule"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add claim mapping rule"))
         {
             try
             {
@@ -337,7 +337,7 @@ public class ScopesController : BaseController
     public async Task<IActionResult> UpdateResources([FromRoute] string prefix, string id, [FromBody] UpdateScopeResourcesRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity($"Update API resources of the scope {id}"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity($"Update API resources of the scope {id}"))
         {
             try
             {

@@ -65,7 +65,7 @@ public class ApiResourcesController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddApiResourceRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add API resource"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add API resource"))
         {
             try
             {
@@ -124,7 +124,7 @@ public class ApiResourcesController : BaseController
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity($"Remove API resource {id}"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity($"Remove API resource {id}"))
         {
             try
             {

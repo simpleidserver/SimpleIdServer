@@ -1,0 +1,71 @@
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+
+using DataSeeder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store.EF;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace IdServerLogging.Conf.Migrations.BeforeDeployment;
+
+public class ClientTypeDataSeeder : BaseBeforeDeploymentDataSeeder
+{
+    private readonly StoreDbContext _dbcontext;
+    private readonly ILogger<StoreDbContext> _logger;
+
+    public ClientTypeDataSeeder(
+        StoreDbContext dbcontext,
+        ILogger<StoreDbContext> logger,
+        IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
+    {
+        _dbcontext = dbcontext;
+        _logger = logger;
+    }
+    public override string Name => "ClientTypeDataSeeder";
+
+    protected override async Task Execute(CancellationToken cancellationToken)
+    {
+        if(_dbcontext.Database.IsInMemory())
+        {
+            return;
+        }
+
+        try
+        {
+            var oldClients = await _dbcontext.Database.SqlQueryRaw<OldClient>("SELECT * FROM Clients").ToListAsync(cancellationToken);
+            oldClients.ForEach(c =>
+            {
+                if (string.IsNullOrWhiteSpace(c.ClientType))
+                {
+                    return;
+                }
+
+                if (Enum.TryParse<ClientTypes>(c.ClientType, true, out var clientType))
+                {
+                    var client = new Client
+                    {
+                        Id = c.Id
+                    };
+                    _dbcontext.Attach(client);
+                    client.ClientType = clientType;
+                }
+            });
+            await _dbcontext.SaveChangesAsync(cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.ToString());
+        }
+    }
+
+    private class OldClient
+    {
+        public string Id { get; set; }
+        public string? ClientType { get; set; }
+    }
+}

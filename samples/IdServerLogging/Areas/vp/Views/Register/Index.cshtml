@@ -1,0 +1,154 @@
+﻿@using FormBuilder.Components.Workflow
+@using FormBuilder
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using System.Text.Json
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
+
+@{
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var qrCodeUrl = Model.Input["QrCodeUrl"].ToString();
+    var statusUrl = Model.Input["StatusUrl"].ToString();
+    var endRegisterUrl = Model.Input["EndRegisterUrl"].ToString();
+    var isCreated = Model.Input["IsCreated"].ToString();
+}
+
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
+           param-Template="@Model.Template" />
+
+@section Header {
+    @foreach (var cssStyle in Model.Template.CssStyles)
+    {
+        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
+    }
+
+    @foreach (var jsStyle in Model.Template.JsStyles)
+    {
+        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        let csharpReference;
+        var isInitialized = false;
+
+        var init = function () {
+            var getQrCodeUrl = "@qrCodeUrl";
+            var statusUrl = "@statusUrl";
+            var endRegisterURL = "@endRegisterUrl";
+            var isCreated = "@isCreated";
+
+            var displayError = function (errorJson) {
+                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
+            }
+
+            var viewQrCode = function (img) {
+                $("#generateQrCodeForm").attr("style", "display: none !important");
+                $("#qrCodeContainer").css("display", "");
+                $("#qrCodeContainer img").attr("src", img);
+            }
+
+            var displaySuccessMessage = function () {
+                csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
+                csharpReference.invokeMethodAsync("ClearErrorMessages");
+                csharpReference.invokeMethodAsync("SetInputData", isCreated, "true");
+                $("#generateQrCodeForm").attr("style", "display: none !important");
+                $("#qrCodeContainer").attr("style", "display: none !important");
+            }
+
+            async function register(state) {
+                let response = await fetch(endRegisterURL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        state: state
+                    }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                let responseJson = await response.json();
+                if (!responseJson.next_registration_url) {
+                    displaySuccessMessage();
+                } else {
+                    window.location.href = responseJson.next_registration_url;
+                }
+            }
+
+            async function checkStatus(state) {
+                setTimeout(async function () {
+                    let response = await fetch(statusUrl + "/" + state, {
+                        method: 'GET'
+                    });
+                    if (!response.ok) {
+                        let responseJson = await response.json();
+                        displayError(responseJson);
+                        await checkStatus(state);
+                        return;
+                    }
+
+                    register(state);
+                }, 1000);
+            }
+
+            async function displayQrCode(id) {
+                let response = await fetch(getQrCodeUrl + "/" + id, {
+                    method: 'GET'
+                });
+                if (!response.ok) {
+                    const json = await response.json();
+                    displayError(json);
+                    return;
+                }
+
+                const state = response.headers.get('state');
+                const blob = await response.blob();
+                const img = URL.createObjectURL(blob);
+                viewQrCode(img);
+                await checkStatus(state);
+            }
+
+            var tryListenForm = function () {
+                const elt = $(".vpRegister");
+                if (isInitialized === true) return;
+                if (elt.length === 0) {
+                    setTimeout(() => tryListenForm(), 500);
+                    return;
+                }
+
+                isInitialized = true;
+                elt.submit(function (e) {
+                    e.preventDefault();
+                    var id = $(e.target).serializeArray()[0].value;
+                    displayQrCode(id);
+                });
+            }
+
+            tryListenForm();
+        }
+
+        setCsharpReference = function (ref) {
+            csharpReference = ref;
+            init();
+        };
+    </script>
+}

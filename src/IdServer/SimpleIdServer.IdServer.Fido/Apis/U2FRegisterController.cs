@@ -213,6 +213,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                             RealmsName = prefix
                         });
                         _userRepository.Add(user);
+                        Counters.UserRegistered();
                     }
                     else
                     {

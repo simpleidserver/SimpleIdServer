@@ -118,7 +118,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> Delete([FromRoute] string prefix, [FromBody] RemoveGroupRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove group"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove group"))
             {
                 try
                 {
@@ -146,7 +146,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddGroupRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Add group"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Add group"))
             {
                 try
                 {
@@ -206,7 +206,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> AddRole([FromRoute] string prefix, string id, [FromBody] AddGroupRoleRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Add group role"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Add group role"))
             {
                 try
                 {
@@ -244,7 +244,7 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> RemoveRole([FromRoute] string prefix, string id, string roleId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove group role"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove group role"))
             {
                 try
                 {

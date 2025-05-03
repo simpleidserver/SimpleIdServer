@@ -57,7 +57,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             IEnumerable<string> scopeLst = null;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Token"))
+            using (var activity = Tracing.TokenActivitySource.StartActivity("Get Token"))
             {
                 using (var transaction = _transactionBuilder.Build())
                 {

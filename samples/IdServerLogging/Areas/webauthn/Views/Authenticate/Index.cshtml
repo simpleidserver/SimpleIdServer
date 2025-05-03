@@ -1,0 +1,166 @@
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@using System.Text.Json
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
+
+@{
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
+    var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
+    var beginLoginUrl = Model.Input["BeginLoginUrl"].ToString();
+    var endLoginUrl = Model.Input["EndLoginUrl"].ToString();
+}
+
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
+           param-Template="@Model.Template" />
+
+@section Header {
+    @foreach (var cssStyle in Model.Template.CssStyles)
+    {
+        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
+    }
+
+    @foreach (var jsStyle in Model.Template.JsStyles)
+    {
+        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        let csharpReference;
+
+        var init = function () {
+            var beginLoginUrl = "@beginLoginUrl";
+            var endLoginUrl = "@endLoginUrl";
+            var makeAssertionsUrl = "@makeAssertionsOptionsUrl";
+            var authenticateUrl = "@authenticateUrl";
+            var isInitialized = false;
+
+            var toggleBtn = function (isDisabled) {
+                $("#fido2Auth button[type='submit']").attr('disabled', isDisabled);
+            }
+
+            var displayError = function (errorJson) {
+                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
+            }
+
+            var tryListenForm = function () {
+                const elt = $("#webauthForm");
+                if (isInitialized === true) return;
+                if (elt.length === 0) {
+                    setTimeout(() => tryListenForm(), 500);
+                    return;
+                }
+
+                isInitialized = true;
+                elt.submit(function (e) {
+                    e.preventDefault();
+                    makeAssertionOptions(convertFormToJSON($(e.target)));
+                });
+            }
+
+            async function makeAssertion(credential, form, sessionId) {
+                let authData = new Uint8Array(credential.response.authenticatorData);
+                let clientDataJSON = new Uint8Array(credential.response.clientDataJSON);
+                let rawId = new Uint8Array(credential.rawId);
+                let sig = new Uint8Array(credential.response.signature);
+                const assertion = {
+                    id: credential.id,
+                    rawId: coerceToBase64Url(rawId),
+                    type: credential.type,
+                    extensions: credential.getClientExtensionResults(),
+                    response: {
+                        authenticatorData: coerceToBase64Url(authData),
+                        clientDataJSON: coerceToBase64Url(clientDataJSON),
+                        signature: coerceToBase64Url(sig)
+                    }
+                };
+                let response = await fetch(endLoginUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login: form.Login, session_id: sessionId, assertion: assertion }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    const json = await response.json();
+                    toggleBtn(false);
+                    displayError(json);
+                    return;
+                }
+
+
+                $("#webauthForm").unbind("submit");
+                $("#webauthForm input[name='SessionId']").val(sessionId);
+                $("#webauthForm input[name='Login']").removeAttr('disabled');
+                $("#webauthForm").trigger("submit");
+            }
+
+            async function makeAssertionOptions(form) {
+                toggleBtn(true);
+                let response = await fetch(beginLoginUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login: form.Login, credential_type: 'webauthn' }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+                const json = await response.json();
+                if (!response.ok) {
+                    toggleBtn(false);
+                    displayError(json);
+                    return;
+                }
+
+                const makeAssertionOptions = json["assertion"];
+                const sessionId = json["session_id"];
+                const challenge = makeAssertionOptions.challenge.replace(/-/g, "+").replace(/_/g, "/");
+                makeAssertionOptions.challenge = Uint8Array.from(atob(challenge), c => c.charCodeAt(0));
+                makeAssertionOptions.allowCredentials.forEach(function (listItem) {
+                    var fixedId = listItem.id.replace(/\_/g, "/").replace(/\-/g, "+");
+                    listItem.id = Uint8Array.from(atob(fixedId), c => c.charCodeAt(0));
+                });
+                let credential;
+                try {
+                    credential = await navigator.credentials.get({ publicKey: makeAssertionOptions })
+                } catch (err) {
+                    console.error(err);
+                    toggleBtn(false);
+                    return;
+                }
+
+                await makeAssertion(credential, form, sessionId);
+            }
+
+            tryListenForm();
+        };
+
+        setCsharpReference  = function(ref) {
+            console.log(ref);
+            csharpReference = ref;
+            init();
+        };
+    </script>
+}

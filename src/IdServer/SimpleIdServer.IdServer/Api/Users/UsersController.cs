@@ -151,7 +151,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPost]
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Add user"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Add user"))
             {
                 try
                 {
@@ -183,6 +183,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                             Realm = realm
                         });
                         _userRepository.Add(newUser);
+                        Counters.UserRegistered();
                         await transaction.Commit(cancellationToken);
                         activity?.SetStatus(ActivityStatusCode.Ok, "Add user success");
                         await _busControl.Publish(new AddUserSuccessEvent
@@ -221,7 +222,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateUserRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Update user"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Update user"))
             {
                 try
                 {
@@ -271,7 +272,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpDelete]
         public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove user"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove user"))
             {
                 try
                 {
@@ -304,7 +305,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPost]
         public async Task<IActionResult> UpdatePicture([FromRoute] string prefix, string id, IFormFile file, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Update user picture"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Update user picture"))
             {
                 try
                 {
@@ -338,7 +339,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> AddCredential([FromRoute] string prefix, string id, [FromBody] AddUserCredentialRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Add user's credential"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Add user's credential"))
             {
                 try
                 {
@@ -386,7 +387,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPut]
         public async Task<IActionResult> UpdateCredential([FromRoute] string prefix, string id, string credentialId, [FromBody] UpdateUserCredentialRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Update credential"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Update credential"))
             {
                 try
                 {
@@ -433,7 +434,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpDelete]
         public async Task<IActionResult> DeleteCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove credential"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove credential"))
             {
                 try
                 {
@@ -464,7 +465,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpGet]
         public async Task<IActionResult> DefaultCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Set default credential"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Set default credential"))
             {
                 try
                 {
@@ -501,7 +502,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPut]
         public async Task<IActionResult> UpdateClaims([FromRoute] string prefix, string id, [FromBody] UpdateUserClaimsRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Update claims"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Update claims"))
             {
                 try
                 {
@@ -558,7 +559,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> AddGroup([FromRoute] string prefix, string id, string groupId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Add user's group"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Add user's group"))
             {
                 try
                 {
@@ -608,7 +609,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RemoveGroup([FromRoute] string prefix, string id, string groupId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove user's group"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove user's group"))
             {
                 try
                 {
@@ -654,7 +655,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeConsent([FromRoute] string prefix, string id, string consentId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Revoke user's consent"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Revoke user's consent"))
             {
                 try
                 {
@@ -700,7 +701,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeSessions([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Revoke user's sessions"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Revoke user's sessions"))
             {
                 try
                 {
@@ -746,7 +747,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeSession([FromRoute] string prefix, string id, string sessionId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Revoke user's session"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Revoke user's session"))
             {
                 try
                 {
@@ -793,7 +794,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> UnlinkExternalAuthProvider([FromRoute] string prefix, string id, [FromBody] UnlinkExternalAuthProviderRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Unlink user's external authentication provider"))
+            using (var activity = Tracing.ApiActivitySource.StartActivity("Unlink user's external authentication provider"))
             {
                 try
                 {

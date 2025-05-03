@@ -1,0 +1,389 @@
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'AuditEvent.Claims' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'AuditEvent.Scopes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'BCAuthorize.Scopes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.AuthorizationDataTypes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.ClientRegistrationTypesSupported' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.Contacts' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.DefaultAcrValues' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.GrantTypes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.PostLogoutRedirectUris' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.RedirectionUrls' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.ResponseTypes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Client.SubjectSyntaxTypesSupported' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Consent.Claims' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'DeviceAuthCode.Scopes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'ExtractedRepresentationStaging.GroupIds' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'MessageBusErrorMessage.Exceptions' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'PresentationDefinitionInputDescriptorConstraint.Path' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'UMAPendingRequest.Scopes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'UMAPermissionTicketRecord.Scopes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'UMAResource.Scopes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'UMAResourcePermission.Scopes' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model
+There are multiple relationships between 'TemplateStyle' and 'Template' without configured foreign key properties. This will cause Entity Framework to create shadow properties on 'TemplateStyle' with names dependent on the discovery order. Consider configuring the foreign key properties using the [ForeignKey] attribute or in 'OnModelCreating'.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'FormRecord.Elements' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Template.Elements' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Template.Styles' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The property 'Template.Windows' is a collection or enumeration type with a value converter but with no value comparer. Set a value comparer to ensure the collection/enumeration elements are compared correctly.
+
+[20:32:45 Warning] Microsoft.EntityFrameworkCore.Model.Validation
+The foreign key property 'TemplateStyle.TemplateId1' was created in shadow state because a conflicting property with the simple name 'TemplateId' exists in the entity type, but is either not mapped, is already used for another relationship, or is incompatible with the associated primary key type. See https://aka.ms/efcore-relationships for information on mapping relationships in EF Core.
+
+[20:32:48 Information] MassTransit
+Configured endpoint hangfire, Consumer: MassTransit.HangfireIntegration.ScheduleMessageConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint hangfire, Consumer: MassTransit.HangfireIntegration.ScheduleRecurringMessageConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint hangfire, Consumer: MassTransit.HangfireIntegration.PauseScheduledRecurringMessageConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint hangfire, Consumer: MassTransit.HangfireIntegration.ResumeScheduledRecurringMessageConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint ExtractUsersFault, Consumer: SimpleIdServer.IdServer.Provisioning.ExtractUsersFaultConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint ImportUsersFault, Consumer: SimpleIdServer.IdServer.Provisioning.ImportUsersFaultConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint IdServerEvents, Consumer: SimpleIdServer.IdServer.Consumers.IdServerEventsConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint IdServerEvents, Consumer: IdServerLogging.Consumers.IdServerEventsConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint extract-users, Consumer: SimpleIdServer.IdServer.Provisioning.ExtractUsersConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint import-users, Consumer: SimpleIdServer.IdServer.Provisioning.ImportUsersConsumer
+
+[20:32:48 Information] MassTransit
+Configured endpoint remove-realm, Consumer: SimpleIdServer.IdServer.Api.Realms.RemoveRealmCommandConsumer
+
+[20:32:50 Warning] Microsoft.AspNetCore.DataProtection.KeyManagement.XmlKeyManager
+No XML encryptor configured. Key {ce17ba99-edb2-4ff6-a0d1-b8ff3bd6372d} may be persisted to storage in unencrypted form.
+
+[20:32:50 Debug] MassTransit.Transports.BusDepot
+Starting bus instances: IBus
+
+[20:32:50 Debug] MassTransit
+Starting bus: "loopback://localhost/"
+
+[20:32:51 Debug] MassTransit
+Endpoint Ready: "loopback://localhost/hangfire"
+
+[20:32:51 Debug] MassTransit
+Endpoint Ready: "loopback://localhost/ImportUsersFault"
+
+[20:32:51 Debug] MassTransit
+Endpoint Ready: "loopback://localhost/ExtractUsersFault"
+
+[20:32:51 Debug] MassTransit
+Endpoint Ready: "loopback://localhost/IdServerEvents"
+
+[20:32:51 Debug] MassTransit
+Endpoint Ready: "loopback://localhost/extract-users"
+
+[20:32:51 Debug] MassTransit
+Endpoint Ready: "loopback://localhost/import-users"
+
+[20:32:51 Debug] MassTransit
+Endpoint Ready: "loopback://localhost/remove-realm"
+
+[20:32:51 Debug] MassTransit
+Endpoint Ready: "loopback://localhost/MILI_IdServerLogging_bus_kb1oyy8ypwex6i1wbdqawh88r5"
+
+[20:32:51 Information] Hangfire.BackgroundJobServer
+Starting Hangfire Server using job storage: 'In-Memory Storage'
+
+[20:32:51 Information] Hangfire.BackgroundJobServer
+Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'mt-message-queue'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop BackgroundServerProcess:679a6752 has started in 3,0573 ms
+
+[20:32:51 Information] MassTransit
+Bus started: "loopback://localhost/"
+
+[20:32:51 Information] Hangfire.Server.BackgroundServerProcess
+Server mt-server-50650000e06d10ff42df08dd8a70e937:25936:31ea2de3 successfully announced in 0,6323 ms
+
+[20:32:51 Information] Hangfire.Server.BackgroundServerProcess
+Server mt-server-50650000e06d10ff42df08dd8a70e937:25936:31ea2de3 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, Worker, DelayedJobScheduler, RecurringJobScheduler...
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop ServerHeartbeatProcess:6108fce9 has started in 2,2165 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop ServerWatchdog:f7cfc44b has started in 2,4328 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop ServerJobCancellationWatcher:d14b71d3 has started in 3,3739 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:8a41fd29 has started in 6,4936 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:27593dbe has started in 7,7405 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:ab8d13e2 has started in 9,274 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:d7f3519c has started in 11,2906 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:f66fd9ce has started in 13,4609 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:b8debe49 has started in 14,8847 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:c753978b has started in 16,5834 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:b732fa09 has started in 18,3603 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:03bad5d2 has started in 20,0533 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:1aa26fb2 has started in 22,3163 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:142d6ed9 has started in 23,7158 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:d9ced435 has started in 25,9382 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:8f59ada9 has started in 27,21 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:8ac455fa has started in 29,5917 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:6127a1f7 has started in 30,8059 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:b636fbc7 has started in 33,2059 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:cdcd7be2 has started in 34,566 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:10afb714 has started in 37,1572 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:173b6d3e has started in 38,6083 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:9b9e339d has started in 40,8579 ms
+
+[20:32:51 Information] Hangfire.Server.BackgroundServerProcess
+Server mt-server-50650000e06d10ff42df08dd8a70e937:25936:31ea2de3 all the dispatchers started
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop DelayedJobScheduler:cca6e2f4 has started in 5,7088 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop RecurringJobScheduler:7aeeead1 has started in 7,5852 ms
+
+[20:32:51 Debug] Hangfire.Server.RecurringJobScheduler
+1 recurring job(s) processed by scheduler.
+
+[20:32:51 Information] Microsoft.Hosting.Lifetime
+Now listening on: https://localhost:5001
+
+[20:32:51 Information] Microsoft.Hosting.Lifetime
+Now listening on: https://0.0.0.0:5001
+
+[20:32:51 Information] Microsoft.Hosting.Lifetime
+Now listening on: http://0.0.0.0:81
+
+[20:32:51 Information] Hangfire.BackgroundJobServer
+Starting Hangfire Server using job storage: 'In-Memory Storage'
+
+[20:32:51 Information] Hangfire.BackgroundJobServer
+Using the following options for Hangfire Server:
+    Worker count: 20
+    Listening queues: 'default'
+    Shutdown timeout: 00:00:15
+    Schedule polling interval: 00:00:15
+
+[20:32:51 Information] Microsoft.Hosting.Lifetime
+Application started. Press Ctrl+C to shut down.
+
+[20:32:51 Information] Microsoft.Hosting.Lifetime
+Hosting environment: Development
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop BackgroundServerProcess:85238b53 has started in 3,1531 ms
+
+[20:32:51 Information] Microsoft.Hosting.Lifetime
+Content root path: C:\Projects\SimpleIdServer\samples\IdServerLogging
+
+[20:32:51 Information] Hangfire.Server.BackgroundServerProcess
+Server mili:25936:2b0b0de4 successfully announced in 0,0898 ms
+
+[20:32:51 Information] Hangfire.Server.BackgroundServerProcess
+Server mili:25936:2b0b0de4 is starting the registered dispatchers: ServerWatchdog, ServerJobCancellationWatcher, Worker, DelayedJobScheduler, RecurringJobScheduler...
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop ServerHeartbeatProcess:96bbcc96 has started in 3,3819 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop ServerWatchdog:06774764 has started in 2,9112 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop ServerJobCancellationWatcher:c4ca8f38 has started in 5,8161 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:cafa754c has started in 4,4704 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:593ff969 has started in 8,1524 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:cb5723e4 has started in 10,4779 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:4919c0c7 has started in 13,748 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:611a43e9 has started in 16,0727 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:c8865074 has started in 18,8907 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:a7be12de has started in 21,2531 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:49aa2249 has started in 23,5282 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:ba139265 has started in 26,6857 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:3629bb57 has started in 28,6904 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:3ac0831d has started in 31,8893 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:81d1e5f5 has started in 35,5829 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:8a817c41 has started in 38,0238 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:dc0e5957 has started in 41,2179 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:ed410db3 has started in 44,3161 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:7e1e41ae has started in 46,2265 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:b319fe23 has started in 48,6717 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:ac6c20ec has started in 51,1697 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:44a2a810 has started in 53,471 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop Worker:b65bd109 has started in 55,7177 ms
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop DelayedJobScheduler:10ce7e85 has started in 7,2435 ms
+
+[20:32:51 Information] Hangfire.Server.BackgroundServerProcess
+Server mili:25936:2b0b0de4 all the dispatchers started
+
+[20:32:51 Debug] Hangfire.Processing.BackgroundExecution
+Execution loop RecurringJobScheduler:5c2ccf5d has started in 5,768 ms
+
+[20:33:06 Debug] Hangfire.Server.RecurringJobScheduler
+1 recurring job(s) processed by scheduler.
+
+[20:33:21 Debug] Hangfire.Server.ServerHeartbeatProcess
+Server mt-server-50650000e06d10ff42df08dd8a70e937:25936:31ea2de3 heartbeat successfully sent
+
+[20:33:21 Debug] Hangfire.Server.RecurringJobScheduler
+1 recurring job(s) processed by scheduler.
+
+[20:33:21 Debug] Hangfire.Server.ServerHeartbeatProcess
+Server mili:25936:2b0b0de4 heartbeat successfully sent
+
+[20:33:36 Debug] Hangfire.Server.RecurringJobScheduler
+1 recurring job(s) processed by scheduler.
+
+[20:33:51 Debug] Hangfire.Server.ServerHeartbeatProcess
+Server mt-server-50650000e06d10ff42df08dd8a70e937:25936:31ea2de3 heartbeat successfully sent
+
+[20:33:51 Debug] Hangfire.Server.RecurringJobScheduler
+1 recurring job(s) processed by scheduler.
+
+[20:33:51 Debug] Hangfire.Server.ServerHeartbeatProcess
+Server mili:25936:2b0b0de4 heartbeat successfully sent
+

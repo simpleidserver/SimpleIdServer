@@ -65,7 +65,7 @@ public class AuthorizationController : Controller
     [HttpGet]
     public async Task Get([FromRoute] string prefix, [FromQuery] AuthorizationRequest request, CancellationToken token)
     {
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Get Authorization"))
+        using (var activity = Tracing.AuthzActivitySource.StartActivity("Get Authorization"))
         {
             var jObjBody = Request.Query.ToJObject();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
@@ -181,7 +181,7 @@ public class AuthorizationController : Controller
         var referer = string.Empty;
         if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
         var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Get authorization callback"))
+        using (var activity = Tracing.AuthzActivitySource.StartActivity("Authorization callback"))
         {
             try
             {

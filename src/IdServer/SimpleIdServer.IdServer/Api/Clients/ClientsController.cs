@@ -93,7 +93,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] Client request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add client"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client"))
         {
             try
             {
@@ -206,7 +206,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateClientRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Update client"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Update client"))
         {
             try
             {
@@ -281,7 +281,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateAdvanced([FromRoute] string prefix, string id, [FromBody] UpdateAdvancedClientSettingsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Update advanced client settings"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Update advanced client settings"))
         {
             try
             {
@@ -338,7 +338,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> RemoveScope([FromRoute] string prefix, string id, string name, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove client scope"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove client scope"))
         {
             try
             {
@@ -382,7 +382,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddScope([FromRoute] string prefix, string id, [FromBody] AddClientScopeRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add client scope"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client scope"))
         {
             try
             {
@@ -495,7 +495,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddSigKey([FromRoute] string prefix, string id, [FromBody] AddSigKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add client signature key"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client signature key"))
         {
             try
             {
@@ -550,7 +550,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddEncKey([FromRoute] string prefix, string id, [FromBody] AddSigKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add client encryption key"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client encryption key"))
         {
             try
             {
@@ -605,7 +605,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> RemoveKey([FromRoute] string prefix, string id, string keyId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove client key"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove client key"))
         {
             try
             {
@@ -649,7 +649,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateCredentials([FromRoute] string prefix, string id, [FromBody] UpdateClientCredentialsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Update client credentials"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Update client credentials"))
         {
             try
             {
@@ -706,7 +706,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddRole([FromRoute] string prefix, string id, [FromBody] AddClientRoleRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add client role"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client role"))
         {
             try
             {
@@ -771,7 +771,7 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateRealms([FromRoute] string prefix, string id, [FromBody] UpdateClientRealmsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Update client realms"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Update client realms"))
         {
             try
             {

@@ -1,0 +1,132 @@
+﻿@using FormBuilder
+@using FormBuilder.Components.Workflow
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
+@using System.Text.Json
+@using System.Text.Json.Nodes
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
+
+@{
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "mobile" });
+    var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "mobile" });
+    var jsonObj = JsonSerializer.Deserialize<JsonObject>(Model.Input.ToString());
+    var beginLoginUrl = Model.Input["BeginLoginUrl"].ToString();
+    var loginStatusUrl = Model.Input["LoginStatusUrl"].ToString();
+}
+
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
+           param-Template="@Model.Template" />
+
+@section Header {
+    @foreach (var cssStyle in Model.Template.CssStyles)
+    {
+        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
+    }
+
+    @foreach (var jsStyle in Model.Template.JsStyles)
+    {
+        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        let csharpReference;
+        var isInitialized = false;
+        var init = function() {
+            var beginLoginUrl = "@beginLoginUrl";
+            var loginStatusUrl = "@loginStatusUrl";
+
+            var displayError = function (errorJson) {
+                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
+            }
+
+            var displayQRCode = function (img) {
+                $("#generateQrCodeForm").css("display", "none");
+                $("#qrCodeContainer").css("display", "");
+                $("#qrCodeContainer img").attr("src", img);
+            }
+
+            async function checkStatus(sessionId) {
+                setTimeout(async function () {
+                    let response = await fetch(loginStatusUrl + "/" + sessionId, {
+                        method: 'GET'
+                    });
+                    if (!response.ok) {
+                        let responseJson = await response.json();
+                        displayError(responseJson);
+                        await checkStatus(sessionId);
+                    } else {
+                        $("#generateQrCodeForm").unbind("submit");
+                        $("#generateQrCodeForm input[name='Login']").removeAttr('disabled');
+                        $("#generateQrCodeForm input[name='SessionId']").val(sessionId);
+                        $("#generateQrCodeForm").trigger("submit");
+                    }
+                }, 1000);
+            }
+
+            async function makeAssertionOptions(form) {
+                let response = await fetch(beginLoginUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login: form.Login, credential_type: 'mobile' }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+                if (!response.ok) {
+                    const json = await response.json();
+                    displayError(json);
+                    return;
+                }
+
+                const sessionId = response.headers.get('SessionId');
+                const qrCode = response.headers.get('QRCode');
+                const blob = await response.blob();
+                const img = URL.createObjectURL(blob);
+
+                displayQRCode(img);
+                await checkStatus(sessionId);
+            }
+
+            var tryListenForm = function () {
+                const elt = $("#generateQrCodeForm");
+                if (isInitialized === true) return;
+                if (elt.length === 0) {
+                    setTimeout(() => tryListenForm(), 500);
+                    return;
+                }
+
+                isInitialized = true;
+                elt.submit(function (e) {
+                    e.preventDefault();
+                    makeAssertionOptions(convertFormToJSON($(e.target)));
+                });
+            }
+
+            tryListenForm();
+        }
+
+        setCsharpReference = function (ref) {
+            csharpReference = ref;
+            init();
+        };
+    </script>
+}

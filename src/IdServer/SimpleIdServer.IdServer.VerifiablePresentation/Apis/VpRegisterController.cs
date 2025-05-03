@@ -119,6 +119,7 @@ public class VpRegisterController : BaseController
                     RealmsName = prefix
                 });
                 _userRepository.Add(user);
+                Counters.UserRegistered();
                 await transaction.Commit(cancellationToken);
                 return new VpEndRegisterResult();
             }

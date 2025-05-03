@@ -2,6 +2,7 @@
 
 namespace SimpleIdServer.IdServer.Startup
 {
+    /*
     public static class OtherFeatures
     {
         public static void ListenActivity()
@@ -20,4 +21,5 @@ namespace SimpleIdServer.IdServer.Startup
             ActivitySource.AddActivityListener(activityListener);
         }
     }
+    */
 }

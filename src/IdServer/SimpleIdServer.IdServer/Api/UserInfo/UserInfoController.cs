@@ -107,7 +107,7 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             string clientId = null;
             IEnumerable<string> scopes = new string[0];
             Domains.User user = null;
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Get UserInfo"))
+            using (var activity = Tracing.UserInfoSource.StartActivity("Get UserInfo"))
             {
                 try
                 {

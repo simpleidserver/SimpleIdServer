@@ -1,0 +1,179 @@
+﻿@using FormBuilder.Components.Workflow
+@using FormBuilder
+@using FormBuilder.Helpers
+@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options;
+@using SimpleIdServer.IdServer.Options;
+@using System.Text.Json
+@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@inject IOptions<FormBuilderOptions> options
+@inject IUriProvider uriProvider
+@inject IHttpContextAccessor HttpContextAccessor;
+
+@{
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
+    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
+    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var beginRegisterUrl = Model.Input["BeginRegisterUrl"].ToString();
+    var endRegisterUrl = Model.Input["EndRegisterUrl"].ToString();
+    var returnUrl = Model.Input["ReturnUrl"].ToString();
+    var isCreated = Model.Input["IsCreated"].ToString();
+}
+
+<component type="typeof(WorkflowViewer)"
+           render-mode="ServerPrerendered"
+           param-Input="@Model.Input"
+           param-Workflow="@Model.Workflow"
+           param-FormRecords="@Model.FormRecords"
+           param-CurrentStepId="@Model.CurrentStepId"
+           param-ErrorMessages="@Model.ErrorMessages"
+           param-SuccessMessages="@Model.SuccessMessages"
+           param-AntiforgeryToken="@Model.AntiforgeryToken"
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
+           param-Template="@Model.Template" />
+
+@section Header {
+    @foreach (var cssStyle in Model.Template.CssStyles)
+    {
+        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
+    }
+
+    @foreach (var jsStyle in Model.Template.JsStyles)
+    {
+        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        let csharpReference;
+
+        var init = function () {
+            var beginRegisterUrl = "@beginRegisterUrl";
+            var endRegisterUrl = "@endRegisterUrl";
+            var redirectUrl = "@returnUrl";
+            var isCreated = "@isCreated";
+            var isInitialized = false;
+
+            var displayError = function (errorJson) {
+                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
+            }
+
+            var displaySuccessMessage = function () {
+                csharpReference.invokeMethodAsync("SetSuccessMessage", "User is created");
+                csharpReference.invokeMethodAsync("ClearErrorMessages");
+                csharpReference.invokeMethodAsync("SetInputData", isCreated, "true");
+                $("#webauthForm").hide();
+            }
+
+            async function registerCredential(newCredential, sessionId, login, nextRegistrationRedirectUrl) {
+                let attestationObject = new Uint8Array(newCredential.response.attestationObject);
+                let clientDataJSON = new Uint8Array(newCredential.response.clientDataJSON);
+                let rawId = new Uint8Array(newCredential.rawId);
+                const serializedAuthenticatorAttestationRawResponse = {
+                    id: newCredential.id,
+                    rawId: coerceToBase64Url(rawId),
+                    type: newCredential.type,
+                    extensions: newCredential.getClientExtensionResults(),
+                    response: {
+                        attestationObject: coerceToBase64Url(attestationObject),
+                        clientDataJSON: coerceToBase64Url(clientDataJSON)
+                    }
+                };
+
+                let response = await fetch(endRegisterUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        attestation: serializedAuthenticatorAttestationRawResponse,
+                        login: login,
+                        session_id: sessionId
+                    }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+                let responseJson = await response.json();
+                if (!response.ok) {
+                    displayError(responseJson);
+                    return;
+                }
+
+                if (nextRegistrationRedirectUrl) {
+                    window.location.href = nextRegistrationRedirectUrl;
+                    return;
+                }
+
+                displaySuccessMessage();
+            }
+
+            async function makeCredential(login, displayName) {
+                let response = await fetch(beginRegisterUrl, {
+                    method: 'POST',
+                    body: JSON.stringify({ login: login, display_name: displayName, credential_type: 'webauthn' }),
+                    headers: {
+                        "Accept": "application/json",
+                        "Content-Type": "application/json"
+                    }
+                });
+                let responseJson = await response.json();
+                if (!response.ok) {
+                    displayError(responseJson);
+                    return;
+                }
+
+                let makeCredentialOptions = responseJson["credential_create_options"];
+                let sessionId = responseJson["session_id"];
+                let nextRegistrationRedirectUrl = null;
+                if (responseJson['next_registration_redirect_url']) {
+                    nextRegistrationRedirectUrl = responseJson['next_registration_redirect_url'];
+                }
+
+                makeCredentialOptions.challenge = coerceToArrayBuffer(makeCredentialOptions.challenge);
+                makeCredentialOptions.user.id = coerceToArrayBuffer(makeCredentialOptions.user.id);
+                makeCredentialOptions.excludeCredentials = makeCredentialOptions.excludeCredentials.map((c) => {
+                    c.id = coerceToArrayBuffer(c.id);
+                    return c;
+                });
+                if (makeCredentialOptions.authenticatorSelection.authenticatorAttachment === null) makeCredentialOptions.authenticatorSelection.authenticatorAttachment = undefined;
+                let newCredential;
+                try {
+                    newCredential = await navigator.credentials.create({
+                        publicKey: makeCredentialOptions
+                    });
+                } catch (e) {
+                    var msg = "Could not create credentials in browser. Probably because the username is already registered with your authenticator. Please change username or authenticator."
+                    console.error(msg, e);
+                    return;
+                }
+
+                await registerCredential(newCredential, sessionId, login, nextRegistrationRedirectUrl);
+            };
+
+            var tryListenForm = function () {
+                const elt = $("#webauthForm");
+                if (isInitialized === true) return;
+                if (elt.length === 0) {
+                    setTimeout(() => tryListenForm(), 500);
+                    return;
+                }
+
+                isInitialized = true;
+                elt.submit(function (e) {
+                    e.preventDefault();
+                    var login = $("#webauthForm input[name='Login']").val();
+                    var displayName = $("#webauthForm input[name='DisplayName']").val();
+                    makeCredential(login, displayName);
+                });
+            }
+
+            tryListenForm();
+        };
+
+        setCsharpReference = function (ref) {
+            csharpReference = ref;
+            init();
+        };
+    </script>
+}

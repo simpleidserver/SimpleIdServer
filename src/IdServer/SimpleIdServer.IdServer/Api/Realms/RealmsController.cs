@@ -98,7 +98,7 @@ public class RealmsController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddRealmRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Add realm"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Add realm"))
         {
             try
             {
@@ -221,7 +221,7 @@ public class RealmsController : BaseController
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Remove realm"))
+        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove realm"))
         {
             try
             {

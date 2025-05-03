@@ -100,6 +100,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
                     RealmsName = prefix
                 });
                 UserRepository.Add(user);
+                Counters.UserRegistered();
                 await transaction.Commit(CancellationToken.None);
                 result.SetSuccessMessage(Global.UserIsCreated);
                 viewModel.IsCreated = true;

@@ -48,7 +48,7 @@ public class TokenExchangePreAuthorizedCodeHandler : BaseCredentialsHandler
 
     public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
     {
-        using (var activity = Tracing.IdServerActivitySource.StartActivity("Exchange access token against pre-authorized_code"))
+        using (var activity = Tracing.TokenActivitySource.StartActivity("Exchange access token against pre-authorized_code"))
         {
             try
             {

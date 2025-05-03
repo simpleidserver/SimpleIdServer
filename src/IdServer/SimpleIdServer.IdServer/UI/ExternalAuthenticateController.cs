@@ -177,6 +177,7 @@ public class ExternalAuthenticateController : BaseAuthenticateController
                     user = _userTransformer.Transform(r, principal, idProvider);
                     user.AddExternalAuthProvider(scheme, sub);
                     UserRepository.Add(user);
+                    Counters.UserRegistered();
                 }
 
                 await transaction.Commit(cancellationToken);

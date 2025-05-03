@@ -61,7 +61,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
         [HttpPost]
         public async Task<IActionResult> Post([FromRoute] string prefix, CancellationToken token)
         {
-            using (var activity = Tracing.IdServerActivitySource.StartActivity("Start Pushed Authorization Request"))
+            using (var activity = Tracing.AuthzActivitySource.StartActivity("Start Pushed Authorization Request"))
             {
                 var jObjBody = Request.Form.ToJsonObject();
                 prefix = prefix ?? Constants.DefaultRealm;

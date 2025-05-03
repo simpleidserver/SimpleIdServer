@@ -84,6 +84,7 @@ const sidebars = {
         },
         'idserver/realm',
         'idserver/fapi2',
+        'idserver/logging',
         {
           type: 'category',
           label: 'Hosting',
