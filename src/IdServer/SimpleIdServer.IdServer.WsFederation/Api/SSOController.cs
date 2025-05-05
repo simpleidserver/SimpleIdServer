@@ -16,6 +16,7 @@ using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.WsFederation.Extensions;
+using System.Diagnostics;
 using System.Net;
 using System.Security.Claims;
 using System.Security.Cryptography.X509Certificates;
@@ -48,18 +49,24 @@ public class SSOController : BaseWsFederationController
     [HttpGet]
     public async Task<IActionResult> Login([FromRoute] string prefix, CancellationToken cancellationToken)
     {
-        var queryStr = Request.QueryString.Value;
-        var federationMessage = WsFederationMessage.FromQueryString(queryStr);
-        try
+        using (var activity = Tracing.IdserverActivitySource.StartActivity("WsFederation.Login"))
         {
-            if (federationMessage.IsSignInMessage)
-                return await SignIn(prefix, federationMessage, cancellationToken);
+            var queryStr = Request.QueryString.Value;
+            var federationMessage = WsFederationMessage.FromQueryString(queryStr);
+            try
+            {
+                if (federationMessage.IsSignInMessage)
+                {
+                    return await SignIn(prefix, federationMessage, cancellationToken);
+                }
 
-            return RedirectToAction("EndSession", "CheckSession");
-        }
-        catch(OAuthException ex)
-        {
-            return RedirectToAction("Index", "Errors", new { code = ex.Code, message = ex.Message });
+                return RedirectToAction("EndSession", "CheckSession");
+            }
+            catch (OAuthException ex)
+            {
+                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                return RedirectToAction("Index", "Errors", new { code = ex.Code, message = ex.Message });
+            }
         }
     }
 

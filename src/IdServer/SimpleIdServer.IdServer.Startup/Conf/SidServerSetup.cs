@@ -15,8 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
@@ -38,7 +38,6 @@ public class SidServerSetup
 {
     public static void ConfigureIdServer(WebApplicationBuilder webApplicationBuilder, IdentityServerConfiguration configuration)
     {
-        ConfigureOpenTelemetry(webApplicationBuilder);
         var section = webApplicationBuilder.Configuration.GetSection(nameof(ScimClientOptions));
         var conf = section.Get<ScimClientOptions>();
         var idServerBuilder = webApplicationBuilder.AddSidIdentityServer(c =>
@@ -111,6 +110,29 @@ public class SidServerSetup
             }, (c) =>
             {
                 ConfigureFormbuilderStorage(webApplicationBuilder, c);
+            })
+            .EnableOpenTelemetry(m =>
+            {
+
+            }, t =>
+            {
+                t.AddEntityFrameworkCoreInstrumentation(o =>
+                {
+                    o.EnrichWithIDbCommand = (activity, command) =>
+                    {
+                        var stateDisplayName = $"{command.CommandType} main";
+                        activity.DisplayName = stateDisplayName;
+                        activity.SetTag("db.name", stateDisplayName);
+                        activity.SetTag("db.text", command.CommandText);
+                    };
+                });
+                t.AddConsoleExporter();
+                t.AddOtlpExporter(o =>
+                {
+                    o.Endpoint = new Uri("https://api.honeycomb.io/v1/traces");
+                    o.Headers = $"x-honeycomb-team=ExZLneG9DeipnZSuVFomXI";
+                    o.Protocol = OtlpExportProtocol.HttpProtobuf;
+                });
             });
         if (configuration.IsForwardedEnabled)
         {
@@ -133,27 +155,6 @@ public class SidServerSetup
 
         ConfigureDistributedCache(webApplicationBuilder);
         ConfigureDataseeder(webApplicationBuilder);
-    }
-
-    private static void ConfigureOpenTelemetry(WebApplicationBuilder webApplicationBuilder)
-    {
-        var telemetry = webApplicationBuilder.Services.AddOpenTelemetry();
-
-        var resourceBuilder = telemetry.ConfigureResource(r => r.AddService(webApplicationBuilder.Environment.ApplicationName));
-        
-        telemetry.WithMetrics(m => m
-            .AddMeter(Counters.ServiceName)
-            .AddPrometheusExporter());
-
-        telemetry.WithTracing(t => t
-            .AddSource(Tracing.Names.UserInfo)
-            .AddSource(Tracing.Names.Api)
-            .AddSource(Tracing.Names.Register)
-            .AddSource(Tracing.Names.Token)
-            .AddSource(Tracing.Names.Authz)
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddConsoleExporter());
     }
 
     private static void ConfigureHangfire(WebApplicationBuilder webApplicationBuilder, IGlobalConfiguration configuration)

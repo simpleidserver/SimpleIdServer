@@ -34,6 +34,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public class IdServerBuilder
 {
+    private readonly WebApplicationBuilder _builder;
     private readonly IServiceCollection _serviceCollection;
     private readonly ISidRoutesStore _sidRoutesStore;
     private readonly AuthenticationBuilder _authBuilder;
@@ -44,8 +45,9 @@ public class IdServerBuilder
     private readonly SidAuthCookie _sidAuthCookie;
     private readonly SidHangfire _sidHangfire;
 
-    public IdServerBuilder(IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie, SidHangfire sidHangfire)
+    public IdServerBuilder(WebApplicationBuilder builder, IServiceCollection serviceCollection, AuthenticationBuilder authBuilder, FormBuilderRegistration formBuidler, IDataProtectionBuilder dataProtectionBuilder, IMvcBuilder mvcBuilder, AutomaticConfigurationOptions automaticConfigurationOptions, SidAuthCookie sidAuthCookie, SidHangfire sidHangfire)
     {
+        _builder = builder;
         _serviceCollection = serviceCollection;
         _authBuilder = authBuilder;
         _formBuilder = formBuidler;
@@ -57,6 +59,8 @@ public class IdServerBuilder
         _sidRoutesStore = new SidRoutesStore();
         _serviceCollection.AddSingleton(_sidRoutesStore);
     }
+
+    internal WebApplicationBuilder Builder => _builder;
 
     internal IServiceCollection Services => _serviceCollection;
 

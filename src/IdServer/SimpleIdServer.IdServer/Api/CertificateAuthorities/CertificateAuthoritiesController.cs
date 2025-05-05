@@ -153,13 +153,13 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] CertificateAuthority request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add certificate authority"))
+        using (var activity = Tracing.CaActivitySource.StartActivity("Ca.Add"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                     await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     activity?.SetTag("subjectName", request.SubjectName);
@@ -215,13 +215,14 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> Remove([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove certificate authority"))
+        using (var activity = Tracing.CaActivitySource.StartActivity("Ca.Remove"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.CaTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
                     var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
                     if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
@@ -272,13 +273,15 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> RemoveClientCertificate([FromRoute] string prefix, string id, string clientCertificateId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove client certificate"))
+        using (var activity = Tracing.CaActivitySource.StartActivity("Ca.RemoveClientCertificate"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.CaTagNames.Id, id);
+                    activity?.SetTag(Tracing.CaTagNames.ClientCertificateId, clientCertificateId);
                     await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
                     var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
                     if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
@@ -316,13 +319,14 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> AddClientCertificate([FromRoute] string prefix, string id, [FromBody] AddClientCertificateRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client certificate authority"))
+        using (var activity = Tracing.CaActivitySource.StartActivity("Ca.AddClientCertificate"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.CaTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ClientCertificateNames.SubjectName));

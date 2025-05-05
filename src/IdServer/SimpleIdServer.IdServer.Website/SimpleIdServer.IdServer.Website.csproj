@@ -23,6 +23,9 @@
 		<ProjectReference Include="..\SimpleIdServer.OpenIdConnect\SimpleIdServer.OpenIdConnect.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Website.OpenTelemetry" />
+	</ItemGroup>
+	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>

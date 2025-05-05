@@ -1,3 +1,5 @@
+using OpenTelemetry.Exporter;
+using OpenTelemetry.Trace;
 using SimpleIdServer.IdServer.Website.Startup;
 using SimpleIdServer.IdServer.Website.Startup.Components;
 
@@ -9,9 +11,18 @@ builder.Configuration.AddJsonFile("appsettings.json")
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 var idserverAdminConfiguration = builder.Configuration.Get<IdentityServerAdminConfiguration>();
-var adminBuilder = builder.Services.AddIdserverAdmin(idserverAdminConfiguration.IdserverBaseUrl, o =>
+var adminBuilder = builder.AddIdserverAdmin(idserverAdminConfiguration.IdserverBaseUrl, o =>
 {
     o.ScimUrl = idserverAdminConfiguration.ScimBaseUrl;
+}).EnableOpenTelemetry(c =>
+{
+    c.AddConsoleExporter()
+       .AddOtlpExporter(o =>
+       {
+           o.Endpoint = new Uri("https://api.honeycomb.io/v1/traces");
+           o.Headers = $"x-honeycomb-team=ExZLneG9DeipnZSuVFomXI";
+           o.Protocol = OtlpExportProtocol.HttpProtobuf;
+       });
 });
 if(!string.IsNullOrWhiteSpace(idserverAdminConfiguration.DataProtectionPath))
 {

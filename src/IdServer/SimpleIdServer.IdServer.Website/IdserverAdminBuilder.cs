@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,13 +8,14 @@ namespace SimpleIdServer.IdServer.Website;
 
 public class IdserverAdminBuilder
 {
+    private readonly WebApplicationBuilder _builder;
     private readonly IServiceCollection _services;
     private readonly IDataProtectionBuilder _dataprotectionBuilder;
     private readonly AdminOpenidAuth _adminOpenidAuth;
     private readonly AdminCookieAuth _adminCookieAuth;
     private readonly AdminAuthz _adminAuthz;
 
-    internal IdserverAdminBuilder(IServiceCollection services, IDataProtectionBuilder dataprotectionBuilder, AdminOpenidAuth adminOpenidAuth, AdminCookieAuth adminCookieAuth, AdminAuthz adminAuthz)
+    internal IdserverAdminBuilder(WebApplicationBuilder builder, IServiceCollection services, IDataProtectionBuilder dataprotectionBuilder, AdminOpenidAuth adminOpenidAuth, AdminCookieAuth adminCookieAuth, AdminAuthz adminAuthz)
     {
         _services = services;
         _dataprotectionBuilder = dataprotectionBuilder;
@@ -21,6 +23,8 @@ public class IdserverAdminBuilder
         _adminCookieAuth = adminCookieAuth;
         _adminAuthz = adminAuthz;
     }
+
+    internal WebApplicationBuilder Builder => _builder;
 
     /// <summary>
     /// Configures the data protection system to persist keys in a specific directory on the file system.

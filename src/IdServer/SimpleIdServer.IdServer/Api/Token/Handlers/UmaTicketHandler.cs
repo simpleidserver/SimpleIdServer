@@ -66,16 +66,15 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             IEnumerable<string> scopeLst = new string[0];
-            using (var activity = Tracing.TokenActivitySource.StartActivity("Get Token"))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("UmaTicketHandler"))
             {
                 try
                 {
-                    activity?.SetTag("grant_type", GRANT_TYPE);
-                    activity?.SetTag("realm", context.Realm);
+                    activity?.SetTag(Tracing.IdserverTagNames.GrantType, GRANT_TYPE);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                     _umaTicketGrantTypeValidator.Validate(context);
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
-                    activity?.SetTag("client_id", oauthClient.ClientId);
                     await _dpopProofValidator.Validate(context);
                     var ticket = context.Request.RequestData.GetTicket();
                     var claimTokenFormat = context.Request.RequestData.GetClaimTokenFormat();
@@ -86,7 +85,6 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                     var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
                     scopeLst = scopes;
-                    activity?.SetTag("scopes", string.Join(",", scopes));
                     var permissionTicket = await _umaPermissionTicketHelper.GetTicket(ticket);
                     if (permissionTicket == null)
                         throw new OAuthException(ErrorCodes.INVALID_GRANT, Global.InvalidTicket);

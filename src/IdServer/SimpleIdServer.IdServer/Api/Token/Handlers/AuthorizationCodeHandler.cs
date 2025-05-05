@@ -79,12 +79,12 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
     public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
     {
         IEnumerable<string> scopeLst = new string[0];
-        using (var activity = Tracing.TokenActivitySource.StartActivity("Get Token"))
+        using (var activity = Tracing.IdserverActivitySource.StartActivity("AuthorizationCodeHandler"))
         {
             try
             {
-                activity?.SetTag("grant_type", GRANT_TYPE);
-                activity?.SetTag("realm", context.Realm);
+                activity?.SetTag(Tracing.IdserverTagNames.GrantType, GRANT_TYPE);
+                activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                 _authorizationCodeGrantTypeValidator.Validate(context);
                 var code = context.Request.RequestData.GetAuthorizationCode();
                 var redirectUri = context.Request.RequestData.GetRedirectUri();
@@ -106,7 +106,6 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
 
                 await AuthenticateClient(context, authCode, cancellationToken); 
                 if (!context.Client.IsSelfIssueEnabled && string.IsNullOrWhiteSpace(context.Request.RequestData.GetStr(TokenRequestParameters.RedirectUri))) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, TokenRequestParameters.RedirectUri));
-                activity?.SetTag("client_id", context.Client.ClientId);
                 CheckDPOPJkt(context, authCode);
                 var previousClientId = previousRequest.GetClientId();
                 var previousRedirectUrl = previousRequest.GetRedirectUri();
@@ -120,7 +119,6 @@ public class AuthorizationCodeHandler : BaseCredentialsHandler
                 var authDetails = previousRequest.GetAuthorizationDetailsFromAuthorizationRequest();
                 var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, new List<string>(), authDetails, cancellationToken);
                 scopeLst = extractionResult.Scopes;
-                activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                 var result = BuildResult(context, extractionResult.Scopes);
                 if(!context.Client.IsSelfIssueEnabled) await Authenticate(previousRequest, context, authCode, cancellationToken);
                 else

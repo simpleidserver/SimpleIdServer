@@ -113,12 +113,14 @@ public class ScopesController : BaseController
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove scope"))
+        using (var activity = Tracing.ScopeActivitySource.StartActivity("Scope.Remove"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ScopeTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
@@ -140,13 +142,14 @@ public class ScopesController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] Scope scope, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add scope"))
+        using (var activity = Tracing.ScopeActivitySource.StartActivity("Scope.Add"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Scopes.Name);
                     var existingScope = await _scopeRepository.GetByName(prefix, scope.Name, cancellationToken);
                     if (existingScope != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scope.Name));
@@ -177,12 +180,14 @@ public class ScopesController : BaseController
     public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateScopeRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Update scope"))
+        using (var activity = Tracing.ScopeActivitySource.StartActivity("Scope.Update"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ScopeTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
@@ -211,12 +216,14 @@ public class ScopesController : BaseController
     public async Task<IActionResult> AddClaimMapper([FromRoute] string prefix, string id, [FromBody] ScopeClaimMapper request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add claim mapping rule"))
+        using (var activity = Tracing.ScopeActivitySource.StartActivity("Scope.AddClaimMapper"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ScopeTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
@@ -255,12 +262,14 @@ public class ScopesController : BaseController
     public async Task<IActionResult> RemoveClaimMapper([FromRoute] string prefix, string id, string mapperId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove scope claim mapper"))
+        using (var activity = Tracing.ScopeActivitySource.StartActivity("Scope.RemoveClaimMapper"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ScopeTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
@@ -286,12 +295,14 @@ public class ScopesController : BaseController
     public async Task<IActionResult> UpdateClaimMapper([FromRoute] string prefix, string id, string mapperId, [FromBody] UpdateScopeClaimRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add claim mapping rule"))
+        using (var activity = Tracing.ScopeActivitySource.StartActivity("Scope.UpdateClaimMapper"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ScopeTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Scopes.Name);
                     var scope = await _scopeRepository.Get(prefix, id, cancellationToken);
                     if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, id));
@@ -337,7 +348,7 @@ public class ScopesController : BaseController
     public async Task<IActionResult> UpdateResources([FromRoute] string prefix, string id, [FromBody] UpdateScopeResourcesRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity($"Update API resources of the scope {id}"))
+        using (var activity = Tracing.ScopeActivitySource.StartActivity("Scope.UpdateResources"))
         {
             try
             {

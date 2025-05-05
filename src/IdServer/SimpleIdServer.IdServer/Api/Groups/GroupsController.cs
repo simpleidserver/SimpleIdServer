@@ -22,14 +22,12 @@ namespace SimpleIdServer.IdServer.Api.Groups
     {
         private readonly IGroupRepository _groupRepository;
         private readonly IScopeRepository _scopeRepository;
-        private readonly IRealmRepository _realmRepository;
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly ILogger<GroupsController> _logger;
 
         public GroupsController(
             IGroupRepository groupRepository,
             IScopeRepository scopeRepository,
-            IRealmRepository realmRepository,
             ITokenRepository tokenRepository,
             ITransactionBuilder transactionBuilder,
             IJwtBuilder jwtBuilder, 
@@ -37,7 +35,6 @@ namespace SimpleIdServer.IdServer.Api.Groups
         {
             _groupRepository = groupRepository;
             _scopeRepository = scopeRepository;
-            _realmRepository = realmRepository;
             _transactionBuilder = transactionBuilder;
             _logger = logger;
         }
@@ -118,13 +115,14 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> Delete([FromRoute] string prefix, [FromBody] RemoveGroupRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove group"))
+            using (var activity = Tracing.GroupActivitySource.StartActivity("Group.Remove"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetTag("realm", prefix);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.GroupTagNames.Path, request.FullPath);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.GetAllByFullPath(prefix, request.FullPath, cancellationToken);
                         _groupRepository.DeleteRange(result);
@@ -146,13 +144,13 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddGroupRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Add group"))
+            using (var activity = Tracing.GroupActivitySource.StartActivity("Group.Add"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetTag("realm", prefix);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var fullPath = request.Name;
                         if (!string.IsNullOrWhiteSpace(request.ParentGroupId))
@@ -206,13 +204,14 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> AddRole([FromRoute] string prefix, string id, [FromBody] AddGroupRoleRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Add group role"))
+            using (var activity = Tracing.GroupActivitySource.StartActivity("Group.AddRole"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetTag("realm", prefix);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.GroupTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.Get(prefix, id, cancellationToken);
                         if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
@@ -244,13 +243,15 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> RemoveRole([FromRoute] string prefix, string id, string roleId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove group role"))
+            using (var activity = Tracing.GroupActivitySource.StartActivity("Group.RemoveRole"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetTag("realm", prefix);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.GroupTagNames.Id, id);
+                        activity?.SetTag(Tracing.GroupTagNames.Role, roleId);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.Get(prefix, id, cancellationToken);
                         if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));

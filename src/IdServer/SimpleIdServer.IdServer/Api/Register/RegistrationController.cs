@@ -70,7 +70,7 @@ namespace SimpleIdServer.IdServer.Api.Register
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RegisterClientRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.RegisterActivitySource.StartActivity("Register Client"))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("RegisterClient"))
             {
                 try
                 {

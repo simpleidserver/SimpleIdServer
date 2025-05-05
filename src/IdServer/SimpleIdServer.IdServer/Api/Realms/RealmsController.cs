@@ -98,12 +98,13 @@ public class RealmsController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddRealmRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add realm"))
+        using (var activity = Tracing.RealmActivitySource.StartActivity("Realm.Add"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
+                    activity?.SetTag(Tracing.RealmTagNames.Id, request.Name);
                     await CheckAccessToken(prefix, DefaultScopes.Realms.Name);
                     var existingRealm = await _realmRepository.Get(request.Name, cancellationToken);
                     if (existingRealm != null) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.RealmExists, request.Name));
@@ -221,10 +222,11 @@ public class RealmsController : BaseController
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove realm"))
+        using (var activity = Tracing.RealmActivitySource.StartActivity("Realm.Remove"))
         {
             try
             {
+                activity?.SetTag(Tracing.RealmTagNames.Id, id);
                 await CheckAccessToken(prefix, Config.DefaultScopes.Realms.Name);
                 if (id == Constants.DefaultRealm) throw new OAuthException(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CannotRemoveMasterRealm);
                 using (var transaction = _transactionBuilder.Build())

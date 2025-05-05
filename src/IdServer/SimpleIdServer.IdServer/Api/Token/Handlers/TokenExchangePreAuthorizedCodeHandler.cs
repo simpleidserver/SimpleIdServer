@@ -48,15 +48,14 @@ public class TokenExchangePreAuthorizedCodeHandler : BaseCredentialsHandler
 
     public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
     {
-        using (var activity = Tracing.TokenActivitySource.StartActivity("Exchange access token against pre-authorized_code"))
+        using (var activity = Tracing.IdserverActivitySource.StartActivity("TokenExchangePreAuthorizedCodeHandler"))
         {
             try
             {
-                activity?.SetTag("grant_type", GRANT_TYPE);
-                activity?.SetTag("realm", context.Realm);
+                activity?.SetTag(Tracing.IdserverTagNames.GrantType, GRANT_TYPE);
+                activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
-                activity?.SetTag("client_id", oauthClient.ClientId);
                 var user = await _validator.Validate(context, cancellationToken);
                 var scopes = context.Request.RequestData.GetScopes();
                 var preAuthCode = new PreAuthCode

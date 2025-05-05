@@ -65,7 +65,7 @@ public class AuthorizationController : Controller
     [HttpGet]
     public async Task Get([FromRoute] string prefix, [FromQuery] AuthorizationRequest request, CancellationToken token)
     {
-        using (var activity = Tracing.AuthzActivitySource.StartActivity("Get Authorization"))
+        using (var activity = Tracing.IdserverActivitySource.StartActivity("Authz.Get"))
         {
             var jObjBody = Request.Query.ToJObject();
             var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
@@ -76,7 +76,7 @@ public class AuthorizationController : Controller
             if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
             context.Request.SetUserAmrs(userAmrs);
-            activity?.SetTag("realm", context.Realm);
+            activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
             try
             {
                 var authorizationResponse = await _authorizationRequestHandler.Handle(context, token);
@@ -181,11 +181,11 @@ public class AuthorizationController : Controller
         var referer = string.Empty;
         if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
         var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
-        using (var activity = Tracing.AuthzActivitySource.StartActivity("Authorization callback"))
+        using (var activity = Tracing.IdserverActivitySource.StartActivity("Authz.Callback"))
         {
             try
             {
-                activity?.SetTag("realm", prefix);
+                activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                 var authorizationResponse = await _authorizationCallbackRequestHandler.Handle(context, cancellationToken);
                 _responseModeHandler.Handle(context, authorizationResponse, HttpContext);
                 activity?.SetStatus(ActivityStatusCode.Ok, "Authorization Success");

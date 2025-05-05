@@ -30,46 +30,52 @@ namespace SimpleIdServer.IdServer.Stores
 
         public IEnumerable<SigningCredentials> GetAllSigningKeys(string realm)
         {
-            var result = new List<SigningCredentials>();
-            var serializedKeys = _fileSerializedKeyStore.GetAllSig(realm, CancellationToken.None).Result;
-            foreach(var serializedKey in serializedKeys)
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("GetAllSigningKeys"))
             {
-                SecurityKey securityKey;
-                if(serializedKey.IsSymmetric)
-                    securityKey = new SymmetricSecurityKey(serializedKey.Key);
-                else
+                var result = new List<SigningCredentials>();
+                var serializedKeys = _fileSerializedKeyStore.GetAllSig(realm, CancellationToken.None).Result;
+                foreach (var serializedKey in serializedKeys)
                 {
-                    var pem = new PemResult(serializedKey.PublicKeyPem, serializedKey.PrivateKeyPem);
-                    securityKey = PemImporter.Import(pem, serializedKey.KeyId);
+                    SecurityKey securityKey;
+                    if (serializedKey.IsSymmetric)
+                        securityKey = new SymmetricSecurityKey(serializedKey.Key);
+                    else
+                    {
+                        var pem = new PemResult(serializedKey.PublicKeyPem, serializedKey.PrivateKeyPem);
+                        securityKey = PemImporter.Import(pem, serializedKey.KeyId);
+                    }
+
+                    securityKey.KeyId = serializedKey.KeyId;
+                    result.Add(new SigningCredentials(securityKey, serializedKey.Alg));
                 }
 
-                securityKey.KeyId = serializedKey.KeyId;
-                result.Add(new SigningCredentials(securityKey, serializedKey.Alg));
+                return result;
             }
-
-            return result;
         }
 
         public IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm)
         {
-            var result = new List<EncryptingCredentials>();
-            var serializedKeys = _fileSerializedKeyStore.GetAllEnc(realm, CancellationToken.None).Result;
-            foreach(var serializedKey in serializedKeys)
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("GetAllEncryptingKeys"))
             {
-                SecurityKey securityKey;
-                if (serializedKey.IsSymmetric)
-                    securityKey = new SymmetricSecurityKey(serializedKey.Key);
-                else
+                var result = new List<EncryptingCredentials>();
+                var serializedKeys = _fileSerializedKeyStore.GetAllEnc(realm, CancellationToken.None).Result;
+                foreach (var serializedKey in serializedKeys)
                 {
-                    var pemResult = new PemResult(serializedKey.PublicKeyPem, serializedKey.PrivateKeyPem);
-                    securityKey = PemImporter.Import(pemResult, serializedKey.KeyId);
+                    SecurityKey securityKey;
+                    if (serializedKey.IsSymmetric)
+                        securityKey = new SymmetricSecurityKey(serializedKey.Key);
+                    else
+                    {
+                        var pemResult = new PemResult(serializedKey.PublicKeyPem, serializedKey.PrivateKeyPem);
+                        securityKey = PemImporter.Import(pemResult, serializedKey.KeyId);
+                    }
+
+                    securityKey.KeyId = serializedKey.KeyId;
+                    result.Add(new EncryptingCredentials(securityKey, serializedKey.Alg, serializedKey.Enc));
                 }
 
-                securityKey.KeyId = serializedKey.KeyId;
-                result.Add(new EncryptingCredentials(securityKey, serializedKey.Alg, serializedKey.Enc));
+                return result;
             }
-
-            return result;
         }
 
         public async void Add(Domains.Realm realm, SigningCredentials signingCredentials)

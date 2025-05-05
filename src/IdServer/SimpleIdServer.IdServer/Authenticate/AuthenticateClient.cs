@@ -55,30 +55,33 @@ namespace SimpleIdServer.IdServer.Authenticate
 
         public async Task Authenticate(Client client, AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
-            if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
-            if (client.IsPublic) return;
-
-            var tokenEndPointAuthMethod = client.TokenEndPointAuthMethod ?? _options.DefaultTokenEndPointAuthMethod;
-            var handler = _handlers.FirstOrDefault(h => h.AuthMethod == tokenEndPointAuthMethod);
-            if (handler == null) throw new OAuthException(errorCode, string.Format(Global.UnknownAuthMethod, tokenEndPointAuthMethod));
-
-            if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken, errorCode))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("AuthenticateClient"))
             {
-                await _busControl.Publish(new ClientAuthenticationFailureEvent
+                if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
+                if (client.IsPublic) return;
+                activity?.SetTag(Tracing.IdserverTagNames.ClientId, client.Id);
+                var tokenEndPointAuthMethod = client.TokenEndPointAuthMethod ?? _options.DefaultTokenEndPointAuthMethod;
+                var handler = _handlers.FirstOrDefault(h => h.AuthMethod == tokenEndPointAuthMethod);
+                if (handler == null) throw new OAuthException(errorCode, string.Format(Global.UnknownAuthMethod, tokenEndPointAuthMethod));
+
+                if (!await handler.Handle(authenticateInstruction, client, issuerName, cancellationToken, errorCode))
+                {
+                    await _busControl.Publish(new ClientAuthenticationFailureEvent
+                    {
+                        ClientId = client.ClientId,
+                        AuthMethod = tokenEndPointAuthMethod,
+                        Realm = authenticateInstruction.Realm
+                    });
+                    throw new OAuthException(errorCode, Global.BadClientCredential);
+                }
+
+                await _busControl.Publish(new ClientAuthenticationSuccessEvent
                 {
                     ClientId = client.ClientId,
                     AuthMethod = tokenEndPointAuthMethod,
                     Realm = authenticateInstruction.Realm
                 });
-                throw new OAuthException(errorCode, Global.BadClientCredential);
             }
-
-            await _busControl.Publish(new ClientAuthenticationSuccessEvent
-            {
-                ClientId = client.ClientId,
-                AuthMethod = tokenEndPointAuthMethod,
-                Realm = authenticateInstruction.Realm
-            });
         }
 
         public bool TryExtractClientIdFromClientAssertion(AuthenticateInstruction instruction, out string clientId)

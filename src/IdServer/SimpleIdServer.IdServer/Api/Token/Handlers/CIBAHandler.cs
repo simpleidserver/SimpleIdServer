@@ -59,21 +59,19 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             IEnumerable<string> scopeLst = new string[0];
-            using (var activity = Tracing.TokenActivitySource.StartActivity("Get Token"))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("CIBAHandler"))
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
                     try
                     {
-                        activity?.SetTag("grant_type", GRANT_TYPE);
-                        activity?.SetTag("realm", context.Realm);
+                        activity?.SetTag(Tracing.IdserverTagNames.GrantType, GRANT_TYPE);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                         var oauthClient = await AuthenticateClient(context, cancellationToken);
                         context.SetClient(oauthClient);
-                        activity?.SetTag("client_id", oauthClient.ClientId);
                         await _dpopProofValidator.Validate(context);
                         var authRequest = await _cibaGrantTypeValidator.Validate(context, cancellationToken);
                         scopeLst = authRequest.Scopes;
-                        activity?.SetTag("scopes", string.Join(",", authRequest.Scopes));
                         var user = await _userRepository.GetById(authRequest.UserId, context.Realm, cancellationToken);
                         context.SetUser(user, null);
                         foreach (var tokenBuilder in _tokenBuilders)

@@ -123,13 +123,14 @@ public class AuthenticationClassReferencesController : BaseController
     [HttpPost]
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddAuthenticationClassReferenceRequest request, CancellationToken cancellationToken)
     {
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add Authentication Class Reference"))
+        using (var activity = Tracing.AcrActivitySource.StartActivity("Acrs.Add"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
                     await Validate();
                     var realm = await _realmRepository.Get(prefix, cancellationToken);
@@ -184,11 +185,13 @@ public class AuthenticationClassReferencesController : BaseController
     [HttpDelete]
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove Authentication Class Reference"))
+        using (var activity = Tracing.AcrActivitySource.StartActivity("Acrs.Remove"))
         {
             using (var transaction = _transactionBuilder.Build())
             {
                 prefix = prefix ?? Constants.DefaultRealm;
+                activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                activity?.SetTag(Tracing.AcrTagNames.Id, prefix);
                 await CheckAccessToken(prefix, Config.DefaultScopes.Acrs.Name);
                 var acr = await _authenticationContextClassReferenceRepository.Get(prefix, id, cancellationToken);
                 if (acr == null)

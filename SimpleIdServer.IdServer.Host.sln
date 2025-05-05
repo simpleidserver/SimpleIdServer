@@ -161,6 +161,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SidFormBuilder.SqliteMigrat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SidFormBuilder.PostgreMigrations", "formbuilder\FormBuilder.PostgreMigrations\SidFormBuilder.PostgreMigrations.csproj", "{A7FA2597-9E78-2296-E491-6E718FC1D4F2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "11. OpenTelemetry", "11. OpenTelemetry", "{6C37A15D-73A4-41D3-B56C-5C7D2A1E26E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.OpenTelemetry", "src\IdServer\SimpleIdServer.IdServer.OpenTelemetry\SimpleIdServer.IdServer.OpenTelemetry.csproj", "{A86EB26B-7E42-4792-2DA7-1151534C1D83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Website.OpenTelemetry", "src\IdServer\SimpleIdServer.IdServer.Website.OpenTelemetry\SimpleIdServer.IdServer.Website.OpenTelemetry.csproj", "{B4BCF71E-C3E8-507E-4C97-0EE2F072EF9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -419,6 +425,14 @@ Global
 		{A7FA2597-9E78-2296-E491-6E718FC1D4F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7FA2597-9E78-2296-E491-6E718FC1D4F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7FA2597-9E78-2296-E491-6E718FC1D4F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A86EB26B-7E42-4792-2DA7-1151534C1D83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A86EB26B-7E42-4792-2DA7-1151534C1D83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A86EB26B-7E42-4792-2DA7-1151534C1D83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A86EB26B-7E42-4792-2DA7-1151534C1D83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4BCF71E-C3E8-507E-4C97-0EE2F072EF9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4BCF71E-C3E8-507E-4C97-0EE2F072EF9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4BCF71E-C3E8-507E-4C97-0EE2F072EF9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4BCF71E-C3E8-507E-4C97-0EE2F072EF9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -499,6 +513,9 @@ Global
 		{732219EE-FBEC-A84B-2C5A-1365562F05B6} = {8653824C-E1CF-422F-BE17-0A271C249D22}
 		{8BD851F9-3D40-C8DB-6858-7FD2F20458A8} = {8653824C-E1CF-422F-BE17-0A271C249D22}
 		{A7FA2597-9E78-2296-E491-6E718FC1D4F2} = {8653824C-E1CF-422F-BE17-0A271C249D22}
+		{6C37A15D-73A4-41D3-B56C-5C7D2A1E26E4} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
+		{A86EB26B-7E42-4792-2DA7-1151534C1D83} = {6C37A15D-73A4-41D3-B56C-5C7D2A1E26E4}
+		{B4BCF71E-C3E8-507E-4C97-0EE2F072EF9E} = {6C37A15D-73A4-41D3-B56C-5C7D2A1E26E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

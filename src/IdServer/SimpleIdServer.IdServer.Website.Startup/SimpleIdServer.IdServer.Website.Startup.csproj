@@ -7,10 +7,14 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
+		<ProjectReference Include="..\SimpleIdServer.IdServer.Website.OpenTelemetry\SimpleIdServer.IdServer.Website.OpenTelemetry.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.0" />
+		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
+		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.0-beta.1" />
 	</ItemGroup>
 </Project>

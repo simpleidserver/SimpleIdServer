@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.IdServer.Helpers;
+using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Nodes;
 
@@ -76,17 +77,17 @@ namespace SimpleIdServer.IdServer.Website
             }
 
             GetAccessTokenResult accessToken = null;
-            if(_accessTokenStore.AccessTokens.ContainsKey(realm))
+            if (_accessTokenStore.AccessTokens.ContainsKey(realm))
                 accessToken = _accessTokenStore.AccessTokens[realm];
             if (accessToken != null && accessToken.IsValid) return accessToken;
-            if (accessToken != null && !accessToken.IsValid) _accessTokenStore.AccessTokens.TryRemove(realm, out GetAccessTokenResult r); 
+            if (accessToken != null && !accessToken.IsValid) _accessTokenStore.AccessTokens.TryRemove(realm, out GetAccessTokenResult r);
             var content = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("client_id", _idServerWebsiteOptions.ClientId),
-                new KeyValuePair<string, string>("client_secret", _idServerWebsiteOptions.ClientSecret),
-                new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities workflows forms recurringjobs templates"),
-                new KeyValuePair<string, string>("grant_type", "client_credentials")
-            };
+                {
+                    new KeyValuePair<string, string>("client_id", _idServerWebsiteOptions.ClientId),
+                    new KeyValuePair<string, string>("client_secret", _idServerWebsiteOptions.ClientSecret),
+                    new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities workflows forms recurringjobs templates"),
+                    new KeyValuePair<string, string>("grant_type", "client_credentials")
+                };
             var url = _idServerWebsiteOptions.Issuer;
             if (!string.IsNullOrWhiteSpace(realm))
                 url += $"/{realm}";
@@ -97,12 +98,18 @@ namespace SimpleIdServer.IdServer.Website
                 RequestUri = new Uri(url),
                 Content = new FormUrlEncodedContent(content)
             };
+            var id = Activity.Current?.Id;
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                httpRequest.Headers.Add("traceparent", id);
+            }
+
             _httpClient.DefaultRequestHeaders.Clear();
             var httpResult = await _httpClient.SendAsync(httpRequest);
             var json = await httpResult.Content.ReadAsStringAsync();
             var at = JsonObject.Parse(json)["access_token"].GetValue<string>();
             JsonWebToken jwt = null;
-            if (_jsonWebTokenHandler.CanReadToken(at)) jwt = _jsonWebTokenHandler.ReadJsonWebToken(at);            
+            if (_jsonWebTokenHandler.CanReadToken(at)) jwt = _jsonWebTokenHandler.ReadJsonWebToken(at);
             accessToken = new GetAccessTokenResult(at, jwt);
             _accessTokenStore.AccessTokens.TryAdd(realm, accessToken);
             return accessToken;

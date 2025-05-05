@@ -151,7 +151,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPost]
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Add user"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Add"))
             {
                 try
                 {
@@ -222,13 +222,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateUserRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Update user"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Update"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
@@ -272,13 +274,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpDelete]
         public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove user"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Remove"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         prefix = prefix ?? Constants.DefaultRealm;
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) return new NotFoundResult();
@@ -305,7 +309,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPost]
         public async Task<IActionResult> UpdatePicture([FromRoute] string prefix, string id, IFormFile file, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Update user picture"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.UpdatePicture"))
             {
                 try
                 {
@@ -313,6 +317,8 @@ namespace SimpleIdServer.IdServer.Api.Users
                     {
                         var issuer = Request.GetAbsoluteUriWithVirtualPath();
                         prefix = prefix ?? Constants.DefaultRealm;
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) return new NotFoundResult();
@@ -339,12 +345,14 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> AddCredential([FromRoute] string prefix, string id, [FromBody] AddUserCredentialRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Add user's credential"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.AddCredential"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
                         if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
@@ -387,13 +395,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPut]
         public async Task<IActionResult> UpdateCredential([FromRoute] string prefix, string id, string credentialId, [FromBody] UpdateUserCredentialRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Update credential"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.UpdateCredential"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         prefix = prefix ?? Constants.DefaultRealm;
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
                         if (string.IsNullOrWhiteSpace(request.Value)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserCredentialNames.Value));
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
@@ -434,13 +444,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpDelete]
         public async Task<IActionResult> DeleteCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove credential"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.DeleteCredential"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         prefix = prefix ?? Constants.DefaultRealm;
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) return new NotFoundResult();
@@ -465,13 +477,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpGet]
         public async Task<IActionResult> DefaultCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Set default credential"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.SetDefaultCredential"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         prefix = prefix ?? Constants.DefaultRealm;
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) return new NotFoundResult();
@@ -502,13 +516,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPut]
         public async Task<IActionResult> UpdateClaims([FromRoute] string prefix, string id, [FromBody] UpdateUserClaimsRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Update claims"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.UpdateClaims"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         prefix = prefix ?? Constants.DefaultRealm;
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
                         Validate();
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
@@ -559,13 +575,16 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> AddGroup([FromRoute] string prefix, string id, string groupId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Add user's group"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.AddGroup"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
+                        activity?.SetTag(Tracing.UserTagNames.GroupId, groupId);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                         var newGroup = await _groupRepository.Get(prefix, groupId, cancellationToken);
@@ -609,13 +628,16 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RemoveGroup([FromRoute] string prefix, string id, string groupId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Remove user's group"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.RemoveGroup"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
+                        activity?.SetTag(Tracing.UserTagNames.GroupId, groupId);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                         var assignedGroup = user.Groups.SingleOrDefault(g => g.GroupsId == groupId);
@@ -655,13 +677,16 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeConsent([FromRoute] string prefix, string id, string consentId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Revoke user's consent"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.RevokeConsent"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
+                        activity?.SetTag(Tracing.UserTagNames.ConsentId, consentId);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                         var consent = user.Consents.SingleOrDefault(c => c.Id == consentId);
@@ -701,13 +726,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeSessions([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Revoke user's sessions"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.RevokeAllSessions"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         var issuer = HandlerContext.GetIssuer(prefix, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
@@ -747,13 +774,16 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeSession([FromRoute] string prefix, string id, string sessionId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Revoke user's session"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.RevokeSession"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
+                        activity?.SetTag(Tracing.UserTagNames.SessionId, sessionId);
                         var issuer = HandlerContext.GetIssuer(prefix, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
                         var user = await _userRepository.GetById(id, prefix, cancellationToken);
                         if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
@@ -794,13 +824,15 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> UnlinkExternalAuthProvider([FromRoute] string prefix, string id, [FromBody] UnlinkExternalAuthProviderRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.ApiActivitySource.StartActivity("Unlink user's external authentication provider"))
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.UnlinkExternalAuthProvider"))
             {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
                         await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                        activity?.SetTag(Tracing.UserTagNames.Id, id);
                         if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                         if (string.IsNullOrWhiteSpace(request.Scheme)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Scheme));
                         if (string.IsNullOrWhiteSpace(request.Subject)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Subject));
@@ -855,19 +887,27 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpGet]
         public Task<IActionResult> Block([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            var options = GetOptions();
-            return Toggle(prefix, id, UserStatus.BLOCKED, options, cancellationToken);
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Block"))
+            {
+                var options = GetOptions();
+                return Toggle(activity, prefix, id, UserStatus.BLOCKED, options, cancellationToken);
+            }
         }
 
         [HttpGet]
         public Task<IActionResult> Unblock([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            return Toggle(prefix, id, UserStatus.ACTIVATED, null, cancellationToken);
+            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Unblock"))
+            {
+                return Toggle(activity, prefix, id, UserStatus.ACTIVATED, null, cancellationToken);
+            }
         }
 
-        private async Task<IActionResult> Toggle(string prefix, string id, UserStatus userStatus, UserLockingOptions options, CancellationToken cancellationToken)
+        private async Task<IActionResult> Toggle(Activity activity, string prefix, string id, UserStatus userStatus, UserLockingOptions options, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
+            activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+            activity?.SetTag(Tracing.UserTagNames.Id, id);
             try
             {
                 await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);

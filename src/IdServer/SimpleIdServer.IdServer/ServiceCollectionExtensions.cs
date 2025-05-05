@@ -99,6 +99,7 @@ public static class ServiceCollectionExtensions
         {
             opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
         });
+        Tracing.Init();
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
         ConfigureDataSeeders(services);
@@ -117,7 +118,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         var sidAuthCookie = new SidAuthCookie();
         var authBuilder = ConfigureAuth(services, sidAuthCookie);
-        var result = new IdServerBuilder(services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie, sidHangfire);
+        var result = new IdServerBuilder(app, services, authBuilder, formBuilder, dataProtectionBuilder, mvcBuilder, autoConfig, sidAuthCookie, sidHangfire);
         if(!skipMasstransitRegistration)
         {
             result.EnableInMemoryMasstransit();

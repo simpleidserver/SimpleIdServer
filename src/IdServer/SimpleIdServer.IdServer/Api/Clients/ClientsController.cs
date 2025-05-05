@@ -93,13 +93,13 @@ public class ClientsController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] Client request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.Add"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     if (string.IsNullOrWhiteSpace(request.ClientId))
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "id"));
@@ -206,13 +206,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateClientRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Update client"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.Update"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
@@ -281,13 +282,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateAdvanced([FromRoute] string prefix, string id, [FromBody] UpdateAdvancedClientSettingsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Update advanced client settings"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.UpdateAdvancedSettings"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
@@ -338,13 +340,15 @@ public class ClientsController : BaseController
     public async Task<IActionResult> RemoveScope([FromRoute] string prefix, string id, string name, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove client scope"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.RemoveScope"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
+                    activity?.SetTag(Tracing.ClientTagNames.Scope, name);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
@@ -382,13 +386,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddScope([FromRoute] string prefix, string id, [FromBody] AddClientScopeRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client scope"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.AddScope"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidRequestParameter);
                     if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, nameof(ScopeNames.Name)));
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
@@ -429,33 +434,39 @@ public class ClientsController : BaseController
     public async Task<IActionResult> GenerateSigKey([FromRoute] string prefix, string id, [FromBody] GenerateSigKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        try
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.GenerateSigKey"))
         {
-            await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-            var client = await _clientRepository.GetById(prefix, id, cancellationToken);
-            if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-            if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
-            SigningCredentials sigCredentials = null;
-            switch (request.KeyType)
+            try
             {
-                case SecurityKeyTypes.RSA:
-                    sigCredentials = ClientKeyGenerator.GenerateRSASignatureKey(request.KeyId, request.Alg);
-                    break;
-                case SecurityKeyTypes.CERTIFICATE:
-                    sigCredentials = ClientKeyGenerator.GenerateX509CertificateSignatureKey(request.KeyId, request.Alg);
-                    break;
-                case SecurityKeyTypes.ECDSA:
-                    sigCredentials = ClientKeyGenerator.GenerateECDsaSignatureKey(request.KeyId, request.Alg);
-                    break;
-            }
+                activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                activity?.SetTag(Tracing.ClientTagNames.Id, id);
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var client = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
+                SigningCredentials sigCredentials = null;
+                switch (request.KeyType)
+                {
+                    case SecurityKeyTypes.RSA:
+                        sigCredentials = ClientKeyGenerator.GenerateRSASignatureKey(request.KeyId, request.Alg);
+                        break;
+                    case SecurityKeyTypes.CERTIFICATE:
+                        sigCredentials = ClientKeyGenerator.GenerateX509CertificateSignatureKey(request.KeyId, request.Alg);
+                        break;
+                    case SecurityKeyTypes.ECDSA:
+                        sigCredentials = ClientKeyGenerator.GenerateECDsaSignatureKey(request.KeyId, request.Alg);
+                        break;
+                }
 
-            var pemResult = PemConverter.ConvertFromSecurityKey(sigCredentials.Key);
-            return new OkObjectResult(pemResult);
-        }
-        catch (OAuthException ex)
-        {
-            _logger.LogError(ex.ToString());
-            return BuildError(ex);
+                var pemResult = PemConverter.ConvertFromSecurityKey(sigCredentials.Key);
+                return new OkObjectResult(pemResult);
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
+                return BuildError(ex);
+            }
         }
     }
 
@@ -463,31 +474,37 @@ public class ClientsController : BaseController
     public async Task<IActionResult> GenerateEncKey([FromRoute] string prefix, string id, [FromBody] GenerateEncKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        try
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.GenerateEncKey"))
         {
-            await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-            var client = await _clientRepository.GetById(prefix, id, cancellationToken);
-            if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-            if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
-
-            EncryptingCredentials encCredentials = null;
-            switch (request.KeyType)
+            try
             {
-                case SecurityKeyTypes.RSA:
-                    encCredentials = ClientKeyGenerator.GenerateRSAEncryptionKey(request.KeyId, request.Alg, request.Enc);
-                    break;
-                case SecurityKeyTypes.CERTIFICATE:
-                    encCredentials = ClientKeyGenerator.GenerateCertificateEncryptionKey(request.KeyId, request.Alg, request.Enc);
-                    break;
-            }
+                activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                activity?.SetTag(Tracing.ClientTagNames.Id, id);
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var client = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
 
-            var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
-            return new OkObjectResult(pemResult);
-        }
-        catch (OAuthException ex)
-        {
-            _logger.LogError(ex.ToString());
-            return BuildError(ex);
+                EncryptingCredentials encCredentials = null;
+                switch (request.KeyType)
+                {
+                    case SecurityKeyTypes.RSA:
+                        encCredentials = ClientKeyGenerator.GenerateRSAEncryptionKey(request.KeyId, request.Alg, request.Enc);
+                        break;
+                    case SecurityKeyTypes.CERTIFICATE:
+                        encCredentials = ClientKeyGenerator.GenerateCertificateEncryptionKey(request.KeyId, request.Alg, request.Enc);
+                        break;
+                }
+
+                var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
+                return new OkObjectResult(pemResult);
+            }
+            catch (OAuthException ex)
+            {
+                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
+            }
         }
     }
 
@@ -495,13 +512,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddSigKey([FromRoute] string prefix, string id, [FromBody] AddSigKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client signature key"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.AddSigKey"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
@@ -550,13 +568,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddEncKey([FromRoute] string prefix, string id, [FromBody] AddSigKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client encryption key"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.AddEncKey"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
@@ -605,13 +624,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> RemoveKey([FromRoute] string prefix, string id, string keyId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Remove client key"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.RemoveKey"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
@@ -649,13 +669,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateCredentials([FromRoute] string prefix, string id, [FromBody] UpdateClientCredentialsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Update client credentials"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.UpdateCredentials"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
@@ -706,13 +727,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddRole([FromRoute] string prefix, string id, [FromBody] AddClientRoleRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add client role"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.AddRole"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
@@ -771,13 +793,14 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateRealms([FromRoute] string prefix, string id, [FromBody] UpdateClientRealmsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Update client realms"))
+        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.UpdateRealms"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
                     var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                     if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));

@@ -65,13 +65,13 @@ public class ApiResourcesController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddApiResourceRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity("Add API resource"))
+        using (var activity = Tracing.ApiResourceActivitySource.StartActivity("ApiResources.Create"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                     await CheckAccessToken(prefix, Config.DefaultScopes.ApiResources.Name);
                     if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
                     if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ApiResourceNames.Name));
@@ -124,13 +124,14 @@ public class ApiResourcesController : BaseController
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiActivitySource.StartActivity($"Remove API resource {id}"))
+        using (var activity = Tracing.ApiResourceActivitySource.StartActivity("ApiResource.Delete"))
         {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
+                    activity?.SetTag(Tracing.ApiResourceTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Scopes.Name);
                     var apiResource = await _apiResourceRepository.Get(prefix, id, cancellationToken);
                     if (apiResource == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownApiResource, id));

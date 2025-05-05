@@ -43,18 +43,16 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
         public async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             string token = null, clientId = null;
-            using (var activity = Tracing.TokenActivitySource.StartActivity("Introspect Token"))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("Token.Introspect"))
             {
                 try
                 {
-                    activity?.SetTag("realm", context.Realm);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                     token = context.Request.RequestData.GetToken();
                     if (string.IsNullOrWhiteSpace(token))
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, IntrospectionRequestParameters.Token));
 
-                    activity?.SetTag("token", token);
                     var client = await _clientAuthenticationHelper.AuthenticateClient(context.Realm, context.Request.HttpHeader, context.Request.RequestData, context.Request.Certificate, context.GetIssuer(), cancellationToken);
-                    activity?.SetTag("client_id", client.ClientId);
                     clientId = client.ClientId;
                     var accessToken = await _grantedTokenHelper.GetAccessToken(token, cancellationToken);
                     var accessTokenClientId = string.Empty;

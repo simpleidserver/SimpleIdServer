@@ -66,12 +66,12 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
     public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
     {
         IEnumerable<string> scopeLst = new string[0];
-        using (var activity = Tracing.TokenActivitySource.StartActivity("Get Token"))
+        using (var activity = Tracing.IdserverActivitySource.StartActivity("PreAuthorizedCodeHandler"))
         {
             try
             {
-                activity?.SetTag("grant_type", GRANT_TYPE);
-                activity?.SetTag("realm", context.Realm);
+                activity?.SetTag(Tracing.IdserverTagNames.GrantType, GRANT_TYPE);
+                activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                 var clientId = context.Request.RequestData.GetClientId();
                 var oauthClient = new Client();
                 bool isClientExists = false;
@@ -83,12 +83,10 @@ public class PreAuthorizedCodeHandler : BaseCredentialsHandler
 
                 context.SetClient(oauthClient);
                 var preAuthCode = await _validator.Validate(context, cancellationToken);
-                activity?.SetTag("client_id", oauthClient.Id);
                 await _dpopProofValidator.Validate(context);
                 var scopes = preAuthCode.Scopes;
                 var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, new List<string>(), new List<string>(), new List<AuthorizationData>(), cancellationToken);
                 scopeLst = extractionResult.Scopes;
-                activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes));
                 var result = BuildResult(context, extractionResult.Scopes);
                 var credentialNonce = Guid.NewGuid().ToString();
                 var parameter = new BuildTokenParameter { AuthorizationDetails = extractionResult.AuthorizationDetails, Audiences = extractionResult.Audiences, Scopes = extractionResult.Scopes };

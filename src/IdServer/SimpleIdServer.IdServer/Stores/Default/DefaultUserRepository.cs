@@ -20,8 +20,13 @@ public class DefaultUserRepository : IUserRepository
 
     public virtual Task<User> GetBySubject(string subject, string realm, CancellationToken cancellationToken)
     {
-        var result = UsersQueryable.FirstOrDefault(u => u.Name == subject && u.Realms.Any(r => r.RealmsName == realm));
-        return Task.FromResult(result);
+        using(var activity = Tracing.UserActivitySource.StartActivity("GetUserBySubject"))
+        {
+            activity?.SetTag(Tracing.UserTagNames.Id, subject);
+            activity?.SetTag(Tracing.CommonTagNames.Realm, realm);
+            var result = UsersQueryable.FirstOrDefault(u => u.Name == subject && u.Realms.Any(r => r.RealmsName == realm));
+            return Task.FromResult(result);
+        }
     }
 
     public Task<User> GetById(string id, CancellationToken cancellationToken)

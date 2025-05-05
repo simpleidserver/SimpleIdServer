@@ -107,12 +107,12 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             string clientId = null;
             IEnumerable<string> scopes = new string[0];
             Domains.User user = null;
-            using (var activity = Tracing.UserInfoSource.StartActivity("Get UserInfo"))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("GetUserInfo"))
             {
                 try
                 {
                     prefix = prefix ?? Constants.DefaultRealm;
-                    activity?.SetTag("realm", prefix);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                     var accessToken = string.Empty;
                     if(content != null)
                     {
@@ -139,19 +139,16 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
 
                     user = await _userRepository.GetBySubject(subject, prefix, cancellationToken);
                     if (user == null) return new UnauthorizedResult();
-                    activity?.SetTag("user", user.Name);
                     var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
                     if (oauthClient == null)
                         throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
 
-                    activity?.SetTag("client_id", oauthClient.ClientId);
                     if (!oauthClient.IsConsentDisabled && _userHelper.GetConsent(user, prefix, oauthClient.ClientId, scopes, claims, null, AuthorizationClaimTypes.UserInfo) == null)
                         throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoConsent);
 
                     var oauthScopes = await _scopeRepository.GetByNames(prefix, scopes.ToList(), cancellationToken);
                     var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm, _options);
                     context.SetUser(user, null);
-                    activity?.SetTag("scopes", string.Join(",", oauthScopes.Select(s => s.Name)));
                     var payload = await _claimsExtractor.ExtractClaims(context, oauthScopes, ScopeProtocols.OPENID);
                     _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationClaimTypes.UserInfo);
                     await _claimsEnricher.Enrich(user, payload, oauthClient, cancellationToken);

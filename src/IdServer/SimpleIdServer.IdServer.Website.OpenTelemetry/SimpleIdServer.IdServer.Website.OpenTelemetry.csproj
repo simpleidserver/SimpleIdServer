@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Enable open telemetry.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Website\SimpleIdServer.IdServer.Website.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.0" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.11.0" />
+	</ItemGroup>
+</Project>

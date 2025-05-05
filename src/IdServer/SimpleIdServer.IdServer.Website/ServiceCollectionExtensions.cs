@@ -6,6 +6,7 @@ using FormBuilder.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
@@ -27,8 +28,9 @@ public static class ServiceCollectionExtensions
     private static string _clientId = "SIDS-manager";
     private static string _clientSecret = "password";
 
-    public static IdserverAdminBuilder AddIdserverAdmin(this IServiceCollection services, string issuer, Action<IdServerWebsiteOptions>? callbackOptions = null)
+    public static IdserverAdminBuilder AddIdserverAdmin(this WebApplicationBuilder builder, string issuer, Action<IdServerWebsiteOptions>? callbackOptions = null)
     {
+        var services = builder.Services;
         services.AddControllersWithViews();
         services.AddFluxor(o =>
         {
@@ -72,7 +74,7 @@ public static class ServiceCollectionExtensions
         var adminAuthz = new AdminAuthz();
         var adminCookieAuth = new AdminCookieAuth();
         ConfigureSecurity(services, adminOpenidAuth, adminAuthz, adminCookieAuth, issuer);
-        var result = new IdserverAdminBuilder(services, b, adminOpenidAuth, adminCookieAuth, adminAuthz);
+        var result = new IdserverAdminBuilder(builder, services, b, adminOpenidAuth, adminCookieAuth, adminAuthz);
         return result;
     }
 

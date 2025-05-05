@@ -44,18 +44,17 @@ public class TokenExchangeHandler : BaseCredentialsHandler
     public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
     {
         IEnumerable<string> scopeLst = new string[0];
-        using (var activity = Tracing.TokenActivitySource.StartActivity("Get Token"))
+        using (var activity = Tracing.IdserverActivitySource.StartActivity("TokenExchangeHandler"))
         {
             try
             {
                 var realm = context.Realm ?? Constants.DefaultRealm;
-                activity?.SetTag("grant_type", GRANT_TYPE);
-                activity?.SetTag("realm", realm);
+                activity?.SetTag(Tracing.IdserverTagNames.GrantType, GRANT_TYPE);
+                activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                 var oauthClient = await AuthenticateClient(context, cancellationToken);
                 context.SetClient(oauthClient);
                 var validationResult = await _tokenExchangeValidator.Validate(realm, context, cancellationToken);
                 scopeLst = validationResult.GrantRequest.Scopes;
-                activity?.SetTag("scopes", string.Join(",", validationResult.GrantRequest.Scopes));
                 var result = BuildResult(context, validationResult.GrantRequest.Scopes);
                 var claims = BuildClaims(validationResult, context);
                 var tokenType = _tokenTypes.Single(t => t.Name == validationResult.TokenType);

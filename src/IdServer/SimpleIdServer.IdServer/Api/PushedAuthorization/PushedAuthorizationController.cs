@@ -61,12 +61,12 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
         [HttpPost]
         public async Task<IActionResult> Post([FromRoute] string prefix, CancellationToken token)
         {
-            using (var activity = Tracing.AuthzActivitySource.StartActivity("Start Pushed Authorization Request"))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("Authz.Pushed"))
             {
                 var jObjBody = Request.Form.ToJsonObject();
                 prefix = prefix ?? Constants.DefaultRealm;
                 var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies), prefix, _options, new HandlerContextResponse(Response.Cookies));
-                activity?.SetTag("realm", context.Realm);
+                activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())

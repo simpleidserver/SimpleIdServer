@@ -46,13 +46,12 @@ namespace SimpleIdServer.IdServer.Api.Token
         public async Task Handle(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
         {
             string token = null;
-            using (var activity = Tracing.TokenActivitySource.StartActivity("Revoke Token"))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("Token.Revoke"))
             {
                 try
                 {
                     token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
                     var validationResult = _revokeTokenValidator.Validate(jObjBody);
-                    activity?.SetTag("token", token);
                     var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(realm, jObjBody, jObjBody, certificate, issuerName, cancellationToken);
                     bool isAccessTokenRemoved = false, isRefreshTokenRemoved = false;
                     if (validationResult.TokenTypeHint == TokenResponseParameters.AccessToken)

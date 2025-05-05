@@ -59,23 +59,21 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             IEnumerable<string> scopeLst = new string[0];
-            using (var activity = Tracing.TokenActivitySource.StartActivity("Get Token"))
+            using (var activity = Tracing.IdserverActivitySource.StartActivity("PasswordHandler"))
             {
                 try
                 {
-                    activity?.SetTag("grant_type", GRANT_TYPE);
-                    activity?.SetTag("realm", context.Realm);
+                    activity?.SetTag(Tracing.IdserverTagNames.GrantType, GRANT_TYPE);
+                    activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
                     _passwordGrantTypeValidator.Validate(context);
                     var oauthClient = await AuthenticateClient(context, cancellationToken);
                     context.SetClient(oauthClient);
-                    activity?.SetTag("client_id", oauthClient.ClientId);
                     await _dpopProofValidator.Validate(context);
                     var scopes = ScopeHelper.Validate(context.Request.RequestData.GetStr(TokenRequestParameters.Scope), oauthClient.Scopes.Select(s => s.Name));
                     var resources = context.Request.RequestData.GetResourcesFromAuthorizationRequest();
                     var authDetails = context.Request.RequestData.GetAuthorizationDetailsFromAuthorizationRequest();
                     var extractionResult = await _audienceHelper.Extract(context.Realm ?? Constants.DefaultRealm, scopes, resources, new List<string>(), authDetails, cancellationToken);
                     scopeLst = extractionResult.Scopes;
-                    activity?.SetTag("scopes", string.Join(",", extractionResult.Scopes)); 
                     var userName = context.Request.RequestData.GetStr(TokenRequestParameters.Username);
                     var password = context.Request.RequestData.GetStr(TokenRequestParameters.Password);
                     var authenticationService = _userAuthenticationServices.Single(s => s.Amr == Constants.AreaPwd);
