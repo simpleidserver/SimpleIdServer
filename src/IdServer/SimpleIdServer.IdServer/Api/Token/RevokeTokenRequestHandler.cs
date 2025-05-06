@@ -46,74 +46,67 @@ namespace SimpleIdServer.IdServer.Api.Token
         public async Task Handle(string realm, JsonObject jObjHeader, JsonObject jObjBody, X509Certificate2 certificate, string issuerName, CancellationToken cancellationToken)
         {
             string token = null;
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("Token.Revoke"))
+            try
             {
-                try
+                token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
+                var validationResult = _revokeTokenValidator.Validate(jObjBody);
+                var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(realm, jObjBody, jObjBody, certificate, issuerName, cancellationToken);
+                bool isAccessTokenRemoved = false, isRefreshTokenRemoved = false;
+                if (validationResult.TokenTypeHint == TokenResponseParameters.AccessToken)
                 {
-                    token = jObjBody.GetStr(RevokeTokenRequestParameters.Token);
-                    var validationResult = _revokeTokenValidator.Validate(jObjBody);
-                    var oauthClient = await _clientAuthenticationHelper.AuthenticateClient(realm, jObjBody, jObjBody, certificate, issuerName, cancellationToken);
-                    bool isAccessTokenRemoved = false, isRefreshTokenRemoved = false;
-                    if (validationResult.TokenTypeHint == TokenResponseParameters.AccessToken)
-                    {
-                        isAccessTokenRemoved = await _grantedTokenHelper.TryRemoveAccessToken(token, oauthClient.ClientId, cancellationToken);
-                    }
-                    else if (validationResult.TokenTypeHint == TokenResponseParameters.RefreshToken)
+                    isAccessTokenRemoved = await _grantedTokenHelper.TryRemoveAccessToken(token, oauthClient.ClientId, cancellationToken);
+                }
+                else if (validationResult.TokenTypeHint == TokenResponseParameters.RefreshToken)
+                {
+                    isRefreshTokenRemoved = await _grantedTokenHelper.TryRemoveRefreshToken(token, oauthClient.ClientId, cancellationToken);
+                }
+                else
+                {
+                    isAccessTokenRemoved = await _grantedTokenHelper.TryRemoveAccessToken(token, oauthClient.ClientId, cancellationToken);
+                    if (!isAccessTokenRemoved)
                     {
                         isRefreshTokenRemoved = await _grantedTokenHelper.TryRemoveRefreshToken(token, oauthClient.ClientId, cancellationToken);
                     }
-                    else
-                    {
-                        isAccessTokenRemoved = await _grantedTokenHelper.TryRemoveAccessToken(token, oauthClient.ClientId, cancellationToken);
-                        if (!isAccessTokenRemoved)
-                        {
-                            isRefreshTokenRemoved = await _grantedTokenHelper.TryRemoveRefreshToken(token, oauthClient.ClientId, cancellationToken);
-                        }
-                    }
-
-                    if (isRefreshTokenRemoved)
-                    {
-                        activity?.SetTag("token_type", "refresh_token");
-                        _logger.LogInformation($"refresh token '{token}' has been removed");
-                    }
-
-                    if (isAccessTokenRemoved)
-                    {
-                        activity?.SetTag("token_type", "access_token");
-                        _logger.LogInformation($"access token '{token}' has been removed");
-                    }
-
-                    if (isRefreshTokenRemoved || isAccessTokenRemoved)
-                    {
-                        activity?.SetStatus(ActivityStatusCode.Ok, "Token has been revoked");
-                        await _busControl.Publish(new TokenRevokedSuccessEvent
-                        {
-                            Token = token,
-                            Realm = realm
-                        });
-                    }
-                    else
-                    {
-                        await _busControl.Publish(new TokenRevokedFailureEvent
-                        {
-                            Token = token,
-                            Realm = realm,
-                            ErrorMessage = "Token has not been revoked"
-                        });
-                        activity?.SetStatus(ActivityStatusCode.Error, "Token has not been revoked");
-                    }
                 }
-                catch(OAuthException ex)
+
+                if (isRefreshTokenRemoved)
                 {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+                    _logger.LogInformation($"refresh token '{token}' has been removed");
+                }
+
+                if (isAccessTokenRemoved)
+                {
+                    _logger.LogInformation($"access token '{token}' has been removed");
+                }
+
+                if (isRefreshTokenRemoved || isAccessTokenRemoved)
+                {
+                    await _busControl.Publish(new TokenRevokedSuccessEvent
+                    {
+                        Token = token,
+                        Realm = realm
+                    });
+                    Counters.RejectToken(oauthClient.ClientId, realm);
+                }
+                else
+                {
                     await _busControl.Publish(new TokenRevokedFailureEvent
                     {
                         Token = token,
                         Realm = realm,
-                        ErrorMessage = ex.Message
+                        ErrorMessage = "Token has not been revoked"
                     });
-                    throw ex;
                 }
+            }
+            catch (OAuthException ex)
+            {
+                await _busControl.Publish(new TokenRevokedFailureEvent
+                {
+                    Token = token,
+                    Realm = realm,
+                    ErrorMessage = ex.Message
+                });
+                throw ex;
             }
         }
     }

@@ -96,9 +96,12 @@ public class UserRepository : IUserRepository
 
     public async Task<User> GetBySubject(string subject, string realm, CancellationToken cancellationToken)
     {
-        var result = await GetUsers()
+        using (var activity = Tracing.StoreActivitySource.StartActivity("GetUserBySubject"))
+        {
+            var result = await GetUsers()
                     .FirstAsync(u => u.Name == subject && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
-        return result?.ToDomain();
+            return result?.ToDomain();
+        }
     }
 
     public async Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, string realm, CancellationToken cancellationToken)

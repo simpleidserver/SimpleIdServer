@@ -67,6 +67,7 @@ namespace SimpleIdServer.IdServer.UI
                             UserName = chooseSessionViewModel.AccountName,
                             Realm = realm
                         });
+                        Counters.Logout(realm);
                         accounts = await GetAccounts(string.Empty, cancellationToken);
                         ViewBag.IsSessionRejected = "true";
                         accounts.Accounts = accounts.Accounts.Where(s => s.Name != chooseSessionViewModel.AccountName).ToList();

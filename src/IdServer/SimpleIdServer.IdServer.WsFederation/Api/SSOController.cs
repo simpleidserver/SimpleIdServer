@@ -49,24 +49,20 @@ public class SSOController : BaseWsFederationController
     [HttpGet]
     public async Task<IActionResult> Login([FromRoute] string prefix, CancellationToken cancellationToken)
     {
-        using (var activity = Tracing.IdserverActivitySource.StartActivity("WsFederation.Login"))
+        var queryStr = Request.QueryString.Value;
+        var federationMessage = WsFederationMessage.FromQueryString(queryStr);
+        try
         {
-            var queryStr = Request.QueryString.Value;
-            var federationMessage = WsFederationMessage.FromQueryString(queryStr);
-            try
+            if (federationMessage.IsSignInMessage)
             {
-                if (federationMessage.IsSignInMessage)
-                {
-                    return await SignIn(prefix, federationMessage, cancellationToken);
-                }
+                return await SignIn(prefix, federationMessage, cancellationToken);
+            }
 
-                return RedirectToAction("EndSession", "CheckSession");
-            }
-            catch (OAuthException ex)
-            {
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                return RedirectToAction("Index", "Errors", new { code = ex.Code, message = ex.Message });
-            }
+            return RedirectToAction("EndSession", "CheckSession");
+        }
+        catch (OAuthException ex)
+        {
+            return RedirectToAction("Index", "Errors", new { code = ex.Code, message = ex.Message });
         }
     }
 

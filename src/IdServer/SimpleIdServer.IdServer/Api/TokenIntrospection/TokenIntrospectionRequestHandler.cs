@@ -43,7 +43,7 @@ namespace SimpleIdServer.IdServer.Api.TokenIntrospection
         public async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             string token = null, clientId = null;
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("Token.Introspect"))
+            using (var activity = Tracing.BasicActivitySource.StartActivity("TokenIntrospect"))
             {
                 try
                 {

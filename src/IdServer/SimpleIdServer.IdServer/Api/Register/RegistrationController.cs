@@ -70,47 +70,42 @@ namespace SimpleIdServer.IdServer.Api.Register
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RegisterClientRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("RegisterClient"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Register.Name);
-                        var client = await Build(request, cancellationToken);
-                        await _validator.Validate(prefix, client, cancellationToken);
-                        _clientRepository.Add(client);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Ok, "Client is registered");
-                        await _busControl.Publish(new ClientRegisteredSuccessEvent
-                        {
-                            Realm = prefix,
-                            RequestJSON = JsonSerializer.Serialize(request)
-                        });
-                        return new ContentResult
-                        {
-                            StatusCode = (int)HttpStatusCode.Created,
-                            Content = client.Serialize(Request.GetAbsoluteUriWithVirtualPath()).ToJsonString(),
-                            ContentType = "application/json"
-                        };
-                    }
-                }
-                catch (OAuthException ex)
-                {
-                    await _busControl.Publish(new ClientRegisteredFailureEvent
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Register.Name);
+                    var client = await Build(request, cancellationToken);
+                    await _validator.Validate(prefix, client, cancellationToken);
+                    _clientRepository.Add(client);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new ClientRegisteredSuccessEvent
                     {
                         Realm = prefix,
-                        ErrorMessage = ex.Message,
                         RequestJSON = JsonSerializer.Serialize(request)
                     });
-                    activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                    var jObj = new JsonObject
+                    return new ContentResult
                     {
-                        [ErrorResponseParameters.Error] = ex.Code,
-                        [ErrorResponseParameters.ErrorDescription] = ex.Message
+                        StatusCode = (int)HttpStatusCode.Created,
+                        Content = client.Serialize(Request.GetAbsoluteUriWithVirtualPath()).ToJsonString(),
+                        ContentType = "application/json"
                     };
-                    return new BadRequestObjectResult(jObj);
                 }
+            }
+            catch (OAuthException ex)
+            {
+                await _busControl.Publish(new ClientRegisteredFailureEvent
+                {
+                    Realm = prefix,
+                    ErrorMessage = ex.Message,
+                    RequestJSON = JsonSerializer.Serialize(request)
+                });
+                var jObj = new JsonObject
+                {
+                    [ErrorResponseParameters.Error] = ex.Code,
+                    [ErrorResponseParameters.ErrorDescription] = ex.Message
+                };
+                return new BadRequestObjectResult(jObj);
             }
 
             async Task<Client> Build(RegisterClientRequest request, CancellationToken cancellationToken)

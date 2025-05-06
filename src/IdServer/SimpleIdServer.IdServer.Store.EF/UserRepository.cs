@@ -20,9 +20,12 @@ public class UserRepository : IUserRepository
 
     public async virtual Task<User> GetBySubject(string subject, string realm, CancellationToken cancellationToken)
     {
-        var result = await GetUsers()
+        using (var activity = Tracing.StoreActivitySource.StartActivity("GetUserBySubject"))
+        {
+            var result = await GetUsers()
                     .FirstOrDefaultAsync(u => u.Name == subject && u.Realms.Any(r => r.RealmsName == realm), cancellationToken);
-        return result;
+            return result;
+        }
     }
 
     public async Task<User> GetById(string id, CancellationToken cancellationToken)

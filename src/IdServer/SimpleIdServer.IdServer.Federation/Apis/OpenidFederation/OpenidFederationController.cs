@@ -33,28 +33,24 @@ public class OpenidFederationController : BaseOpenidFederationController
     [HttpGet]
     public async Task<IActionResult> Get([FromRoute] string prefix, CancellationToken cancellationToken)
     {
-        using(var activity = Tracing.IdserverActivitySource.StartActivity("OpenidFederationController.Get"))
+        var realm = prefix ?? Constants.DefaultRealm;
+        var issuer = this.GetAbsoluteUriWithVirtualPath();
+        var signingKeys = _keyStore.GetAllSigningKeys(realm);
+        var signingKey = signingKeys.FirstOrDefault(k => k.Kid == _options.TokenSignedKid);
+        if (signingKey == null) return Error(System.Net.HttpStatusCode.InternalServerError, SimpleIdServer.OpenidFederation.ErrorCodes.INTERNAL_SERVER_ERROR, SimpleIdServer.OpenidFederation.Resources.Global.CannotExtractSignatureKey);
+        var selfIssuedFederationEntity = await _federationEntityBuilder.BuildSelfIssued(new SimpleIdServer.OpenidFederation.Builders.BuildFederationEntityRequest
         {
-            var realm = prefix ?? Constants.DefaultRealm;
-            activity?.SetTag(Tracing.CommonTagNames.Realm, realm);
-            var issuer = this.GetAbsoluteUriWithVirtualPath();
-            var signingKeys = _keyStore.GetAllSigningKeys(realm);
-            var signingKey = signingKeys.FirstOrDefault(k => k.Kid == _options.TokenSignedKid);
-            if (signingKey == null) return Error(System.Net.HttpStatusCode.InternalServerError, SimpleIdServer.OpenidFederation.ErrorCodes.INTERNAL_SERVER_ERROR, SimpleIdServer.OpenidFederation.Resources.Global.CannotExtractSignatureKey);
-            var selfIssuedFederationEntity = await _federationEntityBuilder.BuildSelfIssued(new SimpleIdServer.OpenidFederation.Builders.BuildFederationEntityRequest
-            {
-                Credential = signingKey,
-                Issuer = issuer,
-                Realm = realm
-            }, cancellationToken);
-            var handler = new JsonWebTokenHandler();
-            var jws = handler.CreateToken(JsonSerializer.Serialize(selfIssuedFederationEntity), new SigningCredentials(signingKey.Key, signingKey.Algorithm));
-            return new ContentResult
-            {
-                StatusCode = (int)HttpStatusCode.OK,
-                Content = jws,
-                ContentType = OpenidFederationConstants.EntityStatementContentType
-            };
-        }
+            Credential = signingKey,
+            Issuer = issuer,
+            Realm = realm
+        }, cancellationToken);
+        var handler = new JsonWebTokenHandler();
+        var jws = handler.CreateToken(JsonSerializer.Serialize(selfIssuedFederationEntity), new SigningCredentials(signingKey.Key, signingKey.Algorithm));
+        return new ContentResult
+        {
+            StatusCode = (int)HttpStatusCode.OK,
+            Content = jws,
+            ContentType = OpenidFederationConstants.EntityStatementContentType
+        };
     }
 }

@@ -12,7 +12,6 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
-using System.Diagnostics;
 using System.Net;
 using System.Text.Json;
 using System.Threading;
@@ -65,58 +64,52 @@ public class ApiResourcesController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddApiResourceRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiResourceActivitySource.StartActivity("ApiResources.Create"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
+                await CheckAccessToken(prefix, Config.DefaultScopes.ApiResources.Name);
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ApiResourceNames.Name));
+                var existingApiResource = await _apiResourceRepository.GetByName(prefix, request.Name, cancellationToken);
+                if (existingApiResource != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ApiResourceAlreadyExists, request.Name));
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
+                var apiResource = new ApiResource
                 {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.ApiResources.Name);
-                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                    if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ApiResourceNames.Name));
-                    var existingApiResource = await _apiResourceRepository.GetByName(prefix, request.Name, cancellationToken);
-                    if (existingApiResource != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ApiResourceAlreadyExists, request.Name));
-                    var realm = await _realmRepository.Get(prefix, cancellationToken);
-                    var apiResource = new ApiResource
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = request.Name,
-                        Audience = request.Audience,
-                        Description = request.Description,
-                        CreateDateTime = DateTime.UtcNow,
-                        UpdateDateTime = DateTime.UtcNow
-                    };
-                    apiResource.Realms.Add(realm);
-                    _apiResourceRepository.Add(apiResource);
-                    await transaction.Commit(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"API resource {request.Name} added");
-                    await _busControl.Publish(new AddApiResourceSuccessEvent
-                    {
-                        Realm = prefix,
-                        Name = request.Name,
-                        Audience = request.Audience
-                    });
-                    return new ContentResult
-                    {
-                        StatusCode = (int)HttpStatusCode.Created,
-                        Content = JsonSerializer.Serialize(apiResource).ToString(),
-                        ContentType = "application/json"
-                    };
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AddApiResourceFailureEvent
+                    Id = Guid.NewGuid().ToString(),
+                    Name = request.Name,
+                    Audience = request.Audience,
+                    Description = request.Description,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow
+                };
+                apiResource.Realms.Add(realm);
+                _apiResourceRepository.Add(apiResource);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new AddApiResourceSuccessEvent
                 {
                     Realm = prefix,
                     Name = request.Name,
                     Audience = request.Audience
                 });
-                return BuildError(ex);
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JsonSerializer.Serialize(apiResource).ToString(),
+                    ContentType = "application/json"
+                };
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new AddApiResourceFailureEvent
+            {
+                Realm = prefix,
+                Name = request.Name,
+                Audience = request.Audience
+            });
+            return BuildError(ex);
         }
     }
 
@@ -124,18 +117,13 @@ public class ApiResourcesController : BaseController
     public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ApiResourceActivitySource.StartActivity("ApiResource.Delete"))
-        {
             try
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ApiResourceTagNames.Id, id);
                     await CheckAccessToken(prefix, Config.DefaultScopes.Scopes.Name);
                     var apiResource = await _apiResourceRepository.Get(prefix, id, cancellationToken);
                     if (apiResource == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownApiResource, id));
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"API resource {id} is removed");
                     _apiResourceRepository.Delete(apiResource);
                     await transaction.Commit(cancellationToken);
                     return new NoContentResult();
@@ -144,9 +132,7 @@ public class ApiResourcesController : BaseController
             catch (OAuthException ex)
             {
                 _logger.LogError(ex.ToString());
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 return BuildError(ex);
             }
-        }
     }
 }

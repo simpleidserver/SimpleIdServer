@@ -107,103 +107,97 @@ namespace SimpleIdServer.IdServer.Api.UserInfo
             string clientId = null;
             IEnumerable<string> scopes = new string[0];
             Domains.User user = null;
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("GetUserInfo"))
+            try
             {
-                try
+                prefix = prefix ?? Constants.DefaultRealm;
+                var accessToken = string.Empty;
+                if (content != null)
                 {
-                    prefix = prefix ?? Constants.DefaultRealm;
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    var accessToken = string.Empty;
-                    if(content != null)
+                    if (content.ContainsKey(TokenResponseParameters.AccessToken))
                     {
-                        if (content.ContainsKey(TokenResponseParameters.AccessToken))
-                        {
-                            var at = content.GetStr(TokenResponseParameters.AccessToken);
-                            if (at != null && !string.IsNullOrWhiteSpace(at.ToString())) accessToken = at.ToString();
-                        }
-
-                        if (string.IsNullOrWhiteSpace(accessToken)) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, Global.MissingToken);
+                        var at = content.GetStr(TokenResponseParameters.AccessToken);
+                        if (at != null && !string.IsNullOrWhiteSpace(at.ToString())) accessToken = at.ToString();
                     }
 
-                    var kvp = await CheckAccessToken(prefix, accessToken: accessToken);
-                    var jwsPayload = kvp.Item1;
-                    var token = kvp.Item2;
-                    var subject = jwsPayload.Subject;
-                    scopes = jwsPayload.Claims.Where(c => c.Type == OpenIdConnectParameterNames.Scope).Select(c => c.Value);
-                    var audiences = jwsPayload.Audiences;
-                    clientId = jwsPayload.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
-                    var claims = GetClaims(jwsPayload);
-                    DateTime? authTime = null;
-                    if (jwsPayload.TryGetClaim(JwtRegisteredClaimNames.AuthTime, out Claim claim) && double.TryParse(claim.Value, out double a))
-                        authTime = a.ConvertFromUnixTimestamp();
-
-                    user = await _userRepository.GetBySubject(subject, prefix, cancellationToken);
-                    if (user == null) return new UnauthorizedResult();
-                    var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
-                    if (oauthClient == null)
-                        throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
-
-                    if (!oauthClient.IsConsentDisabled && _userHelper.GetConsent(user, prefix, oauthClient.ClientId, scopes, claims, null, AuthorizationClaimTypes.UserInfo) == null)
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoConsent);
-
-                    var oauthScopes = await _scopeRepository.GetByNames(prefix, scopes.ToList(), cancellationToken);
-                    var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm, _options);
-                    context.SetUser(user, null);
-                    var payload = await _claimsExtractor.ExtractClaims(context, oauthScopes, ScopeProtocols.OPENID);
-                    _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationClaimTypes.UserInfo);
-                    await _claimsEnricher.Enrich(user, payload, oauthClient, cancellationToken);
-                    string contentType = "application/json";
-                    var result = JsonSerializer.Serialize(payload);
-                    if (!string.IsNullOrWhiteSpace(oauthClient.UserInfoSignedResponseAlg))
-                    {
-                        var securityTokenDescriptor = new SecurityTokenDescriptor
-                        {
-                            Claims = payload
-                        };
-                        securityTokenDescriptor.Issuer = context.GetIssuer();
-                        securityTokenDescriptor.Audience = token.ClientId;
-                        result = await _jwtBuilder.BuildClientToken(prefix, oauthClient, securityTokenDescriptor, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc, cancellationToken);
-                        contentType = "application/jwt";
-                    }
-
-                    await _busControl.Publish(new UserInfoSuccessEvent
-                    {
-                        ClientId = oauthClient.ClientId,
-                        Realm = prefix,
-                        Scopes = scopes,
-                        UserName = user.Name
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Ok, "User Info has been returned");
-                    return new ContentResult
-                    {
-                        Content = result,
-                        ContentType = contentType
-                    };
+                    if (string.IsNullOrWhiteSpace(accessToken)) throw new OAuthException(HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, Global.MissingToken);
                 }
-                catch (OAuthException ex)
+
+                var kvp = await CheckAccessToken(prefix, accessToken: accessToken);
+                var jwsPayload = kvp.Item1;
+                var token = kvp.Item2;
+                var subject = jwsPayload.Subject;
+                scopes = jwsPayload.Claims.Where(c => c.Type == OpenIdConnectParameterNames.Scope).Select(c => c.Value);
+                var audiences = jwsPayload.Audiences;
+                clientId = jwsPayload.Claims.FirstOrDefault(c => c.Type == OpenIdConnectParameterNames.ClientId)?.Value;
+                var claims = GetClaims(jwsPayload);
+                DateTime? authTime = null;
+                if (jwsPayload.TryGetClaim(JwtRegisteredClaimNames.AuthTime, out Claim claim) && double.TryParse(claim.Value, out double a))
+                    authTime = a.ConvertFromUnixTimestamp();
+
+                user = await _userRepository.GetBySubject(subject, prefix, cancellationToken);
+                if (user == null) return new UnauthorizedResult();
+                var oauthClient = await _clientRepository.GetByClientId(prefix, clientId, cancellationToken);
+                if (oauthClient == null)
+                    throw new OAuthException(ErrorCodes.INVALID_CLIENT, string.Format(Global.UnknownClient, clientId));
+
+                if (!oauthClient.IsConsentDisabled && _userHelper.GetConsent(user, prefix, oauthClient.ClientId, scopes, claims, null, AuthorizationClaimTypes.UserInfo) == null)
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoConsent);
+
+                var oauthScopes = await _scopeRepository.GetByNames(prefix, scopes.ToList(), cancellationToken);
+                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, null, null, null, (X509Certificate2)null, HttpContext.Request.Method), prefix ?? Constants.DefaultRealm, _options);
+                context.SetUser(user, null);
+                var payload = await _claimsExtractor.ExtractClaims(context, oauthScopes, ScopeProtocols.OPENID);
+                _claimsJwsPayloadEnricher.EnrichWithClaimsParameter(payload, claims, user, authTime, AuthorizationClaimTypes.UserInfo);
+                await _claimsEnricher.Enrich(user, payload, oauthClient, cancellationToken);
+                string contentType = "application/json";
+                var result = JsonSerializer.Serialize(payload);
+                if (!string.IsNullOrWhiteSpace(oauthClient.UserInfoSignedResponseAlg))
                 {
-                    _logger.LogError(ex.Message);
-                    await _busControl.Publish(new UserInfoFailureEvent
+                    var securityTokenDescriptor = new SecurityTokenDescriptor
                     {
-                        ClientId = clientId,
-                        Realm = prefix,
-                        Scopes = scopes,
-                        ErrorMessage = ex.Message,
-                        UserName = user?.Name
-                    });
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    var jObj = new JsonObject
-                    {
-                        [ErrorResponseParameters.Error] = ex.Code,
-                        [ErrorResponseParameters.ErrorDescription] = ex.Message
+                        Claims = payload
                     };
-                    return new ContentResult
-                    {
-                        Content = jObj.ToString(),
-                        ContentType = "application/json",
-                        StatusCode = (int)HttpStatusCode.BadRequest
-                    };
+                    securityTokenDescriptor.Issuer = context.GetIssuer();
+                    securityTokenDescriptor.Audience = token.ClientId;
+                    result = await _jwtBuilder.BuildClientToken(prefix, oauthClient, securityTokenDescriptor, oauthClient.UserInfoSignedResponseAlg, oauthClient.UserInfoEncryptedResponseAlg, oauthClient.UserInfoEncryptedResponseEnc, cancellationToken);
+                    contentType = "application/jwt";
                 }
+
+                await _busControl.Publish(new UserInfoSuccessEvent
+                {
+                    ClientId = oauthClient.ClientId,
+                    Realm = prefix,
+                    Scopes = scopes,
+                    UserName = user.Name
+                });
+                return new ContentResult
+                {
+                    Content = result,
+                    ContentType = contentType
+                };
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.Message);
+                await _busControl.Publish(new UserInfoFailureEvent
+                {
+                    ClientId = clientId,
+                    Realm = prefix,
+                    Scopes = scopes,
+                    ErrorMessage = ex.Message,
+                    UserName = user?.Name
+                });
+                var jObj = new JsonObject
+                {
+                    [ErrorResponseParameters.Error] = ex.Code,
+                    [ErrorResponseParameters.ErrorDescription] = ex.Message
+                };
+                return new ContentResult
+                {
+                    Content = jObj.ToString(),
+                    ContentType = "application/json",
+                    StatusCode = (int)HttpStatusCode.BadRequest
+                };
             }
 
             IEnumerable<AuthorizedClaim> GetClaims(JsonWebToken jsonWebToken)

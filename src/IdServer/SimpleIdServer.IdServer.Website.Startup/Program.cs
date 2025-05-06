@@ -1,4 +1,3 @@
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Trace;
 using SimpleIdServer.IdServer.Website.Startup;
 using SimpleIdServer.IdServer.Website.Startup.Components;
@@ -16,13 +15,25 @@ var adminBuilder = builder.AddIdserverAdmin(idserverAdminConfiguration.IdserverB
     o.ScimUrl = idserverAdminConfiguration.ScimBaseUrl;
 }).EnableOpenTelemetry(c =>
 {
-    c.AddConsoleExporter()
-       .AddOtlpExporter(o =>
-       {
-           o.Endpoint = new Uri("https://api.honeycomb.io/v1/traces");
-           o.Headers = $"x-honeycomb-team=ExZLneG9DeipnZSuVFomXI";
-           o.Protocol = OtlpExportProtocol.HttpProtobuf;
-       });
+    if(idserverAdminConfiguration.OpenTelemetryOptions == null)
+    {
+        return;
+    }
+
+    if(idserverAdminConfiguration.OpenTelemetryOptions.EnableConsoleExporter)
+    {
+        c.AddConsoleExporter();
+    }
+
+    if (idserverAdminConfiguration.OpenTelemetryOptions.EnableOtpExported)
+    {
+        c.AddOtlpExporter(o =>
+        {
+            o.Endpoint = new Uri(idserverAdminConfiguration.OpenTelemetryOptions.TracesEndpoint);
+            o.Headers = idserverAdminConfiguration.OpenTelemetryOptions.Headers;
+            o.Protocol = idserverAdminConfiguration.OpenTelemetryOptions.Protocol;
+        });
+    }
 });
 if(!string.IsNullOrWhiteSpace(idserverAdminConfiguration.DataProtectionPath))
 {

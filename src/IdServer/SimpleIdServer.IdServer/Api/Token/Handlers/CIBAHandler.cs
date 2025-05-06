@@ -59,7 +59,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             IEnumerable<string> scopeLst = new string[0];
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("CIBAHandler"))
+            using (var activity = Tracing.BasicActivitySource.StartActivity("CIBAHandler"))
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
@@ -84,6 +84,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
                         authRequest.Send();
                         _bcAuthorizeRepository.Update(authRequest);
+                        Issue(result, context.Client.ClientId, context.Realm);
                         await _busControl.Publish(new TokenIssuedSuccessEvent
                         {
                             GrantType = GRANT_TYPE,
@@ -104,6 +105,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                             Realm = context.Realm,
                             ErrorMessage = ex.Message
                         });
+                        Counters.FailToken(context.Client?.ClientId, context.Realm, GrantType);
                         activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                         return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
                     }
@@ -117,6 +119,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                             Realm = context.Realm,
                             ErrorMessage = ex.Message
                         });
+                        Counters.FailToken(context.Client?.ClientId, context.Realm, GrantType);
                         activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                         _logger.LogError(ex.ToString());
                         return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);

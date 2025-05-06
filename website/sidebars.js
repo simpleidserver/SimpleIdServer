@@ -84,7 +84,14 @@ const sidebars = {
         },
         'idserver/realm',
         'idserver/fapi2',
-        'idserver/logging',
+        {
+          type: 'category',
+          label: 'Logging',
+          items: [
+            'idserver/logging/logs',
+            'idserver/logging/telemetry'
+          ]
+        },
         {
           type: 'category',
           label: 'Hosting',
@@ -103,7 +110,15 @@ const sidebars = {
         'idserveradmin/quickstart',
         'idserveradmin/realm',
         'idserveradmin/hosting',
-        'idserveradmin/loadbalancing'
+        'idserveradmin/loadbalancing',
+        {
+          type: 'category',
+          label: 'Logs',
+          items: [
+            'idserveradmin/logging/logs',
+            'idserveradmin/logging/telemetry'
+          ]
+        }
       ]
     },
     {

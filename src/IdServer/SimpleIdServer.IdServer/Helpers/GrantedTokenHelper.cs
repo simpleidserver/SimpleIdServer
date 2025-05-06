@@ -252,7 +252,10 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public Task RemoveRefreshToken(string refreshToken, CancellationToken token)
         {
-            return _distributedCache.RemoveAsync(refreshToken, token);
+            using(var activity = Tracing.CacheActivitySource.StartActivity("RemoveRefreshToken"))
+            {
+                return _distributedCache.RemoveAsync(refreshToken, token);
+            }
         }
 
         public async Task<bool> TryRemoveRefreshToken(string refreshToken, string clientId, CancellationToken cancellationToken)
@@ -282,31 +285,40 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task<AuthCode> GetAuthorizationCode(string code, CancellationToken token)
         {
-            var cache = await _distributedCache.GetAsync(code, token);
-            if (cache == null) return null;
-            return JsonSerializer.Deserialize<AuthCode>(Encoding.UTF8.GetString(cache));
+            using (var activity = Tracing.CacheActivitySource.StartActivity("GetAuthorizationCode"))
+            {
+                var cache = await _distributedCache.GetAsync(code, token);
+                if (cache == null) return null;
+                return JsonSerializer.Deserialize<AuthCode>(Encoding.UTF8.GetString(cache));
+            }
         }
 
         public async Task<string> AddAuthorizationCode(JsonObject originalRequest, string grantId, double validityPeriodsInSeconds, string dpopJkt, string sessionId, CancellationToken cancellationToken)
         {
-            var code = Guid.NewGuid().ToString();
-            var serializedAuthCode = JsonSerializer.Serialize(new AuthCode
+            using (var activity = Tracing.CacheActivitySource.StartActivity("AddAuthorizationCode"))
             {
-                GrantId = grantId,
-                OriginalRequest = originalRequest,
-                DPOPJkt = dpopJkt,
-                SessionId = sessionId
-            });
-            await _distributedCache.SetAsync(code, Encoding.UTF8.GetBytes(serializedAuthCode), new DistributedCacheEntryOptions
-            {
-                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
-            }, cancellationToken);
-            return code;
+                var code = Guid.NewGuid().ToString();
+                var serializedAuthCode = JsonSerializer.Serialize(new AuthCode
+                {
+                    GrantId = grantId,
+                    OriginalRequest = originalRequest,
+                    DPOPJkt = dpopJkt,
+                    SessionId = sessionId
+                });
+                await _distributedCache.SetAsync(code, Encoding.UTF8.GetBytes(serializedAuthCode), new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+                }, cancellationToken);
+                return code;
+            }
         }
 
         public Task RemoveAuthorizationCode(string code, CancellationToken cancellationToken)
         {
-            return _distributedCache.RemoveAsync(code, cancellationToken);
+            using (var activity = Tracing.CacheActivitySource.StartActivity("RemoveAuthorizationCode"))
+            {
+                return _distributedCache.RemoveAsync(code, cancellationToken);
+            }
         }
 
         #endregion
@@ -315,20 +327,32 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task AddPreAuthCode(PreAuthCode preAuthCode, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
-            var serializedPreAuthCode = JsonSerializer.Serialize(preAuthCode);
-            await _distributedCache.SetAsync(preAuthCode.Code, Encoding.UTF8.GetBytes(serializedPreAuthCode), new DistributedCacheEntryOptions
+            using (var activity = Tracing.CacheActivitySource.StartActivity("AddPreAuthCode"))
             {
-                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
-            }, cancellationToken);
+                var serializedPreAuthCode = JsonSerializer.Serialize(preAuthCode);
+                await _distributedCache.SetAsync(preAuthCode.Code, Encoding.UTF8.GetBytes(serializedPreAuthCode), new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+                }, cancellationToken);
+            }
         }
 
-        public Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken) => _distributedCache.RemoveAsync(preAuthorizationCode, cancellationToken);
+        public Task RemovePreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken)
+        {
+            using (var activity = Tracing.CacheActivitySource.StartActivity("RemovePreAuthCode"))
+            {
+                return _distributedCache.RemoveAsync(preAuthorizationCode, cancellationToken);
+            }
+        }
 
         public async Task<PreAuthCode> GetPreAuthCode(string preAuthorizationCode, CancellationToken cancellationToken)
         {
-            var cachedToken = await _distributedCache.GetAsync(preAuthorizationCode, cancellationToken);
-            if (cachedToken == null) return null;
-            return JsonSerializer.Deserialize<PreAuthCode>(Encoding.UTF8.GetString(cachedToken));
+            using (var activity = Tracing.CacheActivitySource.StartActivity("GetPreAuthCode"))
+            {
+                var cachedToken = await _distributedCache.GetAsync(preAuthorizationCode, cancellationToken);
+                if (cachedToken == null) return null;
+                return JsonSerializer.Deserialize<PreAuthCode>(Encoding.UTF8.GetString(cachedToken));
+            }
         }
 
         #endregion
@@ -346,19 +370,25 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task AddResetPasswordLink(string otpCode, string login, string realm, double expirationTimeInSeconds, CancellationToken cancellationToken)
         {
-            var resetPasswordLink = new ResetPasswordLink(otpCode, login, realm);
-            var json = JsonSerializer.Serialize(resetPasswordLink);
-            await _distributedCache.SetAsync(otpCode, Encoding.UTF8.GetBytes(json), new DistributedCacheEntryOptions
+            using (var activity = Tracing.CacheActivitySource.StartActivity("AddResetPasswordLink"))
             {
-                SlidingExpiration = TimeSpan.FromSeconds(expirationTimeInSeconds)
-            }, cancellationToken);
+                var resetPasswordLink = new ResetPasswordLink(otpCode, login, realm);
+                var json = JsonSerializer.Serialize(resetPasswordLink);
+                await _distributedCache.SetAsync(otpCode, Encoding.UTF8.GetBytes(json), new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromSeconds(expirationTimeInSeconds)
+                }, cancellationToken);
+            }
         }
 
         public async Task<ResetPasswordLink> GetResetPasswordLink(string otpCode, CancellationToken cancellationToken)
         {
-            var payload = await _distributedCache.GetAsync(otpCode, cancellationToken);
-            if (payload == null) return null;
-            return JsonSerializer.Deserialize<ResetPasswordLink>(Encoding.UTF8.GetString(payload));
+            using (var activity = Tracing.CacheActivitySource.StartActivity("GetResetPasswordLink"))
+            {
+                var payload = await _distributedCache.GetAsync(otpCode, cancellationToken);
+                if (payload == null) return null;
+                return JsonSerializer.Deserialize<ResetPasswordLink>(Encoding.UTF8.GetString(payload));
+            }
         }
 
         #endregion
@@ -367,17 +397,23 @@ namespace SimpleIdServer.IdServer.Helpers
 
         public async Task AddAuthorizationRequestCallback(string nonce, JsonObject record, double validityPeriodsInSeconds, CancellationToken cancellationToken)
         {
-            await _distributedCache.SetAsync(nonce, Encoding.UTF8.GetBytes(record.ToString()), new DistributedCacheEntryOptions
+            using (var activity = Tracing.CacheActivitySource.StartActivity("AddAuthorizationRequestCallback"))
             {
-                SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
-            }, cancellationToken);
+                await _distributedCache.SetAsync(nonce, Encoding.UTF8.GetBytes(record.ToString()), new DistributedCacheEntryOptions
+                {
+                    SlidingExpiration = TimeSpan.FromSeconds(validityPeriodsInSeconds)
+                }, cancellationToken);
+            }
         }
 
         public async Task<JsonObject> GetAuthorizationRequestCallback(string nonce, CancellationToken cancellationToken)
         {
-            var cache = await _distributedCache.GetAsync(nonce, cancellationToken);
-            if (cache == null) return null;
-            return JsonSerializer.Deserialize<JsonObject>(Encoding.UTF8.GetString(cache));
+            using (var activity = Tracing.CacheActivitySource.StartActivity("GetAuthorizationRequestCallback"))
+            {
+                var cache = await _distributedCache.GetAsync(nonce, cancellationToken);
+                if (cache == null) return null;
+                return JsonSerializer.Deserialize<JsonObject>(Encoding.UTF8.GetString(cache));
+            }
         }
 
         #endregion

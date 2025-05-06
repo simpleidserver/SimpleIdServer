@@ -34,6 +34,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public abstract string GrantType { get; }
 
         public abstract Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken);
+
         protected IdServerHostOptions Options => _options;
 
         protected async Task<Client> AuthenticateClient(HandlerContext context, CancellationToken cancellationToken)
@@ -85,6 +86,24 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             if ((result == null || !result.Any()) && previousRequest != null)
                 result = previousRequest.GetAuthorizationDetailsFromAuthorizationRequest();
             return result;
+        }
+
+        protected void Issue(JsonObject json, string clientId, string realm)
+        {
+            if(json.ContainsKey(TokenResponseParameters.RefreshToken))
+            {
+
+            }
+
+            if(json.ContainsKey(TokenResponseParameters.IdToken))
+            {
+                Counters.IssueIdToken(clientId, realm, GrantType);
+            }
+
+            if(json.ContainsKey(TokenResponseParameters.AccessToken))
+            {
+
+            }
         }
 
         protected void AddTokenProfile(HandlerContext context)

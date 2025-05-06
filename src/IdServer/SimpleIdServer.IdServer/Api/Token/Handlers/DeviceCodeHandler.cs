@@ -57,7 +57,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             IEnumerable<string> scopeLst = null;
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("DeviceCodeHandler"))
+            using (var activity = Tracing.BasicActivitySource.StartActivity("DeviceCodeHandler"))
             {
                 using (var transaction = _transactionBuilder.Build())
                 {
@@ -81,6 +81,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                             result.Add(kvp.Key, kvp.Value);
 
                         deviceAuthCode.Send();
+                        Issue(result, context.Client.ClientId, context.Realm);
                         await _busControl.Publish(new TokenIssuedSuccessEvent
                         {
                             GrantType = GRANT_TYPE,
@@ -101,6 +102,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                             Realm = context.Realm,
                             ErrorMessage = ex.Message
                         });
+                        Counters.FailToken(context.Client?.ClientId, context.Realm, GrantType);
                         activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                         return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
                     }

@@ -7,13 +7,12 @@ using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Domains.DTOs;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
@@ -153,61 +152,54 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] CertificateAuthority request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.CaActivitySource.StartActivity("Ca.Add"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
+                await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                var id = Guid.NewGuid().ToString();
+                var record = new CertificateAuthority
                 {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
-                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                    activity?.SetTag("subjectName", request.SubjectName);
-                    var id = Guid.NewGuid().ToString();
-                    var record = new CertificateAuthority
-                    {
-                        EndDateTime = request.EndDateTime,
-                        FindType = request.FindType,
-                        FindValue = request.FindValue,
-                        Id = id,
-                        PrivateKey = request.PrivateKey,
-                        PublicKey = request.PublicKey,
-                        Source = request.Source,
-                        StartDateTime = request.StartDateTime,
-                        StoreLocation = request.StoreLocation,
-                        SubjectName = request.SubjectName,
-                        StoreName = request.StoreName,
-                        UpdateDateTime = DateTime.UtcNow
-                    };
-                    var realm = await _realmRepository.Get(prefix, cancellationToken);
-                    record.Realms.Add(realm);
-                    _certificateAuthorityRepository.Add(record);
-                    await transaction.Commit(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Certificate authority {request.SubjectName} added");
-                    await _busControl.Publish(new AddCertificateAuthoritySuccessEvent
-                    {
-                        Realm = prefix,
-                        SubjectName = request.SubjectName
-                    });
-                    return new ContentResult
-                    {
-                        StatusCode = (int)HttpStatusCode.Created,
-                        Content = JsonSerializer.Serialize(record).ToString(),
-                        ContentType = "application/json"
-                    };
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AddCertificateAuthorityFailureEvent
+                    EndDateTime = request.EndDateTime,
+                    FindType = request.FindType,
+                    FindValue = request.FindValue,
+                    Id = id,
+                    PrivateKey = request.PrivateKey,
+                    PublicKey = request.PublicKey,
+                    Source = request.Source,
+                    StartDateTime = request.StartDateTime,
+                    StoreLocation = request.StoreLocation,
+                    SubjectName = request.SubjectName,
+                    StoreName = request.StoreName,
+                    UpdateDateTime = DateTime.UtcNow
+                };
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
+                record.Realms.Add(realm);
+                _certificateAuthorityRepository.Add(record);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new AddCertificateAuthoritySuccessEvent
                 {
                     Realm = prefix,
-                    SubjectName = request?.SubjectName
+                    SubjectName = request.SubjectName
                 });
-                return BuildError(ex);
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JsonSerializer.Serialize(record).ToString(),
+                    ContentType = "application/json"
+                };
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new AddCertificateAuthorityFailureEvent
+            {
+                Realm = prefix,
+                SubjectName = request?.SubjectName
+            });
+            return BuildError(ex);
         }
     }
 
@@ -215,39 +207,32 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> Remove([FromRoute] string prefix, string id, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.CaActivitySource.StartActivity("Ca.Remove"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.CaTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
-                    var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
-                    if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
-                    _certificateAuthorityRepository.Delete(ca);
-                    await transaction.Commit(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Certificate authority {id} removed");
-                    await _busControl.Publish(new RemoveCertificateAuthoritySuccessEvent
-                    {
-                        Realm = prefix,
-                        Id = id
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new RemoveCertificateAuthorityFailureEvent
+                await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
+                var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
+                if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
+                _certificateAuthorityRepository.Delete(ca);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new RemoveCertificateAuthoritySuccessEvent
                 {
                     Realm = prefix,
                     Id = id
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new RemoveCertificateAuthorityFailureEvent
+            {
+                Realm = prefix,
+                Id = id
+            });
+            return BuildError(ex);
         }
     }
 
@@ -273,45 +258,36 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> RemoveClientCertificate([FromRoute] string prefix, string id, string clientCertificateId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.CaActivitySource.StartActivity("Ca.RemoveClientCertificate"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.CaTagNames.Id, id);
-                    activity?.SetTag(Tracing.CaTagNames.ClientCertificateId, clientCertificateId);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
-                    var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
-                    if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
-                    var clientCertificate = ca.ClientCertificates.SingleOrDefault(c => c.Id == clientCertificateId);
-                    if (clientCertificate == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClientCa, id));
-                    ca.ClientCertificates.Remove(clientCertificate);
-                    _certificateAuthorityRepository.Update(ca);
-                    await transaction.Commit(CancellationToken.None);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Client certificate {clientCertificateId} removed");
-                    await _busControl.Publish(new RemoveClientCertificateSuccessEvent
-                    {
-                        Realm = prefix,
-                        CAId = id,
-                        ClientCertificateId = clientCertificateId
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new RemoveClientCertificateFailureEvent
+                await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
+                var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
+                if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
+                var clientCertificate = ca.ClientCertificates.SingleOrDefault(c => c.Id == clientCertificateId);
+                if (clientCertificate == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClientCa, id));
+                ca.ClientCertificates.Remove(clientCertificate);
+                await transaction.Commit(CancellationToken.None);
+                await _busControl.Publish(new RemoveClientCertificateSuccessEvent
                 {
                     Realm = prefix,
                     CAId = id,
                     ClientCertificateId = clientCertificateId
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new RemoveClientCertificateFailureEvent
+            {
+                Realm = prefix,
+                CAId = id,
+                ClientCertificateId = clientCertificateId
+            });
+            return BuildError(ex);
         }
     }
 
@@ -319,75 +295,67 @@ public class CertificateAuthoritiesController : BaseController
     public async Task<IActionResult> AddClientCertificate([FromRoute] string prefix, string id, [FromBody] AddClientCertificateRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.CaActivitySource.StartActivity("Ca.AddClientCertificate"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
+                await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ClientCertificateNames.SubjectName));
+                var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
+                if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
+                var store = new Stores.CertificateAuthorityStore(null);
+                var certificate = store.Get(ca);
+                PemResult pem = null;
+                try
                 {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.CaTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.CertificateAuthorities.Name);
-                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                    if (string.IsNullOrWhiteSpace(request.SubjectName)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, ClientCertificateNames.SubjectName));
-                    activity?.SetTag("subjectName", request.SubjectName);
-                    var ca = await _certificateAuthorityRepository.Get(prefix, id, cancellationToken);
-                    if (ca == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownCa, id));
-                    var store = new Stores.CertificateAuthorityStore(null);
-                    var certificate = store.Get(ca);
-                    PemResult pem = null;
-                    try
-                    {
-                        pem = KeyGenerator.GenerateClientCertificate(certificate, request.SubjectName, request.NbDays);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex.ToString());
-                        throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateClientCannotBeGenerated);
-                    }
-
-                    var record = new ClientCertificate
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = request.SubjectName,
-                        PublicKey = pem.PublicKey,
-                        PrivateKey = pem.PrivateKey,
-                        StartDateTime = DateTime.UtcNow,
-                        EndDateTime = DateTime.UtcNow.AddDays(request.NbDays)
-                    };
-                    ca.UpdateDateTime = DateTime.UtcNow;
-                    ca.ClientCertificates.Add(record);
-                    _certificateAuthorityRepository.Update(ca);
-                    await transaction.Commit(CancellationToken.None);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Certificate authority client {request.SubjectName} added");
-                    await _busControl.Publish(new AddClientCertificateAuthoritySuccessEvent
-                    {
-                        Realm = prefix,
-                        SubjectName = request.SubjectName,
-                        CAId = id,
-                        NbDays = request.NbDays
-                    });
-                    return new ContentResult
-                    {
-                        StatusCode = (int)HttpStatusCode.Created,
-                        Content = JsonSerializer.Serialize(record).ToString(),
-                        ContentType = "application/json"
-                    };
+                    pem = KeyGenerator.GenerateClientCertificate(certificate, request.SubjectName, request.NbDays);
                 }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AddClientCertificateAuthorityFailureEvent
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.ToString());
+                    throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.CertificateClientCannotBeGenerated);
+                }
+
+                var record = new ClientCertificate
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = request.SubjectName,
+                    PublicKey = pem.PublicKey,
+                    PrivateKey = pem.PrivateKey,
+                    StartDateTime = DateTime.UtcNow,
+                    EndDateTime = DateTime.UtcNow.AddDays(request.NbDays)
+                };
+                ca.UpdateDateTime = DateTime.UtcNow;
+                ca.ClientCertificates.Add(record);
+                _certificateAuthorityRepository.Update(ca);
+                await transaction.Commit(CancellationToken.None);
+                await _busControl.Publish(new AddClientCertificateAuthoritySuccessEvent
                 {
                     Realm = prefix,
-                    SubjectName = request?.SubjectName,
+                    SubjectName = request.SubjectName,
                     CAId = id,
-                    NbDays = request?.NbDays
+                    NbDays = request.NbDays
                 });
-                return BuildError(ex);
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JsonSerializer.Serialize(record).ToString(),
+                    ContentType = "application/json"
+                };
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new AddClientCertificateAuthorityFailureEvent
+            {
+                Realm = prefix,
+                SubjectName = request?.SubjectName,
+                CAId = id,
+                NbDays = request?.NbDays
+            });
+            return BuildError(ex);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace SimpleIdServer.IdServer.Stores
 
         public IEnumerable<SigningCredentials> GetAllSigningKeys(string realm)
         {
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("GetAllSigningKeys"))
+            using (var activity = Tracing.BasicActivitySource.StartActivity("GetAllSigningKeys"))
             {
                 var result = new List<SigningCredentials>();
                 var serializedKeys = _fileSerializedKeyStore.GetAllSig(realm, CancellationToken.None).Result;
@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Stores
 
         public IEnumerable<EncryptingCredentials> GetAllEncryptingKeys(string realm)
         {
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("GetAllEncryptingKeys"))
+            using (var activity = Tracing.BasicActivitySource.StartActivity("GetAllEncryptingKeys"))
             {
                 var result = new List<EncryptingCredentials>();
                 var serializedKeys = _fileSerializedKeyStore.GetAllEnc(realm, CancellationToken.None).Result;

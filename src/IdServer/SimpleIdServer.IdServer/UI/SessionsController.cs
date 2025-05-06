@@ -50,6 +50,7 @@ public class SessionsController : Controller
             UserName = request.User,
             Realm = request.Realm
         });
+        Counters.Logout(request.Realm);
         return RedirectToAction(nameof(Index));
     }
 

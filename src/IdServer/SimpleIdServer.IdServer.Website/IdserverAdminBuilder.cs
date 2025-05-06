@@ -17,6 +17,7 @@ public class IdserverAdminBuilder
 
     internal IdserverAdminBuilder(WebApplicationBuilder builder, IServiceCollection services, IDataProtectionBuilder dataprotectionBuilder, AdminOpenidAuth adminOpenidAuth, AdminCookieAuth adminCookieAuth, AdminAuthz adminAuthz)
     {
+        _builder = builder;
         _services = services;
         _dataprotectionBuilder = dataprotectionBuilder;
         _adminOpenidAuth = adminOpenidAuth;

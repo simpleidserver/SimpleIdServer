@@ -29,35 +29,38 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public virtual async Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
-            var dic = new JsonObject();
-            if (handlerContext.Request.RequestData != null)
-                foreach (var record in handlerContext.Request.RequestData)
-                    if (record.Value is JsonValue)
-                        dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.GetValue<string>()));
-                    else
-                        dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.ToJsonString()));
+            using (var activity = Tracing.BasicActivitySource.StartActivity("BuildRefreshToken"))
+            {
+                var dic = new JsonObject();
+                if (handlerContext.Request.RequestData != null)
+                    foreach (var record in handlerContext.Request.RequestData)
+                        if (record.Value is JsonValue)
+                            dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.GetValue<string>()));
+                        else
+                            dic.Add(record.Key, QueryCollectionExtensions.GetValue(record.Value.ToJsonString()));
 
-            if (handlerContext.User != null)
-                dic.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Name);
+                if (handlerContext.User != null)
+                    dic.Add(JwtRegisteredClaimNames.Sub, handlerContext.User.Name);
 
-            var authorizationCode = string.Empty;
-            handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
-            string jkt = null;
-            if(handlerContext.DPOPProof != null)
-                jkt = handlerContext.DPOPProof.PublicKey().CreateThumbprint();
+                var authorizationCode = string.Empty;
+                handlerContext.Response.TryGet(AuthorizationResponseParameters.Code, out authorizationCode);
+                string jkt = null;
+                if (handlerContext.DPOPProof != null)
+                    jkt = handlerContext.DPOPProof.PublicKey().CreateThumbprint();
 
-            var sessionId = handlerContext.Session?.SessionId;
-            var refreshToken = await GrantedTokenHelper.AddRefreshToken(
-                handlerContext.Client.ClientId, 
-                authorizationCode, 
-                parameter.GrantId, 
-                dic,
-                handlerContext.OriginalRequest, 
-                handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds, 
-                jkt,
-                sessionId,
-                cancellationToken);
-            handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
+                var sessionId = handlerContext.Session?.SessionId;
+                var refreshToken = await GrantedTokenHelper.AddRefreshToken(
+                    handlerContext.Client.ClientId,
+                    authorizationCode,
+                    parameter.GrantId,
+                    dic,
+                    handlerContext.OriginalRequest,
+                    handlerContext.Client.RefreshTokenExpirationTimeInSeconds ?? _options.DefaultRefreshTokenExpirationTimeInSeconds,
+                    jkt,
+                    sessionId,
+                    cancellationToken);
+                handlerContext.Response.Add(TokenResponseParameters.RefreshToken, refreshToken);
+            }
         }
     }
 }

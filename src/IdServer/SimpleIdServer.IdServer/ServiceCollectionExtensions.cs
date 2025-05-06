@@ -99,7 +99,6 @@ public static class ServiceCollectionExtensions
         {
             opt.ConstraintMap.Add("realmPrefix", typeof(RealmRoutePrefixConstraint));
         });
-        Tracing.Init();
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
         ConfigureDataSeeders(services);

@@ -16,7 +16,6 @@ using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
@@ -65,111 +64,103 @@ public class AuthorizationController : Controller
     [HttpGet]
     public async Task Get([FromRoute] string prefix, [FromQuery] AuthorizationRequest request, CancellationToken token)
     {
-        using (var activity = Tracing.IdserverActivitySource.StartActivity("Authz.Get"))
+        var jObjBody = Request.Query.ToJObject();
+        var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        var claimAmrs = User.Claims.FirstOrDefault(c => c.Type == Config.DefaultUserClaims.Amrs);
+        var userSubject = claimName == null ? string.Empty : claimName.Value;
+        var userAmrs = claimAmrs == null ? new List<string>() : claimAmrs.Value.Split(" ").ToList();
+        var referer = string.Empty;
+        if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
+        var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
+        context.Request.SetUserAmrs(userAmrs);
+        try
         {
-            var jObjBody = Request.Query.ToJObject();
-            var claimName = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            var claimAmrs = User.Claims.FirstOrDefault(c => c.Type == Config.DefaultUserClaims.Amrs);
-            var userSubject = claimName == null ? string.Empty : claimName.Value;
-            var userAmrs = claimAmrs == null ? new List<string>() : claimAmrs.Value.Split(" ").ToList();
-            var referer = string.Empty;
-            if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
-            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), userSubject, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
-            context.Request.SetUserAmrs(userAmrs);
-            activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
-            try
+            var authorizationResponse = await _authorizationRequestHandler.Handle(context, token);
+            if (authorizationResponse.Type == AuthorizationResponseTypes.RedirectUrl)
             {
-                var authorizationResponse = await _authorizationRequestHandler.Handle(context, token);
-                if (authorizationResponse.Type == AuthorizationResponseTypes.RedirectUrl)
-                {
-                    var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
-                    _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
-                    activity?.SetStatus(ActivityStatusCode.Ok, "Authorization Success");
-                    await _busControl.Publish(new AuthorizationSuccessEvent
-                    {
-                        ClientId = context.Client.ClientId,
-                        Realm = context.Realm,
-                        RequestJSON = jObjBody.ToString()
-                    });
-                    return;
-                }
-
-                var redirectActionAuthorizationResponse = authorizationResponse as RedirectActionAuthorizationResponse;
-                if (redirectActionAuthorizationResponse.Disconnect)
-                {
-                    if (redirectActionAuthorizationResponse.CookiesToRemove != null)
-                    {
-                        foreach (var cookieName in redirectActionAuthorizationResponse.CookiesToRemove)
-                        {
-                            Response.Cookies.Delete(cookieName);
-                        }
-                    }
-
-                    Response.Cookies.Delete(IdServerCookieAuthenticationHandler.GetCookieName(_realmStore.Realm, _cookieAuthOptions.Cookie.Name));
-                }
-
-                if(redirectActionAuthorizationResponse.AmrAuthInfo != null)
-                {
-                    await _acrHelper.StoreAcr(redirectActionAuthorizationResponse.AmrAuthInfo, token);
-                }
-
-                var parameters = new List<KeyValuePair<string, string>>();
-                foreach (var record in redirectActionAuthorizationResponse.QueryParameters)
-                {
-                    if (record.Value is JsonArray)
-                    {
-                        var jArr = record.Value.AsArray();
-                        foreach (var rec in jArr)
-                        {
-                            parameters.Add(new KeyValuePair<string, string>(record.Key, rec.ToString()));
-                        }
-                    }
-                    else
-                    {
-                        parameters.Add(new KeyValuePair<string, string>(record.Key, record.Value.ToString()));
-                    }
-                }
-
-                FormatRedirectUrl(parameters);
-                var queryCollection = new QueryBuilder(parameters);
-                var issuer = Request.GetAbsoluteUriWithVirtualPath();
-                if (!string.IsNullOrWhiteSpace(prefix))
-                    issuer = $"{issuer}/{prefix}";
-                var returnUrl = $"{issuer}/{Config.DefaultEndpoints.Authorization}{queryCollection.ToQueryString()}";
-                var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
-                var url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
-                {
-                    ReturnUrl = _dataProtector.Protect(returnUrl),
-                    area = redirectActionAuthorizationResponse.Area,
-                    ui_locales = string.Join(" ", uiLocales)
-                });
-                activity?.SetStatus(ActivityStatusCode.Ok, $"User agent will be redirect to '{url}'");
-                HttpContext.Response.Redirect(url);
-            }
-            catch (OAuthExceptionBadRequestURIException ex)
-            {
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AuthorizationFailureEvent
+                var redirectUrlAuthorizationResponse = authorizationResponse as RedirectURLAuthorizationResponse;
+                _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
+                await _busControl.Publish(new AuthorizationSuccessEvent
                 {
                     ClientId = context.Client.ClientId,
                     Realm = context.Realm,
-                    RequestJSON = jObjBody.ToString(),
-                    ErrorMessage = ex.Message
+                    RequestJSON = jObjBody.ToString()
                 });
-                await BuildErrorResponse(context, ex, true);
+                return;
             }
-            catch (OAuthException ex)
+
+            var redirectActionAuthorizationResponse = authorizationResponse as RedirectActionAuthorizationResponse;
+            if (redirectActionAuthorizationResponse.Disconnect)
             {
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AuthorizationFailureEvent
+                if (redirectActionAuthorizationResponse.CookiesToRemove != null)
                 {
-                    ClientId = context.Client?.ClientId,
-                    Realm = context.Realm,
-                    RequestJSON = jObjBody.ToString(),
-                    ErrorMessage = ex.Message
-                });
-                await BuildErrorResponse(context, ex);
+                    foreach (var cookieName in redirectActionAuthorizationResponse.CookiesToRemove)
+                    {
+                        Response.Cookies.Delete(cookieName);
+                    }
+                }
+
+                Response.Cookies.Delete(IdServerCookieAuthenticationHandler.GetCookieName(_realmStore.Realm, _cookieAuthOptions.Cookie.Name));
             }
+
+            if (redirectActionAuthorizationResponse.AmrAuthInfo != null)
+            {
+                await _acrHelper.StoreAcr(redirectActionAuthorizationResponse.AmrAuthInfo, token);
+            }
+
+            var parameters = new List<KeyValuePair<string, string>>();
+            foreach (var record in redirectActionAuthorizationResponse.QueryParameters)
+            {
+                if (record.Value is JsonArray)
+                {
+                    var jArr = record.Value.AsArray();
+                    foreach (var rec in jArr)
+                    {
+                        parameters.Add(new KeyValuePair<string, string>(record.Key, rec.ToString()));
+                    }
+                }
+                else
+                {
+                    parameters.Add(new KeyValuePair<string, string>(record.Key, record.Value.ToString()));
+                }
+            }
+
+            FormatRedirectUrl(parameters);
+            var queryCollection = new QueryBuilder(parameters);
+            var issuer = Request.GetAbsoluteUriWithVirtualPath();
+            if (!string.IsNullOrWhiteSpace(prefix))
+                issuer = $"{issuer}/{prefix}";
+            var returnUrl = $"{issuer}/{Config.DefaultEndpoints.Authorization}{queryCollection.ToQueryString()}";
+            var uiLocales = context.Request.RequestData.GetUILocalesFromAuthorizationRequest();
+            var url = Url.Action(redirectActionAuthorizationResponse.Action, redirectActionAuthorizationResponse.ControllerName, new
+            {
+                ReturnUrl = _dataProtector.Protect(returnUrl),
+                area = redirectActionAuthorizationResponse.Area,
+                ui_locales = string.Join(" ", uiLocales)
+            });
+            HttpContext.Response.Redirect(url);
+        }
+        catch (OAuthExceptionBadRequestURIException ex)
+        {
+            await _busControl.Publish(new AuthorizationFailureEvent
+            {
+                ClientId = context.Client.ClientId,
+                Realm = context.Realm,
+                RequestJSON = jObjBody.ToString(),
+                ErrorMessage = ex.Message
+            });
+            await BuildErrorResponse(context, ex, true);
+        }
+        catch (OAuthException ex)
+        {
+            await _busControl.Publish(new AuthorizationFailureEvent
+            {
+                ClientId = context.Client?.ClientId,
+                Realm = context.Realm,
+                RequestJSON = jObjBody.ToString(),
+                ErrorMessage = ex.Message
+            });
+            await BuildErrorResponse(context, ex);
         }
     }
 
@@ -181,33 +172,27 @@ public class AuthorizationController : Controller
         var referer = string.Empty;
         if (Request.Headers.Referer.Any()) referer = Request.Headers.Referer.First();
         var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies, referer), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
-        using (var activity = Tracing.IdserverActivitySource.StartActivity("Authz.Callback"))
+        try
         {
-            try
+            var authorizationResponse = await _authorizationCallbackRequestHandler.Handle(context, cancellationToken);
+            _responseModeHandler.Handle(context, authorizationResponse, HttpContext);
+            await _busControl.Publish(new AuthorizationSuccessEvent
             {
-                activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                var authorizationResponse = await _authorizationCallbackRequestHandler.Handle(context, cancellationToken);
-                _responseModeHandler.Handle(context, authorizationResponse, HttpContext);
-                activity?.SetStatus(ActivityStatusCode.Ok, "Authorization Success");
-                await _busControl.Publish(new AuthorizationSuccessEvent
-                {
-                    ClientId = context.Client.ClientId,
-                    Realm = context.Realm,
-                    RequestJSON = jObjBody.ToString()
-                });
-            }
-            catch (OAuthException ex)
+                ClientId = context.Client.ClientId,
+                Realm = context.Realm,
+                RequestJSON = jObjBody.ToString()
+            });
+        }
+        catch (OAuthException ex)
+        {
+            await _busControl.Publish(new AuthorizationFailureEvent
             {
-                activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AuthorizationFailureEvent
-                {
-                    ClientId = context.Client?.ClientId,
-                    Realm = context.Realm,
-                    RequestJSON = jObjBody.ToString(),
-                    ErrorMessage = ex.Message
-                });
-                await BuildErrorResponse(context, ex);
-            }
+                ClientId = context.Client?.ClientId,
+                Realm = context.Realm,
+                RequestJSON = jObjBody.ToString(),
+                ErrorMessage = ex.Message
+            });
+            await BuildErrorResponse(context, ex);
         }
     }
 

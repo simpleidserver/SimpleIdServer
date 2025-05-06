@@ -20,7 +20,6 @@ using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
@@ -151,70 +150,65 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPost]
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] RegisterUserRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Add"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var realm = await _realmRepository.Get(prefix, cancellationToken);
+                    await Validate();
+                    var newUser = new User
                     {
-                        prefix = prefix ?? Constants.DefaultRealm;
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        var realm = await _realmRepository.Get(prefix, cancellationToken);
-                        await Validate();
-                        var newUser = new User
+                        Id = Guid.NewGuid().ToString(),
+                        Name = request.Name,
+                        Firstname = request.Firstname,
+                        Lastname = request.Lastname,
+                        Email = request.Email,
+                        EmailVerified = request.EmailVerified,
+                        OAuthUserClaims = request.Claims?.Select(c => new UserClaim
                         {
                             Id = Guid.NewGuid().ToString(),
-                            Name = request.Name,
-                            Firstname = request.Firstname,
-                            Lastname = request.Lastname,
-                            Email = request.Email,
-                            EmailVerified = request.EmailVerified,
-                            OAuthUserClaims = request.Claims?.Select(c => new UserClaim
-                            {
-                                Id = Guid.NewGuid().ToString(),
-                                Name = c.Key,
-                                Value = c.Value
-                            }).ToList(),
-                            UpdateDateTime = DateTime.UtcNow,
-                            CreateDateTime = DateTime.UtcNow
-                        };
-                        newUser.Realms.Add(new RealmUser
-                        {
-                            Realm = realm
-                        });
-                        _userRepository.Add(newUser);
-                        Counters.UserRegistered();
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "Add user success");
-                        await _busControl.Publish(new AddUserSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = newUser.Id,
-                            Name = newUser.Name,
-                            Email = newUser.Email,
-                            Firstname = newUser.Firstname,
-                            Lastname = newUser.Lastname,
-                            Claims = request.Claims
-                        });
-                        return new ContentResult
-                        {
-                            Content = JsonSerializer.Serialize(newUser),
-                            ContentType = "application/json",
-                            StatusCode = (int)HttpStatusCode.Created
-                        };
-                    }
+                            Name = c.Key,
+                            Value = c.Value
+                        }).ToList(),
+                        UpdateDateTime = DateTime.UtcNow,
+                        CreateDateTime = DateTime.UtcNow
+                    };
+                    newUser.Realms.Add(new RealmUser
+                    {
+                        Realm = realm
+                    });
+                    _userRepository.Add(newUser);
+                    Counters.UserRegistered();
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new AddUserSuccessEvent
+                    {
+                        Realm = prefix,
+                        Id = newUser.Id,
+                        Name = newUser.Name,
+                        Email = newUser.Email,
+                        Firstname = newUser.Firstname,
+                        Lastname = newUser.Lastname,
+                        Claims = request.Claims
+                    });
+                    return new ContentResult
+                    {
+                        Content = JsonSerializer.Serialize(newUser),
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.Created
+                    };
                 }
-                catch (OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(ex);
-                }
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
             }
 
             async Task Validate()
             {
                 if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserNames.Name));
-                if(await _userRepository.IsSubjectExists(request.Name, prefix, cancellationToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UserExists, request.Name));
+                if (await _userRepository.IsSubjectExists(request.Name, prefix, cancellationToken)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UserExists, request.Name));
             }
         }
 
@@ -222,118 +216,97 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateUserRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Update"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    if (!string.IsNullOrWhiteSpace(request.Email))
                     {
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        if (!string.IsNullOrWhiteSpace(request.Email))
-                        {
-                            var existingUser = await _userRepository.GetByEmail(request.Email, prefix, cancellationToken);
-                            if (existingUser != null && existingUser.Id != id) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.EmailIsTaken);
-                        }
-
-                        user.UpdateEmail(request.Email);
-                        user.UpdateName(request.Name);
-                        user.UpdateLastname(request.Lastname);
-                        user.EmailVerified = request.EmailVerified;
-                        user.NotificationMode = request.NotificationMode ?? string.Empty;
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User is updated");
-                        await _busControl.Publish(new UpdateUserSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id
-                        });
-                        return new NoContentResult();
+                        var existingUser = await _userRepository.GetByEmail(request.Email, prefix, cancellationToken);
+                        if (existingUser != null && existingUser.Id != id) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.EmailIsTaken);
                     }
-                }
-                catch (OAuthException ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new UpdateUserFailureEvent
+
+                    user.UpdateEmail(request.Email);
+                    user.UpdateName(request.Name);
+                    user.UpdateLastname(request.Lastname);
+                    user.EmailVerified = request.EmailVerified;
+                    user.NotificationMode = request.NotificationMode ?? string.Empty;
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new UpdateUserSuccessEvent
                     {
                         Realm = prefix,
                         Id = id
                     });
-                    return BuildError(ex);
+                    return new NoContentResult();
                 }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                await _busControl.Publish(new UpdateUserFailureEvent
+                {
+                    Realm = prefix,
+                    Id = id
+                });
+                return BuildError(ex);
             }
         }
 
         [HttpDelete]
         public async Task<IActionResult> Delete([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Remove"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) return new NotFoundResult();
+                    _userRepository.Remove(new List<User> { user });
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new RemoveUserSuccessEvent
                     {
-                        prefix = prefix ?? Constants.DefaultRealm;
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) return new NotFoundResult();
-                        _userRepository.Remove(new List<User> { user });
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User is removed");
-                        await _busControl.Publish(new RemoveUserSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id,
-                            Name = user.Name
-                        });
-                        return new NoContentResult();
-                    }
+                        Realm = prefix,
+                        Id = id,
+                        Name = user.Name
+                    });
+                    return new NoContentResult();
                 }
-                catch (OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(ex);
-                }
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
             }
         }
 
         [HttpPost]
         public async Task<IActionResult> UpdatePicture([FromRoute] string prefix, string id, IFormFile file, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.UpdatePicture"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        var issuer = Request.GetAbsoluteUriWithVirtualPath();
-                        prefix = prefix ?? Constants.DefaultRealm;
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) return new NotFoundResult();
-                        _userHelper.UpdatePicture(user, file, issuer);
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User picture is updated");
-                        return new NoContentResult();
-                    }
+                    var issuer = Request.GetAbsoluteUriWithVirtualPath();
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) return new NotFoundResult();
+                    _userHelper.UpdatePicture(user, file, issuer);
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    return new NoContentResult();
                 }
-                catch (OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(ex);
-                }
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
             }
         }
 
@@ -345,167 +318,139 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> AddCredential([FromRoute] string prefix, string id, [FromBody] AddUserCredentialRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.AddCredential"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    if (request.Active)
                     {
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        if (request.Active)
-                        {
-                            foreach (var act in user.Credentials.Where(c => c.CredentialType == request.Credential.CredentialType))
-                                act.IsActive = false;
-                            request.Credential.IsActive = true;
-                        }
-
-                        if(request.Credential.CredentialType == Constants.AreaPwd)
-                        {
-                            request.Credential.Value = PasswordHelper.ComputeHash(request.Credential.Value, _options.IsPasswordEncodeInBase64);
-                        }
-
-                        request.Credential.Id = Guid.NewGuid().ToString();
-                        user.Credentials.Add(request.Credential);
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User's credential is added");
-                        return new ContentResult
-                        {
-                            Content = JsonSerializer.Serialize(request.Credential),
-                            ContentType = "application/json",
-                            StatusCode = (int)HttpStatusCode.Created
-                        };
+                        foreach (var act in user.Credentials.Where(c => c.CredentialType == request.Credential.CredentialType))
+                            act.IsActive = false;
+                        request.Credential.IsActive = true;
                     }
+
+                    if (request.Credential.CredentialType == Constants.AreaPwd)
+                    {
+                        request.Credential.Value = PasswordHelper.ComputeHash(request.Credential.Value, _options.IsPasswordEncodeInBase64);
+                    }
+
+                    request.Credential.Id = Guid.NewGuid().ToString();
+                    user.Credentials.Add(request.Credential);
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    return new ContentResult
+                    {
+                        Content = JsonSerializer.Serialize(request.Credential),
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.Created
+                    };
                 }
-                catch (OAuthException ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(ex);
-                }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
             }
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateCredential([FromRoute] string prefix, string id, string credentialId, [FromBody] UpdateUserCredentialRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.UpdateCredential"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        prefix = prefix ?? Constants.DefaultRealm;
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        if (string.IsNullOrWhiteSpace(request.Value)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserCredentialNames.Value));
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) return new NotFoundResult();
-                        var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
-                        if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
-                        if(existingCredential.CredentialType == Constants.AreaPwd)
-                            existingCredential.Value = PasswordHelper.ComputeHash(request.Value, _options.IsPasswordEncodeInBase64);
-                        else
-                            existingCredential.Value = request.Value;
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    if (string.IsNullOrWhiteSpace(request.Value)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserCredentialNames.Value));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) return new NotFoundResult();
+                    var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
+                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
+                    if (existingCredential.CredentialType == Constants.AreaPwd)
+                        existingCredential.Value = PasswordHelper.ComputeHash(request.Value, _options.IsPasswordEncodeInBase64);
+                    else
+                        existingCredential.Value = request.Value;
 
-                        existingCredential.OTPAlg = request.OTPAlg;
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "Credential is replaced");
-                        await _busControl.Publish(new UpdateUserCredentialSuccessEvent
-                        {
-                            Realm = prefix,
-                            Name = user.Name
-                        });
-                        return new ContentResult
-                        {
-                            Content = JsonSerializer.Serialize(existingCredential),
-                            ContentType = "application/json",
-                            StatusCode = (int)HttpStatusCode.OK
-                        };
-                    }
+                    existingCredential.OTPAlg = request.OTPAlg;
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new UpdateUserCredentialSuccessEvent
+                    {
+                        Realm = prefix,
+                        Name = user.Name
+                    });
+                    return new ContentResult
+                    {
+                        Content = JsonSerializer.Serialize(existingCredential),
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.OK
+                    };
                 }
-                catch (OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(ex);
-                }
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
             }
         }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.DeleteCredential"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        prefix = prefix ?? Constants.DefaultRealm;
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) return new NotFoundResult();
-                        var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
-                        if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
-                        user.Credentials.Remove(existingCredential);
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "Credential is removed");
-                        return new NoContentResult();
-                    }
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) return new NotFoundResult();
+                    var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
+                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
+                    user.Credentials.Remove(existingCredential);
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    return new NoContentResult();
                 }
-                catch (OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(ex);
-                }
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
             }
         }
 
         [HttpGet]
         public async Task<IActionResult> DefaultCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.SetDefaultCredential"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        prefix = prefix ?? Constants.DefaultRealm;
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) return new NotFoundResult();
-                        var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
-                        if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
-                        foreach (var cred in user.Credentials.Where(c => c.CredentialType == existingCredential.CredentialType))
-                            cred.IsActive = false;
-                        existingCredential.IsActive = true;
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "Default credential is set");
-                        return new NoContentResult();
-                    }
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) return new NotFoundResult();
+                    var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
+                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
+                    foreach (var cred in user.Credentials.Where(c => c.CredentialType == existingCredential.CredentialType))
+                        cred.IsActive = false;
+                    existingCredential.IsActive = true;
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    return new NoContentResult();
                 }
-                catch (OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    return BuildError(ex);
-                }
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
             }
         }
 
@@ -516,54 +461,47 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpPut]
         public async Task<IActionResult> UpdateClaims([FromRoute] string prefix, string id, [FromBody] UpdateUserClaimsRequest request, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.UpdateClaims"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        prefix = prefix ?? Constants.DefaultRealm;
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        Validate();
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        Update(user, request);
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "Claims are updated");
-                        await _busControl.Publish(new UpdateUserClaimsSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id
-                        });
-                        return new NoContentResult();
-                    }
-                }
-                catch (OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new UpdateUserClaimsFailureEvent
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    Validate();
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    Update(user, request);
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new UpdateUserClaimsSuccessEvent
                     {
                         Realm = prefix,
                         Id = id
                     });
-                    return BuildError(ex);
+                    return new NoContentResult();
                 }
-
-                void Validate()
+            }
+            catch (OAuthException ex)
+            {
+                await _busControl.Publish(new UpdateUserClaimsFailureEvent
                 {
-                    if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                }
+                    Realm = prefix,
+                    Id = id
+                });
+                return BuildError(ex);
+            }
 
-                void Update(User user, UpdateUserClaimsRequest request)
-                {
-                    _userRepository.Remove(user.OAuthUserClaims);
-                    user.OAuthUserClaims.Clear();
-                    foreach (var cl in request.Claims)
-                        user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = cl.Name, Value = cl.Value });
-                }
+            void Validate()
+            {
+                if (request == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+            }
+
+            void Update(User user, UpdateUserClaimsRequest request)
+            {
+                _userRepository.Remove(user.OAuthUserClaims);
+                user.OAuthUserClaims.Clear();
+                foreach (var cl in request.Claims)
+                    user.OAuthUserClaims.Add(new UserClaim { Id = Guid.NewGuid().ToString(), Name = cl.Name, Value = cl.Value });
             }
         }
 
@@ -575,52 +513,44 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> AddGroup([FromRoute] string prefix, string id, string groupId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.AddGroup"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    var newGroup = await _groupRepository.Get(prefix, groupId, cancellationToken);
+                    if (newGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
+                    user.Groups.Add(new GroupUser
                     {
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        activity?.SetTag(Tracing.UserTagNames.GroupId, groupId);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        var newGroup = await _groupRepository.Get(prefix, groupId, cancellationToken);
-                        if (newGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
-                        user.Groups.Add(new GroupUser
-                        {
-                            GroupsId = newGroup.Id
-                        });
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User's group is added");
-                        await _busControl.Publish(new AssignUserGroupSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id
-                        });
-                        return new ContentResult
-                        {
-                            Content = JsonSerializer.Serialize(newGroup),
-                            ContentType = "application/json",
-                            StatusCode = (int)HttpStatusCode.Created
-                        };
-                    }
-                }
-                catch (OAuthException ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new AssignUserGroupFailureEvent
+                        GroupsId = newGroup.Id
+                    });
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new AssignUserGroupSuccessEvent
                     {
                         Realm = prefix,
                         Id = id
                     });
-                    return BuildError(ex);
+                    return new ContentResult
+                    {
+                        Content = JsonSerializer.Serialize(newGroup),
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.Created
+                    };
                 }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                await _busControl.Publish(new AssignUserGroupFailureEvent
+                {
+                    Realm = prefix,
+                    Id = id
+                });
+                return BuildError(ex);
             }
         }
 
@@ -628,44 +558,36 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RemoveGroup([FromRoute] string prefix, string id, string groupId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.RemoveGroup"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        activity?.SetTag(Tracing.UserTagNames.GroupId, groupId);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        var assignedGroup = user.Groups.SingleOrDefault(g => g.GroupsId == groupId);
-                        if (assignedGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
-                        user.Groups.Remove(assignedGroup);
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User's group is removed");
-                        await _busControl.Publish(new RemoveUserGroupSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id
-                        });
-                        return new NoContentResult();
-                    }
-                }
-                catch (OAuthException ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new RemoveUserGroupFailureEvent
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    var assignedGroup = user.Groups.SingleOrDefault(g => g.GroupsId == groupId);
+                    if (assignedGroup == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserGroup, groupId));
+                    user.Groups.Remove(assignedGroup);
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new RemoveUserGroupSuccessEvent
                     {
                         Realm = prefix,
                         Id = id
                     });
-                    return BuildError(ex);
+                    return new NoContentResult();
                 }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                await _busControl.Publish(new RemoveUserGroupFailureEvent
+                {
+                    Realm = prefix,
+                    Id = id
+                });
+                return BuildError(ex);
             }
         }
 
@@ -677,44 +599,36 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeConsent([FromRoute] string prefix, string id, string consentId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.RevokeConsent"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        activity?.SetTag(Tracing.UserTagNames.ConsentId, consentId);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        var consent = user.Consents.SingleOrDefault(c => c.Id == consentId);
-                        if (consent == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserConsent, consentId));
-                        user.Consents.Remove(consent);
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User's consent is revoked");
-                        await _busControl.Publish(new RevokeUserConsentSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id
-                        });
-                        return new NoContentResult();
-                    }
-                }
-                catch (OAuthException ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new RevokeUserConsentFailureEvent
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    var consent = user.Consents.SingleOrDefault(c => c.Id == consentId);
+                    if (consent == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserConsent, consentId));
+                    user.Consents.Remove(consent);
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new RevokeUserConsentSuccessEvent
                     {
                         Realm = prefix,
                         Id = id
                     });
-                    return BuildError(ex);
+                    return new NoContentResult();
                 }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                await _busControl.Publish(new RevokeUserConsentFailureEvent
+                {
+                    Realm = prefix,
+                    Id = id
+                });
+                return BuildError(ex);
             }
         }
 
@@ -726,47 +640,40 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeSessions([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.RevokeAllSessions"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var issuer = HandlerContext.GetIssuer(prefix, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    var sessions = await _userSessionRepository.GetActive(id, prefix, cancellationToken);
+                    foreach (var session in sessions)
                     {
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        var issuer = HandlerContext.GetIssuer(prefix, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        var sessions = await _userSessionRepository.GetActive(id, prefix, cancellationToken);
-                        foreach (var session in sessions)
-                        {
-                            session.State = UserSessionStates.Rejected;
-                            _userSessionRepository.Update(session);
-                        }
-
-                        await transaction.Commit(cancellationToken);
-                        _recurringJobManager.Trigger(nameof(UserSessionJob));
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User's sessions are revoked");
-                        await _busControl.Publish(new RevokeUserSessionsSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id
-                        });
-                        return new NoContentResult();
+                        session.State = UserSessionStates.Rejected;
+                        _userSessionRepository.Update(session);
                     }
-                }
-                catch(OAuthException ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new RevokeUserSessionsFailureEvent
+
+                    await transaction.Commit(cancellationToken);
+                    _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    await _busControl.Publish(new RevokeUserSessionsSuccessEvent
                     {
                         Realm = prefix,
                         Id = id
                     });
-                    return BuildError(ex);
+                    return new NoContentResult();
                 }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                await _busControl.Publish(new RevokeUserSessionsFailureEvent
+                {
+                    Realm = prefix,
+                    Id = id
+                });
+                return BuildError(ex);
             }
         }
 
@@ -774,45 +681,37 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> RevokeSession([FromRoute] string prefix, string id, string sessionId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.RevokeSession"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        activity?.SetTag(Tracing.UserTagNames.SessionId, sessionId);
-                        var issuer = HandlerContext.GetIssuer(prefix, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        var session = await _userSessionRepository.GetById(sessionId, prefix, cancellationToken);
-                        if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, sessionId));
-                        session.State = UserSessionStates.Rejected;
-                        _userSessionRepository.Update(session);
-                        await transaction.Commit(cancellationToken);
-                        _recurringJobManager.Trigger(nameof(UserSessionJob));
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User's session is revoked");
-                        await _busControl.Publish(new RevokeUserSessionSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id
-                        });
-                        return new NoContentResult();
-                    }
-                }
-                catch (OAuthException ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new RevokeUserSessionFailureEvent
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    var issuer = HandlerContext.GetIssuer(prefix, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    var session = await _userSessionRepository.GetById(sessionId, prefix, cancellationToken);
+                    if (session == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserSession, sessionId));
+                    session.State = UserSessionStates.Rejected;
+                    _userSessionRepository.Update(session);
+                    await transaction.Commit(cancellationToken);
+                    _recurringJobManager.Trigger(nameof(UserSessionJob));
+                    await _busControl.Publish(new RevokeUserSessionSuccessEvent
                     {
                         Realm = prefix,
                         Id = id
                     });
-                    return BuildError(ex);
+                    return new NoContentResult();
                 }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                await _busControl.Publish(new RevokeUserSessionFailureEvent
+                {
+                    Realm = prefix,
+                    Id = id
+                });
+                return BuildError(ex);
             }
         }
 
@@ -824,46 +723,39 @@ namespace SimpleIdServer.IdServer.Api.Users
         public async Task<IActionResult> UnlinkExternalAuthProvider([FromRoute] string prefix, string id, [FromBody] UnlinkExternalAuthProviderRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.UnlinkExternalAuthProvider"))
+            try
             {
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
-                    {
-                        await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.UserTagNames.Id, id);
-                        if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-                        if (string.IsNullOrWhiteSpace(request.Scheme)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Scheme));
-                        if (string.IsNullOrWhiteSpace(request.Subject)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Subject));
-                        var user = await _userRepository.GetById(id, prefix, cancellationToken);
-                        if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
-                        var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(c => c.Subject == request.Subject && c.Scheme == request.Scheme);
-                        if (externalAuthProvider == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnknownUserExternalAuthProvider);
-                        user.ExternalAuthProviders.Remove(externalAuthProvider);
-                        user.UpdateDateTime = DateTime.UtcNow;
-                        _userRepository.Update(user);
-                        await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, "User's external authentication provider is unlinked");
-                        await _busControl.Publish(new UnlinkUserExternalAuthProviderSuccessEvent
-                        {
-                            Realm = prefix,
-                            Id = id
-                        });
-                        return new NoContentResult();
-                    }
-                }
-                catch (OAuthException ex)
-                {
-                    _logger.LogError(ex.ToString());
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new UnlinkUserExternalAuthProviderFailureEvent
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                    if (string.IsNullOrWhiteSpace(request.Scheme)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Scheme));
+                    if (string.IsNullOrWhiteSpace(request.Subject)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserExternalAuthProviderNames.Subject));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                    var externalAuthProvider = user.ExternalAuthProviders.SingleOrDefault(c => c.Subject == request.Subject && c.Scheme == request.Scheme);
+                    if (externalAuthProvider == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.UnknownUserExternalAuthProvider);
+                    user.ExternalAuthProviders.Remove(externalAuthProvider);
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new UnlinkUserExternalAuthProviderSuccessEvent
                     {
                         Realm = prefix,
                         Id = id
                     });
-                    return BuildError(ex);
+                    return new NoContentResult();
                 }
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                await _busControl.Publish(new UnlinkUserExternalAuthProviderFailureEvent
+                {
+                    Realm = prefix,
+                    Id = id
+                });
+                return BuildError(ex);
             }
         }
 
@@ -887,27 +779,19 @@ namespace SimpleIdServer.IdServer.Api.Users
         [HttpGet]
         public Task<IActionResult> Block([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Block"))
-            {
-                var options = GetOptions();
-                return Toggle(activity, prefix, id, UserStatus.BLOCKED, options, cancellationToken);
-            }
+            var options = GetOptions();
+            return Toggle(prefix, id, UserStatus.BLOCKED, options, cancellationToken);
         }
 
         [HttpGet]
         public Task<IActionResult> Unblock([FromRoute] string prefix, string id, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.UserActivitySource.StartActivity("Users.Unblock"))
-            {
-                return Toggle(activity, prefix, id, UserStatus.ACTIVATED, null, cancellationToken);
-            }
+            return Toggle(prefix, id, UserStatus.ACTIVATED, null, cancellationToken);
         }
 
-        private async Task<IActionResult> Toggle(Activity activity, string prefix, string id, UserStatus userStatus, UserLockingOptions options, CancellationToken cancellationToken)
+        private async Task<IActionResult> Toggle(string prefix, string id, UserStatus userStatus, UserLockingOptions options, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-            activity?.SetTag(Tracing.UserTagNames.Id, id);
             try
             {
                 await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
@@ -921,12 +805,12 @@ namespace SimpleIdServer.IdServer.Api.Users
             using (var transaction = _transactionBuilder.Build())
             {
                 var user = await _userRepository.GetById(id, cancellationToken);
-                if(user == null)
+                if (user == null)
                 {
                     return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
                 }
 
-                if(userStatus == UserStatus.ACTIVATED)
+                if (userStatus == UserStatus.ACTIVATED)
                 {
                     user.Unblock();
                 }
@@ -936,7 +820,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                 }
 
                 await transaction.Commit(cancellationToken);
-                if(userStatus == UserStatus.ACTIVATED)
+                if (userStatus == UserStatus.ACTIVATED)
                 {
                     return NoContent();
                 }

@@ -44,7 +44,7 @@ public class TokenExchangeHandler : BaseCredentialsHandler
     public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
     {
         IEnumerable<string> scopeLst = new string[0];
-        using (var activity = Tracing.IdserverActivitySource.StartActivity("TokenExchangeHandler"))
+        using (var activity = Tracing.BasicActivitySource.StartActivity("TokenExchangeHandler"))
         {
             try
             {
@@ -62,6 +62,7 @@ public class TokenExchangeHandler : BaseCredentialsHandler
                 result.Add(TokenResponseParameters.AccessToken, token);
                 result.Add(TokenResponseParameters.IssuedTokenType, validationResult.TokenType);
                 result.Add(TokenResponseParameters.TokenType, tokenType.TokenType);
+                Issue(result, context.Client.ClientId, context.Realm);
                 await _busControl.Publish(new TokenIssuedSuccessEvent
                 {
                     GrantType = GRANT_TYPE,
@@ -82,6 +83,7 @@ public class TokenExchangeHandler : BaseCredentialsHandler
                     Realm = context.Realm,
                     ErrorMessage = ex.Message
                 });
+                Counters.FailToken(context.Client?.ClientId, context.Realm, GrantType);
                 activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
             }
@@ -95,6 +97,7 @@ public class TokenExchangeHandler : BaseCredentialsHandler
                     Realm = context.Realm,
                     ErrorMessage = ex.Message
                 });
+                Counters.FailToken(context.Client?.ClientId, context.Realm, GrantType);
                 activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
             }

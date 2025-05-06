@@ -9,7 +9,6 @@ using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
@@ -115,18 +114,13 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> Delete([FromRoute] string prefix, [FromBody] RemoveGroupRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.GroupActivitySource.StartActivity("Group.Remove"))
-            {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.GroupTagNames.Path, request.FullPath);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.GetAllByFullPath(prefix, request.FullPath, cancellationToken);
                         _groupRepository.DeleteRange(result);
-                        activity?.SetStatus(ActivityStatusCode.Ok, $"Groups {request.FullPath} are removed");
                         await transaction.Commit(cancellationToken);
                         return new NoContentResult();
                     }
@@ -134,23 +128,18 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 catch (OAuthException ex)
                 {
                     _logger.LogError(ex.ToString());
-                    activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
                     return BuildError(ex);
                 }
-            }
         }
 
         [HttpPost]
         public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] AddGroupRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.GroupActivitySource.StartActivity("Group.Add"))
-            {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var fullPath = request.Name;
                         if (!string.IsNullOrWhiteSpace(request.ParentGroupId))
@@ -178,7 +167,6 @@ namespace SimpleIdServer.IdServer.Api.Groups
                         });
                         _groupRepository.Add(grp);
                         await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, $"Group {fullPath} is added");
                         return new ContentResult
                         {
                             StatusCode = (int)HttpStatusCode.Created,
@@ -190,11 +178,9 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 catch (OAuthException ex)
                 {
                     _logger.LogError(ex.ToString());
-                    activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
                     return BuildError(ex);
                 }
             }
-        }
 
         #endregion
 
@@ -204,14 +190,10 @@ namespace SimpleIdServer.IdServer.Api.Groups
         public async Task<IActionResult> AddRole([FromRoute] string prefix, string id, [FromBody] AddGroupRoleRequest request, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.GroupActivitySource.StartActivity("Group.AddRole"))
-            {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.GroupTagNames.Id, id);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.Get(prefix, id, cancellationToken);
                         if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
@@ -221,7 +203,6 @@ namespace SimpleIdServer.IdServer.Api.Groups
                         result.UpdateDateTime = DateTime.UtcNow;
                         _groupRepository.Update(result);
                         await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, $"Group role {request.Scope} is added");
                         return new ContentResult
                         {
                             StatusCode = (int)HttpStatusCode.Created,
@@ -233,25 +214,18 @@ namespace SimpleIdServer.IdServer.Api.Groups
                 catch (OAuthException ex)
                 {
                     _logger.LogError(ex.ToString());
-                    activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
                     return BuildError(ex);
                 }
             }
-        }
 
         [HttpDelete]
         public async Task<IActionResult> RemoveRole([FromRoute] string prefix, string id, string roleId, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            using (var activity = Tracing.GroupActivitySource.StartActivity("Group.RemoveRole"))
-            {
                 try
                 {
                     using (var transaction = _transactionBuilder.Build())
                     {
-                        activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                        activity?.SetTag(Tracing.GroupTagNames.Id, id);
-                        activity?.SetTag(Tracing.GroupTagNames.Role, roleId);
                         await CheckAccessToken(prefix, Config.DefaultScopes.Groups.Name);
                         var result = await _groupRepository.Get(prefix, id, cancellationToken);
                         if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownGroup, id));
@@ -261,18 +235,15 @@ namespace SimpleIdServer.IdServer.Api.Groups
                         result.UpdateDateTime = DateTime.UtcNow;
                         _groupRepository.Update(result);
                         await transaction.Commit(cancellationToken);
-                        activity?.SetStatus(ActivityStatusCode.Ok, $"Group role {roleId} is removed");
                         return new NoContentResult();
                     }
                 }
                 catch (OAuthException ex)
                 {
                     _logger.LogError(ex.ToString());
-                    activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
                     return BuildError(ex);
                 }
             }
-        }
 
         #endregion
     }

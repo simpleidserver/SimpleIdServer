@@ -39,33 +39,27 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
             var jObjBody = Request.Form.ToJsonObject();
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), string.Empty, jObjBody, null, Request.Cookies, string.Empty), prefix ?? Constants.DefaultRealm, _options, new HandlerContextResponse(Response.Cookies));
             context.SetUrlHelper(Url);
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("DeviceAuthorization.Post"))
+            try
             {
-                try
+                var result = await _handler.Handle(context, token);
+                await _busControl.Publish(new DeviceAuthorizationSuccessEvent
                 {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
-                    var result = await _handler.Handle(context, token);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Device Authorization succeeded");
-                    await _busControl.Publish(new DeviceAuthorizationSuccessEvent
-                    {
-                        ClientId = context.Client?.ClientId,
-                        Realm = context.Realm,
-                        RequestJSON = jObjBody.ToString(),
-                    });
-                    return new OkObjectResult(result);
-                }
-                catch (OAuthException ex)
+                    ClientId = context.Client?.ClientId,
+                    Realm = context.Realm,
+                    RequestJSON = jObjBody.ToString(),
+                });
+                return new OkObjectResult(result);
+            }
+            catch (OAuthException ex)
+            {
+                await _busControl.Publish(new DeviceAuthorizationFailureEvent
                 {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new DeviceAuthorizationFailureEvent
-                    {
-                        ClientId = context.Client?.ClientId,
-                        Realm = context.Realm,
-                        RequestJSON = jObjBody.ToString(),
-                        ErrorMessage = ex.Message
-                    });
-                    return BuildError(ex);
-                }
+                    ClientId = context.Client?.ClientId,
+                    Realm = context.Realm,
+                    RequestJSON = jObjBody.ToString(),
+                    ErrorMessage = ex.Message
+                });
+                return BuildError(ex);
             }
         }
     }

@@ -55,7 +55,7 @@ namespace SimpleIdServer.IdServer.Authenticate
 
         public async Task Authenticate(Client client, AuthenticateInstruction authenticateInstruction, string issuerName, CancellationToken cancellationToken, string errorCode = ErrorCodes.INVALID_CLIENT)
         {
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("AuthenticateClient"))
+            using (var activity = Tracing.BasicActivitySource.StartActivity("AuthenticateClient"))
             {
                 if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
                 if (client.IsPublic) return;

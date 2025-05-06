@@ -61,6 +61,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization.ResponseTypes
             CheckPKCEParameters(context);
             var dpopJkt = context.Request.RequestData.GetDPOPJktFromAuthorizationRequest();
             var authCode = await _grantedTokenHelper.AddAuthorizationCode(dic, parameter.GrantId, _options.AuthorizationCodeExpirationInSeconds, dpopJkt, context.Session?.SessionId, cancellationToken);
+            Counters.IssueAuthorizationCode(context.Client.Id, context.Realm);
             context.Response.Add(AuthorizationResponseParameters.Code, authCode);
         }
 

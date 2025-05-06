@@ -24,6 +24,7 @@ using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
+using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -355,6 +356,7 @@ namespace SimpleIdServer.IdServer.UI
                 UserName = nameIdentifier,
                 Realm = prefix
             });
+            Counters.Logout(prefix);
             var languages = await _languageRepository.GetAll(cancellationToken);
             return View(new DisconnectViewModel
             {

@@ -61,74 +61,68 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
         [HttpPost]
         public async Task<IActionResult> Post([FromRoute] string prefix, CancellationToken token)
         {
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("Authz.Pushed"))
+            var jObjBody = Request.Form.ToJsonObject();
+            prefix = prefix ?? Constants.DefaultRealm;
+            var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies), prefix, _options, new HandlerContextResponse(Response.Cookies));
+            try
             {
-                var jObjBody = Request.Form.ToJsonObject();
-                prefix = prefix ?? Constants.DefaultRealm;
-                var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, jObjBody, null, Request.Cookies), prefix, _options, new HandlerContextResponse(Response.Cookies));
-                activity?.SetTag(Tracing.CommonTagNames.Realm, context.Realm);
-                try
+                using (var transaction = _transactionBuilder.Build())
                 {
-                    using (var transaction = _transactionBuilder.Build())
+                    Validate(context);
+                    string clientId;
+                    var authenticateInstruction = new AuthenticateInstruction
                     {
-                        Validate(context);
-                        string clientId;
-                        var authenticateInstruction = new AuthenticateInstruction
-                        {
-                            ClientAssertion = jObjBody.GetClientAssertion(),
-                            ClientAssertionType = jObjBody.GetClientAssertionType(),
-                            ClientIdFromHttpRequestBody = jObjBody.GetClientId()
-                        };
-                        if (!_authenticateClient.TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingClientId);
-                        var client = await _clientHelper.ResolveClient(context.Realm, clientId, token);
-                        if (client != null)
-                            context.SetClient(client);
-                        var validationResult = await _validator.ValidateStandardAuthorizationRequest(context, clientId, token);
-                        if (!string.IsNullOrWhiteSpace(authenticateInstruction.ClientAssertion))
-                        {
-                            var authHandler = _authenticationHandlers.Single(a => a.AuthMethod == OAuthClientPrivateKeyJwtAuthenticationHandler.AUTH_METHOD);
-                            if (!(await authHandler.Handle(authenticateInstruction, context.Client, context.GetIssuer(), token)))
-                                throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.BadClientCredential);
-                        }
+                        ClientAssertion = jObjBody.GetClientAssertion(),
+                        ClientAssertionType = jObjBody.GetClientAssertionType(),
+                        ClientIdFromHttpRequestBody = jObjBody.GetClientId()
+                    };
+                    if (!_authenticateClient.TryGetClientId(authenticateInstruction, out clientId)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.MissingClientId);
+                    var client = await _clientHelper.ResolveClient(context.Realm, clientId, token);
+                    if (client != null)
+                        context.SetClient(client);
+                    var validationResult = await _validator.ValidateStandardAuthorizationRequest(context, clientId, token);
+                    if (!string.IsNullOrWhiteSpace(authenticateInstruction.ClientAssertion))
+                    {
+                        var authHandler = _authenticationHandlers.Single(a => a.AuthMethod == OAuthClientPrivateKeyJwtAuthenticationHandler.AUTH_METHOD);
+                        if (!(await authHandler.Handle(authenticateInstruction, context.Client, context.GetIssuer(), token)))
+                            throw new OAuthException(ErrorCodes.INVALID_CLIENT, Global.BadClientCredential);
+                    }
 
-                        activity?.SetStatus(ActivityStatusCode.Ok, "Pushed Authorization Request is granted");
-                        var pushedAuthorizationRequestId = $"{Constants.ParFormatKey}:{Guid.NewGuid()}";
-                        await _distributedCache.SetAsync(pushedAuthorizationRequestId, Encoding.UTF8.GetBytes(context.Request.RequestData.ToJsonString()), new DistributedCacheEntryOptions
-                        {
-                            SlidingExpiration = TimeSpan.FromSeconds(_options.PARExpirationTimeInSeconds)
-                        }, token);
-                        await _busControl.Publish(new PushedAuthorizationRequestSuccessEvent
-                        {
-                            ClientId = context.Client?.ClientId,
-                            Realm = context.Realm,
-                            RequestJSON = jObjBody.ToString()
-                        });
-                        await transaction.Commit(token);
-                        var jObj = new JsonObject
+                    var pushedAuthorizationRequestId = $"{Constants.ParFormatKey}:{Guid.NewGuid()}";
+                    await _distributedCache.SetAsync(pushedAuthorizationRequestId, Encoding.UTF8.GetBytes(context.Request.RequestData.ToJsonString()), new DistributedCacheEntryOptions
+                    {
+                        SlidingExpiration = TimeSpan.FromSeconds(_options.PARExpirationTimeInSeconds)
+                    }, token);
+                    await _busControl.Publish(new PushedAuthorizationRequestSuccessEvent
+                    {
+                        ClientId = context.Client?.ClientId,
+                        Realm = context.Realm,
+                        RequestJSON = jObjBody.ToString()
+                    });
+                    await transaction.Commit(token);
+                    var jObj = new JsonObject
                         {
                             { AuthorizationRequestParameters.RequestUri, pushedAuthorizationRequestId },
                             { AuthorizationResponseParameters.ExpiresIn, _options.PARExpirationTimeInSeconds }
                         };
-                        return new ContentResult
-                        {
-                            ContentType = "application/json",
-                            StatusCode = (int)HttpStatusCode.Created,
-                            Content = jObj.ToJsonString()
-                        };
-                    }
-                }
-                catch(OAuthException ex)
-                {
-                    activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
-                    await _busControl.Publish(new PushedAuthorizationRequestFailureEvent
+                    return new ContentResult
                     {
-                        ClientId = context.Client?.ClientId,
-                        Realm = context.Realm,
-                        RequestJSON = jObjBody.ToString(),
-                        ErrorMessage = ex.Message
-                    });
-                    return BuildErrorResponse(ex);
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.Created,
+                        Content = jObj.ToJsonString()
+                    };
                 }
+            }
+            catch (OAuthException ex)
+            {
+                await _busControl.Publish(new PushedAuthorizationRequestFailureEvent
+                {
+                    ClientId = context.Client?.ClientId,
+                    Realm = context.Realm,
+                    RequestJSON = jObjBody.ToString(),
+                    ErrorMessage = ex.Message
+                });
+                return BuildErrorResponse(ex);
             }
 
             void Validate(HandlerContext context)

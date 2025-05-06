@@ -15,7 +15,6 @@ using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text.Json;
@@ -36,14 +35,14 @@ public class ClientsController : BaseController
     private readonly ILogger<ClientsController> _logger;
 
     public ClientsController(
-        IClientRepository clientRepository, 
-        IScopeRepository scopeRepository, 
-        IRealmRepository realmRepository, 
-        IRegisterClientRequestValidator registerClientRequestValidator, 
+        IClientRepository clientRepository,
+        IScopeRepository scopeRepository,
+        IRealmRepository realmRepository,
+        IRegisterClientRequestValidator registerClientRequestValidator,
         IBusControl busControl,
         ITransactionBuilder transactionBuilder,
         ITokenRepository tokenRepository,
-        IJwtBuilder jwtBuilder, 
+        IJwtBuilder jwtBuilder,
         ILogger<ClientsController> logger) : base(tokenRepository, jwtBuilder)
     {
         _clientRepository = clientRepository;
@@ -93,52 +92,46 @@ public class ClientsController : BaseController
     public async Task<IActionResult> Add([FromRoute] string prefix, [FromBody] Client request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.Add"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    if (string.IsNullOrWhiteSpace(request.ClientId))
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "id"));
-                    var existingClient = await _clientRepository.GetByClientId(prefix, request.ClientId, cancellationToken);
-                    if (existingClient != null)
-                        throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.ClientIdentifierAlreadyExists, request.ClientId));
-                    request.Scopes = await GetScopes(prefix, request.Scope, CancellationToken.None);
-                    var realm = await _realmRepository.Get(prefix, cancellationToken);
-                    request.Realms.Clear();
-                    request.Realms.Add(realm);
-                    await _registerClientRequestValidator.Validate(prefix, request, CancellationToken.None);
-                    _clientRepository.Add(request);
-                    await transaction.Commit(cancellationToken);
-                    activity?.SetStatus(ActivityStatusCode.Ok, $"Client {request.Id} is added");
-                    await _busControl.Publish(new ClientRegisteredSuccessEvent
-                    {
-                        Realm = prefix,
-                        RequestJSON = JsonSerializer.Serialize(request)
-                    });
-                    return new ContentResult
-                    {
-                        StatusCode = (int)HttpStatusCode.Created,
-                        Content = JsonSerializer.Serialize(request).ToString(),
-                        ContentType = "application/json"
-                    };
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new ClientRegisteredFailureEvent
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                if (string.IsNullOrWhiteSpace(request.ClientId))
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "id"));
+                var existingClient = await _clientRepository.GetByClientId(prefix, request.ClientId, cancellationToken);
+                if (existingClient != null)
+                    throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.ClientIdentifierAlreadyExists, request.ClientId));
+                request.Scopes = await GetScopes(prefix, request.Scope, CancellationToken.None);
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
+                request.Realms.Clear();
+                request.Realms.Add(realm);
+                await _registerClientRequestValidator.Validate(prefix, request, CancellationToken.None);
+                _clientRepository.Add(request);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new ClientRegisteredSuccessEvent
                 {
                     Realm = prefix,
-                    ErrorMessage = ex.Message,
                     RequestJSON = JsonSerializer.Serialize(request)
                 });
-                return BuildError(ex);
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JsonSerializer.Serialize(request).ToString(),
+                    ContentType = "application/json"
+                };
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new ClientRegisteredFailureEvent
+            {
+                Realm = prefix,
+                ErrorMessage = ex.Message,
+                RequestJSON = JsonSerializer.Serialize(request)
+            });
+            return BuildError(ex);
         }
 
         async Task<ICollection<Domains.Scope>> GetScopes(string realm, string scope, CancellationToken cancellationToken)
@@ -161,7 +154,7 @@ public class ClientsController : BaseController
             if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
             return new OkObjectResult(result);
         }
-        catch(OAuthException ex)
+        catch (OAuthException ex)
         {
             _logger.LogError(ex.ToString());
             return BuildError(ex);
@@ -206,43 +199,37 @@ public class ClientsController : BaseController
     public async Task<IActionResult> Update([FromRoute] string prefix, string id, [FromBody] UpdateClientRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.Update"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    Update(result, request);
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    await _registerClientRequestValidator.Validate(prefix, result, CancellationToken.None);
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new ClientUpdatedSuccessEvent
-                    {
-                        Realm = prefix,
-                        SerializedRequest = JsonSerializer.Serialize(request),
-                        Id = id
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new ClientUpdatedFailureEvent
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                Update(result, request);
+                result.UpdateDateTime = DateTime.UtcNow;
+                await _registerClientRequestValidator.Validate(prefix, result, CancellationToken.None);
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new ClientUpdatedSuccessEvent
                 {
                     Realm = prefix,
                     SerializedRequest = JsonSerializer.Serialize(request),
                     Id = id
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new ClientUpdatedFailureEvent
+            {
+                Realm = prefix,
+                SerializedRequest = JsonSerializer.Serialize(request),
+                Id = id
+            });
+            return BuildError(ex);
         }
 
         void Update(Client existingClient, UpdateClientRequest newClient)
@@ -282,43 +269,37 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateAdvanced([FromRoute] string prefix, string id, [FromBody] UpdateAdvancedClientSettingsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.UpdateAdvancedSettings"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    Update(result, request);
-                    await _registerClientRequestValidator.Validate(prefix, result, CancellationToken.None);
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new ClientAdvancedSettingsUpdatedSuccessEvent
-                    {
-                        Realm = prefix,
-                        SerializedRequest = JsonSerializer.Serialize(request),
-                        Id = id
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new ClientAdvancedSettingsUpdatedFailureEvent
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                Update(result, request);
+                await _registerClientRequestValidator.Validate(prefix, result, CancellationToken.None);
+                result.UpdateDateTime = DateTime.UtcNow;
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new ClientAdvancedSettingsUpdatedSuccessEvent
                 {
                     Realm = prefix,
                     SerializedRequest = JsonSerializer.Serialize(request),
                     Id = id
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new ClientAdvancedSettingsUpdatedFailureEvent
+            {
+                Realm = prefix,
+                SerializedRequest = JsonSerializer.Serialize(request),
+                Id = id
+            });
+            return BuildError(ex);
         }
 
         void Update(Client existingClient, UpdateAdvancedClientSettingsRequest request)
@@ -340,45 +321,38 @@ public class ClientsController : BaseController
     public async Task<IActionResult> RemoveScope([FromRoute] string prefix, string id, string name, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.RemoveScope"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    activity?.SetTag(Tracing.ClientTagNames.Scope, name);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    var scope = result.Scopes.SingleOrDefault(s => s.Name == name);
-                    if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, name));
-                    result.Scopes.Remove(scope);
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new ClientScopeRemovedSuccessEvent
-                    {
-                        Realm = prefix,
-                        ClientId = id,
-                        Scope = name
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new ClientScopeRemovedFailureEvent
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                var scope = result.Scopes.SingleOrDefault(s => s.Name == name);
+                if (scope == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownScope, name));
+                result.Scopes.Remove(scope);
+                result.UpdateDateTime = DateTime.UtcNow;
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new ClientScopeRemovedSuccessEvent
                 {
                     Realm = prefix,
                     ClientId = id,
                     Scope = name
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new ClientScopeRemovedFailureEvent
+            {
+                Realm = prefix,
+                ClientId = id,
+                Scope = name
+            });
+            return BuildError(ex);
         }
     }
 
@@ -386,47 +360,41 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddScope([FromRoute] string prefix, string id, [FromBody] AddClientScopeRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.AddScope"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidRequestParameter);
-                    if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, nameof(ScopeNames.Name)));
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    if (result.Scopes.Any(s => s.Name == request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, request.Name));
-                    var scope = await _scopeRepository.GetByName(prefix, request.Name, cancellationToken);
-                    if (scope == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScope, request.Name));
-                    result.Scopes.Add(scope);
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new AddClientScopeSuccessEvent
-                    {
-                        Realm = prefix,
-                        ClientId = id,
-                        Scope = request.Name
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AddClientScopeFailureEvent
+                if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidRequestParameter);
+                if (string.IsNullOrWhiteSpace(request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, nameof(ScopeNames.Name)));
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                if (result.Scopes.Any(s => s.Name == request.Name)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, request.Name));
+                var scope = await _scopeRepository.GetByName(prefix, request.Name, cancellationToken);
+                if (scope == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownScope, request.Name));
+                result.Scopes.Add(scope);
+                result.UpdateDateTime = DateTime.UtcNow;
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new AddClientScopeSuccessEvent
                 {
                     Realm = prefix,
                     ClientId = id,
                     Scope = request.Name
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new AddClientScopeFailureEvent
+            {
+                Realm = prefix,
+                ClientId = id,
+                Scope = request.Name
+            });
+            return BuildError(ex);
         }
     }
 
@@ -434,39 +402,33 @@ public class ClientsController : BaseController
     public async Task<IActionResult> GenerateSigKey([FromRoute] string prefix, string id, [FromBody] GenerateSigKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.GenerateSigKey"))
+        try
         {
-            try
+            await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+            var client = await _clientRepository.GetById(prefix, id, cancellationToken);
+            if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+            if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
+            SigningCredentials sigCredentials = null;
+            switch (request.KeyType)
             {
-                activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                var client = await _clientRepository.GetById(prefix, id, cancellationToken);
-                if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
-                SigningCredentials sigCredentials = null;
-                switch (request.KeyType)
-                {
-                    case SecurityKeyTypes.RSA:
-                        sigCredentials = ClientKeyGenerator.GenerateRSASignatureKey(request.KeyId, request.Alg);
-                        break;
-                    case SecurityKeyTypes.CERTIFICATE:
-                        sigCredentials = ClientKeyGenerator.GenerateX509CertificateSignatureKey(request.KeyId, request.Alg);
-                        break;
-                    case SecurityKeyTypes.ECDSA:
-                        sigCredentials = ClientKeyGenerator.GenerateECDsaSignatureKey(request.KeyId, request.Alg);
-                        break;
-                }
+                case SecurityKeyTypes.RSA:
+                    sigCredentials = ClientKeyGenerator.GenerateRSASignatureKey(request.KeyId, request.Alg);
+                    break;
+                case SecurityKeyTypes.CERTIFICATE:
+                    sigCredentials = ClientKeyGenerator.GenerateX509CertificateSignatureKey(request.KeyId, request.Alg);
+                    break;
+                case SecurityKeyTypes.ECDSA:
+                    sigCredentials = ClientKeyGenerator.GenerateECDsaSignatureKey(request.KeyId, request.Alg);
+                    break;
+            }
 
-                var pemResult = PemConverter.ConvertFromSecurityKey(sigCredentials.Key);
-                return new OkObjectResult(pemResult);
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                return BuildError(ex);
-            }
+            var pemResult = PemConverter.ConvertFromSecurityKey(sigCredentials.Key);
+            return new OkObjectResult(pemResult);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
         }
     }
 
@@ -474,37 +436,31 @@ public class ClientsController : BaseController
     public async Task<IActionResult> GenerateEncKey([FromRoute] string prefix, string id, [FromBody] GenerateEncKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.GenerateEncKey"))
+        try
         {
-            try
-            {
-                activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                var client = await _clientRepository.GetById(prefix, id, cancellationToken);
-                if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
+            await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+            var client = await _clientRepository.GetById(prefix, id, cancellationToken);
+            if (client == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+            if (client.JsonWebKeys.Any(j => j.KeyId == request.KeyId)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.SigKeyAlreadyExists, request.KeyId));
 
-                EncryptingCredentials encCredentials = null;
-                switch (request.KeyType)
-                {
-                    case SecurityKeyTypes.RSA:
-                        encCredentials = ClientKeyGenerator.GenerateRSAEncryptionKey(request.KeyId, request.Alg, request.Enc);
-                        break;
-                    case SecurityKeyTypes.CERTIFICATE:
-                        encCredentials = ClientKeyGenerator.GenerateCertificateEncryptionKey(request.KeyId, request.Alg, request.Enc);
-                        break;
-                }
-
-                var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
-                return new OkObjectResult(pemResult);
-            }
-            catch (OAuthException ex)
+            EncryptingCredentials encCredentials = null;
+            switch (request.KeyType)
             {
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                _logger.LogError(ex.ToString());
-                return BuildError(ex);
+                case SecurityKeyTypes.RSA:
+                    encCredentials = ClientKeyGenerator.GenerateRSAEncryptionKey(request.KeyId, request.Alg, request.Enc);
+                    break;
+                case SecurityKeyTypes.CERTIFICATE:
+                    encCredentials = ClientKeyGenerator.GenerateCertificateEncryptionKey(request.KeyId, request.Alg, request.Enc);
+                    break;
             }
+
+            var pemResult = PemConverter.ConvertFromSecurityKey(encCredentials.Key);
+            return new OkObjectResult(pemResult);
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
         }
     }
 
@@ -512,45 +468,25 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddSigKey([FromRoute] string prefix, string id, [FromBody] AddSigKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.AddSigKey"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                result.SerializedJsonWebKeys.Add(new ClientJsonWebKey
                 {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    result.SerializedJsonWebKeys.Add(new ClientJsonWebKey
-                    {
-                        Kid = request.KeyId,
-                        SerializedJsonWebKey = request.SerializedJsonWebKey,
-                        Alg = request.Alg,
-                        KeyType = request.KeyType,
-                        Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig
-                    });
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new AddClientSignatureKeySuccessEvent
-                    {
-                        Realm = prefix,
-                        ClientId = id,
-                        Alg = request.Alg,
-                        KeyType = request.KeyType,
-                        KeyId = request.KeyId,
-                        SerializedJsonWebKey = request.SerializedJsonWebKey
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AddClientSignatureKeyFailureEvent
+                    Kid = request.KeyId,
+                    SerializedJsonWebKey = request.SerializedJsonWebKey,
+                    Alg = request.Alg,
+                    KeyType = request.KeyType,
+                    Usage = DefaultTokenSecurityAlgs.JwkUsages.Sig
+                });
+                result.UpdateDateTime = DateTime.UtcNow;
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new AddClientSignatureKeySuccessEvent
                 {
                     Realm = prefix,
                     ClientId = id,
@@ -559,8 +495,22 @@ public class ClientsController : BaseController
                     KeyId = request.KeyId,
                     SerializedJsonWebKey = request.SerializedJsonWebKey
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new AddClientSignatureKeyFailureEvent
+            {
+                Realm = prefix,
+                ClientId = id,
+                Alg = request.Alg,
+                KeyType = request.KeyType,
+                KeyId = request.KeyId,
+                SerializedJsonWebKey = request.SerializedJsonWebKey
+            });
+            return BuildError(ex);
         }
     }
 
@@ -568,45 +518,25 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddEncKey([FromRoute] string prefix, string id, [FromBody] AddSigKeyRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.AddEncKey"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                result.SerializedJsonWebKeys.Add(new ClientJsonWebKey
                 {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    result.SerializedJsonWebKeys.Add(new ClientJsonWebKey
-                    {
-                        Kid = request.KeyId,
-                        SerializedJsonWebKey = request.SerializedJsonWebKey,
-                        Alg = request.Alg,
-                        KeyType = request.KeyType,
-                        Usage = DefaultTokenSecurityAlgs.JwkUsages.Enc
-                    });
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new AddClientEncryptionKeySuccessEvent
-                    {
-                        Realm = prefix,
-                        ClientId = id,
-                        Alg = request.Alg,
-                        KeyType = request.KeyType,
-                        KeyId = request.KeyId,
-                        SerializedJsonWebKey = request.SerializedJsonWebKey
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AddClientEncryptionKeyFailureEvent
+                    Kid = request.KeyId,
+                    SerializedJsonWebKey = request.SerializedJsonWebKey,
+                    Alg = request.Alg,
+                    KeyType = request.KeyType,
+                    Usage = DefaultTokenSecurityAlgs.JwkUsages.Enc
+                });
+                result.UpdateDateTime = DateTime.UtcNow;
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new AddClientEncryptionKeySuccessEvent
                 {
                     Realm = prefix,
                     ClientId = id,
@@ -615,8 +545,22 @@ public class ClientsController : BaseController
                     KeyId = request.KeyId,
                     SerializedJsonWebKey = request.SerializedJsonWebKey
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new AddClientEncryptionKeyFailureEvent
+            {
+                Realm = prefix,
+                ClientId = id,
+                Alg = request.Alg,
+                KeyType = request.KeyType,
+                KeyId = request.KeyId,
+                SerializedJsonWebKey = request.SerializedJsonWebKey
+            });
+            return BuildError(ex);
         }
     }
 
@@ -624,44 +568,38 @@ public class ClientsController : BaseController
     public async Task<IActionResult> RemoveKey([FromRoute] string prefix, string id, string keyId, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.RemoveKey"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    var serializedJsonWebKey = result.SerializedJsonWebKeys.SingleOrDefault(k => k.Kid == keyId);
-                    if (serializedJsonWebKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownJwk, keyId));
-                    result.SerializedJsonWebKeys.Remove(serializedJsonWebKey);
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new RemoveClientKeySuccessEvent
-                    {
-                        Realm = prefix,
-                        ClientId = id,
-                        Kid = keyId
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new RemoveClientKeyFailureEvent
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                var serializedJsonWebKey = result.SerializedJsonWebKeys.SingleOrDefault(k => k.Kid == keyId);
+                if (serializedJsonWebKey == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownJwk, keyId));
+                result.SerializedJsonWebKeys.Remove(serializedJsonWebKey);
+                result.UpdateDateTime = DateTime.UtcNow;
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new RemoveClientKeySuccessEvent
                 {
                     Realm = prefix,
                     ClientId = id,
                     Kid = keyId
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new RemoveClientKeyFailureEvent
+            {
+                Realm = prefix,
+                ClientId = id,
+                Kid = keyId
+            });
+            return BuildError(ex);
         }
     }
 
@@ -669,45 +607,23 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateCredentials([FromRoute] string prefix, string id, [FromBody] UpdateClientCredentialsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.UpdateCredentials"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    result.TokenEndPointAuthMethod = request.TokenEndpointAuthMethod;
-                    result.ClientSecret = request.ClientSecret;
-                    result.TlsClientAuthSubjectDN = request.TlsClientAuthSubjectDN;
-                    result.TlsClientAuthSanDNS = request.TlsClientAuthSanDNS;
-                    result.TlsClientAuthSanEmail = request.TlsClientAuthSanEmail;
-                    result.TlsClientAuthSanIP = request.TlsClientAuthSanIp;
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new ClientCredentialUpdatedSuccessEvent
-                    {
-                        Realm = prefix,
-                        ClientId = id,
-                        ClientSecret = request.ClientSecret,
-                        TokenEndpointAuthMethod = request.TokenEndpointAuthMethod,
-                        TlsClientAuthSanDNS = request.TlsClientAuthSanDNS,
-                        TlsClientAuthSanEmail = request.TlsClientAuthSanEmail,
-                        TlsClientAuthSanIp = request.TlsClientAuthSanIp,
-                        TlsClientAuthSubjectDN = request.TlsClientAuthSubjectDN
-                    });
-                    return new NoContentResult();
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new ClientCredentialUpdatedFailureEvent
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                result.TokenEndPointAuthMethod = request.TokenEndpointAuthMethod;
+                result.ClientSecret = request.ClientSecret;
+                result.TlsClientAuthSubjectDN = request.TlsClientAuthSubjectDN;
+                result.TlsClientAuthSanDNS = request.TlsClientAuthSanDNS;
+                result.TlsClientAuthSanEmail = request.TlsClientAuthSanEmail;
+                result.TlsClientAuthSanIP = request.TlsClientAuthSanIp;
+                result.UpdateDateTime = DateTime.UtcNow;
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new ClientCredentialUpdatedSuccessEvent
                 {
                     Realm = prefix,
                     ClientId = id,
@@ -718,8 +634,24 @@ public class ClientsController : BaseController
                     TlsClientAuthSanIp = request.TlsClientAuthSanIp,
                     TlsClientAuthSubjectDN = request.TlsClientAuthSubjectDN
                 });
-                return BuildError(ex);
+                return new NoContentResult();
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new ClientCredentialUpdatedFailureEvent
+            {
+                Realm = prefix,
+                ClientId = id,
+                ClientSecret = request.ClientSecret,
+                TokenEndpointAuthMethod = request.TokenEndpointAuthMethod,
+                TlsClientAuthSanDNS = request.TlsClientAuthSanDNS,
+                TlsClientAuthSanEmail = request.TlsClientAuthSanEmail,
+                TlsClientAuthSanIp = request.TlsClientAuthSanIp,
+                TlsClientAuthSubjectDN = request.TlsClientAuthSubjectDN
+            });
+            return BuildError(ex);
         }
     }
 
@@ -727,65 +659,59 @@ public class ClientsController : BaseController
     public async Task<IActionResult> AddRole([FromRoute] string prefix, string id, [FromBody] AddClientRoleRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.AddRole"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                var scopeName = $"{result.ClientId}/{request.Name}";
+                var existingScope = await _scopeRepository.GetByName(prefix, scopeName, cancellationToken);
+                if (existingScope != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scopeName));
+                var newScope = new Domains.Scope
                 {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    var scopeName = $"{result.ClientId}/{request.Name}";
-                    var existingScope = await _scopeRepository.GetByName(prefix, scopeName, cancellationToken);
-                    if (existingScope != null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.ScopeAlreadyExists, scopeName));
-                    var newScope = new Domains.Scope
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        Name = scopeName,
-                        Type = ScopeTypes.ROLE,
-                        Protocol = ScopeProtocols.OAUTH,
-                        Description = request.Description,
-                        CreateDateTime = DateTime.UtcNow,
-                        UpdateDateTime = DateTime.UtcNow,
-                    };
-                    var realm = await _realmRepository.Get(prefix, cancellationToken);
-                    newScope.Realms.Add(realm);
-                    result.Scopes.Add(newScope);
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _scopeRepository.Add(newScope);
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    await _busControl.Publish(new AddClientRoleSuccessEvent
-                    {
-                        Realm = prefix,
-                        ClientId = id,
-                        Description = request.Description,
-                        Name = request.Name
-                    });
-                    return new ContentResult
-                    {
-                        StatusCode = (int)HttpStatusCode.Created,
-                        Content = JsonSerializer.Serialize(newScope).ToString(),
-                        ContentType = "application/json"
-                    };
-                }
-            }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                await _busControl.Publish(new AddClientRoleFailureEvent
+                    Id = Guid.NewGuid().ToString(),
+                    Name = scopeName,
+                    Type = ScopeTypes.ROLE,
+                    Protocol = ScopeProtocols.OAUTH,
+                    Description = request.Description,
+                    CreateDateTime = DateTime.UtcNow,
+                    UpdateDateTime = DateTime.UtcNow,
+                };
+                var realm = await _realmRepository.Get(prefix, cancellationToken);
+                newScope.Realms.Add(realm);
+                result.Scopes.Add(newScope);
+                result.UpdateDateTime = DateTime.UtcNow;
+                _scopeRepository.Add(newScope);
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                await _busControl.Publish(new AddClientRoleSuccessEvent
                 {
                     Realm = prefix,
                     ClientId = id,
                     Description = request.Description,
                     Name = request.Name
                 });
-                return BuildError(ex);
+                return new ContentResult
+                {
+                    StatusCode = (int)HttpStatusCode.Created,
+                    Content = JsonSerializer.Serialize(newScope).ToString(),
+                    ContentType = "application/json"
+                };
             }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            await _busControl.Publish(new AddClientRoleFailureEvent
+            {
+                Realm = prefix,
+                ClientId = id,
+                Description = request.Description,
+                Name = request.Name
+            });
+            return BuildError(ex);
         }
     }
 
@@ -793,31 +719,25 @@ public class ClientsController : BaseController
     public async Task<IActionResult> UpdateRealms([FromRoute] string prefix, string id, [FromBody] UpdateClientRealmsRequest request, CancellationToken cancellationToken)
     {
         prefix = prefix ?? Constants.DefaultRealm;
-        using (var activity = Tracing.ClientActivitySource.StartActivity("Client.UpdateRealms"))
+        try
         {
-            try
+            using (var transaction = _transactionBuilder.Build())
             {
-                using (var transaction = _transactionBuilder.Build())
-                {
-                    activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                    activity?.SetTag(Tracing.ClientTagNames.Id, id);
-                    await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
-                    var result = await _clientRepository.GetById(prefix, id, cancellationToken);
-                    if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
-                    var realms = await _realmRepository.GetAll(cancellationToken);
-                    result.Realms = realms.Where(r => r.Name == prefix || request.Realms.Contains(r.Name)).ToList();
-                    result.UpdateDateTime = DateTime.UtcNow;
-                    _clientRepository.Update(result);
-                    await transaction.Commit(cancellationToken);
-                    return new NoContentResult();
-                }
+                await CheckAccessToken(prefix, Config.DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                var realms = await _realmRepository.GetAll(cancellationToken);
+                result.Realms = realms.Where(r => r.Name == prefix || request.Realms.Contains(r.Name)).ToList();
+                result.UpdateDateTime = DateTime.UtcNow;
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
             }
-            catch (OAuthException ex)
-            {
-                _logger.LogError(ex.ToString());
-                activity?.SetStatus(System.Diagnostics.ActivityStatusCode.Error, ex.Message);
-                return BuildError(ex);
-            }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
         }
     }
 }

@@ -242,6 +242,7 @@ namespace SimpleIdServer.IdServer.UI
                             Amr = Amr,
                             Login = viewModel.Login
                         });
+                        Counters.AuthFailure(GetClientId(viewModel.ReturnUrl), prefix);
                         return View(workflowResult);
                     case ValidationStatus.NOCONTENT:
                         if (!string.IsNullOrWhiteSpace(authenticationResult.ErrorCode) && !string.IsNullOrWhiteSpace(authenticationResult.ErrorMessage))
@@ -258,7 +259,8 @@ namespace SimpleIdServer.IdServer.UI
                                 Amr = Amr,
                                 Login = viewModel.Login
                             });
-                            if(authenticationResult.AuthenticatedUser != null)
+                            Counters.AuthFailure(GetClientId(viewModel.ReturnUrl), prefix);
+                            if (authenticationResult.AuthenticatedUser != null)
                             {
                                 authenticationResult.AuthenticatedUser.LoginAttempt(options.MaxLoginAttempts, options.LockTimeInSeconds);
                                 UserRepository.Update(authenticationResult.AuthenticatedUser);

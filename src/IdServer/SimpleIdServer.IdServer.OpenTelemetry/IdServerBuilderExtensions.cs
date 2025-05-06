@@ -23,7 +23,9 @@ public static class IdServerBuilderExtensions
             .WithTracing(t =>
             {
                 t.SetResourceBuilder(ResourceBuilder.CreateDefault().AddService(builder.Builder.Environment.ApplicationName))
-                .AddSource(Tracing.Names.Idserver)
+                .AddSource(Tracing.Names.Basic)
+                .AddSource(Tracing.Names.Cache)
+                .AddSource(Tracing.Names.Store)
                 .AddAspNetCoreInstrumentation(o =>
                 {
                     o.EnrichWithHttpRequest = (activity, request) =>
@@ -33,7 +35,7 @@ public static class IdServerBuilderExtensions
                     o.Filter = (httpContext) =>
                     {
                         var path = httpContext.Request.Path.ToString();
-                        if (path.StartsWith("/_blazor") || new string[] { ".css", ".js", ".png" }.Any(s => path.EndsWith(s)))
+                        if (path.StartsWith("/_blazor") || new string[] { ".css", ".js", ".png", ".svg" }.Any(s => path.EndsWith(s)))
                         {
                             return false;
                         }

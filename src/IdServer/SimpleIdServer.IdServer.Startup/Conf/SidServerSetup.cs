@@ -15,7 +15,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
-using OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using SimpleIdServer.Configuration;
@@ -40,6 +39,8 @@ public class SidServerSetup
     {
         var section = webApplicationBuilder.Configuration.GetSection(nameof(ScimClientOptions));
         var conf = section.Get<ScimClientOptions>();
+        var openTelemetrySection = webApplicationBuilder.Configuration.GetSection(nameof(OpenTelemetryOptions));
+        var openTelemetryOptions = openTelemetrySection.Get<OpenTelemetryOptions>();
         var idServerBuilder = webApplicationBuilder.AddSidIdentityServer(c =>
             {
                 c.ForceHttps = configuration.ForceHttps;
@@ -113,26 +114,10 @@ public class SidServerSetup
             })
             .EnableOpenTelemetry(m =>
             {
-
+                ConfigureMetrics(m, openTelemetryOptions);
             }, t =>
             {
-                t.AddEntityFrameworkCoreInstrumentation(o =>
-                {
-                    o.EnrichWithIDbCommand = (activity, command) =>
-                    {
-                        var stateDisplayName = $"{command.CommandType} main";
-                        activity.DisplayName = stateDisplayName;
-                        activity.SetTag("db.name", stateDisplayName);
-                        activity.SetTag("db.text", command.CommandText);
-                    };
-                });
-                t.AddConsoleExporter();
-                t.AddOtlpExporter(o =>
-                {
-                    o.Endpoint = new Uri("https://api.honeycomb.io/v1/traces");
-                    o.Headers = $"x-honeycomb-team=ExZLneG9DeipnZSuVFomXI";
-                    o.Protocol = OtlpExportProtocol.HttpProtobuf;
-                });
+                ConfigureTraces(t, openTelemetryOptions);
             });
         if (configuration.IsForwardedEnabled)
         {
@@ -155,6 +140,56 @@ public class SidServerSetup
 
         ConfigureDistributedCache(webApplicationBuilder);
         ConfigureDataseeder(webApplicationBuilder);
+    }
+
+    private static void ConfigureMetrics(MeterProviderBuilder builder, OpenTelemetryOptions options)
+    {
+        if(options.EnableConsoleExporter)
+        {
+            builder.AddConsoleExporter();
+        }
+
+        if(options.EnableOtpExported)
+        {
+            builder.AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri(options.MetricsEndpoint);
+                o.Headers = options.Headers;
+                o.Protocol = options.Protocol;
+            });
+        }
+    }
+
+    private static void ConfigureTraces(TracerProviderBuilder builder, OpenTelemetryOptions options)
+    {
+        if(options.EnableEfCoreTracing)
+        {
+            builder.AddEntityFrameworkCoreInstrumentation(o =>
+            {
+                o.EnrichWithIDbCommand = (activity, command) =>
+                {
+                    var stateDisplayName = $"{command.CommandType} main";
+                    activity.DisplayName = stateDisplayName;
+                    activity.SetTag("db.name", stateDisplayName);
+                    activity.SetTag("db.text", command.CommandText);
+                };
+            });
+        }
+
+        if (options.EnableConsoleExporter)
+        {
+            builder.AddConsoleExporter();
+        }
+
+        if (options.EnableOtpExported)
+        {
+            builder.AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri(options.TracesEndpoint);
+                o.Headers = options.Headers;
+                o.Protocol = options.Protocol;
+            });
+        }
     }
 
     private static void ConfigureHangfire(WebApplicationBuilder webApplicationBuilder, IGlobalConfiguration configuration)

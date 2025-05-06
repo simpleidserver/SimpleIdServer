@@ -44,17 +44,20 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public async virtual Task Build(BuildTokenParameter parameter, HandlerContext handlerContext, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
-            var tokenDescriptor = BuildOpenIdPayload(parameter.Scopes, parameter.Audiences, parameter.Claims, parameter.AuthorizationDetails, handlerContext);
-            var scopes = handlerContext.Client.Scopes.Where(s => parameter.Scopes.Contains(s.Name));
-            var claimsDic = await _scopeClaimsExtractor.ExtractClaims(handlerContext, scopes, ScopeProtocols.OAUTH);
-            foreach (var claim in claimsDic)
-                tokenDescriptor.Claims.Add(claim.Key, claim.Value);
-
-            if (parameter.AdditionalClaims != null)
-                foreach(var claim in parameter.AdditionalClaims)
+            using (var activity = Tracing.BasicActivitySource.StartActivity("BuildAccessToken"))
+            {
+                var tokenDescriptor = BuildOpenIdPayload(parameter.Scopes, parameter.Audiences, parameter.Claims, parameter.AuthorizationDetails, handlerContext);
+                var scopes = handlerContext.Client.Scopes.Where(s => parameter.Scopes.Contains(s.Name));
+                var claimsDic = await _scopeClaimsExtractor.ExtractClaims(handlerContext, scopes, ScopeProtocols.OAUTH);
+                foreach (var claim in claimsDic)
                     tokenDescriptor.Claims.Add(claim.Key, claim.Value);
 
-            await SetResponse(handlerContext.Realm, parameter.GrantId, handlerContext, tokenDescriptor, cancellationToken);
+                if (parameter.AdditionalClaims != null)
+                    foreach (var claim in parameter.AdditionalClaims)
+                        tokenDescriptor.Claims.Add(claim.Key, claim.Value);
+
+                await SetResponse(handlerContext.Realm, parameter.GrantId, handlerContext, tokenDescriptor, cancellationToken);
+            }
         }
         
         protected virtual SecurityTokenDescriptor BuildOpenIdPayload(IEnumerable<string> scopes, IEnumerable<string> resources, IEnumerable<AuthorizedClaim> claims, ICollection<AuthorizationData> authorizationDetails, HandlerContext handlerContext)

@@ -118,6 +118,17 @@ public class BaseAuthenticateController : BaseController
         }
     }
 
+    protected string GetClientId(string returnUrl)
+    {
+        if(string.IsNullOrWhiteSpace(returnUrl) || IsProtected(returnUrl))
+        {
+            return null;
+        }
+
+        var query = ExtractQuery(returnUrl);
+        return query.GetClientIdFromAuthorizationRequest();
+    }
+
     protected async Task<IActionResult> Authenticate<T>(string realm, T viewModel, string currentAmr, User user, CancellationToken cancellationToken, bool? rememberLogin = null) where T : ISidStepViewModel
     {
         string nextAmr = null;
@@ -201,6 +212,7 @@ public class BaseAuthenticateController : BaseController
             UserName = user.Name,
             Amr = currentAmr
         }, token);
+        Counters.AuthSuccess(client?.Id, realm);
         return Redirect(returnUrl);
     }
 

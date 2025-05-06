@@ -52,13 +52,16 @@ namespace SimpleIdServer.IdServer.Api.Token.TokenBuilders
 
         public virtual async Task Build(BuildTokenParameter parameter, HandlerContext context, CancellationToken cancellationToken, bool useOriginalRequest = false)
         {
-            if (!parameter.Scopes.Contains(Config.DefaultScopes.OpenIdScope.Name) || context.User == null)
-                return;
+            using (var activity = Tracing.BasicActivitySource.StartActivity("BuildIdToken"))
+            {
+                if (!parameter.Scopes.Contains(Config.DefaultScopes.OpenIdScope.Name) || context.User == null)
+                    return;
 
-            var openidClient = context.Client;
-            var payload = await BuildIdToken(context, useOriginalRequest ? context.OriginalRequest : context.Request.RequestData, parameter.Scopes, parameter.Claims, cancellationToken);
-            var idToken = await _jwtBuilder.BuildClientToken(context.Realm, context.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
-            context.Response.Add(Name, idToken);
+                var openidClient = context.Client;
+                var payload = await BuildIdToken(context, useOriginalRequest ? context.OriginalRequest : context.Request.RequestData, parameter.Scopes, parameter.Claims, cancellationToken);
+                var idToken = await _jwtBuilder.BuildClientToken(context.Realm, context.Client, payload, (openidClient.IdTokenSignedResponseAlg ?? _options.DefaultTokenSignedResponseAlg), openidClient.IdTokenEncryptedResponseAlg, openidClient.IdTokenEncryptedResponseEnc, cancellationToken);
+                context.Response.Add(Name, idToken);
+            }
         }
 
         protected virtual async Task<SecurityTokenDescriptor> BuildIdToken(HandlerContext currentContext, JsonObject queryParameters, IEnumerable<string> requestedScopes, IEnumerable<AuthorizedClaim> requestedClaims, CancellationToken cancellationToken)

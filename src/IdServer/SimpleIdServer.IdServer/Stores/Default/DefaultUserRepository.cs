@@ -20,7 +20,7 @@ public class DefaultUserRepository : IUserRepository
 
     public virtual Task<User> GetBySubject(string subject, string realm, CancellationToken cancellationToken)
     {
-        using(var activity = Tracing.UserActivitySource.StartActivity("GetUserBySubject"))
+        using(var activity = Tracing.StoreActivitySource.StartActivity("GetUserBySubject"))
         {
             activity?.SetTag(Tracing.UserTagNames.Id, subject);
             activity?.SetTag(Tracing.CommonTagNames.Realm, realm);

@@ -50,37 +50,33 @@ namespace SimpleIdServer.IdServer.Api.Configuration
 
         public virtual async Task<JsonObject> Handle(string prefix, string issuer, CancellationToken cancellationToken)
         {
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("GetOAuthConfiguration"))
+            var subUrl = string.Empty;
+            var issuerStr = issuer;
+            if (!string.IsNullOrWhiteSpace(prefix))
             {
-                var subUrl = string.Empty;
-                var issuerStr = issuer;
-                if (!string.IsNullOrWhiteSpace(prefix))
-                {
-                    issuerStr = $"{issuer}/{prefix}";
-                    subUrl = $"{prefix}/";
-                }
-
-                activity?.SetTag(Tracing.CommonTagNames.Realm, prefix);
-                var jObj = new JsonObject
-                {
-                    [OAuthConfigurationNames.Issuer] = issuerStr,
-                    [OAuthConfigurationNames.AuthorizationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Authorization}",
-                    [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Registration}",
-                    [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Token}",
-                    [OAuthConfigurationNames.RevocationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Token}/revoke",
-                    [OAuthConfigurationNames.JwksUri] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Jwks}",
-                    [OAuthConfigurationNames.IntrospectionEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.TokenInfo}"
-                };
-                var scopes = (await _scopeRepository.GetAllExposedScopes(prefix, cancellationToken)).Select(s => s.Name);
-                jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);
-                jObj.Add(OAuthConfigurationNames.ScopesSupported, JsonSerializer.SerializeToNode(scopes));
-                jObj.Add(OAuthConfigurationNames.ResponseTypesSupported, JsonSerializer.SerializeToNode(GetResponseTypes()));
-                jObj.Add(OAuthConfigurationNames.ResponseModesSupported, JsonSerializer.SerializeToNode(_oauthResponseModes.Select(s => s.ResponseMode)));
-                jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JsonSerializer.SerializeToNode(GetGrantTypes()));
-                jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JsonSerializer.SerializeToNode(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
-                jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
-                return jObj;
+                issuerStr = $"{issuer}/{prefix}";
+                subUrl = $"{prefix}/";
             }
+
+            var jObj = new JsonObject
+            {
+                [OAuthConfigurationNames.Issuer] = issuerStr,
+                [OAuthConfigurationNames.AuthorizationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Authorization}",
+                [OAuthConfigurationNames.RegistrationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Registration}",
+                [OAuthConfigurationNames.TokenEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Token}",
+                [OAuthConfigurationNames.RevocationEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Token}/revoke",
+                [OAuthConfigurationNames.JwksUri] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.Jwks}",
+                [OAuthConfigurationNames.IntrospectionEndpoint] = $"{issuer}/{subUrl}{Config.DefaultEndpoints.TokenInfo}"
+            };
+            var scopes = (await _scopeRepository.GetAllExposedScopes(prefix, cancellationToken)).Select(s => s.Name);
+            jObj.Add(OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens, true);
+            jObj.Add(OAuthConfigurationNames.ScopesSupported, JsonSerializer.SerializeToNode(scopes));
+            jObj.Add(OAuthConfigurationNames.ResponseTypesSupported, JsonSerializer.SerializeToNode(GetResponseTypes()));
+            jObj.Add(OAuthConfigurationNames.ResponseModesSupported, JsonSerializer.SerializeToNode(_oauthResponseModes.Select(s => s.ResponseMode)));
+            jObj.Add(OAuthConfigurationNames.GrantTypesSupported, JsonSerializer.SerializeToNode(GetGrantTypes()));
+            jObj.Add(OAuthConfigurationNames.TokenEndpointAuthMethodsSupported, JsonSerializer.SerializeToNode(_oauthClientAuthenticationHandlers.Select(r => r.AuthMethod)));
+            jObj.Add(OAuthConfigurationNames.TokenEndpointAuthSigningAlgValuesSupported, JsonSerializer.SerializeToNode(DefaultTokenSecurityAlgs.AllSigAlgs));
+            return jObj;
         }
 
         protected List<string> GetGrantTypes()

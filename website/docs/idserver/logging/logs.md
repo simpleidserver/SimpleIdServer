@@ -1,4 +1,4 @@
-# Logging
+# Logs
 
 When building or maintaining an identity server, robust logging is essential for diagnosing issues in production and understanding application behavior.
 By default, ASP.NET Core includes a built-in logging framework provided by Microsoft. For more details, see the official documentation: [https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-9.0](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-9.0).
@@ -7,7 +7,7 @@ However, we recommend using the [Serilog.AspNetCore](https://github.com/serilog/
 
 1. **Contextual Enrichment** : Serilog can automatically enrich every log event with contextual properties—such as the machine name, the current user’s name, or the request identifier—without any extra work in your code. This additional metadata makes troubleshooting in production much simpler, since you immediately know where and why a given log entry was recorded.
 
-2. **Flexible and Powerful Sinks** : Serilog offers dozens of “sink” packages that let you route logs to a variety of targets. A few popular examples include:
+2. **Flexible and Powerful Sinks** : Serilog offers dozens of `sink` packages that let you route logs to a variety of targets. A few popular examples include:
    * **Serilog.Sinks.Seq**: sends log events to the [Seq dashboard]((https://datalust.co/seq)) for interactive querying.
    * **Serilog.Sinks.Elasticsearch** : pushes logs into an Elasticsearch cluster, where they can be indexed and searched at scale.
 

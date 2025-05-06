@@ -12,8 +12,8 @@ using SimpleIdServer.IdServer.Api.Authorization;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseModes;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -180,6 +180,7 @@ namespace SimpleIdServer.IdServer.UI
                 Scopes = scopes,
                 Claims = claims
             });
+            Counters.RejectConsent(clientId, prefix);
             var redirectUrlAuthorizationResponse = new RedirectURLAuthorizationResponse(redirectUri, dic);
             var context = new HandlerContext(new HandlerContextRequest(Request.GetAbsoluteUriWithVirtualPath(), null, query), prefix, _options);
             _responseModeHandler.Handle(context, redirectUrlAuthorizationResponse, HttpContext);
@@ -207,6 +208,7 @@ namespace SimpleIdServer.IdServer.UI
                         var consent = user.Consents.Single(c => c.Id == grantId);
                         consent.Accept();
                         await RevokeTokens(grantId, cancellationToken);
+                        Counters.AcceptConsent(clientId, prefix);
                         await _busControl.Publish(new ConsentGrantedEvent
                         {
                             UserName = nameIdentifier,
@@ -223,6 +225,7 @@ namespace SimpleIdServer.IdServer.UI
                         {
                             consent = _userConsentFetcher.BuildFromAuthorizationRequest(prefix, query);
                             user.Consents.Add(consent);
+                            Counters.AcceptConsent(clientId, prefix);
                             await _busControl.Publish(new ConsentGrantedEvent
                             {
                                 UserName = nameIdentifier,

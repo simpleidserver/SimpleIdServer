@@ -53,7 +53,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
         public override async Task<IActionResult> Handle(HandlerContext context, CancellationToken cancellationToken)
         {
             IEnumerable<string> scopeLst = new string[0];
-            using (var activity = Tracing.IdserverActivitySource.StartActivity("ClientCredentialsHandler"))
+            using (var activity = Tracing.BasicActivitySource.StartActivity("ClientCredentialsHandler"))
             {
                 try
                 {
@@ -75,6 +75,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     AddTokenProfile(context);
                     foreach (var kvp in context.Response.Parameters)
                         result.Add(kvp.Key, kvp.Value);
+                    Issue(result, context.Client.ClientId, context.Realm);
                     await _busControl.Publish(new TokenIssuedSuccessEvent
                     {
                         GrantType = GRANT_TYPE,
@@ -95,6 +96,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         Realm = context.Realm,
                         ErrorMessage = ex.Message
                     });
+                    Counters.FailToken(context.Client?.ClientId, context.Realm, GrantType);
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                     return BuildError(HttpStatusCode.Unauthorized, ex.Code, ex.Message);
                 }
@@ -114,6 +116,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         Realm = context.Realm,
                         ErrorMessage = ex.Message
                     });
+                    Counters.FailToken(context.Client?.ClientId, context.Realm, GrantType);
                     activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                     return BuildError(HttpStatusCode.BadRequest, ex.Code, ex.Message);
                 }
