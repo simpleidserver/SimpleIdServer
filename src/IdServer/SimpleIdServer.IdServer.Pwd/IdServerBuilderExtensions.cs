@@ -42,10 +42,7 @@ public static class IdServerBuilderExtensions
             {
                 o.DefaultAcrValue = SimpleIdServer.IdServer.Config.DefaultAcrs.FirstLevelAssurance.Name;
             });
-            idServerBuilder.SidAuthCookie.Callback = (o) =>
-            {
-                o.LoginPath = $"/{SimpleIdServer.IdServer.Constants.AreaPwd}/Authenticate";
-            };
+            idServerBuilder.SidAuthCookie.LoginPath = $"/{SimpleIdServer.IdServer.Constants.AreaPwd}/Authenticate";
         }
 
         return idServerBuilder;

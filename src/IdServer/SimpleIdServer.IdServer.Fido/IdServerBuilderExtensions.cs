@@ -30,10 +30,7 @@ public static class IdServerBuilderExtensions
             {
                 o.DefaultAcrValue = Constants.MobileAMR;
             });
-            idServerBuilder.SidAuthCookie.Callback = (o) =>
-            {
-                o.LoginPath = $"/{Constants.MobileAMR}/Authenticate";
-            };
+            idServerBuilder.SidAuthCookie.LoginPath = $"/{Constants.MobileAMR}/Authenticate";
         }
 
         return idServerBuilder;
@@ -55,10 +52,7 @@ public static class IdServerBuilderExtensions
             {
                 o.DefaultAcrValue = Constants.AMR;
             });
-            idServerBuilder.SidAuthCookie.Callback = (o) =>
-            {
-                o.LoginPath = $"/{Constants.AMR}/Authenticate";
-            };
+            idServerBuilder.SidAuthCookie.LoginPath = $"/{Constants.AMR}/Authenticate";
         }
 
         return idServerBuilder;

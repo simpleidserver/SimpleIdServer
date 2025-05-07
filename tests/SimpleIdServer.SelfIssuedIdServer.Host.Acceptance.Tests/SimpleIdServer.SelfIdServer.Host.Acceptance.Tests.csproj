@@ -30,7 +30,7 @@
 		</None>
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\..\formbuilder\FormBuilder.EF\FormBuilder.EF.csproj" />
+	  <ProjectReference Include="..\..\formbuilder\FormBuilder.EF\SidFormBuilder.EF.csproj" />
 	  <ProjectReference Include="..\..\src\Did\SimpleIdServer.Did.Key\SimpleIdServer.Did.Key.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer.Store.EF\SimpleIdServer.IdServer.Store.EF.csproj" />
 	  <ProjectReference Include="..\..\src\IdServer\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />

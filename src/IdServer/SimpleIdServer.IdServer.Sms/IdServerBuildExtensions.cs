@@ -34,10 +34,7 @@ public static class IdServerBuildExtensions
             {
                 o.DefaultAcrValue = SimpleIdServer.IdServer.Sms.Constants.AMR;
             });
-            idServerBuilder.SidAuthCookie.Callback = (o) =>
-            {
-                o.LoginPath = $"/{SimpleIdServer.IdServer.Sms.Constants.AMR}/Authenticate";
-            };
+            idServerBuilder.SidAuthCookie.LoginPath = $"/{SimpleIdServer.IdServer.Sms.Constants.AMR}/Authenticate";
         }
 
         return idServerBuilder;

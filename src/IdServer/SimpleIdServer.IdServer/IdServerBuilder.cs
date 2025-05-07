@@ -6,9 +6,9 @@ using Hangfire;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Certificate;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
@@ -291,11 +291,13 @@ public class IdServerBuilder
     }
 
     /// <summary>
-    /// Configures the authentication cookie options by setting a callback.
+    /// Disables the sharing of the authentication cookie across different applications.
     /// </summary>
-    public IdServerBuilder ConfigureAuthCookie(Action<CookieAuthenticationOptions> cb)
+    /// <returns></returns>
+    public IdServerBuilder DisableSharingAuthCookie()
     {
-        _sidAuthCookie.Callback = cb;
+        _sidAuthCookie.CookieSameSiteMode = SameSiteMode.Lax;
+        _sidAuthCookie.CookieSecurePolicy = CookieSecurePolicy.SameAsRequest;
         return this;
     }
 

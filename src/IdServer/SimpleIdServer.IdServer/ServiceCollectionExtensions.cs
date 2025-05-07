@@ -231,7 +231,9 @@ public static class ServiceCollectionExtensions
             .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddIdServerCookie(CookieAuthenticationDefaults.AuthenticationScheme, null, opts =>
             {
-                sidAuthCookie.Callback(opts);
+                opts.LoginPath = sidAuthCookie.LoginPath;
+                opts.Cookie.SameSite = sidAuthCookie.CookieSameSiteMode;
+                opts.Cookie.SecurePolicy = sidAuthCookie.CookieSecurePolicy;
                 opts.Events.OnSigningIn += (CookieSigningInContext ctx) =>
                 {
                     if (ctx.Principal != null && ctx.Principal.Identity != null && ctx.Principal.Identity.IsAuthenticated)
@@ -570,15 +572,9 @@ public class RealmRoutePrefixConstraint : IRouteConstraint
 
 public class SidAuthCookie
 {
-    public SidAuthCookie()
-    {
-        Callback = (o) =>
-        {
-            o.LoginPath = $"/{Constants.AreaPwd}/Authenticate";
-        };
-    }
-
-    internal Action<CookieAuthenticationOptions> Callback { get; set; }
+    internal string LoginPath { get; set; } = $"/{Constants.AreaPwd}/Authenticate";
+    internal SameSiteMode CookieSameSiteMode { get; set; } = SameSiteMode.None;
+    internal CookieSecurePolicy CookieSecurePolicy { get; set; } = CookieSecurePolicy.Always;
 }
 
 public class SidHangfire

@@ -32,10 +32,7 @@ public static class IdServerBuilderExtensions
             {
                 o.DefaultAcrValue = "otp";
             });
-            idServerBuilder.SidAuthCookie.Callback = (o) =>
-            {
-                o.LoginPath = $"/{SimpleIdServer.IdServer.Otp.Constants.Amr}/Authenticate";
-            };
+            idServerBuilder.SidAuthCookie.LoginPath = $"/{SimpleIdServer.IdServer.Otp.Constants.Amr}/Authenticate";
         }
 
         return idServerBuilder;

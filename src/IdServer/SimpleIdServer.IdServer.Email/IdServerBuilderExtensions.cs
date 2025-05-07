@@ -38,10 +38,7 @@ public static class IdServerBuilderExtensions
             {
                 o.DefaultAcrValue = "email";
             });
-            idServerBuilder.SidAuthCookie.Callback = (o) =>
-            {
-                o.LoginPath = $"/{Constants.AMR}/Authenticate";
-            };
+            idServerBuilder.SidAuthCookie.LoginPath = $"/{Constants.AMR}/Authenticate";
         }
 
         return idServerBuilder;
