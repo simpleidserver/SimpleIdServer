@@ -284,12 +284,14 @@ spec:
               value: "Data Source=db-service,1433;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
             - name: "StorageConfiguration__ConnectionString"
               value: "Data Source=db-service,1433;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
-            - name: "SCIMBaseUrl"
+            - name: "ScimClientOptions_SCIMEdp"
               value: "https://scim.sid.svc.cluster.local"
             - name: "Authority"
               value: "https://idserver.sid.svc.cluster.local"
             - name: "SCIM__SCIMRepresentationsExtractionJobOptions__SCIMEdp"
               value: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
+            - name: "AdminUiUrl"
+              value: "https://website.sid.svc.cluster.local"
 ---
 apiVersion: apps/v1
 kind: Deployment

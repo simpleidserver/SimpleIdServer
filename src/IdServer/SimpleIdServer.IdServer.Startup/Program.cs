@@ -21,7 +21,6 @@ SidServerSetup.ConfigureIdServer(webApplicationBuilder, identityServerConfigurat
 var app = webApplicationBuilder.Build();
 app.Services.SeedData();
 var hostedServices = app.Services.GetServices<IHostedService>();
-// app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.UseCors("AllowAll");
 app.UseSid()
     .UseSidSwagger()

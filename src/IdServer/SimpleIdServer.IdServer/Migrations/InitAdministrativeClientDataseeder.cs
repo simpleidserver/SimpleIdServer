@@ -43,7 +43,7 @@ public class InitAdministrativeClientDataseeder : BaseClientDataseeder
     {
         using (var transaction = _transactionBuilder.Build())
         {
-            var newClient = BuildAdministrativeClient(_redirectUrls.ToArray(), _postLogoutUrls, _backChannelLogoutUrl, _additionalScopes.ToArray());
+            var newClient = BuildAdministrativeClient(_redirectUrls?.ToArray(), _postLogoutUrls, _backChannelLogoutUrl, _additionalScopes.ToArray());
             await TryAddClient(newClient, cancellationToken);
             await transaction.Commit(cancellationToken);
         }
@@ -81,9 +81,12 @@ public class InitAdministrativeClientDataseeder : BaseClientDataseeder
                 DefaultScopes.Forms,
                 DefaultScopes.RecurringJobs,
                 DefaultScopes.Templates);
-        foreach (var postLogoutUrl in postLogoutUrls)
+        if(postLogoutUrls != null)
         {
-            builder.AddPostLogoutUri(postLogoutUrl);
+            foreach (var postLogoutUrl in postLogoutUrls)
+            {
+                builder.AddPostLogoutUri(postLogoutUrl);
+            }
         }
 
         builder.AddScope(additionalScopes);

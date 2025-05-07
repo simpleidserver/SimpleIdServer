@@ -55,9 +55,10 @@ services:
       StorageConfiguration__Type: "SQLSERVER"
       DistributedCacheConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
       StorageConfiguration__ConnectionString: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
-      SCIMBaseUrl: "https://scim.localhost.com"
+      ScimClientOptions_SCIMEdp: "https://scim.localhost.com"
       Authority: "https://idserver.localhost.com"
       SCIM__SCIMRepresentationsExtractionJobOptions__SCIMEdp: "https://scim.localhost.com"
+      AdminUiUrl: "https://website.localhost.com"
     depends_on:
       - db
       - scim

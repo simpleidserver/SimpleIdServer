@@ -37,6 +37,7 @@ public class SidServerSetup
 {
     public static void ConfigureIdServer(WebApplicationBuilder webApplicationBuilder, IdentityServerConfiguration configuration)
     {
+        webApplicationBuilder.Services.AddSingleton(configuration);
         var section = webApplicationBuilder.Configuration.GetSection(nameof(ScimClientOptions));
         var conf = section.Get<ScimClientOptions>();
         var openTelemetrySection = webApplicationBuilder.Configuration.GetSection(nameof(OpenTelemetryOptions));
@@ -98,12 +99,12 @@ public class SidServerSetup
                 ConfigureMessageBroker(webApplicationBuilder, o);
             }, () => ConfigureMessageBrokerMigration(webApplicationBuilder))
             .SeedAdministrationData(
-                new List<string> { "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*" },
-                new List<string> { "https://localhost:5002/signout-callback-oidc", "https://website.sid.svc.cluster.local/signout-callback-oidc", "https://website.simpleidserver.com/signout-callback-oidc" },
-                "https://localhost:5002/bc-logout",
+                new List<string> { },
+                new List<string> { },
+                string.Empty,
                 new List<Scope>())
             .SeedSwagger(
-                new List<string> { "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html" }
+                new List<string> { }
             )
             .UseEfStore((c) =>
             {
@@ -412,5 +413,7 @@ public class SidServerSetup
         builder.Services.AddTransient<IDataSeeder, ConfigureFastfedDataSeeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureGotifyDataseeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureFederationDataseeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureAdminWebsiteRedirectUrlsDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureSwaggerClientRedirectUrlsDataSeeder>();
     }
 }

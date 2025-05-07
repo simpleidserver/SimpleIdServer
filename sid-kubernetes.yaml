@@ -229,7 +229,7 @@ spec:
       subdomain: localhost
       containers:
       - name: scim-deploy
-        image: simpleidserver/scim:6.0.1
+        image: simpleidserver/scim:6.0.2
         ports:
           - containerPort: 80
         env:
@@ -266,7 +266,7 @@ spec:
       subdomain: localhost
       containers:
       - name: idserver-deploy
-        image: simpleidserver/idserver:6.0.1
+        image: simpleidserver/idserver:6.0.2
         ports:
           - containerPort: 80
         env:
@@ -282,12 +282,14 @@ spec:
               value: "Data Source=db-service,1433;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
             - name: "StorageConfiguration__ConnectionString"
               value: "Data Source=db-service,1433;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
-            - name: "SCIMBaseUrl"
+            - name: "ScimClientOptions_SCIMEdp"
               value: "https://scim.sid.svc.cluster.local"
             - name: "Authority"
               value: "https://idserver.sid.svc.cluster.local"
             - name: "SCIM__SCIMRepresentationsExtractionJobOptions__SCIMEdp"
               value: "Data Source=db;Initial Catalog=IdServer;TrustServerCertificate=True;User=sa;Password=D54DE7hHpkG9;"
+            - name: "AdminUiUrl"
+              value: "https://website.sid.svc.cluster.local"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -309,7 +311,7 @@ spec:
       subdomain: localhost
       containers:
       - name: website-deploy
-        image: simpleidserver/website:6.0.1
+        image: simpleidserver/website:6.0.2
         ports:
           - containerPort: 80
         env:
@@ -350,7 +352,7 @@ spec:
       subdomain: localhost
       containers:
       - name: credentialissuer-deploy
-        image: simpleidserver/credentialissuer:6.0.1
+        image: simpleidserver/credentialissuer:6.0.2
         ports:
           - containerPort: 80
         env:
@@ -385,7 +387,7 @@ spec:
       subdomain: localhost
       containers:
       - name: credentialissuerwebsite-deploy
-        image: simpleidserver/credentialissuerwebsite:6.0.1
+        image: simpleidserver/credentialissuerwebsite:6.0.2
         ports:
           - containerPort: 80
         env:
