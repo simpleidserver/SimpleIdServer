@@ -4,6 +4,7 @@
 using DataSeeder;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Store.EF;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -39,7 +40,34 @@ public class DropDistributedCacheDataSeeder : BaseBeforeDeploymentDataSeeder
         var appliedMigrations = await _dbContext.Database.GetAppliedMigrationsAsync(cancellationToken);
         if(!appliedMigrations.Any(m => _migrationNames.Contains(m)))
         {
-            _dbContext.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS DistributedCache");
+            var sql = GetDropDistributedCacheTableSql(_dbContext);
+            _dbContext.Database.ExecuteSqlRaw(sql);
+        }
+    }
+
+    private static string GetDropDistributedCacheTableSql(DbContext dbContext)
+    {
+        var db = dbContext.Database;
+        if (db.IsSqlServer())
+        {
+            return @"IF OBJECT_ID(N'[dbo].[DistributedCache]', N'U') IS NOT NULL
+            DROP TABLE [dbo].[DistributedCache]";
+        }
+        else if (db.IsMySql())
+        {
+            return "DROP TABLE IF EXISTS `DistributedCache`;";
+        }
+        else if (db.IsSqlite())
+        {
+            return "DROP TABLE IF EXISTS DistributedCache;";
+        }
+        else if (db.IsNpgsql())
+        {
+            return @"DROP TABLE IF EXISTS ""DistributedCache"";";
+        }
+        else
+        {
+            throw new NotSupportedException("Unsupported database provider.");
         }
     }
 }
