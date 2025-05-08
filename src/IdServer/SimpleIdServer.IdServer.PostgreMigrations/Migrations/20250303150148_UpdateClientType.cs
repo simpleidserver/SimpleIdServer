@@ -10,27 +10,19 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<int>(
-                name: "ClientType",
-                table: "Clients",
-                type: "integer",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "text",
-                oldNullable: true);
+            migrationBuilder.Sql(
+                @"ALTER TABLE ""Clients""
+                  ALTER COLUMN ""ClientType"" TYPE integer
+                  USING (""ClientType""::integer);");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<string>(
-                name: "ClientType",
-                table: "Clients",
-                type: "text",
-                nullable: true,
-                oldClrType: typeof(int),
-                oldType: "integer",
-                oldNullable: true);
+            migrationBuilder.Sql(
+                @"ALTER TABLE ""Clients""
+              ALTER COLUMN ""ClientType"" TYPE text
+              USING (""ClientType""::text);");
         }
     }
 }
