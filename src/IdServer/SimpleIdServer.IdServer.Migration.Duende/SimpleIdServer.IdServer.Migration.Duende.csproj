@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Migration from Duende project.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Duende.IdentityServer.EntityFramework.Storage" Version="7.2.3" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
+	</ItemGroup>
+</Project>

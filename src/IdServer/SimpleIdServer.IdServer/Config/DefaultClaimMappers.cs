@@ -10,6 +10,40 @@ namespace SimpleIdServer.IdServer.Config;
 
 public class DefaultClaimMappers
 {
+    public static List<ScopeClaimMapper> All
+    {
+        get
+        {
+            var result = new List<ScopeClaimMapper>
+            {
+                Subject,
+                Name,
+                FamilyName,
+                UpdatedAt,
+                Email,
+                EmailVerified,
+                UniqueName,
+                GivenName,
+                MiddleName,
+                NickName,
+                PreferredUserName,
+                Profile,
+                Picture,
+                WebSite,
+                Gender,
+                BirthDate,
+                ZoneInfo,
+                Locale,
+                PhoneNumber,
+                PhoneNumberVerified,
+                Role,
+                ScimId
+            };
+            result.AddRange(Address);
+            return result;
+        }
+    }
+
     public static ScopeClaimMapper Subject = ScopeClaimMapper.CreateOpenIdSubjectClaim();
     public static ScopeClaimMapper Name = ScopeClaimMapper.CreateOpenIdPropertyClaim(JwtRegisteredClaimNames.Name, JwtRegisteredClaimNames.Name, nameof(User.Firstname));
     public static ScopeClaimMapper FamilyName = ScopeClaimMapper.CreateOpenIdPropertyClaim(JwtRegisteredClaimNames.FamilyName, JwtRegisteredClaimNames.FamilyName, nameof(User.Lastname));

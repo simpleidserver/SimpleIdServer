@@ -10,6 +10,15 @@ using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
 {
+    public class ClientTranslationKeys
+    {
+        public const string ClientName = "client_name";
+        public const string ClientUri = "client_uri";
+        public const string LogoUri = "logo_uri";
+        public const string TosUri = "tos_uri";
+        public const string PolicyUri = "policy_uri";
+    }
+
     [JsonConverter(typeof(TranslatableConverter<Client>))]
     public class Client : ITranslatable, IEquatable<Client>
     {
@@ -61,7 +70,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return Translate("client_name");
+                return Translate(ClientTranslationKeys.ClientName);
             }
         }
         /// <summary>
@@ -71,7 +80,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return Translate("logo_uri");
+                return Translate(ClientTranslationKeys.LogoUri);
             }
         }
         /// <summary>
@@ -81,7 +90,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return Translate("client_uri");
+                return Translate(ClientTranslationKeys.ClientUri);
             }
         }
         /// <summary>
@@ -91,7 +100,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return Translate("tos_uri");
+                return Translate(ClientTranslationKeys.TosUri);
             }
         }
         /// <summary>
@@ -101,7 +110,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return Translate("policy_uri");
+                return Translate(ClientTranslationKeys.PolicyUri);
             }
         }
         /// <summary>
@@ -590,14 +599,50 @@ namespace SimpleIdServer.IdServer.Domains
         public void UpdateClientName(string clientName)
         {
             var language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-            var translation = Translations.FirstOrDefault(tr => tr.Key == "client_name" && tr.Language == language);
-            if (translation == null)
-                Translations.Add(new Translation { Language = language, Key = "client_name", Value = clientName });
-            else
-                translation.Value = clientName;
+            UpdateClientName(clientName, language);
+        }
+
+        public void UpdateClientName(string clientName, string language)
+        {
+            UpdateTranslation(ClientTranslationKeys.ClientName, clientName, language);
+        }
+
+        public void UpdateClientUri(string clientUri)
+        {
+            var language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            UpdateClientUri(clientUri, language);
+        }
+
+        public void UpdateClientUri(string clientName, string language)
+        {
+            UpdateTranslation(ClientTranslationKeys.ClientUri, clientName, language);
+        }
+
+        public void UpdateLogoUri(string clientUri)
+        {
+            var language = CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
+            UpdateLogoUri(clientUri, language);
+        }
+
+        public void UpdateLogoUri(string clientName, string language)
+        {
+            UpdateTranslation(ClientTranslationKeys.LogoUri, clientName, language);
         }
 
         public IEnumerable<string> GetStringArrayParameter(string name) => Parameters[name].ToString().Split(',');
+
+        private void UpdateTranslation(string key, string value, string language)
+        {
+            var translation = Translations.FirstOrDefault(tr => tr.Key == key && tr.Language == language);
+            if (translation == null)
+            {
+                Translations.Add(new Translation { Language = language, Key = key, Value = value });
+            }
+            else
+            {
+                translation.Value = value;
+            }
+        }
 
         private string? Translate(string key)
         {

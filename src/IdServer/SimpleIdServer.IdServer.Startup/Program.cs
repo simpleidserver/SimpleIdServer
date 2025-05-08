@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SimpleIdServer.IdServer.Migration.Duende;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Conf;
+using System.Threading;
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
 webApplicationBuilder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
@@ -19,6 +21,12 @@ var identityServerConfiguration = webApplicationBuilder.Configuration.Get<Identi
 SidServerSetup.ConfigureIdServer(webApplicationBuilder, identityServerConfiguration);
 
 var app = webApplicationBuilder.Build();
+using(var s = app.Services.CreateScope())
+{
+    var migrationService = s.ServiceProvider.GetRequiredService<ConfigurationMigrationService>();
+    var tt = migrationService.Extract(CancellationToken.None).Result;
+}
+
 app.Services.SeedData();
 var hostedServices = app.Services.GetServices<IHostedService>();
 app.UseCors("AllowAll");

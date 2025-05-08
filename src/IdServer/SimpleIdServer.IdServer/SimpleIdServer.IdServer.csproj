@@ -50,6 +50,7 @@
 		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Swagger" />
 		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Notification.Gotify" />
 		<InternalsVisibleTo Include="SimpleIdServer.IdServer.OpenTelemetry" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Migration.Duende" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">
