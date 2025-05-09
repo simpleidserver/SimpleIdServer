@@ -5,5 +5,13 @@ namespace SimpleIdServer.IdServer.Migration.Duende;
 
 public class UserMigrationService
 {
+    public UserMigrationService()
+    {
+        
+    }
 
+    public async Task Extract(CancellationToken cancellationToken)
+    {
+
+    }
 }
