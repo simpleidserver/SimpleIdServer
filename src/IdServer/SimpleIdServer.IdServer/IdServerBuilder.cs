@@ -19,6 +19,7 @@ using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Migrations;
+using SimpleIdServer.IdServer.Migrations.Static;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Provisioning;
 using SimpleIdServer.IdServer.Stores;
@@ -113,7 +114,8 @@ public class IdServerBuilder
     /// </summary>
     public IdServerBuilder AddInMemoryClients(List<Client> clients)
     {
-        Services.AddSingleton<IClientRepository>(new DefaultClientRepository(clients));
+        Services.AddSingleton(new StaticClientsDataSeeder(clients));
+        Services.AddSingleton<IDataSeeder, InitStaticClientsDataSeeder>();
         return this;
     }
 
@@ -122,7 +124,8 @@ public class IdServerBuilder
     /// </summary>
     public IdServerBuilder AddInMemoryScopes(List<Scope> scopes)
     {
-        Services.AddSingleton<IScopeRepository>(new DefaultScopeRepository(scopes));
+        Services.AddSingleton(new StaticScopesDataSeeder(scopes));
+        Services.AddSingleton<IDataSeeder, InitStaticScopesDataSeeder>();
         return this;
     }
 
@@ -131,7 +134,8 @@ public class IdServerBuilder
     /// </summary>
     public IdServerBuilder AddInMemoryUsers(List<User> users)
     {
-        Services.AddSingleton<IUserRepository>(new DefaultUserRepository(users));
+        Services.AddSingleton(new StaticUsersDataSeeder(users));
+        Services.AddTransient<IDataSeeder, InitStaticUsersDataSeeder>();
         return this;
     }
 
@@ -140,8 +144,8 @@ public class IdServerBuilder
     /// </summary>
     public IdServerBuilder AddInMemoryLanguages(List<SimpleIdServer.IdServer.Domains.Language> languages)
     {
-        RemoveDataseeder<InitLanguageDataSeeder>();
-        Services.AddSingleton<ILanguageRepository>(new DefaultLanguageRepository(languages));
+        Services.AddSingleton(new StaticLanguagesDataSeeder(languages));
+        Services.AddSingleton<IDataSeeder, InitLanguageDataSeeder>();
         return this;
     }
 
