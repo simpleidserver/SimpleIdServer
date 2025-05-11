@@ -52,6 +52,15 @@ public class ScopeRepository : IScopeRepository
                 .ToListAsync(cancellationToken);
     }
 
+    public Task<List<Scope>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+    {
+        return _dbContext.Scopes
+                .Include(s => s.Realms)
+                .Include(s => s.ClaimMappers)
+                .Where(s => ids.Contains(s.Id))
+                .ToListAsync(cancellationToken);
+    }
+
     public Task<List<Scope>> GetByNames(string realm, List<string> scopeNames, CancellationToken cancellationToken)
     {
         return _dbContext.Scopes

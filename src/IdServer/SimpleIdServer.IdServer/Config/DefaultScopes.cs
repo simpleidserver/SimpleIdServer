@@ -541,6 +541,20 @@ public static class DefaultScopes
         CreateDateTime = DateTime.UtcNow,
         UpdateDateTime = DateTime.UtcNow
     };
+    public static Scope Migrations = new Scope
+    {
+        Id = Guid.NewGuid().ToString(),
+        Type = ScopeTypes.APIRESOURCE,
+        Name = "migrations",
+        Realms = new List<Domains.Realm>
+        {
+            DefaultRealms.Master
+        },
+        Protocol = ScopeProtocols.OAUTH,
+        IsExposedInConfigurationEdp = true,
+        CreateDateTime = DateTime.UtcNow,
+        UpdateDateTime = DateTime.UtcNow
+    };
     public static Scope Forms = new Scope
     {
         Id = Guid.NewGuid().ToString(),

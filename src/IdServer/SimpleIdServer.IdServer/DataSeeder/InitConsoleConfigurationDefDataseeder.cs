@@ -5,7 +5,7 @@ using DataSeeder;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Stores;
 
-namespace SimpleIdServer.IdServer.Migrations;
+namespace SimpleIdServer.IdServer.DataSeeder;
 
 public class InitConsoleConfigurationDefDataseeder : BaseConfigurationDefinitionDataseeder<IdServerConsoleOptions>
 {

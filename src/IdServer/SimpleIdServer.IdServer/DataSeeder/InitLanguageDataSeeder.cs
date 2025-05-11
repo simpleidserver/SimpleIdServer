@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Migrations;
+namespace SimpleIdServer.IdServer.DataSeeder;
 
 public class InitLanguageDataSeeder : BaseAfterDeploymentDataSeeder
 {

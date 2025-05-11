@@ -1,17 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.Identity;
 
 namespace SimpleIdServer.IdServer.Migration.Duende;
 
-public class UserMigrationService
+public class ApplicationUser : IdentityUser
 {
-    public UserMigrationService()
-    {
-        
-    }
-
-    public async Task Extract(CancellationToken cancellationToken)
-    {
-
-    }
 }

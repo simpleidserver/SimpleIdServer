@@ -17,6 +17,7 @@ public interface IScopeRepository
     Task<List<Scope>> GetByNames(string realm, List<string> scopeNames, CancellationToken cancellationToken);
     Task<List<Scope>> GetAllExposedScopes(string realm, CancellationToken cancellationToken);
     Task<List<Scope>> GetAll(string realm, List<string> scopeNames, CancellationToken cancellationToken);
+    Task<List<Scope>> GetByIds(List<string> ids, CancellationToken cancellationToken);
     Task<List<Scope>> GetByNames(List<string> scopeNames, CancellationToken cancellation);
     Task<List<Scope>> GetAllRealmScopes(string realm, CancellationToken cancellationToken);
     Task<SearchResult<Scope>> Search(string realm, SearchScopeRequest request, CancellationToken cancellationToken);

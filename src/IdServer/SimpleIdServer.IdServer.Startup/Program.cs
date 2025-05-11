@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SimpleIdServer.IdServer.Migrate;
 using SimpleIdServer.IdServer.Migration.Duende;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Conf;
@@ -23,8 +24,12 @@ SidServerSetup.ConfigureIdServer(webApplicationBuilder, identityServerConfigurat
 var app = webApplicationBuilder.Build();
 using(var s = app.Services.CreateScope())
 {
-    var migrationService = s.ServiceProvider.GetRequiredService<ConfigurationMigrationService>();
-    var tt = migrationService.Extract(CancellationToken.None).Result;
+    var migrationService = s.ServiceProvider.GetRequiredService<UserMigrationService>();
+    var tt = migrationService.ExtractUsers(new ExtractParameter
+    {
+        Count = 100
+    }, CancellationToken.None).Result;
+    string sss = "";
 }
 
 app.Services.SeedData();

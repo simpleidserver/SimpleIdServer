@@ -5,7 +5,7 @@ using DataSeeder;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 
-namespace SimpleIdServer.IdServer.Migrations;
+namespace SimpleIdServer.IdServer.DataSeeder;
 
 public class InitUserLockingConfigurationDefDataseeder : BaseConfigurationDefinitionDataseeder<UserLockingOptions>
 {

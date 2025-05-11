@@ -59,7 +59,7 @@ public class SidServerSetup
             })
             .AddDuendeMigration(a =>
             {
-                a.ConfigureDbContext = b => b.UseNpgsql("Host=localhost;Port=5432;Database=duende;Username=admin;Password=tJWBx3ccNJ6dyp1wxoA99qqQ");
+                a.UseNpgsql("Host=localhost;Port=5432;Database=duende;Username=admin;Password=tJWBx3ccNJ6dyp1wxoA99qqQ");
             })
             .AddPwdAuthentication(true)
             .AddEmailAuthentication()
