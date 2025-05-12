@@ -23,6 +23,7 @@ namespace SimpleIdServer.IdServer.Stores
         void Delete(Client client);
         void Add(Client client);
         void Update(Client client);
+        Task BulkAdd(List<Client> clients);
         void DeleteRange(IEnumerable<Client> clients);
     }
 }

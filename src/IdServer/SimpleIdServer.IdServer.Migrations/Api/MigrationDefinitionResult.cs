@@ -4,7 +4,7 @@
 using SimpleIdServer.IdServer.DTOs;
 using System.Text.Json.Serialization;
 
-namespace SimpleIdServer.IdServer.Api.Migrations;
+namespace SimpleIdServer.IdServer.Migrations.Api;
 
 public class MigrationDefinitionResult
 {

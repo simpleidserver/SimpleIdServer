@@ -5,8 +5,8 @@ using DataSeeder;
 using FormBuilder.Builders;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
+using SimpleIdServer.IdServer.DataSeeder;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Migrations;
 using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Email.Migrations;

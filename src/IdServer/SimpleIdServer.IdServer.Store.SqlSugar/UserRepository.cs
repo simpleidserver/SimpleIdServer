@@ -30,6 +30,11 @@ public class UserRepository : IUserRepository
             .ExecuteCommand();
     }
 
+    public Task BulkAdd(List<User> users)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task BulkUpdate(List<UserClaim> userClaims)
     {
         var claims = userClaims.Select(c => SugarUserClaim.Transform(c)).ToList();

@@ -31,14 +31,6 @@ public class MigrationExecution
         get; set;
     }
 
-    public bool IsGroupsMigrated
-    {
-        get
-        {
-            return IsMigrated(MigrationExecutionHistoryTypes.GROUPS);
-        }
-    }
-
     public bool IsApiScopesMigrated
     {
         get
@@ -71,12 +63,40 @@ public class MigrationExecution
         }
     }
 
+    public bool IsGroupsMigrated
+    {
+        get
+        {
+            return IsMigrated(MigrationExecutionHistoryTypes.GROUPS);
+        }
+    }
+
     public bool IsUsersMigrated
     {
         get
         {
             return IsMigrated(MigrationExecutionHistoryTypes.USERS);
         }
+    }
+
+    public void MigrateApiScopes(DateTime startDatetime, DateTime endDatetime, int nbScopes)
+    {
+        Migrate(MigrationExecutionHistoryTypes.APISCOPES, startDatetime, endDatetime, nbScopes);
+    }
+
+    public void MigrateIdentityScopes(DateTime startDatetime, DateTime endDatetime, int nbScopes)
+    {
+        Migrate(MigrationExecutionHistoryTypes.IDENTITYSCOPES, startDatetime, endDatetime, nbScopes);
+    }
+
+    public void MigrateApiResources(DateTime startDatetime, DateTime endDatetime, int nbScopes)
+    {
+        Migrate(MigrationExecutionHistoryTypes.APIRESOURCES, startDatetime, endDatetime, nbScopes);
+    }
+
+    public void MigrateClients(DateTime startDatetime, DateTime endDatetime, int nbClients)
+    {
+        Migrate(MigrationExecutionHistoryTypes.CLIENTS, startDatetime, endDatetime, nbClients);
     }
 
     public void MigrateGroups(DateTime startDatetime, DateTime endDatetime, int nbGroups)

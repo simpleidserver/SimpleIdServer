@@ -191,4 +191,10 @@ public class DefaultUserRepository : IUserRepository
         }
         return Task.CompletedTask;
     }
+
+    public Task BulkAdd(List<User> users)
+    {
+        _users.AddRange(users);
+        return Task.CompletedTask;
+    }
 }

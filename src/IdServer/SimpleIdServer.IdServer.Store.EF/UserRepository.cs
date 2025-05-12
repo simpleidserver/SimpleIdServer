@@ -306,4 +306,25 @@ public class UserRepository : IUserRepository
                     .Include(u => u.Devices)
                     .Include(u => u.OAuthUserClaims)
                     .Include(u => u.Realms);
+
+    public async Task BulkAdd(List<User> users)
+    {
+        if (_dbContext.Database.IsRelational())
+        {
+            var merged = LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.Users.ToLinqToDBTable()),
+                                        users
+                                    ),
+                                    (s1, s2) => s1.Id == s2.Id
+                            ),
+                            source => source);
+            await LinqToDB.LinqExtensions.MergeAsync(merged);
+            return;
+        }
+
+        _dbContext.Users.AddRange(users);
+    }
 }

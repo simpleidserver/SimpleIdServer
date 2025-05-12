@@ -3,8 +3,8 @@
 
 using Duende.IdentityServer.EntityFramework.Storage;
 using Microsoft.EntityFrameworkCore;
-using SimpleIdServer.IdServer.Migrate;
-using SimpleIdServer.IdServer.Migration.Duende;
+using SimpleIdServer.IdServer.Migrations;
+using SimpleIdServer.IdServer.Migrations.Duende;
 
 namespace Microsoft.Extensions.DependencyInjection;
 

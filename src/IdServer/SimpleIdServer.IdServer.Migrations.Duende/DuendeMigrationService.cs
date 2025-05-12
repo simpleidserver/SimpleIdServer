@@ -14,7 +14,7 @@ using DuendeApiResource = Duende.IdentityServer.EntityFramework.Entities.ApiReso
 using DuendeApiScope = Duende.IdentityServer.EntityFramework.Entities.ApiScope;
 using DuendeClient = Duende.IdentityServer.EntityFramework.Entities.Client;
 using DuendeIdentityResource = Duende.IdentityServer.EntityFramework.Entities.IdentityResource;
-namespace SimpleIdServer.IdServer.Migration.Duende;
+namespace SimpleIdServer.IdServer.Migrations.Duende;
 
 public class DuendeMigrationService : IMigrationService
 {
@@ -32,6 +32,11 @@ public class DuendeMigrationService : IMigrationService
         _scopeRepository = scopeRepository;
     }
 
+    public Task<int> NbApiScopes(CancellationToken cancellationToken)
+    {
+        return _configurationDbcontext.ApiScopes.CountAsync(cancellationToken);
+    }
+
     public async Task<List<Scope>> ExtractApiScopes(ExtractParameter parameter, CancellationToken cancellationToken)
     {
         var scopes = await _configurationDbcontext.ApiScopes
@@ -42,6 +47,11 @@ public class DuendeMigrationService : IMigrationService
         return scopes.Select(Map).ToList();
     }
 
+    public Task<int> NbIdentityScopes(CancellationToken cancellationToken)
+    {
+        return _configurationDbcontext.IdentityResources.CountAsync(cancellationToken);
+    }
+
     public async Task<List<Scope>> ExtractIdentityScopes(ExtractParameter parameter, CancellationToken cancellationToken)
     {
         var scopes = await _configurationDbcontext.IdentityResources
@@ -50,6 +60,11 @@ public class DuendeMigrationService : IMigrationService
             .AsNoTracking()
             .ToListAsync();
         return scopes.Select(Map).ToList();
+    }
+
+    public Task<int> NbApiResources(CancellationToken cancellationToken)
+    {
+        return _configurationDbcontext.ApiResources.CountAsync(cancellationToken);
     }
 
     public async Task<List<ApiResource>> ExtractApiResources(ExtractParameter parameter, CancellationToken cancellationToken)
@@ -67,6 +82,11 @@ public class DuendeMigrationService : IMigrationService
             var filteredScopes = allScopes.Where(s => r.Scopes.All(rs => rs.Scope == s.Name)).ToList();
             return Map(r, filteredScopes);
         }).ToList();
+    }
+
+    public Task<int> NbClients(CancellationToken cancellationToken)
+    {
+        return _configurationDbcontext.Clients.CountAsync(cancellationToken);
     }
 
     public async Task<List<Client>> ExtractClients(ExtractParameter parameter, CancellationToken cancellationToken)
@@ -89,10 +109,20 @@ public class DuendeMigrationService : IMigrationService
         }).ToList();
     }
 
+    public Task<int> NbGroups(CancellationToken cancellationToken)
+    {
+        return _applicationDbcontext.Roles.CountAsync(cancellationToken);
+    }
+
     public async Task<List<Group>> ExtractGroups(ExtractParameter parameter, CancellationToken cancellationToken)
     {
         var allGroups = await _applicationDbcontext.Roles.Skip(parameter.StartIndex).Take(parameter.Count).ToListAsync(cancellationToken);
         return allGroups.Select(Map).ToList();
+    }
+
+    public Task<int> NbUsers(CancellationToken cancellationToken)
+    {
+        return _applicationDbcontext.Users.CountAsync(cancellationToken);
     }
 
     public async Task<List<User>> ExtractUsers(ExtractParameter parameter, CancellationToken cancellationToken)

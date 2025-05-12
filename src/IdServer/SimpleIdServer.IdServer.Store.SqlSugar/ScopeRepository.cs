@@ -154,5 +154,10 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 .ToListAsync(cancellationToken);
             return result.Select(s => s.ToDomain()).ToList();
         }
+
+        public Task BulkAdd(List<Scope> scopes)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -5,12 +5,8 @@ using MassTransit;
 using Microsoft.Extensions.Configuration;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Migration;
+namespace SimpleIdServer.IdServer.Migrations;
 
 public class LaunchMigrationConsumer : 
     IConsumer<LaunchMigrationCommand>,
@@ -26,6 +22,10 @@ public class LaunchMigrationConsumer :
     private readonly IMigrationServiceFactory _migrationServiceFactory;
     private readonly ITransactionBuilder _transactionBuilder;
     private readonly IDateTimeHelper _dateTimeHelper;
+    private readonly IRealmRepository _realmRepository;
+    private readonly IScopeRepository _scopeRepository;
+    private readonly IApiResourceRepository _apiResourceRepository;
+    private readonly IClientRepository _clientRepository;
     private readonly IGroupRepository _groupRepository;
     private readonly IUserRepository _userRepository;
     public static string QueueName = "launch-migration";
@@ -36,6 +36,10 @@ public class LaunchMigrationConsumer :
         IMigrationServiceFactory migrationServiceFactory,
         ITransactionBuilder transactionBuilder,
         IDateTimeHelper dateTimeHelper,
+        IRealmRepository realmRepository,
+        IScopeRepository scopeRepository,
+        IApiResourceRepository apiResourceRepository,
+        IClientRepository clientRepository,
         IGroupRepository groupRepository,
         IUserRepository userRepository)
     {
@@ -44,14 +48,18 @@ public class LaunchMigrationConsumer :
         _migrationServiceFactory = migrationServiceFactory;
         _transactionBuilder = transactionBuilder;
         _dateTimeHelper = dateTimeHelper;
+        _realmRepository = realmRepository;
+        _scopeRepository = scopeRepository;
+        _apiResourceRepository = apiResourceRepository;
+        _clientRepository = clientRepository;
         _groupRepository = groupRepository;
         _userRepository = userRepository;
     }
     public async Task Consume(ConsumeContext<LaunchMigrationCommand> context)
     {
+        var msg = context.Message;
         using (var transaction = _transactionBuilder.Build())
         {
-            var msg = context.Message;
             var migrationExecution = await _migrationStore.Get(msg.Realm, msg.Name, context.CancellationToken);
             if (migrationExecution != null)
             {
@@ -65,28 +73,36 @@ public class LaunchMigrationConsumer :
 
             await transaction.Commit(context.CancellationToken);
         }
+
+        var destination = new Uri($"queue:{QueueName}");
+        await context.Send(destination, new MigrateApiScopesCommand
+        {
+            Name = msg.Name,
+            Realm = msg.Realm
+        });
     }
 
     public async Task Consume(ConsumeContext<MigrateApiScopesCommand> context)
     {
         var msg = context.Message;
+        var currentRealm = await _realmRepository.Get(msg.Realm, context.CancellationToken);
         var migrationService = _migrationServiceFactory.Create(msg.Name);
         var isMigrated = await Migrate(
             msg.Realm,
             msg.Name,
-            (m) => m.IsGroupsMigrated,
-            migrationService.NbGroups,
+            (m) => m.IsApiScopesMigrated,
+            migrationService.NbApiScopes,
             async (e, c) =>
             {
-                var groups = await migrationService.ExtractGroups(e, c);
-                await _groupRepository.BulkAdd(groups);
+                var extractedScopes = await migrationService.ExtractApiScopes(e, c);
+                await MigrateScopes(extractedScopes, currentRealm, migrationService, c);
             },
-            (m, s, e, n) => m.MigrateGroups(s, e, n),
+            (m, s, e, n) => m.MigrateApiScopes(s, e, n),
             context.CancellationToken);
         if (isMigrated)
         {
             var destination = new Uri($"queue:{QueueName}");
-            await context.Send(destination, new MigrateUsersCommand
+            await context.Send(destination, new MigrateIdentityScopesCommand
             {
                 Name = msg.Name,
                 Realm = msg.Realm
@@ -97,23 +113,24 @@ public class LaunchMigrationConsumer :
     public async Task Consume(ConsumeContext<MigrateIdentityScopesCommand> context)
     {
         var msg = context.Message;
+        var currentRealm = await _realmRepository.Get(msg.Realm, context.CancellationToken);
         var migrationService = _migrationServiceFactory.Create(msg.Name);
         var isMigrated = await Migrate(
             msg.Realm,
             msg.Name,
-            (m) => m.IsGroupsMigrated,
-            migrationService.NbGroups,
+            (m) => m.IsIdentityScopesMigrated,
+            migrationService.NbIdentityScopes,
             async (e, c) =>
             {
-                var groups = await migrationService.ExtractGroups(e, c);
-                await _groupRepository.BulkAdd(groups);
+                var extractedScopes = await migrationService.ExtractIdentityScopes(e, c);
+                await MigrateScopes(extractedScopes, currentRealm, migrationService, c);
             },
-            (m, s, e, n) => m.MigrateGroups(s, e, n),
+            (m, s, e, n) => m.MigrateIdentityScopes(s, e, n),
             context.CancellationToken);
         if (isMigrated)
         {
             var destination = new Uri($"queue:{QueueName}");
-            await context.Send(destination, new MigrateUsersCommand
+            await context.Send(destination, new MigrateApiResourcesCommand
             {
                 Name = msg.Name,
                 Realm = msg.Realm
@@ -125,22 +142,33 @@ public class LaunchMigrationConsumer :
     {
         var msg = context.Message;
         var migrationService = _migrationServiceFactory.Create(msg.Name);
+        var currentRealm = await _realmRepository.Get(msg.Realm, context.CancellationToken);
         var isMigrated = await Migrate(
             msg.Realm,
             msg.Name,
-            (m) => m.IsGroupsMigrated,
-            migrationService.NbGroups,
+            (m) => m.IsApiResoucesMigrated,
+            migrationService.NbApiResources,
             async (e, c) =>
             {
-                var groups = await migrationService.ExtractGroups(e, c);
-                await _groupRepository.BulkAdd(groups);
+                var apiResources = await migrationService.ExtractApiResources(e, c);
+                var allApiResourceIds = apiResources.Select(s => s.Id).ToList();
+                var existingApiResources = await _apiResourceRepository.GetByIds(allApiResourceIds, context.CancellationToken);
+                foreach (var existingApiResource in existingApiResources)
+                {
+                    existingApiResource.Realms.Add(currentRealm);
+                    _apiResourceRepository.Update(existingApiResource);
+                }
+
+                var existingApiResourceIds = existingApiResources.Select(s => s.Id).ToList();
+                var unknownApiResources = apiResources.Where(s => !existingApiResourceIds.Contains(s.Id)).ToList();
+                await _apiResourceRepository.BulkAdd(unknownApiResources);
             },
-            (m, s, e, n) => m.MigrateGroups(s, e, n),
+            (m, s, e, n) => m.MigrateApiResources(s, e, n),
             context.CancellationToken);
         if (isMigrated)
         {
             var destination = new Uri($"queue:{QueueName}");
-            await context.Send(destination, new MigrateUsersCommand
+            await context.Send(destination, new MigrateClientsCommand
             {
                 Name = msg.Name,
                 Realm = msg.Realm
@@ -151,23 +179,34 @@ public class LaunchMigrationConsumer :
     public async Task Consume(ConsumeContext<MigrateClientsCommand> context)
     {
         var msg = context.Message;
+        var currentRealm = await _realmRepository.Get(msg.Realm, context.CancellationToken);
         var migrationService = _migrationServiceFactory.Create(msg.Name);
         var isMigrated = await Migrate(
             msg.Realm,
             msg.Name,
-            (m) => m.IsGroupsMigrated,
-            migrationService.NbGroups,
+            (m) => m.IsClientsMigrated,
+            migrationService.NbClients,
             async (e, c) =>
             {
-                var groups = await migrationService.ExtractGroups(e, c);
-                await _groupRepository.BulkAdd(groups);
+                var clients = await migrationService.ExtractClients(e, c);
+                var allClientIds = clients.Select(s => s.Id).ToList();
+                var existingClients = await _clientRepository.GetByClientIds(allClientIds, context.CancellationToken);
+                foreach (var existingClient in existingClients)
+                {
+                    existingClient.Realms.Add(currentRealm);
+                    _clientRepository.Update(existingClient);
+                }
+
+                var existingClientIds = existingClients.Select(s => s.Id).ToList();
+                var unknownClients = clients.Where(s => !existingClientIds.Contains(s.Id)).ToList();
+                await _clientRepository.BulkAdd(unknownClients);
             },
-            (m, s, e, n) => m.MigrateGroups(s, e, n),
+            (m, s, e, n) => m.MigrateClients(s, e, n),
             context.CancellationToken);
         if (isMigrated)
         {
             var destination = new Uri($"queue:{QueueName}");
-            await context.Send(destination, new MigrateUsersCommand
+            await context.Send(destination, new MigrateGroupsCommand
             {
                 Name = msg.Name,
                 Realm = msg.Realm
@@ -220,6 +259,21 @@ public class LaunchMigrationConsumer :
             context.CancellationToken);
     }
 
+    private async Task MigrateScopes(List<Scope> scopes, Domains.Realm realm, IMigrationService migrationService, CancellationToken cancellationToken)
+    {
+        var allScopeIds = scopes.Select(s => s.Id).ToList();
+        var existingScopes = await _scopeRepository.GetByIds(allScopeIds, cancellationToken);
+        foreach (var existingScope in existingScopes)
+        {
+            existingScope.Realms.Add(realm);
+            _scopeRepository.Update(existingScope);
+        }
+
+        var existingScopeIds = existingScopes.Select(s => s.Id).ToList();
+        var unknownScopes = scopes.Where(s => !existingScopeIds.Contains(s.Id)).ToList();
+        await _scopeRepository.BulkAdd(unknownScopes);
+    }
+
     private async Task<bool> Migrate(
         string realm,
         string name, 
@@ -253,7 +307,7 @@ public class LaunchMigrationConsumer :
             }
 
             var end = _dateTimeHelper.GetCurrent();
-            endCb(migrationExecution, start, end, nbRecords),
+            endCb(migrationExecution, start, end, nbRecords);
             await transaction.Commit(cancellationToken);
         }
 

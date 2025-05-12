@@ -122,4 +122,10 @@ public class DefaultScopeRepository : IScopeRepository
     public void Add(Scope scope) => _scopes.Add(scope);
 
     public void Update(Scope scope) { }
+
+    public Task BulkAdd(List<Scope> scopes)
+    {
+        _scopes.AddRange(scopes);
+        return Task.CompletedTask;
+    }
 }

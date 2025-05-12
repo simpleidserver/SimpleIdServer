@@ -79,4 +79,19 @@ public class DefaultApiResourceRepository : IApiResourceRepository
 
     public void Delete(ApiResource apiResource)
         => _apiResources.Remove(apiResource);
+
+    public Task<List<ApiResource>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_apiResources.Where(r => ids.Contains(r.Id)).ToList());
+    }
+
+    public void Update(ApiResource apiResource)
+    {
+    }
+
+    public Task BulkAdd(List<ApiResource> apiResources)
+    {
+        _apiResources.AddRange(apiResources);
+        return Task.CompletedTask;
+    }
 }

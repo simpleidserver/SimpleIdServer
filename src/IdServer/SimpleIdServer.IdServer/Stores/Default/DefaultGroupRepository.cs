@@ -112,4 +112,10 @@ public class DefaultGroupRepository : IGroupRepository
         }
         await Task.CompletedTask;
     }
+
+    public Task BulkAdd(List<Group> groups)
+    {
+        _groups.AddRange(groups);
+        return Task.CompletedTask;
+    }
 }

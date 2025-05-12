@@ -55,7 +55,7 @@ using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
-using SimpleIdServer.IdServer.Migrations;
+using SimpleIdServer.IdServer.DataSeeder;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Stores;

@@ -50,7 +50,8 @@
 		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Swagger" />
 		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Notification.Gotify" />
 		<InternalsVisibleTo Include="SimpleIdServer.IdServer.OpenTelemetry" />
-		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Migration.Duende" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Migrations.Duende" />
+		<InternalsVisibleTo Include="SimpleIdServer.IdServer.Migrations" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">
@@ -64,5 +65,8 @@
 	    <Generator>PublicResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Global.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Migration\" />
 	</ItemGroup>
 </Project>

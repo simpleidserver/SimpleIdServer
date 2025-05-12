@@ -1,40 +1,39 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using SimpleIdServer.IdServer.Api.Migrations;
+using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
-using SimpleIdServer.IdServer.Migration;
 using SimpleIdServer.IdServer.Stores;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace SimpleIdServer.IdServer.Api.Migrate;
+namespace SimpleIdServer.IdServer.Migrations.Api;
 
 public class MigrationsController : BaseController
 {
     private readonly IEnumerable<IMigrationService> _migrationServices;
     private readonly IMigrationStore _migrationStore;
+    private readonly IBusControl _busControl;
     private readonly ILogger<MigrationsController> _logger;
 
     public MigrationsController(
         IEnumerable<IMigrationService> migrationServices,
         IMigrationStore migrationStore,
+        IBusControl busControl,
         ILogger<MigrationsController> logger,
         ITokenRepository tokenRepository, 
         IJwtBuilder jwtBuilder) : base(tokenRepository, jwtBuilder)
     {
         _migrationServices = migrationServices;
         _migrationStore = migrationStore;
+        _busControl = busControl;
         _logger = logger;
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllDefinitions([FromRoute] string prefix, string name, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllDefinitions([FromRoute] string prefix, CancellationToken cancellationToken)
     {
         try
         {
@@ -56,9 +55,9 @@ public class MigrationsController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllExecutions([FromRoute] string prefix, string name, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAllExecutions([FromRoute] string prefix, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? Constants.DefaultRealm;
+        prefix = prefix ?? IdServer.Constants.DefaultRealm;
         try
         {
             await CheckAccessToken(prefix, Config.DefaultScopes.Migrations.Name);
@@ -81,6 +80,22 @@ public class MigrationsController : BaseController
     [HttpGet]
     public async Task<IActionResult> Launch([FromRoute] string prefix, string name, CancellationToken cancellationToken)
     {
-        return null;
+        prefix = prefix ?? IdServer.Constants.DefaultRealm;
+        try
+        {
+            await CheckAccessToken(prefix, Config.DefaultScopes.Migrations.Name);
+            var sendEndpoint = await _busControl.GetSendEndpoint(new Uri($"queue:{LaunchMigrationConsumer.QueueName}"));
+            await sendEndpoint.Send(new LaunchMigrationCommand
+            {
+                Name = name,
+                Realm = prefix
+            });
+            return NoContent();
+        }
+        catch(OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
     }
 }

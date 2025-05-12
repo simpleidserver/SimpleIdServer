@@ -166,4 +166,9 @@ public class GroupRepository : IGroupRepository
             RealmsName = realm.RealmsName,
         };
     }
+
+    public Task BulkAdd(List<Group> groups)
+    {
+        throw new NotImplementedException();
+    }
 }

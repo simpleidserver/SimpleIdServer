@@ -4,8 +4,8 @@
 using DataSeeder;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Config;
+using SimpleIdServer.IdServer.DataSeeder;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Migrations;
 using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Swagger.Migrations;

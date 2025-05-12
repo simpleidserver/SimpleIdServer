@@ -116,4 +116,19 @@ public class ApiResourceRepository : IApiResourceRepository
     {
         _dbContext.Client.Deleteable(apiResource).ExecuteCommand();
     }
+
+    public Task<List<ApiResource>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Update(ApiResource apiResource)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task BulkAdd(List<ApiResource> apiResources)
+    {
+        throw new NotImplementedException();
+    }
 }

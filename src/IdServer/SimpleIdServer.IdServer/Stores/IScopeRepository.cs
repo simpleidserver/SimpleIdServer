@@ -24,4 +24,5 @@ public interface IScopeRepository
     void Add(Scope scope);
     void Update(Scope scope);
     void DeleteRange(IEnumerable<Scope> scopes);
+    Task BulkAdd(List<Scope> scopes);
 }

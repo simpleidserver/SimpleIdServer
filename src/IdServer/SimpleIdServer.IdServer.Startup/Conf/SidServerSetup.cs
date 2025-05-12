@@ -57,6 +57,7 @@ public class SidServerSetup
             {
                 c.AddTailwindcss();
             })
+            .EnableMigration()
             .AddDuendeMigration(a =>
             {
                 a.UseNpgsql("Host=localhost;Port=5432;Database=duende;Username=admin;Password=tJWBx3ccNJ6dyp1wxoA99qqQ");

@@ -3,7 +3,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace SimpleIdServer.IdServer.Migration.Duende;
+namespace SimpleIdServer.IdServer.Migrations.Duende;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {

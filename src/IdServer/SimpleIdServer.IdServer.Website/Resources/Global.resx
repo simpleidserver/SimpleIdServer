@@ -2100,4 +2100,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="CreateWorkflow" xml:space="preserve">
     <value>Create workflow</value>
   </data>
+  <data name="Migrations" xml:space="preserve">
+    <value>Migrations</value>
+  </data>
 </root>

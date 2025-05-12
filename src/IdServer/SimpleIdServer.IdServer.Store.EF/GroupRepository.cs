@@ -155,4 +155,25 @@ public class GroupRepository : IGroupRepository
         _dbContext.GroupRealm.AddRange(newRealms);
         await _dbContext.SaveChangesAsync();
     }
+
+    public async Task BulkAdd(List<Group> groups)
+    {
+        if (_dbContext.Database.IsRelational())
+        {
+            var merged = LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.Groups.ToLinqToDBTable()),
+                                        groups
+                                    ),
+                                    (s1, s2) => s1.Id == s2.Id
+                            ),
+                            source => source);
+            await LinqToDB.LinqExtensions.MergeAsync(merged);
+            return;
+        }
+
+        _dbContext.Groups.AddRange(groups);
+    }
 }

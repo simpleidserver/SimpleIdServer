@@ -3130,6 +3130,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Migrations.
+        /// </summary>
+        public static string Migrations {
+            get {
+                return ResourceManager.GetString("Migrations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Minutes.
         /// </summary>
         public static string Minutes {
