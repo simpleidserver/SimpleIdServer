@@ -23,4 +23,5 @@ public interface IGroupRepository
     void DeleteRange(IEnumerable<Group> groups);
     Task BulkUpdate(List<Group> groups);
     Task BulkUpdate(List<GroupRealm> groupRealms);
+    Task BulkAdd(List<Group> groups);
 }

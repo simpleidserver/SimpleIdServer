@@ -34,6 +34,10 @@ public class MigrationExecutionHistory
 
 public enum MigrationExecutionHistoryTypes
 {
-    GROUPS = 0,
-    USERS = 1
+    APISCOPES = 0,
+    IDENTITYSCOPES = 1,
+    APIRESOURCES = 2,
+    CLIENTS = 3,
+    GROUPS = 4,
+    USERS = 5
 }

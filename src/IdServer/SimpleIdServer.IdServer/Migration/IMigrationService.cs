@@ -26,5 +26,7 @@ public interface IMigrationService
 
     Task<List<Group>> ExtractGroups(ExtractParameter parameter, CancellationToken cancellationToken);
 
+    Task<int> NbUsers(CancellationToken cancellationToken);
+
     Task<List<User>> ExtractUsers(ExtractParameter parameter, CancellationToken cancellationToken);
 }

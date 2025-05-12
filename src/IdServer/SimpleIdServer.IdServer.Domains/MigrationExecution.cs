@@ -35,18 +35,73 @@ public class MigrationExecution
     {
         get
         {
-            return Histories != null && Histories.Any() && Histories.Any(h => h.Type == MigrationExecutionHistoryTypes.GROUPS);
+            return IsMigrated(MigrationExecutionHistoryTypes.GROUPS);
+        }
+    }
+
+    public bool IsApiScopesMigrated
+    {
+        get
+        {
+            return IsMigrated(MigrationExecutionHistoryTypes.APISCOPES);
+        }
+    }
+
+    public bool IsIdentityScopesMigrated
+    {
+        get
+        {
+            return IsMigrated(MigrationExecutionHistoryTypes.IDENTITYSCOPES);
+        }
+    }
+
+    public bool IsApiResoucesMigrated
+    {
+        get
+        {
+            return IsMigrated(MigrationExecutionHistoryTypes.APIRESOURCES);
+        }
+    }
+
+    public bool IsClientsMigrated
+    {
+        get
+        {
+            return IsMigrated(MigrationExecutionHistoryTypes.CLIENTS);
+        }
+    }
+
+    public bool IsUsersMigrated
+    {
+        get
+        {
+            return IsMigrated(MigrationExecutionHistoryTypes.USERS);
         }
     }
 
     public void MigrateGroups(DateTime startDatetime, DateTime endDatetime, int nbGroups)
+    {
+        Migrate(MigrationExecutionHistoryTypes.GROUPS, startDatetime, endDatetime, nbGroups);
+    }
+
+    public void MigrateUsers(DateTime startDateTime, DateTime endDateTime, int nbUsers)
+    {
+        Migrate(MigrationExecutionHistoryTypes.USERS, startDateTime, endDateTime, nbUsers);
+    }
+
+    private bool IsMigrated(MigrationExecutionHistoryTypes type)
+    {
+        return Histories != null && Histories.Any() && Histories.Any(h => h.Type == type);
+    }
+
+    private void Migrate(MigrationExecutionHistoryTypes type, DateTime startDatetime, DateTime endDatetime, int nbGroups)
     {
         Histories.Add(new MigrationExecutionHistory
         {
             StartDatetime = startDatetime,
             EndDatetime = endDatetime,
             NbRecords = nbGroups,
-            Type = MigrationExecutionHistoryTypes.GROUPS
+            Type = type
         });
     }
 }
