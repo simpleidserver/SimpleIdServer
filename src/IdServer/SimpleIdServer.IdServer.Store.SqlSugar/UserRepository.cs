@@ -30,6 +30,11 @@ public class UserRepository : IUserRepository
             .ExecuteCommand();
     }
 
+    public Task BulkAdd(List<User> users)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task BulkUpdate(List<UserClaim> userClaims)
     {
         var claims = userClaims.Select(c => SugarUserClaim.Transform(c)).ToList();
@@ -110,6 +115,19 @@ public class UserRepository : IUserRepository
             .Where(u => u.Realms.Any(r => r.RealmsName == realm) && ids.Contains(u.Id))
             .ToListAsync(cancellationToken);
         return result.Select(u => u.ToDomain()).ToList();
+    }
+
+    public Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, CancellationToken cancellationToken)
+    {
+        var users = await GetUsers()
+            .Where(u => subjects.Contains(u.Name))
+            .ToListAsync(cancellationToken);
+        return users.Select(u => u.ToDomain()).ToList();
     }
 
     public async Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, string realm, CancellationToken cancellationToken)

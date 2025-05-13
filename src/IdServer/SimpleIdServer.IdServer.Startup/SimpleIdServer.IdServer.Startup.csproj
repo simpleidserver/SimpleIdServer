@@ -16,6 +16,7 @@
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Email\SimpleIdServer.IdServer.Email.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Federation\SimpleIdServer.IdServer.Federation.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Fido\SimpleIdServer.IdServer.Fido.csproj" />
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Migrations.Duende\SimpleIdServer.IdServer.Migrations.Duende.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.MySQLMigrations\SimpleIdServer.IdServer.MySQLMigrations.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Notification.Fcm\SimpleIdServer.IdServer.Notification.Fcm.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.IdServer.Notification.Gotify\SimpleIdServer.IdServer.Notification.Gotify.csproj" />

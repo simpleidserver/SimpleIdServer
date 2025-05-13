@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
@@ -34,6 +35,14 @@ public class ApiResourceRepository : IApiResourceRepository
                 .Include(p => p.Realms)
                 .Include(p => p.Scopes)
                 .SingleOrDefaultAsync(p => p.Realms.Any(r => r.Name == realm) && p.Name == name, cancellationToken);
+        return result;
+    }
+
+    public Task<List<ApiResource>> GetByNames(List<string> names, CancellationToken cancellationToken)
+    {
+        var result = _dbContext.ApiResources
+            .Include(r => r.Realms)
+            .Where(r => names.Contains(r.Name)).ToListAsync(cancellationToken);
         return result;
     }
 
@@ -88,4 +97,39 @@ public class ApiResourceRepository : IApiResourceRepository
 
     public void Delete(ApiResource apiResource)
         => _dbContext.ApiResources.Remove(apiResource);
+
+    public async Task<List<ApiResource>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.ApiResources
+                .Include(p => p.Realms)
+                .Include(p => p.Scopes)
+                .Where(p => ids.Contains(p.Id))
+                .ToListAsync(cancellationToken);
+        return result;
+    }
+
+    public void Update(ApiResource apiResource)
+    {
+    }
+
+    public async Task BulkAdd(List<ApiResource> apiResources)
+    {
+        if (_dbContext.Database.IsRelational())
+        {
+            var merged = LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.ApiResources.ToLinqToDBTable()),
+                                        apiResources
+                                    ),
+                                    (s1, s2) => s1.Id == s2.Id
+                            ),
+                            source => source);
+            await LinqToDB.LinqExtensions.MergeAsync(merged);
+            return;
+        }
+
+        _dbContext.ApiResources.AddRange(apiResources);
+    }
 }

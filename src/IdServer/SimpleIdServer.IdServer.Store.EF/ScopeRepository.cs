@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Api.Scopes;
 using SimpleIdServer.IdServer.Domains;
@@ -49,6 +50,15 @@ public class ScopeRepository : IScopeRepository
                 .Include(s => s.Realms)
                 .Include(s => s.ClaimMappers)
                 .Where(s => scopeNames.Contains(s.Name))
+                .ToListAsync(cancellationToken);
+    }
+
+    public Task<List<Scope>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+    {
+        return _dbContext.Scopes
+                .Include(s => s.Realms)
+                .Include(s => s.ClaimMappers)
+                .Where(s => ids.Contains(s.Id))
                 .ToListAsync(cancellationToken);
     }
 
@@ -117,4 +127,25 @@ public class ScopeRepository : IScopeRepository
     public void Add(Scope scope) => _dbContext.Scopes.Add(scope);
 
     public void Update(Scope scope) { }
+
+    public async Task BulkAdd(List<Scope> scopes)
+    {
+        if (_dbContext.Database.IsRelational())
+        {
+            var merged = LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.Scopes.ToLinqToDBTable()),
+                                        scopes
+                                    ),
+                                    (s1, s2) => s1.Id == s2.Id
+                            ),
+                            source => source);
+            await LinqToDB.LinqExtensions.MergeAsync(merged);
+            return;
+        }
+
+        _dbContext.Scopes.AddRange(scopes);
+    }
 }

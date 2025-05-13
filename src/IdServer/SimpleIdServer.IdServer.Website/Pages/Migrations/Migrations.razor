@@ -1,0 +1,201 @@
+﻿@page "/migrations"
+@attribute [Authorize("Authenticated")]
+@using SimpleIdServer.IdServer.Website.Resources
+@using SimpleIdServer.IdServer.Website.Shared.Dialogs
+@using SimpleIdServer.IdServer.Website.Stores.MigrationStore
+@layout SimpleIdServer.IdServer.Website.Shared.MainLayout
+@using SimpleIdServer.IdServer.Domains
+@using System.Text
+@inject NavigationManager navigationManager
+@inject ContextMenuService contextMenuService
+@inject IState<MigrationExecutionsState> migrationExecutionsState
+@inject DialogService dialogService
+@inject NotificationService notificationService
+@inject IUrlHelper urlHelper
+@inject IDispatcher dispatcher
+@inject TooltipService tooltipService
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent
+
+<SidAuthorizeView Roles=@($"/migrations/manage,/migrations/view")>
+    <Authorized>
+        <RadzenText class="mt-3 mb-3 no-margin" Text="@Global.Migrations" TextStyle="TextStyle.DisplayH3" />
+        <RadzenDataGrid AllowFiltering="true"
+                        AllowColumnResize="true"
+                        AllowAlternatingRows="false"
+                        AllowSorting="true"
+                        PageSize="30"
+                        AllowPaging="true"
+                        PagerHorizontalAlign="HorizontalAlign.Left"
+                        ShowPagingSummary="true"
+                        IsLoading="@migrationExecutionsState.Value.IsLoading"
+                        Count="@migrationExecutionsState.Value.Count"
+                        Data="@migrationExecutionsState.Value.Executions"
+                        FilterMode="FilterMode.Simple"
+                        LogicalFilterOperator="LogicalFilterOperator.And"
+                        FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                        RowRender="@RowRender"
+                        TItem="MigrationExecution"
+                        ColumnWidth="300px">
+            <Columns>
+                <RadzenDataGridColumn Title="@Global.Name" TItem="MigrationExecution" Filterable="true" Sortable="false" Width="40px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        @data.Name
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Title="@Global.StartDatetime" TItem="MigrationExecution" Filterable="false" Sortable="false" Width="40px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        @(data.LastExecutionHistory == null ? "" : (data.LastExecutionHistory?.StartDatetime.ToString("yyyy-MM-dd HH:mm:ss")))
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Title="@Global.EndDatetime" TItem="MigrationExecution" Filterable="false" Sortable="false" Width="40px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        @(data.LastExecutionHistory == null ? "" : (data.LastExecutionHistory?.EndDatetime?.ToString("yyyy-MM-dd HH:mm:ss")))
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Title="@Global.Status" TItem="MigrationExecution" Filterable="false" Sortable="false"  TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <div style="display: flex;">
+                            <ul class="stateDig">
+                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedScopes, data.TotalMigratedScopes)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.APISCOPES, MigrationExecutionHistoryTypes.IDENTITYSCOPES))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.APISCOPES, MigrationExecutionHistoryTypes.IDENTITYSCOPES))>
+                                    <div @ref=extractedElements[data.Name] class="title">@Global.Scopes</div>
+                                </li>
+                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedApiResources, data.TotalMigratedApiResources)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.APIRESOURCES))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.APIRESOURCES))>
+                                    <div class="title">@Global.ApiResources</div>
+                                </li>
+                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedClients, data.TotalMigratedApiResources)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.CLIENTS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.CLIENTS))>
+                                    <div class="title">@Global.Clients</div>
+                                </li>
+                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedGroups, data.TotalMigratedGroups)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.GROUPS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.GROUPS))>
+                                    <div class="title">@Global.Groups</div>
+                                </li>
+                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedUsers, data.TotalMigratedUsers)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.USERS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.USERS))>
+                                    <div class="title">@Global.Users</div>
+                                </li>
+                            </ul>
+                        </div>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="MigrationExecution" Filterable="false" Sortable="false"  Width="40px" TextAlign="TextAlign.Center">
+                    <Template Context="data">
+                        <SidAuthorizeView Roles=@("/migrations/manage")>
+                            <Authorized>
+                                <RadzenButton Icon="more_vert" Click="@(args => ShowMoreContextMenu(data, args))" />
+                            </Authorized>
+                        </SidAuthorizeView>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+
+    </Authorized>
+    <NotAuthorized>
+        @Global.NotAuthorized
+    </NotAuthorized>
+</SidAuthorizeView>
+
+@code {
+    Dictionary<string, ElementReference?> extractedElements = new Dictionary<string, ElementReference?>();
+
+    void RowRender(RowRenderEventArgs<MigrationExecution> row)
+    {
+        const string className = "class";
+        if (row.Attributes.ContainsKey(className))
+            row.Attributes.Remove(className);
+    }
+
+
+    void ShowStep(ElementReference? elementReference, string msg)
+    {
+        tooltipService.Open(elementReference.Value, msg);
+    }
+
+    void ShowMigratedRecords(MigrationExecution execution, ElementReference elementReference)
+    {
+        var options = new TooltipOptions() { Position = TooltipPosition.Bottom };
+        var msg = string.Format(Global.MigratedRecordsSummary, execution.TotalMigratedScopes, execution.TotalMigratedUsers, execution.TotalMigratedGroups, execution.TotalMigratedClients, execution.TotalMigratedApiResources);
+        tooltipService.Open(elementReference, msg, options);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+        if(firstRender)
+        {
+            SubscribeToAction<LaunchMigrationSuccessAction>(async (act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.MigrationLaunched });
+            });
+            dispatcher.Dispatch(new GetAllMigrationsExecutionsAction());
+        }
+    }
+
+    async Task ShowError(MigrationExecution execution, params MigrationExecutionHistoryTypes[] types)
+    {
+        var errors = execution.GetErrors(types);
+        if (errors == null || errors.Count == 0)
+        {
+            return;
+        }
+
+        var strBuilder = new StringBuilder();
+        foreach (var error in errors)
+        {
+            strBuilder.AppendLine(error);
+        }
+
+        await dialogService.OpenAsync<RequestDialog>(Global.Request, new Dictionary<string, object>
+        {
+            { "Content", strBuilder.ToString() }
+        }, new DialogOptions
+        {
+            Width = "700px",
+            Height = "512px",
+            Resizable = true,
+            Draggable = true
+        });
+    }
+
+    void ShowMoreContextMenu(MigrationExecution migrationExecution, MouseEventArgs args)
+    {
+        contextMenuService.Open(args, new List<ContextMenuItem>
+        {
+            new ContextMenuItem { Text = "Launch", Value = 1 }
+        }, (a) =>
+    {
+    if (a.Value.Equals(1))
+    {
+        var act = new LaunchMigrationAction { MigrationName = migrationExecution.Name };
+        dispatcher.Dispatch(act);
+        contextMenuService.Close();
+    }
+    });
+    }
+
+    string GetNodeClassName(MigrationExecution execution,  params MigrationExecutionHistoryTypes[] types)
+    {
+        var classNames = new List<string>
+        {
+            "node"
+        };
+        var isMigrated = execution.IsMigrated(types);
+        if (isMigrated)
+        {
+            classNames.Add("finished");
+        }
+        else
+        {
+            var errors = execution.GetErrors(types);
+            if(errors != null && errors.Count > 0)
+            {
+                classNames.Add("error");
+            }
+            else
+            {
+                classNames.Add("active");
+            }
+        }
+
+
+        return string.Join(" ", classNames);
+    }
+}

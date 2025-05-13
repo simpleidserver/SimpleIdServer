@@ -4,7 +4,7 @@
 using DataSeeder;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Migrations;
+using SimpleIdServer.IdServer.DataSeeder;
 using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Provisioning.LDAP.Migrations;

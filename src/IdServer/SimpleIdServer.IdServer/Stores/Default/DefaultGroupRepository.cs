@@ -1,8 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Org.BouncyCastle.Crypto;
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
@@ -111,5 +113,23 @@ public class DefaultGroupRepository : IGroupRepository
                 group.Realms.Add(new GroupRealm { RealmsName = gr.RealmsName });
         }
         await Task.CompletedTask;
+    }
+
+    public Task BulkAdd(List<Group> groups)
+    {
+        _groups.AddRange(groups);
+        return Task.CompletedTask;
+    }
+
+    public Task<List<Group>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+    {
+        var list = _groups.Where(g => ids.Contains(g.Id)).ToList();
+        return Task.FromResult(list);
+    }
+    
+    public Task<List<Group>> GetByNames(List<string> names, CancellationToken cancellationToken)
+    {
+        var list = _groups.Where(g => names.Contains(g.Name)).ToList();
+        return Task.FromResult(list);
     }
 }

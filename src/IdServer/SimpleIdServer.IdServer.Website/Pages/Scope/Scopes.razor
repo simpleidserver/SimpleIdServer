@@ -92,6 +92,14 @@
                         }
                     </Template>
                 </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableScope" Property="Value.Source" Filterable="true" Sortable="false" Title="@Global.Source" Width="80px">
+                    <Template Context="data">
+                        @if(!string.IsNullOrWhiteSpace(data.Value.Source))
+                        {
+                            <RadzenBadge Text="@data.Value.Source" BadgeStyle="BadgeStyle.Info" IsPill="true" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableScope" Property="Value.Description" Filterable="true" Sortable="false" Title="@Global.Description" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableScope" Property="Value.UpdateDateTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableScope" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">

@@ -85,7 +85,7 @@ namespace SimpleIdServer.IdServer.Website
                 {
                     new KeyValuePair<string, string>("client_id", _idServerWebsiteOptions.ClientId),
                     new KeyValuePair<string, string>("client_secret", _idServerWebsiteOptions.ClientSecret),
-                    new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities workflows forms recurringjobs templates"),
+                    new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities workflows forms recurringjobs templates migrations"),
                     new KeyValuePair<string, string>("grant_type", "client_credentials")
                 };
             var url = _idServerWebsiteOptions.Issuer;

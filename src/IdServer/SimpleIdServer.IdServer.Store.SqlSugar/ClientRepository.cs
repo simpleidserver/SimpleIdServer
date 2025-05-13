@@ -166,5 +166,10 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
                 Content = clients.Select(c => c.ToDomain()).ToList()
             };
         }
+
+        public Task BulkAdd(List<Client> clients)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

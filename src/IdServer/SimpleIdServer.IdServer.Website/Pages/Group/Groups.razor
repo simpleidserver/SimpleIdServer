@@ -66,6 +66,14 @@
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableGroup" Property="Group.Description" Filterable="true" Sortable="false" Title="@Global.Description" Width="80px" />
+                <RadzenDataGridColumn TItem="SelectableGroup" Property="Group.Source" Filterable="true" Sortable="false" Title="@Global.Source" Width="80px">
+                    <Template Context="data">
+                        @if (!string.IsNullOrWhiteSpace(data.Group.Source))
+                        {
+                            <RadzenBadge Text="@data.Group.Source" BadgeStyle="BadgeStyle.Info" IsPill="true" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableGroup" Property="Group.UpdateDateTime" Filterable="true" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableGroup" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">

@@ -16,4 +16,5 @@ public class GroupNames
     public const string ParentGroupId = "parent_group_id";
     public const string Children = "children";
     public const string Roles = "roles";
+    public const string Source = "source";
 }

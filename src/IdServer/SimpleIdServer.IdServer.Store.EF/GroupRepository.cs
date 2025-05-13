@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto;
 using SimpleIdServer.IdServer.Api.Groups;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
@@ -155,4 +156,37 @@ public class GroupRepository : IGroupRepository
         _dbContext.GroupRealm.AddRange(newRealms);
         await _dbContext.SaveChangesAsync();
     }
+
+    public async Task BulkAdd(List<Group> groups)
+    {
+        if (_dbContext.Database.IsRelational())
+        {
+            var merged = LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.Groups.ToLinqToDBTable()),
+                                        groups
+                                    ),
+                                    (s1, s2) => s1.Id == s2.Id
+                            ),
+                            source => source);
+            await LinqToDB.LinqExtensions.MergeAsync(merged);
+            return;
+        }
+
+        _dbContext.Groups.AddRange(groups);
+    }
+
+    public Task<List<Group>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+        => _dbContext.Groups
+                .Include(c => c.Realms)
+                .Where(g => ids.Contains(g.Id))
+                .ToListAsync(cancellationToken);
+
+    public Task<List<Group>> GetByNames(List<string> names, CancellationToken cancellationToken)
+        => _dbContext.Groups
+                .Include(c => c.Realms)
+                .Where(g => names.Contains(g.Name))
+                .ToListAsync(cancellationToken);
 }

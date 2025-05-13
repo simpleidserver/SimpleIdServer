@@ -42,6 +42,14 @@ public class DefaultScopeRepository : IScopeRepository
         return Task.FromResult(scope);
     }
 
+    public Task<List<Scope>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+    {
+        var result = _scopes
+            .Where(s => ids.Contains(s.Id))
+            .ToList();
+        return Task.FromResult(result);
+    }
+
     public Task<List<Scope>> GetByNames(List<string> scopeNames, CancellationToken cancellationToken)
     {
         var result = _scopes
@@ -114,4 +122,10 @@ public class DefaultScopeRepository : IScopeRepository
     public void Add(Scope scope) => _scopes.Add(scope);
 
     public void Update(Scope scope) { }
+
+    public Task BulkAdd(List<Scope> scopes)
+    {
+        _scopes.AddRange(scopes);
+        return Task.CompletedTask;
+    }
 }

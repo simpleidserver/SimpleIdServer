@@ -57,6 +57,11 @@ public class SidServerSetup
             {
                 c.AddTailwindcss();
             })
+            .EnableMigration()
+            .AddDuendeMigration(a =>
+            {
+                ConfigureDuendeMigration(webApplicationBuilder, a);
+            })
             .AddPwdAuthentication(true)
             .AddEmailAuthentication()
             .AddOtpAuthentication()
@@ -96,6 +101,7 @@ public class SidServerSetup
             .EnableMasstransit(o =>
             {
                 o.AddConsumer<IdServerEventsConsumer>();
+                o.ConfigureMigration();
                 ConfigureMessageBroker(webApplicationBuilder, o);
             }, () => ConfigureMessageBrokerMigration(webApplicationBuilder))
             .SeedAdministrationData(
@@ -141,6 +147,30 @@ public class SidServerSetup
 
         ConfigureDistributedCache(webApplicationBuilder);
         ConfigureDataseeder(webApplicationBuilder);
+    }
+
+    private static void ConfigureDuendeMigration(WebApplicationBuilder builder, DbContextOptionsBuilder db)
+    {
+        var section = builder.Configuration.GetSection(nameof(DuendeMigrationOptions));
+        var conf = section.Get<DuendeMigrationOptions>();
+        switch(conf.Transport)
+        {
+            case StorageTypes.MYSQL:
+                db.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                break;
+            case StorageTypes.POSTGRE:
+                db.UseNpgsql(conf.ConnectionString);
+                break;
+            case StorageTypes.SQLSERVER:
+                db.UseSqlServer(conf.ConnectionString);
+                break;
+            case StorageTypes.SQLITE:
+                db.UseSqlite(conf.ConnectionString);
+                break;
+            case StorageTypes.INMEMORY:
+                db.UseInMemoryDatabase(conf.ConnectionString);
+                break;
+        }
     }
 
     private static void ConfigureMetrics(MeterProviderBuilder builder, OpenTelemetryOptions options)

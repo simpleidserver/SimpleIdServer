@@ -100,4 +100,10 @@ public class DefaultClientRepository : IClientRepository
     public void Update(Client client)
     {
     }
+
+    public Task BulkAdd(List<Client> clients)
+    {
+        _clients.AddRange(clients);
+        return Task.CompletedTask;
+    }
 }

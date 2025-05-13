@@ -32,6 +32,12 @@ public class DefaultApiResourceRepository : IApiResourceRepository
         return Task.FromResult(result);
     }
 
+    public Task<List<ApiResource>> GetByNames(List<string> names, CancellationToken cancellationToken)
+    {
+        var result = _apiResources.Where(r => names.Contains(r.Name)).ToList();
+        return Task.FromResult(result);
+    }
+
     public Task<List<ApiResource>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken)
     {
         var result = _apiResources.Where(r => names.Contains(r.Name) && r.Realms.Any(re => re.Name == realm)).ToList();
@@ -79,4 +85,19 @@ public class DefaultApiResourceRepository : IApiResourceRepository
 
     public void Delete(ApiResource apiResource)
         => _apiResources.Remove(apiResource);
+
+    public Task<List<ApiResource>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+    {
+        return Task.FromResult(_apiResources.Where(r => ids.Contains(r.Id)).ToList());
+    }
+
+    public void Update(ApiResource apiResource)
+    {
+    }
+
+    public Task BulkAdd(List<ApiResource> apiResources)
+    {
+        _apiResources.AddRange(apiResources);
+        return Task.CompletedTask;
+    }
 }

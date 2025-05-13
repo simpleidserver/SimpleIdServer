@@ -1,10 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using LinqToDB.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Stores;
-using SimpleIdServer.Scim.Domains;
 using System.Linq.Dynamic.Core;
 
 namespace SimpleIdServer.IdServer.Store.EF;
@@ -135,5 +135,27 @@ public class ClientRepository : IClientRepository
     public void Update(Client client)
     {
 
+    }
+
+    public async Task BulkAdd(List<Client> clients)
+    {
+
+        if (_dbContext.Database.IsRelational())
+        {
+            var merged = LinqToDB.LinqExtensions.InsertWhenNotMatched(
+                            LinqToDB.LinqExtensions.On(
+                                LinqToDB.LinqExtensions.Using(
+                                    LinqToDB.LinqExtensions.Merge(
+                                        _dbContext.Clients.ToLinqToDBTable()),
+                                        clients
+                                    ),
+                                    (s1, s2) => s1.Id == s2.Id
+                            ),
+                            source => source);
+            await LinqToDB.LinqExtensions.MergeAsync(merged);
+            return;
+        }
+
+        _dbContext.Clients.AddRange(clients);
     }
 }

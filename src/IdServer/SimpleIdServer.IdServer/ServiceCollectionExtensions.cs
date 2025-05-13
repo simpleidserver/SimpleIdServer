@@ -48,6 +48,7 @@ using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Console.Services;
+using SimpleIdServer.IdServer.DataSeeder;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Extractors;
 using SimpleIdServer.IdServer.Helpers;
@@ -55,7 +56,6 @@ using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.Infastructures;
 using SimpleIdServer.IdServer.Jobs;
 using SimpleIdServer.IdServer.Jwt;
-using SimpleIdServer.IdServer.Migrations;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Seeding;
 using SimpleIdServer.IdServer.Stores;
@@ -552,6 +552,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IProvisioningStagingStore>(new DefaultProvisioningStagingStore(new List<ExtractedRepresentationStaging>()));
         services.AddTransient<ITransactionBuilder, DefaultTranslationBuilder>();
         services.AddTransient<IDataSeederExecutionHistoryRepository, DefaultDataSeederExecutionHistoryRepository>();
+        services.AddSingleton<IMigrationStore, DefaultMigrationStore>();
         return services;
 
     }

@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using DataSeeder;
-using SimpleIdServer.IdServer.Migrations;
+using SimpleIdServer.IdServer.DataSeeder;
 using SimpleIdServer.IdServer.Stores;
 
 namespace SimpleIdServer.IdServer.Provisioning.SCIM.Migrations;

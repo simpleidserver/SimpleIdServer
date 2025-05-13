@@ -19,7 +19,6 @@
     padding-left: 5px;
     background-color: #d4d4d4;
     border: 1px solid gray;
-    pointer-events: none;
 }
 
 .stateDig > li.active > .title {
@@ -27,9 +26,19 @@
     border: 1px solid #ff8434;
 }
 
+.stateDig > li.active {
+    background-color: transparent !important;
+}
+
 .stateDig > li.finished > .title {
     background-color: #b9eeb9;
     border: 1px solid green;
+}
+
+.stateDig > li.error > .title {
+    background-color: #ff9a9a;
+    border: 1px solid #ff3434;
+    cursor: pointer !important;
 }
 
 .stateDig > li.node::after {

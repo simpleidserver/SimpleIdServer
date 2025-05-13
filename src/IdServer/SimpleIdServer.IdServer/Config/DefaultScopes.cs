@@ -54,7 +54,8 @@ public static class DefaultScopes
         Forms,
         Realms,
         Groups,
-        Templates
+        Templates,
+        Migrations
     };
 
     public static List<Scope> AdministrativeScopes
@@ -532,6 +533,20 @@ public static class DefaultScopes
         Id = Guid.NewGuid().ToString(),
         Type = ScopeTypes.APIRESOURCE,
         Name = "clients",
+        Realms = new List<Domains.Realm>
+        {
+            DefaultRealms.Master
+        },
+        Protocol = ScopeProtocols.OAUTH,
+        IsExposedInConfigurationEdp = true,
+        CreateDateTime = DateTime.UtcNow,
+        UpdateDateTime = DateTime.UtcNow
+    };
+    public static Scope Migrations = new Scope
+    {
+        Id = Guid.NewGuid().ToString(),
+        Type = ScopeTypes.APIRESOURCE,
+        Name = "migrations",
         Realms = new List<Domains.Realm>
         {
             DefaultRealms.Master

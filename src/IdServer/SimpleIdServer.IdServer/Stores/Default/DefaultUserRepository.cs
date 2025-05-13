@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,10 +60,22 @@ public class DefaultUserRepository : IUserRepository
         return Task.FromResult(result);
     }
 
+    public Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, CancellationToken cancellationToken)
+    {
+        var result = UsersQueryable.Where(u => ids.Contains(u.Id)).ToList();
+        return Task.FromResult((IEnumerable<User>)result);
+    }
+
     public virtual Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, string realm, CancellationToken cancellationToken)
     {
         var result = UsersQueryable.Where(u => u.Realms.Any(r => r.RealmsName == realm) && ids.Contains(u.Id)).ToList();
         return Task.FromResult((IEnumerable<User>)result);
+    }
+
+    public Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, CancellationToken cancellationToken)
+    {
+        var users = UsersQueryable.Where(u => subjects.Contains(u.Name)).ToList();
+        return Task.FromResult((IEnumerable<User>)users);
     }
 
     public virtual Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, string realm, CancellationToken cancellationToken)
@@ -189,6 +202,12 @@ public class DefaultUserRepository : IUserRepository
             if (user != null && !user.Groups.Any(g => g.GroupsId == groupUser.GroupsId))
                 user.Groups.Add(groupUser);
         }
+        return Task.CompletedTask;
+    }
+
+    public Task BulkAdd(List<User> users)
+    {
+        _users.AddRange(users);
         return Task.CompletedTask;
     }
 }

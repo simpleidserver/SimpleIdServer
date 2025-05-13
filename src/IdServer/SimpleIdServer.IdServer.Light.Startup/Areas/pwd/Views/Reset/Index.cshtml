@@ -24,7 +24,8 @@
            param-ErrorMessages="@Model.ErrorMessages"
            param-SuccessMessages="@Model.SuccessMessages"
            param-AntiforgeryToken="@Model.AntiforgeryToken"
-           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes" />
+           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
+           param-Template="@Model.Template" />
 
 @section Header {
     @foreach (var cssStyle in Model.Template.CssStyles)

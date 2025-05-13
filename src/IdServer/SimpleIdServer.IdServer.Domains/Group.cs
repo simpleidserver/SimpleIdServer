@@ -9,6 +9,8 @@ namespace SimpleIdServer.IdServer.Domains
     {
         [JsonPropertyName(GroupNames.Id)]
         public string Id { get; set; } = null!;
+        [JsonPropertyName(GroupNames.Source)]
+        public string? Source { get; set; } = null!;
         [JsonPropertyName(GroupNames.Name)]
         public string Name { get; set; } = null!;
         [JsonPropertyName(GroupNames.FullPath)]

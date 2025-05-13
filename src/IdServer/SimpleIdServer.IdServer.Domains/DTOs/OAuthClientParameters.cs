@@ -96,5 +96,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string ClientRegistrationTypesSupported = "client_registration_types_supported";
         public const string Realms = "realms";
         public const string UserCookieExpirationTimeInSeconds = "user_cookie_expirationtime_seconds";
+        public const string Source = "source";
     }
 }
