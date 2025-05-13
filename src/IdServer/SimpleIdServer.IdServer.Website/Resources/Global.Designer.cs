@@ -6025,6 +6025,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Workflow is created.
+        /// </summary>
+        public static string WorkflowIsCreated {
+            get {
+                return ResourceManager.GetString("WorkflowIsCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à WS-Federation.
         /// </summary>
         public static string WsFederation {

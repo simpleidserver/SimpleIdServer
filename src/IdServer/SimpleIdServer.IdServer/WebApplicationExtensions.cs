@@ -440,6 +440,9 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("updateRegistrationWorkflow",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.RegistrationWorkflows + "/{id}",
             defaults: new { controller = "RegistrationWorkflows", action = "Update" });
+        webApplication.SidMapControllerRoute("addWorkflowToRegistrationWorkflow",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.RegistrationWorkflows + "/{id}/workflow",
+            defaults: new { controller = "RegistrationWorkflows", action = "CreateWorkflow" });
 
         webApplication.SidMapControllerRoute("getWorkflow",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Workflows + "/{id}",

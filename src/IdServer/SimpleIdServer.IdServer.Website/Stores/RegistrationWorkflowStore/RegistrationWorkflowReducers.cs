@@ -3,6 +3,7 @@
 
 using Fluxor;
 using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
+using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
 
 namespace SimpleIdServer.IdServer.Website.Stores.RegistrationWorkflowStore;
 
@@ -127,6 +128,28 @@ public class RegistrationWorkflowReducers
         return state with
         {
             IsLoading = false
+        };
+    }
+
+    [ReducerMethod]
+    public static RegistrationWorkflowsState ReduceCreateRegistrationWorkflowAction(RegistrationWorkflowsState state, CreateRegistrationWorkflowAction action)
+    {
+        return state with
+        {
+            IsLoading = true
+        };
+    }
+
+    [ReducerMethod]
+    public static RegistrationWorkflowsState ReduceCreateRegistrationWorkflowSuccessAction(RegistrationWorkflowsState state, CreateRegistrationWorkflowSuccessAction action)
+    {
+        var workflows = state.RegistrationWorkflows.ToList();
+        var workflow = workflows.Single(a => a.RegistrationWorkflow.Id == action.Id);
+        workflow.RegistrationWorkflow.WorkflowId = action.Workflow.Id;
+        return state with
+        {
+            IsLoading = false,
+            RegistrationWorkflows = workflows
         };
     }
 

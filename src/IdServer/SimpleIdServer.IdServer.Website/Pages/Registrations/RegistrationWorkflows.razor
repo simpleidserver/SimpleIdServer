@@ -33,20 +33,20 @@
     </div>
 
     <RadzenDataGrid @ref="registrationWorkflowsGrid"
-        AllowFiltering="false"
-        AllowColumnResize="true"
-        AllowAlternatingRows="false"
-        AllowSorting="false"
-        PageSize="30"
-        AllowPaging="false"
-        PagerHorizontalAlign="HorizontalAlign.Left"
-        ShowPagingSummary="false"
-        IsLoading="@registrationWorkflowsState.Value.IsLoading"
-        Count="@registrationWorkflowsState.Value.Count"
-        Data="@registrationWorkflowsState.Value.RegistrationWorkflows"
-        LoadData="@LoadData"
-        RowRender="@RowRender"
-        TItem="SelectableRegistrationWorkflow"
+    AllowFiltering="false"
+    AllowColumnResize="true"
+    AllowAlternatingRows="false"
+    AllowSorting="false"
+    PageSize="30"
+    AllowPaging="false"
+    PagerHorizontalAlign="HorizontalAlign.Left"
+    ShowPagingSummary="false"
+    IsLoading="@registrationWorkflowsState.Value.IsLoading"
+    Count="@registrationWorkflowsState.Value.Count"
+    Data="@registrationWorkflowsState.Value.RegistrationWorkflows"
+    LoadData="@LoadData"
+    RowRender="@RowRender"
+    TItem="SelectableRegistrationWorkflow"
     ColumnWidth="300px">
         <Columns>
             <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Width="80px" TextAlign="TextAlign.Center">
@@ -59,7 +59,14 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.Name">
                 <Template Context="data">
-                    <RadzenLink Path="@urlHelper.GetUrl($"/registrations/workflows/{data.RegistrationWorkflow.Id}")">@data.RegistrationWorkflow.Name</RadzenLink>
+                    @if(string.IsNullOrWhiteSpace(data.RegistrationWorkflow.WorkflowId))
+                    {
+                        @data.RegistrationWorkflow.Name
+                    }
+                    else
+                    {
+                        <RadzenLink Path="@urlHelper.GetUrl($"/registrations/workflows/{data.RegistrationWorkflow.Id}")">@data.RegistrationWorkflow.Name</RadzenLink>
+                    }
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="SelectableRegistrationWorkflow" Filterable="false" Sortable="false" Title="@Global.IsDefault">
@@ -89,6 +96,7 @@
     string activeRealm;
     RadzenDataGrid<SelectableRegistrationWorkflow> registrationWorkflowsGrid;
     [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
+    [Inject] private IOptions<IdServerWebsiteOptions> options { get; set; }
     [Inject] private IRealmStore realmStore { get; set; }
 
     protected override void OnAfterRender(bool firstRender)
@@ -104,6 +112,11 @@
             SubscribeToAction<UpdateRegistrationWorkflowFailureAction>((act) =>
             {
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = act.ErrorMessage });
+                StateHasChanged();
+            });
+            SubscribeToAction<CreateRegistrationWorkflowSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.WorkflowIsCreated });
                 StateHasChanged();
             });
             if (!registrationWorkflowsState.Value.IsLoading && registrationWorkflowsGrid != null)
@@ -150,32 +163,52 @@
     {
         var authState = authenticationStateTask.Result;
         var user = authState.User;
-        var canManage = user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value == "/manualidprovisioning/manage");
+        var realm = !options.Value.IsReamEnabled ? SimpleIdServer.IdServer.Constants.DefaultRealm : realmStore.Realm;
+        var canManage = user.Claims.Any(c => c.Type == ClaimTypes.Role && c.Value.Contains($"{realm}/manualidprovisioning/manage"));
         var menuItems = new List<ContextMenuItem>();
+        var ids = registrationWorkflowsState.Value.RegistrationWorkflows?.Where(c => c.IsSelected).Select(c => c.RegistrationWorkflow.Id)?.ToList() ?? new List<string>();
+        if (!ids.Contains(registrationWorkflow.RegistrationWorkflow.Id))
+        {
+            ids.Add(registrationWorkflow.RegistrationWorkflow.Id);
+        }
+
         if (canManage)
         {
             menuItems.Add(new ContextMenuItem { Text = Global.Delete, Value = 1 });
+            if (ids.Count() == 1)
+            {
+                var selectedRegistrationWorkflow = registrationWorkflowsState.Value.RegistrationWorkflows.Single(r => r.RegistrationWorkflow.Id == ids.First());
+                if (string.IsNullOrWhiteSpace(selectedRegistrationWorkflow.RegistrationWorkflow.WorkflowId))
+                {
+                    menuItems.Add(new ContextMenuItem { Text = Global.CreateWorkflow, Value = 2 });
+                }
+            }
         }
 
-        menuItems.Add(new ContextMenuItem { Text = Global.Demo, Value = 2 });
-        contextMenuService.Open(args, new List<ContextMenuItem>
-        {
-            new ContextMenuItem { Text = Global.Delete, Value = 1 }
-        }, (a) =>
+        menuItems.Add(new ContextMenuItem { Text = Global.Demo, Value = 3 });
+        contextMenuService.Open(args, menuItems, (a) =>
         {
             if (a.Value.Equals(1))
             {
-                var registrationWorkflowIds = registrationWorkflowsState.Value.RegistrationWorkflows.Where(r => r.IsSelected).Select(r => r.RegistrationWorkflow.Id).ToList();
-                var act = new RemoveSelectedRegistrationWorkflowsAction { Ids = registrationWorkflowIds };
+                var act = new RemoveSelectedRegistrationWorkflowsAction { Ids = ids };
                 dispatcher.Dispatch(act);
                 contextMenuService.Close();
                 return;
             }
 
-            if(a.Value.Equals(2))
+            if (a.Value.Equals(2))
+            {
+                var act = new CreateRegistrationWorkflowAction { Id = ids.First() };
+                dispatcher.Dispatch(act);
+                contextMenuService.Close();
+                return;
+            }
+
+            if(a.Value.Equals(3))
             {
                 var url = GetDemoUrl(registrationWorkflow);
                 navigationManager.NavigateTo(url, true);
+                contextMenuService.Close();
             }
         });
     }

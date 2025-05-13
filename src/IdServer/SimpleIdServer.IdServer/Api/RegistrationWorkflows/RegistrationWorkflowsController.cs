@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using FormBuilder;
+using FormBuilder.Builders;
 using FormBuilder.Helpers;
 using FormBuilder.Models;
 using FormBuilder.Repositories;
@@ -190,6 +191,42 @@ public class RegistrationWorkflowsController : BaseController
         }
         catch (OAuthException ex)
         {
+            return BuildError(ex);
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateWorkflow([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using (var transaction = _transactionBuilder.Build())
+            {
+                prefix = prefix ?? Constants.DefaultRealm;
+                await CheckAccessToken(prefix, Config.DefaultScopes.RegistrationWorkflows.Name);
+                var existingRegistrationWorkflow = await _registrationWorkflowRepository.Get(prefix, id, cancellationToken);
+                if (existingRegistrationWorkflow == null)
+                {
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownRegistrationWorkflow, id));
+                }
+
+                var workflowId = Guid.NewGuid().ToString();
+                var workflow = WorkflowBuilder.New(workflowId, existingRegistrationWorkflow.Name).Build(_dateTimeHelper.GetCurrent());
+                _workflowStore.Add(workflow);
+                existingRegistrationWorkflow.WorkflowId = workflowId;
+                await _workflowStore.SaveChanges(cancellationToken);
+                await transaction.Commit(cancellationToken);
+                return new ContentResult
+                {
+                    Content = JsonSerializer.Serialize(workflow),
+                    ContentType = "application/json",
+                    StatusCode = (int)HttpStatusCode.OK
+                };
+            }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
             return BuildError(ex);
         }
     }

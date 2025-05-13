@@ -104,6 +104,11 @@
                 notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.SelectedAcrsRemoved });
                 StateHasChanged();
             });
+            SubscribeToAction<CreateAcrWorkflowSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.WorkflowIsCreated });
+                StateHasChanged();
+            });
             if (!acrsState.Value.IsLoading && acrsGrid != null)
                 acrsGrid?.Reload();
         }

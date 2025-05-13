@@ -2130,4 +2130,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="MigrationLaunched" xml:space="preserve">
     <value>The migration has been launched</value>
   </data>
+  <data name="WorkflowIsCreated" xml:space="preserve">
+    <value>Workflow is created</value>
+  </data>
 </root>

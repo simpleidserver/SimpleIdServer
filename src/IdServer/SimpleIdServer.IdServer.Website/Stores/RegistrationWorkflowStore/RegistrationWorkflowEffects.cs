@@ -7,6 +7,7 @@ using FormBuilder.Models.Layout;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api.RegistrationWorkflows;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -184,7 +185,21 @@ public class RegistrationWorkflowEffects
         };
         var forms = JsonSerializer.Deserialize<List<FormRecord>>(json, settings);
         dispatcher.Dispatch(new GetAllRegistrationFormsSuccessAction { RegistrationForms = forms });
+    }
 
+    [EffectMethod]
+    public async Task Handle(CreateRegistrationWorkflowAction action, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetBaseUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var httpResult = await httpClient.SendAsync(new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{action.Id}/workflow"),
+            Method = HttpMethod.Post
+        });
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var workflow = JsonSerializer.Deserialize<WorkflowRecord>(json);
+        dispatcher.Dispatch(new CreateRegistrationWorkflowSuccessAction { Id = action.Id, Workflow = workflow });
     }
 
     private async Task<string> GetBaseUrl()
@@ -301,4 +316,25 @@ public class GetAllRegistrationWorkflowLayoutsAction
 public class GetAllRegistrationWorkflowLayoutsSuccessAction
 {
     public List<WorkflowLayout> WorkflowLayouts { get; set; }
+}
+
+public class CreateRegistrationWorkflowAction
+{
+    public string Id
+    {
+        get; set;
+    }
+}
+
+public class CreateRegistrationWorkflowSuccessAction
+{
+    public string Id
+    {
+        get; set;
+    }
+
+    public WorkflowRecord Workflow
+    {
+        get; set;
+    }
 }
