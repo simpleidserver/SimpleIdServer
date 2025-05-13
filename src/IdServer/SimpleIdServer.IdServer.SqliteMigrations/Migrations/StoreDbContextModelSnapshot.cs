@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
@@ -354,6 +354,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("TEXT")
@@ -1030,6 +1034,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "software_version");
 
+                    b.Property<string>("Source")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
+
                     b.Property<string>("SubjectSyntaxTypesSupported")
                         .IsRequired()
                         .HasColumnType("TEXT")
@@ -1417,6 +1425,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "parent_group_id");
 
+                    b.Property<string>("Source")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
@@ -1652,6 +1664,64 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.ToTable("MessageBusErrorMessages");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecution", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MigrationExecutions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecutionHistory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("EndDatetime")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "end_datetime");
+
+                    b.Property<string>("Errors")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "errors");
+
+                    b.Property<string>("MigrationExecutionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("NbRecords")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "nb_records");
+
+                    b.Property<DateTime>("StartDatetime")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "start_datetime");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MigrationExecutionId");
+
+                    b.ToTable("MigrationExecutionHistory");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "histories");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
                 {
                     b.Property<string>("Id")
@@ -1876,6 +1946,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Property<int>("Protocol")
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "protocol");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<int>("Type")
                         .HasColumnType("INTEGER")
@@ -2959,6 +3033,14 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Navigation("IdentityProvisioningDefinition");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecutionHistory", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.MigrationExecution", null)
+                        .WithMany("Histories")
+                        .HasForeignKey("MigrationExecutionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
@@ -3231,6 +3313,11 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Navigation("Instances");
 
                     b.Navigation("MappingRules");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecution", b =>
+                {
+                    b.Navigation("Histories");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>

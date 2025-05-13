@@ -36,6 +36,15 @@ public class ApiResourceRepository : IApiResourceRepository
         return result?.ToDomain();
     }
 
+    public async Task<List<ApiResource>> GetByNames(List<string> names, CancellationToken cancellationToken)
+    {
+        var result = await _dbContext.Client.Queryable<SugarApiResource>()
+            .Includes(r => r.Realms)
+            .Where(r => names.Contains(r.Name))
+            .ToListAsync(cancellationToken);
+        return result.Select(r => r.ToDomain()).ToList();
+    }
+
     public async Task<List<ApiResource>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken)
     {
         var result = await _dbContext.Client.Queryable<SugarApiResource>()

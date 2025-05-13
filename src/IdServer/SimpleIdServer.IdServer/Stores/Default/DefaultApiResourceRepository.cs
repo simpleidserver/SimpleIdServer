@@ -32,6 +32,12 @@ public class DefaultApiResourceRepository : IApiResourceRepository
         return Task.FromResult(result);
     }
 
+    public Task<List<ApiResource>> GetByNames(List<string> names, CancellationToken cancellationToken)
+    {
+        var result = _apiResources.Where(r => names.Contains(r.Name)).ToList();
+        return Task.FromResult(result);
+    }
+
     public Task<List<ApiResource>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken)
     {
         var result = _apiResources.Where(r => names.Contains(r.Name) && r.Realms.Any(re => re.Name == realm)).ToList();

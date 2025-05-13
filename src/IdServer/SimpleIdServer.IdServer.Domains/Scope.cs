@@ -18,6 +18,11 @@ namespace SimpleIdServer.IdServer.Domains
             Name = name;
         }
 
+        [JsonPropertyName(ScopeNames.Source)]
+        public string? Source
+        {
+            get; set;
+        }
         [JsonPropertyName(ScopeNames.Id)]
         public string Id { get; set; }
         [JsonPropertyName(ScopeNames.Name)]

@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -361,6 +361,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("timestamp with time zone")
@@ -1043,6 +1047,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "software_version");
 
+                    b.Property<string>("Source")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
+
                     b.Property<string>("SubjectSyntaxTypesSupported")
                         .IsRequired()
                         .HasColumnType("text")
@@ -1432,6 +1440,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "parent_group_id");
 
+                    b.Property<string>("Source")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
@@ -1669,6 +1681,64 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.ToTable("MessageBusErrorMessages");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecution", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MigrationExecutions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecutionHistory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("EndDatetime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasAnnotation("Relational:JsonPropertyName", "end_datetime");
+
+                    b.Property<string>("Errors")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "errors");
+
+                    b.Property<string>("MigrationExecutionId")
+                        .HasColumnType("text");
+
+                    b.Property<int>("NbRecords")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "nb_records");
+
+                    b.Property<DateTime>("StartDatetime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasAnnotation("Relational:JsonPropertyName", "start_datetime");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MigrationExecutionId");
+
+                    b.ToTable("MigrationExecutionHistory");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "histories");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
                 {
                     b.Property<string>("Id")
@@ -1893,6 +1963,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Property<int>("Protocol")
                         .HasColumnType("integer")
                         .HasAnnotation("Relational:JsonPropertyName", "protocol");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer")
@@ -2988,6 +3062,14 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("IdentityProvisioningDefinition");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecutionHistory", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.MigrationExecution", null)
+                        .WithMany("Histories")
+                        .HasForeignKey("MigrationExecutionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
@@ -3260,6 +3342,11 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                     b.Navigation("Instances");
 
                     b.Navigation("MappingRules");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecution", b =>
+                {
+                    b.Navigation("Histories");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>

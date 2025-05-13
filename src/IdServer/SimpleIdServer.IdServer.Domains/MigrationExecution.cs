@@ -23,12 +23,61 @@ public class MigrationExecution
     public List<MigrationExecutionHistory> Histories
     {
         get; set;
-    }
+    } = new List<MigrationExecutionHistory>();
 
     [JsonIgnore]
     public string Realm
     {
         get; set;
+    }
+
+    [JsonIgnore]
+    public MigrationExecutionHistory? LastExecutionHistory
+    {
+        get
+        {
+            return Histories.OrderByDescending(h => h.StartDatetime).FirstOrDefault();
+        }
+    }
+
+    public int TotalMigratedUsers
+    {
+        get
+        {
+            return NbMigrated(MigrationExecutionHistoryTypes.USERS);
+        }
+    }
+
+    public int TotalMigratedGroups
+    {
+        get
+        {
+            return NbMigrated(MigrationExecutionHistoryTypes.GROUPS);
+        }
+    }
+
+    public int TotalMigratedScopes
+    {
+        get
+        {
+            return NbMigrated(MigrationExecutionHistoryTypes.APISCOPES, MigrationExecutionHistoryTypes.IDENTITYSCOPES);
+        }
+    }
+
+    public int TotalMigratedClients
+    {
+        get
+        {
+            return NbMigrated(MigrationExecutionHistoryTypes.CLIENTS);
+        }
+    }
+
+    public int TotalMigratedApiResources
+    {
+        get
+        {
+            return NbMigrated(MigrationExecutionHistoryTypes.APIRESOURCES);
+        }
     }
 
     public bool IsApiScopesMigrated
@@ -104,24 +153,63 @@ public class MigrationExecution
         Migrate(MigrationExecutionHistoryTypes.GROUPS, startDatetime, endDatetime, nbGroups);
     }
 
+    public void LogErrors(MigrationExecutionHistoryTypes type, List<string> errorMessages)
+    {
+        var history = Histories.SingleOrDefault(h => h.Type == type);
+        if (history == null)
+        {
+            history = new MigrationExecutionHistory
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = type,
+                StartDatetime = DateTime.UtcNow
+            };
+            Histories.Add(history);
+        }
+
+        history.Errors = errorMessages;
+    }
+
     public void MigrateUsers(DateTime startDateTime, DateTime endDateTime, int nbUsers)
     {
         Migrate(MigrationExecutionHistoryTypes.USERS, startDateTime, endDateTime, nbUsers);
     }
 
-    private bool IsMigrated(MigrationExecutionHistoryTypes type)
+    public List<string> GetErrors(params MigrationExecutionHistoryTypes[] types)
     {
-        return Histories != null && Histories.Any() && Histories.Any(h => h.Type == type);
+        if(Histories == null || !Histories.Any()) return new List<string>();
+        var filtered = Histories.Where(h => types.Contains(h.Type) && h.EndDatetime == null);
+        return filtered.SelectMany(h => h.Errors).ToList();
     }
 
-    private void Migrate(MigrationExecutionHistoryTypes type, DateTime startDatetime, DateTime endDatetime, int nbGroups)
+    public bool IsMigrated(params MigrationExecutionHistoryTypes[] types)
     {
-        Histories.Add(new MigrationExecutionHistory
+        return Histories != null && Histories.Any() && types.All(t => Histories.Any(h => h.Type == t && h.EndDatetime != null));
+    }
+
+    private void Migrate(MigrationExecutionHistoryTypes type, DateTime startDatetime, DateTime endDatetime, int nbRecords)
+    {
+        var history = Histories.SingleOrDefault(h => h.Type == type);
+        if (history == null)
         {
-            StartDatetime = startDatetime,
-            EndDatetime = endDatetime,
-            NbRecords = nbGroups,
-            Type = type
-        });
+            history = new MigrationExecutionHistory
+            {
+                Id = Guid.NewGuid().ToString(),
+                Type = type
+            };
+            Histories.Add(history);
+        }
+
+        history.StartDatetime = startDatetime;
+        history.EndDatetime = endDatetime;
+        history.NbRecords = nbRecords;
+    }
+
+    private int NbMigrated(params MigrationExecutionHistoryTypes[] types)
+    {
+        if (Histories == null || !Histories.Any()) return 0;
+        var history = Histories.FirstOrDefault(h => types.Contains(h.Type));
+        if (history == null) return 0;
+        return history.NbRecords;
     }
 }

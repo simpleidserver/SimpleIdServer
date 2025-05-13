@@ -54,7 +54,8 @@ public static class DefaultScopes
         Forms,
         Realms,
         Groups,
-        Templates
+        Templates,
+        Migrations
     };
 
     public static List<Scope> AdministrativeScopes

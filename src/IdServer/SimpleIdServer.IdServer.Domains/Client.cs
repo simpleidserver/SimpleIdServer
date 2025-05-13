@@ -24,6 +24,8 @@ namespace SimpleIdServer.IdServer.Domains
     {
         [JsonPropertyName(OAuthClientParameters.Id)]
         public string Id { get; set; }
+        [JsonPropertyName(OAuthClientParameters.Source)]
+        public string? Source { get; set; }
         [JsonPropertyName(OAuthClientParameters.IsPublic)]
         public bool IsPublic { get; set; }
         /// <summary>

@@ -17,7 +17,9 @@ public interface IUserRepository
     Task<User> GetByEmail(string email, string realm, CancellationToken cancellationToken);
     Task<User> GetByExternalAuthProvider(string scheme, string sub, string realm, CancellationToken cancellationToken);
     Task<User> GetByClaim(string name, string value, string realm, CancellationToken cancellationToken);
+    Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, CancellationToken cancellationToken);
     Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, string realm, CancellationToken cancellationToken);
+    Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, CancellationToken cancellationToken);
     Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, string realm, CancellationToken cancellationToken);
     Task<int> NbUsers(string realm, CancellationToken cancellationToken);
     Task<bool> IsExternalAuthProviderExists(string scheme, string sub, string realm, CancellationToken cancellationToken);

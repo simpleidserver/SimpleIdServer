@@ -46,7 +46,7 @@
                     <Template Context="data">
                         @if (data.RequestJSON != null)
                         {
-                            <RadzenButton Icon="search" Click="@(args => ShowAudit(data))" />
+                            <RadzenButton Icon="search" Click="@(async (args) => await ShowAudit(data))" />
                         }
                     </Template>
                 </RadzenDataGridColumn>
@@ -78,7 +78,7 @@
         dispatcher.Dispatch(act);
     }
 
-    async void ShowAudit(AuditEvent auditEvt)
+    async Task ShowAudit(AuditEvent auditEvt)
     {
         await dialogService.OpenAsync<RequestDialog>(Global.Request, new Dictionary<string, object>
         {

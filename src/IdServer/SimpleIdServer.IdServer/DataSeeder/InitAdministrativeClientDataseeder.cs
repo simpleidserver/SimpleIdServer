@@ -80,6 +80,7 @@ public class InitAdministrativeClientDataseeder : BaseClientDataseeder
                 DefaultScopes.WebsiteAdministratorRole,
                 DefaultScopes.Forms,
                 DefaultScopes.RecurringJobs,
+                DefaultScopes.Migrations,
                 DefaultScopes.Templates);
         if(postLogoutUrls != null)
         {

@@ -38,6 +38,14 @@ public class ApiResourceRepository : IApiResourceRepository
         return result;
     }
 
+    public Task<List<ApiResource>> GetByNames(List<string> names, CancellationToken cancellationToken)
+    {
+        var result = _dbContext.ApiResources
+            .Include(r => r.Realms)
+            .Where(r => names.Contains(r.Name)).ToListAsync(cancellationToken);
+        return result;
+    }
+
     public Task<List<ApiResource>> GetByNames(string realm, List<string> names, CancellationToken cancellationToken)
     {
         var result = _dbContext.ApiResources

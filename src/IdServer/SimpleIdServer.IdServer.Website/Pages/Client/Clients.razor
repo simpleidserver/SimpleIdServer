@@ -79,6 +79,14 @@
                                         Change="@(args => { context.FilterValue = args; clientsGrid.Reload(); })" />
                     </FilterTemplate>
                 </RadzenDataGridColumn>
+                <RadzenDataGridColumn TItem="SelectableClient" Property="Value.Source" Filterable="true" Sortable="false" Title="@Global.Source" Width="80px">
+                    <Template Context="data">
+                        @if (!string.IsNullOrWhiteSpace(data.Value.Source))
+                        {
+                            <RadzenBadge Text="@data.Value.Source" BadgeStyle="BadgeStyle.Info" IsPill="true" />
+                        }
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn TItem="SelectableClient" Filterable="true" Property="Value.UpdateDateTime" Sortable="true" FormatString="{0:dd/M/yyyy HH:mm:ss}" SortOrder="SortOrder.Descending" Title="@Global.UpdateDateTime" Width="80px" />
                 <RadzenDataGridColumn TItem="SelectableClient" Filterable="false" Sortable="false" FormatString="{0:dd/M/yyyy HH:mm:ss}" Width="80px" TextAlign="TextAlign.Center">
                     <Template Context="data">

@@ -9,4 +9,5 @@ public static class MigrationExecutionHistoryNames
     public const string Index = "index";
     public const string StartDatetime = "start_datetime";
     public const string EndDatetime = "end_datetime";
+    public const string Errors = "errors";
 }

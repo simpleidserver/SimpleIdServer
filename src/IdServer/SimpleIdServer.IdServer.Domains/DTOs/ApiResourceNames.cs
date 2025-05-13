@@ -5,6 +5,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs;
 public static class ApiResourceNames
 {
     public const string Id = "id";
+    public const string Source = "source";
     public const string Name = "name";
     public const string Audience = "aud";
     public const string Description = "description";

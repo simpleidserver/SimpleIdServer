@@ -2103,4 +2103,31 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="Migrations" xml:space="preserve">
     <value>Migrations</value>
   </data>
+  <data name="NbMigratedRecords" xml:space="preserve">
+    <value>Migrated records</value>
+  </data>
+  <data name="MigratedRecordsSummary" xml:space="preserve">
+    <value>Scopes : {0}, Users : {1}, Groups : {2}, Clients: {3}, Api resources : {4}</value>
+  </data>
+  <data name="ExtractedScopes" xml:space="preserve">
+    <value>Scopes {0}</value>
+  </data>
+  <data name="ExtractedApiResources" xml:space="preserve">
+    <value>Api resources {0}</value>
+  </data>
+  <data name="ExtractedClients" xml:space="preserve">
+    <value>Clients {0}</value>
+  </data>
+  <data name="ExtractedGroups" xml:space="preserve">
+    <value>Groups {0}</value>
+  </data>
+  <data name="ExtractedUsers" xml:space="preserve">
+    <value>Users {0}</value>
+  </data>
+  <data name="DatePeriod" xml:space="preserve">
+    <value>Period</value>
+  </data>
+  <data name="MigrationLaunched" xml:space="preserve">
+    <value>The migration has been launched</value>
+  </data>
 </root>

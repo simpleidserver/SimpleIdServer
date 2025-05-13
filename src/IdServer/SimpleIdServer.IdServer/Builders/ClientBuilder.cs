@@ -9,7 +9,6 @@ using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Collections.Generic;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -147,6 +146,7 @@ namespace SimpleIdServer.IdServer.Builders
                 DefaultScopes.WebsiteAdministratorRole,
                 DefaultScopes.Forms,
                 DefaultScopes.RecurringJobs,
+                DefaultScopes.Migrations
             };
             scopes.AddRange(additionalScopes);
             return ClientBuilder.BuildTraditionalWebsiteClient(DefaultClients.SidAdminClientId, password, null, redirectUrls)

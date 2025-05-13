@@ -19,7 +19,6 @@ public class LanguageEffects
         _options = options.Value;
     }
 
-
     [EffectMethod]
     public async Task Handle(GetLanguagesAction action, IDispatcher dispatcher)
     {

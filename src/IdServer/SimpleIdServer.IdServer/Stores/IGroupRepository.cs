@@ -18,6 +18,8 @@ public interface IGroupRepository
     Task<List<Group>> GetAllByStrictFullPath(List<string> fullPathLst, CancellationToken cancellationToken);
     Task<List<Group>> GetAllByStrictFullPath(string realm, List<string> fullPathLst, CancellationToken cancellationToken);
     Task<List<Group>> GetAllByFullPath(string realm, string id, string fullPath, CancellationToken cancellationToken);
+    Task<List<Group>> GetByIds(List<string> ids, CancellationToken cancellationToken);
+    Task<List<Group>> GetByNames(List<string> names, CancellationToken cancellationToken);
     void Add(Group group);
     void Update(Group group);
     void DeleteRange(IEnumerable<Group> groups);

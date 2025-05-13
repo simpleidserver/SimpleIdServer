@@ -117,6 +117,19 @@ public class UserRepository : IUserRepository
         return result.Select(u => u.ToDomain()).ToList();
     }
 
+    public Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, CancellationToken cancellationToken)
+    {
+        var users = await GetUsers()
+            .Where(u => subjects.Contains(u.Name))
+            .ToListAsync(cancellationToken);
+        return users.Select(u => u.ToDomain()).ToList();
+    }
+
     public async Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, string realm, CancellationToken cancellationToken)
     {
         var users = await GetUsers()

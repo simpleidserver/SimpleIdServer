@@ -7,6 +7,11 @@ namespace SimpleIdServer.IdServer.Domains;
 
 public class MigrationExecutionHistory
 {
+    public string Id
+    {
+        get; set;
+    }
+
     [JsonPropertyName(MigrationExecutionHistoryNames.StartDatetime)]
     public DateTime StartDatetime
     {
@@ -14,7 +19,7 @@ public class MigrationExecutionHistory
     }
 
     [JsonPropertyName(MigrationExecutionHistoryNames.EndDatetime)]
-    public DateTime EndDatetime
+    public DateTime? EndDatetime
     {
         get; set;
     }
@@ -25,11 +30,17 @@ public class MigrationExecutionHistory
         get; set;
     }
 
-    [JsonPropertyName(MigrationExecutionHistoryNames.Type)]
+    [JsonPropertyName(MigrationExecutionHistoryNames.NbRecords)]
     public int NbRecords
     {
         get; set;
     }
+
+    [JsonPropertyName(MigrationExecutionHistoryNames.Errors)]
+    public List<string> Errors
+    {
+        get; set;
+    } = new List<string>();
 }
 
 public enum MigrationExecutionHistoryTypes

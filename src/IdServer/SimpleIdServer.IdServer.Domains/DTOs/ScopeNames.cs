@@ -18,4 +18,5 @@ public static class ScopeNames
     public const string IsRole = "is_role";
     public const string Component = "component";
     public const string Action = "action";
+    public const string Source = "source";
 }

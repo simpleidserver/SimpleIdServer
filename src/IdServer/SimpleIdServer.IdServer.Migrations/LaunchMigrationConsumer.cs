@@ -61,12 +61,13 @@ public class LaunchMigrationConsumer :
         using (var transaction = _transactionBuilder.Build())
         {
             var migrationExecution = await _migrationStore.Get(msg.Realm, msg.Name, context.CancellationToken);
-            if (migrationExecution != null)
+            if (migrationExecution == null)
             {
                 migrationExecution = new MigrationExecution
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = msg.Name
+                    Name = msg.Name,
+                    Realm = msg.Realm
                 };
                 _migrationStore.Add(migrationExecution);
             }
@@ -151,16 +152,27 @@ public class LaunchMigrationConsumer :
             async (e, c) =>
             {
                 var apiResources = await migrationService.ExtractApiResources(e, c);
-                var allApiResourceIds = apiResources.Select(s => s.Id).ToList();
-                var existingApiResources = await _apiResourceRepository.GetByIds(allApiResourceIds, context.CancellationToken);
+                var allApiResourceNames = apiResources.Select(s => s.Name).ToList();
+                var existingApiResources = await _apiResourceRepository.GetByNames(allApiResourceNames, context.CancellationToken);
                 foreach (var existingApiResource in existingApiResources)
                 {
-                    existingApiResource.Realms.Add(currentRealm);
-                    _apiResourceRepository.Update(existingApiResource);
+                    if(!existingApiResource.Realms.Any(r => r.Name == msg.Realm))
+                    {
+                        existingApiResource.Realms.Add(currentRealm);
+                        _apiResourceRepository.Update(existingApiResource);
+                    }
                 }
 
-                var existingApiResourceIds = existingApiResources.Select(s => s.Id).ToList();
-                var unknownApiResources = apiResources.Where(s => !existingApiResourceIds.Contains(s.Id)).ToList();
+                var existingApiResourceNames = existingApiResources.Select(s => s.Name).ToList();
+                var unknownApiResources = apiResources.Where(s => !existingApiResourceNames.Contains(s.Name)).ToList();
+                foreach(var unknownApiResource in unknownApiResources)
+                {
+                    unknownApiResource.Realms = new List<Realm>
+                    {
+                        currentRealm
+                    };
+                }
+
                 await _apiResourceRepository.BulkAdd(unknownApiResources);
             },
             (m, s, e, n) => m.MigrateApiResources(s, e, n),
@@ -189,16 +201,27 @@ public class LaunchMigrationConsumer :
             async (e, c) =>
             {
                 var clients = await migrationService.ExtractClients(e, c);
-                var allClientIds = clients.Select(s => s.Id).ToList();
+                var allClientIds = clients.Select(s => s.ClientId).ToList();
                 var existingClients = await _clientRepository.GetByClientIds(allClientIds, context.CancellationToken);
                 foreach (var existingClient in existingClients)
                 {
-                    existingClient.Realms.Add(currentRealm);
-                    _clientRepository.Update(existingClient);
+                    if (!existingClient.Realms.Any(r => r.Name == msg.Realm))
+                    {
+                        existingClient.Realms.Add(currentRealm);
+                        _clientRepository.Update(existingClient);
+                    }
                 }
 
-                var existingClientIds = existingClients.Select(s => s.Id).ToList();
-                var unknownClients = clients.Where(s => !existingClientIds.Contains(s.Id)).ToList();
+                var existingClientIds = existingClients.Select(s => s.ClientId).ToList();
+                var unknownClients = clients.Where(s => !existingClientIds.Contains(s.ClientId)).ToList();
+                foreach (var unknownClient in unknownClients)
+                {
+                    unknownClient.Realms = new List<Realm>
+                    {
+                        currentRealm
+                    };
+                }
+
                 await _clientRepository.BulkAdd(unknownClients);
             },
             (m, s, e, n) => m.MigrateClients(s, e, n),
@@ -218,6 +241,7 @@ public class LaunchMigrationConsumer :
     {
         var msg = context.Message;
         var migrationService = _migrationServiceFactory.Create(msg.Name);
+        var currentRealm = await _realmRepository.Get(msg.Realm, context.CancellationToken);
         var isMigrated = await Migrate(
             msg.Realm,
             msg.Name,
@@ -226,7 +250,34 @@ public class LaunchMigrationConsumer :
             async (e, c) =>
             {
                 var groups = await migrationService.ExtractGroups(e, c);
-                await _groupRepository.BulkAdd(groups);
+                var allGroupNames = groups.Select(s => s.Name).ToList();
+                var existingGroups = await _groupRepository.GetByNames(allGroupNames, context.CancellationToken);
+                foreach (var existingGroup in existingGroups)
+                {
+                    if (!existingGroup.Realms.Any(r => r.RealmsName == msg.Realm))
+                    {
+                        existingGroup.Realms.Add(new GroupRealm
+                        {
+                            RealmsName = msg.Name
+                        });
+                        _groupRepository.Update(existingGroup);
+                    }
+                }
+
+                var existingGroupNames = existingGroups.Select(s => s.Name).ToList();
+                var unknownGroups = groups.Where(s => !existingGroupNames.Contains(s.Name)).ToList();
+                foreach(var unknownGroup in unknownGroups)
+                {
+                    unknownGroup.Realms = new List<GroupRealm>
+                    {
+                        new GroupRealm
+                        {
+                            RealmsName = msg.Name
+                        }
+                    };
+                }
+
+                await _groupRepository.BulkAdd(unknownGroups);
             },
             (m, s, e, n) => m.MigrateGroups(s, e, n),
             context.CancellationToken);
@@ -253,7 +304,34 @@ public class LaunchMigrationConsumer :
             async (e, c) =>
             {
                 var users = await migrationService.ExtractUsers(e, c);
-                await _userRepository.BulkAdd(users);
+                var allUserIds = users.Select(s => s.Name).ToList();
+                var existingUsers = await _userRepository.GetUsersBySubjects(allUserIds, context.CancellationToken);
+                foreach (var existingUser in existingUsers)
+                {
+                    if (!existingUser.Realms.Any(r => r.RealmsName == msg.Realm))
+                    {
+                        existingUser.Realms.Add(new RealmUser
+                        {
+                            RealmsName = msg.Name
+                        });
+                        _userRepository.Update(existingUser);
+                    }
+                }
+
+                var existingUserNames = existingUsers.Select(s => s.Name).ToList();
+                var unknownUsers = users.Where(s => !existingUserNames.Contains(s.Name)).ToList();
+                foreach(var unknownUser in unknownUsers)
+                {
+                    unknownUser.Realms = new List<RealmUser>
+                    {
+                        new RealmUser
+                        {
+                            RealmsName = msg.Realm
+                        }
+                    };
+                }
+
+                await _userRepository.BulkAdd(unknownUsers);
             },
             (m, s, e, n) => m.MigrateUsers(s, e, n),
             context.CancellationToken);
@@ -261,16 +339,27 @@ public class LaunchMigrationConsumer :
 
     private async Task MigrateScopes(List<Scope> scopes, Domains.Realm realm, IMigrationService migrationService, CancellationToken cancellationToken)
     {
-        var allScopeIds = scopes.Select(s => s.Id).ToList();
-        var existingScopes = await _scopeRepository.GetByIds(allScopeIds, cancellationToken);
+        var allScopeNames = scopes.Select(s => s.Name).ToList();
+        var existingScopes = await _scopeRepository.GetByNames(allScopeNames, cancellationToken);
         foreach (var existingScope in existingScopes)
         {
-            existingScope.Realms.Add(realm);
-            _scopeRepository.Update(existingScope);
+            if(!existingScope.Realms.Any(r => r.Name == realm.Name))
+            {
+                existingScope.Realms.Add(realm);
+                _scopeRepository.Update(existingScope);
+            }
         }
 
-        var existingScopeIds = existingScopes.Select(s => s.Id).ToList();
-        var unknownScopes = scopes.Where(s => !existingScopeIds.Contains(s.Id)).ToList();
+        var existingScopeNames = existingScopes.Select(s => s.Name).ToList();
+        var unknownScopes = scopes.Where(s => !existingScopeNames.Contains(s.Name)).ToList();
+        foreach(var unknownScope in unknownScopes)
+        {
+            unknownScope.Realms = new List<Realm>
+            {
+                realm
+            };
+        }
+
         await _scopeRepository.BulkAdd(unknownScopes);
     }
 
@@ -318,5 +407,23 @@ public class LaunchMigrationConsumer :
     {
         var section = _configuration.GetSection(typeof(MigrationOptions).Name);
         return section.Get<MigrationOptions>() ?? new MigrationOptions();
+    }
+}
+
+public class LaunchMigrationConsumerDefinition : ConsumerDefinition<LaunchMigrationConsumer>
+{
+    public LaunchMigrationConsumerDefinition()
+    {
+        EndpointName = LaunchMigrationConsumer.QueueName;
+        ConcurrentMessageLimit = 8;
+    }
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
+        IConsumerConfigurator<LaunchMigrationConsumer> consumerConfigurator)
+    {
+        // configure message retry with millisecond intervals
+        endpointConfigurator.UseMessageRetry(r => r.Intervals(100, 200));
+
+        // use the outbox to prevent duplicate events from being published
+        endpointConfigurator.UseInMemoryOutbox();
     }
 }

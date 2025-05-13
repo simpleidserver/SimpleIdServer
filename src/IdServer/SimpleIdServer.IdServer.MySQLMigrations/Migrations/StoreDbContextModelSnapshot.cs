@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -361,6 +361,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("longtext")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime(6)")
@@ -1043,6 +1047,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("longtext")
                         .HasAnnotation("Relational:JsonPropertyName", "software_version");
 
+                    b.Property<string>("Source")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
+
                     b.Property<string>("SubjectSyntaxTypesSupported")
                         .IsRequired()
                         .HasColumnType("longtext")
@@ -1432,6 +1440,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("varchar(255)")
                         .HasAnnotation("Relational:JsonPropertyName", "parent_group_id");
 
+                    b.Property<string>("Source")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
+
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime(6)")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
@@ -1669,6 +1681,64 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.ToTable("MessageBusErrorMessages");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecution", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "name");
+
+                    b.Property<string>("Realm")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MigrationExecutions");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecutionHistory", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime?>("EndDatetime")
+                        .HasColumnType("datetime(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "end_datetime");
+
+                    b.Property<string>("Errors")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "errors");
+
+                    b.Property<string>("MigrationExecutionId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("NbRecords")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "nb_records");
+
+                    b.Property<DateTime>("StartDatetime")
+                        .HasColumnType("datetime(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "start_datetime");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "type");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MigrationExecutionId");
+
+                    b.ToTable("MigrationExecutionHistory");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "histories");
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
                 {
                     b.Property<string>("Id")
@@ -1893,6 +1963,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<int>("Protocol")
                         .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "protocol");
+
+                    b.Property<string>("Source")
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<int>("Type")
                         .HasColumnType("int")
@@ -2988,6 +3062,14 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Navigation("IdentityProvisioningDefinition");
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecutionHistory", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.MigrationExecution", null)
+                        .WithMany("Histories")
+                        .HasForeignKey("MigrationExecutionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Realm", "Realm")
@@ -3260,6 +3342,11 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Navigation("Instances");
 
                     b.Navigation("MappingRules");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecution", b =>
+                {
+                    b.Navigation("Histories");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>

@@ -171,4 +171,10 @@ public class GroupRepository : IGroupRepository
     {
         throw new NotImplementedException();
     }
+
+    public Task<List<Group>> GetByIds(List<string> ids, CancellationToken cancellationToken)
+        => throw new NotImplementedException();
+
+    public Task<List<Group>> GetByNames(List<string> names, CancellationToken cancellationToken)
+        => throw new NotImplementedException();
 }

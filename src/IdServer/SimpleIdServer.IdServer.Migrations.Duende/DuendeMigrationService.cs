@@ -4,6 +4,7 @@ using Duende.IdentityServer.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api.Token.Handlers;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
@@ -29,6 +30,7 @@ public class DuendeMigrationService : IMigrationService
         IScopeRepository scopeRepository)
     {
         _configurationDbcontext = configurationDbcontext;
+        _applicationDbcontext = applicationDbcontext;
         _scopeRepository = scopeRepository;
     }
 
@@ -150,6 +152,7 @@ public class DuendeMigrationService : IMigrationService
         var result = new Scope
         {
             Id = $"{Constants.ApiScope}_{scope.Name}",
+            Source = Constants.Name,
             Name = scope.Name,
             Type = scope.UserClaims.Any() ? ScopeTypes.IDENTITY : ScopeTypes.APIRESOURCE,
             Protocol = ScopeProtocols.OPENID,
@@ -184,6 +187,7 @@ public class DuendeMigrationService : IMigrationService
         return new Scope
         {
             Id = $"{Constants.IdentityResource}_{identityResource.Name}",
+            Source = Constants.Name,
             Name = identityResource.Name,
             Description = identityResource.Description,
             IsExposedInConfigurationEdp = identityResource.ShowInDiscoveryDocument,
@@ -215,10 +219,13 @@ public class DuendeMigrationService : IMigrationService
         var result = new ApiResource
         {
             Id = Guid.NewGuid().ToString(),
+            Source = Constants.Name,
             Name = resource.Name,
             Audience = resource.Name,
             Scopes = scopes,
             Description = resource.Description,
+            CreateDateTime = resource.Created,
+            UpdateDateTime = resource.Updated ?? resource.Created
         };
         return result;
     }
@@ -230,6 +237,8 @@ public class DuendeMigrationService : IMigrationService
         {
             Id = Guid.NewGuid().ToString(),
             ClientId = client.ClientId,
+            Source = Constants.Name,
+            ClientType = ResolveClientType(client),
             GrantTypes = client.AllowedGrantTypes.Select(g => g.GrantType).ToList(),
             FrontChannelLogoutUri = client.FrontChannelLogoutUri,
             FrontChannelLogoutSessionRequired = client.FrontChannelLogoutSessionRequired,
@@ -358,6 +367,7 @@ public class DuendeMigrationService : IMigrationService
         {
             Id = identityRole.Id,
             Name = identityRole.Name,
+            Source = Constants.Name,
             FullPath = identityRole.Name,
             Description = identityRole.NormalizedName,
             CreateDateTime = DateTime.UtcNow,
@@ -370,9 +380,10 @@ public class DuendeMigrationService : IMigrationService
         var result = new User
         {
             Id = applicationUser.Id,
+            Source = Constants.Name,
             Name = applicationUser.UserName,
             Email = applicationUser.Email,
-            Status = applicationUser.LockoutEnabled ? UserStatus.BLOCKED : UserStatus.ACTIVATED,
+            UnblockDateTime = applicationUser.LockoutEnd == null ? null : applicationUser.LockoutEnd.Value.UtcDateTime,
             NbLoginAttempt = applicationUser.AccessFailedCount,
             EmailVerified = applicationUser.EmailConfirmed,
             Credentials = new List<UserCredential>
@@ -386,7 +397,9 @@ public class DuendeMigrationService : IMigrationService
                 }
             },
             CreateDateTime = DateTime.UtcNow,
+            UpdateDateTime = DateTime.UtcNow
         };
+        result.Status = result.IsBlocked() ? UserStatus.BLOCKED : UserStatus.ACTIVATED;
         var claims = new List<UserClaim>();
         var filteredClaims = userClaims.Where(c => c.UserId == applicationUser.Id);
         claims.AddRange(filteredClaims);
@@ -416,5 +429,21 @@ public class DuendeMigrationService : IMigrationService
             GroupsId = groupId
         }).ToList();
         return result;
+    }
+
+    private static ClientTypes ResolveClientType(DuendeClient client)
+    {
+        var grantTypes = client.AllowedGrantTypes.Select(g => g.GrantType).ToList();
+        if (grantTypes.Contains(ClientCredentialsHandler.GRANT_TYPE))
+        {
+            return ClientTypes.MACHINE;
+        }
+
+        if (client.RequirePkce && grantTypes.Contains(AuthorizationCodeHandler.GRANT_TYPE))
+        {
+            return ClientTypes.SPA;
+        }
+
+        return ClientTypes.MACHINE;
     }
 }

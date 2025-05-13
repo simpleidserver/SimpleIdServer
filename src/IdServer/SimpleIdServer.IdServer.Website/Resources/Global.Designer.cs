@@ -1510,6 +1510,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Period.
+        /// </summary>
+        public static string DatePeriod {
+            get {
+                return ResourceManager.GetString("DatePeriod", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Default acr methods.
         /// </summary>
         public static string DefaultClientAcr {
@@ -1947,6 +1956,51 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Extracted {
             get {
                 return ResourceManager.GetString("Extracted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Api resources {0}.
+        /// </summary>
+        public static string ExtractedApiResources {
+            get {
+                return ResourceManager.GetString("ExtractedApiResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Clients {0}.
+        /// </summary>
+        public static string ExtractedClients {
+            get {
+                return ResourceManager.GetString("ExtractedClients", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Groups {0}.
+        /// </summary>
+        public static string ExtractedGroups {
+            get {
+                return ResourceManager.GetString("ExtractedGroups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scopes {0}.
+        /// </summary>
+        public static string ExtractedScopes {
+            get {
+                return ResourceManager.GetString("ExtractedScopes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Users {0}.
+        /// </summary>
+        public static string ExtractedUsers {
+            get {
+                return ResourceManager.GetString("ExtractedUsers", resourceCulture);
             }
         }
         
@@ -3130,6 +3184,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Scopes : {0}, Users : {1}, Groups : {2}, Clients: {3}, Api resources : {4}.
+        /// </summary>
+        public static string MigratedRecordsSummary {
+            get {
+                return ResourceManager.GetString("MigratedRecordsSummary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The migration has been launched.
+        /// </summary>
+        public static string MigrationLaunched {
+            get {
+                return ResourceManager.GetString("MigrationLaunched", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Migrations.
         /// </summary>
         public static string Migrations {
@@ -3236,6 +3308,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string NbLoginAttempt {
             get {
                 return ResourceManager.GetString("NbLoginAttempt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Migrated records.
+        /// </summary>
+        public static string NbMigratedRecords {
+            get {
+                return ResourceManager.GetString("NbMigratedRecords", resourceCulture);
             }
         }
         

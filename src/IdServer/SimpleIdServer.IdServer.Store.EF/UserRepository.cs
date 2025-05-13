@@ -63,12 +63,28 @@ public class UserRepository : IUserRepository
         return result;
     }
 
+    public async Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, CancellationToken cancellationToken)
+    {
+        var result = await GetUsers()
+            .Where(u => ids.Contains(u.Id))
+            .ToListAsync(cancellationToken);
+        return result;
+    }
+
     public async virtual Task<IEnumerable<User>> GetUsersById(IEnumerable<string> ids, string realm, CancellationToken cancellationToken)
     {
         var result = await GetUsers()
             .Where(u => u.Realms.Any(r => r.RealmsName == realm) && ids.Contains(u.Id))
             .ToListAsync(cancellationToken);
         return result;
+    }
+
+    public async Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, CancellationToken cancellationToken)
+    {
+        var users = await GetUsers()
+            .Where(u => subjects.Contains(u.Name))
+            .ToListAsync(cancellationToken);
+        return users;
     }
 
     public async virtual Task<IEnumerable<User>> GetUsersBySubjects(IEnumerable<string> subjects, string realm, CancellationToken cancellationToken)

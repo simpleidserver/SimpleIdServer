@@ -57,6 +57,7 @@ namespace SimpleIdServer.IdServer.Store.EF
         public DbSet<FederationEntity> FederationEntities { get; set; }
         public DbSet<RecurringJobStatus> RecurringJobStatusLst { get; set; }
         public DbSet<DataSeederExecutionHistory> ExecutionHistories { get; set; }
+        public DbSet<MigrationExecution> MigrationExecutions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -122,6 +123,8 @@ namespace SimpleIdServer.IdServer.Store.EF
             modelBuilder.ApplyConfiguration(new RecurringJobStatusConfiguration());
             modelBuilder.ApplyConfiguration(new DataSeederExecutionHistoryConfiguration());
             modelBuilder.ApplyConfiguration(new DistributedCacheConfiguration());
+            modelBuilder.ApplyConfiguration(new MigrationExecutionConfiguration());
+            modelBuilder.ApplyConfiguration(new MigrationExecutionHistoryConfiguration());
         }
     }
 }
