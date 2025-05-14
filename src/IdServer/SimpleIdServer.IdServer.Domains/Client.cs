@@ -66,6 +66,14 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.ResponseTypes)]
         public ICollection<string> ResponseTypes { get; set; } = new List<string>();
         /// <summary>
+        /// Lifetime of an authorization code in seconds (default value : 600).
+        /// </summary>
+        [JsonPropertyName(OAuthClientParameters.AuthorizationCodeExpirationInSeconds)]
+        public int AuthorizationCodeExpirationInSeconds
+        {
+            get; set;
+        } = 600;
+        /// <summary>
         /// Readable client name.
         /// </summary>
         public string? ClientName

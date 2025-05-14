@@ -809,6 +809,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                     b.Property<string>("AuthenticationContextClassReferenceId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<int>("AuthorizationCodeExpirationInSeconds")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_code_expirationtime_seconds");
+
                     b.Property<string>("AuthorizationDataTypes")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")

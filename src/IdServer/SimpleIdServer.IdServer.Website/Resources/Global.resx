@@ -2133,4 +2133,10 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="WorkflowIsCreated" xml:space="preserve">
     <value>Workflow is created</value>
   </data>
+  <data name="AuthCodeExpirationTimeTooltip" xml:space="preserve">
+    <value>Set the authorization code duration in seconds; by default the value is 10 minutes</value>
+  </data>
+  <data name="AuthCodeExpirationTime" xml:space="preserve">
+    <value>Authorization code expiration time</value>
+  </data>
 </root>

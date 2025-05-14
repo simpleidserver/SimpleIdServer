@@ -78,6 +78,16 @@
                         <RadzenDropDown @bind-Value=@selectedResponseTypes Chips=true Data=@responseTypes Multiple=true AllowClear=true Placeholder="@Global.SelectResponseTypes" class="w-100"></RadzenDropDown>
                     </div>
                 </div>
+                <!-- Authorization code expiration time -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.AuthCodeExpirationTimeTooltip))" />
+                        <RadzenLabel Text="@Global.AuthCodeExpirationTime" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric Name="AuthorizationCodeExpirationInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.AuthorizationCodeExpirationInSeconds></RadzenNumeric>
+                    </div>
+                </div>
                 <!-- Token expiration time -->
                 <div class="row mt-1">
                     <div class="col-md-2">
@@ -157,6 +167,7 @@
         public double DPOPNonceLifetimeInSeconds { get; set; }
         public double UserCookieExpirationTimeInSeconds { get; set; } = 60 * 30;
         public double TokenExpirationTimeInSeconds { get; set; } = 60 * 30;
+        public int AuthorizationCodeExpirationInSeconds { get; set; } = 600;
     }
 
     UpdateAdvancedClient updateAdvancedClient = new UpdateAdvancedClient();
@@ -200,9 +211,16 @@
             DPOPNonceLifetimeInSeconds = Client.DPOPNonceLifetimeInSeconds
         };
         if (Client.TokenExpirationTimeInSeconds != null)
+        {
             updateAdvancedClient.TokenExpirationTimeInSeconds = Client.TokenExpirationTimeInSeconds.Value;
+        }
+
         if (Client.UserCookieExpirationTimeInSeconds != null)
+        {
             updateAdvancedClient.UserCookieExpirationTimeInSeconds = Client.UserCookieExpirationTimeInSeconds.Value;
+        }
+
+        updateAdvancedClient.AuthorizationCodeExpirationInSeconds = Client.AuthorizationCodeExpirationInSeconds;
         selectedResponseTypes = Client.ResponseTypes.Where(r => !string.IsNullOrWhiteSpace(r));
     }
 
@@ -221,7 +239,8 @@
             IsDPoPNonceRequired = client.IsDPoPNonceRequired,
             IsDPoPRequired = client.IsDPoPRequired,
             TokenExpirationTimeInSeconds = client.TokenExpirationTimeInSeconds,
-            UserCookieExpirationTimeInSeconds = client.UserCookieExpirationTimeInSeconds
+            UserCookieExpirationTimeInSeconds = client.UserCookieExpirationTimeInSeconds,
+            AuthorizationCodeExpirationInSeconds = client.AuthorizationCodeExpirationInSeconds
         });
     }
 

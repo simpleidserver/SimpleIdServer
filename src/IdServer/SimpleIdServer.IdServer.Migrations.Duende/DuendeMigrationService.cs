@@ -262,12 +262,12 @@ public class DuendeMigrationService : IMigrationService
             ClientSecret = Guid.NewGuid().ToString(),
             CreateDateTime = client.Created,
             UpdateDateTime = client.Updated ?? client.Created,
+            AuthorizationCodeExpirationInSeconds = client.AuthorizationCodeLifetime
         };
         result.UpdateClientName(client.ClientName, IdServer.Constants.DefaultLanguage);
         result.UpdateClientUri(client.ClientUri, IdServer.Constants.DefaultLanguage);
         result.UpdateLogoUri(client.LogoUri, IdServer.Constants.DefaultLanguage);
         /*
-        AuthorizationCodeLifetime
         AllowPlainTextPkce
         EnableLocalLogin
         RequireRequestObject

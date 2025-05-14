@@ -334,6 +334,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds;
             client.TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds;
             client.UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds;
+            client.AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds;
             return state with
             {
                 Client = client

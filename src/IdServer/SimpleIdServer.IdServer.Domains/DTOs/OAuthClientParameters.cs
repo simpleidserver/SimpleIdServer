@@ -97,5 +97,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Realms = "realms";
         public const string UserCookieExpirationTimeInSeconds = "user_cookie_expirationtime_seconds";
         public const string Source = "source";
+        public const string AuthorizationCodeExpirationInSeconds = "authorization_code_expirationtime_seconds";
     }
 }

@@ -796,6 +796,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Property<string>("AuthenticationContextClassReferenceId")
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("AuthorizationCodeExpirationInSeconds")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "authorization_code_expirationtime_seconds");
+
                     b.Property<string>("AuthorizationDataTypes")
                         .IsRequired()
                         .HasColumnType("TEXT")

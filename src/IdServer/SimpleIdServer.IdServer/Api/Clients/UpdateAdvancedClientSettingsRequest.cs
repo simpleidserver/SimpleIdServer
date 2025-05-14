@@ -29,4 +29,6 @@ public class UpdateAdvancedClientSettingsRequest
     public double TokenExpirationTimeInSeconds { get; set; }
     [JsonPropertyName(OAuthClientParameters.UserCookieExpirationTimeInSeconds)]
     public double UserCookieExpirationTimeInSeconds { get; set; }
+    [JsonPropertyName(OAuthClientParameters.AuthorizationCodeExpirationInSeconds)]
+    public int AuthorizationCodeExpirationInSeconds { get; set; }
 }

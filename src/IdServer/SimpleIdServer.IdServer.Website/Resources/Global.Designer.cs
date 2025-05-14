@@ -583,6 +583,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Authorization code expiration time.
+        /// </summary>
+        public static string AuthCodeExpirationTime {
+            get {
+                return ResourceManager.GetString("AuthCodeExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the authorization code duration in seconds; by default the value is 10 minutes.
+        /// </summary>
+        public static string AuthCodeExpirationTimeTooltip {
+            get {
+                return ResourceManager.GetString("AuthCodeExpirationTimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Authentication.
         /// </summary>
         public static string Authentication {

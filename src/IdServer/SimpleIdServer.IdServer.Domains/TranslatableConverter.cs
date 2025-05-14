@@ -67,6 +67,8 @@ public class TranslatableConverter<T> : JsonConverter<T> where T : class
                 writer.WriteBoolean(prop.Item2, (bool)obj);
             else if (propertyType == typeof(double?) || propertyType == typeof(double))
                 writer.WriteNumber(prop.Item2, (double)obj);
+            else if (propertyType == typeof(int?) || propertyType == typeof(int))
+                writer.WriteNumber(prop.Item2, (int)obj);
             else if (propertyType == typeof(DateTime))
                 writer.WriteString(prop.Item2, (DateTime)obj);
             else if (propertyType == typeof(DateTime?) && obj != null)

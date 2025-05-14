@@ -29,10 +29,6 @@ public class IdServerHostOptions
     /// </summary>
     public int? ClientSecretExpirationInSeconds { get; set; } = null;
     /// <summary>
-    /// Authorization code expiration time in seconds.
-    /// </summary>
-    public int AuthorizationCodeExpirationInSeconds { get; set; } = 600;
-    /// <summary>
     /// Pre Authorization code expiration time in seconds.
     /// </summary>
     public int CredOfferExpirationInSeconds { get; set; } = 600;
