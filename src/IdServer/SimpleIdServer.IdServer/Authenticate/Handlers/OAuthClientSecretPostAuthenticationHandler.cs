@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer.Authenticate.Validations;
 using SimpleIdServer.IdServer.Domains;
 using System;
 using System.Threading;
@@ -9,7 +10,12 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
 {
     public class OAuthClientSecretPostAuthenticationHandler : IOAuthClientAuthenticationHandler
     {
-        public OAuthClientSecretPostAuthenticationHandler() { }
+        private readonly IClientSecretValidator _clientSecretValidator;
+
+        public OAuthClientSecretPostAuthenticationHandler(IClientSecretValidator clientSecretValidator) 
+        {
+            _clientSecretValidator = clientSecretValidator;
+        }
 
         public string AuthMethod => AUTH_METHOD;
         public const string AUTH_METHOD = "client_secret_post";
@@ -18,9 +24,12 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
         {
             if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
             if (client == null) throw new ArgumentNullException(nameof(client));
-            if (string.IsNullOrWhiteSpace(client.ClientSecret)) return Task.FromResult(false);
-            var result = string.Compare(client.ClientSecret, authenticateInstruction.ClientSecretFromHttpRequestBody, StringComparison.CurrentCultureIgnoreCase) == 0;
-            return Task.FromResult(result);
+            if (string.IsNullOrWhiteSpace(client.ClientSecret))
+            {
+                return Task.FromResult(false);
+            }
+
+            return Task.FromResult(_clientSecretValidator.IsValid(client, authenticateInstruction.ClientSecretFromHttpRequestBody));
         }
     }
 }

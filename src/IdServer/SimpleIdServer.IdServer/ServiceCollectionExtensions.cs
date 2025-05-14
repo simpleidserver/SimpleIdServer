@@ -42,6 +42,7 @@ using SimpleIdServer.IdServer.Auth;
 using SimpleIdServer.IdServer.Authenticate;
 using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
+using SimpleIdServer.IdServer.Authenticate.Validations;
 using SimpleIdServer.IdServer.Builders;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
@@ -354,6 +355,10 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSecretPostAuthenticationHandler>();
         services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientTlsClientAuthenticationHandler>();
         services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSelfSignedTlsClientAuthenticationHandler>();
+        services.AddTransient<IClientSecretValidator, ClientSecretValidator>();
+        services.AddTransient<IAlgClientSecretValidator, PlainTextClientSecretValidator>();
+        services.AddTransient<IAlgClientSecretValidator, Sha256ClientSecretValidator>();
+        services.AddTransient<IAlgClientSecretValidator, Sha512ClientSecretValidator>();
         services.AddTransient<IPkceVerifier, PkceVerifier>();
         return services;
     }

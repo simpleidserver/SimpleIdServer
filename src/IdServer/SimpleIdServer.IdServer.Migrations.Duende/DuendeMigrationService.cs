@@ -4,7 +4,9 @@ using Duende.IdentityServer.EntityFramework.DbContexts;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
+using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
@@ -18,7 +20,7 @@ using DuendeIdentityResource = Duende.IdentityServer.EntityFramework.Entities.Id
 namespace SimpleIdServer.IdServer.Migrations.Duende;
 
 public class DuendeMigrationService : IMigrationService
-{
+{    
     public string Name => Constants.Name;
     private readonly ConfigurationDbContext _configurationDbcontext;
     private readonly ApplicationDbContext _applicationDbcontext;
@@ -259,11 +261,13 @@ public class DuendeMigrationService : IMigrationService
             IsConsentDisabled = !client.RequireConsent,
             Scopes = scopes,
             SerializedJsonWebKeys = ResolveSerializedJsonWebKeys(client),
-            ClientSecret = Guid.NewGuid().ToString(),
+            ClientSecret = ResolveClientSecret(client),
             CreateDateTime = client.Created,
             UpdateDateTime = client.Updated ?? client.Created,
             AuthorizationCodeExpirationInSeconds = client.AuthorizationCodeLifetime
         };
+        result.ResponseTypes = ResolveResponseTypes(result.ClientType);
+        result.TokenEndPointAuthMethod = result.ClientType == ClientTypes.MACHINE || result.ClientType == ClientTypes.WEBSITE ? OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD : null;
         result.UpdateClientName(client.ClientName, IdServer.Constants.DefaultLanguage);
         result.UpdateClientUri(client.ClientUri, IdServer.Constants.DefaultLanguage);
         result.UpdateLogoUri(client.LogoUri, IdServer.Constants.DefaultLanguage);
@@ -277,7 +281,6 @@ public class DuendeMigrationService : IMigrationService
         AllowAccessTokensViaBrowser
         Enabled
         ProtocolType
-        ClientSecrets 
         RequireClientSecret
         Description
         AllowRememberConsent
@@ -348,6 +351,18 @@ public class DuendeMigrationService : IMigrationService
     private static int ResolveDPOPNonceLifetimeInSeconds(DuendeClient client)
     {
         return (int)client.DPoPClockSkew.TotalSeconds;
+    }
+
+    private static string ResolveClientSecret(DuendeClient client)
+    {
+        const string clientSecretType = "SharedSecret";
+        var clientSecret = client.ClientSecrets.FirstOrDefault(s => s.Type == clientSecretType && s.Expiration == null);
+        if (clientSecret == null)
+        {
+            clientSecret = client.ClientSecrets.FirstOrDefault(s => s.Type == clientSecretType && s.Expiration != null && s.Expiration >= DateTime.UtcNow);
+        }
+
+        return clientSecret?.Value ?? Guid.NewGuid().ToString();
     }
 
     private static UserClaim Map(IdentityUserClaim<string> userClaim)
@@ -445,6 +460,24 @@ public class DuendeMigrationService : IMigrationService
             return ClientTypes.SPA;
         }
 
+        if (!client.RequirePkce && grantTypes.Contains(AuthorizationCodeHandler.GRANT_TYPE))
+        {
+            return ClientTypes.WEBSITE;
+        }
+
         return ClientTypes.MACHINE;
+    }
+
+    private static List<string> ResolveResponseTypes(ClientTypes? type)
+    {
+        if (type == null || type == ClientTypes.MACHINE)
+        {
+            return new List<string>();
+        }
+
+        return new List<string>
+        {
+            AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE,
+        };
     }
 }

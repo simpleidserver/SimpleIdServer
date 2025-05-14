@@ -54,23 +54,30 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Title="@Global.Status" TItem="MigrationExecution" Filterable="false" Sortable="false"  TextAlign="TextAlign.Center">
                     <Template Context="data">
-                        <div style="display: flex;">
+                        <div style="display: flex; justify-content: center">
                             <ul class="stateDig">
-                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedScopes, data.TotalMigratedScopes)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.APISCOPES, MigrationExecutionHistoryTypes.IDENTITYSCOPES))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.APISCOPES, MigrationExecutionHistoryTypes.IDENTITYSCOPES))>
-                                    <div @ref=extractedElements[data.Name] class="title">@Global.Scopes</div>
-                                </li>
-                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedApiResources, data.TotalMigratedApiResources)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.APIRESOURCES))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.APIRESOURCES))>
-                                    <div class="title">@Global.ApiResources</div>
-                                </li>
-                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedClients, data.TotalMigratedApiResources)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.CLIENTS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.CLIENTS))>
-                                    <div class="title">@Global.Clients</div>
-                                </li>
-                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedGroups, data.TotalMigratedGroups)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.GROUPS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.GROUPS))>
-                                    <div class="title">@Global.Groups</div>
-                                </li>
-                                <li @onmouseenter="@( _ => ShowStep(extractedElements[data.Name], string.Format(Global.ExtractedUsers, data.TotalMigratedUsers)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.USERS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.USERS))>
-                                    <div class="title">@Global.Users</div>
-                                </li>
+                                @{
+                                    var scopesName = data.Name + "_scopes";
+                                    <li @onmouseenter="@( _ => ShowStep(extractedElements[scopesName], string.Format(Global.ExtractedScopes, data.TotalMigratedScopes)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.APISCOPES, MigrationExecutionHistoryTypes.IDENTITYSCOPES))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.APISCOPES, MigrationExecutionHistoryTypes.IDENTITYSCOPES))>
+                                        <div @ref=extractedElements[scopesName] class="title">@Global.Scopes</div>
+                                    </li>
+                                    var apiResourcesName = data.Name + "_apiresources";
+                                    <li @onmouseenter="@( _ => ShowStep(extractedElements[apiResourcesName], string.Format(Global.ExtractedApiResources, data.TotalMigratedApiResources)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.APIRESOURCES))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.APIRESOURCES))>
+                                        <div @ref=extractedElements[apiResourcesName] class="title">@Global.ApiResources</div>
+                                    </li>
+                                    var clientsName = data.Name + "_clients";
+                                    <li @onmouseenter="@( _ => ShowStep(extractedElements[clientsName], string.Format(Global.ExtractedClients, data.TotalMigratedClients)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.CLIENTS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.CLIENTS))>
+                                        <div @ref=extractedElements[clientsName] class="title">@Global.Clients</div>
+                                    </li>
+                                    var groupsName = data.Name + "_groups";
+                                    <li @onmouseenter="@( _ => ShowStep(extractedElements[groupsName], string.Format(Global.ExtractedGroups, data.TotalMigratedGroups)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.GROUPS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.GROUPS))>
+                                        <div @ref=extractedElements[groupsName] class="title">@Global.Groups</div>
+                                    </li>
+                                    var usersName = data.Name + "_users";
+                                    <li @onmouseenter="@( _ => ShowStep(extractedElements[usersName], string.Format(Global.ExtractedUsers, data.TotalMigratedUsers)) )" @onclick="(_ => ShowError(data, MigrationExecutionHistoryTypes.USERS))" class=@(GetNodeClassName(data, MigrationExecutionHistoryTypes.USERS))>
+                                        <div @ref=extractedElements[usersName] class="title">@Global.Users</div>
+                                    </li>
+                                }
                             </ul>
                         </div>
                     </Template>

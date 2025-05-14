@@ -49,3 +49,8 @@
     margin: auto;
     width: 20px;
 }
+
+.stateDig > li.node:last-child::after {
+    content: none;
+    border: none;
+}
