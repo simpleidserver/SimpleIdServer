@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains.DTOs;
-using SimpleIdServer.IdServer.Helpers;
 using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains
@@ -33,6 +32,8 @@ namespace SimpleIdServer.IdServer.Domains
         public int TOTPStep { get; set; } = 30;
         [JsonPropertyName(UserCredentialNames.HOTPWindow)]
         public int HOTPWindow { get; set; } = 5;
+        [JsonPropertyName(UserCredentialNames.HashAlg)]
+        public PasswordHashAlgs HashAlg { get; set; } = PasswordHashAlgs.Default;
         [JsonIgnore]
         public User User { get; set; }
         [JsonIgnore]
@@ -47,8 +48,6 @@ namespace SimpleIdServer.IdServer.Domains
                 Value = Value
             };
         }
-
-        public static UserCredential CreatePassword(string pwd, bool isBase64Encoded) => new UserCredential { Id = Guid.NewGuid().ToString(), CredentialType = "pwd", Value = PasswordHelper.ComputeHash(pwd, isBase64Encoded) };
     }
 
     public enum OTPAlgs
@@ -56,4 +55,10 @@ namespace SimpleIdServer.IdServer.Domains
         HOTP = 0,
         TOTP = 1
     }
+}
+
+public enum PasswordHashAlgs
+{
+    Default = 0,
+    Microsoft = 1
 }

@@ -2432,6 +2432,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("Relational:JsonPropertyName", "hotp_window");
 
+                    b.Property<int>("HashAlg")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "hash_alg");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasAnnotation("Relational:JsonPropertyName", "active");

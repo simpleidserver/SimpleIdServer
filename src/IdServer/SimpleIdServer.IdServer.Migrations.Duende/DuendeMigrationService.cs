@@ -393,7 +393,8 @@ public class DuendeMigrationService : IMigrationService
                     Id = Guid.NewGuid().ToString(),
                     Value = applicationUser.PasswordHash,
                     CredentialType = UserCredential.PWD,
-                    IsActive = true
+                    IsActive = true,
+                    HashAlg = PasswordHashAlgs.Microsoft
                 }
             },
             CreateDateTime = DateTime.UtcNow,

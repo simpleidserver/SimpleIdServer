@@ -207,13 +207,13 @@ public class IdServerHostOptions
     /// </summary>
     public int EndSessionRedirectionTimeInMS { get; set; } = 3 * 1000;
     /// <summary>
-    /// Set if the password is encoded in base64.
-    /// </summary>
-    public bool IsPasswordEncodeInBase64 { get; set; } = false;
-    /// <summary>
     /// Maximum number of active sessions.
     /// </summary>
     public int MaxNbActiveSessions { get; set; } = 4;
+    /// <summary>
+    /// Algorithm used to hash the password.
+    /// </summary>
+    public PasswordHashAlgs PwdHashAlg { get; set; } = PasswordHashAlgs.Default;
 
     public ScimClientOptions ScimClientOptions { get; set; }
 

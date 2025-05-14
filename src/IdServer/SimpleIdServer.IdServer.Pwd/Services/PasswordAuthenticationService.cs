@@ -19,7 +19,6 @@ public interface IPasswordAuthenticationService : IUserAuthenticationService
 public class PasswordAuthenticationService : GenericAuthenticationService<AuthenticatePasswordViewModel>, IPasswordAuthenticationService
 {
     private readonly IEnumerable<IIdProviderAuthService> _authServices;
-    private readonly IdServerHostOptions _options;
 
     public PasswordAuthenticationService(
         IEnumerable<IIdProviderAuthService> authServices, 
@@ -28,7 +27,6 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
         IUserRepository userRepository) : base(authenticationHelper, userRepository)
     {
         _authServices = authServices;
-        _options = options.Value;
     }
 
     public override string Amr => Constants.AreaPwd;
@@ -62,8 +60,10 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
         else
         {
             var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.AreaPwd && c.IsActive);
-            var hash = PasswordHelper.ComputeHash(viewModel.Password, _options.IsPasswordEncodeInBase64);
-            if (credential == null || credential.Value != hash) return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
+            if (!PasswordHelper.VerifyHash(credential, viewModel.Password))
+            {
+                return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
+            }
         }
 
         return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser));

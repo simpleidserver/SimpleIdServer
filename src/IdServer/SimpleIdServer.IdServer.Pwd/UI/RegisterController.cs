@@ -126,14 +126,19 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
             {
                 var user = await UserRepository.GetBySubject(viewModel.Login, prefix, cancellationToken);
                 var passwordCredential = user.Credentials.FirstOrDefault(c => c.CredentialType == UserCredential.PWD);
-                if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputeHash(viewModel.Password, Options.IsPasswordEncodeInBase64);
-                else user.Credentials.Add(new UserCredential
+                if (passwordCredential != null) passwordCredential.Value = PasswordHelper.ComputerHash(passwordCredential, viewModel.Password);
+                else
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    Value = PasswordHelper.ComputeHash(viewModel.Password, Options.IsPasswordEncodeInBase64),
-                    CredentialType = UserCredential.PWD,
-                    IsActive = true
-                });
+                    var credential = new UserCredential
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        CredentialType = UserCredential.PWD,
+                        HashAlg = Options.PwdHashAlg,
+                        IsActive = true
+                    };
+                    credential.Value = PasswordHelper.ComputerHash(passwordCredential, viewModel.Password);
+                    user.Credentials.Add(credential);
+                }
                 UserRepository.Update(user);
                 await transaction.Commit(cancellationToken);
                 return await base.UpdateUser(result, userRegistrationProgress, viewModel, Constants.AreaPwd, viewModel.ReturnUrl);
@@ -143,13 +148,15 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 
     protected override void EnrichUser(User user, PwdRegisterViewModel viewModel)
     {
-        user.Credentials.Add(new UserCredential
+        var credential = new UserCredential
         {
             Id = Guid.NewGuid().ToString(),
-            CredentialType = "pwd",
-            IsActive = true,
-            Value = PasswordHelper.ComputeHash(viewModel.Password, Options.IsPasswordEncodeInBase64)
-        });
+            CredentialType = UserCredential.PWD,
+            HashAlg = Options.PwdHashAlg,
+            IsActive = true
+        };
+        credential.Value = PasswordHelper.ComputerHash(credential, viewModel.Password);
+        user.Credentials.Add(credential);
         user.Name = viewModel.Login;
         if (Options.IsEmailUsedDuringAuthentication) user.Email = viewModel.Login;
     }

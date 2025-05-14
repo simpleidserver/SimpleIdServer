@@ -2432,6 +2432,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("integer")
                         .HasAnnotation("Relational:JsonPropertyName", "hotp_window");
 
+                    b.Property<int>("HashAlg")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "hash_alg");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasAnnotation("Relational:JsonPropertyName", "active");

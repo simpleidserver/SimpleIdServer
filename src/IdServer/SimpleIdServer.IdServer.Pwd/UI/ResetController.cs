@@ -261,12 +261,13 @@ public class ResetController : BaseController
                 {
                     Id = Guid.NewGuid().ToString(),
                     CredentialType = Constants.AreaPwd,
+                    HashAlg = _options.PwdHashAlg,
                     IsActive = true
                 };
                 user.Credentials.Add(credential);
             }
 
-            credential.Value = PasswordHelper.ComputeHash(viewModel.Password, _options.IsPasswordEncodeInBase64);
+            credential.Value = PasswordHelper.ComputerHash(credential, viewModel.Password);
             _userRepository.Update(user);
             await transaction.Commit(cancellationToken);
             viewModel.IsPasswordUpdated = true;

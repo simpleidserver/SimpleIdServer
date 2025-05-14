@@ -335,7 +335,7 @@ namespace SimpleIdServer.IdServer.Api.Users
 
                     if (request.Credential.CredentialType == Constants.AreaPwd)
                     {
-                        request.Credential.Value = PasswordHelper.ComputeHash(request.Credential.Value, _options.IsPasswordEncodeInBase64);
+                        request.Credential.Value = PasswordHelper.ComputerHash(request.Credential, request.Credential.Value);
                     }
 
                     request.Credential.Id = Guid.NewGuid().ToString();
@@ -373,9 +373,13 @@ namespace SimpleIdServer.IdServer.Api.Users
                     var existingCredential = user.Credentials.SingleOrDefault(c => c.Id == credentialId);
                     if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
                     if (existingCredential.CredentialType == Constants.AreaPwd)
-                        existingCredential.Value = PasswordHelper.ComputeHash(request.Value, _options.IsPasswordEncodeInBase64);
+                    {
+                        existingCredential.Value = PasswordHelper.ComputerHash(existingCredential, request.Value);
+                    }
                     else
+                    {
                         existingCredential.Value = request.Value;
+                    }
 
                     existingCredential.OTPAlg = request.OTPAlg;
                     user.UpdateDateTime = DateTime.UtcNow;

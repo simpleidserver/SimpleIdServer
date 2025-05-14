@@ -258,7 +258,7 @@ public class LaunchMigrationConsumer :
                     {
                         existingGroup.Realms.Add(new GroupRealm
                         {
-                            RealmsName = msg.Name
+                            RealmsName = msg.Realm
                         });
                         _groupRepository.Update(existingGroup);
                     }
@@ -272,7 +272,7 @@ public class LaunchMigrationConsumer :
                     {
                         new GroupRealm
                         {
-                            RealmsName = msg.Name
+                            RealmsName = msg.Realm
                         }
                     };
                 }
@@ -312,7 +312,7 @@ public class LaunchMigrationConsumer :
                     {
                         existingUser.Realms.Add(new RealmUser
                         {
-                            RealmsName = msg.Name
+                            RealmsName = msg.Realm
                         });
                         _userRepository.Update(existingUser);
                     }

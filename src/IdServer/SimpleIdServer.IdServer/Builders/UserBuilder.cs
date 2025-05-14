@@ -7,7 +7,6 @@ using SimpleIdServer.IdServer.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static SimpleIdServer.IdServer.Constants;
 
 namespace SimpleIdServer.IdServer.Builders
 {
@@ -27,19 +26,22 @@ namespace SimpleIdServer.IdServer.Builders
         /// <param name="password">The user's password.</param>
         /// <param name="name">(Optional) The user's first name.</param>
         /// <param name="realm">(Optional) The realm to asign.</param>
+        /// <param name="hashAlg">(Optional) Algorithm used to hash the password.</param>
         /// <returns>An instace for building an user.</returns>
-        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null, bool isBase64Encoded = false)
+        public static UserBuilder Create(string login, string password, string name = null, Domains.Realm realm = null, PasswordHashAlgs hashAlg = PasswordHashAlgs.Default)
         {
             var result = new UserBuilder();
             result._user.Id = Guid.NewGuid().ToString();
             result._user.Name = login;
-            result._user.Credentials.Add(new UserCredential
+            var userCredential = new UserCredential
             {
                 Id = Guid.NewGuid().ToString(),
                 CredentialType = "pwd",
                 IsActive = true,
-                Value = PasswordHelper.ComputeHash(password, isBase64Encoded)
-            });
+                HashAlg = hashAlg
+            };
+            userCredential.Value = PasswordHelper.ComputerHash(userCredential, password);
+            result._user.Credentials.Add(userCredential);
             if (realm == null) result._user.Realms.Add(new RealmUser { RealmsName = Config.DefaultRealms.Master.Name });
             else result._user.Realms.Add(new RealmUser { RealmsName = realm.Name });
 

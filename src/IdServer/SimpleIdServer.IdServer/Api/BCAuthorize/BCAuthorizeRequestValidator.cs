@@ -146,8 +146,7 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         {
             if (string.IsNullOrWhiteSpace(userCode)) return;
             var credential = user.Credentials.FirstOrDefault(c => c.CredentialType == Constants.AreaPwd && c.IsActive);
-            var hash = PasswordHelper.ComputeHash(userCode, _options.IsPasswordEncodeInBase64);
-            if (credential == null || credential.Value != PasswordHelper.ComputeHash(userCode, _options.IsPasswordEncodeInBase64))
+            if(credential == null || !PasswordHelper.VerifyHash(credential, userCode))
                 throw new OAuthException(ErrorCodes.INVALID_CREDENTIALS, Global.InvalidUserCode);
         }
 

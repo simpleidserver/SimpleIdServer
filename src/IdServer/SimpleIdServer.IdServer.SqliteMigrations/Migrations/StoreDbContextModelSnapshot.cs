@@ -2407,6 +2407,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "hotp_window");
 
+                    b.Property<int>("HashAlg")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "hash_alg");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "active");
