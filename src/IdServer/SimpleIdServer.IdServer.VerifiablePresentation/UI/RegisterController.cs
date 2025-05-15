@@ -80,5 +80,5 @@ public class RegisterController : BaseRegisterController<VerifiablePresentationR
         return StandardVpRegistrationWorkflows.DefaultWorkflow;
     }
 
-    private string GetRealm(string realm) => Options.UseRealm ? $"{realm}/" : string.Empty;
+    private string GetRealm(string realm) => Options.RealmEnabled ? $"{realm}/" : string.Empty;
 }

@@ -478,7 +478,7 @@ namespace SimpleIdServer.IdServer.UI
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, Request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, Request.GetAbsoluteUriWithVirtualPath(), _options.RealmEnabled);
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },

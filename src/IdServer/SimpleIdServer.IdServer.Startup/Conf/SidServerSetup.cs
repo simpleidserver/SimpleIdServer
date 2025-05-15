@@ -44,7 +44,7 @@ public class SidServerSetup
         var openTelemetryOptions = openTelemetrySection.Get<OpenTelemetryOptions>();
         var idServerBuilder = webApplicationBuilder.AddSidIdentityServer(c =>
             {
-                c.ForceHttps = configuration.ForceHttps;
+                c.ForceHttpsEnabled = configuration.ForceHttps;
                 c.Authority = configuration.Authority;
                 c.ScimClientOptions = conf;
                 if (!string.IsNullOrWhiteSpace(configuration.SessionCookieNamePrefix))

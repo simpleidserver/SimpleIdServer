@@ -190,7 +190,7 @@ namespace SimpleIdServer.IdServer.Api
         public string GetIssuer()
         {
             var result = Request.IssuerName;
-            return GetIssuer(result, Options.UseRealm);
+            return GetIssuer(result, Options.RealmEnabled);
         }
 
         public string GetIssuer(string result, bool useRealm)

@@ -140,7 +140,7 @@ namespace SimpleIdServer.IdServer.UI
                 var externalIdProviders = ExternalProviderHelper.GetExternalAuthenticationSchemes(schemes);
                 viewModel.ReturnUrl = returnUrl;
                 viewModel.AuthUrl = UriHelper.GetDisplayUrl(Request);
-                viewModel.Realm = Options.UseRealm ? prefix : string.Empty;
+                viewModel.Realm = Options.RealmEnabled ? prefix : string.Empty;
                 viewModel.ExternalIdsProviders = externalIdProviders.Select(e => new ExternalIdProvider
                 {
                     AuthenticationScheme = e.Name,
@@ -179,7 +179,7 @@ namespace SimpleIdServer.IdServer.UI
             var checkResult = await CheckAntiforgery();
             if (checkResult != null) return checkResult;
             // 2. Build view model
-            viewModel.Realm = Options.UseRealm ? prefix : string.Empty;
+            viewModel.Realm = Options.RealmEnabled ? prefix : string.Empty;
             EnrichViewModel(viewModel);
             await UpdateViewModel(viewModel);
 

@@ -37,4 +37,19 @@ public class UpdateAdvancedClientSettingsRequest
     public int DeviceCodePollingInterval { get; set; }
     [JsonPropertyName(OAuthClientParameters.PARExpirationTimeInSeconds)]
     public int PARExpirationTimeInSeconds { get; set; }
+    [JsonPropertyName(OAuthClientParameters.MaxRequestParameterLifetimeSeconds)]
+    public int MaxRequestParameterLifetimeSeconds
+    {
+        get; set;
+    }
+    [JsonPropertyName(OAuthClientParameters.MaxBindingMessageSize)]
+    public int MaxBindingMessageSize
+    {
+        get; set;
+    }
+    [JsonPropertyName(OAuthClientParameters.DpopLifetimeSeconds)]
+    public int DpopLifetimeSeconds
+    {
+        get; set;
+    }
 }

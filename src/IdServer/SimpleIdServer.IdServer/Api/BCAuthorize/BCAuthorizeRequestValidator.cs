@@ -40,16 +40,13 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
     {
         private readonly IUserRepository _userRepository;
         private readonly IJwtBuilder _jwtBuilder;
-        private readonly IdServerHostOptions _options;
 
         public BCAuthorizeRequestValidator(
             IUserRepository userRepository,
-            IJwtBuilder jwtBuilder,
-            IOptions<IdServerHostOptions> options)
+            IJwtBuilder jwtBuilder)
         {
             _userRepository = userRepository;
             _jwtBuilder = jwtBuilder;
-            _options = options.Value;
         }
 
         public async Task<User> ValidateCreate(HandlerContext context, CancellationToken cancellationToken)
@@ -182,8 +179,9 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AuthRequestIsExpired);
 
             var diffSeconds = (exp - nbf).TotalSeconds;
-            if (diffSeconds > _options.MaxRequestLifetime)
-                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AuthRequestMaximumLifetime, _options.MaxRequestLifetime));
+            Client openidClient = context.Client;
+            if (diffSeconds > openidClient.MaxRequestParameterLifetimeSeconds)
+                throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AuthRequestMaximumLifetime, openidClient.MaxRequestParameterLifetimeSeconds));
 
             if (currentDateTime < nbf)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AuthRequestBadNbf, nbf));
@@ -193,7 +191,6 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.AuthRequestNoJti);
             }
 
-            Client openidClient = context.Client;
             if (openidClient.BCAuthenticationRequestSigningAlg != jsonWebTokenResult.Jwt.Alg)
                 throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.AuthRequestAlgNotValid, openidClient.BCAuthenticationRequestSigningAlg));
 
@@ -266,8 +263,8 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         private void CheckBindingMessage(HandlerContext context)
         {
             var bindingMessage = context.Request.RequestData.GetBindingMessage();
-            if (!string.IsNullOrWhiteSpace(bindingMessage) && bindingMessage.Count() > _options.MaxBindingMessageSize)
-                throw new OAuthException(ErrorCodes.INVALID_BINDING_MESSAGE, string.Format(Global.BindingMessageMustNotExceed, _options.MaxBindingMessageSize));
+            if (!string.IsNullOrWhiteSpace(bindingMessage) && bindingMessage.Count() > context.Client.MaxBindingMessageSize)
+                throw new OAuthException(ErrorCodes.INVALID_BINDING_MESSAGE, string.Format(Global.BindingMessageMustNotExceed, context.Client.MaxBindingMessageSize));
         }
 
         private void CheckRequestedExpiry(HandlerContext context)

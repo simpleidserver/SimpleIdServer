@@ -33,15 +33,15 @@
 
             @if (scopeState.Value.Scope.Protocol == ScopeProtocols.OPENID)
             {
-                <RadzenBadge Text="@Global.OpenId" IsPill="true" />
+                <RadzenBadge style="margin-left: 5px;" Text="@Global.OpenId" IsPill="true" />
             }
             else if (scopeState.Value.Scope.Protocol == ScopeProtocols.SAML)
             {
-                <RadzenBadge Text="@Global.Saml" IsPill="true" />
+                <RadzenBadge style="margin-left: 5px;" Text="@Global.Saml" IsPill="true" />
             }
             else if (scopeState.Value.Scope.Protocol == ScopeProtocols.OAUTH)
             {
-                <RadzenBadge Text="@Global.OAuth" IsPill="true" />
+                <RadzenBadge style="margin-left: 5px;" Text="@Global.OAuth" IsPill="true" />
             }
         </div>
 

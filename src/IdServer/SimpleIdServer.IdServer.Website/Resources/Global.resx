@@ -2157,4 +2157,22 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="ParExpirationTimeTooltip" xml:space="preserve">
     <value>Set the PAR duration in seconds; by default, the value is 30 minutes</value>
   </data>
+  <data name="MaxRequestParameterLifetimeSeconds" xml:space="preserve">
+    <value>Validity of request parameters</value>
+  </data>
+  <data name="MaxRequestParameterLifetimeSecondsTooltip" xml:space="preserve">
+    <value>Set the validity duration of the request parameter in seconds</value>
+  </data>
+  <data name="MaxBindingMessageSize" xml:space="preserve">
+    <value>Maximum size of the binding_message parameter</value>
+  </data>
+  <data name="MaxBindingMessageSizeTooltip" xml:space="preserve">
+    <value>Set the maximum number of characters allowed for the received binding_message parameter</value>
+  </data>
+  <data name="DpopLifetime" xml:space="preserve">
+    <value>DPOP expiration time</value>
+  </data>
+  <data name="DpopLifetimeTooltip" xml:space="preserve">
+    <value>Set the lifetime of a DPoP request in seconds</value>
+  </data>
 </root>

@@ -17,7 +17,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton(BuildProtectedSessionStorage());
 builder.AddSidIdentityServer(o =>
 {
-    o.WalletAuthorizationServer = "http://localhost";
 }).UseEfStore(e => e.UseInMemoryDatabase("idserver"), e => e.UseInMemoryDatabase("formbuilder"))
     .AddPwdAuthentication()
     .AddOpenidFederation(o =>

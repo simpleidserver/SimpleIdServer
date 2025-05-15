@@ -237,7 +237,7 @@ public class IdServerBuilder
         _serviceCollection.AddTransient<BCNotificationJob>();
         _serviceCollection.Configure<IdServerHostOptions>(o =>
         {
-            o.IsBCEnabled = true;
+            o.BCEnabled = true;
         });
         return this;
     }
@@ -328,7 +328,7 @@ public class IdServerBuilder
     {
         _serviceCollection.Configure<IdServerHostOptions>(o =>
         {
-            o.UseRealm = true;
+            o.RealmEnabled = true;
         });
         return this;
     }

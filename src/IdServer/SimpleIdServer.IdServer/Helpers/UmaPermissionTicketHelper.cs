@@ -45,7 +45,7 @@ namespace SimpleIdServer.IdServer.Helpers
             var payload = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(umaPermissionTicket));
             await _distributedCache.SetAsync(umaPermissionTicket.Id, payload, new DistributedCacheEntryOptions
             {
-                SlidingExpiration = TimeSpan.FromSeconds(_options.ValidityPeriodPermissionTicketInSeconds)
+                SlidingExpiration = TimeSpan.FromSeconds(_options.UmaValidityPeriodPermissionTicketInSeconds)
             }, cancellationToken);
             return true;
         }

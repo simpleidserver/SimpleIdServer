@@ -261,7 +261,7 @@ public class ResetController : BaseController
                 {
                     Id = Guid.NewGuid().ToString(),
                     CredentialType = Constants.AreaPwd,
-                    HashAlg = _options.PwdHashAlg,
+                    HashAlg = _options.DefaultPwdHashAlg,
                     IsActive = true
                 };
                 user.Credentials.Add(credential);

@@ -133,7 +133,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
                     {
                         Id = Guid.NewGuid().ToString(),
                         CredentialType = UserCredential.PWD,
-                        HashAlg = Options.PwdHashAlg,
+                        HashAlg = Options.DefaultPwdHashAlg,
                         IsActive = true
                     };
                     credential.Value = PasswordHelper.ComputerHash(passwordCredential, viewModel.Password);
@@ -152,7 +152,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         {
             Id = Guid.NewGuid().ToString(),
             CredentialType = UserCredential.PWD,
-            HashAlg = Options.PwdHashAlg,
+            HashAlg = Options.DefaultPwdHashAlg,
             IsActive = true
         };
         credential.Value = PasswordHelper.ComputerHash(credential, viewModel.Password);

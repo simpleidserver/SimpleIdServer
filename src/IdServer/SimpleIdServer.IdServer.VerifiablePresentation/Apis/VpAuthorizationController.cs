@@ -128,7 +128,7 @@ public class VpAuthorizationController : BaseController
         return result;
     }
 
-    private string GetRealm(string realm) => _idServerOptions.UseRealm ? $"{realm}/" : string.Empty;
+    private string GetRealm(string realm) => _idServerOptions.RealmEnabled ? $"{realm}/" : string.Empty;
 
     private async Task<VpAuthorizationValidationResult> Validate(VpAuthorizationResponse request, string prefix, CancellationToken cancellationToken)
     {

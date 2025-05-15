@@ -14,7 +14,7 @@ public static class WebApplicationExtensions
     public static WebApplication UseGotifyNotification(this WebApplication webApplication)
     {
         var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
-        var usePrefix = opts.UseRealm;
+        var usePrefix = opts.RealmEnabled;
 
         webApplication.SidMapControllerRoute("createGotifyConnection",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + Constants.EndPoints.Connections,

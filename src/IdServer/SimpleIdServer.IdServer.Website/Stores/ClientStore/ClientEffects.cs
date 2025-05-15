@@ -699,7 +699,10 @@ public class ClientEffects
             AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds,
             DeviceCodeExpirationInSeconds = act.DeviceCodeExpirationInSeconds,
             DeviceCodePollingInterval = act.DeviceCodePollingInterval,
-            PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds
+            PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds,
+            DpopLifetimeSeconds = act.DpopLifetimeSeconds,
+            MaxBindingMessageSize = act.MaxBindingMessageSize,
+            MaxRequestParameterLifetimeSeconds = act.MaxRequestParameterLifetimeSeconds
         };
         var requestMessage = new HttpRequestMessage
         {
@@ -727,7 +730,10 @@ public class ClientEffects
                 AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds,
                 DeviceCodeExpirationInSeconds = act.DeviceCodeExpirationInSeconds,
                 DeviceCodePollingInterval = act.DeviceCodePollingInterval,
-                PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds
+                PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds,
+                DpopLifetimeSeconds = act.DpopLifetimeSeconds,
+                MaxBindingMessageSize = act.MaxBindingMessageSize,
+                MaxRequestParameterLifetimeSeconds = act.MaxRequestParameterLifetimeSeconds
             });
         }
         catch
@@ -1269,6 +1275,9 @@ public class UpdateAdvancedClientSettingsAction
     public int DeviceCodeExpirationInSeconds { get; set; }
     public int DeviceCodePollingInterval { get; set; }
     public int PARExpirationTimeInSeconds { get; set; }
+    public int MaxRequestParameterLifetimeSeconds { get; set; }
+    public int MaxBindingMessageSize { get; set; }
+    public int DpopLifetimeSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsSuccessAction
@@ -1287,6 +1296,9 @@ public class UpdateAdvancedClientSettingsSuccessAction
     public int DeviceCodeExpirationInSeconds { get; set; }
     public int DeviceCodePollingInterval { get; set; }
     public int PARExpirationTimeInSeconds { get; set; }
+    public int MaxRequestParameterLifetimeSeconds { get; set; }
+    public int MaxBindingMessageSize { get; set; }
+    public int DpopLifetimeSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsFailureAction

@@ -22,8 +22,8 @@ public static class WebApplicationExtensions
     public static WebApplication UseSid(this WebApplication webApplication, bool cookiesAlwaysSecure = true)
     {
         var opts = webApplication.Services.GetRequiredService<IOptions<IdServerHostOptions>>().Value;
-        if(opts.ForceHttps) webApplication.UseMiddleware<HttpsMiddleware>();
-        var usePrefix = opts.UseRealm;
+        if(opts.ForceHttpsEnabled) webApplication.UseMiddleware<HttpsMiddleware>();
+        var usePrefix = opts.RealmEnabled;
         if(usePrefix) webApplication.UseMiddleware<RealmMiddleware>();
         var sidRoutesStore = webApplication.Services.GetRequiredService<ISidRoutesStore>();
         var certificateForwardingOptions = webApplication.Services.GetService<IOptions<CertificateForwardingOptions>>();
@@ -124,7 +124,7 @@ public static class WebApplicationExtensions
                 pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.MtlsPrefix + "/" + DefaultEndpoints.TokenRevoke,
                 defaults: new { controller = "Token", action = "Revoke" });
 
-            if (opts.IsBCEnabled)
+            if (opts.BCEnabled)
             {
                 webApplication.SidMapControllerRoute("bcAuthorizeMtls",
                     pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.MtlsBCAuthorize,
@@ -132,7 +132,7 @@ public static class WebApplicationExtensions
             }
         }
 
-        if (opts.IsBCEnabled)
+        if (opts.BCEnabled)
         {
             // Occurs every 15 seconds.
             reccuringJobManager.AddOrUpdate<BCNotificationJob>(nameof(BCNotificationJob), j => webApplication.Services.GetRequiredService<BCNotificationJob>().Execute(), "*/15 * * * * *");

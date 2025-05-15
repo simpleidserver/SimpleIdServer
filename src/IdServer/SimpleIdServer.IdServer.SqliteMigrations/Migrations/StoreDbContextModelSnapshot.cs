@@ -909,6 +909,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "device_code_polling_interval");
 
+                    b.Property<int>("DpopLifetimeSeconds")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "dpop_lifetime_seconds");
+
                     b.Property<DateTime?>("ExpirationDateTime")
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "expiration_datetime");
@@ -976,6 +980,14 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Property<string>("JwksUri")
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "jwks_uri");
+
+                    b.Property<int>("MaxBindingMessageSize")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "max_binding_message_size");
+
+                    b.Property<int>("MaxRequestParameterLifetimeSeconds")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "max_request_parameter_lifetime_seconds");
 
                     b.Property<int>("PARExpirationTimeInSeconds")
                         .HasColumnType("INTEGER")

@@ -101,5 +101,8 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string DeviceCodeExpirationInSeconds = "device_code_expirationtime_seconds";
         public const string DeviceCodePollingInterval = "device_code_polling_interval";
         public const string PARExpirationTimeInSeconds = "par_expirationtime_seconds";
+        public const string MaxRequestParameterLifetimeSeconds = "max_request_parameter_lifetime_seconds";
+        public const string MaxBindingMessageSize = "max_binding_message_size";
+        public const string DpopLifetimeSeconds = "dpop_lifetime_seconds";
     }
 }

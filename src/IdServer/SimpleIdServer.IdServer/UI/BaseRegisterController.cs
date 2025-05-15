@@ -169,7 +169,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
                 FormValue = tokenSet.RequestToken
             }
         };
-        viewModel.Realm = Options.UseRealm ? prefix : null;
+        viewModel.Realm = Options.RealmEnabled ? prefix : null;
         viewModel.UpdateOneCredential = registrationProgress.UpdateOneCredential;
         return result;
     }

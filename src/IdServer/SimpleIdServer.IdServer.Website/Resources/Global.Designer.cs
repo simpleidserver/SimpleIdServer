@@ -1744,6 +1744,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à DPOP expiration time.
+        /// </summary>
+        public static string DpopLifetime {
+            get {
+                return ResourceManager.GetString("DpopLifetime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the lifetime of a DPoP request in seconds.
+        /// </summary>
+        public static string DpopLifetimeTooltip {
+            get {
+                return ResourceManager.GetString("DpopLifetimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Lifetime of DPoP Nonce.
         /// </summary>
         public static string DpopNonceLifetime {
@@ -3216,6 +3234,42 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string MapUserPropertyToClaim {
             get {
                 return ResourceManager.GetString("MapUserPropertyToClaim", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Maximum size of the binding_message parameter.
+        /// </summary>
+        public static string MaxBindingMessageSize {
+            get {
+                return ResourceManager.GetString("MaxBindingMessageSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the maximum number of characters allowed for the received binding_message parameter.
+        /// </summary>
+        public static string MaxBindingMessageSizeTooltip {
+            get {
+                return ResourceManager.GetString("MaxBindingMessageSizeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Validity of request parameters.
+        /// </summary>
+        public static string MaxRequestParameterLifetimeSeconds {
+            get {
+                return ResourceManager.GetString("MaxRequestParameterLifetimeSeconds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the validity duration of the request parameter in seconds.
+        /// </summary>
+        public static string MaxRequestParameterLifetimeSecondsTooltip {
+            get {
+                return ResourceManager.GetString("MaxRequestParameterLifetimeSecondsTooltip", resourceCulture);
             }
         }
         

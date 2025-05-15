@@ -81,7 +81,7 @@ public class SIDSwaggerMiddleware
 
     private OpenApiPaths Transform(OpenApiPaths paths, string realm)
     {
-        if (!_idOptions.UseRealm) return paths;
+        if (!_idOptions.RealmEnabled) return paths;
         var result = new OpenApiPaths();
         foreach (var path in paths)
         {
@@ -95,7 +95,7 @@ public class SIDSwaggerMiddleware
     private IDictionary<string, OpenApiSecurityScheme> Transform(IDictionary<string, OpenApiSecurityScheme> securitySchemes, string realm)
     {
         var baseUrl = _idOptions.Authority;
-        if (_idOptions.UseRealm) baseUrl = $"{baseUrl}/{realm}";
+        if (_idOptions.RealmEnabled) baseUrl = $"{baseUrl}/{realm}";
         foreach(var kvp in securitySchemes)
         {
             kvp.Value.Flows.AuthorizationCode.AuthorizationUrl = new Uri($"{baseUrl}/authorization");
@@ -109,7 +109,7 @@ public class SIDSwaggerMiddleware
     {
         realm = null;
         var routeTemplate = _options.RouteTemplate.TrimStart('/');
-        if (_idOptions.UseRealm) routeTemplate = "{"+ Constants.Prefix + "}/" + routeTemplate;
+        if (_idOptions.RealmEnabled) routeTemplate = "{"+ Constants.Prefix + "}/" + routeTemplate;
         var requestMatcher = new TemplateMatcher(TemplateParser.Parse(routeTemplate), new RouteValueDictionary());
         documentName = null;
         if (request.Method != "GET") return false;
@@ -118,7 +118,7 @@ public class SIDSwaggerMiddleware
         if (!requestMatcher.TryMatch(request.Path, routeValues) || !routeValues.ContainsKey("documentName")) return false;
 
         documentName = routeValues["documentName"].ToString();
-        if (_idOptions.UseRealm) realm = routeValues[Constants.Prefix].ToString();
+        if (_idOptions.RealmEnabled) realm = routeValues[Constants.Prefix].ToString();
         return true;
     }
 

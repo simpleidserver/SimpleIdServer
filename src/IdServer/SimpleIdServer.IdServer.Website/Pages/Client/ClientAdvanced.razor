@@ -138,6 +138,16 @@
                         <RadzenNumeric Name="UserCookieExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.UserCookieExpirationTimeInSeconds></RadzenNumeric>
                     </div>
                 </div>
+                <!-- Max authorization request lifetime -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.MaxRequestParameterLifetimeSecondsTooltip))" />
+                        <RadzenLabel Text="@Global.MaxRequestParameterLifetimeSeconds" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric @bind-Value=@updateAdvancedClient.MaxRequestParameterLifetimeSeconds Class="w-100" />
+                    </div>
+                </div>
                 <!-- DPoP -->
                 <div class="row mt-1">
                     <div class="col-md-2">
@@ -166,6 +176,26 @@
                     </div>
                     <div class="col">
                         <RadzenNumeric @bind-Value=@updateAdvancedClient.DPOPNonceLifetimeInSeconds Class="w-100" />
+                    </div>
+                </div>
+                <!-- DPoP lifetime in seconds -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.DpopLifetimeTooltip))" />
+                        <RadzenLabel Text="@Global.DpopLifetime" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric @bind-Value=@updateAdvancedClient.DpopLifetimeSeconds Class="w-100" />
+                    </div>
+                </div>
+                <!-- Max binding message size -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.MaxBindingMessageSizeTooltip))" />
+                        <RadzenLabel Text="@Global.MaxBindingMessageSize" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric @bind-Value=@updateAdvancedClient.MaxBindingMessageSize Class="w-100" />
                     </div>
                 </div>
             </RadzenAccordionItem>
@@ -201,6 +231,9 @@
         public int DeviceCodeExpirationInSeconds { get; set; } = 600;
         public int DeviceCodePollingInterval { get; set; } = 5;
         public int PARExpirationTimeInSeconds { get; set; } = 600;
+        public int DpopLifetimeSeconds { get; set; } = 300;
+        public int MaxBindingMessageSize { get; set; } = 150;
+        public int MaxRequestParameterLifetimeSeconds { get; set; } = 300;
     }
 
     UpdateAdvancedClient updateAdvancedClient = new UpdateAdvancedClient();
@@ -257,6 +290,9 @@
         updateAdvancedClient.DeviceCodeExpirationInSeconds = Client.DeviceCodeExpirationInSeconds;
         updateAdvancedClient.DeviceCodePollingInterval = Client.DeviceCodePollingInterval;
         updateAdvancedClient.PARExpirationTimeInSeconds = Client.PARExpirationTimeInSeconds;
+        updateAdvancedClient.MaxRequestParameterLifetimeSeconds = Client.MaxRequestParameterLifetimeSeconds;
+        updateAdvancedClient.MaxBindingMessageSize = Client.MaxBindingMessageSize;
+        updateAdvancedClient.DpopLifetimeSeconds = Client.DpopLifetimeSeconds;
         selectedResponseTypes = Client.ResponseTypes.Where(r => !string.IsNullOrWhiteSpace(r));
     }
 
@@ -279,7 +315,10 @@
             AuthorizationCodeExpirationInSeconds = client.AuthorizationCodeExpirationInSeconds,
             DeviceCodeExpirationInSeconds = client.DeviceCodeExpirationInSeconds,
             DeviceCodePollingInterval = client.DeviceCodePollingInterval,
-            PARExpirationTimeInSeconds = client.PARExpirationTimeInSeconds
+            PARExpirationTimeInSeconds = client.PARExpirationTimeInSeconds,
+            MaxRequestParameterLifetimeSeconds = client.MaxRequestParameterLifetimeSeconds,
+            MaxBindingMessageSize = client.MaxBindingMessageSize,
+            DpopLifetimeSeconds = client.DpopLifetimeSeconds
         });
     }
 

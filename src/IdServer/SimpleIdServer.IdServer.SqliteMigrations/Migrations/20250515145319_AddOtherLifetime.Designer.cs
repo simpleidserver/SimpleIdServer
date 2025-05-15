@@ -2,33 +2,31 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SimpleIdServer.IdServer.Store.EF;
 
 #nullable disable
 
-namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
+namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
 {
     [DbContext(typeof(StoreDbContext))]
-    partial class StoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250515145319_AddOtherLifetime")]
+    partial class AddOtherLifetime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
                     b.Property<string>("ApiResourcesId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ApiResourcesId", "RealmsName");
 
@@ -40,10 +38,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("ApiResourceScope", b =>
                 {
                     b.Property<string>("ApiResourcesId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ScopesId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ApiResourcesId", "ScopesId");
 
@@ -55,10 +53,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("AuthenticationContextClassReferenceRealm", b =>
                 {
                     b.Property<string>("AuthenticationContextClassReferencesId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("AuthenticationContextClassReferencesId", "RealmsName");
 
@@ -70,10 +68,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("AuthenticationSchemeProviderRealm", b =>
                 {
                     b.Property<string>("AuthenticationSchemeProvidersId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("AuthenticationSchemeProvidersId", "RealmsName");
 
@@ -85,10 +83,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("CertificateAuthorityRealm", b =>
                 {
                     b.Property<string>("CertificateAuthoritiesId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("CertificateAuthoritiesId", "RealmsName");
 
@@ -100,10 +98,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("ClientRealm", b =>
                 {
                     b.Property<string>("ClientsId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ClientsId", "RealmsName");
 
@@ -115,10 +113,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("ClientScope", b =>
                 {
                     b.Property<string>("ClientsId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ScopesId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ClientsId", "ScopesId");
 
@@ -130,10 +128,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("ConfigurationDefinitionRecordTranslation", b =>
                 {
                     b.Property<string>("ConfigurationDefinitionRecordId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("TranslationsId")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ConfigurationDefinitionRecordId", "TranslationsId");
 
@@ -145,10 +143,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("ConfigurationDefinitionRecordValueTranslation", b =>
                 {
                     b.Property<string>("ConfigurationDefinitionRecordValueId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("TranslationsId")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ConfigurationDefinitionRecordValueId", "TranslationsId");
 
@@ -160,14 +158,14 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("DataSeeder.DataSeederExecutionHistory", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ExecutionDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -177,10 +175,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("GroupScope", b =>
                 {
                     b.Property<string>("GroupsId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RolesId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("GroupsId", "RolesId");
 
@@ -192,10 +190,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("IdentityProvisioningRealm", b =>
                 {
                     b.Property<string>("IdentityProvisioningLstId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("IdentityProvisioningLstId", "RealmsName");
 
@@ -208,15 +206,13 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("FriendlyName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Xml")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -226,10 +222,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("RealmScope", b =>
                 {
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ScopesId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("RealmsName", "ScopesId");
 
@@ -241,10 +237,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("RealmSerializedFileKey", b =>
                 {
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SerializedFileKeysId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("RealmsName", "SerializedFileKeysId");
 
@@ -256,16 +252,16 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.Configuration.Models.ConfigurationDefinition", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FullQualifiedName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -275,31 +271,31 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.Configuration.Models.ConfigurationDefinitionRecord", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ConfigurationDefinitionId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("DisplayCondition")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsRequired")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -311,13 +307,13 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.Configuration.Models.ConfigurationDefinitionRecordValue", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ConfigurationDefinitionRecordId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -329,10 +325,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.Configuration.Models.ConfigurationKeyPairValueRecord", b =>
                 {
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Name");
 
@@ -342,32 +338,32 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ApiResource", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("Audience")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "aud");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("Source")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Id");
@@ -378,64 +374,64 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuditEvent", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("AuthMethod")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "auth_method");
 
                     b.Property<string>("Claims")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "claims");
 
                     b.Property<string>("ClientId")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "client_id");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<string>("ErrorMessage")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "error_message");
 
                     b.Property<string>("EventName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<bool>("IsError")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_error");
 
                     b.Property<string>("Realm")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "realm");
 
                     b.Property<string>("RedirectUrl")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "redirect_url");
 
                     b.Property<string>("RequestJSON")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "request_json");
 
                     b.Property<string>("Scopes")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "scopes");
 
                     b.Property<string>("UserName")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "username");
 
                     b.HasKey("Id");
@@ -446,32 +442,32 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationContextClassReference", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("AuthenticationWorkflow")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "authentication_workflow");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "display_name");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("RegistrationWorkflowId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Id");
@@ -484,27 +480,27 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProvider", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("AuthSchemeProviderDefinitionName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("DisplayName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -516,27 +512,27 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderDefinition", b =>
                 {
                     b.Property<string>("Name")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<string>("HandlerFullQualifiedName")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "handler_full_qualifiedname");
 
                     b.Property<string>("Image")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "img");
 
                     b.Property<string>("OptionsFullQualifiedName")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "options_full_qualifiedname");
 
                     b.Property<string>("OptionsName")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "options_name");
 
                     b.HasKey("Name");
@@ -547,27 +543,27 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.AuthenticationSchemeProviderMapper", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("IdProviderId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("MapperType")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SourceClaimName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TargetUserAttribute")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TargetUserProperty")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -580,19 +576,17 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Audience")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("AuthorizedScopeId")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Resource")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -605,17 +599,15 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ConsentId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Scope")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "scope");
 
                     b.HasKey("Id");
@@ -630,51 +622,51 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.BCAuthorize", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ClientId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ExpirationDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("Interval")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("LastStatus")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("NextFetchTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NotificationEdp")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NotificationMode")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NotificationToken")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Realm")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("RejectionSentDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Scopes")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SerializedAuthorizationDetails")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -685,24 +677,22 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("BCAuthorizeId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("EndDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Message")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -714,52 +704,52 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.CertificateAuthority", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "end_datetime");
 
                     b.Property<int?>("FindType")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "find_type");
 
                     b.Property<string>("FindValue")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "find_value");
 
                     b.Property<string>("PrivateKey")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "private_key");
 
                     b.Property<string>("PublicKey")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "public_key");
 
                     b.Property<int>("Source")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "start_datetime");
 
                     b.Property<int?>("StoreLocation")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "store_location");
 
                     b.Property<int?>("StoreName")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "store_name");
 
                     b.Property<string>("SubjectName")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "subject_name");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Id");
@@ -770,18 +760,18 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClaimProvider", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("ClaimType")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ConnectionString")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -791,369 +781,369 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Client", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<int>("AccessTokenType")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "access_token_type");
 
                     b.Property<string>("ApplicationType")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "application_type");
 
                     b.Property<int>("AuthReqIdExpirationTimeInSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "auth_reqid_expirationtime");
 
                     b.Property<string>("AuthenticationContextClassReferenceId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("AuthorizationCodeExpirationInSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "authorization_code_expirationtime_seconds");
 
                     b.Property<string>("AuthorizationDataTypes")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "authorization_data_types");
 
                     b.Property<string>("AuthorizationEncryptedResponseAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "authorization_encrypted_response_alg");
 
                     b.Property<string>("AuthorizationEncryptedResponseEnc")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "authorization_encrypted_response_enc");
 
                     b.Property<string>("AuthorizationSignedResponseAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "authorization_signed_response_alg");
 
                     b.Property<string>("BCAuthenticationRequestSigningAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_authentication_request_signing_alg");
 
                     b.Property<string>("BCClientNotificationEndpoint")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_client_notification_endpoint");
 
                     b.Property<int>("BCIntervalSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "bc_interval");
 
                     b.Property<string>("BCTokenDeliveryMode")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_token_delivery_mode");
 
                     b.Property<bool>("BCUserCodeParameter")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_user_code_parameter");
 
                     b.Property<bool>("BackChannelLogoutSessionRequired")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_logout_session_required");
 
                     b.Property<string>("BackChannelLogoutUri")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "backchannel_logout_uri");
 
                     b.Property<double?>("CNonceExpirationTimeInSeconds")
-                        .HasColumnType("double precision");
+                        .HasColumnType("REAL");
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "client_id");
 
                     b.Property<string>("ClientRegistrationTypesSupported")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "client_registration_types_supported");
 
                     b.Property<string>("ClientSecret")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "client_secret");
 
                     b.Property<DateTime?>("ClientSecretExpirationTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "client_secret_expires_at");
 
                     b.Property<int?>("ClientType")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "client_type");
 
                     b.Property<string>("Contacts")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "contacts");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("CredentialOfferEndpoint")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "credential_offer_endpoint");
 
                     b.Property<bool>("DPOPBoundAccessTokens")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_bound_access_tokens");
 
                     b.Property<double>("DPOPNonceLifetimeInSeconds")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_lifetime");
 
                     b.Property<string>("DefaultAcrValues")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "default_acr_values");
 
                     b.Property<double?>("DefaultMaxAge")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasAnnotation("Relational:JsonPropertyName", "default_max_age");
 
                     b.Property<int>("DeviceCodeExpirationInSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "device_code_expirationtime_seconds");
 
                     b.Property<int>("DeviceCodePollingInterval")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "device_code_polling_interval");
 
                     b.Property<int>("DpopLifetimeSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_lifetime_seconds");
 
                     b.Property<DateTime?>("ExpirationDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "expiration_datetime");
 
                     b.Property<bool>("FrontChannelLogoutSessionRequired")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "frontchannel_logout_session_required");
 
                     b.Property<string>("FrontChannelLogoutUri")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "frontchannel_logout_uri");
 
                     b.Property<string>("GrantTypes")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "grant_types");
 
                     b.Property<string>("IdTokenEncryptedResponseAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id_token_encrypted_response_alg");
 
                     b.Property<string>("IdTokenEncryptedResponseEnc")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id_token_encrypted_response_enc");
 
                     b.Property<string>("IdTokenSignedResponseAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id_token_signed_response_alg");
 
                     b.Property<string>("InitiateLoginUri")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "initiate_login_uri");
 
                     b.Property<bool>("IsConsentDisabled")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_consent_disabled");
 
                     b.Property<bool>("IsDPOPNonceRequired")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "dpop_nonce_required");
 
                     b.Property<bool>("IsPublic")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_public");
 
                     b.Property<bool>("IsRedirectUrlCaseSensitive")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_redirect_url_casesensitive");
 
                     b.Property<bool>("IsResourceParameterRequired")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_resource_parameter_required");
 
                     b.Property<bool>("IsSelfIssueEnabled")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_self_issue_enabled");
 
                     b.Property<bool>("IsTokenExchangeEnabled")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_token_exchange_enabled");
 
                     b.Property<bool>("IsTransactionCodeRequired")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("JwksUri")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "jwks_uri");
 
                     b.Property<int>("MaxBindingMessageSize")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "max_binding_message_size");
 
                     b.Property<int>("MaxRequestParameterLifetimeSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "max_request_parameter_lifetime_seconds");
 
                     b.Property<int>("PARExpirationTimeInSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "par_expirationtime_seconds");
 
                     b.Property<string>("PairWiseIdentifierSalt")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PostLogoutRedirectUris")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "post_logout_redirect_uris");
 
                     b.Property<double>("PreAuthCodeExpirationTimeInSeconds")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasAnnotation("Relational:JsonPropertyName", "pre_auth_code_expiration_time");
 
                     b.Property<string>("PreferredTokenProfile")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "preferred_token_profile");
 
                     b.Property<bool>("RedirectToRevokeSessionUI")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "redirect_revoke_session_ui");
 
                     b.Property<string>("RedirectionUrls")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "redirect_uris");
 
                     b.Property<double?>("RefreshTokenExpirationTimeInSeconds")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasAnnotation("Relational:JsonPropertyName", "refresh_token_expiration_time_seconds");
 
                     b.Property<string>("RegistrationAccessToken")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "registration_access_token");
 
                     b.Property<string>("RequestObjectEncryptionAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "request_object_encryption_alg");
 
                     b.Property<string>("RequestObjectEncryptionEnc")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "request_object_encryption_enc");
 
                     b.Property<string>("RequestObjectSigningAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "request_object_signing_alg");
 
                     b.Property<bool>("RequireAuthTime")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "require_auth_time");
 
                     b.Property<string>("ResponseTypes")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "response_types");
 
                     b.Property<string>("SectorIdentifierUri")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "sector_identifier_uri");
 
                     b.Property<string>("SerializedParameters")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SoftwareId")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "software_id");
 
                     b.Property<string>("SoftwareVersion")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "software_version");
 
                     b.Property<string>("Source")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<string>("SubjectSyntaxTypesSupported")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "subject_syntax_types_supported");
 
                     b.Property<string>("SubjectType")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "subject_type");
 
                     b.Property<string>("TlsClientAuthSanDNS")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "tls_client_auth_san_dns");
 
                     b.Property<string>("TlsClientAuthSanEmail")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "tls_client_auth_san_email");
 
                     b.Property<string>("TlsClientAuthSanIP")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "tls_client_auth_san_ip");
 
                     b.Property<string>("TlsClientAuthSanURI")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "tls_client_auth_san_uri");
 
                     b.Property<string>("TlsClientAuthSubjectDN")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "tls_client_auth_subject_dn");
 
                     b.Property<bool>("TlsClientCertificateBoundAccessToken")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "tls_client_certificate_bound_access_token");
 
                     b.Property<string>("TokenEncryptedResponseAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "token_encrypted_response_alg");
 
                     b.Property<string>("TokenEncryptedResponseEnc")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "token_encrypted_response_enc");
 
                     b.Property<string>("TokenEndPointAuthMethod")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "token_endpoint_auth_method");
 
                     b.Property<int?>("TokenExchangeType")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "token_exchange_type");
 
                     b.Property<double?>("TokenExpirationTimeInSeconds")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasAnnotation("Relational:JsonPropertyName", "token_expiration_time_seconds");
 
                     b.Property<string>("TokenSignedResponseAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "token_signed_response_alg");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.Property<double?>("UserCookieExpirationTimeInSeconds")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasAnnotation("Relational:JsonPropertyName", "user_cookie_expirationtime_seconds");
 
                     b.Property<string>("UserInfoEncryptedResponseAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "userinfo_encrypted_response_alg");
 
                     b.Property<string>("UserInfoEncryptedResponseEnc")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "userinfo_encrypted_response_enc");
 
                     b.Property<string>("UserInfoSignedResponseAlg")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "userinfo_signed_response_alg");
 
                     b.HasKey("Id");
@@ -1166,38 +1156,38 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientCertificate", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("CertificateAuthorityId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<DateTime>("EndDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "end_datetime");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("PrivateKey")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "private_key");
 
                     b.Property<string>("PublicKey")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "public_key");
 
                     b.Property<DateTime>("StartDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "start_datetime");
 
                     b.HasKey("Id");
@@ -1213,35 +1203,33 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Alg")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "alg");
 
                     b.Property<string>("ClientId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("KeyType")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "key_type");
 
                     b.Property<string>("Kid")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "kid");
 
                     b.Property<string>("SerializedJsonWebKey")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "serialized_jwk");
 
                     b.Property<string>("Usage")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "usage");
 
                     b.HasKey("Id");
@@ -1256,44 +1244,44 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("Claims")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "claims");
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "client_id");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("Realm")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ScopeId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SerializedAuthorizationDetails")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "status");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1309,43 +1297,43 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.DeviceAuthCode", b =>
                 {
                     b.Property<string>("DeviceCode")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ClientId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ExpirationDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("LastAccessTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("NextAccessDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Scopes")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserCode")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserLogin")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("DeviceCode");
 
@@ -1360,20 +1348,20 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(449)
-                        .HasColumnType("character varying(449)");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset?>("AbsoluteExpiration")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTimeOffset>("ExpiresAtTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<long?>("SlidingExpirationInSeconds")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<byte[]>("Value")
                         .IsRequired()
-                        .HasColumnType("bytea");
+                        .HasColumnType("BLOB");
 
                     b.HasKey("Id");
 
@@ -1383,11 +1371,11 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ExtractedRepresentation", b =>
                 {
                     b.Property<string>("ExternalId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Version")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ExternalId");
 
@@ -1397,29 +1385,29 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ExtractedRepresentationStaging", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("GroupIds")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("IdProvisioningProcessId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RepresentationId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RepresentationVersion")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Values")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1429,11 +1417,11 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GotifySession", b =>
                 {
                     b.Property<string>("ApplicationToken")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ClientToken")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ApplicationToken");
 
@@ -1443,37 +1431,37 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Group", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<string>("FullPath")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "full_path");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("ParentGroupId")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "parent_group_id");
 
                     b.Property<string>("Source")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Id");
@@ -1488,10 +1476,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GroupRealm", b =>
                 {
                     b.Property<string>("GroupsId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("GroupsId", "RealmsName");
 
@@ -1503,10 +1491,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.GroupUser", b =>
                 {
                     b.Property<string>("GroupsId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UsersId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("GroupsId", "UsersId");
 
@@ -1520,26 +1508,26 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioning", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("DefinitionName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsEnabled")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1551,24 +1539,24 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningDefinition", b =>
                 {
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("OptionsFullQualifiedName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("OptionsName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Name");
 
@@ -1579,38 +1567,36 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("CurrentPage")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("ExecutionDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("IdentityProvisioningId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("NbFilteredRepresentations")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("NbGroups")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("NbUsers")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ProcessId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("TotalPages")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -1622,30 +1608,30 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.IdentityProvisioningMappingRule", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("From")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("HasMultipleAttribute")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("IdentityProvisioningDefinitionName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("MapperType")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TargetUserAttribute")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TargetUserProperty")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Usage")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
@@ -1657,15 +1643,15 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Language", b =>
                 {
                     b.Property<string>("Code")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "code");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Code");
@@ -1676,33 +1662,33 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MessageBusErrorMessage", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Exceptions")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ExternalId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("QueueName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("ReceivedDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1712,17 +1698,17 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecution", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("Realm")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1732,30 +1718,30 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.MigrationExecutionHistory", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("EndDatetime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "end_datetime");
 
                     b.Property<string>("Errors")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "errors");
 
                     b.Property<string>("MigrationExecutionId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("NbRecords")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "nb_records");
 
                     b.Property<DateTime>("StartDatetime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "start_datetime");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
                     b.HasKey("Id");
@@ -1770,24 +1756,24 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinition", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("PublicId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("Purpose")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "purpose");
 
                     b.Property<string>("RealmName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1799,18 +1785,18 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionFormat", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Format")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PresentationDefinitionInputDescriptorId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ProofType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1822,22 +1808,22 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptor", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("PresentationDefinitionId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PublicId")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("Purpose")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "purpose");
 
                     b.HasKey("Id");
@@ -1852,18 +1838,18 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.PresentationDefinitionInputDescriptorConstraint", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Filter")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Path")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PresentationDefinitionInputDescriptorId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1875,19 +1861,19 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Realm", b =>
                 {
                     b.Property<string>("Name")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Name");
@@ -1898,10 +1884,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RealmUser", b =>
                 {
                     b.Property<string>("UsersId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RealmsName")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("UsersId", "RealmsName");
 
@@ -1913,10 +1899,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RecurringJobStatus", b =>
                 {
                     b.Property<string>("JobId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDisabled")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("JobId");
 
@@ -1926,29 +1912,29 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.RegistrationWorkflow", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("RealmName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("WorkflowId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -1960,48 +1946,48 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Scope", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<int?>("Action")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "action");
 
                     b.Property<string>("Component")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "component");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("Description")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "description");
 
                     b.Property<bool>("IsExposedInConfigurationEdp")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_exposed");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<int>("Protocol")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "protocol");
 
                     b.Property<string>("Source")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<int>("Type")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "update_datetime");
 
                     b.HasKey("Id");
@@ -2012,52 +1998,52 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ScopeClaimMapper", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<bool>("IncludeInAccessToken")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "include_in_accesstoken");
 
                     b.Property<bool>("IsMultiValued")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_multivalued");
 
                     b.Property<int>("MapperType")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "mapper_type");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("SAMLAttributeName")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "saml_attribute_name");
 
                     b.Property<string>("ScopeId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SourceScimPath")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source_scim_path");
 
                     b.Property<string>("SourceUserAttribute")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source_user_attribute");
 
                     b.Property<string>("SourceUserProperty")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source_user_property");
 
                     b.Property<string>("TargetClaimPath")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "target_claim_path");
 
                     b.Property<int?>("TokenClaimJsonType")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "token_claim_json_type");
 
                     b.HasKey("Id");
@@ -2072,40 +2058,40 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.SerializedFileKey", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Alg")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Enc")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsSymmetric")
-                        .HasColumnType("boolean");
+                        .HasColumnType("INTEGER");
 
                     b.Property<byte[]>("Key")
-                        .HasColumnType("bytea");
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("KeyId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PrivateKeyPem")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PublicKeyPem")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Usage")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2116,46 +2102,44 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("PkID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PkID"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("AccessTokenType")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("AuthorizationCode")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ClientId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Data")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime?>("ExpirationTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("GrantId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Jkt")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("OriginalData")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SessionId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("TokenType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("PkID");
 
@@ -2166,37 +2150,35 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Owner")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Realm")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Requester")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ResourceId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Scopes")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TicketId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2208,7 +2190,7 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAPermissionTicket", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2219,20 +2201,18 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ResourceId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Scopes")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UMAPermissionTicketId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2244,35 +2224,35 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResource", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "_id");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("IconUri")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "icon_uri");
 
                     b.Property<string>("Realm")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Scopes")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "resource_scopes");
 
                     b.Property<string>("Subject")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Type")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2282,18 +2262,18 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UMAResourcePermission", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Scopes")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "scopes");
 
                     b.Property<string>("UMAResourceId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2306,29 +2286,27 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ClaimType")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "claim_type");
 
                     b.Property<string>("FriendlyName")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "friendly_name");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("UMAResourcePermissionId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "value");
 
                     b.HasKey("Id");
@@ -2343,67 +2321,67 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.User", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "createDateTime");
 
                     b.Property<string>("DeviceRegistrationToken")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "device_registration_token");
 
                     b.Property<string>("Email")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "email");
 
                     b.Property<bool>("EmailVerified")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "emailVerified");
 
                     b.Property<string>("EncodedPicture")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Firstname")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "firstname");
 
                     b.Property<string>("IdentityProvisioningId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Lastname")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "lastname");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<int>("NbLoginAttempt")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "nb_login_attempt");
 
                     b.Property<string>("NotificationMode")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "notification_mode");
 
                     b.Property<string>("Source")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "source");
 
                     b.Property<int>("Status")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "status");
 
                     b.Property<DateTime?>("UnblockDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "unblock_datetime");
 
                     b.Property<DateTime>("UpdateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "updateDateTime");
 
                     b.HasKey("Id");
@@ -2416,24 +2394,24 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserClaim", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "name");
 
                     b.Property<string>("Type")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "value");
 
                     b.HasKey("Id");
@@ -2448,45 +2426,45 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserCredential", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<string>("CredentialType")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "type");
 
                     b.Property<int>("HOTPWindow")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "hotp_window");
 
                     b.Property<int>("HashAlg")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "hash_alg");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "active");
 
                     b.Property<int?>("OTPAlg")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "otp_alg");
 
                     b.Property<int>("OTPCounter")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "otp_counter");
 
                     b.Property<int>("TOTPStep")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "totp_step");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "value");
 
                     b.HasKey("Id");
@@ -2501,35 +2479,35 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserDevice", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("DeviceType")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Manufacturer")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Model")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PushToken")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("PushType")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Version")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2544,27 +2522,25 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<string>("Scheme")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "scheme");
 
                     b.Property<string>("Subject")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "sub");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2578,37 +2554,37 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.UserSession", b =>
                 {
                     b.Property<string>("SessionId")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "session_id");
 
                     b.Property<DateTime>("AuthenticationDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "auth_datetime");
 
                     b.Property<DateTime>("ExpirationDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "exp_datetime");
 
                     b.Property<bool>("IsClientsNotified")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_clients_notified");
 
                     b.Property<string>("Realm")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "realm");
 
                     b.Property<string>("SerializedClientIds")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("State")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "state");
 
                     b.Property<string>("UserId")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("SessionId");
 
@@ -2623,22 +2599,20 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("ClientId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Key")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Language")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -2650,24 +2624,24 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.OpenidFederation.Domains.FederationEntity", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "id");
 
                     b.Property<DateTime>("CreateDateTime")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "create_datetime");
 
                     b.Property<bool>("IsSubordinate")
-                        .HasColumnType("boolean")
+                        .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "is_subordinate");
 
                     b.Property<string>("Realm")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "realm");
 
                     b.Property<string>("Sub")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "sub");
 
                     b.HasKey("Id");
@@ -2678,10 +2652,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
             modelBuilder.Entity("TranslationUMAResource", b =>
                 {
                     b.Property<int>("TranslationsId")
-                        .HasColumnType("integer");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("UMAResourceId")
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("TranslationsId", "UMAResourceId");
 

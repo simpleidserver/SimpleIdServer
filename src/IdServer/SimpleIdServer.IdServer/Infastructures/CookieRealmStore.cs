@@ -26,7 +26,7 @@ public class CookieRealmStore : IRealmStore
     {
         get
         {
-            if (!_idServerHostOptions.UseRealm)
+            if (!_idServerHostOptions.RealmEnabled)
             {
                 return null;
             }

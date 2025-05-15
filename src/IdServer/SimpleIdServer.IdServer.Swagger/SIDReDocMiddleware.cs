@@ -92,7 +92,7 @@ public class SIDReDocMiddleware
 
     private string GetRegex()
     {
-        if (_idOptions.UseRealm) return @$"^\/(.)*\/{_options.RoutePrefix}\/?";
+        if (_idOptions.RealmEnabled) return @$"^\/(.)*\/{_options.RoutePrefix}\/?";
         return @$"^\/{_options.RoutePrefix}\/?";
     }
 
@@ -133,7 +133,7 @@ public class SIDReDocMiddleware
 
     private string FormatHeadContent()
     {
-        if (!_idOptions.UseRealm) return _options.HeadContent;
+        if (!_idOptions.RealmEnabled) return _options.HeadContent;
         var strBuilder = new StringBuilder(_options.HeadContent);
         strBuilder.AppendLine($"<script src='../../{_options.RoutePrefix}/redoc.standalone.js'></script>");
         return strBuilder.ToString();

@@ -94,7 +94,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
 
         public IEnumerable<(AuthenticationTicket ticket, string realm)> FetchTicketsFromAllRealm(HttpContext context)
         {
-            var regex = new Regex(_options.UseRealm ? $"{COOKIE_NAME}\\.\\w*\\-\\w*" : $"{COOKIE_NAME}\\-\\w*");
+            var regex = new Regex(_options.RealmEnabled ? $"{COOKIE_NAME}\\.\\w*\\-\\w*" : $"{COOKIE_NAME}\\-\\w*");
             var filteredCookies = context.Request.Cookies.Where(c => regex.IsMatch(c.Key));
             var result = new List<(AuthenticationTicket ticket, string realm)>();
             foreach (var filterCookie in filteredCookies)
@@ -146,7 +146,7 @@ namespace SimpleIdServer.IdServer.UI.Infrastructures
             var url = client.FrontChannelLogoutUri;
             if (client.FrontChannelLogoutSessionRequired)
             {
-                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, request.GetAbsoluteUriWithVirtualPath(), _options.UseRealm);
+                var issuer = HandlerContext.GetIssuer(_realmStore.Realm, request.GetAbsoluteUriWithVirtualPath(), _options.RealmEnabled);
                 url = QueryHelpers.AddQueryString(url, new Dictionary<string, string>
                 {
                     { JwtRegisteredClaimNames.Iss, issuer },

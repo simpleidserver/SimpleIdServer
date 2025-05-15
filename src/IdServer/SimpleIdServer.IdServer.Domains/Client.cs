@@ -566,6 +566,21 @@ namespace SimpleIdServer.IdServer.Domains
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.IsSelfIssueEnabled)]
         public bool IsSelfIssueEnabled { get; set; }
+        [JsonPropertyName(OAuthClientParameters.MaxRequestParameterLifetimeSeconds)]
+        public int MaxRequestParameterLifetimeSeconds
+        {
+            get; set;
+        } = 300;
+        [JsonPropertyName(OAuthClientParameters.MaxBindingMessageSize)]
+        public int MaxBindingMessageSize
+        {
+            get; set;
+        } = 150;
+        [JsonPropertyName(OAuthClientParameters.DpopLifetimeSeconds)]
+        public int DpopLifetimeSeconds
+        {
+            get; set;
+        } = 300;
         [JsonPropertyName(OAuthClientParameters.Parameters)]
         public JsonObject Parameters
         {

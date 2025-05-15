@@ -318,6 +318,9 @@ public class ClientsController : BaseController
             existingClient.DeviceCodeExpirationInSeconds = request.DeviceCodeExpirationInSeconds;
             existingClient.DeviceCodePollingInterval = request.DeviceCodePollingInterval;
             existingClient.PARExpirationTimeInSeconds = request.PARExpirationTimeInSeconds;
+            existingClient.MaxRequestParameterLifetimeSeconds = request.MaxRequestParameterLifetimeSeconds;
+            existingClient.MaxBindingMessageSize = request.MaxBindingMessageSize;
+            existingClient.DpopLifetimeSeconds = request.DpopLifetimeSeconds;
         }
     }
 

@@ -1,12 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Exceptions;
-using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using System;
 using System.Linq;
@@ -24,12 +22,10 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
 
     public class DPOPProofValidator : IDPOPProofValidator
     {
-        private readonly IdServerHostOptions _options;
         private readonly IDistributedCache _distributedCache;
 
-        public DPOPProofValidator(IOptions<IdServerHostOptions> options, IDistributedCache distributedCache)
+        public DPOPProofValidator(IDistributedCache distributedCache)
         {
-            _options = options.Value;
             _distributedCache = distributedCache;
         }
 
@@ -52,7 +48,7 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
             }
 
             var handler = new DPoPHandler();
-            var validationResult = handler.Validate(dpopProof, DefaultTokenSecurityAlgs.AllSigAlgs, context.Request.HttpMethod, $"{context.GetIssuer()}/{Config.DefaultEndpoints.Token}", _options.DpopLifetimeSeconds);
+            var validationResult = handler.Validate(dpopProof, DefaultTokenSecurityAlgs.AllSigAlgs, context.Request.HttpMethod, $"{context.GetIssuer()}/{Config.DefaultEndpoints.Token}", context.Client.DpopLifetimeSeconds);
             if (!validationResult.IsValid) throw new OAuthException(ErrorCodes.INVALID_DPOP_PROOF, validationResult.ErrorMessage);
             await ValidateNonce(context, validationResult.Jwt);
             context.SetDPOPProof(validationResult.Jwt);

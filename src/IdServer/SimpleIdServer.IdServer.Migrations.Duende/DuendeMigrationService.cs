@@ -297,7 +297,6 @@ public class DuendeMigrationService : IMigrationService
         ClientProperty
         UserCodeType
         */
-
         return result;
     }
 

@@ -201,7 +201,7 @@ namespace SimpleIdServer.IdServer.Api.Authorization
 
         protected async Task<UserSession> GetActiveSession(HandlerContext context, CancellationToken cancellationToken)
         {
-            var realm = _options.UseRealm ? context.Realm : null;
+            var realm = _options.RealmEnabled ? context.Realm : null;
             var kvp = context.Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(realm, context.Request.UserSubject));
             if (string.IsNullOrWhiteSpace(kvp.Value)) return null;
             var userSession = await _userSessionRepository.GetById(kvp.Value, context.Realm, cancellationToken);

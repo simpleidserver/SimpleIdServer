@@ -248,7 +248,7 @@ public class BaseAuthenticateController : BaseController
             }
 
             var sub = claims.Single(c => c.Type == ClaimTypes.NameIdentifier).Value;
-            realm = _options.UseRealm ? realm : null;
+            realm = _options.RealmEnabled ? realm : null;
             Response.Cookies.Append(_options.GetSessionCookieName(realm, sub), session.SessionId, cookieOptions);
         }
     }

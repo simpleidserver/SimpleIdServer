@@ -84,7 +84,7 @@ public class SidSwaggerUIMiddleware
     private StaticFileMiddleware GetStaticFileMiddleware(string path)
     {
         string key = $"/{_options.RoutePrefix}";
-        if(_idOptions.UseRealm)
+        if(_idOptions.RealmEnabled)
         {
             var splittedPath = path.TrimStart('/').Split('/');
             if (splittedPath.Length >= 3 && 
@@ -135,7 +135,7 @@ public class SidSwaggerUIMiddleware
 
     private string GetRegex()
     {
-        if (_idOptions.UseRealm) return @$"^\/(.)*\/{_options.RoutePrefix}\/?";
+        if (_idOptions.RealmEnabled) return @$"^\/(.)*\/{_options.RoutePrefix}\/?";
         return @$"^\/{_options.RoutePrefix}\/?";
     }
 
@@ -153,7 +153,7 @@ public class SidSwaggerUIMiddleware
 
     private string FormatHeadContent()
     {
-        if (!_idOptions.UseRealm) return _options.HeadContent;
+        if (!_idOptions.RealmEnabled) return _options.HeadContent;
         var strBuilder = new StringBuilder(_options.HeadContent);
         strBuilder.AppendLine($"<link href='../../{_options.RoutePrefix}/swagger-ui.css' rel='stylesheet' media='screen' type='text/css' />");
         strBuilder.AppendLine($"<script src='../../{_options.RoutePrefix}/swagger-ui-bundle.js'></script>");

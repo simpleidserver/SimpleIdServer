@@ -78,13 +78,13 @@ namespace SimpleIdServer.IdServer.Api.BCAuthorize
         protected string BuildBackChannelConsentUrl(IUrlHelper urlHelper, string realm, string issuer, List<KeyValuePair<string, string>> queries)
         {
             var queryCollection = new QueryBuilder(queries);
-            var returnUrl = $"{HandlerContext.GetIssuer(realm, issuer, _options.UseRealm)}/{Config.DefaultEndpoints.BCCallback}{queryCollection.ToQueryString()}";
+            var returnUrl = $"{HandlerContext.GetIssuer(realm, issuer, _options.RealmEnabled)}/{Config.DefaultEndpoints.BCCallback}{queryCollection.ToQueryString()}";
             return $"{issuer}{urlHelper.Action("Index", "BackChannelConsents", new
             {
                 returnUrl = _dataProtector.Protect(returnUrl)
             })}";
         }
 
-        protected string BuildBackChannelUrl(string realm, string issuer) => $"{HandlerContext.GetIssuer(realm, issuer, _options.UseRealm)}/{Config.DefaultEndpoints.BCCallback}";
+        protected string BuildBackChannelUrl(string realm, string issuer) => $"{HandlerContext.GetIssuer(realm, issuer, _options.RealmEnabled)}/{Config.DefaultEndpoints.BCCallback}";
     }
 }
