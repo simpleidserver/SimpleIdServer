@@ -33,14 +33,6 @@ public class IdServerHostOptions
     /// </summary>
     public int CredOfferExpirationInSeconds { get; set; } = 600;
     /// <summary>
-    /// Device code expiration time in seconds.
-    /// </summary>
-    public int DeviceCodeExpirationInSeconds { get; set; } = 600;
-    /// <summary>
-    /// The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.
-    /// </summary>
-    public int DeviceCodeInterval { get; set; } = 5;
-    /// <summary>
     /// Expiration time of the issuer state.
     /// </summary>
     public int AuthorizationCodeIssuerStateExpirationInSeconds { get; set; } = 600;

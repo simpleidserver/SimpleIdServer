@@ -31,4 +31,8 @@ public class UpdateAdvancedClientSettingsRequest
     public double UserCookieExpirationTimeInSeconds { get; set; }
     [JsonPropertyName(OAuthClientParameters.AuthorizationCodeExpirationInSeconds)]
     public int AuthorizationCodeExpirationInSeconds { get; set; }
+    [JsonPropertyName(OAuthClientParameters.DeviceCodeExpirationInSeconds)]
+    public int DeviceCodeExpirationInSeconds { get; set; }
+    [JsonPropertyName(OAuthClientParameters.DeviceCodePollingInterval)]
+    public int DeviceCodePollingInterval { get; set; }
 }

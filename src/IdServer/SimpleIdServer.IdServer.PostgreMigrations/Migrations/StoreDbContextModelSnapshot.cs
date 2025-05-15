@@ -914,6 +914,14 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("double precision")
                         .HasAnnotation("Relational:JsonPropertyName", "default_max_age");
 
+                    b.Property<int>("DeviceCodeExpirationInSeconds")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "device_code_expirationtime_seconds");
+
+                    b.Property<int>("DeviceCodePollingInterval")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "device_code_polling_interval");
+
                     b.Property<DateTime?>("ExpirationDateTime")
                         .HasColumnType("timestamp with time zone")
                         .HasAnnotation("Relational:JsonPropertyName", "expiration_datetime");

@@ -2139,4 +2139,16 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="AuthCodeExpirationTime" xml:space="preserve">
     <value>Authorization code expiration time</value>
   </data>
+  <data name="DeviceCodeExpirationTime" xml:space="preserve">
+    <value>Device code expiration time</value>
+  </data>
+  <data name="DeviceCodeExpirationTimeTooltip" xml:space="preserve">
+    <value>Set the device code expiration time in seconds; Default value is 30 minutes</value>
+  </data>
+  <data name="DeviceCodePollingInterval" xml:space="preserve">
+    <value>Device code polling interval</value>
+  </data>
+  <data name="DeviceCodePollingIntervalTooltip" xml:space="preserve">
+    <value>Maximum polling interval for the client to use the device code</value>
+  </data>
 </root>

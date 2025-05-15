@@ -234,6 +234,16 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public double? RefreshTokenExpirationTimeInSeconds { get; set; }
+        [JsonPropertyName(OAuthClientParameters.DeviceCodeExpirationInSeconds)]
+        public int DeviceCodeExpirationInSeconds
+        {
+            get; set;
+        } = 600;
+        [JsonPropertyName(OAuthClientParameters.DeviceCodePollingInterval)]
+        public int DeviceCodePollingInterval
+        {
+            get; set;
+        } = 5;
         [JsonPropertyName(OAuthClientParameters.Scope)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Scope

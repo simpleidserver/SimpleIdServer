@@ -1618,6 +1618,42 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Device code expiration time.
+        /// </summary>
+        public static string DeviceCodeExpirationTime {
+            get {
+                return ResourceManager.GetString("DeviceCodeExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the device code expiration time in seconds; Default value is 30 minutes.
+        /// </summary>
+        public static string DeviceCodeExpirationTimeTooltip {
+            get {
+                return ResourceManager.GetString("DeviceCodeExpirationTimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Device code polling interval.
+        /// </summary>
+        public static string DeviceCodePollingInterval {
+            get {
+                return ResourceManager.GetString("DeviceCodePollingInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Maximum polling interval for the client to use the device code.
+        /// </summary>
+        public static string DeviceCodePollingIntervalTooltip {
+            get {
+                return ResourceManager.GetString("DeviceCodePollingIntervalTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à An IoT application or otherwise browserless or input constrained device..
         /// </summary>
         public static string DeviceDescription {

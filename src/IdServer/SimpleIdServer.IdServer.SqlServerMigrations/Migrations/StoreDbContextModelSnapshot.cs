@@ -914,6 +914,14 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("float")
                         .HasAnnotation("Relational:JsonPropertyName", "default_max_age");
 
+                    b.Property<int>("DeviceCodeExpirationInSeconds")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "device_code_expirationtime_seconds");
+
+                    b.Property<int>("DeviceCodePollingInterval")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "device_code_polling_interval");
+
                     b.Property<DateTime?>("ExpirationDateTime")
                         .HasColumnType("datetime2")
                         .HasAnnotation("Relational:JsonPropertyName", "expiration_datetime");

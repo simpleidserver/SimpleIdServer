@@ -315,6 +315,8 @@ public class ClientsController : BaseController
             existingClient.TokenExpirationTimeInSeconds = request.TokenExpirationTimeInSeconds;
             existingClient.UserCookieExpirationTimeInSeconds = request.UserCookieExpirationTimeInSeconds;
             existingClient.AuthorizationCodeExpirationInSeconds = request.AuthorizationCodeExpirationInSeconds;
+            existingClient.DeviceCodeExpirationInSeconds = request.DeviceCodeExpirationInSeconds;
+            existingClient.DeviceCodePollingInterval = request.DeviceCodePollingInterval;
         }
     }
 

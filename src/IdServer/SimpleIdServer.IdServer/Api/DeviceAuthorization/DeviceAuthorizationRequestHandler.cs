@@ -1,10 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.DTOs;
-using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using System;
 using System.Text.Json.Nodes;
@@ -23,18 +21,15 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
         private readonly IDeviceAuthorizationRequestValidator _validator;
         private readonly IDeviceAuthCodeRepository _deviceAuthCodeRepository;
         private readonly ITransactionBuilder _transactionBuilder;
-        private readonly IdServerHostOptions _options;
 
         public DeviceAuthorizationRequestHandler(
             IDeviceAuthorizationRequestValidator validator, 
             IDeviceAuthCodeRepository deviceAuthCodeRepository, 
-            ITransactionBuilder transactionBuilder,
-            IOptions<IdServerHostOptions> options)
+            ITransactionBuilder transactionBuilder)
         {
             _validator = validator;
             _deviceAuthCodeRepository = deviceAuthCodeRepository;
             _transactionBuilder = transactionBuilder;
-            _options = options.Value;
         }
 
         public virtual async Task<JsonObject> Handle(HandlerContext context, CancellationToken cancellationToken)
@@ -45,7 +40,7 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
                 var deviceCode = Guid.NewGuid().ToString();
                 var userCode = GenerateUserCode();
                 var scopes = context.Request.RequestData.GetScopesFromAuthorizationRequest();
-                _deviceAuthCodeRepository.Add(DeviceAuthCode.Create(deviceCode, userCode, context.Client.Id, scopes, _options.DeviceCodeExpirationInSeconds));
+                _deviceAuthCodeRepository.Add(DeviceAuthCode.Create(deviceCode, userCode, context.Client.Id, scopes, context.Client.DeviceCodeExpirationInSeconds));
                 await transaction.Commit(cancellationToken);
                 var verificationUri = $"{context.Request.IssuerName}{context.UrlHelper.Action("Index", "Device")}";
                 var verificationUriComplete = $"{context.Request.IssuerName}{context.UrlHelper.Action("Index", "Device", new { userCode = userCode })}";
@@ -55,8 +50,8 @@ namespace SimpleIdServer.IdServer.Api.DeviceAuthorization
                     { DeviceAuthorizationNames.UserCode, userCode },
                     { DeviceAuthorizationNames.VerificationUri, verificationUri },
                     { DeviceAuthorizationNames.VerificationUriComplete, verificationUriComplete },
-                    { DeviceAuthorizationNames.ExpiresIn, _options.DeviceCodeExpirationInSeconds },
-                    { DeviceAuthorizationNames.Interval, _options.DeviceCodeInterval }
+                    { DeviceAuthorizationNames.ExpiresIn, context.Client.DeviceCodeExpirationInSeconds },
+                    { DeviceAuthorizationNames.Interval, context.Client.DeviceCodePollingInterval }
                 };
             }
         }

@@ -696,7 +696,9 @@ public class ClientEffects
             IsDPOPNonceRequired = act.IsDPoPNonceRequired,
             TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds,
             UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds,
-            AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds
+            AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds,
+            DeviceCodeExpirationInSeconds = act.DeviceCodeExpirationInSeconds,
+            DeviceCodePollingInterval = act.DeviceCodePollingInterval
         };
         var requestMessage = new HttpRequestMessage
         {
@@ -721,7 +723,9 @@ public class ClientEffects
                 IsDPoPRequired = act.IsDPoPRequired,
                 TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds,
                 UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds,
-                AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds
+                AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds,
+                DeviceCodeExpirationInSeconds = act.DeviceCodeExpirationInSeconds,
+                DeviceCodePollingInterval = act.DeviceCodePollingInterval
             });
         }
         catch
@@ -1260,6 +1264,8 @@ public class UpdateAdvancedClientSettingsAction
     public double TokenExpirationTimeInSeconds { get; set; }
     public double UserCookieExpirationTimeInSeconds { get; set; }
     public int AuthorizationCodeExpirationInSeconds { get; set; }
+    public int DeviceCodeExpirationInSeconds { get; set; }
+    public int DeviceCodePollingInterval { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsSuccessAction
@@ -1275,6 +1281,8 @@ public class UpdateAdvancedClientSettingsSuccessAction
     public string? TokenSignedResponseAlg { get; set;  }
     public double UserCookieExpirationTimeInSeconds { get; set; }
     public int AuthorizationCodeExpirationInSeconds { get; set; }
+    public int DeviceCodeExpirationInSeconds { get; set; }
+    public int DeviceCodePollingInterval { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsFailureAction
