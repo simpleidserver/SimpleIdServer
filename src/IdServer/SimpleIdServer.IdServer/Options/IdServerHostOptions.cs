@@ -9,7 +9,6 @@ using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.SubjectTypeBuilders;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Options;
@@ -28,18 +27,6 @@ public class IdServerHostOptions
     /// Client secret expiration time in seconds.
     /// </summary>
     public int? ClientSecretExpirationInSeconds { get; set; } = null;
-    /// <summary>
-    /// Pre Authorization code expiration time in seconds.
-    /// </summary>
-    public int CredOfferExpirationInSeconds { get; set; } = 600;
-    /// <summary>
-    /// Expiration time of the issuer state.
-    /// </summary>
-    public int AuthorizationCodeIssuerStateExpirationInSeconds { get; set; } = 600;
-    /// <summary>
-    /// Trusted parties used to validate the software statement.
-    /// </summary>
-    public List<SoftwareStatementTrustedParty> SoftwareStatementTrustedParties { get; set; } = new List<SoftwareStatementTrustedParty>();
     /// <summary>
     /// Mututal TLS is enabled.
     /// </summary>
@@ -171,21 +158,9 @@ public class IdServerHostOptions
     /// </summary>
     public bool RequiredPushedAuthorizationRequest { get; set; } = false;
     /// <summary>
-    /// Expiration time of a PAR.
-    /// </summary>
-    public double PARExpirationTimeInSeconds { get; set; } = 600;
-    /// <summary>
-    /// Destination folder where representations will be extracted.
-    /// </summary>
-    public string ExtractRepresentationsFolder { get; set; } = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "Extraction");
-    /// <summary>
     /// If the Credential Issuer is not the same than Authorization Server, then the authorization server must be specified.
     /// </summary>
     public string? WalletAuthorizationServer { get; set; } = null;
-    /// <summary>
-    /// Send credential offer by reference using credential_offer_uri parameter.
-    /// </summary>
-    public bool SendCredentialOfferByReference { get; set; } = false;
     /// <summary>
     /// Lifetime of a DPoP in seconds.
     /// </summary>

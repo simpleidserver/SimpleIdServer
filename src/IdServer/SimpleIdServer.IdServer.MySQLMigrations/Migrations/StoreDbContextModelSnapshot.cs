@@ -990,6 +990,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .HasColumnType("longtext")
                         .HasAnnotation("Relational:JsonPropertyName", "jwks_uri");
 
+                    b.Property<int>("PARExpirationTimeInSeconds")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "par_expirationtime_seconds");
+
                     b.Property<string>("PairWiseIdentifierSalt")
                         .HasColumnType("longtext");
 

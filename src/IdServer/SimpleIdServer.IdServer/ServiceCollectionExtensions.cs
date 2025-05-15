@@ -139,6 +139,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IDataSeeder, InitConsoleConfigurationDefDataseeder>();
         services.AddTransient<IDataSeeder, UpdateAuthorizationCodeLifetimeDataSeeder>();
         services.AddTransient<IDataSeeder, UpdateDeviceCodeLitetimeDataSeeder>();
+        services.AddTransient<IDataSeeder, UpdateParLitetimeDataSeeder>();
     }
 
     private static void ConfigureIdentityServer(IServiceCollection services)

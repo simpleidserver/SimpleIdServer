@@ -35,4 +35,6 @@ public class UpdateAdvancedClientSettingsRequest
     public int DeviceCodeExpirationInSeconds { get; set; }
     [JsonPropertyName(OAuthClientParameters.DeviceCodePollingInterval)]
     public int DeviceCodePollingInterval { get; set; }
+    [JsonPropertyName(OAuthClientParameters.PARExpirationTimeInSeconds)]
+    public int PARExpirationTimeInSeconds { get; set; }
 }

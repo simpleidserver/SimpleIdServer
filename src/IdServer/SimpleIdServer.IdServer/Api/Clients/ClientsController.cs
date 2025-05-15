@@ -317,6 +317,7 @@ public class ClientsController : BaseController
             existingClient.AuthorizationCodeExpirationInSeconds = request.AuthorizationCodeExpirationInSeconds;
             existingClient.DeviceCodeExpirationInSeconds = request.DeviceCodeExpirationInSeconds;
             existingClient.DeviceCodePollingInterval = request.DeviceCodePollingInterval;
+            existingClient.PARExpirationTimeInSeconds = request.PARExpirationTimeInSeconds;
         }
     }
 

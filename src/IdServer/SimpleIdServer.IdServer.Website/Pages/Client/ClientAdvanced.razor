@@ -98,6 +98,16 @@
                         <RadzenNumeric Name="DeviceCodePollingInterval" Class="w-100" @bind-Value=@updateAdvancedClient.DeviceCodePollingInterval></RadzenNumeric>
                     </div>
                 </div>
+                <!-- Pushed authorization request expiration time -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.ParExpirationTimeTooltip))" />
+                        <RadzenLabel Text="@Global.ParExpirationTime" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric Name="PARExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.PARExpirationTimeInSeconds></RadzenNumeric>
+                    </div>
+                </div>
                 <!-- Authorization code expiration time -->
                 <div class="row mt-1">
                     <div class="col-md-2">
@@ -190,6 +200,7 @@
         public int AuthorizationCodeExpirationInSeconds { get; set; } = 600;
         public int DeviceCodeExpirationInSeconds { get; set; } = 600;
         public int DeviceCodePollingInterval { get; set; } = 5;
+        public int PARExpirationTimeInSeconds { get; set; } = 600;
     }
 
     UpdateAdvancedClient updateAdvancedClient = new UpdateAdvancedClient();
@@ -245,6 +256,7 @@
         updateAdvancedClient.AuthorizationCodeExpirationInSeconds = Client.AuthorizationCodeExpirationInSeconds;
         updateAdvancedClient.DeviceCodeExpirationInSeconds = Client.DeviceCodeExpirationInSeconds;
         updateAdvancedClient.DeviceCodePollingInterval = Client.DeviceCodePollingInterval;
+        updateAdvancedClient.PARExpirationTimeInSeconds = Client.PARExpirationTimeInSeconds;
         selectedResponseTypes = Client.ResponseTypes.Where(r => !string.IsNullOrWhiteSpace(r));
     }
 
@@ -266,7 +278,8 @@
             UserCookieExpirationTimeInSeconds = client.UserCookieExpirationTimeInSeconds,
             AuthorizationCodeExpirationInSeconds = client.AuthorizationCodeExpirationInSeconds,
             DeviceCodeExpirationInSeconds = client.DeviceCodeExpirationInSeconds,
-            DeviceCodePollingInterval = client.DeviceCodePollingInterval
+            DeviceCodePollingInterval = client.DeviceCodePollingInterval,
+            PARExpirationTimeInSeconds = client.PARExpirationTimeInSeconds
         });
     }
 

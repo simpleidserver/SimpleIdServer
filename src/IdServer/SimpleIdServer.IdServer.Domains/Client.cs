@@ -244,6 +244,11 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get; set;
         } = 5;
+        [JsonPropertyName(OAuthClientParameters.PARExpirationTimeInSeconds)]
+        public int PARExpirationTimeInSeconds
+        {
+            get; set;
+        } = 600;
         [JsonPropertyName(OAuthClientParameters.Scope)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string Scope

@@ -3510,6 +3510,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à PAR expiration time.
+        /// </summary>
+        public static string ParExpirationTime {
+            get {
+                return ResourceManager.GetString("ParExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the PAR duration in seconds; by default, the value is 30 minutes.
+        /// </summary>
+        public static string ParExpirationTimeTooltip {
+            get {
+                return ResourceManager.GetString("ParExpirationTimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Password.
         /// </summary>
         public static string Password {

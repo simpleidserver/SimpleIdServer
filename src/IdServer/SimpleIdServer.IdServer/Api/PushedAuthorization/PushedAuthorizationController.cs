@@ -91,7 +91,7 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
                     var pushedAuthorizationRequestId = $"{Constants.ParFormatKey}:{Guid.NewGuid()}";
                     await _distributedCache.SetAsync(pushedAuthorizationRequestId, Encoding.UTF8.GetBytes(context.Request.RequestData.ToJsonString()), new DistributedCacheEntryOptions
                     {
-                        SlidingExpiration = TimeSpan.FromSeconds(_options.PARExpirationTimeInSeconds)
+                        SlidingExpiration = TimeSpan.FromSeconds(context.Client.PARExpirationTimeInSeconds)
                     }, token);
                     await _busControl.Publish(new PushedAuthorizationRequestSuccessEvent
                     {
@@ -101,10 +101,10 @@ namespace SimpleIdServer.IdServer.Api.PushedAuthorization
                     });
                     await transaction.Commit(token);
                     var jObj = new JsonObject
-                        {
-                            { AuthorizationRequestParameters.RequestUri, pushedAuthorizationRequestId },
-                            { AuthorizationResponseParameters.ExpiresIn, _options.PARExpirationTimeInSeconds }
-                        };
+                    {
+                        { AuthorizationRequestParameters.RequestUri, pushedAuthorizationRequestId },
+                        { AuthorizationResponseParameters.ExpiresIn, context.Client.PARExpirationTimeInSeconds }
+                    };
                     return new ContentResult
                     {
                         ContentType = "application/json",

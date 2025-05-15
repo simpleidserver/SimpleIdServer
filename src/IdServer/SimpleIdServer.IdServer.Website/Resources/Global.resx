@@ -2151,4 +2151,10 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="DeviceCodePollingIntervalTooltip" xml:space="preserve">
     <value>Maximum polling interval for the client to use the device code</value>
   </data>
+  <data name="ParExpirationTime" xml:space="preserve">
+    <value>PAR expiration time</value>
+  </data>
+  <data name="ParExpirationTimeTooltip" xml:space="preserve">
+    <value>Set the PAR duration in seconds; by default, the value is 30 minutes</value>
+  </data>
 </root>

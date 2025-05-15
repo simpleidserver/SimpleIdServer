@@ -266,7 +266,8 @@ public class DuendeMigrationService : IMigrationService
             UpdateDateTime = client.Updated ?? client.Created,
             AuthorizationCodeExpirationInSeconds = client.AuthorizationCodeLifetime,
             DeviceCodeExpirationInSeconds = client.DeviceCodeLifetime,
-            DeviceCodePollingInterval = client.PollingInterval ?? 5
+            DeviceCodePollingInterval = client.PollingInterval ?? 5,
+            PARExpirationTimeInSeconds = client.PushedAuthorizationLifetime ?? 600
         };
         result.ResponseTypes = ResolveResponseTypes(result.ClientType);
         result.TokenEndPointAuthMethod = result.ClientType == ClientTypes.MACHINE || result.ClientType == ClientTypes.WEBSITE ? OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD : null;

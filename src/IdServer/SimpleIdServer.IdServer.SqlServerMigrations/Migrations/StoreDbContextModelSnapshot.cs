@@ -990,6 +990,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "jwks_uri");
 
+                    b.Property<int>("PARExpirationTimeInSeconds")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "par_expirationtime_seconds");
+
                     b.Property<string>("PairWiseIdentifierSalt")
                         .HasColumnType("nvarchar(max)");
 

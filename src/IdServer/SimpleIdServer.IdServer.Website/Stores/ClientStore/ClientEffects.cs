@@ -698,7 +698,8 @@ public class ClientEffects
             UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds,
             AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds,
             DeviceCodeExpirationInSeconds = act.DeviceCodeExpirationInSeconds,
-            DeviceCodePollingInterval = act.DeviceCodePollingInterval
+            DeviceCodePollingInterval = act.DeviceCodePollingInterval,
+            PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds
         };
         var requestMessage = new HttpRequestMessage
         {
@@ -725,7 +726,8 @@ public class ClientEffects
                 UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds,
                 AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds,
                 DeviceCodeExpirationInSeconds = act.DeviceCodeExpirationInSeconds,
-                DeviceCodePollingInterval = act.DeviceCodePollingInterval
+                DeviceCodePollingInterval = act.DeviceCodePollingInterval,
+                PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds
             });
         }
         catch
@@ -1266,6 +1268,7 @@ public class UpdateAdvancedClientSettingsAction
     public int AuthorizationCodeExpirationInSeconds { get; set; }
     public int DeviceCodeExpirationInSeconds { get; set; }
     public int DeviceCodePollingInterval { get; set; }
+    public int PARExpirationTimeInSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsSuccessAction
@@ -1283,6 +1286,7 @@ public class UpdateAdvancedClientSettingsSuccessAction
     public int AuthorizationCodeExpirationInSeconds { get; set; }
     public int DeviceCodeExpirationInSeconds { get; set; }
     public int DeviceCodePollingInterval { get; set; }
+    public int PARExpirationTimeInSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsFailureAction

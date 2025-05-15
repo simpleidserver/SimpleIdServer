@@ -990,6 +990,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "jwks_uri");
 
+                    b.Property<int>("PARExpirationTimeInSeconds")
+                        .HasColumnType("integer")
+                        .HasAnnotation("Relational:JsonPropertyName", "par_expirationtime_seconds");
+
                     b.Property<string>("PairWiseIdentifierSalt")
                         .HasColumnType("text");
 

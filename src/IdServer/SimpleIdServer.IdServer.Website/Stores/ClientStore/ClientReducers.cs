@@ -337,6 +337,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds;
             client.DeviceCodeExpirationInSeconds = act.DeviceCodeExpirationInSeconds;
             client.DeviceCodePollingInterval = act.DeviceCodePollingInterval;
+            client.PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds;
             return state with
             {
                 Client = client
