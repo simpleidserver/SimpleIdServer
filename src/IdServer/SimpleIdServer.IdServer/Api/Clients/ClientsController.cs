@@ -622,7 +622,6 @@ public class ClientsController : BaseController
                 var result = await _clientRepository.GetById(prefix, id, cancellationToken);
                 if (result == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
                 result.TokenEndPointAuthMethod = request.TokenEndpointAuthMethod;
-                result.ClientSecret = request.ClientSecret;
                 result.TlsClientAuthSubjectDN = request.TlsClientAuthSubjectDN;
                 result.TlsClientAuthSanDNS = request.TlsClientAuthSanDNS;
                 result.TlsClientAuthSanEmail = request.TlsClientAuthSanEmail;
@@ -634,7 +633,6 @@ public class ClientsController : BaseController
                 {
                     Realm = prefix,
                     ClientId = id,
-                    ClientSecret = request.ClientSecret,
                     TokenEndpointAuthMethod = request.TokenEndpointAuthMethod,
                     TlsClientAuthSanDNS = request.TlsClientAuthSanDNS,
                     TlsClientAuthSanEmail = request.TlsClientAuthSanEmail,
@@ -651,13 +649,75 @@ public class ClientsController : BaseController
             {
                 Realm = prefix,
                 ClientId = id,
-                ClientSecret = request.ClientSecret,
                 TokenEndpointAuthMethod = request.TokenEndpointAuthMethod,
                 TlsClientAuthSanDNS = request.TlsClientAuthSanDNS,
                 TlsClientAuthSanEmail = request.TlsClientAuthSanEmail,
                 TlsClientAuthSanIp = request.TlsClientAuthSanIp,
                 TlsClientAuthSubjectDN = request.TlsClientAuthSubjectDN
             });
+            return BuildError(ex);
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddSecret(string prefix, string id, [FromBody] AddClientSecretRequest request, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        try
+        {
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null)
+                {
+                    throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                }
+
+                var clientSecret = ClientSecret.Create(request.Value, request.Alg);
+                result.Add(clientSecret);
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                return new OkObjectResult(result.Secrets);
+            }
+        }
+        catch(OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
+            return BuildError(ex);
+        }
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> RemoveSecret(string prefix, string id, string secretId, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        try
+        {
+            using (var transaction = _transactionBuilder.Build())
+            {
+                await CheckAccessToken(prefix, DefaultScopes.Clients.Name);
+                var result = await _clientRepository.GetById(prefix, id, cancellationToken);
+                if (result == null)
+                {
+                    throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClient, id));
+                }
+
+                var existingClientSecret = result.Secrets.SingleOrDefault(s => s.Id == secretId);
+                if(existingClientSecret == null)
+                {
+                    throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownClientSecret, id));
+                }
+
+                result.Secrets.Remove(existingClientSecret);
+                _clientRepository.Update(result);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
+            }
+        }
+        catch (OAuthException ex)
+        {
+            _logger.LogError(ex.ToString());
             return BuildError(ex);
         }
     }

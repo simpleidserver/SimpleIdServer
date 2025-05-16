@@ -6,5 +6,6 @@ namespace SimpleIdServer.IdServer.Authenticate.Validations;
 
 public interface IAlgClientSecretValidator
 {
-    bool IsValid(Client client, string clientSecret);
+    bool IsValid(ClientSecret secret, string clientSecret);
+    HashAlgs Alg { get; }
 }

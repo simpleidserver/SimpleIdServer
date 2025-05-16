@@ -38,8 +38,17 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
             var clientAssertion = authenticateInstruction.ClientAssertion;
             var handler = new JsonWebTokenHandler();
             var token = handler.ReadJsonWebToken(clientAssertion);
-            if (!token.IsEncrypted) throw new OAuthException(errorCode, Global.ClientAssertionIsNotEncrypted);
-            var encryptionSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.ClientSecret));
+            if (!token.IsEncrypted)
+            {
+                throw new OAuthException(errorCode, Global.ClientAssertionIsNotEncrypted);
+            }
+
+            if(client.PlainSecret == null)
+            {
+                throw new OAuthException(errorCode, Global.PlainClientSecretRequired);
+            }
+
+            var encryptionSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.PlainSecret.Value));
             string jws = null;
             try
             {

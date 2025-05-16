@@ -3,6 +3,7 @@
 
 using SimpleIdServer.IdServer.Domains;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SimpleIdServer.IdServer.Authenticate.Validations;
 
@@ -27,9 +28,10 @@ public class ClientSecretValidator : IClientSecretValidator
             return false;
         }
 
-        foreach (var validator in _validators)
+        foreach(var cl in client.Secrets.Where(s => !s.IsExpired))
         {
-            if (validator.IsValid(client, clientSecret))
+            var validator = _validators.Single(v => v.Alg == cl.Alg);
+            if(validator.IsValid(cl, clientSecret))
             {
                 return true;
             }

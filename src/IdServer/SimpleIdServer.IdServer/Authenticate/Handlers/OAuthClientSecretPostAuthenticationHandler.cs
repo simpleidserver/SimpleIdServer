@@ -3,6 +3,7 @@
 using SimpleIdServer.IdServer.Authenticate.Validations;
 using SimpleIdServer.IdServer.Domains;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace SimpleIdServer.IdServer.Authenticate.Handlers
         {
             if (authenticateInstruction == null) throw new ArgumentNullException(nameof(authenticateInstruction));
             if (client == null) throw new ArgumentNullException(nameof(client));
-            if (string.IsNullOrWhiteSpace(client.ClientSecret))
+            if (client.Secrets == null || !client.Secrets.Any())
             {
                 return Task.FromResult(false);
             }

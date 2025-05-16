@@ -24,6 +24,8 @@ namespace SimpleIdServer.IdServer.Domains
     {
         [JsonPropertyName(OAuthClientParameters.Id)]
         public string Id { get; set; }
+        public string ClientSecret { get; set; } = null!;
+        public DateTime? ClientSecretExpirationTime { get; set; }
         [JsonPropertyName(OAuthClientParameters.Source)]
         public string? Source { get; set; }
         [JsonPropertyName(OAuthClientParameters.IsPublic)]
@@ -34,10 +36,10 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.ClientId)]
         public string ClientId { get; set; } = null!;
         /// <summary>
-        /// Client secret.
+        /// Client secrets.
         /// </summary>
-        [JsonPropertyName(OAuthClientParameters.ClientSecret)]
-        public string ClientSecret { get; set; } = null!;
+        [JsonPropertyName(OAuthClientParameters.ClientSecrets)]
+        public List<ClientSecret> Secrets { get; set; } = new List<ClientSecret>();
         /// <summary>
         /// String containing the access token to be used at the client configuration endpoint to perform subsequent operations upon the client registration.
         /// </summary>
@@ -177,12 +179,6 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonPropertyName(OAuthClientParameters.TlsClientAuthSanEmail)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? TlsClientAuthSanEmail { get; set; } = null;
-        /// <summary>
-        /// Client secret expiration time.
-        /// </summary>
-        [JsonPropertyName(OAuthClientParameters.ClientSecretExpiresAt)]
-        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public DateTime? ClientSecretExpirationTime { get; set; }
         /// <summary>
         /// Update date time.
         /// </summary>
@@ -615,6 +611,14 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         public ICollection<DeviceAuthCode> DeviceAuthCodes { get; set; } = new List<DeviceAuthCode>();
 
+        public ClientSecret PlainSecret
+        {
+            get
+            {
+                return Secrets.SingleOrDefault(s => s.Alg == HashAlgs.PLAINTEXT && !s.IsExpired);
+            }
+        }
+
         public double? GetDoubleParameter(string name)
         {
             if (!Parameters.ContainsKey(name)) return null;
@@ -632,6 +636,20 @@ namespace SimpleIdServer.IdServer.Domains
                 KeyType = keyType,
                 Usage = usage
             });
+        }
+
+        public void Add(ClientSecret secret)
+        {
+            if(secret.Alg == HashAlgs.PLAINTEXT)
+            {
+                var otherSecrets = Secrets.Where(s => s.Alg == HashAlgs.PLAINTEXT).ToList();
+                foreach(var otherSecret in otherSecrets)
+                {
+                    otherSecret.IsActive = false;
+                }
+            }
+
+            Secrets.Add(secret);
         }
 
         public string GetStringParameter(string name) => Parameters[name].ToString();

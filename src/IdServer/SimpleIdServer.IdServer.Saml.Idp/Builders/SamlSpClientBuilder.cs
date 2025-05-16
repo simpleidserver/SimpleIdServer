@@ -23,11 +23,14 @@ public class SamlSpClientBuilder
         var client = new Client
         {
             Id = Guid.NewGuid().ToString(),
-            ClientSecret = Guid.NewGuid().ToString(),
             ClientId = clientId,
             ClientType = ClientTypes.SAML,
             CreateDateTime = DateTime.UtcNow,
-            UpdateDateTime = DateTime.UtcNow
+            UpdateDateTime = DateTime.UtcNow,
+            Secrets = new List<ClientSecret>
+            {
+                ClientSecret.Create(Guid.NewGuid().ToString(), HashAlgs.PLAINTEXT)
+            }
         };
         if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
         else client.Realms.Add(realm);

@@ -619,7 +619,6 @@ public class ClientEffects
         var httpClient = await _websiteHttpClientFactory.Build();
         var request = new UpdateClientCredentialsRequest
         {
-            ClientSecret = act.ClientSecret,
             TlsClientAuthSanDNS = act.TlsClientAuthSanDNS,
             TlsClientAuthSanEmail = act.TlsClientAuthSanEmail,
             TlsClientAuthSanIp = act.TlsClientAuthSanIP,
@@ -637,7 +636,6 @@ public class ClientEffects
         {
             AuthMethod = act.AuthMethod,
             ClientId = act.ClientId,
-            ClientSecret = act.ClientSecret,
             TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN,
             TlsClientAuthSanDNS = act.TlsClientAuthSanDNS,
             TlsClientAuthSanEmail = act.TlsClientAuthSanEmail,
@@ -762,7 +760,55 @@ public class ClientEffects
         dispatcher.Dispatch(new UpdateClientRealmsSuccessAction());
     }
 
-    private async Task CreateClient(Domains.Client client, IDispatcher dispatcher, ClientTypes clientType, PemResult pemResult = null, string jsonWebKey = null)
+    [EffectMethod]
+    public async Task Handle(AddClientSecretAction act, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetClientsUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var request = new AddClientSecretRequest
+        {
+            Alg = act.Alg,
+            Value = act.Value
+        };
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/secrets"),
+            Method = HttpMethod.Post,
+            Content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json")
+        };
+        var httpResult = await httpClient.SendAsync(requestMessage);
+        var json = await httpResult.Content.ReadAsStringAsync();
+        var secrets = JsonSerializer.Deserialize<List<ClientSecret>>(json);
+        dispatcher.Dispatch(new AddClientSecretSuccessAction
+        {
+            Secrets = secrets,
+            Id = act.Id
+        });
+    }
+
+    [EffectMethod]
+    public async Task Handle(DeleteClientSecretsAction act, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetClientsUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        foreach(var secretId in act.SecretIds)
+        {
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{act.Id}/secrets/{secretId}"),
+                Method = HttpMethod.Delete
+            };
+            await httpClient.SendAsync(requestMessage);
+        }
+
+        dispatcher.Dispatch(new DeleteClientSecretsSuccessAction
+        {
+            SecretIds = act.SecretIds,
+            Id = act.Id
+        });
+    }
+
+    private async Task CreateClient(Client client, IDispatcher dispatcher, ClientTypes clientType, PemResult pemResult = null, string jsonWebKey = null)
     {
         var baseUrl = await GetClientsUrl();
         var httpClient = await _websiteHttpClientFactory.Build();
@@ -1210,7 +1256,6 @@ public class UpdateClientCredentialsAction
     public string Id { get; set; }
     public string ClientId { get; set; }
     public string AuthMethod { get; set; } = null!;
-    public string? ClientSecret { get; set; } = null;
     public string? TlsClientAuthSubjectDN { get; set; } = null;
     public string? TlsClientAuthSanDNS { get; set; } = null;
     public string? TlsClientAuthSanEmail { get; set; } = null;
@@ -1221,7 +1266,6 @@ public class UpdateClientCredentialsSuccessAction
 {
     public string ClientId { get; set; }
     public string AuthMethod { get; set; } = null!;
-    public string? ClientSecret { get; set; } = null;
     public string? TlsClientAuthSubjectDN { get; set; } = null;
     public string? TlsClientAuthSanDNS { get; set; } = null;
     public string? TlsClientAuthSanEmail { get; set; } = null;
@@ -1328,4 +1372,61 @@ public class UpdateClientRealmsAction
 public class UpdateClientRealmsSuccessAction
 {
 
+}
+
+public class DeleteClientSecretsAction
+{
+    public string Id
+    {
+        get; set;
+    }
+
+    public List<string> SecretIds
+    {
+        get; set;
+    }
+}
+
+public class DeleteClientSecretsSuccessAction
+{
+    public string Id
+    {
+        get; set;
+    }
+
+    public List<string> SecretIds
+    {
+        get; set;
+    }
+}
+
+public class AddClientSecretAction
+{
+    public string Id
+    {
+        get; set;
+    }
+
+    public string Value
+    {
+        get; set;
+    }
+
+    public HashAlgs Alg
+    {
+        get; set;
+    }
+}
+
+public class AddClientSecretSuccessAction
+{
+    public string Id
+    {
+        get; set;
+    }
+
+    public List<ClientSecret> Secrets
+    {
+        get; set;
+    }
 }

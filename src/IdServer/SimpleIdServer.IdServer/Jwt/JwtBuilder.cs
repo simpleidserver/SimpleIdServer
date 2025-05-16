@@ -181,7 +181,12 @@ namespace SimpleIdServer.IdServer.Jwt
                 {
                     try
                     {
-                        var encryptionSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.ClientSecret));
+                        if (client.PlainSecret == null)
+                        {
+                            return ReadJsonWebTokenResult.BuildError(Global.PlainClientSecretRequired);
+                        }
+
+                        var encryptionSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.PlainSecret.Value));
                         jwt = handler.DecryptToken(jsonWebToken, new TokenValidationParameters
                         {
                             ValidateAudience = false,

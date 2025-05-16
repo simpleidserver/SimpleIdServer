@@ -28,12 +28,15 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = clientSecret,
                 ClientType = ClientTypes.CREDENTIALISSUER,
                 RedirectionUrls = redirectUrls,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE },
+                Secrets = new List<ClientSecret>
+                {
+                    ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
+                }
             };
             if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
@@ -55,10 +58,13 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = clientSecret,
                 ClientType = ClientTypes.WALLET,
                 CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
+                UpdateDateTime = DateTime.UtcNow,
+                Secrets = new List<ClientSecret>
+                {
+                    ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
+                }
             };
             if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
@@ -81,10 +87,13 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = clientSecret,
                 ClientType = ClientTypes.MACHINE,
                 CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
+                UpdateDateTime = DateTime.UtcNow,
+                Secrets = new List<ClientSecret>
+                {
+                    ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
+                }
             };
             if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
@@ -107,12 +116,15 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = clientSecret,
                 ClientType = ClientTypes.WEBSITE,
                 RedirectionUrls = redirectUrls,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE },
+                Secrets = new List<ClientSecret>
+                {
+                    ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
+                }
             };
             if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
@@ -169,7 +181,6 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = Guid.NewGuid().ToString(),
                 ClientType = ClientTypes.EXTERNAL,
                 TlsClientAuthSubjectDN = subjectName,
                 TokenEndPointAuthMethod = OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD,
@@ -178,7 +189,11 @@ namespace SimpleIdServer.IdServer.Builders
                 IdTokenSignedResponseAlg = SecurityAlgorithms.EcdsaSha256,
                 BCUserCodeParameter = false,
                 CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
+                UpdateDateTime = DateTime.UtcNow,
+                Secrets = new List<ClientSecret>
+                {
+                    ClientSecret.Create(Guid.NewGuid().ToString(), HashAlgs.PLAINTEXT)
+                }
             };
             if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
@@ -199,12 +214,15 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = clientSecret,
                 ClientType = ClientTypes.DEVICE,
                 TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD,
                 IdTokenSignedResponseAlg = SecurityAlgorithms.EcdsaSha256,
                 CreateDateTime = DateTime.UtcNow,
-                UpdateDateTime = DateTime.UtcNow
+                UpdateDateTime = DateTime.UtcNow,
+                Secrets = new List<ClientSecret>
+                {
+                    ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
+                }
             };
             if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
@@ -226,13 +244,16 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = clientSecret,
                 IsPublic = true,
                 ClientType = ClientTypes.MOBILE,
                 RedirectionUrls = redirectUrls,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
-                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE },
+                Secrets = new List<ClientSecret>
+                {
+                    ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
+                }
             };
             if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);
@@ -254,13 +275,16 @@ namespace SimpleIdServer.IdServer.Builders
             {
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
-                ClientSecret = clientSecret,
                 RedirectionUrls = redirectUrls,
                 ClientType = ClientTypes.SPA,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
                 IsPublic = true,
-                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE }
+                ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE },
+                Secrets = new List<ClientSecret>
+                {
+                    ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
+                }
             };
             if (realm == null) client.Realms.Add(Config.DefaultRealms.Master);
             else client.Realms.Add(realm);

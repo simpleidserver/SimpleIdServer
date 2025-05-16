@@ -2175,4 +2175,10 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="DpopLifetimeTooltip" xml:space="preserve">
     <value>Set the lifetime of a DPoP request in seconds</value>
   </data>
+  <data name="HashAlgorithm" xml:space="preserve">
+    <value>Hash algorithm</value>
+  </data>
+  <data name="ClientSecretAdded" xml:space="preserve">
+    <value>Client secret is added</value>
+  </data>
 </root>

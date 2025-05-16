@@ -2158,6 +2158,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Plain client secret is required.
+        /// </summary>
+        public static string PlainClientSecretRequired {
+            get {
+                return ResourceManager.GetString("PlainClientSecretRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à only one polling device can be registrered.
         /// </summary>
         public static string PollingDeviceAlreadyRegistered {
@@ -2550,6 +2559,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string UnknownClientCa {
             get {
                 return ResourceManager.GetString("UnknownClientCa", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The client secret {0} doesn&apos;t exist.
+        /// </summary>
+        public static string UnknownClientSecret {
+            get {
+                return ResourceManager.GetString("UnknownClientSecret", resourceCulture);
             }
         }
         

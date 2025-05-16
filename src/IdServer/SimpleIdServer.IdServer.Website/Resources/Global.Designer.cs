@@ -1213,6 +1213,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client secret is added.
+        /// </summary>
+        public static string ClientSecretAdded {
+            get {
+                return ResourceManager.GetString("ClientSecretAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The application utilizes the HTTP Basic Authentication scheme..
         /// </summary>
         public static string ClientSecretBasicDescription {
@@ -2406,6 +2415,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Groups {
             get {
                 return ResourceManager.GetString("Groups", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Hash algorithm.
+        /// </summary>
+        public static string HashAlgorithm {
+            get {
+                return ResourceManager.GetString("HashAlgorithm", resourceCulture);
             }
         }
         

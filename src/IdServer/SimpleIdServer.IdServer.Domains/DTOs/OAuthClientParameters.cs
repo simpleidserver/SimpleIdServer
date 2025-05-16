@@ -8,9 +8,8 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string IsPublic = "is_public";
         public const string ClientId = "client_id";
         public const string ClientType = "client_type";
-        public const string ClientSecret = "client_secret";
+        public const string ClientSecrets = "client_secrets";
         public const string ClientIdIssuedAt = "client_id_issued_at";
-        public const string ClientSecretExpiresAt = "client_secret_expires_at";
         public const string RegistrationAccessToken = "registration_access_token";
         public const string GrantTypes = "grant_types";
         public const string RedirectUris = "redirect_uris";

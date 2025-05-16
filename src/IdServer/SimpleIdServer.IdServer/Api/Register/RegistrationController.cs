@@ -126,8 +126,10 @@ namespace SimpleIdServer.IdServer.Api.Register
                     TokenExpirationTimeInSeconds = _options.DefaultTokenExpirationTimeInSeconds,
                     UserCookieExpirationTimeInSeconds = _options.DefaultUserCookieExpirationTimeInSeconds,
                     PreferredTokenProfile = _options.DefaultTokenProfile,
-                    ClientSecret = Guid.NewGuid().ToString(),
-                    ClientSecretExpirationTime = expirationDateTime,
+                    Secrets = new List<ClientSecret>
+                    {
+                        ClientSecret.Create(Guid.NewGuid().ToString(), HashAlgs.PLAINTEXT, expirationDateTime)
+                    },
                     Scopes = await GetScopes(prefix, request.Scope, cancellationToken)
                 };
                 client.Realms.Add(realm);

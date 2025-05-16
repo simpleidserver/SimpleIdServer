@@ -6,8 +6,10 @@ namespace SimpleIdServer.IdServer.Authenticate.Validations;
 
 public class Sha512ClientSecretValidator : IAlgClientSecretValidator
 {
-    public bool IsValid(Client client, string clientSecret)
+    public HashAlgs Alg => HashAlgs.SHA512;
+
+    public bool IsValid(ClientSecret secret, string clientSecret)
     {
-        return new ClientSecret(clientSecret).Sha512() == client.ClientSecret;
+        return secret.Value == ClientSecret.Create(clientSecret, Alg).Value;
     }
 }

@@ -1167,4 +1167,10 @@
   <data name="AuthenticationMethodIsNotWellConfigured" xml:space="preserve">
     <value>The authentication method is not configured correctly.</value>
   </data>
+  <data name="UnknownClientSecret" xml:space="preserve">
+    <value>The client secret {0} doesn't exist</value>
+  </data>
+  <data name="PlainClientSecretRequired" xml:space="preserve">
+    <value>Plain client secret is required</value>
+  </data>
 </root>

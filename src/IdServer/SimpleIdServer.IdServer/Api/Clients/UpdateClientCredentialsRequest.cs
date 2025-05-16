@@ -10,8 +10,6 @@ public class UpdateClientCredentialsRequest
 {
     [JsonPropertyName(OAuthClientParameters.TokenEndpointAuthMethod)]
     public string TokenEndpointAuthMethod { get; set; }
-    [JsonPropertyName(OAuthClientParameters.ClientSecret)]
-    public string ClientSecret { get; set; }
     [JsonPropertyName(OAuthClientParameters.TlsClientAuthSubjectDN)]
     public string TlsClientAuthSubjectDN { get; set; }
     [JsonPropertyName(OAuthClientParameters.TlsClientAuthSanDNS)]

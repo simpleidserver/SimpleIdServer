@@ -261,7 +261,7 @@ public class DuendeMigrationService : IMigrationService
             IsConsentDisabled = !client.RequireConsent,
             Scopes = scopes,
             SerializedJsonWebKeys = ResolveSerializedJsonWebKeys(client),
-            ClientSecret = ResolveClientSecret(client),
+            Secrets = ResolveClientSecrets(client),
             CreateDateTime = client.Created,
             UpdateDateTime = client.Updated ?? client.Created,
             AuthorizationCodeExpirationInSeconds = client.AuthorizationCodeLifetime,
@@ -354,16 +354,17 @@ public class DuendeMigrationService : IMigrationService
         return (int)client.DPoPClockSkew.TotalSeconds;
     }
 
-    private static string ResolveClientSecret(DuendeClient client)
+    private static List<ClientSecret> ResolveClientSecrets(DuendeClient client)
     {
         const string clientSecretType = "SharedSecret";
-        var clientSecret = client.ClientSecrets.FirstOrDefault(s => s.Type == clientSecretType && s.Expiration == null);
-        if (clientSecret == null)
+        var clientSecrets = client.ClientSecrets.Where(s => s.Type == clientSecretType);
+        return clientSecrets.Select(s =>
         {
-            clientSecret = client.ClientSecrets.FirstOrDefault(s => s.Type == clientSecretType && s.Expiration != null && s.Expiration >= DateTime.UtcNow);
-        }
-
-        return clientSecret?.Value ?? Guid.NewGuid().ToString();
+            var result = ClientSecret.Resolve(s.Value);
+            result.ExpirationDateTime = s.Expiration;
+            result.CreateDateTime = s.Created;
+            return result;
+        }).ToList();
     }
 
     private static UserClaim Map(IdentityUserClaim<string> userClaim)

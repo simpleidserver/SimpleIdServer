@@ -230,6 +230,29 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         #region ClientState
 
         [ReducerMethod]
+        public static ClientState ReduceAddClientSecretSuccessAction(ClientState state, AddClientSecretSuccessAction act)
+        {
+            var client = state.Client;
+            client.Secrets = act.Secrets;
+            return state with
+            {
+                Client = client
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientState ReduceDeleteClientSecretsSuccessAction(ClientState state, DeleteClientSecretsSuccessAction act)
+        {
+            var client = state.Client;
+            var secrets = client.Secrets.Where(s => !act.SecretIds.Contains(s.Id));
+            client.Secrets = secrets.ToList();
+            return state with
+            {
+                Client = client
+            };
+        }
+
+        [ReducerMethod]
         public static ClientState ReduceGetClientAction(ClientState state, GetClientAction act) => state with
         {
             IsLoading = true
@@ -303,9 +326,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
         {
             var client = state.Client;
             client.TokenEndPointAuthMethod = act.AuthMethod;
-            if (client.TokenEndPointAuthMethod == OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD || client.TokenEndPointAuthMethod == OAuthClientSecretBasicAuthenticationHandler.AUTH_METHOD)
-                client.ClientSecret = act.ClientSecret;
-            else if (client.TokenEndPointAuthMethod == OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD)
+            if (client.TokenEndPointAuthMethod == OAuthClientTlsClientAuthenticationHandler.AUTH_METHOD)
             {
                 client.TlsClientAuthSubjectDN = act.TlsClientAuthSubjectDN;
                 client.TlsClientAuthSanDNS = act.TlsClientAuthSanDNS;

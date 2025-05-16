@@ -13,7 +13,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         [SugarColumn(IsPrimaryKey = true)]
         public string Id { get; set; }
         public string ClientId { get; set; } = null!;
-        public string ClientSecret { get; set; } = null!;
         [SugarColumn(IsNullable = true)]
         public string? RegistrationAccessToken { get; set; } = null;
         public string GrantTypes { get; set; }
@@ -42,8 +41,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
         public string? TlsClientAuthSanEmail { get; set; } = null;
         [SugarColumn(IsNullable = true)]
         public string? AuthenticationContextClassReferenceId { get; set; } = null;
-        [SugarColumn(IsNullable = true)]
-        public DateTime? ClientSecretExpirationTime { get; set; }
         public DateTime UpdateDateTime { get; set; }
         public DateTime CreateDateTime { get; set; }
         public bool IsTokenExchangeEnabled { get; set; }
@@ -164,8 +161,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 BCTokenDeliveryMode = client.BCTokenDeliveryMode,
                 BCUserCodeParameter = client.BCUserCodeParameter,
                 ClientId = client.ClientId,
-                ClientSecret = client.ClientSecret,
-                ClientSecretExpirationTime = client.ClientSecretExpirationTime,
                 ClientType = client.ClientType,
                 CNonceExpirationTimeInSeconds = client.CNonceExpirationTimeInSeconds,
                 CreateDateTime = client.CreateDateTime,
@@ -282,8 +277,6 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar.Models
                 BCTokenDeliveryMode = BCTokenDeliveryMode,
                 BCUserCodeParameter = BCUserCodeParameter,
                 ClientId = ClientId,
-                ClientSecret = ClientSecret,
-                ClientSecretExpirationTime = ClientSecretExpirationTime,
                 ClientType = ClientType,
                 CNonceExpirationTimeInSeconds = CNonceExpirationTimeInSeconds,
                 CredentialOfferEndpoint = CredentialOfferEndpoint,

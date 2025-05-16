@@ -14,10 +14,13 @@ public static class WsClientBuilder
         {
             Id = Guid.NewGuid().ToString(),
             ClientId = clientId,
-            ClientSecret = Guid.NewGuid().ToString(),
             ClientType = ClientTypes.WSFEDERATION,
             CreateDateTime = DateTime.UtcNow,
-            UpdateDateTime = DateTime.UtcNow
+            UpdateDateTime = DateTime.UtcNow,
+            Secrets = new List<ClientSecret>
+            {
+                ClientSecret.Create(Guid.NewGuid().ToString(), HashAlgs.PLAINTEXT)
+            }
         };
         if (realm == null) client.Realms.Add(SimpleIdServer.IdServer.Config.DefaultRealms.Master);
         else client.Realms.Add(realm);

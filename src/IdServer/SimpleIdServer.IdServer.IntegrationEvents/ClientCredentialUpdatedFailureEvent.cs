@@ -8,7 +8,6 @@ public class ClientCredentialUpdatedFailureEvent : IIntegrationEvent
     public string Realm { get; set; }
     public string ClientId { get; set; }
     public string TokenEndpointAuthMethod { get; set; }
-    public string ClientSecret { get; set; }
     public string TlsClientAuthSubjectDN { get; set; }
     public string TlsClientAuthSanDNS { get; set; }
     public string TlsClientAuthSanEmail { get; set; }

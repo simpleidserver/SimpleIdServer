@@ -166,7 +166,10 @@ public class ClientRegistrationService : IClientRegistrationService
         };
         newClient.Scopes = await _scopeRepository.GetByNames(realm, newClient.Scopes.Select(s => s.Name).ToList(), cancellationToken);
         newClient.ClientType = ClientTypes.FEDERATION;
-        newClient.ClientSecret = Guid.NewGuid().ToString();
+        newClient.Secrets = new List<ClientSecret>
+        {
+            ClientSecret.Create(Guid.NewGuid().ToString(), HashAlgs.PLAINTEXT)
+        };
         newClient.ExpirationDateTime = trustChain.ExpirationDateTime;
         newClient.UpdateDateTime = DateTime.UtcNow;
         newClient.CreateDateTime = DateTime.UtcNow;

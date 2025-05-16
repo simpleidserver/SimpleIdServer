@@ -125,6 +125,7 @@ namespace SimpleIdServer.IdServer.Store.EF
             modelBuilder.ApplyConfiguration(new DistributedCacheConfiguration());
             modelBuilder.ApplyConfiguration(new MigrationExecutionConfiguration());
             modelBuilder.ApplyConfiguration(new MigrationExecutionHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new ClientSecretConfiguration());
         }
     }
 }

@@ -359,8 +359,11 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientTlsClientAuthenticationHandler>();
         services.AddTransient<IOAuthClientAuthenticationHandler, OAuthClientSelfSignedTlsClientAuthenticationHandler>();
         services.AddTransient<IClientSecretValidator, ClientSecretValidator>();
+        services.AddTransient<IAlgClientSecretValidator, Md5ClientSecretValidator>();
         services.AddTransient<IAlgClientSecretValidator, PlainTextClientSecretValidator>();
+        services.AddTransient<IAlgClientSecretValidator, Sha1ClientSecretValidator>();
         services.AddTransient<IAlgClientSecretValidator, Sha256ClientSecretValidator>();
+        services.AddTransient<IAlgClientSecretValidator, Sha384ClientSecretValidator>();
         services.AddTransient<IAlgClientSecretValidator, Sha512ClientSecretValidator>();
         services.AddTransient<IPkceVerifier, PkceVerifier>();
         return services;

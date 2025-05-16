@@ -575,6 +575,13 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("updateClientRealms",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Clients + "/{id}/realms",
             defaults: new { controller = "Clients", action = "UpdateRealms" });
+        webApplication.SidMapControllerRoute("AddClientSecret",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Clients + "/{id}/secrets",
+            defaults: new { controller = "Clients", action = "AddSecret" });
+        webApplication.SidMapControllerRoute("RemoveClientSecret",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Clients + "/{id}/secrets/{secretId}",
+            defaults: new { controller = "Clients", action = "RemoveSecret" });
+
 
         webApplication.SidMapControllerRoute("getActiveTemplate",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Templates + "/active",
