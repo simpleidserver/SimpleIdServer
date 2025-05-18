@@ -1,7 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.IdServer.Domains;
 
@@ -26,42 +28,56 @@ public class ClientSecret
         (HashAlgs.PLAINTEXT, (string pwd) => pwd)
     };
 
+    [JsonPropertyName(ClientSecretNames.Id)]
     public string Id
     {
         get; set;
     }
 
+    [JsonPropertyName(ClientSecretNames.Value)]
     public string Value
     {
         get; set;
     }
 
+    [JsonPropertyName(ClientSecretNames.Alg)]
     public HashAlgs Alg
     {
         get; set;
     }
 
+    [JsonPropertyName(ClientSecretNames.ExpirationDateTime)]
     public DateTime? ExpirationDateTime
     {
         get; set;
     }
 
+    [JsonPropertyName(ClientSecretNames.CreateDateTime)]
     public DateTime CreateDateTime
     {
         get; set;
     }
 
+    [JsonPropertyName(ClientSecretNames.IsActive)]
     public bool IsActive
     {
         get; set;
     } = true;
+
+    public bool IsInactive
+    {
+        get
+        {
+            return !IsActive || IsExpired;
+        }
+    }
 
     public bool IsExpired
     {
         get
         {
             if (ExpirationDateTime.HasValue == false) return false;
-            return ExpirationDateTime.Value < DateTime.UtcNow && IsActive;
+            return ExpirationDateTime.Value < DateTime.UtcNow;
         }
     }
 

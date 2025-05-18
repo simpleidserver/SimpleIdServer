@@ -28,7 +28,7 @@ public class ClientSecretValidator : IClientSecretValidator
             return false;
         }
 
-        foreach(var cl in client.Secrets.Where(s => !s.IsExpired))
+        foreach(var cl in client.Secrets.Where(s => !s.IsInactive))
         {
             var validator = _validators.Single(v => v.Alg == cl.Alg);
             if(validator.IsValid(cl, clientSecret))

@@ -2181,4 +2181,13 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="ClientSecretAdded" xml:space="preserve">
     <value>Client secret is added</value>
   </data>
+  <data name="AddClientSecret" xml:space="preserve">
+    <value>Add secret</value>
+  </data>
+  <data name="ClientSecretsRemoved" xml:space="preserve">
+    <value>Client secrets are removed</value>
+  </data>
+  <data name="ManageClientSecrets" xml:space="preserve">
+    <value>Client secrets</value>
+  </data>
 </root>

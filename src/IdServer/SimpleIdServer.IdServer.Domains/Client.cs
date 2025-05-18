@@ -24,7 +24,9 @@ namespace SimpleIdServer.IdServer.Domains
     {
         [JsonPropertyName(OAuthClientParameters.Id)]
         public string Id { get; set; }
-        public string ClientSecret { get; set; } = null!;
+        [JsonIgnore]
+        public string ClientSecret { get; set; } = "";
+        [JsonIgnore]
         public DateTime? ClientSecretExpirationTime { get; set; }
         [JsonPropertyName(OAuthClientParameters.Source)]
         public string? Source { get; set; }
@@ -615,7 +617,7 @@ namespace SimpleIdServer.IdServer.Domains
         {
             get
             {
-                return Secrets.SingleOrDefault(s => s.Alg == HashAlgs.PLAINTEXT && !s.IsExpired);
+                return Secrets.SingleOrDefault(s => s.Alg == HashAlgs.PLAINTEXT && !s.IsInactive);
             }
         }
 
@@ -738,6 +740,12 @@ namespace SimpleIdServer.IdServer.Domains
         {
             var result = JsonSerializer.SerializeToNode(this).AsObject();
             result.Add(OAuthClientParameters.RegistrationClientUri, $"{baseUrl}/{ClientId}");
+            var plainSecret = Secrets.SingleOrDefault(s => s.Alg == HashAlgs.PLAINTEXT && !s.IsInactive);
+            if(plainSecret != null)
+            {
+                result.Add(OAuthClientParameters.ClientSecret, plainSecret.Value);
+            }
+
             return result;
         }
     }

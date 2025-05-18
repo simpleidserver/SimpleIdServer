@@ -25,6 +25,7 @@ public class ClientRepository : IClientRepository
                 .Include(c => c.SerializedJsonWebKeys)
                 .Include(c => c.Translations)
                 .Include(c => c.Realms)
+                .Include(c => c.Secrets)
                 .SingleOrDefaultAsync(c => c.Id == id && c.Realms.Any(r => r.Name == realm), cancellationToken);
     }
 
@@ -35,6 +36,7 @@ public class ClientRepository : IClientRepository
                 .Include(c => c.SerializedJsonWebKeys)
                 .Include(c => c.Translations)
                 .Include(c => c.Realms)
+                .Include(c => c.Secrets)
                 .SingleOrDefaultAsync(c => c.ClientId == clientId && c.Realms.Any(r => r.Name == realm), cancellationToken);
     }
 
@@ -56,6 +58,7 @@ public class ClientRepository : IClientRepository
                 .Include(c => c.Realms)
                 .Include(c => c.Scopes)
                 .Include(c => c.Translations)
+                .Include(c => c.Secrets)
                 .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm))
                 .ToListAsync(cancellationToken);
     }
@@ -64,6 +67,7 @@ public class ClientRepository : IClientRepository
     {
         return _dbContext.Clients
             .Include(c => c.Realms)
+            .Include(c => c.Secrets)
             .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm) && !string.IsNullOrWhiteSpace(c.BackChannelLogoutUri))
             .ToListAsync();
     }
@@ -72,6 +76,7 @@ public class ClientRepository : IClientRepository
     public Task<List<Client>> GetByClientIdsAndExistingFrontchannelLogoutUri(string realm, List<string> clientIds, CancellationToken cancellationToken)
     {
         return _dbContext.Clients
+            .Include(c => c.Secrets)
             .Where(c => clientIds.Contains(c.ClientId) && c.Realms.Any(r => r.Name == realm) && !string.IsNullOrWhiteSpace(c.FrontChannelLogoutUri))
             .ToListAsync();
     }
@@ -82,6 +87,7 @@ public class ClientRepository : IClientRepository
                 .Include(c => c.Translations)
                 .Include(p => p.Realms)
                 .Include(p => p.Scopes)
+                .Include(c => c.Secrets)
                 .Where(p => p.Realms.Any(r => r.Name == realm))
                 .ToListAsync(cancellationToken);
         return result;
@@ -91,6 +97,7 @@ public class ClientRepository : IClientRepository
     {
         var result = _dbContext.Clients
                 .Include(p => p.Realms)
+                .Include(c => c.Secrets)
                 .Where(p => clientIds.Contains(p.ClientId) && p.Realms.Any(r => r.Name == realm))
                 .ToListAsync(cancellationToken);
         return result;
@@ -102,6 +109,7 @@ public class ClientRepository : IClientRepository
             .Include(c => c.Translations)
             .Include(p => p.Realms)
             .Include(p => p.Scopes)
+            .Include(c => c.Secrets)
             .Where(p => p.Realms.Any(r => r.Name == realm))
             .AsNoTracking();
         if (!string.IsNullOrWhiteSpace(request.Filter))

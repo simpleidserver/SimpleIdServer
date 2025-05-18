@@ -241,6 +241,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Add secret.
+        /// </summary>
+        public static string AddClientSecret {
+            get {
+                return ResourceManager.GetString("AddClientSecret", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Add credential.
         /// </summary>
         public static string AddCredential {
@@ -1263,6 +1272,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string ClientSecretRequired {
             get {
                 return ResourceManager.GetString("ClientSecretRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client secrets are removed.
+        /// </summary>
+        public static string ClientSecretsRemoved {
+            get {
+                return ResourceManager.GetString("ClientSecretsRemoved", resourceCulture);
             }
         }
         
@@ -3153,6 +3171,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string Manage {
             get {
                 return ResourceManager.GetString("Manage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Client secrets.
+        /// </summary>
+        public static string ManageClientSecrets {
+            get {
+                return ResourceManager.GetString("ManageClientSecrets", resourceCulture);
             }
         }
         

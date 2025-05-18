@@ -873,12 +873,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
 
                     b.Property<string>("ClientSecret")
                         .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasAnnotation("Relational:JsonPropertyName", "client_secret");
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime?>("ClientSecretExpirationTime")
-                        .HasColumnType("datetime(6)")
-                        .HasAnnotation("Relational:JsonPropertyName", "client_secret_expires_at");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<int?>("ClientType")
                         .HasColumnType("int")
@@ -1251,6 +1249,45 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.ToTable("ClientJsonWebKey");
 
                     b.HasAnnotation("Relational:JsonPropertyName", "serialized_jwks");
+                });
+
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientSecret", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("varchar(255)")
+                        .HasAnnotation("Relational:JsonPropertyName", "id");
+
+                    b.Property<int>("Alg")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "alg");
+
+                    b.Property<string>("ClientId")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("datetime(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "create_date_time");
+
+                    b.Property<DateTime?>("ExpirationDateTime")
+                        .HasColumnType("datetime(6)")
+                        .HasAnnotation("Relational:JsonPropertyName", "expiration_date_time");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_active");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("longtext")
+                        .HasAnnotation("Relational:JsonPropertyName", "value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClientId");
+
+                    b.ToTable("ClientSecret");
+
+                    b.HasAnnotation("Relational:JsonPropertyName", "client_secrets");
                 });
 
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
@@ -2982,6 +3019,14 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("SimpleIdServer.IdServer.Domains.ClientSecret", b =>
+                {
+                    b.HasOne("SimpleIdServer.IdServer.Domains.Client", null)
+                        .WithMany("Secrets")
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Consent", b =>
                 {
                     b.HasOne("SimpleIdServer.IdServer.Domains.Scope", null)
@@ -3342,6 +3387,8 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
             modelBuilder.Entity("SimpleIdServer.IdServer.Domains.Client", b =>
                 {
                     b.Navigation("DeviceAuthCodes");
+
+                    b.Navigation("Secrets");
 
                     b.Navigation("SerializedJsonWebKeys");
 
