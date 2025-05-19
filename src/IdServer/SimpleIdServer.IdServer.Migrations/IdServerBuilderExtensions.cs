@@ -13,6 +13,8 @@ public static class IdServerBuilderExtensions
     {
         idserverBuilder.Services.AddTransient<IMigrationServiceFactory, MigrationServiceFactory>();
         idserverBuilder.Services.AddTransient<IDataSeeder, AddMigrationsScopeDataSeeder>();
+        idserverBuilder.Services.AddTransient<ILaunchMigrationService, LaunchMigrationService>();
+        idserverBuilder.Services.AddTransient<ILaunchAllMigrationsService, LaunchAllMigrationsService>();
         idserverBuilder.AddRoute("getAllDefsMigrations", Constants.Endpoints.MigDefinitions, new { controller = "Migrations", action = "GetAllDefinitions" });
         idserverBuilder.AddRoute("getAllExecutionsMigrations", Constants.Endpoints.MigExecutions, new { controller = "Migrations", action = "GetAllExecutions" });
         idserverBuilder.AddRoute("launchMigration", Constants.Endpoints.LaunchMigration, new { controller = "Migrations", action = "Launch" });
