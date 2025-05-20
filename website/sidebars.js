@@ -100,6 +100,13 @@ const sidebars = {
             'idserver/hosting/nginx',
             'idserver/hosting/loadbalancing'
           ]
+        },
+        {
+          type: 'category',
+          label: 'Migrations',
+          items: [
+            'idserver/migrations/duende'
+          ]
         }
       ]
     },
