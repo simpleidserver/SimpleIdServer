@@ -105,7 +105,13 @@ public class ClientSecret
             {
                 alg = _mappingAlgToSize.Single(kvp => kvp.Value == size).Key;
             }
-
+            else
+            {
+                if (payload[0] == 0x01)
+                {
+                    alg = HashAlgs.PBKDF2;
+                }
+            }
         }
 
         return new ClientSecret
@@ -146,5 +152,6 @@ public enum HashAlgs
     SHA1 = 2,
     SHA256 = 3,
     SHA384 = 4,
-    SHA512 = 5
+    SHA512 = 5,
+    PBKDF2 = 6
 }

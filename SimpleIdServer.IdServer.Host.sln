@@ -173,6 +173,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Mig
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Migrations", "src\IdServer\SimpleIdServer.IdServer.Migrations\SimpleIdServer.IdServer.Migrations.csproj", "{1C89FFB2-6054-73EC-8DFE-B97CC1C7B55B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Migrations.Openiddict", "src\IdServer\SimpleIdServer.IdServer.Migrations.Openiddict\SimpleIdServer.IdServer.Migrations.Openiddict.csproj", "{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -447,6 +449,10 @@ Global
 		{1C89FFB2-6054-73EC-8DFE-B97CC1C7B55B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C89FFB2-6054-73EC-8DFE-B97CC1C7B55B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C89FFB2-6054-73EC-8DFE-B97CC1C7B55B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -533,6 +539,7 @@ Global
 		{E3ED0DEE-B9BE-4A44-918E-78AF07F8CC13} = {4796A22B-91A9-42AF-87CA-F69392696B0A}
 		{A6C36FE3-F338-477B-E160-360D44D30D43} = {E3ED0DEE-B9BE-4A44-918E-78AF07F8CC13}
 		{1C89FFB2-6054-73EC-8DFE-B97CC1C7B55B} = {E3ED0DEE-B9BE-4A44-918E-78AF07F8CC13}
+		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D} = {E3ED0DEE-B9BE-4A44-918E-78AF07F8CC13}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

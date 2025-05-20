@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Duende.IdentityServer.EntityFramework.DbContexts;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using SimpleIdServer.IdServer.Api.Authorization.ResponseTypes;
@@ -10,7 +9,6 @@ using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Stores;
-using System.IdentityModel.Tokens.Jwt;
 using DPoPTokenExpirationValidationMode = Duende.IdentityServer.Models.DPoPTokenExpirationValidationMode;
 using DuendeAccessTokenType = Duende.IdentityServer.Models.AccessTokenType;
 using DuendeApiResource = Duende.IdentityServer.EntityFramework.Entities.ApiResource;
@@ -19,29 +17,28 @@ using DuendeClient = Duende.IdentityServer.EntityFramework.Entities.Client;
 using DuendeIdentityResource = Duende.IdentityServer.EntityFramework.Entities.IdentityResource;
 namespace SimpleIdServer.IdServer.Migrations.Duende;
 
-public class DuendeMigrationService : IMigrationService
+public class DuendeMigrationService : BaseMicrosoftIdentityMigrationService
 {    
-    public string Name => Constants.Name;
     private readonly ConfigurationDbContext _configurationDbcontext;
-    private readonly ApplicationDbContext _applicationDbcontext;
     private readonly IScopeRepository _scopeRepository;
 
     public DuendeMigrationService(
         ConfigurationDbContext configurationDbcontext,
         ApplicationDbContext applicationDbcontext,
-        IScopeRepository scopeRepository)
+        IScopeRepository scopeRepository) : base(applicationDbcontext)
     {
         _configurationDbcontext = configurationDbcontext;
-        _applicationDbcontext = applicationDbcontext;
         _scopeRepository = scopeRepository;
     }
 
-    public Task<int> NbApiScopes(CancellationToken cancellationToken)
+    public override string Name => Constants.Name;
+
+    public override Task<int> NbApiScopes(CancellationToken cancellationToken)
     {
         return _configurationDbcontext.ApiScopes.CountAsync(cancellationToken);
     }
 
-    public async Task<List<Scope>> ExtractApiScopes(ExtractParameter parameter, CancellationToken cancellationToken)
+    public override async Task<List<Scope>> ExtractApiScopes(ExtractParameter parameter, CancellationToken cancellationToken)
     {
         var scopes = await _configurationDbcontext.ApiScopes
             .Include(c => c.UserClaims)
@@ -51,12 +48,12 @@ public class DuendeMigrationService : IMigrationService
         return scopes.Select(Map).ToList();
     }
 
-    public Task<int> NbIdentityScopes(CancellationToken cancellationToken)
+    public override Task<int> NbIdentityScopes(CancellationToken cancellationToken)
     {
         return _configurationDbcontext.IdentityResources.CountAsync(cancellationToken);
     }
 
-    public async Task<List<Scope>> ExtractIdentityScopes(ExtractParameter parameter, CancellationToken cancellationToken)
+    public override async Task<List<Scope>> ExtractIdentityScopes(ExtractParameter parameter, CancellationToken cancellationToken)
     {
         var scopes = await _configurationDbcontext.IdentityResources
             .Include(c => c.UserClaims)
@@ -66,12 +63,12 @@ public class DuendeMigrationService : IMigrationService
         return scopes.Select(Map).ToList();
     }
 
-    public Task<int> NbApiResources(CancellationToken cancellationToken)
+    public override Task<int> NbApiResources(CancellationToken cancellationToken)
     {
         return _configurationDbcontext.ApiResources.CountAsync(cancellationToken);
     }
 
-    public async Task<List<ApiResource>> ExtractApiResources(ExtractParameter parameter, CancellationToken cancellationToken)
+    public override async Task<List<ApiResource>> ExtractApiResources(ExtractParameter parameter, CancellationToken cancellationToken)
     {
         var apiResources = await _configurationDbcontext.ApiResources
             .Include(c => c.UserClaims)
@@ -88,12 +85,12 @@ public class DuendeMigrationService : IMigrationService
         }).ToList();
     }
 
-    public Task<int> NbClients(CancellationToken cancellationToken)
+    public override Task<int> NbClients(CancellationToken cancellationToken)
     {
         return _configurationDbcontext.Clients.CountAsync(cancellationToken);
     }
 
-    public async Task<List<Client>> ExtractClients(ExtractParameter parameter, CancellationToken cancellationToken)
+    public override async Task<List<Client>> ExtractClients(ExtractParameter parameter, CancellationToken cancellationToken)
     {
         var clients = await _configurationDbcontext.Clients
             .Include(c => c.RedirectUris)
@@ -105,47 +102,14 @@ public class DuendeMigrationService : IMigrationService
             .AsNoTracking()
             .ToListAsync();
         var allScopeNames = clients.SelectMany(c => c.AllowedScopes.Select(s => s.Scope)).Distinct().ToList();
+        allScopeNames.Add(DefaultScopes.OpenIdScope.Name);
         var allScopes = await _scopeRepository.GetByNames(allScopeNames, cancellationToken);
         return clients.Select(c =>
         {
-            var filteredScopes = allScopes.Where(s => c.AllowedScopes.All(cs => cs.Scope == s.Name)).ToList();
+            var clientType = ResolveClientType(c);
+            var filteredScopes = allScopes.Where(s => c.AllowedScopes.All(cs => cs.Scope == s.Name) || (s.Name == DefaultScopes.OpenIdScope.Name && clientType != ClientTypes.MACHINE)).ToList();
             return Map(c, filteredScopes);
         }).ToList();
-    }
-
-    public Task<int> NbGroups(CancellationToken cancellationToken)
-    {
-        return _applicationDbcontext.Roles.CountAsync(cancellationToken);
-    }
-
-    public async Task<List<Group>> ExtractGroups(ExtractParameter parameter, CancellationToken cancellationToken)
-    {
-        var allGroups = await _applicationDbcontext.Roles.Skip(parameter.StartIndex).Take(parameter.Count).ToListAsync(cancellationToken);
-        return allGroups.Select(Map).ToList();
-    }
-
-    public Task<int> NbUsers(CancellationToken cancellationToken)
-    {
-        return _applicationDbcontext.Users.CountAsync(cancellationToken);
-    }
-
-    public async Task<List<User>> ExtractUsers(ExtractParameter parameter, CancellationToken cancellationToken)
-    {
-        var users = await _applicationDbcontext.Users.Skip(parameter.StartIndex).Take(parameter.Count).ToListAsync(cancellationToken);
-        var allUserIds = users.Select(u => u.Id).ToList();
-        var allUserClaims = await _applicationDbcontext.UserClaims.Where(c => allUserIds.Contains(c.UserId)).ToListAsync(cancellationToken);
-        var allUserRoles = await _applicationDbcontext.UserRoles.Where(c => allUserIds.Contains(c.UserId)).ToListAsync(cancellationToken);
-        var allUserRoleIds = allUserRoles.Select(ur => ur.RoleId).Distinct().ToList();
-        var extractedUsers = new List<User>();
-        foreach (var user in users)
-        {
-            var userClaims = allUserClaims.Where(c => c.UserId == user.Id).Select(Map).ToList();
-            var userRoles = allUserRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId).ToList();
-            var extractedUser = Map(user, userClaims, userRoles);
-            extractedUsers.Add(extractedUser);
-        }
-
-        return extractedUsers;
     }
 
     private static Scope Map(DuendeApiScope scope)
@@ -274,29 +238,6 @@ public class DuendeMigrationService : IMigrationService
         result.UpdateClientName(client.ClientName, IdServer.Constants.DefaultLanguage);
         result.UpdateClientUri(client.ClientUri, IdServer.Constants.DefaultLanguage);
         result.UpdateLogoUri(client.LogoUri, IdServer.Constants.DefaultLanguage);
-        /*
-        AllowPlainTextPkce
-        EnableLocalLogin
-        RequireRequestObject
-        AllowedIdentityTokenSigningAlgorithms
-        AccessTokenLifetime
-        AllowOfflineAccess
-        AllowAccessTokensViaBrowser
-        Enabled
-        ProtocolType
-        RequireClientSecret
-        Description
-        AllowRememberConsent
-        AlwaysIncludeUserClaimsInIdToken
-        IdentityProviderRestrictions
-        IncludeJwtId
-        Claims
-        AlwaysSendClientClaims
-        ClientClaimsPrefix
-        ClientCorsOrigin
-        ClientProperty
-        UserCodeType
-        */
         return result;
     }
 
@@ -365,88 +306,6 @@ public class DuendeMigrationService : IMigrationService
             result.CreateDateTime = s.Created;
             return result;
         }).ToList();
-    }
-
-    private static UserClaim Map(IdentityUserClaim<string> userClaim)
-    {
-        return new UserClaim
-        {
-            Id = Guid.NewGuid().ToString(),
-            Name = userClaim.ClaimType,
-            Value = userClaim.ClaimValue,
-            UserId = userClaim.UserId
-        };
-    }
-
-    private static Group Map(IdentityRole identityRole)
-    {
-        return new Group
-        {
-            Id = identityRole.Id,
-            Name = identityRole.Name,
-            Source = Constants.Name,
-            FullPath = identityRole.Name,
-            Description = identityRole.NormalizedName,
-            CreateDateTime = DateTime.UtcNow,
-            UpdateDateTime = DateTime.UtcNow
-        };
-    }
-
-    private static User Map(ApplicationUser applicationUser, List<UserClaim> userClaims, List<string> groupIds)
-    {
-        var result = new User
-        {
-            Id = applicationUser.Id,
-            Source = Constants.Name,
-            Name = applicationUser.UserName,
-            Email = applicationUser.Email,
-            UnblockDateTime = applicationUser.LockoutEnd == null ? null : applicationUser.LockoutEnd.Value.UtcDateTime,
-            NbLoginAttempt = applicationUser.AccessFailedCount,
-            EmailVerified = applicationUser.EmailConfirmed,
-            Credentials = new List<UserCredential>
-            {
-                new UserCredential
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    Value = applicationUser.PasswordHash,
-                    CredentialType = UserCredential.PWD,
-                    IsActive = true,
-                    HashAlg = PasswordHashAlgs.Microsoft
-                }
-            },
-            CreateDateTime = DateTime.UtcNow,
-            UpdateDateTime = DateTime.UtcNow
-        };
-        result.Status = result.IsBlocked() ? UserStatus.BLOCKED : UserStatus.ACTIVATED;
-        var claims = new List<UserClaim>();
-        var filteredClaims = userClaims.Where(c => c.UserId == applicationUser.Id);
-        claims.AddRange(filteredClaims);
-        if (!string.IsNullOrWhiteSpace(applicationUser.PhoneNumber) && !claims.Any(c => c.Type == JwtRegisteredClaimNames.PhoneNumber))
-        {
-            claims.Add(new UserClaim
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = JwtRegisteredClaimNames.PhoneNumber,
-                Value = applicationUser.PhoneNumber
-            });
-        }
-
-        if (!claims.Any(c => c.Type == JwtRegisteredClaimNames.PhoneNumberVerified))
-        {
-            claims.Add(new UserClaim
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = JwtRegisteredClaimNames.PhoneNumberVerified,
-                Value = applicationUser.PhoneNumberConfirmed.ToString().ToLowerInvariant()
-            });
-        }
-
-        result.OAuthUserClaims = claims;
-        result.Groups = groupIds.Select(groupId => new GroupUser
-        {
-            GroupsId = groupId
-        }).ToList();
-        return result;
     }
 
     private static ClientTypes ResolveClientType(DuendeClient client)

@@ -245,6 +245,9 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.IntegrationEvents\SimpleIdServer.IdServer.IntegrationEvents.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.OpenTelemetry\SimpleIdServer.IdServer.OpenTelemetry.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Website.OpenTelemetry\SimpleIdServer.IdServer.Website.OpenTelemetry.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Migrations\SimpleIdServer.IdServer.Migrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Migrations.Duende\SimpleIdServer.IdServer.Migrations.Duende.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\IdServer\SimpleIdServer.IdServer.Migrations.Openiddict\SimpleIdServer.IdServer.Migrations.Openiddict.csproj -c $config --output $result_dir }
 	
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Domains\SimpleIdServer.Scim.Domains.csproj -c $config --output $result_dir }

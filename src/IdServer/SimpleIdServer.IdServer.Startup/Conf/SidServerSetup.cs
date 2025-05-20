@@ -62,6 +62,10 @@ public class SidServerSetup
             {
                 ConfigureDuendeMigration(webApplicationBuilder, a);
             })
+            .AddOpeniddictMigration(a =>
+            {
+                ConfigureOpeniddictMigration(webApplicationBuilder, a);
+            })
             .AddPwdAuthentication(true)
             .AddEmailAuthentication()
             .AddOtpAuthentication()
@@ -154,6 +158,30 @@ public class SidServerSetup
         var section = builder.Configuration.GetSection(nameof(DuendeMigrationOptions));
         var conf = section.Get<DuendeMigrationOptions>();
         switch(conf.Transport)
+        {
+            case StorageTypes.MYSQL:
+                db.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                break;
+            case StorageTypes.POSTGRE:
+                db.UseNpgsql(conf.ConnectionString);
+                break;
+            case StorageTypes.SQLSERVER:
+                db.UseSqlServer(conf.ConnectionString);
+                break;
+            case StorageTypes.SQLITE:
+                db.UseSqlite(conf.ConnectionString);
+                break;
+            case StorageTypes.INMEMORY:
+                db.UseInMemoryDatabase(conf.ConnectionString);
+                break;
+        }
+    }
+
+    private static void ConfigureOpeniddictMigration(WebApplicationBuilder builder, DbContextOptionsBuilder db)
+    {
+        var section = builder.Configuration.GetSection(nameof(OpeniddictMigrationOptions));
+        var conf = section.Get<OpeniddictMigrationOptions>();
+        switch (conf.Transport)
         {
             case StorageTypes.MYSQL:
                 db.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));

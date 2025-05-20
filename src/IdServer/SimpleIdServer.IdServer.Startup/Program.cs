@@ -6,11 +6,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleIdServer.IdServer.Startup;
 using SimpleIdServer.IdServer.Startup.Conf;
-using System;
-
-
-var hashedPwd = "o90IbCACXKUkunXoa18cODcLKnQTbjOo5ihEw9j58+8=";
-var s = Convert.FromBase64String(hashedPwd);
 
 var webApplicationBuilder = WebApplication.CreateBuilder(args);
 webApplicationBuilder.Services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Description>Migration from Openiddct project.</Description>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="6.2.1" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.IdServer.Migrations\SimpleIdServer.IdServer.Migrations.csproj" />
+	</ItemGroup>
+</Project>

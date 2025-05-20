@@ -366,6 +366,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IAlgClientSecretValidator, Sha256ClientSecretValidator>();
         services.AddTransient<IAlgClientSecretValidator, Sha384ClientSecretValidator>();
         services.AddTransient<IAlgClientSecretValidator, Sha512ClientSecretValidator>();
+        services.AddTransient<IAlgClientSecretValidator, PBKDF2ClientSecretValidator>();
         services.AddTransient<IPkceVerifier, PkceVerifier>();
         return services;
     }
