@@ -581,6 +581,9 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("RemoveClientSecret",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Clients + "/{id}/secrets/{secretId}",
             defaults: new { controller = "Clients", action = "RemoveSecret" });
+        webApplication.SidMapControllerRoute("UpdateClientType",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Clients + "/{id}/type",
+            defaults: new { controller = "Clients", action = "UpdateClientType" });
 
 
         webApplication.SidMapControllerRoute("getActiveTemplate",

@@ -10,6 +10,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers.Models;
 using SimpleIdServer.IdServer.Saml.Idp.Extensions;
 using SimpleIdServer.IdServer.Website.Stores.ScopeStore;
+using System.Xml;
 
 namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 {
@@ -104,6 +105,28 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             foreach (var client in clients) client.IsSelected = act.IsSelected;
             return state with
             {
+                Clients = clients
+            };
+        }
+
+        [ReducerMethod]
+        public static SearchClientsState ReduceUpdateClientTypeSuccessAction(SearchClientsState state, UpdateClientTypeSuccessAction act)
+        {
+            if(state.Clients == null)
+            {
+                return state;
+            }
+
+            var clients = state.Clients;
+            var selectedClient = clients.SingleOrDefault(c => c.Value.Id == act.Id);
+            if(selectedClient != null)
+            {
+                selectedClient.Value.ClientType = act.ClientType;
+            }
+
+            return state with
+            {
+                IsLoading = false,
                 Clients = clients
             };
         }
@@ -221,6 +244,18 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
 
         [ReducerMethod]
         public static UpdateClientState ReduceUpdateAdvancedClientSettingsSuccessAction(UpdateClientState state, UpdateAdvancedClientSettingsSuccessAction act) => state with
+        {
+            IsUpdating = false
+        };
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateClientTypeAction(UpdateClientState state, UpdateClientTypeAction act) => state with
+        {
+            IsUpdating = true
+        };
+
+        [ReducerMethod]
+        public static UpdateClientState ReduceUpdateClientTypeSuccessAction(UpdateClientState state, UpdateClientTypeSuccessAction act) => state with
         {
             IsUpdating = false
         };
@@ -365,6 +400,24 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             return state with
             {
                 Client = client
+            };
+        }
+
+        [ReducerMethod]
+        public static ClientState ReduceUpdateClientTypeAction(ClientState state, UpdateClientTypeAction act) => state with
+        {
+            IsLoading = true
+        };
+
+        [ReducerMethod]
+        public static ClientState ReduceUpdateClientTypeSuccessAction(ClientState state, UpdateClientTypeSuccessAction act)
+        {
+            var client = state.Client;
+            client.ClientType = act.ClientType;
+            return state with
+            {
+                Client = client,
+                IsLoading = false
             };
         }
 

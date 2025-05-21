@@ -808,6 +808,28 @@ public class ClientEffects
         });
     }
 
+    [EffectMethod]
+    public async Task Handle(UpdateClientTypeAction act, IDispatcher dispatcher)
+    {
+        var baseUrl = await GetClientsUrl();
+        var httpClient = await _websiteHttpClientFactory.Build();
+        var requestMessage = new HttpRequestMessage
+        {
+            RequestUri = new Uri($"{baseUrl}/{act.Id}/type"),
+            Method = HttpMethod.Put,
+            Content = new StringContent(JsonSerializer.Serialize(new UpdateClientTypeRequest
+            {
+                ClientType = act.ClientType
+            }), Encoding.UTF8, "application/json")
+        };
+        await httpClient.SendAsync(requestMessage);
+        dispatcher.Dispatch(new UpdateClientTypeSuccessAction
+        {
+            ClientType = act.ClientType,
+            Id = act.Id
+        });
+    }
+
     private async Task CreateClient(Client client, IDispatcher dispatcher, ClientTypes clientType, PemResult pemResult = null, string jsonWebKey = null)
     {
         var baseUrl = await GetClientsUrl();
@@ -1426,6 +1448,32 @@ public class AddClientSecretSuccessAction
     }
 
     public List<ClientSecret> Secrets
+    {
+        get; set;
+    }
+}
+
+public class UpdateClientTypeAction
+{
+    public string Id
+    {
+        get; set;
+    }
+
+    public ClientTypes ClientType
+    {
+        get; set;
+    }
+}
+
+public class UpdateClientTypeSuccessAction
+{
+    public string Id
+    {
+        get; set;
+    }
+
+    public ClientTypes ClientType
     {
         get; set;
     }
