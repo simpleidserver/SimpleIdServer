@@ -91,7 +91,7 @@ function Feature({Icon, title, description, full}) {
 
 export default function HomepageFeatures() {
   return (    
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="lg:text-center">
           <h2 className="text-base text-primary-600 font-semibold tracking-wide uppercase">Features</h2>

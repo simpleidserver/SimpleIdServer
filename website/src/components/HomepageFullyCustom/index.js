@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function HomepageFullyCustom() {
   return (    
-    <section class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+    <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">

@@ -105,7 +105,8 @@ const sidebars = {
           type: 'category',
           label: 'Migrations',
           items: [
-            'idserver/migrations/duende'
+            'idserver/migrations/duende',
+            'idserver/migrations/openiddict'
           ]
         }
       ]

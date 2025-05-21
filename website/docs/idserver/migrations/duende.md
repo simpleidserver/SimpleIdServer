@@ -1,6 +1,6 @@
 # Migrating from Duende to SimpleIdServer
 
-If you're currently using Duende IdentityServer version 7, migrating to SimpleIdServer is a smooth and straightforward process.
+If you're currently using [Duende](http://duendesoftware.com/) IdentityServer version 7, migrating to SimpleIdServer is a smooth and straightforward process.
 With the help of our migration tool, you can quickly transition your identity server without hassle.
 
 ## How to Migrate

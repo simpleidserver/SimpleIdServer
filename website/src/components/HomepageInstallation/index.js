@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function HomepageInstallation() {
   return (  
     <section class="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
@@ -13,9 +11,9 @@ export default function HomepageInstallation() {
                 </p>
             </div>
             
-            <div class="installation-carousel">
-                <div class="installation-carousel-inner">
-                    <div class="installation-item active">
+            <div class="carousel installation-carousel">
+                <div class="carousel-inner installation-carousel-inner">
+                    <div class="carousel-item installation-item active" data-index="0">
                         <div class="text-primary-500 mb-4">
                             <i class="fas fa-terminal text-4xl"></i>
                         </div>
@@ -27,7 +25,7 @@ export default function HomepageInstallation() {
                             Install our .NET templates to quickly create any type of SimpleIdServer project with all dependencies pre-configured.
                         </p>
                     </div>
-                    <div class="installation-item">
+                    <div class="carousel-item installation-item">
                         <div class="text-primary-500 mb-4">
                             <i class="fab fa-docker text-4xl"></i>
                         </div>
@@ -39,7 +37,7 @@ export default function HomepageInstallation() {
                             Run SimpleIdServer in containers with our pre-configured Docker setup. Perfect for development and production environments.
                         </p>
                     </div>
-                    <div class="installation-item">
+                    <div class="carousel-item installation-item">
                         <div class="text-primary-500 mb-4">
                             <i class="fas fa-dharmachakra text-4xl"></i>
                         </div>
@@ -51,7 +49,7 @@ export default function HomepageInstallation() {
                             Deploy SimpleIdServer on your Kubernetes cluster with our production-ready manifests for high availability.
                         </p>
                     </div>
-                    <div class="installation-item">
+                    <div class="carousel-item installation-item">
                         <div class="text-primary-500 mb-4">
                             <i class="fas fa-mobile-alt text-4xl"></i>
                         </div>
@@ -64,12 +62,18 @@ export default function HomepageInstallation() {
                             Use our mobile app for secure multi-factor authentication and passwordless login experiences.
                         </p>
                     </div>
-                </div>                
+                </div>     
+                <div class="carousel-control carousel-control-prev">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="carousel-control carousel-control-next">
+                    <i class="fas fa-chevron-right"></i>
+                </div>           
                 <div class="carousel-indicators">
-                    <div class="carousel-indicator active" data-index="0"></div>
-                    <div class="carousel-indicator" data-index="1"></div>
-                    <div class="carousel-indicator" data-index="2"></div>
-                    <div class="carousel-indicator" data-index="3"></div>
+                    <div class="carousel-indicator active" data-slide-to="0"></div>
+                    <div class="carousel-indicator" data-slide-to="1"></div>
+                    <div class="carousel-indicator" data-slide-to="2"></div>
+                    <div class="carousel-indicator" data-slide-to="3"></div>
                 </div>
             </div>
         </div>

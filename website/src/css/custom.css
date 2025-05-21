@@ -48,38 +48,103 @@ article a {
 }
 
 /* Carousel styles */
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff7ed;
+    border-radius: 14px;
+    margin-bottom: 1.5rem;
+    color: #f97316;
+    font-size: 1.8rem;
+    box-shadow: 0 4px 6px rgba(249, 115, 22, 0.1);
+}
+
 .carousel {
     position: relative;
-    width: 100%;
-    height: 400px;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    height: 100%;
 }
 
 .carousel-inner {
-    position: relative;
-    width: 100%;
+    display: flex;
+    transition: transform 0.5s ease;
     height: 100%;
 }
 
 .carousel-item {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    flex: 0 0 100%;
+    padding: 2rem;
+    background-color: white;
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    transition: opacity 0.5s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .carousel-item.active {
     opacity: 1;
 }
 
-.carousel-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+.carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #f97316;
+    z-index: 10;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+}
+
+.carousel-control:hover {
+    background-color: #f97316;
+    color: white;
+}
+
+.carousel-control-prev {
+    left: 20px;
+}
+
+.carousel-control-next {
+    right: 20px;
+}
+
+.carousel-indicators {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.carousel-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: rgba(249, 115, 22, 0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.carousel-indicator.active {
+    background-color: #f97316;
+    transform: scale(1.3);
 }
 
 /* Technical badge*/       
@@ -108,43 +173,21 @@ article a {
     margin: 0 auto;
     overflow: hidden;
     border-radius: 12px;
-    background-color: #1e293b;
+    background-color: #1e293b !important;
     color: white;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.installation-item {
+    background-color: #1e293b !important;
+    justify-content: center;
+    align-items: center;
 }
 
 .installation-carousel-inner {
     position: relative;
     width: 100%;
     height: 350px;
-}
-
-.installation-item {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
-    text-align: center;
-}
-
-.installation-item a {
-    pointer-events: none;
-}
-
-.installation-item.active {
-    opacity: 1;
-}
-
-.installation-item.active a {
-    pointer-events: initial !important;
 }
 
 .command-box {
@@ -165,30 +208,6 @@ article a {
 .command-box i {
     margin-right: 0.5rem;
     color: #94a3b8;
-}
-        
-.carousel-indicators {
-    display: flex;
-    justify-content: center;
-    padding: 1rem 0;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}
-
-.carousel-indicator {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #64748b;
-    margin: 0 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.carousel-indicator.active {
-    background-color: #f97316;
 }
         
 .mobile-link {
@@ -364,6 +383,184 @@ article a {
     color: #6b7280;
     font-size: 0.875rem;
 }
+  
+/* Migration path styles */
+.migration-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 3rem 0;
+}
+
+.migration-sources {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.migration-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.migration-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f3f4f6;
+    margin-bottom: 1rem;
+    border: 3px solid #e5e7eb;
+}
+
+.migration-icon > img {
+    width: 40px;
+}
+
+.migration-icon i {
+    font-size: 2rem;
+    color: #f97316;
+}
+
+.migration-arrow-container {
+    width: 150px;
+    position: relative;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.migration-label {
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+    max-width: 150px;
+}
+
+.migration-destination {
+    background-color: #ffedd5;
+    border-color: #fdba74;
+}
+
+.migration-destination i {
+    color: #ea580c;
+}
+
+/* Animating data particles */
+.data-particle {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: moveRight 3s linear infinite;
+    opacity: 0;
+}
+/* User (circle) particle */
+.data-particle.user {
+    background-color: #f97316;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: white;
+    font-size: 12px;
+}
+
+/* Application (rectangle) particle */
+.data-particle.app {
+    width: 24px;
+    height: 24px;
+    background-color: #3b82f6;
+    border-radius: 3px;
+    color: white;
+    font-size: 12px;
+}
+
+/* Scope (triangle) particle with icon */
+.data-particle.scope {
+    width: 28px;
+    height: 28px;
+    color: white;
+    position: relative;
+}
+.scope-bg {
+    position: absolute;
+    width: 0;
+    height: 0;
+    background-color: transparent;
+    border-left: 14px solid transparent;
+    border-right: 14px solid transparent;
+    border-bottom: 24px solid #10b981;
+    z-index: -1;
+}
+.scope-icon {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10px;
+}
+
+/* Delay each particle */
+.data-particle:nth-child(1) { animation-delay: 0s; }
+.data-particle:nth-child(2) { animation-delay: 0.8s; }
+.data-particle:nth-child(3) { animation-delay: 1.6s; }
+.data-particle:nth-child(4) { animation-delay: 2.4s; }
+.data-particle:nth-child(5) { animation-delay: 3.2s; }
+
+/* Vary vertical position */
+.data-particle:nth-child(1) { top: 30%; }
+.data-particle:nth-child(2) { top: 45%; }
+.data-particle:nth-child(3) { top: 60%; }
+.data-particle:nth-child(4) { top: 35%; }
+.data-particle:nth-child(5) { top: 55%; }
+
+@keyframes moveRight {
+    0% {
+        left: 0;
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        left: 100%;
+        opacity: 0;
+    }
+}
+
+/* Arrow line */
+.arrow-line {
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    background-color: #e5e7eb;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.arrow-head {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 12px solid #9ca3af;
+}
 
 /* Fix the docusaurus style */
 h1 {
@@ -449,4 +646,12 @@ ul, ol {
 .clean-list {
     list-style: none !important;
     padding-left: 0 !important;
+}
+
+.navbar {
+	justify-content: center;
+}
+
+.navbar__inner {
+	max-width: var(--ifm-container-width-xl);
 }
