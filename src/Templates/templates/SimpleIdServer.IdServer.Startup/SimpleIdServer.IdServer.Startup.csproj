@@ -4,56 +4,63 @@
 		<OutputType>Exe</OutputType>
 	</PropertyGroup>
 	<ItemGroup>
-	  <PackageReference Include="SidFormBuilder.MySQLMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="SidFormBuilder.PostgreMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="SidFormBuilder.SqliteMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="SidFormBuilder.SqlServerMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="SidFormBuilder.Tailwindcss" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.Did.Key" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.VerifiablePresentation" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Otp" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Email" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Fido" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Notification.Fcm" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Notification.Gotify" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.PostgreMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Saml.Idp" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.MySQLMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.SqlServerMigrations" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.SqliteMigrations"  Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Store.EF" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Provisioning.LDAP" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Provisioning.SCIM" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.IdServer.Federation" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.Configuration" Version="6.0.*-*" />
-	  <PackageReference Include="SimpleIdServer.Configuration.Redis" Version="6.0.*-*" />
-	  <PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
-	  <PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />
-	  <PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
-	  <PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
-	  <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
-      <PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
-	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
-	  <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.10" />
-	  <PackageReference Include="Pomelo.Extensions.Caching.MySql" Version="2.2.0" />
-	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
-	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
-	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
-	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.10" />
-	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.6" />
-	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="8.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.10" />
-	  <PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.4.0" />
-	  <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
-		<PrivateAssets>all</PrivateAssets>
-		<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-	  </PackageReference>
+		<PackageReference Include="SidFormBuilder.MySQLMigrations" Version="6.0.*-*" />
+		<PackageReference Include="SidFormBuilder.PostgreMigrations" Version="6.0.*-*" />
+		<PackageReference Include="SidFormBuilder.SqliteMigrations" Version="6.0.*-*" />
+		<PackageReference Include="SidFormBuilder.SqlServerMigrations" Version="6.0.*-*" />
+		<PackageReference Include="SidFormBuilder.Tailwindcss" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.Did.Key" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.VerifiablePresentation" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Otp" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Email" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Fido" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Notification.Fcm" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Notification.Gotify" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.PostgreMigrations" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Saml.Idp" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Sms" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.MySQLMigrations" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.SqlServerMigrations" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.SqliteMigrations"  Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Store.EF" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Provisioning.LDAP" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Provisioning.SCIM" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Federation" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.Configuration" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.Configuration.Redis" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.OpenTelemetry" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Migrations.Duende" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Migrations.Openiddict" Version="6.0.*-*" />
+		<PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
+		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />
+		<PackageReference Include="Hangfire.SQLite" Version="1.4.2" />
+		<PackageReference Include="Hangfire.MySqlStorage" Version="2.0.3" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.10" />
+		<PackageReference Include="Pomelo.Extensions.Caching.MySql" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.10" />
+		<PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.6" />
+		<PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.10" />
+		<PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.4.0" />
+		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.0" />
+		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />
+		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.0-beta.1" />
+		<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.11.0-beta.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.10">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Resources\AccountsResource.Designer.cs">

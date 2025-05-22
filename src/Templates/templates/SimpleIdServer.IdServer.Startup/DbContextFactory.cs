@@ -1,4 +1,4 @@
-﻿/*
+﻿
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using SimpleIdServer.IdServer.Store.EF;
@@ -18,4 +18,3 @@ public class DbContextFactory : IDesignTimeDbContextFactory<StoreDbContext>
         return new StoreDbContext(optionsBuilder.Options);
     }
 }
-*/

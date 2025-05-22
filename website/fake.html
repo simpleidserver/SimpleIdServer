@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SimpleIdServer - Feature Carousel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#fff7ed',
+                            100: '#ffedd5',
+                            200: '#fed7aa',
+                            300: '#fdba74',
+                            400: '#fb923c',
+                            500: '#f97316',
+                            600: '#ea580c',
+                            700: '#c2410c',
+                            800: '#9a3412',
+                            900: '#7c2d12',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Carousel styles */
+        .carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            height: 100%;
+        }
+        
+        .carousel-inner {
+            display: flex;
+            transition: transform 0.5s ease;
+            height: 100%;
+        }
+        
+        .carousel-item {
+            flex: 0 0 100%;
+            padding: 2rem;
+            background-color: white;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .carousel-item.active {
+            opacity: 1;
+        }
+        
+        .carousel-control {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #f97316;
+            z-index: 10;
+            transition: all 0.2s ease;
+            font-size: 1.2rem;
+        }
+        
+        .carousel-control:hover {
+            background-color: #f97316;
+            color: white;
+        }
+        
+        .carousel-control-prev {
+            left: 20px;
+        }
+        
+        .carousel-control-next {
+            right: 20px;
+        }
+        
+        .carousel-indicators {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+        
+        .carousel-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: rgba(249, 115, 22, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .carousel-indicator.active {
+            background-color: #f97316;
+            transform: scale(1.3);
+        }
+        
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff7ed;
+            border-radius: 14px;
+            margin-bottom: 1.5rem;
+            color: #f97316;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 6px rgba(249, 115, 22, 0.1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .main-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .branding-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-right: 2rem;
+        }
+        
+        .carousel-column {
+            height: 600px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .branding-column {
+                padding-right: 0;
+                padding-bottom: 2rem;
+                text-align: center;
+            }
+            
+            .carousel-column {
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 main-container">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+            <!-- Colonne de gauche : Branding -->
+            <div class="md:col-span-3 branding-column">
+                <div>
+                    <h1 class="text-5xl font-bold text-gray-900 mb-6">SimpleIdServer</h1>
+                    <p class="text-2xl text-primary-600 font-medium leading-relaxed">The complete identity solution to secure and simplify your digital ecosystem</p>
+                </div>
+            </div>
+            
+            <!-- Colonne de droite : Carrousel (plus grande) -->
+            <div class="md:col-span-9 carousel-column">
+                <div class="carousel h-full">
+                    <div class="carousel-inner">
+                        <!-- Slide 1: Multi-protocol Identity Server -->
+                        <div class="carousel-item active" data-index="0">
+                            <div class="flex flex-col md:flex-row items-center gap-8 h-full">
+                                <div class="md:w-1/2 animate-fade-in" style="animation-delay: 0.1s">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Multi-protocol Identity Server</h3>
+                                    <p class="text-lg text-gray-600 mb-6">
+                                        SimpleIdServer supports multiple standard authentication and authorization protocols including:
+                                    </p>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">OpenID Connect</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">WS-Federation</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">SAML 2.0</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="md:w-1/2 animate-fade-in" style="animation-delay: 0.3s">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="p-2 bg-white rounded shadow-sm border border-gray-100">
+                                            <img src="/api/placeholder/600/350" alt="Identity Server Protocols" class="rounded" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 2: Customizable Authentication Interface -->
+                        <div class="carousel-item" data-index="1">
+                            <div class="flex flex-col md:flex-row items-center gap-8 h-full">
+                                <div class="md:w-1/2 animate-fade-in" style="animation-delay: 0.1s">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-paint-brush"></i>
+                                    </div>
+                                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Customizable Authentication Interface</h3>
+                                    <p class="text-lg text-gray-600 mb-6">
+                                        Adapt the authentication experience to your brand with our highly customizable interface:
+                                    </p>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Customizable themes and colors</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Adaptable page templates</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Unified user experience</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="md:w-1/2 animate-fade-in" style="animation-delay: 0.3s">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="p-2 bg-white rounded shadow-sm border border-gray-100">
+                                            <img src="/api/placeholder/600/350" alt="Authentication Interface" class="rounded" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 3: Flexible Identity Provisioning -->
+                        <div class="carousel-item" data-index="2">
+                            <div class="flex flex-col md:flex-row items-center gap-8 h-full">
+                                <div class="md:w-1/2 animate-fade-in" style="animation-delay: 0.1s">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-users-cog"></i>
+                                    </div>
+                                    <h3 class="text-3xl font-bold text-gray-900 mb-4">Flexible Identity Provisioning</h3>
+                                    <p class="text-lg text-gray-600 mb-6">
+                                        Efficiently manage your users' identities with our provisioning options:
+                                    </p>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Automatic provisioning via SCIM</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Intuitive administration interface</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Integration with existing HR systems</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="md:w-1/2 animate-fade-in" style="animation-delay: 0.3s">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="p-2 bg-white rounded shadow-sm border border-gray-100">
+                                            <img src="/api/placeholder/600/350" alt="Identity Provisioning" class="rounded" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Slide 4: EBSI-compatible Digital Wallet -->
+                        <div class="carousel-item" data-index="3">
+                            <div class="flex flex-col md:flex-row items-center gap-8 h-full">
+                                <div class="md:w-1/2 animate-fade-in" style="animation-delay: 0.1s">
+                                    <div class="feature-icon">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                    <h3 class="text-3xl font-bold text-gray-900 mb-4">EBSI-compatible Digital Wallet</h3>
+                                    <p class="text-lg text-gray-600 mb-6">
+                                        Embrace decentralized identity with our solution that complies with European standards:
+                                    </p>
+                                    <ul class="space-y-3">
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Compatible with European Blockchain Services Infrastructure</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Verifiable Credentials management</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <span class="bg-primary-100 text-primary-600 rounded-full p-1.5 mr-3">
+                                                <i class="fas fa-check text-sm"></i>
+                                            </span>
+                                            <span class="text-lg">Sovereign identity and data portability</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="md:w-1/2 animate-fade-in" style="animation-delay: 0.3s">
+                                    <div class="bg-gray-50 p-4 rounded-lg">
+                                        <div class="p-2 bg-white rounded shadow-sm border border-gray-100">
+                                            <img src="/api/placeholder/600/350" alt="EBSI Wallet" class="rounded" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Carousel Controls -->
+                    <div class="carousel-control carousel-control-prev">
+                        <i class="fas fa-chevron-left"></i>
+                    </div>
+                    <div class="carousel-control carousel-control-next">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                    
+                    <!-- Carousel Indicators -->
+                    <div class="carousel-indicators">
+                        <div class="carousel-indicator active" data-slide-to="0"></div>
+                        <div class="carousel-indicator" data-slide-to="1"></div>
+                        <div class="carousel-indicator" data-slide-to="2"></div>
+                        <div class="carousel-indicator" data-slide-to="3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const carouselInner = document.querySelector('.carousel-inner');
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            const carouselIndicators = document.querySelectorAll('.carousel-indicator');
+            const prevControl = document.querySelector('.carousel-control-prev');
+            const nextControl = document.querySelector('.carousel-control-next');
+            
+            let currentIndex = 0;
+            const totalItems = carouselItems.length;
+            
+            // Initialize carousel
+            updateCarousel();
+            
+            // Setup automatic sliding
+            let slideInterval = setInterval(nextSlide, 5000);
+            
+            // Event listeners for controls
+            prevControl.addEventListener('click', function() {
+                prevSlide();
+                resetInterval();
+            });
+            
+            nextControl.addEventListener('click', function() {
+                nextSlide();
+                resetInterval();
+            });
+            
+            // Event listeners for indicators
+            carouselIndicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', function() {
+                    currentIndex = index;
+                    updateCarousel();
+                    resetInterval();
+                });
+            });
+            
+            function prevSlide() {
+                currentIndex = (currentIndex - 1 + totalItems) % totalItems;
+                updateCarousel();
+            }
+            
+            function nextSlide() {
+                currentIndex = (currentIndex + 1) % totalItems;
+                updateCarousel();
+            }
+            
+            function updateCarousel() {
+                // Update active carousel item
+                carouselItems.forEach((item, index) => {
+                    if (index === currentIndex) {
+                        item.classList.add('active');
+                    } else {
+                        item.classList.remove('active');
+                    }
+                });
+                
+                // Update carousel inner position
+                carouselInner.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                // Update indicators
+                carouselIndicators.forEach((indicator, index) => {
+                    if (index === currentIndex) {
+                        indicator.classList.add('active');
+                    } else {
+                        indicator.classList.remove('active');
+                    }
+                });
+                
+                // Reset animations
+                const animatedElements = carouselItems[currentIndex].querySelectorAll('.animate-fade-in');
+                animatedElements.forEach(el => {
+                    el.style.opacity = 0;
+                    void el.offsetWidth; // Trigger reflow
+                    el.style.opacity = '';
+                });
+            }
+            
+            function resetInterval() {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 5000);
+            }
+        });
+    </script>
+</body>
+</html>

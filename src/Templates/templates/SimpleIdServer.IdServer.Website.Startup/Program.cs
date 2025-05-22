@@ -1,3 +1,4 @@
+using OpenTelemetry.Trace;
 using SimpleIdServer.IdServer.Website.Startup;
 using SimpleIdServer.IdServer.Website.Startup.Components;
 
@@ -9,9 +10,30 @@ builder.Configuration.AddJsonFile("appsettings.json")
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 var idserverAdminConfiguration = builder.Configuration.Get<IdentityServerAdminConfiguration>();
-var adminBuilder = builder.Services.AddIdserverAdmin(idserverAdminConfiguration.IdserverBaseUrl, o =>
+var adminBuilder = builder.AddIdserverAdmin(idserverAdminConfiguration.IdserverBaseUrl, o =>
 {
     o.ScimUrl = idserverAdminConfiguration.ScimBaseUrl;
+}).EnableOpenTelemetry(c =>
+{
+    if(idserverAdminConfiguration.OpenTelemetryOptions == null)
+    {
+        return;
+    }
+
+    if(idserverAdminConfiguration.OpenTelemetryOptions.EnableConsoleExporter)
+    {
+        c.AddConsoleExporter();
+    }
+
+    if (idserverAdminConfiguration.OpenTelemetryOptions.EnableOtpExported)
+    {
+        c.AddOtlpExporter(o =>
+        {
+            o.Endpoint = new Uri(idserverAdminConfiguration.OpenTelemetryOptions.TracesEndpoint);
+            o.Headers = idserverAdminConfiguration.OpenTelemetryOptions.Headers;
+            o.Protocol = idserverAdminConfiguration.OpenTelemetryOptions.Protocol;
+        });
+    }
 });
 if(!string.IsNullOrWhiteSpace(idserverAdminConfiguration.DataProtectionPath))
 {

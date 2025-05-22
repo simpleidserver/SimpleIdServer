@@ -37,7 +37,8 @@ public class ClientTypeDataSeeder : BaseBeforeDeploymentDataSeeder
 
         try
         {
-            var oldClients = await _dbcontext.Database.SqlQueryRaw<OldClient>("SELECT * FROM Clients").ToListAsync(cancellationToken);
+            string query = GetSelectClientsQuery(_dbcontext);
+            var oldClients = await _dbcontext.Database.SqlQueryRaw<OldClient>(query).ToListAsync(cancellationToken);
             oldClients.ForEach(c =>
             {
                 if (string.IsNullOrWhiteSpace(c.ClientType))
@@ -60,6 +61,32 @@ public class ClientTypeDataSeeder : BaseBeforeDeploymentDataSeeder
         catch (Exception ex)
         {
             _logger.LogError(ex.ToString());
+        }
+    }
+
+    private static string GetSelectClientsQuery(DbContext dbContext)
+    {
+        var db = dbContext.Database;
+
+        if (db.IsSqlServer())
+        {
+            return "SELECT [Id], [ClientType] FROM [Clients]";
+        }
+        else if (db.IsMySql())
+        {
+            return "SELECT `Id`, `ClientType` FROM `Clients`";
+        }
+        else if (db.IsSqlite())
+        {
+            return "SELECT Id, ClientType FROM Clients";
+        }
+        else if (db.IsNpgsql())
+        {
+            return @"SELECT ""Id"", ""ClientType"" FROM ""Clients""";
+        }
+        else
+        {
+            throw new NotSupportedException("Unsupported database provider.");
         }
     }
 

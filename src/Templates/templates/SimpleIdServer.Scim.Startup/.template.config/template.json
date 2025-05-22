@@ -22,7 +22,7 @@
 	  "type": {
 		  "type": "parameter",
 		  "defaultValue": "SQLSERVER",
-		  "replaces": "SQLSERVER",
+		  "replaces": "STORAGE_TYPE",
 		  "isRequired": false,
 		  "description": "Type of store",
 		  "choices": [

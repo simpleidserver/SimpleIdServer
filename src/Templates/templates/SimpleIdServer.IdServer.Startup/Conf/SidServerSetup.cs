@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Community.Microsoft.Extensions.Caching.PostgreSql;
 using DataSeeder;
+using FormBuilder;
 using Hangfire;
 using Hangfire.MySql;
 using Hangfire.PostgreSql;
@@ -14,6 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NeoSmart.Caching.Sqlite.AspNetCore;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
 using SimpleIdServer.IdServer.Domains;
@@ -26,7 +29,6 @@ using SimpleIdServer.IdServer.TokenTypes;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using FormBuilder;
 using System.Transactions;
 
 namespace SimpleIdServer.IdServer.Startup.Conf;
@@ -35,11 +37,14 @@ public class SidServerSetup
 {
     public static void ConfigureIdServer(WebApplicationBuilder webApplicationBuilder, IdentityServerConfiguration configuration)
     {
+        webApplicationBuilder.Services.AddSingleton(configuration);
         var section = webApplicationBuilder.Configuration.GetSection(nameof(ScimClientOptions));
         var conf = section.Get<ScimClientOptions>();
+        var openTelemetrySection = webApplicationBuilder.Configuration.GetSection(nameof(OpenTelemetryOptions));
+        var openTelemetryOptions = openTelemetrySection.Get<OpenTelemetryOptions>();
         var idServerBuilder = webApplicationBuilder.AddSidIdentityServer(c =>
             {
-                c.ForceHttps = configuration.ForceHttps;
+                c.ForceHttpsEnabled = configuration.ForceHttps;
                 c.Authority = configuration.Authority;
                 c.ScimClientOptions = conf;
                 if (!string.IsNullOrWhiteSpace(configuration.SessionCookieNamePrefix))
@@ -51,6 +56,15 @@ public class SidServerSetup
             .ConfigureFormBuilder(c =>
             {
                 c.AddTailwindcss();
+            })
+            .EnableMigration()
+            .AddDuendeMigration(a =>
+            {
+                ConfigureDuendeMigration(webApplicationBuilder, a);
+            })
+            .AddOpeniddictMigration(a =>
+            {
+                ConfigureOpeniddictMigration(webApplicationBuilder, a);
             })
             .AddPwdAuthentication(true)
             .AddEmailAuthentication()
@@ -91,15 +105,16 @@ public class SidServerSetup
             .EnableMasstransit(o =>
             {
                 o.AddConsumer<IdServerEventsConsumer>();
+                o.ConfigureMigration();
                 ConfigureMessageBroker(webApplicationBuilder, o);
             }, () => ConfigureMessageBrokerMigration(webApplicationBuilder))
             .SeedAdministrationData(
-                new List<string> { "https://localhost:5002/*", "https://website.simpleidserver.com/*", "https://website.localhost.com/*", "http://website.localhost.com/*", "https://website.sid.svc.cluster.local/*" },
-                new List<string> { "https://localhost:5002/signout-callback-oidc", "https://website.sid.svc.cluster.local/signout-callback-oidc", "https://website.simpleidserver.com/signout-callback-oidc" },
-                "https://localhost:5002/bc-logout",
+                new List<string> { },
+                new List<string> { },
+                string.Empty,
                 new List<Scope>())
             .SeedSwagger(
-                new List<string> { "https://localhost:5001/swagger/oauth2-redirect.html", "https://localhost:5001/(.*)/swagger/oauth2-redirect.html" }
+                new List<string> { }
             )
             .UseEfStore((c) =>
             {
@@ -107,6 +122,13 @@ public class SidServerSetup
             }, (c) =>
             {
                 ConfigureFormbuilderStorage(webApplicationBuilder, c);
+            })
+            .EnableOpenTelemetry(m =>
+            {
+                ConfigureMetrics(m, openTelemetryOptions);
+            }, t =>
+            {
+                ConfigureTraces(t, openTelemetryOptions);
             });
         if (configuration.IsForwardedEnabled)
         {
@@ -129,6 +151,104 @@ public class SidServerSetup
 
         ConfigureDistributedCache(webApplicationBuilder);
         ConfigureDataseeder(webApplicationBuilder);
+    }
+
+    private static void ConfigureDuendeMigration(WebApplicationBuilder builder, DbContextOptionsBuilder db)
+    {
+        var section = builder.Configuration.GetSection(nameof(DuendeMigrationOptions));
+        var conf = section.Get<DuendeMigrationOptions>();
+        switch(conf.Transport)
+        {
+            case StorageTypes.MYSQL:
+                db.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                break;
+            case StorageTypes.POSTGRE:
+                db.UseNpgsql(conf.ConnectionString);
+                break;
+            case StorageTypes.SQLSERVER:
+                db.UseSqlServer(conf.ConnectionString);
+                break;
+            case StorageTypes.SQLITE:
+                db.UseSqlite(conf.ConnectionString);
+                break;
+            case StorageTypes.INMEMORY:
+                db.UseInMemoryDatabase(conf.ConnectionString);
+                break;
+        }
+    }
+
+    private static void ConfigureOpeniddictMigration(WebApplicationBuilder builder, DbContextOptionsBuilder db)
+    {
+        var section = builder.Configuration.GetSection(nameof(OpeniddictMigrationOptions));
+        var conf = section.Get<OpeniddictMigrationOptions>();
+        switch (conf.Transport)
+        {
+            case StorageTypes.MYSQL:
+                db.UseMySql(conf.ConnectionString, ServerVersion.AutoDetect(conf.ConnectionString));
+                break;
+            case StorageTypes.POSTGRE:
+                db.UseNpgsql(conf.ConnectionString);
+                break;
+            case StorageTypes.SQLSERVER:
+                db.UseSqlServer(conf.ConnectionString);
+                break;
+            case StorageTypes.SQLITE:
+                db.UseSqlite(conf.ConnectionString);
+                break;
+            case StorageTypes.INMEMORY:
+                db.UseInMemoryDatabase(conf.ConnectionString);
+                break;
+        }
+    }
+
+    private static void ConfigureMetrics(MeterProviderBuilder builder, OpenTelemetryOptions options)
+    {
+        if(options.EnableConsoleExporter)
+        {
+            builder.AddConsoleExporter();
+        }
+
+        if(options.EnableOtpExported)
+        {
+            builder.AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri(options.MetricsEndpoint);
+                o.Headers = options.Headers;
+                o.Protocol = options.Protocol;
+            });
+        }
+    }
+
+    private static void ConfigureTraces(TracerProviderBuilder builder, OpenTelemetryOptions options)
+    {
+        if(options.EnableEfCoreTracing)
+        {
+            builder.AddEntityFrameworkCoreInstrumentation(o =>
+            {
+                o.EnrichWithIDbCommand = (activity, command) =>
+                {
+                    var stateDisplayName = $"{command.CommandType} main";
+                    activity.DisplayName = stateDisplayName;
+                    activity.SetTag("db.name", stateDisplayName);
+                    activity.SetTag("db.text", command.CommandText);
+                };
+            });
+        }
+
+        if (options.EnableConsoleExporter)
+        {
+            builder.AddConsoleExporter();
+        }
+
+        if (options.EnableOtpExported)
+        {
+            builder.AddOtlpExporter(o =>
+            {
+                o.Endpoint = new Uri(options.TracesEndpoint);
+                o.Headers = options.Headers;
+                o.Protocol = options.Protocol;
+            });
+        }
     }
 
     private static void ConfigureHangfire(WebApplicationBuilder webApplicationBuilder, IGlobalConfiguration configuration)
@@ -351,5 +471,7 @@ public class SidServerSetup
         builder.Services.AddTransient<IDataSeeder, ConfigureFastfedDataSeeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureGotifyDataseeder>();
         builder.Services.AddTransient<IDataSeeder, ConfigureFederationDataseeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureAdminWebsiteRedirectUrlsDataSeeder>();
+        builder.Services.AddTransient<IDataSeeder, ConfigureSwaggerClientRedirectUrlsDataSeeder>();
     }
 }

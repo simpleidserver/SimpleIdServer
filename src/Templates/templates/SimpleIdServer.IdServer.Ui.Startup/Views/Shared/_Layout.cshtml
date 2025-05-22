@@ -41,7 +41,7 @@
                     </li>
                 }
 
-                @if (options.Value.UseRealm)
+                @if (options.Value.RealmEnabled)
                 {
                     <li class="nav-item">
                         <a class="nav-link" href="@Url.Action("Index", "Sessions", new { prefix = string.Empty })">
