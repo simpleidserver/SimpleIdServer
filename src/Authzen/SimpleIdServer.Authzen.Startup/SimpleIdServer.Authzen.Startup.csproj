@@ -6,18 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Rego\SimpleIdServer.Rego.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <None Update="sample.rego">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+		<None Include="**\*.rego">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
     <None Update="input.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>

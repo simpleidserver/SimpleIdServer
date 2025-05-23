@@ -8,4 +8,4 @@ choco install antlr4
 
 Exécuter cette instruction pour générer les classes
 
-antlr4 -Dlanguage=CSharp -visitor ElsaParser.g4 RegoLexer.g4
+antlr4 -Dlanguage=CSharp -visitor RegoParser.g4 RegoLexer.g4

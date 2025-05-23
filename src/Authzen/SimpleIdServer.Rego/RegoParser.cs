@@ -19,6 +19,8 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
+namespace SimpleIdServer.Rego;
+
 using System;
 using System.IO;
 using System.Text;

@@ -19,6 +19,8 @@
 // Ambiguous reference in cref attribute
 #pragma warning disable 419
 
+namespace SimpleIdServer.Rego;
+
 using System;
 using System.IO;
 using System.Text;
@@ -118,17 +120,17 @@ public partial class RegoLexer : Lexer {
 	}
 	private void Comment_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
-		case 0: _channel = COMMENTS_AND_FORMATTING; break;
+		case 0: Channel = COMMENTS_AND_FORMATTING; break;
 		}
 	}
 	private void WhiteSpace_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
-		case 1: _channel = COMMENTS_AND_FORMATTING; break;
+		case 1: Channel = COMMENTS_AND_FORMATTING; break;
 		}
 	}
 	private void LineEnd_action(RuleContext _localctx, int actionIndex) {
 		switch (actionIndex) {
-		case 2: _channel = COMMENTS_AND_FORMATTING; break;
+		case 2: Channel = COMMENTS_AND_FORMATTING; break;
 		}
 	}
 

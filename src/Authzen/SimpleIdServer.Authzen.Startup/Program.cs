@@ -1,20 +1,26 @@
-﻿using Antlr4.Runtime;
-using System.Text.Json;
+﻿using SimpleIdServer.Rego;
 
-// See https://aka.ms/new-console-template for more information
-var jsonText = File.ReadAllText("input.json");
-var inputObj = JsonSerializer.Deserialize<Dictionary<string, object>>(jsonText);
-var regoText = File.ReadAllText("sample.rego");
-var inputStream = new AntlrInputStream(regoText);
-var lexer = new RegoLexer(inputStream);
-var tokenStream = new CommonTokenStream(lexer);
-var parser = new RegoParser(tokenStream);
+static void DisplayTree(string rego)
+{
+    var prettyTree = RegoEvaluator.ToPrettyTree(rego);
+    Console.WriteLine("Pretty Tree:");
+    Console.WriteLine(prettyTree);
+}
 
-// Le point d'entrée de la grammaire est probablement 'root' (voir RegoParser.g4)
-var tree = parser.root();
+static void RegoAllowPolicy()
+{
+    var input = File.ReadAllText("input.json");
+    var rego = File.ReadAllText("sample.rego");
+    var evaluationReuslt = RegoEvaluator.Evaluate(input, rego);
+    var prettyTree = RegoEvaluator.ToPrettyTree(rego);
+    Console.WriteLine($"allow = {evaluationReuslt}");
+    DisplayTree(rego);
+}
 
-// Évaluer la policy Rego sur l'input JSON
-var evaluator = new RegoPolicyEvaluator(inputObj);
-bool isAllowed = evaluator.Visit(tree);
+static void RegoSimpleVariable()
+{
+    var rego = File.ReadAllText(Path.Combine(Directory.GetCurrentDirectory(), "basics", "simple-variable.rego"));
+    DisplayTree(rego);
+}
 
-Console.WriteLine($"allow = {isAllowed}");
+RegoSimpleVariable();
