@@ -1,0 +1,11 @@
+Pour générer le code c# à partir des fichiers G4 :
+
+java -jar antlr-4.13.1-complete.jar -Dlanguage=CSharp ElsaParser.g4 RegoLexer.g4
+
+Possible d'installer antlr4 avec choco 
+
+choco install antlr4
+
+Exécuter cette instruction pour générer les classes
+
+antlr4 -Dlanguage=CSharp -visitor ElsaParser.g4 RegoLexer.g4
