@@ -254,11 +254,18 @@ public class RealmsController : BaseController
             foreach (var step in workflow.Steps)
             {
                 var newStepId = Guid.NewGuid().ToString();
-                var filteredLinks = workflow.Links.Where(l => l.SourceStepId == step.Id || l.TargetStepId == step.Id);
+                var filteredLinks = workflow.Links.Where(l => l.SourceStepId == step.Id || l.Targets.Any(t => t.TargetStepId == step.Id));
                 foreach (var link in filteredLinks)
                 {
-                    if(link.SourceStepId == step.Id) link.SourceStepId = newStepId;
-                    else link.TargetStepId = newStepId;
+                    if (link.SourceStepId == step.Id)
+                    {
+                        link.SourceStepId = newStepId;
+                    }
+                    else
+                    {
+                        var targetLink = link.Targets.Single(t => t.TargetStepId == step.Id);
+                        targetLink.TargetStepId = newStepId;
+                    }
                 }
 
                 step.Id = newStepId;

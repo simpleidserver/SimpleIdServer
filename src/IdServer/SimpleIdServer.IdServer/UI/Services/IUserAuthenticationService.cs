@@ -25,9 +25,10 @@ public enum ValidationStatus
 
 public record CredentialsValidationResult
 {
-    private CredentialsValidationResult(User authenticatedUser)
+    private CredentialsValidationResult(User authenticatedUser, bool isTemporaryCredential)
     {
         AuthenticatedUser = authenticatedUser;
+        IsTemporaryCredential = isTemporaryCredential;
         Status = ValidationStatus.AUTHENTICATE;
     }
 
@@ -38,10 +39,11 @@ public record CredentialsValidationResult
 
     public User AuthenticatedUser { get; private set; }
     public ValidationStatus Status { get; private set; }
+    public bool IsTemporaryCredential { get; private set; }
     public string ErrorCode { get; private set; }
     public string ErrorMessage { get; private set; }
 
-    public static CredentialsValidationResult Ok(User user) => new CredentialsValidationResult(user);
+    public static CredentialsValidationResult Ok(User user, bool isTemporaryCredential) => new CredentialsValidationResult(user, isTemporaryCredential);
 
     public static CredentialsValidationResult Error(ValidationStatus status) => new CredentialsValidationResult(status);
 

@@ -30,10 +30,16 @@ public class EmailAuthWorkflowLayout : IWorkflowLayoutService
                 // Confirmation code.
                 new WorkflowLinkLayout
                 {
-                    Description = "Confirmation code",
                     EltCorrelationId = StandardEmailAuthForms.emailSendConfirmationCode,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Confirmation code"
+                        }
+                    },
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
@@ -55,9 +61,15 @@ public class EmailAuthWorkflowLayout : IWorkflowLayoutService
                 // Authenticate
                 new WorkflowLinkLayout
                 {
-                    Description = "Authenticate",
                     EltCorrelationId = StandardEmailAuthForms.emailAuthForm,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Authenticate"
+                        }
+                    },
                     IsMainLink = true,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {

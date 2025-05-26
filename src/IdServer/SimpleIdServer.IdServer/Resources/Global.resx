@@ -1173,4 +1173,13 @@
   <data name="PlainClientSecretRequired" xml:space="preserve">
     <value>Plain client secret is required</value>
   </data>
+  <data name="CannotResolveUser" xml:space="preserve">
+    <value>User cannot be resolved</value>
+  </data>
+  <data name="NoActivePassword" xml:space="preserve">
+    <value>There is no active password</value>
+  </data>
+  <data name="PasswordIsNotTemporary" xml:space="preserve">
+    <value>The password is not temporary</value>
+  </data>
 </root>

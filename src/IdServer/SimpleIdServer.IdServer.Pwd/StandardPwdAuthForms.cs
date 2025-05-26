@@ -28,6 +28,8 @@ public class StandardPwdAuthForms
     public static string confirmResetPwdFormId = "e42e4c7f-90e8-455d-be48-fbfbc5424f0f";
     public static string confirmResetPwdBackId = "a355339a-d3fb-4a83-90b2-c781c6f0dda4";
 
+    public static string resetTemporaryPwdFormId = "218e85c5-78fa-4b36-a657-d7d906bf2679";
+
     public static FormRecord PwdForm = AuthLayoutBuilder.New("a415938e-26e1-4065-ac7f-bc583f36b123", "pwdAuth", Constants.AreaPwd)
         .AddElement(new FormStackLayoutRecord
         {
@@ -250,6 +252,43 @@ public class StandardPwdAuthForms
                     ActAsButton = true,
                     Labels = LayoutTranslations.Back
                 }
+            }
+        }).Build();
+
+    public static FormRecord ResetTemporaryPasswordForm = AuthLayoutBuilder.New("d8e6cc6b-cdff-424d-9e09-0daab82a08c2", "resetTmpPwd", "resetTmpPwd", false)
+        .AddElement(new FormStackLayoutRecord
+        {
+            Id = resetTemporaryPwdFormId,
+            CorrelationId = resetTemporaryPwdFormId,
+            IsFormEnabled = true,
+            Elements = new ObservableCollection<IFormElementRecord>
+            {
+                // Realm
+                StandardFormComponents.NewRealm(),
+                // ReturnUrl
+                StandardFormComponents.NewReturnUrl(),
+                // Login
+                new FormInputFieldRecord
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = nameof(ResetPasswordIndexViewModel.Login),
+                    FormType = FormInputTypes.TEXT,
+                    Disabled = true,
+                    Transformations = new List<ITransformationRule>
+                    {
+                        new IncomingTokensTransformationRule
+                        {
+                            Source = $"$.{nameof(ResetPasswordIndexViewModel.Login)}"
+                        }
+                    },
+                    Labels = LayoutTranslations.Login
+                },
+                // Password
+                StandardFormComponents.NewPassword(nameof(ResetPasswordIndexViewModel.Password)),
+                // RepeatPassword
+                StandardFormComponents.NewPassword(nameof(ResetPasswordIndexViewModel.ConfirmedPassword)),
+                // Update
+                StandardFormComponents.NewButton(LayoutTranslations.Update)
             }
         }).Build();
 }

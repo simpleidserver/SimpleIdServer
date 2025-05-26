@@ -122,11 +122,19 @@
                     DefaultPathGenerator = new SmoothPathGenerator()
                 }
             };
-            if (Diagram.Container == null) Diagram.ContainerChanged += OnContainerChanged;
-            else Init();
+            if (Diagram.Container == null) 
+            {
+                Diagram.ContainerChanged += OnContainerChanged;
+            }
+            else 
+            {
+                Init();
+            }
+
             RefreshJson();
             Diagram.RegisterComponent<WorkflowStepNode, WorkflowStepNodeWidget>();
             Diagram.RegisterComponent<WorkflowStepChooserNode, WorkflowStepChooserNodeWidget>();
+            Diagram.RegisterComponent<WorkflowConditionNode, WorkflowConditionNodeWidget>();
         }
     }
 
@@ -164,7 +172,11 @@
     {
         var form = Context.Definition.Records.Single(r => r.CorrelationId == newStep.FormRecordCorrelationId);
         var node = new WorkflowStepNode(newStep, form, isBlocked, EditNode, link);
-        if (source != null) AddLink(source, node, description);
+        if (source != null) 
+        {
+            AddLink(source, node, description);
+        }
+
         node.AddPort(PortAlignment.Bottom);
         var pt = AddNode(startPosX, startPosY, node, source, index);
         startPosX = pt.X; 
@@ -181,21 +193,65 @@
         var workflowLayout = WorkflowLayouts.SingleOrDefault(l => l.SourceFormCorrelationId == newStep.FormRecordCorrelationId);
         foreach(var stepLink in stepLinks)
         {
-            var nextStep = Context.Definition.Workflow.Steps.SingleOrDefault(s => s.Id == stepLink.TargetStepId);
+            var targetStepIds = stepLink.Targets.Select(t => t.TargetStepId);
+            var nextSteps = Context.Definition.Workflow.Steps.Where(s => targetStepIds.Contains(s.Id));
             isBlocked = false;
             if(workflowLayout != null)
             {
                 var elt = form.GetChildByCorrelationId(stepLink.Source.EltId);
                 var lnk = workflowLayout.Links.SingleOrDefault(l => l.EltCorrelationId == elt.CorrelationId);
-                if(lnk != null) isBlocked = !string.IsNullOrWhiteSpace(lnk.TargetFormCorrelationId);
+                if(lnk != null) 
+                {
+                    isBlocked = lnk.Targets == null || lnk.Targets.Any();
+                }
             }
 
-            if (nextStep != null) AddNode(startPosX, startPosY, nextStep, node, i, stepLink.Description, isBlocked, stepLink);
-            else 
+            if(targetStepIds.Count() > 1)
             {
-                var record = new WorkflowStepChooserNode(AddNode, availableLayouts, stepLink);
-                AddNode(startPosX, startPosY, record, node, i);
-                AddLink(node, record, stepLink.Description);
+                var conditionNode = new WorkflowConditionNode();
+                conditionNode.AddPort(PortAlignment.Bottom);
+                AddNode(startPosX, startPosY, conditionNode, node, index);
+                AddLink(node, conditionNode, "Condition");
+                var newStartPosX = (stepLinks.Count() == 1) ? startPosX : (
+                    (stepLinks.Count() % 2 == 0 ?
+                        (startPosX + (stepSize.Width / 2) - ((spaceBetweenNodeXPx + stepSize.Width) * (nbLinks / 2))) :
+                        (startPosX - (spaceBetweenNodeXPx + stepSize.Width) * (nbLinks / 2))
+                    )
+                );
+                startPosY = startPosY + spaceBetweenNodeYPx;
+                int si = 0;
+                foreach (var targetStepId in targetStepIds)
+                {
+                    var target = stepLink.Targets.Single(t => t.TargetStepId == targetStepId);
+                    var nextStep = nextSteps.SingleOrDefault(s => s.Id == targetStepId);
+                    if (nextStep != null)
+                    {
+                        AddNode(newStartPosX, startPosY, nextStep, conditionNode, si, target.Description, isBlocked, stepLink);
+                    }
+                    else
+                    {
+                        var record = new WorkflowStepChooserNode(AddNode, availableLayouts, stepLink);
+                        AddNode(newStartPosX, startPosY, record, conditionNode, si);
+                        AddLink(conditionNode, record, target.Description);
+                    }
+
+                    si++;
+                }
+            }
+            else
+            {
+                var target = stepLink.Targets.First();
+                var nextStep = nextSteps.FirstOrDefault();
+                if (nextStep != null)
+                {
+                    AddNode(startPosX, startPosY, nextStep, node, i, target.Description, isBlocked, stepLink);
+                }
+                else
+                {
+                    var record = new WorkflowStepChooserNode(AddNode, availableLayouts, stepLink);
+                    AddNode(startPosX, startPosY, record, node, i);
+                    AddLink(node, record, target.Description);
+                }
             }
 
             i++;
@@ -282,7 +338,7 @@
     private void Remove(WorkflowStep workflowStep)
     {
         var links = Context.Definition.Workflow.Links.Where(l => l.SourceStepId == workflowStep.Id).ToList();
-        var targetedStepIds = links.Select(l => l.TargetStepId);
+        var targetedStepIds = links.SelectMany(l => l.Targets.Select(t => t.TargetStepId));
         var targetedSteps = Context.Definition.Workflow.Steps.Where(s => targetedStepIds.Contains(s.Id)).ToList();
         foreach (var targetedStep in targetedSteps)
             Remove(targetedStep);
@@ -322,7 +378,7 @@
     {
         var layout = WorkflowLayouts.Single(l => l.WorkflowCorrelationId == correlationId);
         var formRecord = Forms.Single(r => r.CorrelationId == layout.SourceFormCorrelationId);
-        var resolvedSteps = Forms.Where(f => layout.Links.Where(l => !string.IsNullOrWhiteSpace(l.TargetFormCorrelationId)).Select(l => l.TargetFormCorrelationId).Contains(f.CorrelationId))
+        var resolvedSteps = Forms.Where(f => layout.Links.Where(l => l.Targets != null).SelectMany(l => l.Targets.Select(t => t.TargetFormCorrelationId)).Where(t => !string.IsNullOrWhiteSpace(t)).Contains(f.CorrelationId))
             .Select(f =>
             {
                 return new WorkflowStep
@@ -335,23 +391,33 @@
         {
             var eltId = formRecord.GetChildByCorrelationId(l.EltCorrelationId).CorrelationId;
             var source = new WorkflowLinkSource
-                {
-                    EltId = eltId
-                };
-            var form = Forms.SingleOrDefault(r => r.CorrelationId == l.TargetFormCorrelationId);
-            var targetStep = resolvedSteps.SingleOrDefault(s => s.FormRecordCorrelationId == form?.CorrelationId);
-            var targetStepId = targetStep?.Id;
-            return new WorkflowLink
+            {
+                EltId = eltId
+            };
+            var link = new WorkflowLink
             {
                 Id = Guid.NewGuid().ToString(),
                 SourceStepId = newStep.Id,
                 Source = source,
                 ActionType = l.ActionType,
                 ActionParameter = l.ActionParameter,
-                Description = l.Description,
-                TargetStepId = targetStepId,
-                IsMainLink = l.IsMainLink
+                IsMainLink = l.IsMainLink,
+                Targets = new List<WorkflowLinkTarget>()
             };
+            foreach (var target in l.Targets)
+            {
+                var form = Forms.SingleOrDefault(r => r.CorrelationId == target.TargetFormCorrelationId);
+                var targetStep = resolvedSteps.SingleOrDefault(s => s.FormRecordCorrelationId == form?.CorrelationId);
+                var targetStepId = targetStep?.Id;
+                link.Targets.Add(new WorkflowLinkTarget
+                {
+                    TargetStepId = targetStepId,
+                    Condition = target.Condition,
+                    Description = target.Description
+                });
+            }
+
+            return link;
         });
         Context.Definition.Workflow.Steps.AddRange(resolvedSteps);
         Context.Definition.Workflow.Links.AddRange(links);
@@ -372,7 +438,7 @@
             var link = Context.Definition.Workflow.Links.SingleOrDefault(l => l.Id == sourceLink.Id);
             if(link != null) 
             {
-                link.TargetStepId = newStep.Id;
+                link.Targets.First().TargetStepId = newStep.Id;
             }
         }
     }
@@ -387,7 +453,7 @@
     }
 
     private List<WorkflowLink> GetEmptyLinks()
-        => Context.Definition.Workflow.Links.Where(l => l.TargetStepId == null).ToList();
+        => Context.Definition.Workflow.Links.Where(l => l.Targets == null || !l.Targets.Any()).ToList();
 
     private async Task Save()
     {

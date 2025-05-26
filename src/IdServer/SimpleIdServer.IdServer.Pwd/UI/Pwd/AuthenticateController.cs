@@ -13,14 +13,14 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Pwd.Services;
 using SimpleIdServer.IdServer.Stores;
+using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
-namespace SimpleIdServer.IdServer.UI;
+namespace SimpleIdServer.IdServer.Pwd.UI.Pwd;
 
 [Area(Constants.AreaPwd)]
 public class AuthenticateController : BaseAuthenticationMethodController<AuthenticatePasswordViewModel>
@@ -51,7 +51,8 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         IFormStore formStore,
         ILanguageRepository languageRepository,
         IAcrHelper acrHelper,
-        IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, formBuilderOptions)
+        IWorkflowHelper workflowHelper,
+        IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, formBuilderOptions)
     {
         _configuration = configuration;
     }

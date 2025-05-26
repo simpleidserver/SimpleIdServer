@@ -9,6 +9,7 @@ using SimpleIdServer.IdServer.Pwd;
 using SimpleIdServer.IdServer.Pwd.Fakers;
 using SimpleIdServer.IdServer.Pwd.Migrations;
 using SimpleIdServer.IdServer.Pwd.Services;
+using SimpleIdServer.IdServer.Pwd.UI.Pwd;
 using SimpleIdServer.IdServer.UI.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -24,12 +25,13 @@ public static class IdServerBuilderExtensions
     /// <returns>The updated IdServerBuilder instance.</returns>
     public static IdServerBuilder AddPwdAuthentication(this IdServerBuilder idServerBuilder, bool isDefaultAuthMethod = false)
     {
-        idServerBuilder.MvcBuilder.AddApplicationPart(typeof(SimpleIdServer.IdServer.UI.AuthenticateController).Assembly);
+        idServerBuilder.MvcBuilder.AddApplicationPart(typeof(AuthenticateController).Assembly);
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, PwdAuthenticationMethodService>();
         idServerBuilder.Services.AddTransient<IPasswordAuthenticationService, PasswordAuthenticationService>();
         idServerBuilder.Services.AddTransient<IUserAuthenticationService, PasswordAuthenticationService>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdAuthWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ConfirmResetPwdWorkflowLayout>();
+        idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ResetTemporaryPwdWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, PwdRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, ResetPwdWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitPwdAuthDataseeder>();

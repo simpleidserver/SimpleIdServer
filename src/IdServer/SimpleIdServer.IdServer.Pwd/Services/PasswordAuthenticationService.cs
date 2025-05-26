@@ -51,11 +51,19 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
 
     protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticatePasswordViewModel viewModel, CancellationToken cancellationToken)
     {
-        if (authenticatedUser.IsBlocked()) return Task.FromResult(CredentialsValidationResult.Error("user_blocked", Global.UserAccountIsBlocked));
+        if (authenticatedUser.IsBlocked())
+        {
+            return Task.FromResult(CredentialsValidationResult.Error("user_blocked", Global.UserAccountIsBlocked));
+        }
+
         var authService = _authServices.SingleOrDefault(s => s.Name == authenticatedUser.Source);
+        bool isTemporaryCredential = false;
         if (authService != null)
         {
-            if (!authService.Authenticate(authenticatedUser, authenticatedUser.IdentityProvisioning, viewModel.Password)) return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
+            if (!authService.Authenticate(authenticatedUser, authenticatedUser.IdentityProvisioning, viewModel.Password))
+            {
+                return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
+            }
         }
         else
         {
@@ -64,8 +72,10 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
             {
                 return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));
             }
+
+            isTemporaryCredential = credential.IsTemporary;
         }
 
-        return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser));
+        return Task.FromResult(CredentialsValidationResult.Ok(authenticatedUser, isTemporaryCredential));
     }
 }

@@ -1,0 +1,20 @@
+﻿@using Blazor.Diagrams.Components.Renderers
+@using FormBuilder.Models.Layout
+
+<div class="final-step">
+    <svg width="40" height="40" viewBox="0 0 40 40">
+        <polygon points="20,2 38,20 20,38 2,20"
+                 fill="white"
+                 stroke="black"
+                 stroke-width="1" />
+    </svg>
+
+    @foreach (var port in Node.Ports)
+    {
+        <PortRenderer @key="port" Port="port"></PortRenderer>
+    }
+</div>
+
+@code {
+    [Parameter] public WorkflowConditionNode Node { get; set; }
+}

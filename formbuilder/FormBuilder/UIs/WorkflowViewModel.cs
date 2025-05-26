@@ -35,16 +35,4 @@ public class WorkflowViewModel
         var link = Workflow.Links.Single(l => l.Id == viewModel.CurrentLink);
         CurrentStepId = link.SourceStepId;
     }
-
-    public void MoveNextStep(IStepViewModel viewModel)
-    {
-        var link = Workflow.Links.Single(l => l.Id == viewModel.CurrentLink);
-        CurrentStepId = link.TargetStepId;
-    }
-
-    public string GetNextStepId(IStepViewModel viewModel)
-    {
-        var link = Workflow.Links.Single(l => l.Id == viewModel.CurrentLink);
-        return link.TargetStepId;
-    }
 }

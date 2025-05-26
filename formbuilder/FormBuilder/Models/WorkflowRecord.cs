@@ -17,11 +17,19 @@ public class WorkflowRecord : ICloneable
         var link = Links.SingleOrDefault(l => l.SourceStepId == stepId && l.IsMainLink);
         if (link != null)
         {
-            var targetStep = Steps.Single(s => s.Id == link.TargetStepId);
-            if(!targetStep.IsEmptyStep)
+            var targetStepIds = link.Targets.Select(t => t.TargetStepId);
+            var targetSteps = Steps.Where(s => targetStepIds.Contains(s.Id));
+            foreach(var targetStep in targetSteps)
             {
-                result.Add(targetStep);
-                result.AddRange(GetAllChildrenMainLinks(link.TargetStepId));
+                if (!targetStep.IsEmptyStep)
+                {
+                    result.Add(targetStep);
+                    var subIds = link.Targets.Select(t => t.TargetStepId);
+                    foreach(var subId in subIds)
+                    {
+                        result.AddRange(GetAllChildrenMainLinks(subId));
+                    }
+                }
             }
         }
 
@@ -31,7 +39,7 @@ public class WorkflowRecord : ICloneable
     public List<WorkflowStep> GetAllParentMainLinks(string stepId)
     {
         var result = new List<WorkflowStep>();
-        var link = Links.SingleOrDefault(l => l.TargetStepId == stepId);
+        var link = Links.FirstOrDefault(l => l.Targets.Any(t => t.TargetStepId == stepId));
         if (link != null)
         {
             var sourceStep = Steps.Single(s => s.Id == link.SourceStepId);
@@ -49,7 +57,7 @@ public class WorkflowRecord : ICloneable
     public int ComputeLevel(WorkflowStep step)
     {
         if (step.FormRecordCorrelationId == Constants.EmptyStep.CorrelationId) return 999;
-        var link = Links.SingleOrDefault(l => l.TargetStepId == step.Id);
+        var link = Links.SingleOrDefault(l => l.Targets.Any(t => t.TargetStepId == step.Id));
         if (link == null) return 0;
         var parentStep = Steps.Single(s => s.Id == link.SourceStepId);
         return ComputeLevel(parentStep) + 1;
@@ -86,7 +94,7 @@ public class WorkflowRecord : ICloneable
 
     public WorkflowStep GetFirstStep()
     {
-        var targetStepIds = Links.Select(l => l.TargetStepId);
+        var targetStepIds = Links.SelectMany(l => l.Targets.Select(t => t.TargetStepId));
         var filteredSteps = Steps.Where(s => !targetStepIds.Contains(s.Id));
         return filteredSteps.FirstOrDefault();
     }

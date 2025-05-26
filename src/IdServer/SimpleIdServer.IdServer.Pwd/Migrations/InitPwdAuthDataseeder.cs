@@ -39,6 +39,7 @@ public class InitPwdAuthDataseeder : BaseAuthDataSeeder
             await TryAddForm(Constants.DefaultRealm, StandardPwdAuthForms.PwdForm, cancellationToken);
             await TryAddForm(Constants.DefaultRealm, StandardPwdAuthForms.ResetForm, cancellationToken);
             await TryAddForm(Constants.DefaultRealm, StandardPwdAuthForms.ConfirmResetForm, cancellationToken);
+            await TryAddForm(Constants.DefaultRealm, StandardPwdAuthForms.ResetTemporaryPasswordForm, cancellationToken);
             await TryAddForm(Constants.DefaultRealm, StandardPwdRegisterForms.PwdForm, cancellationToken);
             await TryAddWorkflow(Constants.DefaultRealm, StandardPwdAuthWorkflows.DefaultCompletePwdAuthWorkflow, cancellationToken);
             await TryAddWorkflow(Constants.DefaultRealm, StandardPwdAuthWorkflows.DefaultConfirmResetPwdWorkflow, cancellationToken);

@@ -30,8 +30,14 @@ public class EmailRegisterWorkflowLayout : IWorkflowLayoutService
                 // Confirmation code.
                 new WorkflowLinkLayout
                 {
-                    Description = "Confirmation code",
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Confirmation code"
+                        }
+                    },
                     EltCorrelationId = StandardEmailRegistrationForms.emailSendConfirmationCodeFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize( new WorkflowLinkHttpRequestParameter
@@ -55,7 +61,13 @@ public class EmailRegisterWorkflowLayout : IWorkflowLayoutService
                 // Register
                 new WorkflowLinkLayout
                 {
-                    Description = "Register",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Register"
+                        }
+                    },
                     IsMainLink = true,
                     EltCorrelationId = StandardEmailRegistrationForms.emailRegisterFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
@@ -80,8 +92,13 @@ public class EmailRegisterWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
-                    Description = "Back",
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Back"
+                        }
+                    },
                     EltCorrelationId = StandardEmailRegistrationForms.backButtonId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter 

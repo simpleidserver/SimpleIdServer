@@ -1,11 +1,13 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using FormBuilder;
+using FormBuilder.Conditions;
 using FormBuilder.Link;
 using FormBuilder.Models.Layout;
 using FormBuilder.Models.Rules;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Layout;
 using System.Collections.ObjectModel;
 using System.Text.Json;
@@ -28,8 +30,25 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                 // Authenticate.
                 new WorkflowLinkLayout
                 {
-                    Description = "Authenticate",
                     EltCorrelationId = StandardPwdAuthForms.pwdAuthFormId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Reset",
+                            Condition = new ComparisonParameter
+                            {
+                                Operator = ComparisonOperators.EQ,
+                                Source = "$." + DefaultWorkflowParameters.IsTemporaryCredential,
+                                Value = "True"
+                            },
+                            TargetFormCorrelationId = StandardPwdAuthForms.ResetTemporaryPasswordForm.CorrelationId
+                        },
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Authenticate"
+                        }
+                    },
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     IsMainLink = true,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
@@ -53,7 +72,13 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                 // External auth.
                 new WorkflowLinkLayout
                 {
-                    Description = "External auth",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "External auth"
+                        }
+                    },
                     EltCorrelationId = StandardPwdAuthForms.pwdAuthExternalIdProviderId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter 
@@ -78,9 +103,15 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                 // Register.
                 new WorkflowLinkLayout
                 {
-                    Description = "Register",
                     EltCorrelationId = StandardPwdAuthForms.pwdRegisterBtnId,
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout 
+                        { 
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Register"
+                        }
+                    },
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter
                     {
@@ -102,9 +133,15 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                 // Forget
                 new WorkflowLinkLayout
                 {
-                    Description = "Forget",
                     EltCorrelationId = StandardPwdAuthForms.pwdForgetBtnId,
-                    TargetFormCorrelationId = StandardPwdAuthForms.ResetForm.CorrelationId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout 
+                        { 
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Forget"
+                        }
+                    },
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {

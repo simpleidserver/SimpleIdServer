@@ -107,7 +107,7 @@ public class VpRegisterController : BaseController
                 UpdateDateTime = DateTime.UtcNow
             };
             var nextAmr = !registrationProgress.UpdateOneCredential ? 
-                await _workflowHelper.GetNextAmr(prefix, FormCategories.Registration, registrationProgress.WorkflowId, amr, cancellationToken) : 
+                await _workflowHelper.GetNextAmr(null, prefix, FormCategories.Registration, registrationProgress.WorkflowId, amr, cancellationToken) : 
                 string.Empty;
             if (
                 (!string.IsNullOrWhiteSpace(nextAmr) && WorkflowHelper.IsLastStep(nextAmr)) ||

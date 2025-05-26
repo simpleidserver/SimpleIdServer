@@ -44,6 +44,7 @@ public class ResetController : BaseController
     private readonly ILanguageRepository _languageRepository;
     private readonly IRealmStore _realmStore;
     private readonly ITemplateStore _templateStore;
+    private readonly IWorkflowHelper _workflowHelper;
     private readonly ILogger<ResetController> _logger;
     private readonly FormBuilderOptions _formBuilderOptions;
 
@@ -63,6 +64,7 @@ public class ResetController : BaseController
         ILanguageRepository languageRepository,
         IRealmStore realmStore,
         ITemplateStore templateStore,
+        IWorkflowHelper workflowHelper,
         ILogger<ResetController> logger,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(tokenRepository, jwtBuilder)
     {
@@ -79,6 +81,7 @@ public class ResetController : BaseController
         _languageRepository = languageRepository;
         _realmStore = realmStore;
         _templateStore = templateStore;
+        _workflowHelper = workflowHelper;
         _logger = logger;
         _formBuilderOptions = formBuilderOptions.Value;
     }
@@ -110,7 +113,7 @@ public class ResetController : BaseController
         };
         var result = await BuildWorkflowViewModel(prefix, vm, cancellationToken);
         result.SetInput(viewModel);
-        result.MoveNextStep(vm);
+        result.CurrentStepId = _workflowHelper.GetNextAmr(null, result, vm);
         return View(result);
     }
 

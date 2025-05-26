@@ -41,7 +41,8 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IWorkflowStore workflowStore,
             ILanguageRepository languageRepository,
             IRealmStore realmStore,
-            ITemplateStore templateStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore)
+            ITemplateStore templateStore,
+            IWorkflowHelper workflowHelper) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore, workflowHelper)
         {
             _configuration = configuration;
         }

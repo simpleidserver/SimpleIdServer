@@ -745,6 +745,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à User cannot be resolved.
+        /// </summary>
+        public static string CannotResolveUser {
+            get {
+                return ResourceManager.GetString("CannotResolveUser", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à An error occured while trying to send the OTP.
         /// </summary>
         public static string CannotSendOtpCode {
@@ -1978,6 +1987,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à There is no active password.
+        /// </summary>
+        public static string NoActivePassword {
+            get {
+                return ResourceManager.GetString("NoActivePassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à no client certificate.
         /// </summary>
         public static string NoClientCertificate {
@@ -2136,6 +2154,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string OtpCodeMustBeNumber {
             get {
                 return ResourceManager.GetString("OtpCodeMustBeNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The password is not temporary.
+        /// </summary>
+        public static string PasswordIsNotTemporary {
+            get {
+                return ResourceManager.GetString("PasswordIsNotTemporary", resourceCulture);
             }
         }
         

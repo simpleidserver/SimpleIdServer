@@ -13,7 +13,7 @@ using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Pwd;
 
-public class ResetPwdWorkflowLayout : IWorkflowLayoutService
+public class ResetTemporaryPwdWorkflowLayout : IWorkflowLayoutService
 {
     public string Category => FormCategories.Authentication;
 
@@ -21,22 +21,22 @@ public class ResetPwdWorkflowLayout : IWorkflowLayoutService
     {
         return new WorkflowLayout
         {
-            Name = "resetPwd",
-            WorkflowCorrelationId = "resetPwd",
-            SourceFormCorrelationId = "resetPwd",
+            Name = "resetTmpPwd",
+            WorkflowCorrelationId = "resetTmpPwd",
+            SourceFormCorrelationId = "resetTmpPwd",
             Links = new List<WorkflowLinkLayout>
             {
                 // Reset
                 new WorkflowLinkLayout
                 {
                     IsMainLink = true,
-                    EltCorrelationId = StandardPwdAuthForms.pwdResetFormId,
+                    EltCorrelationId = StandardPwdAuthForms.resetTemporaryPwdFormId,
                     Targets = new List<WorkflowLinkTargetLayout>
                     {
                         new WorkflowLinkTargetLayout 
-                        { 
-                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
-                            Description = "Reset"
+                        {
+                            Description = "Reset",
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId
                         }
                     },
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
@@ -44,18 +44,18 @@ public class ResetPwdWorkflowLayout : IWorkflowLayoutService
                     {
                         Method = HttpMethods.POST,
                         IsAntiforgeryEnabled = true,
-                        Target = "/{realm}/pwd/Reset",
+                        Target = "/{realm}/pwd/Reset/Confirm",
                         Transformers = new List<ITransformerParameters>
+                        {
+                            new RegexTransformerParameters()
                             {
-                                new RegexTransformerParameters()
+                                Rules = new ObservableCollection<MappingRule>
                                 {
-                                    Rules = new ObservableCollection<MappingRule>
-                                    {
-                                        new MappingRule { Source = "$.Realm", Target = "realm" }
-                                    }
-                                },
-                                new RelativeUrlTransformerParameters()
-                            }
+                                    new MappingRule { Source = "$.Realm", Target = "realm" }
+                                }
+                            },
+                            new RelativeUrlTransformerParameters()
+                        }
                     })
                 }
             }

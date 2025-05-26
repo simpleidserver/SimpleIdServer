@@ -1,4 +1,5 @@
-﻿using FormBuilder.Link;
+﻿using FormBuilder.Conditions;
+using FormBuilder.Link;
 using FormBuilder.Models;
 using FormBuilder.Models.Transformer;
 using FormBuilder.Transformers;
@@ -49,7 +50,17 @@ public static class WorkflowBuilderExtensions
 
     public static WorkflowBuilder AddLinkHttpRequestAction(this WorkflowBuilder builder, FormRecord sourceForm, FormRecord targetForm, string eltId, string description, WorkflowLinkHttpRequestParameter parameter, bool isMainLink)
     {
-        builder.AddLink(sourceForm, targetForm, eltId, description,  isMainLink, (a) =>
+        builder.AddLink(sourceForm, targetForm, eltId, description, isMainLink, (a) =>
+        {
+            a.ActionType = WorkflowLinkHttpRequestAction.ActionType;
+            a.ActionParameter = JsonSerializer.Serialize(parameter);
+        });
+        return builder;
+    }
+
+    public static WorkflowBuilder AddLinkHttpRequestAction(this WorkflowBuilder builder, FormRecord sourceForm, List<(FormRecord form, IConditionParameter condition, string description)> targets, string eltId, WorkflowLinkHttpRequestParameter parameter, bool isMainLink)
+    {
+        builder.AddLink(sourceForm, targets, eltId, isMainLink, (a) =>
         {
             a.ActionType = WorkflowLinkHttpRequestAction.ActionType;
             a.ActionParameter = JsonSerializer.Serialize(parameter);

@@ -54,7 +54,8 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         IJwtBuilder jwtBuilder,
         ILanguageRepository languageRepository,
         IRealmStore realmStore,
-        ITemplateStore templateStore) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore)
+        ITemplateStore templateStore,
+        IWorkflowHelper workflowHelper) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore, workflowHelper)
     {
         _logger = logger;
         _userRepository = userRepository;

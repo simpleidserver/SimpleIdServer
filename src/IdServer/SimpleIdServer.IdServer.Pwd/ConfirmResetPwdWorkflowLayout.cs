@@ -29,9 +29,15 @@ public class ConfirmResetPwdWorkflowLayout : IWorkflowLayoutService
                 // Reset
                 new WorkflowLinkLayout
                 {
-                    Description = "Reset",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Reset"
+                        }
+                    },
                     IsMainLink = true,
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
                     EltCorrelationId = StandardPwdAuthForms.confirmResetPwdFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
@@ -55,8 +61,14 @@ public class ConfirmResetPwdWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
-                    Description = "Back",
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout 
+                        { 
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Back"
+                        }
+                    },
                     EltCorrelationId = StandardPwdAuthForms.confirmResetPwdBackId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter

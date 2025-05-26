@@ -29,7 +29,13 @@ internal class VpRegisterWorkflowLayout : IWorkflowLayoutService
                 // Choose vp.
                 new WorkflowLinkLayout
                 {
-                    Description = "Choose vp",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Choose vp"
+                        }
+                    },
                     IsMainLink = true,
                     EltCorrelationId = StandardVpRegisterForms.vpRegistrationFormId,
                     ActionType = WorkflowLinkAction.ActionType
@@ -37,8 +43,14 @@ internal class VpRegisterWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
-                    Description = "Back",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout 
+                        { 
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Back"
+                        }
+                    },
                     EltCorrelationId = StandardVpRegisterForms.backBtnId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter

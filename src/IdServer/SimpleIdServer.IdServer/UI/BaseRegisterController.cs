@@ -41,7 +41,8 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         IWorkflowStore workflowStore,
         ILanguageRepository languageRepository,
         IRealmStore realmStore,
-        ITemplateStore templateStore) : base(tokenRepository, jwtBuilder)
+        ITemplateStore templateStore,
+        IWorkflowHelper workflowHelper) : base(tokenRepository, jwtBuilder)
     {
         Options = options.Value;
         FormOptions = formOptions.Value;
@@ -54,6 +55,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         LanguageRepository = languageRepository;
         RealmStore = realmStore;
         TemplateStore = templateStore;
+        WorkflowHelper = workflowHelper;
     }
 
     protected IdServerHostOptions Options { get; }
@@ -68,6 +70,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
     protected abstract string Amr { get; }
     private IRealmStore RealmStore { get; }
     protected ITemplateStore TemplateStore { get; }
+    protected IWorkflowHelper WorkflowHelper { get; }
 
     protected async Task<UserRegistrationProgress> GetRegistrationProgress()
     {
@@ -180,7 +183,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
 
     private string GetNextAmr(WorkflowViewModel result, TViewModel viewModel)
     {
-        var nextStepId = result.GetNextStepId(viewModel);
+        var nextStepId = this.WorkflowHelper.GetTargetFormRecordId(null, result.Workflow, viewModel);
         var nextStep = result.Workflow.Steps.Single(r => r.Id == nextStepId);
         if (nextStep.IsEmptyStep)
         {

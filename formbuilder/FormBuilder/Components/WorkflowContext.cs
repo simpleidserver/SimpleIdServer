@@ -147,7 +147,7 @@ public class WorkflowContext
 
     public WorkflowStep GetFirstStep()
     {
-        var allLinkedSteps = Definition.Workflow.Links.Select(l => l.TargetStepId);
+        var allLinkedSteps = Definition.Workflow.Links.SelectMany(l => l.Targets.Select(t => t.TargetStepId));
         var firstStep = Definition.Workflow.Steps.FirstOrDefault(s => !allLinkedSteps.Contains(s.Id));
         return firstStep;
     }
@@ -160,7 +160,7 @@ public class WorkflowContext
     }
 
     public void NextStep(WorkflowLink link)
-        => NavigateToStep(link.TargetStepId);
+        => NavigateToStep(link.Targets == null ? string.Empty : link.Targets.First().TargetStepId);
 
     public void NavigateToStep(string stepId)
     {
@@ -414,9 +414,6 @@ public class WorkflowExecutionContext
         var link = Workflow.Links.SingleOrDefault(l => l.Source.EltId == record.Id);
         return link;
     }
-
-    public void NextStep(WorkflowLink link)
-        => CurrentStepId = link.TargetStepId;
 
     public FormRecord GetCurrentRecord()
     {

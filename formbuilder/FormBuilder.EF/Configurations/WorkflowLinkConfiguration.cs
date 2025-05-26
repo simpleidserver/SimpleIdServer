@@ -17,5 +17,8 @@ public class WorkflowLinkConfiguration : IEntityTypeConfiguration<WorkflowLink>
         builder.Property(w => w.Source).HasConversion(
                 v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
                 v => string.IsNullOrWhiteSpace(v) ? null : JsonSerializer.Deserialize<WorkflowLinkSource>(v, (JsonSerializerOptions)null));
+        builder.Property(w => w.Targets).HasConversion(
+                v => JsonSerializer.Serialize(v, (JsonSerializerOptions)null),
+                v => string.IsNullOrWhiteSpace(v) ? null : JsonSerializer.Deserialize<List<WorkflowLinkTarget>>(v, (JsonSerializerOptions)null));
     }
 }

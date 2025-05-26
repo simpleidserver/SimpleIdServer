@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Components;
+using FormBuilder.Helpers;
 using FormBuilder.Link.Components;
 using FormBuilder.Models;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -10,10 +11,12 @@ namespace FormBuilder.Link;
 public class WorkflowLinkPopupAction : IWorkflowLinkAction
 {
     private readonly DialogService _dialogService;
+    private readonly IWorkflowLinkHelper _workflowLinkHelper;
 
-    public WorkflowLinkPopupAction(DialogService dialogService)
+    public WorkflowLinkPopupAction(DialogService dialogService, IWorkflowLinkHelper workflowLinkHelper)
     {
         _dialogService = dialogService;
+        _workflowLinkHelper = workflowLinkHelper;
     }
 
     public string Type => ActionType;
@@ -31,7 +34,8 @@ public class WorkflowLinkPopupAction : IWorkflowLinkAction
 
     public async Task Execute(WorkflowLink activeLink, WorkflowStepLinkExecution linkExecution, WorkflowContext context)
     {
-        var newContext = context.BuildContextAndMoveToStep(activeLink.TargetStepId);
+        var targetStepId = _workflowLinkHelper.ResolveNextStep(null, context.Definition.Workflow, activeLink.Id);
+        var newContext = context.BuildContextAndMoveToStep(targetStepId);
         await _dialogService.OpenAsync<WorkflowLinkPopupActionComponent>(string.Empty, new Dictionary<string, object>
         {
             { nameof(WorkflowLinkPopupActionComponent.Context), newContext }

@@ -54,11 +54,12 @@ public class ExternalAuthenticateController : BaseAuthenticateController
         IWorkflowStore workflowStore,
         IAcrHelper acrHelper,
         IFormStore formStore,
-        IAuthenticationContextClassReferenceRepository acrRepository) : base(
+        IAuthenticationContextClassReferenceRepository acrRepository,
+        IWorkflowHelper workflowHelper) : base(
             clientRepository, 
             userRepository, 
             userSessionRepository, 
-            amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, acrRepository, options)
+            amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, acrRepository, workflowHelper, options)
     {
         _logger = logger;
         _userTransformer = userTransformer;

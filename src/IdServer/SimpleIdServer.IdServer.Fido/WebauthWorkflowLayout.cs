@@ -30,7 +30,13 @@ public class WebauthWorkflowLayout : IWorkflowLayoutService
                 // Authenticate
                 new WorkflowLinkLayout
                 {
-                    Description = "Authenticate",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Authenticate"
+                        }
+                    },
                     EltCorrelationId = StandardFidoAuthForms.webauthnFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter

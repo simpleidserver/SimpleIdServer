@@ -13,4 +13,5 @@ public class UserCredentialNames
     public const string TOTPStep = "totp_step";
     public const string HOTPWindow = "hotp_window";
     public const string HashAlg = "hash_alg";
+    public const string IsTemporary = "is_temporary";
 }

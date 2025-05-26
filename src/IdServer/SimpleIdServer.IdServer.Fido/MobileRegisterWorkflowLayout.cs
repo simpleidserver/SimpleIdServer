@@ -29,7 +29,13 @@ public class MobileRegisterWorkflowLayout : IWorkflowLayoutService
                 // Register
                 new WorkflowLinkLayout
                 {
-                    Description = "Register",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Register"
+                        }
+                    },
                     IsMainLink = true,
                     EltCorrelationId = StandardFidoRegisterForms.mobileFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
@@ -38,8 +44,14 @@ public class MobileRegisterWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
-                    Description = "Back",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Back"
+                        }
+                    },
                     EltCorrelationId = StandardFidoRegisterForms.mobileBackButtonId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter

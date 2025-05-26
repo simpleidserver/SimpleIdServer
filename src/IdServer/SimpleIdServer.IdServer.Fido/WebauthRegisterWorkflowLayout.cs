@@ -29,7 +29,13 @@ public class WebauthRegisterWorkflowLayout : IWorkflowLayoutService
                 // Register
                 new WorkflowLinkLayout
                 {
-                    Description = "Register",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Register"
+                        }
+                    },
                     EltCorrelationId = StandardFidoRegisterForms.webauthnFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
@@ -53,8 +59,14 @@ public class WebauthRegisterWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
-                    Description = "Back",
+                    Targets = new List<WorkflowLinkTargetLayout> 
+                    { 
+                        new WorkflowLinkTargetLayout 
+                        { 
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Back"
+                        } 
+                    },
                     EltCorrelationId = StandardFidoRegisterForms.webauthnBackButtonId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter

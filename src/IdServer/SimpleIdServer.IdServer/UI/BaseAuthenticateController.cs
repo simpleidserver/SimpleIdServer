@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
+using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
@@ -39,6 +40,7 @@ public class BaseAuthenticateController : BaseController
     private readonly IDataProtector _dataProtector;
     private readonly IAuthenticationHelper _authenticationHelper;
     private readonly IAuthenticationContextClassReferenceRepository _acrRepository;
+    private readonly IWorkflowHelper _workflowHelper;
     private readonly IdServerHostOptions _options;
 
     public BaseAuthenticateController(
@@ -57,6 +59,7 @@ public class BaseAuthenticateController : BaseController
         IFormStore formStore,
         IAcrHelper acrHelper,
         IAuthenticationContextClassReferenceRepository acrRepository,
+        IWorkflowHelper workflowHelper,
         IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
     {
         _clientRepository = clientRepository;
@@ -72,6 +75,7 @@ public class BaseAuthenticateController : BaseController
         FormStore = formStore;
         AcrHelper = acrHelper;
         _acrRepository = acrRepository;
+        _workflowHelper = workflowHelper;
         _options = options.Value;
     }
 
@@ -129,7 +133,7 @@ public class BaseAuthenticateController : BaseController
         return query.GetClientIdFromAuthorizationRequest();
     }
 
-    protected async Task<IActionResult> Authenticate<T>(string realm, T viewModel, string currentAmr, User user, CancellationToken cancellationToken, bool? rememberLogin = null) where T : ISidStepViewModel
+    protected async Task<IActionResult> Authenticate<T>(string realm, T viewModel, string currentAmr, User user, CancellationToken cancellationToken, bool? rememberLogin = null, bool isTemporaryCredential = false) where T : ISidStepViewModel
     {
         string nextAmr = null;
         Client client = null;
@@ -139,14 +143,14 @@ public class BaseAuthenticateController : BaseController
         string currentAcr = null;
         if (!IsProtected(returnUrl))
         {
-            var result = await GetNextAmrFromNormalAuthentication(realm, viewModel, cancellationToken);
+            var result = await GetNextAmrFromNormalAuthentication(realm, viewModel, isTemporaryCredential, cancellationToken);
             nextAmr = result.nextAmr;
             amrs = result.amrs;
         }
         else
         {
             unprotectedUrl = Unprotect(returnUrl);
-            var result = await GetNextAmrFormAuthorizationRequestAuthentication(realm, currentAmr, unprotectedUrl, viewModel, cancellationToken);
+            var result = await GetNextAmrFormAuthorizationRequestAuthentication(realm, currentAmr, unprotectedUrl, viewModel, isTemporaryCredential, cancellationToken);
             nextAmr = result.nextAmr;
             client = result.client;
             amrs = result.acr.AllAmrs;
@@ -253,17 +257,18 @@ public class BaseAuthenticateController : BaseController
         }
     }
 
-    private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication<T>(string realm, T viewModel, CancellationToken cancellationToken) where T : ISidStepViewModel
+    private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication<T>(string realm, T viewModel, bool isTemporaryCredential, CancellationToken cancellationToken) where T : ISidStepViewModel
     {
         var acr = await AcrRepository.GetByName(realm, Options.DefaultAcrValue, cancellationToken);
         var workflow = await WorkflowStore.Get(realm, acr.AuthenticationWorkflow, cancellationToken);
         var forms = await FormStore.GetLatestPublishedVersionByCategory(realm, FormCategories.Authentication, cancellationToken);
-        var nextAmr = WorkflowHelper.GetNextAmr<T>(workflow, forms, viewModel.CurrentLink);
+        var inputData = GetInputData(isTemporaryCredential);
+        var nextAmr = _workflowHelper.GetNextAmr<T>(inputData, workflow, forms, viewModel.CurrentLink);
         var amrs = WorkflowHelper.ExtractAmrs(workflow, forms);
         return (nextAmr, amrs);
     }
 
-    private async Task<(string nextAmr, Client client, AcrResult acr)> GetNextAmrFormAuthorizationRequestAuthentication<T>(string realm, string currentAmr, string unprotectedUrl, T viewModel, CancellationToken cancellationToken) where T : ISidStepViewModel
+    private async Task<(string nextAmr, Client client, AcrResult acr)> GetNextAmrFormAuthorizationRequestAuthentication<T>(string realm, string currentAmr, string unprotectedUrl, T viewModel, bool isTemporaryCredential, CancellationToken cancellationToken) where T : ISidStepViewModel
     {
         var query = ExtractQueryFromUnprotectedUrl(unprotectedUrl);
         var acrValues = query.GetAcrValuesFromAuthorizationRequest();
@@ -271,7 +276,7 @@ public class BaseAuthenticateController : BaseController
         var requestedClaims = query.GetClaimsFromAuthorizationRequest();
         var client = await _clientRepository.GetByClientId(realm, clientId, cancellationToken);
         var acr = await _amrHelper.FetchDefaultAcr(realm, FormCategories.Authentication, acrValues, requestedClaims, client, cancellationToken);
-        var nextAmr = acr == null ? null : WorkflowHelper.GetNextAmr<T>(acr.Workflow, acr.Forms, viewModel.CurrentLink);
+        var nextAmr = acr == null ? null : _workflowHelper.GetNextAmr<T>(GetInputData(isTemporaryCredential), acr.Workflow, acr.Forms, viewModel.CurrentLink);
         return (nextAmr, client, acr);
     }
 
@@ -280,5 +285,13 @@ public class BaseAuthenticateController : BaseController
         var expirationTimeInSeconds = client == null || client.UserCookieExpirationTimeInSeconds == null ?
            _options.DefaultTokenExpirationTimeInSeconds : client.UserCookieExpirationTimeInSeconds.Value;
         return expirationTimeInSeconds;
+    }
+
+    private static JsonObject GetInputData(bool isTemporaryCredential)
+    {
+        return new JsonObject
+        {
+            { DefaultWorkflowParameters.IsTemporaryCredential, isTemporaryCredential.ToString() }
+        };
     }
 }

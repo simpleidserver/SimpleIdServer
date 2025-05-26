@@ -32,6 +32,8 @@ namespace SimpleIdServer.IdServer.Domains
         public int TOTPStep { get; set; } = 30;
         [JsonPropertyName(UserCredentialNames.HOTPWindow)]
         public int HOTPWindow { get; set; } = 5;
+        [JsonPropertyName(UserCredentialNames.IsTemporary)]
+        public bool IsTemporary { get; set; } = false;
         [JsonPropertyName(UserCredentialNames.HashAlg)]
         public PasswordHashAlgs HashAlg { get; set; } = PasswordHashAlgs.Default;
         [JsonIgnore]
@@ -39,7 +41,6 @@ namespace SimpleIdServer.IdServer.Domains
         [JsonIgnore]
         [Newtonsoft.Json.JsonIgnore]
         public byte[] OTPKey => CredentialType == PWD ? null : Value?.ConvertToBase32();
-
         public object Clone()
         {
             return new UserCredential

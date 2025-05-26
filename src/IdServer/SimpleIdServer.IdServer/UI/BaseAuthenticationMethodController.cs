@@ -70,7 +70,8 @@ namespace SimpleIdServer.IdServer.UI
             IFormStore formStore,
             ILanguageRepository languageRepository,
             IAcrHelper acrHelper,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, authenticationContextClassReferenceRepository, options)
+            IWorkflowHelper workflowHelper,
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, authenticationContextClassReferenceRepository, workflowHelper, options)
         {
             _templateStore = templateStore;
             _configuration = configuration;
@@ -278,7 +279,8 @@ namespace SimpleIdServer.IdServer.UI
                Amr,
                authenticationResult.AuthenticatedUser,
                token,
-               acrInfo?.RememberLogin ?? viewModel.RememberLogin);
+               acrInfo?.RememberLogin ?? viewModel.RememberLogin,
+               authenticationResult.IsTemporaryCredential);
 
             async Task<IActionResult> CheckAntiforgery()
             {

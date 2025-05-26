@@ -1,4 +1,5 @@
-﻿using FormBuilder.Models;
+﻿using FormBuilder.Conditions;
+using FormBuilder.Models;
 
 namespace FormBuilder.Builders;
 
@@ -30,7 +31,13 @@ public class WorkflowBuilder
 
     public WorkflowBuilder AddLink(FormRecord sourceForm, FormRecord targetForm, string eltId, string description, bool isMainLink, Action<WorkflowLink> cb = null)
     {
-        _workflowLinks.Add(new WorkflowLinkBuilder(sourceForm, targetForm, eltId, description, isMainLink, cb));
+        _workflowLinks.Add(new WorkflowLinkBuilder(sourceForm, new List<(FormRecord form, IConditionParameter condition, string description)> { { (targetForm, null, description) } }, eltId, isMainLink, cb));
+        return this;
+    }
+
+    public WorkflowBuilder AddLink(FormRecord sourceForm, List<(FormRecord form, IConditionParameter condition, string description)> targets, string eltId, bool isMainLink, Action<WorkflowLink> cb = null)
+    {
+        _workflowLinks.Add(new WorkflowLinkBuilder(sourceForm, targets, eltId, isMainLink, cb));
         return this;
     }
 
@@ -39,19 +46,31 @@ public class WorkflowBuilder
         foreach(var link in _workflowLinks)
         {
             var sourceStep = _workflow.GetStep(link.SourceForm.CorrelationId);
-            WorkflowStep targetStep = null;
-            if(link.TargetForm.CorrelationId == FormBuilder.Constants.EmptyStep.CorrelationId)
+            var targets = new List<WorkflowLinkTarget>();
+            foreach(var target in link.Targets)
             {
-                targetStep = new WorkflowStep
+                WorkflowStep targetStep;
+                if (target.form.CorrelationId == FormBuilder.Constants.EmptyStep.CorrelationId)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    FormRecordCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId
+                    targetStep = new WorkflowStep
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        FormRecordCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId
+                    };
+                    _workflow.Steps.Add(targetStep);
+                }
+                else
+                {
+                    targetStep = _workflow.GetStep(target.form.CorrelationId);
+                }
+
+                var workflowLinkTarget = new WorkflowLinkTarget
+                {
+                    Condition = target.condition,
+                    TargetStepId = targetStep.Id,
+                    Description = target.description
                 };
-                _workflow.Steps.Add(targetStep);
-            }
-            else
-            {
-                targetStep = _workflow.GetStep(link.TargetForm.CorrelationId);
+                targets.Add(workflowLinkTarget);
             }
 
             var workflowLink = new WorkflowLink
@@ -62,8 +81,7 @@ public class WorkflowBuilder
                     EltId = link.EltId
                 },
                 SourceStepId = sourceStep.Id,
-                TargetStepId = targetStep.Id,
-                Description = link.Description,
+                Targets = targets,
                 IsMainLink = link.IsMainLink
             };
             _workflow.Links.Add(workflowLink);
@@ -75,20 +93,18 @@ public class WorkflowBuilder
 
     private record WorkflowLinkBuilder
     {
-        public WorkflowLinkBuilder(FormRecord sourceForm, FormRecord targetForm, string eltId, string description, bool isMainLink, Action<WorkflowLink> cb)
+        public WorkflowLinkBuilder(FormRecord sourceForm, List<(FormRecord form, IConditionParameter condition, string description)> targets, string eltId, bool isMainLink, Action<WorkflowLink> cb)
         {
             SourceForm = sourceForm;
-            TargetForm = targetForm;
+            Targets = targets;
             EltId = eltId;
-            Description = description;
             IsMainLink = isMainLink;
             Cb = cb;
         }
 
         public FormRecord SourceForm { get; private set; }
-        public FormRecord TargetForm { get; private set; }
+        public List<(FormRecord form, IConditionParameter condition, string description)> Targets { get; private set; }
         public string EltId { get; private set; }
-        public string Description { get; private set; }
         public bool IsMainLink { get; private set; }
         public Action<WorkflowLink> Cb { get; private set; }
     }

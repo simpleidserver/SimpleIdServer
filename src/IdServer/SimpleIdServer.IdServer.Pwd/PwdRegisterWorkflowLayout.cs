@@ -29,7 +29,13 @@ public class PwdRegisterWorkflowLayout : IWorkflowLayoutService
                 // Register
                 new WorkflowLinkLayout
                 {
-                    Description = "Register",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Register"
+                        }
+                    },
                     EltCorrelationId = StandardPwdRegisterForms.pwdRegisterFormId,
                     IsMainLink = true,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
@@ -54,10 +60,16 @@ public class PwdRegisterWorkflowLayout : IWorkflowLayoutService
                 // Back
                 new WorkflowLinkLayout
                 {
-                    Description = "Back",
                     EltCorrelationId = StandardPwdRegisterForms.backBtnId,
                     ActionType = WorkflowLinkUrlTransformerAction.ActionType,
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout 
+                        { 
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Back"
+                        }
+                    },
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkUrlTransformationParameter
                     {
                         Url = "{returnUrl}",

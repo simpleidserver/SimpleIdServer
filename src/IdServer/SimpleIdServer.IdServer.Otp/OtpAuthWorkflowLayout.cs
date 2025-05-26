@@ -29,7 +29,13 @@ public class OtpAuthWorkflowLayout : IWorkflowLayoutService
                 // Authenticate.
                 new WorkflowLinkLayout
                 {
-                    Description = "Authenticate",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Authenticate"
+                        }
+                    },
                     EltCorrelationId = StandardOtpAuthForms.otpCodeFormId,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
                     IsMainLink = true,

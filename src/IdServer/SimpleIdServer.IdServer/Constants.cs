@@ -8,6 +8,7 @@ public static class Constants
     public const string SubjectAlternativeNameOid = "2.5.29.17";
     public const string AuthenticatedPolicyName = "authenticated";
     public const string AreaPwd = "pwd";
+    public const string AreaTmpPwd = "resetTmpPwd";
     public const string LogoutUserKey = "otherUser";
     public const string RealmKey = "realm";
     public const string DefaultExternalCookieAuthenticationScheme = "ExternalCookies";

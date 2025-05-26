@@ -157,6 +157,16 @@ namespace SimpleIdServer.IdServer.Builders
 
         #endregion
 
+        public UserBuilder EnableTemporaryPassword()
+        {
+            foreach(var credential in _user.Credentials.Where(c => c.CredentialType == "pwd"))
+            {
+                credential.IsTemporary = true;
+            }
+
+            return this;
+        }
+
         public UserBuilder GenerateRandomHOTPKey()
         {
             _user.GenerateHOTP();

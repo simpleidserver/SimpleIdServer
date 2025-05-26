@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder.Helpers;
 using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
@@ -7,6 +8,7 @@ using FormBuilder.UIs;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,52 +16,64 @@ namespace SimpleIdServer.IdServer.Helpers;
 
 public interface IWorkflowHelper
 {
-    Task<string> GetNextAmr(string realm, string category, string workflowId, string amr, CancellationToken cancellationToken);
+    string GetNextAmr<TViewModel>(JsonObject input, WorkflowViewModel result, TViewModel viewModel) where TViewModel : ISidStepViewModel;
+    string GetNextAmr<TViewModel>(JsonObject input, WorkflowRecord workflow, List<FormRecord> records, string activeLink);
+    Task<string> GetNextAmr(JsonObject input, string realm, string category, string workflowId, string amr, CancellationToken cancellationToken);
+    string GetNextAmr(JsonObject input, WorkflowRecord workflow, List<FormRecord> forms, string amr);
+    string GetTargetFormRecordId<TViewModel>(JsonObject input, WorkflowRecord workflow, TViewModel viewModel) where TViewModel : ISidStepViewModel;
 }
 
 public class WorkflowHelper : IWorkflowHelper
 {
     private readonly IFormStore _formStore;
     private readonly IWorkflowStore _workflowStore;
+    private readonly IWorkflowLinkHelper _workflowLinkHelper;
 
-    public WorkflowHelper(IFormStore formStore, IWorkflowStore workflowStore)
+    public WorkflowHelper(
+        IFormStore formStore, 
+        IWorkflowStore workflowStore,
+        IWorkflowLinkHelper workflowLinkHelper)
     {
         _formStore = formStore;
         _workflowStore = workflowStore;
+        _workflowLinkHelper = workflowLinkHelper;
     }
 
-    public static string GetNextAmr<TViewModel>(WorkflowViewModel result, TViewModel viewModel) where TViewModel : ISidStepViewModel
-        => GetNextAmr<TViewModel>(result.Workflow, result.FormRecords, viewModel.CurrentLink);
+    public string GetNextAmr<TViewModel>(JsonObject input, WorkflowViewModel result, TViewModel viewModel) where TViewModel : ISidStepViewModel
+        => GetNextAmr<TViewModel>(input, result.Workflow, result.FormRecords, viewModel.CurrentLink);
 
-    public static string GetNextAmr<TViewModel>(WorkflowRecord workflow, List<FormRecord> records, string activeLink)
+    public string GetNextAmr<TViewModel>(JsonObject input, WorkflowRecord workflow, List<FormRecord> records, string activeLink)
     {
-        var targetFormRecordId = GetTargetFormRecordId(workflow, activeLink);
+        var targetFormRecordId = GetTargetFormRecordId(input, workflow, activeLink);
         if (targetFormRecordId == FormBuilder.Constants.EmptyStep.CorrelationId) return FormBuilder.Constants.EmptyStep.Name;
         var formRecord = records.Single(rec => rec.CorrelationId == targetFormRecordId);
         return formRecord.Name;
     }
 
-    public static bool IsLastStep(string stepName)
-        => stepName == FormBuilder.Constants.EmptyStep.Name;
-
-    public async Task<string> GetNextAmr(string realm, string category, string workflowId, string amr, CancellationToken cancellationToken)
+    public async Task<string> GetNextAmr(JsonObject input, string realm, string category, string workflowId, string amr, CancellationToken cancellationToken)
     {
         var workflow = await _workflowStore.Get(realm, workflowId, cancellationToken);
         var forms = await _formStore.GetLatestPublishedVersionByCategory(realm, category, cancellationToken);
-        return GetNextAmr(workflow, forms, amr);
+        return GetNextAmr(input, workflow, forms, amr);
     }
 
-    public static string GetNextAmr(WorkflowRecord workflow, List<FormRecord> forms, string amr)
+    public string GetNextAmr(JsonObject input, WorkflowRecord workflow, List<FormRecord> forms, string amr)
     {
         var workflowFormIds = workflow.Steps.Select(r => r.FormRecordCorrelationId);
         var workflowForms = forms.Where(f => workflowFormIds.Contains(f.CorrelationId));
         var currentForm = workflowForms.Single(f => f.Name == amr);
         var workflowStep = workflow.Steps.Single(s => s.FormRecordCorrelationId == currentForm.CorrelationId);
-        var stepLinks = workflow.Links.Where(l => l.SourceStepId == workflowStep.Id).Select(l => l.TargetStepId);
+        var stepLinks = workflow.Links.Where(l => l.SourceStepId == workflowStep.Id).Select(s => _workflowLinkHelper.ResolveNextStep(input, workflow, s.Id));
         var targetFormIds = workflow.Steps.Where(s => stepLinks.Contains(s.Id)).Select(s => s.FormRecordCorrelationId);
         var result = workflowForms.FirstOrDefault(f => targetFormIds.Contains(f.CorrelationId) && f.ActAsStep)?.Name;
         if (result != null) return result;
         return FormBuilder.Constants.EmptyStep.Name;
+    }
+
+    public string GetTargetFormRecordId<TViewModel>(JsonObject input, WorkflowRecord workflow, TViewModel viewModel) 
+        where TViewModel : ISidStepViewModel
+    {
+        return GetTargetFormRecordId(input, workflow, viewModel.CurrentLink);
     }
 
     public static List<string> ExtractAmrs(WorkflowRecord workflow, List<FormRecord> forms)
@@ -74,9 +88,12 @@ public class WorkflowHelper : IWorkflowHelper
         return names;
     }
 
-    private static string GetTargetFormRecordId(WorkflowRecord workflow, string activeLink)
+    public static bool IsLastStep(string stepName)
+        => stepName == FormBuilder.Constants.EmptyStep.Name;
+
+    private string GetTargetFormRecordId(JsonObject input, WorkflowRecord workflow, string activeLink)
     {
-        var link = workflow.Links.Single(l => l.Id == activeLink);
-        return workflow.Steps.Single(r => r.Id == link.TargetStepId).FormRecordCorrelationId;
+        var stepId = _workflowLinkHelper.ResolveNextStep(input, workflow, activeLink);
+        return workflow.Steps.Single(s => s.Id == stepId).FormRecordCorrelationId;
     }
 }

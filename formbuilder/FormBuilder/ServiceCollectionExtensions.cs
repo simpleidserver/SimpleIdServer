@@ -49,6 +49,7 @@ public static class ServiceCollectionExtensions
         else services.Configure<FormBuilderOptions>(cb);
         services.AddTransient<IFormBuilderJsService, FormBuilderJsService>();
         services.AddTransient<INavigationHistoryService, NavigationHistoryService>();
+        services.AddTransient<IWorkflowLinkHelper, WorkflowLinkHelper>();
 
         services.AddTransient<IFormElementDefinition, FormInputFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();

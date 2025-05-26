@@ -30,10 +30,16 @@ public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
                 // Confirmation code.
                 new WorkflowLinkLayout
                 {
-                    Description = "Confirmation code",
                     EltCorrelationId = StandardConsoleAuthForms.consoleSendConfirmationCode,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,
-                    TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout 
+                        { 
+                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            Description = "Confirmation code"
+                        }
+                    },
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.POST,
@@ -55,7 +61,13 @@ public class ConsoleAuthWorkflowLayout : IWorkflowLayoutService
                 // Authenticate
                 new WorkflowLinkLayout
                 {
-                    Description = "Authenticate",
+                    Targets = new List<WorkflowLinkTargetLayout>
+                    {
+                        new WorkflowLinkTargetLayout
+                        {
+                            Description = "Authenticate"
+                        }
+                    },
                     IsMainLink = true,
                     EltCorrelationId = StandardConsoleAuthForms.consoleAuthForm,
                     ActionType = WorkflowLinkHttpRequestAction.ActionType,

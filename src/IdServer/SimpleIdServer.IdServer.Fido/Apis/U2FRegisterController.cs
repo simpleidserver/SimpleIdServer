@@ -200,7 +200,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             async Task<IActionResult> HandleWorkflowRegistration()
             {
                 var nextAmr = !registrationProgress.UpdateOneCredential ? 
-                    (await _workflowHelper.GetNextAmr(prefix, FormCategories.Registration, registrationProgress.WorkflowId, sessionRecord.CredentialType, cancellationToken)) : string.Empty;
+                    (await _workflowHelper.GetNextAmr(null, prefix, FormCategories.Registration, registrationProgress.WorkflowId, sessionRecord.CredentialType, cancellationToken)) : string.Empty;
                 if (
                     (!string.IsNullOrWhiteSpace(nextAmr) && WorkflowHelper.IsLastStep(nextAmr)) || 
                     registrationProgress.UpdateOneCredential
@@ -283,7 +283,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             string nextAmr = null;
             if (registrationProgress != null && !registrationProgress.UpdateOneCredential)
             {
-                nextAmr = await _workflowHelper.GetNextAmr(prefix, FormCategories.Registration, registrationProgress.WorkflowId, request.CredentialType, cancellationToken);
+                nextAmr = await _workflowHelper.GetNextAmr(null, prefix, FormCategories.Registration, registrationProgress.WorkflowId, request.CredentialType, cancellationToken);
             }
 
             if (registrationProgress != null && !WorkflowHelper.IsLastStep(nextAmr) && !registrationProgress.UpdateOneCredential)
