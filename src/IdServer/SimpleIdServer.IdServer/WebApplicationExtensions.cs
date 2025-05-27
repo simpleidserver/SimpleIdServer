@@ -219,6 +219,12 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("searchUsers",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Users + "/.search",
             defaults: new { controller = "Users", action = "Search" });
+        webApplication.SidMapControllerRoute("enableTemporaryPassword",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Users + "/{id}/tmppwd/enable",
+            defaults: new { controller = "Users", action = "EnableTemporaryPassword" });
+        webApplication.SidMapControllerRoute("disableTemporaryPassword",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Users + "/{id}/tmppwd/disable",
+            defaults: new { controller = "Users", action = "DisableTemporaryPassword" });
         webApplication.SidMapControllerRoute("blockUser",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Users + "/{id}/block",
             defaults: new { controller = "Users", action = "Block" });

@@ -113,7 +113,7 @@ public static class StandardPwdAuthWorkflows
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
-                Target = "/{realm}/pwd/ResetTemporary",
+                Target = "/{realm}/resetTmpPwd/Authenticate",
                 Transformers = new List<ITransformerParameters>
                 {
                     new RegexTransformerParameters()

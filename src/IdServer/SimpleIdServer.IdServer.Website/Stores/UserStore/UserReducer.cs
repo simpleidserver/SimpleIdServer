@@ -213,6 +213,48 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         }
 
         [ReducerMethod]
+        public static UserState ReduceEnableTemporaryPasswordAction(UserState state, EnableTemporaryPasswordAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceDisableTemporaryPasswordAction(UserState state, DisableTemporaryPasswordAction act)
+        {
+            return state with
+            {
+                IsLoading = true
+            };
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceEnableTemporaryPasswordSuccessAction(UserState state, EnableTemporaryPasswordSuccessAction act)
+        {
+            var user = state.User;
+            user.ActivePassword.IsTemporary = true;
+            return state with
+            {
+                IsLoading = false,
+                User = user
+            };
+        }
+
+        [ReducerMethod]
+        public static UserState ReduceDisableTemporaryPasswordSuccessAction(UserState state, DisableTemporaryPasswordSuccessAction act)
+        {
+            var user = state.User;
+            user.ActivePassword.IsTemporary = false;
+            return state with
+            {
+                IsLoading = false,
+                User = user
+            };
+        }
+
+        [ReducerMethod]
         public static UserState ReduceGetUserAction(UserState state, GetUserAction act) => new(isLoading: true, user: null);
 
         [ReducerMethod]

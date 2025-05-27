@@ -81,7 +81,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             return Task.FromResult(UserAuthenticationResult.Ok());
         }
 
-
         protected override void EnrichViewModel(AuthenticateWebauthnViewModel viewModel)
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();

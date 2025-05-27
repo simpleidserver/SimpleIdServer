@@ -835,6 +835,52 @@ namespace SimpleIdServer.IdServer.Api.Users
 
         #endregion
 
+        [HttpGet]
+        public Task<IActionResult> EnableTemporaryPassword([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+        {
+            return ToggleTemporaryPassword(prefix, id, true, cancellationToken);
+        }
+
+        [HttpGet]
+        public Task<IActionResult> DisableTemporaryPassword([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+        {
+            return ToggleTemporaryPassword(prefix, id, false, cancellationToken);
+        }
+
+        private async Task<IActionResult> ToggleTemporaryPassword(string prefix, string id, bool isTemporary, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+            }
+            catch (OAuthException ex)
+            {
+                _logger.LogError(ex.ToString());
+                return BuildError(ex);
+            }
+
+            using (var transaction = _transactionBuilder.Build())
+            {
+                var user = await _userRepository.GetById(id, cancellationToken);
+                if (user == null)
+                {
+                    return BuildError(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownUser, id));
+                }
+
+                if (user.ActivePassword == null)
+                {
+                    return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.NoActivePassword);
+                }
+
+                user.ActivePassword.IsTemporary = isTemporary;
+                user.UpdateDateTime = DateTime.UtcNow;
+                _userRepository.Update(user);
+                await transaction.Commit(cancellationToken);
+                return new NoContentResult();
+            }
+        }
+
         protected UserLockingOptions GetOptions()
         {
             var section = _configuration.GetSection(typeof(UserLockingOptions).Name);

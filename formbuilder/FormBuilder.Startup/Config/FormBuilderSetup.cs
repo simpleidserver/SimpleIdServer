@@ -25,28 +25,28 @@ public class FormBuilderSetup
             case StorageTypes.SQLSERVER:
                 builder.UseSqlServer(configuration.ConnectionString, o =>
                 {
-                    o.MigrationsAssembly("FormBuilder.SqlServerMigrations");
+                    o.MigrationsAssembly("SidFormBuilder.SqlServerMigrations");
                     o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 });
                 break;
             case StorageTypes.SQLITE:
                 builder.UseSqlite(configuration.ConnectionString, o =>
                 {
-                    o.MigrationsAssembly("FormBuilder.SqliteMigrations");
+                    o.MigrationsAssembly("SidFormBuilder.SqliteMigrations");
                     o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 });
                 break;
             case StorageTypes.POSTGRE:
                 builder.UseNpgsql(configuration.ConnectionString, o =>
                 {
-                    o.MigrationsAssembly("FormBuilder.PostgreMigrations");
+                    o.MigrationsAssembly("SidFormBuilder.PostgreMigrations");
                     o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 });
                 break;
             case StorageTypes.MYSQL:
                 builder.UseMySql(configuration.ConnectionString, ServerVersion.AutoDetect(configuration.ConnectionString), o =>
                 {
-                    o.MigrationsAssembly("FormBuilder.MySQLMigrations");
+                    o.MigrationsAssembly("SidFormBuilder.MySQLMigrations");
                     o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
                 });
                 break;

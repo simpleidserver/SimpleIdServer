@@ -2190,4 +2190,19 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="ManageClientSecrets" xml:space="preserve">
     <value>Client secrets</value>
   </data>
+  <data name="IsTemporary" xml:space="preserve">
+    <value>Is temporary</value>
+  </data>
+  <data name="IsTemporaryPwd" xml:space="preserve">
+    <value>Password is temporary</value>
+  </data>
+  <data name="IsNotTemporaryPwd" xml:space="preserve">
+    <value>Password is not temporary</value>
+  </data>
+  <data name="PasswordIsNotTemporary" xml:space="preserve">
+    <value>The password is temporary</value>
+  </data>
+  <data name="PasswordIsTemporary" xml:space="preserve">
+    <value>The password is temporary</value>
+  </data>
 </root>

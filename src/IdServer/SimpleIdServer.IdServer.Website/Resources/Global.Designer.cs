@@ -2905,6 +2905,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Password is not temporary.
+        /// </summary>
+        public static string IsNotTemporaryPwd {
+            get {
+                return ResourceManager.GetString("IsNotTemporaryPwd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Is public?.
         /// </summary>
         public static string IsPublic {
@@ -2919,6 +2928,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string IsPublicTooltip {
             get {
                 return ResourceManager.GetString("IsPublicTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Is temporary.
+        /// </summary>
+        public static string IsTemporary {
+            get {
+                return ResourceManager.GetString("IsTemporary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Password is temporary.
+        /// </summary>
+        public static string IsTemporaryPwd {
+            get {
+                return ResourceManager.GetString("IsTemporaryPwd", resourceCulture);
             }
         }
         
@@ -3650,6 +3677,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         public static string PasswordCredDescription {
             get {
                 return ResourceManager.GetString("PasswordCredDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The password is temporary.
+        /// </summary>
+        public static string PasswordIsNotTemporary {
+            get {
+                return ResourceManager.GetString("PasswordIsNotTemporary", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The password is temporary.
+        /// </summary>
+        public static string PasswordIsTemporary {
+            get {
+                return ResourceManager.GetString("PasswordIsTemporary", resourceCulture);
             }
         }
         

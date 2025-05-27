@@ -30,6 +30,11 @@
                 <RadzenStack Orientation="Orientation.Horizontal">
                     <RadzenSwitch Value=@(userState.Value.User.Status == UserStatus.ACTIVATED) ValueChanged="ToggleUser" />
                     <RadzenBadge BadgeStyle=@(userState.Value.User.Status == UserStatus.ACTIVATED ? BadgeStyle.Success : BadgeStyle.Danger) Text=@(userState.Value.User.Status == UserStatus.ACTIVATED ? Global.Active : Global.Blocked)></RadzenBadge>
+                    @if(userState.Value.User.ActivePassword != null)
+                    {
+                        <RadzenSwitch Value=@(userState.Value.User.ActivePassword.IsTemporary) ValueChanged="ToggleTemporaryPassword" />
+                        <RadzenBadge BadgeStyle=@(userState.Value.User.ActivePassword.IsTemporary ? BadgeStyle.Danger : BadgeStyle.Success) Text=@(userState.Value.User.ActivePassword.IsTemporary ? Global.IsTemporaryPwd : Global.IsNotTemporaryPwd)></RadzenBadge>
+                    }
                 </RadzenStack>
             }
         </RadzenStack>        
@@ -113,6 +118,14 @@
             {
                 Init();
             });
+            SubscribeToAction<DisableTemporaryPasswordSuccessAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.PasswordIsNotTemporary });
+            });
+            SubscribeToAction<EnableTemporaryPasswordAction>((act) =>
+            {
+                notificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = Global.PasswordIsTemporary });
+            });
             Init();
         }
     }
@@ -136,6 +149,13 @@
     {
         IsActive = value;
         object act = value ? new UnblockUserAction { UserId = id } : new BlockUserAction { UserId = id };
+        dispatcher.Dispatch(act);
+    }
+
+    private void ToggleTemporaryPassword(bool value)
+    {
+        IsActive = value;
+        object act = value ? new EnableTemporaryPasswordAction { UserId = id } : new DisableTemporaryPasswordAction { UserId = id };
         dispatcher.Dispatch(act);
     }
 

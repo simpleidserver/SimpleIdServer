@@ -137,9 +137,6 @@ namespace FormBuilder.PostgreMigrations.Migrations
                     b.Property<string>("ActionType")
                         .HasColumnType("text");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
                     b.Property<bool>("IsMainLink")
                         .HasColumnType("boolean");
 
@@ -152,6 +149,10 @@ namespace FormBuilder.PostgreMigrations.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("TargetStepId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Targets")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("WorkflowRecordId")

@@ -17,7 +17,7 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.11")
+                .HasAnnotation("ProductVersion", "8.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -2504,6 +2504,10 @@ namespace SimpleIdServer.IdServer.MySQLMigrations.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("tinyint(1)")
                         .HasAnnotation("Relational:JsonPropertyName", "active");
+
+                    b.Property<bool>("IsTemporary")
+                        .HasColumnType("tinyint(1)")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_temporary");
 
                     b.Property<int?>("OTPAlg")
                         .HasColumnType("int")

@@ -15,7 +15,7 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.11");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.13");
 
             modelBuilder.Entity("ApiResourceRealm", b =>
                 {
@@ -2479,6 +2479,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("INTEGER")
                         .HasAnnotation("Relational:JsonPropertyName", "active");
+
+                    b.Property<bool>("IsTemporary")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "is_temporary");
 
                     b.Property<int?>("OTPAlg")
                         .HasColumnType("INTEGER")

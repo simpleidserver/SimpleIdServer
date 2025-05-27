@@ -271,22 +271,22 @@ public class StandardPwdAuthForms
                 new FormInputFieldRecord
                 {
                     Id = Guid.NewGuid().ToString(),
-                    Name = nameof(ResetPasswordIndexViewModel.Login),
+                    Name = nameof(ResetTemporaryPasswordViewModel.Login),
                     FormType = FormInputTypes.TEXT,
                     Disabled = true,
                     Transformations = new List<ITransformationRule>
                     {
                         new IncomingTokensTransformationRule
                         {
-                            Source = $"$.{nameof(ResetPasswordIndexViewModel.Login)}"
+                            Source = $"$.{nameof(ResetTemporaryPasswordViewModel.Login)}"
                         }
                     },
                     Labels = LayoutTranslations.Login
                 },
                 // Password
-                StandardFormComponents.NewPassword(nameof(ResetPasswordIndexViewModel.Password)),
+                StandardFormComponents.NewPassword(nameof(ResetTemporaryPasswordViewModel.Password)),
                 // RepeatPassword
-                StandardFormComponents.NewPassword(nameof(ResetPasswordIndexViewModel.ConfirmedPassword)),
+                StandardFormComponents.NewPassword(nameof(ResetTemporaryPasswordViewModel.ConfirmationPassword)),
                 // Update
                 StandardFormComponents.NewButton(LayoutTranslations.Update)
             }

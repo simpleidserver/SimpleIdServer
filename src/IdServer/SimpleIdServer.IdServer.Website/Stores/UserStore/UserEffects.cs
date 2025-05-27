@@ -21,7 +21,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         private readonly IRealmStore _realmStore;
 
         public UserEffects(
-            IWebsiteHttpClientFactory websiteHttpClientFactory, 
+            IWebsiteHttpClientFactory websiteHttpClientFactory,
             IOptions<IdServerWebsiteOptions> websiteOptions,
             IRealmStore realmStore)
         {
@@ -287,7 +287,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         {
             var baseUrl = await GetUsersUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
-            foreach(var groupId in action.GroupIds)
+            foreach (var groupId in action.GroupIds)
             {
                 var requestMessage = new HttpRequestMessage
                 {
@@ -306,7 +306,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             var baseUrl = await GetUsersUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
             var groups = new List<Domains.Group>();
-            foreach(var groupId in action.GroupIds)
+            foreach (var groupId in action.GroupIds)
             {
                 var requestMessage = new HttpRequestMessage
                 {
@@ -343,7 +343,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         {
             var baseUrl = await GetUsersUrl();
             var httpClient = await _websiteHttpClientFactory.Build();
-            foreach(var userId in action.UserIds)
+            foreach (var userId in action.UserIds)
             {
                 var requestMessage = new HttpRequestMessage
                 {
@@ -431,6 +431,36 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             dispatcher.Dispatch(new UnblockUserSuccessAction());
         }
 
+        [EffectMethod]
+        public async Task Handle(EnableTemporaryPasswordAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/tmppwd/enable"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            await httpResult.Content.ReadAsStringAsync();
+            dispatcher.Dispatch(new EnableTemporaryPasswordSuccessAction());
+        }
+
+        [EffectMethod]
+        public async Task Handle(DisableTemporaryPasswordAction action, IDispatcher dispatcher)
+        {
+            var baseUrl = await GetUsersUrl();
+            var httpClient = await _websiteHttpClientFactory.Build();
+            var requestMessage = new HttpRequestMessage
+            {
+                RequestUri = new Uri($"{baseUrl}/{action.UserId}/tmppwd/disable"),
+                Method = HttpMethod.Get
+            };
+            var httpResult = await httpClient.SendAsync(requestMessage);
+            await httpResult.Content.ReadAsStringAsync();
+            dispatcher.Dispatch(new DisableTemporaryPasswordSuccessAction());
+        }
+
         private async Task<string> GetUsersUrl()
         {
             var baseUrl = await GetBaseUrl();
@@ -439,7 +469,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
 
         private async Task<string> GetBaseUrl()
         {
-            if(_options.IsReamEnabled)
+            if (_options.IsReamEnabled)
             {
                 var realm = await GetRealm();
                 return $"{_options.Issuer}/{realm}";
@@ -798,6 +828,32 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
     }
 
     public class UnblockUserSuccessAction
+    {
+        public string UserId { get; set; }
+    }
+
+    public class EnableTemporaryPasswordAction
+    {
+        public string UserId
+        {
+            get; set;
+        }
+    }
+
+    public class EnableTemporaryPasswordSuccessAction
+    {
+        public string UserId { get; set; }
+    }
+
+    public class DisableTemporaryPasswordAction
+    {
+        public string UserId
+        {
+            get; set;
+        }
+    }
+
+    public class DisableTemporaryPasswordSuccessAction
     {
         public string UserId { get; set; }
     }

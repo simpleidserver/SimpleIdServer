@@ -132,9 +132,6 @@ namespace FormBuilder.SqliteMigrations.Migrations
                     b.Property<string>("ActionType")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
                     b.Property<bool>("IsMainLink")
                         .HasColumnType("INTEGER");
 
@@ -147,6 +144,10 @@ namespace FormBuilder.SqliteMigrations.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TargetStepId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Targets")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("WorkflowRecordId")

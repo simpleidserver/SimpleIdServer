@@ -137,9 +137,6 @@ namespace FormBuilder.SqlServerMigrations.Migrations
                     b.Property<string>("ActionType")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<bool>("IsMainLink")
                         .HasColumnType("bit");
 
@@ -152,6 +149,10 @@ namespace FormBuilder.SqlServerMigrations.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TargetStepId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Targets")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WorkflowRecordId")
