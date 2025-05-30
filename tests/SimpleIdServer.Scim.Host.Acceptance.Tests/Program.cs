@@ -181,7 +181,7 @@ void ConfigureServices(IServiceCollection services)
     {
         o.EnableEndpointRouting = false;
         o.ValueProviderFactories.Insert(0, new SeparatedQueryStringValueProviderFactory(","));
-    }).AddNewtonsoftJson(o => { });
+    });
     services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
     services.AddAuthorization(opts =>
     {

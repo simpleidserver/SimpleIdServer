@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -14,6 +13,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -24,7 +25,7 @@ namespace SimpleIdServer.Scim.Helpers
         Task<SCIMRepresentationPatchResult> Apply(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues, CancellationToken cancellationToken);
         Task CheckUniqueness(IEnumerable<SCIMRepresentationAttribute> attributes);
         void CheckMutability(List<SCIMPatchResult> patchOperations);
-        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings);
+        SCIMRepresentation ExtractSCIMRepresentationFromJSON(JsonObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings);
     }
 
     public class RepresentationHelper : IRepresentationHelper
@@ -278,22 +279,22 @@ namespace SimpleIdServer.Scim.Helpers
             return result.OrderBy(r => r.Item3).Select(r => (r.Item1, r.Item2)).ToList();
         }
 
-        private JObject MergePatchOperationValues(IEnumerable<PatchOperationParameter> parameters)
+        private JsonObject MergePatchOperationValues(IEnumerable<PatchOperationParameter> parameters)
         {
-            var mergedResult = new JObject();
+            var mergedResult = new JsonObject();
             foreach (var operation in parameters)
             {
-                var operationValueJson = operation.Value as JObject;
+                var operationValueJson = operation.Value as JsonObject;
                 if (operationValueJson == null) continue;
                 foreach(var kvp in operationValueJson)
                 {
                     var json = kvp.Value.ToString();
-                    JToken node = null;
-                    switch(kvp.Value.Type)
+                    JsonNode node = null;
+                    switch(kvp.Value.GetValueKind())
                     {
-                        case JTokenType.Object:
-                        case JTokenType.Array:
-                            node = JToken.Parse(json);
+                        case JsonValueKind.Object:
+                        case JsonValueKind.Array:
+                            node = JsonNode.Parse(json);
                             break;
                         default:
                             node = json;
@@ -439,9 +440,9 @@ namespace SimpleIdServer.Scim.Helpers
                 return false;
             }
 
-            var jObj = patchOperation.Value as JObject;
-            if (patchOperation.Path == attrName &&
-                (patchOperation.Value.GetType() == typeof(string) || patchOperation.Value.GetType() == typeof(JValue)))
+            var jObj = patchOperation.Value as JsonObject;
+            var type = patchOperation.Value.GetValueKind();
+            if (patchOperation.Path == attrName && type == JsonValueKind.String)
             {
                 value = patchOperation.Value.ToString();
                 return true;
@@ -459,14 +460,14 @@ namespace SimpleIdServer.Scim.Helpers
         private static ICollection<SCIMRepresentationAttribute> ExtractRepresentationAttributesFromJSON(ICollection<SCIMSchema> schemas, ICollection<SCIMSchemaAttribute> schemaAttributes, object obj, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new List<SCIMRepresentationAttribute>();
-            var jArr = obj as JArray;
-            var jObj = obj as JObject;
+            var jArr = obj as JsonArray;
+            var jObj = obj as JsonObject;
             if (jObj != null && schemaAttributes != null &&
                 schemaAttributes.Any() &&
                 schemaAttributes.Count() == 1 &&
                 schemaAttributes.First().Type == SCIMSchemaAttributeTypes.COMPLEX)
             {
-                jArr = new JArray();
+                jArr = new JsonArray();
                 jArr.Add(jObj);
             }
 
@@ -608,13 +609,13 @@ namespace SimpleIdServer.Scim.Helpers
         #region Extract
 
 
-        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings)
+        public SCIMRepresentation ExtractSCIMRepresentationFromJSON(JsonObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings)
         {
             CheckRequiredAttributes(mainSchema, extensionSchemas, json);
             return BuildRepresentation(json, externalId, mainSchema, extensionSchemas, _options.IgnoreUnsupportedCanonicalValues, attributeMappings);
         }
 
-        public static SCIMRepresentation BuildRepresentation(JObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, bool ignoreUnsupportedCanonicalValues, IEnumerable<SCIMAttributeMapping> attributeMappings)
+        public static SCIMRepresentation BuildRepresentation(JsonObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, bool ignoreUnsupportedCanonicalValues, IEnumerable<SCIMAttributeMapping> attributeMappings)
         {
             var schemas = new List<SCIMSchema>
             {
@@ -653,7 +654,7 @@ namespace SimpleIdServer.Scim.Helpers
                 // Add attribute
                 if (record.SchemaAttribute.MultiValued)
                 {
-                    var jArr = record.Content as JArray;
+                    var jArr = record.Content as JsonArray;
                     if (jArr == null && !record.Content.IsEmpty())
                     {
                         throw new SCIMSchemaViolatedException(string.Format(Global.AttributeIsNotArray, record.SchemaAttribute.Name));
@@ -663,8 +664,13 @@ namespace SimpleIdServer.Scim.Helpers
                 }
                 else
                 {
-                    var jArr = new JArray();
-                    jArr.Add(record.Content);
+                    var jArr = new JsonArray();
+                    if (!record.Content.IsEmpty())
+                    {
+                        var clone = JsonNode.Parse(record.Content.ToJsonString());
+                        jArr.Add(clone);
+                    }
+
                     attributes.AddRange(BuildAttributes(jArr, record.SchemaAttribute, record.Schema, ignoreUnsupportedCanonicalValues));
                 }
             }
@@ -718,7 +724,7 @@ namespace SimpleIdServer.Scim.Helpers
             return attributes;
         }
 
-        public static ICollection<SCIMRepresentationAttribute> BuildAttributes(JArray jArr, SCIMSchemaAttribute schemaAttribute, SCIMSchema schema, bool ignoreUnsupportedCanonicalValues)
+        public static ICollection<SCIMRepresentationAttribute> BuildAttributes(JsonArray jArr, SCIMSchemaAttribute schemaAttribute, SCIMSchema schema, bool ignoreUnsupportedCanonicalValues)
         {
             var result = new List<SCIMRepresentationAttribute>();
             if (schemaAttribute.Mutability == SCIMSchemaAttributeMutabilities.READONLY)
@@ -737,7 +743,7 @@ namespace SimpleIdServer.Scim.Helpers
                 {
                     foreach (var jsonProperty in jArr)
                     {
-                        var rec = jsonProperty as JObject;
+                        var rec = jsonProperty as JsonObject;
                         if (rec == null)
                         {
                             throw new SCIMSchemaViolatedException(string.Format(Global.NotValidJSON, jsonProperty.ToString()));
@@ -806,7 +812,7 @@ namespace SimpleIdServer.Scim.Helpers
                         }
                         break;
                     case SCIMSchemaAttributeTypes.STRING:
-                        var strs = jArr.Select(j => j.Type == JTokenType.Null ? null : j.ToString()).ToList();
+                        var strs = jArr.Select(j => j.GetValueKind() == System.Text.Json.JsonValueKind.Null ? null : j.ToString()).ToList();
                         if (schemaAttribute.CanonicalValues != null
                             && schemaAttribute.CanonicalValues.Any()
                             && !ignoreUnsupportedCanonicalValues
@@ -882,7 +888,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         #region Resolve attributes
 
-        public static ResolutionResult Resolve(JObject json, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas)
+        public static ResolutionResult Resolve(JsonObject json, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas)
         {
             var rows = new List<ResolutionRowResult>();
             var schemas = new List<SCIMSchema>
@@ -909,7 +915,7 @@ namespace SimpleIdServer.Scim.Helpers
             return new ResolutionResult(schemas, rows);
         }
 
-        public static ResolutionResult Resolve(JObject json, SCIMSchema schema, ICollection<SCIMSchemaAttribute> schemaAttributes)
+        public static ResolutionResult Resolve(JsonObject json, SCIMSchema schema, ICollection<SCIMSchemaAttribute> schemaAttributes)
         {
             var rows = new List<ResolutionRowResult>();
             foreach (var kvp in json)
@@ -920,7 +926,7 @@ namespace SimpleIdServer.Scim.Helpers
             return new ResolutionResult(rows);
         }
 
-        private static ResolutionRowResult Resolve(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> allSchemas)
+        private static ResolutionRowResult Resolve(KeyValuePair<string, JsonNode> kvp, ICollection<SCIMSchema> allSchemas)
         {
             var schema = allSchemas.FirstOrDefault(s => s.Attributes.Any(at => at.FullPath.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase)));
             if (schema == null)
@@ -931,10 +937,10 @@ namespace SimpleIdServer.Scim.Helpers
             return new ResolutionRowResult(schema, schema.Attributes.First(at => at.FullPath.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase)), kvp.Value);
         }
 
-        private static ICollection<ResolutionRowResult> ResolveFullQualifiedName(KeyValuePair<string, JToken> kvp, ICollection<SCIMSchema> extensionSchemas)
+        private static ICollection<ResolutionRowResult> ResolveFullQualifiedName(KeyValuePair<string, JsonNode> kvp, ICollection<SCIMSchema> extensionSchemas)
         {
-            var jObj = kvp.Value as JObject;
-            var jArr = kvp.Value as JArray;
+            var jObj = kvp.Value as JsonObject;
+            var jArr = kvp.Value as JsonArray;
             if (jArr != null)
             {
                 throw new SCIMSchemaViolatedException(string.Format(Global.PropertyCannotContainsArray, kvp.Key));
@@ -957,7 +963,7 @@ namespace SimpleIdServer.Scim.Helpers
             return result;
         }
 
-        private static ResolutionRowResult Resolve(KeyValuePair<string, JToken> kvp, SCIMSchema schema, ICollection<SCIMSchemaAttribute> schemaAttributes)
+        private static ResolutionRowResult Resolve(KeyValuePair<string, JsonNode> kvp, SCIMSchema schema, ICollection<SCIMSchemaAttribute> schemaAttributes)
         {
             var attrSchema = schemaAttributes.FirstOrDefault(a => a.Name.Equals(kvp.Key, StringComparison.InvariantCultureIgnoreCase));
             if (attrSchema == null)
@@ -972,7 +978,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         #region Check required attributes
 
-        private static void CheckRequiredAttributes(SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, JObject json)
+        private static void CheckRequiredAttributes(SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, JsonObject json)
         {
             CheckRequiredAttributes(mainSchema, json);
             foreach (var extensionSchema in extensionSchemas)
@@ -981,13 +987,13 @@ namespace SimpleIdServer.Scim.Helpers
             }
         }
 
-        private static void CheckRequiredAttributes(SCIMSchema schema, JObject json)
+        private static void CheckRequiredAttributes(SCIMSchema schema, JsonObject json)
         {
             var attributes = schema.HierarchicalAttributes.Select(h => h.Leaf);
             CheckRequiredAttributes(schema, attributes, json);
         }
 
-        private static void CheckRequiredAttributes(SCIMSchema schema, IEnumerable<SCIMSchemaAttribute> schemaAttributes, JObject json)
+        private static void CheckRequiredAttributes(SCIMSchema schema, IEnumerable<SCIMSchemaAttribute> schemaAttributes, JsonObject json)
         {
             var missingRequiredAttributes = schemaAttributes.Where(a => a.Required && !json.HasElement(a.Name, schema.Id));
             if (missingRequiredAttributes.Any())
@@ -1000,20 +1006,20 @@ namespace SimpleIdServer.Scim.Helpers
 
         public class ResolutionRowResult
         {
-            public ResolutionRowResult(SCIMSchemaAttribute schemaAttribute, JToken content)
+            public ResolutionRowResult(SCIMSchemaAttribute schemaAttribute, JsonNode content)
             {
                 SchemaAttribute = schemaAttribute;
                 Content = content;
             }
 
-            public ResolutionRowResult(SCIMSchema schema, SCIMSchemaAttribute schemaAttribute, JToken content) : this(schemaAttribute, content)
+            public ResolutionRowResult(SCIMSchema schema, SCIMSchemaAttribute schemaAttribute, JsonNode content) : this(schemaAttribute, content)
             {
                 Schema = schema;
             }
 
             public SCIMSchema Schema { get; set; }
             public SCIMSchemaAttribute SchemaAttribute { get; set; }
-            public JToken Content { get; set; }
+            public JsonNode Content { get; set; }
         }
 
         public class ResolutionResult
@@ -1052,7 +1058,7 @@ namespace SimpleIdServer.Scim.Helpers
             public ICollection<T> Values { get; set; }
         }
 
-        private static ExtractionResult<T> Extract<T>(JArray jArr) where T : struct
+        private static ExtractionResult<T> Extract<T>(JsonArray jArr) where T : struct
         {
             var result = new ExtractionResult<T>();
             var type = typeof(T);
@@ -1060,7 +1066,7 @@ namespace SimpleIdServer.Scim.Helpers
             var method = typeof(T).GetMethod("TryParse", BindingFlags.Static | BindingFlags.Public, Type.DefaultBinder, argTypes, null);
             foreach (var record in jArr)
             {
-                if (record.Type == JTokenType.Null) continue;
+                if (record.GetValueKind() == System.Text.Json.JsonValueKind.Null) continue;
                 var parameters = new object[] { record.ToString(), null };
                 var success = (bool)method.Invoke(null, parameters);
                 if (!success)

@@ -5,8 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Commands;
 using SimpleIdServer.Scim.Commands.Handlers;
 using SimpleIdServer.Scim.Domain;
@@ -25,6 +23,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -243,20 +243,20 @@ namespace SimpleIdServer.Scim.Api
                 var searchResult = await _searchRepresentationsQueryHandler.Handle(realm, searchRequest, _resourceType, cancellationToken);
                 if (searchResult.HasError) return this.BuildError(searchResult);
                 var result = searchResult.Result;
-                var jObj = new JObject
+                var jObj = new JsonObject
                 {
-                    { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
+                    { StandardSCIMRepresentationAttributes.Schemas, new JsonArray(new [] { StandardSchemas.ListResponseSchemas.Id }.Select(v => JsonValue.Create(v)).ToArray() ) },
                     { StandardSCIMRepresentationAttributes.TotalResults, result.TotalResults },
                     { StandardSCIMRepresentationAttributes.ItemsPerPage, searchRequest.Count },
                     { StandardSCIMRepresentationAttributes.StartIndex, searchRequest.StartIndex }
                 };
-                var resources = new JArray();
+                var resources = new JsonArray();
                 var baseUrl = _uriProvider.GetAbsoluteUriWithVirtualPath();
                 var representations = result.Content.ToList();
                 await _attributeReferenceEnricher.Enrich(_resourceType, representations, baseUrl);
                 foreach (var record in representations)
                 {
-                    JObject newJObj = null;
+                    JsonObject newJObj = null;
                     var location = GetLocation(realm, record);
                     bool includeStandardRequest = true;
                     if (searchRequest.Attributes.Any())
@@ -516,7 +516,7 @@ namespace SimpleIdServer.Scim.Api
             var realm = _options.EnableRealm ? prefix : string.Empty;
             var status = await CheckRealm(realm, cancellationToken);
             if (status != RealmStatus.AUTHORIZED) return Build(realm, status);
-            _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonConvert.SerializeObject(patchRepresentation)));
+            _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonSerializer.Serialize(patchRepresentation)));
             try
             {
                 var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm));
@@ -609,7 +609,7 @@ namespace SimpleIdServer.Scim.Api
             return BuildHTTPResult(status, location, representation.Version, content);
         }
 
-        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, string version, JObject content)
+        protected IActionResult BuildHTTPResult(HttpStatusCode status, string location, string version, JsonObject content)
         {
             HttpContext.Response.Headers.Add("Location", location);
             HttpContext.Response.Headers.Add("ETag", version);

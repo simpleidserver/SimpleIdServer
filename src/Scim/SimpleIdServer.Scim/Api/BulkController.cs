@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Exceptions;
@@ -24,6 +22,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
@@ -68,17 +68,17 @@ namespace SimpleIdServer.Scim.Api
         [Authorize("BulkScimResource")]
         public async virtual Task<IActionResult> Index([FromBody] BulkParameter bulk)
         {
-            var json = JsonConvert.SerializeObject(bulk);
+            var json = JsonSerializer.Serialize(bulk);
             _logger.LogInformation(string.Format(Global.StartBulk, json));
             try
             {
                 CheckParameter(bulk);
                 var size = ASCIIEncoding.ASCII.GetByteCount(json.ToString());
                 if (bulk.Operations.Count() > _options.MaxOperations || size > _options.MaxPayloadSize) throw new SCIMTooManyBulkOperationsException();
-                var operationsResult = new JArray();
+                var operationsResult = new JsonArray();
                 var attributeMappings = await _scimAttributeMappingQueryRepository.GetAll();
                 var rootSchemas = await _scimSchemaQueryRepository.GetAll();
-                var allParameters = new List<(BulkOperationParameter, JToken)>();
+                var allParameters = new List<(BulkOperationParameter, JsonNode)>();
                 foreach (var patchOperation in bulk.Operations)
                 {
                     var updateResult = UpdateBulkIdParameters(patchOperation, allParameters, attributeMappings, rootSchemas);
@@ -93,9 +93,9 @@ namespace SimpleIdServer.Scim.Api
                     allParameters.Add((patchOperation, bulkOperationResult.Item2));
                 }
 
-                var result = new JObject
+                var result = new JsonObject
                 {
-                    { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.BulkResponseSchemas.Id } ) },
+                    { StandardSCIMRepresentationAttributes.Schemas, new JsonArray(new [] { StandardSchemas.BulkResponseSchemas.Id }.Select(s => JsonValue.Create(s)).ToArray() ) },
                     { StandardSCIMRepresentationAttributes.Operations, operationsResult }
                 };
                 return new ContentResult
@@ -141,7 +141,7 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        protected async Task<(JObject, JToken)> ExecuteBulkOperation(BulkOperationParameter scimBulkOperationRequest)
+        protected async Task<(JsonObject, JsonNode)> ExecuteBulkOperation(BulkOperationParameter scimBulkOperationRequest)
         {
             var router = RouteData.Routers.OfType<IRouteCollection>().First();
             var features = new FeatureCollection();
@@ -179,19 +179,23 @@ namespace SimpleIdServer.Scim.Api
                 newHttpContext.Response.Body.Position = 0;
                 var responseBody = new StreamReader(newHttpContext.Response.Body).ReadToEnd();
                 newHttpContext.Response.Body.Position = 0;
-                JToken json = null;
-                if (!string.IsNullOrWhiteSpace(responseBody)) json = JToken.Parse(responseBody);
-                var result = new JObject
+                JsonNode json = null;
+                if (!string.IsNullOrWhiteSpace(responseBody))
+                {
+                    json = JsonNode.Parse(responseBody);
+                }
+
+                var result = new JsonObject
                 {
                     { StandardSCIMRepresentationAttributes.Method, scimBulkOperationRequest.HttpMethod },
                     { StandardSCIMRepresentationAttributes.BulkId, scimBulkOperationRequest.BulkIdentifier }
                 };
                 var statusCode = newHttpContext.Response.StatusCode;
-                var statusContent = new JObject();
+                var statusContent = new JsonObject();
                 statusContent.Add("code", statusCode);
                 if (statusCode >= 400)
                 {
-                    var response = new JObject();
+                    var response = new JsonObject();
                     if(json != null)
                     {
                         var scimTypeToken = json.SelectToken("response.scimType");
@@ -210,11 +214,11 @@ namespace SimpleIdServer.Scim.Api
             }
         }
 
-        private (bool, JToken) UpdateBulkIdParameters(BulkOperationParameter parameter, List<(BulkOperationParameter, JToken)> processedBulkOperations, IEnumerable<SCIMAttributeMapping> attributeMappings, IEnumerable<SCIMSchema> rootSchemas)
+        private (bool, JsonNode) UpdateBulkIdParameters(BulkOperationParameter parameter, List<(BulkOperationParameter, JsonNode)> processedBulkOperations, IEnumerable<SCIMAttributeMapping> attributeMappings, IEnumerable<SCIMSchema> rootSchemas)
         {
             var path = parameter.Path;
             if (parameter.Data == null) return (true, null);
-            var schemasJArr = parameter.Data.SelectToken(StandardSCIMRepresentationAttributes.Schemas) as JArray;
+            var schemasJArr = parameter.Data.SelectToken(StandardSCIMRepresentationAttributes.Schemas) as JsonArray;
             if (schemasJArr == null) return (true, null);
             var schemas = schemasJArr.Select(s => s.ToString());
             var resourceTypes = rootSchemas.Where(rs => schemas.Any(s => rs.Id == s)).Select(rs => rs.ResourceType);
@@ -223,18 +227,18 @@ namespace SimpleIdServer.Scim.Api
             {
                 var token = parameter.Data.SelectToken($"$..{attributeMapping.SourceAttributeSelector}");
                 if (token == null) continue;
-                var arr = token as JArray;
-                if (token.Type == JTokenType.Object) arr = new JArray() { token };
+                var arr = token as JsonArray;
+                if (token.GetValueKind() == JsonValueKind.Object) arr = new JsonArray() { token };
                 if (arr == null) continue;
                 foreach(var attr in arr)
                 {
-                    var value = attr.SelectToken(SCIMConstants.StandardSCIMReferenceProperties.Value) as JValue;
+                    var value = attr.SelectToken(SCIMConstants.StandardSCIMReferenceProperties.Value) as JsonValue;
                     if (value == null || !value.ToString().Contains("bulkId")) continue;
                     string bulkId;
                     if (!ValidateBulkId(value.ToString(), out bulkId)) return (false, BuildError(string.Format(Global.BulkIdIsNotWellFormatted, value.ToString())));
                     string externalId;
                     if (!TryExtractBulkId(bulkId, out externalId)) return (false, BuildError(string.Format(Global.UnknownBulkId, bulkId)));
-                    value.Value = externalId;
+                    attr[SCIMConstants.StandardSCIMReferenceProperties.Value] = externalId;
                 }
             }
 
@@ -260,15 +264,15 @@ namespace SimpleIdServer.Scim.Api
                 return true;
             }
 
-            JObject BuildError(string description)
+            JsonObject BuildError(string description)
             {
                 var serializer = new SCIMSerializer();
-                return new JObject
+                return new JsonObject
                 {
                     { StandardSCIMRepresentationAttributes.Method, parameter.HttpMethod },
                     { StandardSCIMRepresentationAttributes.BulkId, parameter.BulkIdentifier },
                     { "status", (int)HttpStatusCode.BadRequest },
-                    { "response", new JObject
+                    { "response", new JsonObject
                         {
                             { "scimType", SCIMConstants.ErrorSCIMTypes.InvalidSyntax },
                             { "detail", description }

@@ -4,10 +4,12 @@ using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domain;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Domains.Builders;
+using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Parser;
 using SimpleIdServer.Scim.Parser.Expressions;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using Xunit;
 
 namespace SimpleIdServer.Scim.Tests
@@ -74,7 +76,7 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal("home", secondJSON.SelectToken("phones[0].type").ToString());
             Assert.Null(thirdJSON.SelectToken("userName"));
             Assert.Null(fourthJSON.SelectToken("phones[0].phoneNumber"));
-            Assert.True((fifthJSON.SelectToken("phones") as JArray).Count == 1);
+            Assert.True((fifthJSON.SelectToken("phones") as JsonArray).Count == 1);
             Assert.NotNull(sixJSON.SelectToken("meta.lastModified"));
             Assert.Null(sevenJSON.SelectToken("meta.lastModified"));
             Assert.NotNull(eightJSON.SelectToken("id"));
@@ -82,7 +84,7 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal("20", tenJSON.SelectToken("info.age").ToString());
         }
 
-        private static JObject IncludeAttributes(SCIMRepresentation representation, IEnumerable<SCIMAttributeExpression> attributes, string location = null, bool isComplex = false)
+        private static JsonObject IncludeAttributes(SCIMRepresentation representation, IEnumerable<SCIMAttributeExpression> attributes, string location = null, bool isComplex = false)
         {
             var clone = representation.Clone() as SCIMRepresentation;
             clone.FilterAttributes(attributes, new SCIMAttributeExpression[0]);
@@ -90,7 +92,7 @@ namespace SimpleIdServer.Scim.Tests
             return clone.ToResponse(location, false, false);
         }
 
-        private static JObject ExcludeAttributes(SCIMRepresentation representation, IEnumerable<SCIMAttributeExpression> attributes, string location = null, bool isComplex = false)
+        private static JsonObject ExcludeAttributes(SCIMRepresentation representation, IEnumerable<SCIMAttributeExpression> attributes, string location = null, bool isComplex = false)
         {
             var clone = representation.Clone() as SCIMRepresentation;
             clone.FilterAttributes(new SCIMAttributeExpression[0], attributes);

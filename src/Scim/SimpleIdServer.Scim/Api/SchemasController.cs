@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Extensions;
 using SimpleIdServer.Scim.Helpers;
@@ -10,6 +9,7 @@ using SimpleIdServer.Scim.Persistence;
 using SimpleIdServer.Scim.Resources;
 using System.Linq;
 using System.Net;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Api
@@ -38,14 +38,14 @@ namespace SimpleIdServer.Scim.Api
         {
             _logger.LogInformation(Global.StartGetSchemas);
             var schemas = await _scimSchemaQueryRepository.GetAll();
-            var jObj = new JObject
+            var jObj = new JsonObject
             {
-                { StandardSCIMRepresentationAttributes.Schemas, new JArray(new [] { StandardSchemas.ListResponseSchemas.Id } ) },
+                { StandardSCIMRepresentationAttributes.Schemas, new JsonArray(new [] { StandardSchemas.ListResponseSchemas.Id }.Select(s => JsonValue.Create(s)).ToArray() ) },
                 { StandardSCIMRepresentationAttributes.TotalResults, schemas.Count() },
                 { StandardSCIMRepresentationAttributes.ItemsPerPage, schemas.Count()},
                 { StandardSCIMRepresentationAttributes.StartIndex, 1 }
             };
-            var resources = new JArray();
+            var resources = new JsonArray();
             foreach(var schema in schemas)
                 resources.Add(schema.ToResponse(GetBaseUrl()));
             jObj.Add(StandardSCIMRepresentationAttributes.Resources, resources);

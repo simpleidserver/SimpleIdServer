@@ -1,11 +1,12 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Infrastructure;
 using SimpleIdServer.Scim.Serialization;
 using System.Net;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Scim.Extensions
 {
@@ -36,13 +37,13 @@ namespace SimpleIdServer.Scim.Extensions
             };
         }
 
-        public static JObject SerializeQuery(this Controller controller)
+        public static JsonObject SerializeQuery(this Controller controller)
         {
             var query = controller.Request.Query;
-            var result = new JObject();
+            var result = new JsonObject();
             foreach(var record in query)
             {
-                result.Add(record.Key, JToken.FromObject(record));
+                result.Add(record.Key, JsonObject.Parse(JsonSerializer.Serialize(record)));
             }
 
             return result;

@@ -42,7 +42,7 @@ public static class ServiceCollectionExtensions
         {
             o.EnableEndpointRouting = false;
             o.AddScimValueProviders();
-        }).AddNewtonsoftJson();
+        });
         if(!skipMasstransitRegistration)
         {
             var repository = new InMemoryMessageDataRepository();

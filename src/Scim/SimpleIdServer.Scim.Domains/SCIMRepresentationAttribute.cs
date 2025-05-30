@@ -70,16 +70,12 @@ namespace SimpleIdServer.Scim.Domains
         public string ValueBinary { get; set; }
         public string Namespace { get; set; }
         public string ComputedValueIndex { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
         public SCIMSchemaAttribute SchemaAttribute { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
         public SCIMRepresentation Representation { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
         public ICollection<SCIMRepresentationAttribute> Children { get; set; }
-        [Newtonsoft.Json.JsonIgnore]
         [System.Text.Json.Serialization.JsonIgnore]
         public ICollection<SCIMRepresentationAttribute> CachedChildren { get; set; }
         public bool IsComputed { get; set; }

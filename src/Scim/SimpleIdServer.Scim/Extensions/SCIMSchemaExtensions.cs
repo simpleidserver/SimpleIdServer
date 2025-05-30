@@ -1,23 +1,22 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
-using System;
 using System.Linq;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Scim.Extensions
 {
     public static class SCIMSchemaExtensions
     {
-        public static JObject ToResponse(this SCIMSchema schema, string baseLocation)
+        public static JsonObject ToResponse(this SCIMSchema schema, string baseLocation)
         {
-            var jObj = new JObject
+            var jObj = new JsonObject
             {
                 { StandardSCIMRepresentationAttributes.Id, schema.Id },
                 { StandardSCIMRepresentationAttributes.Name,  schema.Name},
                 { StandardSCIMRepresentationAttributes.Description,  schema.Description}
             };
-            var attributes = new JArray();
+            var attributes = new JsonArray();
             schema.AddCommonAttributes();
             foreach (var attribute in schema.HierarchicalAttributes)
                 attributes.Add(SerializeSCIMSchemaAttribute(attribute));
@@ -26,9 +25,9 @@ namespace SimpleIdServer.Scim.Extensions
             return jObj;
         }
 
-        private static JObject SerializeSCIMSchemaAttribute(TreeNode<SCIMSchemaAttribute> scimSchemaAttribute)
+        private static JsonObject SerializeSCIMSchemaAttribute(TreeNode<SCIMSchemaAttribute> scimSchemaAttribute)
         {
-            var result = new JObject();
+            var result = new JsonObject();
             result.Add(StandardSCIMRepresentationAttributes.Name, scimSchemaAttribute.Leaf.Name);
             result.Add(StandardSCIMRepresentationAttributes.Type, scimSchemaAttribute.Leaf.Type.ToString().ToLowerInvariant());
             result.Add(StandardSCIMRepresentationAttributes.MultiValued, scimSchemaAttribute.Leaf.MultiValued);
@@ -40,20 +39,20 @@ namespace SimpleIdServer.Scim.Extensions
             result.Add(StandardSCIMRepresentationAttributes.Uniqueness, scimSchemaAttribute.Leaf.Uniqueness.ToName());
             if (scimSchemaAttribute.Children != null && scimSchemaAttribute.Children.Any())
             {
-                var subAttributes = new JArray();
+                var subAttributes = new JsonArray();
                 foreach(var subAttribute in scimSchemaAttribute.Children)
                     subAttributes.Add(SerializeSCIMSchemaAttribute(subAttribute));
                 result.Add(StandardSCIMRepresentationAttributes.SubAttributes, subAttributes);
             }
 
             if (scimSchemaAttribute.Leaf.CanonicalValues != null && scimSchemaAttribute.Leaf.CanonicalValues.Any())
-                result.Add(StandardSCIMRepresentationAttributes.CanonicalValues, new JArray(scimSchemaAttribute.Leaf.CanonicalValues));
+                result.Add(StandardSCIMRepresentationAttributes.CanonicalValues, new JsonArray(scimSchemaAttribute.Leaf.CanonicalValues.Select(s => JsonValue.Create(s)).ToArray()));
             return result;
         }
 
-        private static void AddMetadata(JObject jObj, string baseLocation, string id)
+        private static void AddMetadata(JsonObject jObj, string baseLocation, string id)
         {
-            var metadata = new JObject
+            var metadata = new JsonObject
             {
                 { StandardSCIMMetaAttributes.ResourceType, SCIMResourceTypes.Schema },
                 { StandardSCIMMetaAttributes.Location, string.Format(baseLocation, id) }

@@ -1,10 +1,10 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using Newtonsoft.Json;
 using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace SimpleIdServer.Scim.DTOs
 {
@@ -19,7 +19,7 @@ namespace SimpleIdServer.Scim.DTOs
         /// Defines operations within a bulk job.
         /// </summary>
         [DataMember(Name = StandardSCIMRepresentationAttributes.Operations)]
-        [JsonProperty(StandardSCIMRepresentationAttributes.Operations)]
+        [JsonPropertyName(StandardSCIMRepresentationAttributes.Operations)]
         public ICollection<BulkOperationParameter> Operations { get; set; }
     }
 }

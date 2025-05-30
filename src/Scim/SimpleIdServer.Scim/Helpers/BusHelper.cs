@@ -2,11 +2,10 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using MassTransit;
-using MassTransit.MessageData;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using SimpleIdServer.Scim.ExternalEvents;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -52,7 +51,7 @@ namespace SimpleIdServer.Scim.Helpers
 
         public static byte[] Serialize(object obj)
         {
-            var json = JsonConvert.SerializeObject(obj);
+            var json = JsonSerializer.Serialize(obj);
             return Encoding.UTF8.GetBytes(json);
         }
     }

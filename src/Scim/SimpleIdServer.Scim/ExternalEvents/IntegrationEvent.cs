@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Scim.ExternalEvents
 {
@@ -20,7 +20,7 @@ namespace SimpleIdServer.Scim.ExternalEvents
         }
 
 
-        public IntegrationEvent(string id, string version, string resourceType, string realm, JObject representation) : this(id, version, resourceType, realm)
+        public IntegrationEvent(string id, string version, string resourceType, string realm, JsonObject representation) : this(id, version, resourceType, realm)
         {
             SerializedRepresentation = representation?.ToString();
         }
@@ -31,12 +31,11 @@ namespace SimpleIdServer.Scim.ExternalEvents
         public string Realm { get; set; }
         public string SerializedRepresentation { get; set; }
         [System.Text.Json.Serialization.JsonIgnore]
-        [Newtonsoft.Json.JsonIgnore]
-        public JObject Representation
+        public JsonObject Representation
         {
             get
             {
-                return string.IsNullOrWhiteSpace(SerializedRepresentation) ? null : JObject.Parse(SerializedRepresentation);
+                return string.IsNullOrWhiteSpace(SerializedRepresentation) ? null : JsonObject.Parse(SerializedRepresentation).AsObject();
             }
         }
     }

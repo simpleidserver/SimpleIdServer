@@ -1,7 +1,5 @@
 // Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit;
-using Newtonsoft.Json.Linq;
 using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.DTOs;
 using SimpleIdServer.Scim.Helpers;
@@ -10,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.Json.Nodes;
 
 namespace SimpleIdServer.Scim.Domain
 {
@@ -163,10 +162,14 @@ namespace SimpleIdServer.Scim.Domain
             }
         }
 
-        public static JObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true, bool addEmptyArray = false, bool mergeExtensionAttributes = false)
+        public static JsonObject ToResponse(this SCIMRepresentation representation, string location, bool isGetRequest = false, bool includeStandardAttributes = true, bool addEmptyArray = false, bool mergeExtensionAttributes = false)
         {
-            var jObj = new JObject();
-            if (!string.IsNullOrEmpty(representation.Id)) jObj.Add(StandardSCIMRepresentationAttributes.Id, representation.Id);
+            var jObj = new JsonObject();
+            if (!string.IsNullOrEmpty(representation.Id))
+            {
+                jObj.Add(StandardSCIMRepresentationAttributes.Id, representation.Id);
+            }
+
             if (includeStandardAttributes)
             {
                 representation.AddStandardAttributes(location, new List<string> { }, ignore: true);
@@ -200,9 +203,9 @@ namespace SimpleIdServer.Scim.Domain
                 return false;
             }
 
-            var jObj = patchOperation.Value as JObject;
+            var jObj = patchOperation.Value as JsonObject;
             if (patchOperation.Path == StandardSCIMRepresentationAttributes.ExternalId && 
-                (patchOperation.Value.GetType() == typeof(string) || patchOperation.Value.GetType() == typeof(JValue)))
+                (patchOperation.Value.GetType() == typeof(string) || patchOperation.Value.GetType() == typeof(JsonValue)))
             {
                 externalId = patchOperation.Value.ToString();
                 return true;
@@ -241,7 +244,7 @@ namespace SimpleIdServer.Scim.Domain
             return result;
         }
 
-        public static void EnrichResponse(IEnumerable<EnrichParameter> attributes, JObject jObj, bool mergeExtensionAttributes = false, bool isGetRequest = false)
+        public static void EnrichResponse(IEnumerable<EnrichParameter> attributes, JsonObject jObj, bool mergeExtensionAttributes = false, bool isGetRequest = false)
         {
             foreach (var kvp in attributes.OrderBy(at => at.Order).GroupBy(a => a.AttributeNode.SchemaAttribute.Id))
             {
@@ -260,11 +263,11 @@ namespace SimpleIdServer.Scim.Domain
                 {
                     if (jObj.ContainsKey(firstRecord.Schema.Id))
                     {
-                        record = jObj[firstRecord.Schema.Id] as JObject;
+                        record = jObj[firstRecord.Schema.Id] as JsonObject;
                     }
                     else
                     {
-                        record = new JObject();
+                        record = new JsonObject();
                         jObj.Add(firstRecord.Schema.Id, record);
                     }
                 }
@@ -274,48 +277,48 @@ namespace SimpleIdServer.Scim.Domain
                     case SCIMSchemaAttributeTypes.STRING:
                         var valuesStr = records.Select(r => r.AttributeNode.ValueString).Where(r => r != null);
                         if (valuesStr.Any())
-                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesStr) : valuesStr.First());
+                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JsonNode)new JsonArray(valuesStr.Select(s => JsonValue.Create(s)).ToArray()) : valuesStr.First());
                         break;
                     case SCIMSchemaAttributeTypes.REFERENCE:
                         var valuesRef = records.Select(r => r.AttributeNode.ValueReference).Where(r => r != null);
                         if (valuesRef.Any())
-                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesRef) : valuesRef.First());
+                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JsonNode)new JsonArray(valuesRef.Select(s => JsonValue.Create(s)).ToArray()) : valuesRef.First());
                         break;
                     case SCIMSchemaAttributeTypes.BOOLEAN:
                         var valuesBoolean = records.Select(r => r.AttributeNode.ValueBoolean).Where(r => r != null);
                         if (valuesBoolean.Any())
-                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesBoolean) : valuesBoolean.First());
+                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JsonNode)new JsonArray(valuesBoolean.Select(s => JsonValue.Create(s)).ToArray()) : valuesBoolean.First());
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
                         var valuesInteger = records.Select(r => r.AttributeNode.ValueInteger).Where(r => r != null);
                         if (valuesInteger.Any())
-                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesInteger) : valuesInteger.First());
+                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JsonNode)new JsonArray(valuesInteger.Select(s => JsonValue.Create(s)).ToArray()) : valuesInteger.First());
                         break;
                     case SCIMSchemaAttributeTypes.DATETIME:
                         var valuesDateTime = records.Select(r => r.AttributeNode.ValueDateTime).Where(r => r != null);
                         if (valuesDateTime.Any())
-                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesDateTime) : valuesDateTime.First());
+                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JsonNode)new JsonArray(valuesDateTime.Select(s => JsonValue.Create(s)).ToArray()) : valuesDateTime.First());
                         break;
                     case SCIMSchemaAttributeTypes.COMPLEX:
                         if (firstRecord.AttributeNode.SchemaAttribute.MultiValued == false)
                         {
-                            var jObjVal = new JObject();
+                            var jObjVal = new JsonObject();
                             var children = firstRecord.AttributeNode.CachedChildren;
                             EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, mergeExtensionAttributes, isGetRequest);
-                            if (jObjVal.Children().Any())
+                            if (jObjVal.AsEnumerable().Any())
                             {
                                 record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, jObjVal);
                             }
                         }
                         else
                         {
-                            var jArr = new JArray();
+                            var jArr = new JsonArray();
                             foreach (var attr in records)
                             {
-                                var jObjVal = new JObject();
+                                var jObjVal = new JsonObject();
                                 var children = attr.AttributeNode.CachedChildren;
                                 EnrichResponse(children.Select(v => new EnrichParameter(firstRecord.Schema, 0, v)), jObjVal, mergeExtensionAttributes, isGetRequest);
-                                if (jObjVal.Children().Any())
+                                if (jObjVal.AsEnumerable().Any())
                                 {
                                     jArr.Add(jObjVal);
                                 }
@@ -327,12 +330,12 @@ namespace SimpleIdServer.Scim.Domain
                     case SCIMSchemaAttributeTypes.DECIMAL:
                         var valuesDecimal = records.Select(r => r.AttributeNode.ValueDecimal).Where(r => r != null);
                         if (valuesDecimal.Any())
-                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesDecimal) : valuesDecimal.First());
+                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JsonNode)new JsonArray(valuesDecimal.Select(s => JsonValue.Create(s)).ToArray()) : valuesDecimal.First());
                         break;
                     case SCIMSchemaAttributeTypes.BINARY:
                         var valuesBinary = records.Select(r => r.AttributeNode.ValueBinary).Where(r => r != null);
                         if (valuesBinary.Any())
-                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JToken)new JArray(valuesBinary) : valuesBinary.First());
+                            record.Add(firstRecord.AttributeNode.SchemaAttribute.Name, firstRecord.AttributeNode.SchemaAttribute.MultiValued ? (JsonNode)new JsonArray(valuesBinary.Select(s => JsonValue.Create(s)).ToArray()) : valuesBinary.First());
                         break;
                 }
             }
