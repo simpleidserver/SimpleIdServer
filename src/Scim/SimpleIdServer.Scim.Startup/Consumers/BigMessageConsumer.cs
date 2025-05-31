@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using SimpleIdServer.Scim.ExternalEvents;
+using SimpleIdServer.Scim.MassTransit;
 using System;
 using System.Collections.Generic;
 using System.Linq;

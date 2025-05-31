@@ -1,58 +1,54 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using MassTransit;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.Scim.ExternalEvents;
-using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SimpleIdServer.Scim.Helpers
+namespace SimpleIdServer.Scim.Helpers;
+
+public interface IBusHelper
 {
-    public interface IBusHelper
+    Task Publish<T>(T evt, CancellationToken cancellationToken = default) where T : IntegrationEvent;
+}
+
+public class BusHelper : IBusHelper
+{
+    private readonly ScimHostOptions _options;
+
+    public BusHelper(IOptions<ScimHostOptions> options)
     {
-        Task Publish<T>(T evt, CancellationToken cancellationToken = default) where T : IntegrationEvent;
+        _options = options.Value;
     }
 
-    public class BusHelper : IBusHelper
+    public Task Publish<T>(T evt, CancellationToken cancellationToken = default) where T : IntegrationEvent
     {
-        private readonly ScimHostOptions _options;
-        private readonly IBusControl _busControl;
-        private readonly IMessageDataRepository _messageDataRepository;
-
-        public BusHelper(
-            IOptionsMonitor<ScimHostOptions> options, 
-            IBusControl busControl, 
-            IMessageDataRepository messageDataRepository)
+        if (evt is RepresentationAddedEvent addedEvent)
         {
-            _options = options.CurrentValue;
-            _busControl = busControl;
-            _messageDataRepository = messageDataRepository;
+            _options.SCIMEvents.RepresentationAdded?.Invoke(addedEvent);
+        }
+        else if (evt is RepresentationRefAttributeAddedEvent refAttributeAddedEvent)
+        {
+            _options.SCIMEvents.RepresentationRefAttributeAdded?.Invoke(refAttributeAddedEvent);
+        }
+        else if (evt is RepresentationRefAttributeRemovedEvent refAttributeRemovedEvent)
+        {
+            _options.SCIMEvents.RepresentationRefAttributeRemoved?.Invoke(refAttributeRemovedEvent);
+        }
+        else if (evt is RepresentationRefAttributeUpdatedEvent refAttributeUpdatedEvent)
+        {
+            _options.SCIMEvents.RepresentationRefAttributeUpdated?.Invoke(refAttributeUpdatedEvent);
+        }
+        else if (evt is RepresentationRemovedEvent removedEvent)
+        {
+            _options.SCIMEvents.RepresentationRemoved?.Invoke(removedEvent);
+        }
+        else if (evt is RepresentationUpdatedEvent updatedEvent)
+        {
+            _options.SCIMEvents.RepresentationUpdated?.Invoke(updatedEvent);
         }
 
-        public async Task Publish<T>(T evt, CancellationToken cancellationToken = default) where T : IntegrationEvent
-        {
-            if (!_options.IsBigMessagePublished)
-            {
-                await _busControl.Publish(evt);
-                return;
-            }
-
-            var bigPayload = await _messageDataRepository.PutBytes(Serialize(evt), cancellationToken);
-            var message = new BigMessage
-            {
-                Name = typeof(T).Name,
-                Payload = bigPayload
-            };
-            await _busControl.Publish(message, cancellationToken);
-        }
-
-        public static byte[] Serialize(object obj)
-        {
-            var json = JsonSerializer.Serialize(obj);
-            return Encoding.UTF8.GetBytes(json);
-        }
+        return Task.CompletedTask;
     }
 }

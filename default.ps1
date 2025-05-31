@@ -253,6 +253,7 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Domains\SimpleIdServer.Scim.Domains.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Parser\SimpleIdServer.Scim.Parser.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Client\SimpleIdServer.Scim.Client.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.MassTransit\SimpleIdServer.Scim.MassTransit.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.EF\SimpleIdServer.Scim.Persistence.EF.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.Swashbuckle\SimpleIdServer.Scim.Swashbuckle.csproj -c $config --output $result_dir }
@@ -261,6 +262,7 @@ task pack -depends release, compile, buildTemplate {
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.PostgreMigrations\SimpleIdServer.Scim.PostgreMigrations.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.SqliteMigrations\SimpleIdServer.Scim.SqliteMigrations.csproj -c $config --output $result_dir }
+	exec { dotnet pack $source_dir\Scim\SimpleIdServer.Scim.ApiKeyAuth\SimpleIdServer.Scim.ApiKeyAuth.csproj -c $config --output $result_dir }
 	
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did\SimpleIdServer.Did.csproj -c $config --output $result_dir }
 	exec { dotnet pack $source_dir\Did\SimpleIdServer.Did.Ethr\SimpleIdServer.Did.Ethr.csproj -c $config --output $result_dir }

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+	<TargetFramework>net8.0</TargetFramework>
+    <Description>Use masstransit to publish external events.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="MassTransit" Version="8.4.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
+	</ItemGroup>
+</Project>

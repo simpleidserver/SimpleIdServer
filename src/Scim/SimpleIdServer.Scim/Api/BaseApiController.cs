@@ -358,10 +358,6 @@ namespace SimpleIdServer.Scim.Api
                 var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
                 if (IsPublishEvtsEnabled)
                 {
-                    var message = new BigMessage
-                    {
-
-                    };
                     await _busControl.Publish(new RepresentationAddedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty));
                 }
 

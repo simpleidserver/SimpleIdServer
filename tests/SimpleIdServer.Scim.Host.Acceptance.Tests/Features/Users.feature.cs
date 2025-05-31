@@ -2373,7 +2373,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "3"});
                 table204.AddRow(new string[] {
                             "attributes",
-                            "[ \'phones.phoneNumber\' ]"});
+                            "[ \"phones.phoneNumber\" ]"});
 #line 689
  testRunner.And("execute HTTP POST JSON request \'http://localhost/Users/.search\'", ((string)(null)), table204, "And ");
 #line hidden

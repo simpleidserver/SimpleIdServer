@@ -6,9 +6,7 @@
 	<GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-	<PackageReference Include="MassTransit" Version="8.4.0" />
 	<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
-	<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
   	<FrameworkReference Include="Microsoft.AspNetCore.App" />

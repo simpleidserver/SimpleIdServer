@@ -160,7 +160,8 @@ const sidebars = {
         'scim/realm',
         'scim/integrationevents',
         'scim/hosting',
-        'scim/loadbalancing'
+        'scim/loadbalancing',
+        'scim/security'
       ]
     },
     'mobileapplication'

@@ -3,7 +3,6 @@
 using SimpleIdServer.Scim.Domains;
 using System.Collections.Generic;
 using System.Linq;
-using static MassTransit.ValidationResultExtensions;
 
 namespace SimpleIdServer.Scim.Helpers
 {

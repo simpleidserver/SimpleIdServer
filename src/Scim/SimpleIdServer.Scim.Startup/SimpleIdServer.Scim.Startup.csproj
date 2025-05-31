@@ -15,6 +15,8 @@
 		<PackageReference Include="MassTransit.Azure.Storage" Version="8.4.0" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\SimpleIdServer.Scim.ApiKeyAuth\SimpleIdServer.Scim.ApiKeyAuth.csproj" />
+		<ProjectReference Include="..\SimpleIdServer.Scim.MassTransit\SimpleIdServer.Scim.MassTransit.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Scim.SqliteMigrations\SimpleIdServer.Scim.SqliteMigrations.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Scim.MySQLMigrations\SimpleIdServer.Scim.MySQLMigrations.csproj" />
 		<ProjectReference Include="..\SimpleIdServer.Scim.Persistence.MongoDB\SimpleIdServer.Scim.Persistence.MongoDB.csproj" />

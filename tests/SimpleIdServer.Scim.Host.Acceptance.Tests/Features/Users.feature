@@ -690,7 +690,7 @@ Scenario: Check user can be filtered (HTTP POST)
 	| Key        | Value                                                                  |
 	| filter     | userName eq "bjen" and ( age gt 15" and eidCertificate eq "aGVsbG8=" ) |
 	| count      | 3                                                                      |
-	| attributes | [ 'phones.phoneNumber' ]                                               |
+	| attributes | [ "phones.phoneNumber" ]                                               |
 
 	And extract JSON from body
 

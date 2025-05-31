@@ -82,10 +82,12 @@ namespace SimpleIdServer.Scim
         /// </summary>
         public SCIMHostEvents SCIMEvents { get; set; } = new SCIMHostEvents();
         /// <summary>
+        /// Return the full representation 
+        /// </summary>
+        public bool IsFullRepresentationReturned { get; set; }
+        /// <summary>
         /// Enable or disable realm.
         /// </summary>
         internal bool EnableRealm { get; set; } = false;
-        public bool IsFullRepresentationReturned { get; set; }
-        internal bool IsBigMessagePublished { get; set; }
     }
 }

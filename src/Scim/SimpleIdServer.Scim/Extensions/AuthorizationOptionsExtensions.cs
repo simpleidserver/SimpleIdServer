@@ -14,4 +14,13 @@ public static class AuthorizationOptionsExtensions
         opts.AddPolicy("UpdateScimResource", p => p.RequireClaim("scope", "update_scim_resource"));
         opts.AddPolicy("BulkScimResource", p => p.RequireClaim("scope", "bulk_scim_resource"));
     }
+
+    public static void AddAnonymousAuthorizationPolicy(this AuthorizationOptions opts)
+    {
+        opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
+        opts.AddPolicy("AddScimResource", p => p.RequireAssertion(_ => true));
+        opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
+        opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
+        opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
+    }
 }

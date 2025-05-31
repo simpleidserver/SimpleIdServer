@@ -45,6 +45,8 @@ namespace SimpleIdServer.Scim.Host.Acceptance.Tests.Steps
                 catch
                 {
                     jObj.Add(key, value.ToString());
+
+
                 }
             }
 

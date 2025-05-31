@@ -1,8 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using AspNetCore.Authentication.ApiKey;
-using MassTransit;
-using MassTransit.MessageData;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -22,7 +19,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static ScimBuilder AddScim(this IServiceCollection services, Action<ScimHostOptions> options = null, bool skipMasstransitRegistration = false, bool skipAuth = false)
+    public static ScimBuilder AddScim(this IServiceCollection services, Action<ScimHostOptions> options = null, bool ignoreAnonymousAccess = false)
     {
         var builder = new ScimBuilder(services);
         if(options != null)
@@ -43,27 +40,14 @@ public static class ServiceCollectionExtensions
             o.EnableEndpointRouting = false;
             o.AddScimValueProviders();
         });
-        if(!skipMasstransitRegistration)
-        {
-            var repository = new InMemoryMessageDataRepository();
-            services.AddSingleton<IMessageDataRepository>(repository);
-            services.AddMassTransit((o) =>
-            {
-                o.UsingInMemory((context, cfg) =>
-                {
-                    cfg.UseMessageData(repository);
-                    cfg.ConfigureEndpoints(context);
-                });
-            });
-        }
         services.ConfigureCommands()
             .ConfigureQueries()
             .ConfigureRepositories()
             .ConfigureHelpers()
             .ConfigureInfrastructures();
-        if(!skipAuth)
+        if(!ignoreAnonymousAccess)
         {
-            services.ConfigureAuth();
+            services.AddAuthorization(opts => opts.AddAnonymousAuthorizationPolicy());
         }
 
         return builder;
@@ -128,19 +112,6 @@ public static class ServiceCollectionExtensions
         }
 
         services.AddSingleton<IScimEndpointStore, ScimEndpointStore>();
-        return services;
-    }
-
-    private static IServiceCollection ConfigureAuth(this IServiceCollection services)
-    {
-        services.AddSingleton(ApiKeysConfiguration.Default);
-        services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
-            .AddApiKeyInHeaderOrQueryParams<ApiKeyProvider>(options =>
-            {
-                options.Realm = "Sample Web API";
-                options.KeyName = "Authorization";
-            });
-        services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
         return services;
     }
 }

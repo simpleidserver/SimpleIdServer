@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace SimpleIdServer.Scim.Infrastructure;
+namespace SimpleIdServer.Scim.ApiKeyAuth;
 
 public class ApiKeysConfiguration
 {
@@ -32,11 +32,4 @@ public class ApiKeysConfiguration
             }
         }
     };
-}
-
-public class ApiKeyConfiguration
-{
-    public string Owner { get; set; }
-    public string Value { get; set; }
-    public List<string> Scopes { get; set; } = new List<string>();
 }

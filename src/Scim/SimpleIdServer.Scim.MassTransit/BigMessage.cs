@@ -2,11 +2,17 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using MassTransit;
 
-namespace SimpleIdServer.Scim.ExternalEvents
+namespace SimpleIdServer.Scim.MassTransit;
+
+public class BigMessage
 {
-    public class BigMessage
-    {
-        public string Name { get; set; }
-        public MessageData<byte[]> Payload { get; set; }
+    public string Name 
+    { 
+        get; set; 
+    }
+
+    public MessageData<byte[]> Payload 
+    { 
+        get; set; 
     }
 }

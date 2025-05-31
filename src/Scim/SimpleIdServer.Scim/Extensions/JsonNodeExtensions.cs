@@ -20,16 +20,15 @@ public static class JsonNodeExtensions
             return null;
 
         query = query.Trim();
-
-        if (query.StartsWith("$."))
-        {
-            query = query.Substring(2);
-        }
-
         if (query.StartsWith("..") || query.StartsWith("$.."))
         {
             var targetProperty = query.StartsWith("..") ? query.Substring(2) : query.Substring(3);
             return FindFirstRecursively(token, targetProperty);
+        }
+
+        if (query.StartsWith("$."))
+        {
+            query = query.Substring(2);
         }
 
         var parts = query.Split('.');

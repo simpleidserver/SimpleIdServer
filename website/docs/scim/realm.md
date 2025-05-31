@@ -43,6 +43,22 @@ By executing this configuration, the SCIM server automatically sets up the two d
 
 ## Securing Realm Operations with API Keys
 
+To secure realm-level operations in a customizable way, you can explicitly enable API key authentication by using the `SimpleIdServer.Scim.ApiKeyAuth` NuGet package.
+
+```batch title="cmd.exe"
+dotnet add package SimpleIdServer.Scim.ApiKeyAuth
+```
+
+In your `Program.cs`, after configuring SCIM with `AddScim(...)`, call the `EnableApiKeyAuth(...`) extension method to enable API key authentication. This method accepts an instance of ApiKeysConfiguration, where you define the mapping between realm names and their corresponding API keys.
+
+```csharp title="Program.cs"
+// Register the SCIM server
+builder.Services.AddScim();
+
+// Enable API key authentication
+builder.Services.EnableApiKeyAuth();
+```
+
 For security, each realm operation requires the client to pass an authentication key via the HTTP Authorization header. The default configuration includes these API keys:
 
 | Realm | Value |
@@ -77,7 +93,7 @@ builder.Services.AddScim().AddInMemoryRealms(new List<Realm>
         Name = "test",
         Owner = "test"
     }
-}).UpdateApiKeys(new ApiKeysConfiguration
+}).EnableApiKeyAuth(new ApiKeysConfiguration
 {
     ApiKeys = new List<ApiKeyConfiguration>
     {

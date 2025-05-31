@@ -225,7 +225,7 @@ namespace SimpleIdServer.Scim.Api
             var filteredAttributeMappings = attributeMappings.Where(m => resourceTypes.Contains(m.SourceResourceType));
             foreach(var attributeMapping in filteredAttributeMappings)
             {
-                var token = parameter.Data.SelectToken($"$..{attributeMapping.SourceAttributeSelector}");
+                var token = parameter.Data.SelectToken("$.." + attributeMapping.SourceAttributeSelector);
                 if (token == null) continue;
                 var arr = token as JsonArray;
                 if (token.GetValueKind() == JsonValueKind.Object) arr = new JsonArray() { token };

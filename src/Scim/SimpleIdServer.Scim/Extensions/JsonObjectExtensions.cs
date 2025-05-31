@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Microsoft.AspNetCore.OutputCaching;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -103,15 +104,10 @@ public static class JsonObjectExtensions
         var type = token.GetValueKind();
         if (type == JsonValueKind.Object)
         {
-            ExpandoObject expando = token.Deserialize<ExpandoObject>(new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
-            var json = JsonSerializer.Serialize(expando, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
-            return JsonObject.Parse(json).AsObject();
+            var expando = token.Deserialize<ExpandoObject>();
+            var camelCased = ConvertToCamelCase(expando!);
+            var json = JsonSerializer.Serialize(camelCased, new JsonSerializerOptions { WriteIndented = true });
+            return JsonObject.Parse(json);
         }
 
         if(type == JsonValueKind.Array)
@@ -126,5 +122,19 @@ public static class JsonObjectExtensions
         }
 
         return token;
+    }
+
+    private static ExpandoObject ConvertToCamelCase(ExpandoObject input)
+    {
+        var result = new ExpandoObject();
+        var dict = (IDictionary<string, object?>)result;
+
+        foreach (var kvp in input)
+        {
+            var key = char.ToLowerInvariant(kvp.Key[0]) + kvp.Key.Substring(1);
+            dict[key] = kvp.Value is ExpandoObject nested ? ConvertToCamelCase(nested) : kvp.Value;
+        }
+
+        return result;
     }
 }

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Description>Protect SCIM2.0 API with API keys.</Description>
+	<LangVersion>latest</LangVersion>
+	<GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+	<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="8.0.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SimpleIdServer.Scim\SimpleIdServer.Scim.csproj" />
+  </ItemGroup>
+</Project>

@@ -2,13 +2,13 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using AspNetCore.Authentication.ApiKey;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using System;
-using System.Linq;
 
-namespace SimpleIdServer.Scim.Infrastructure;
+namespace SimpleIdServer.Scim.ApiKeyAuth;
 
 public class ApiKeyProvider : IApiKeyProvider
 {
@@ -42,20 +42,4 @@ public class ApiKeyProvider : IApiKeyProvider
             throw;
         }
     }
-}
-
-public class ApiKey : IApiKey
-{
-    public ApiKey(string key, string owner, IEnumerable<string> scopes)
-    {
-        Key = key;
-        OwnerName = owner;
-        var claims = scopes.Select(s => new Claim("scope", s)).ToList();
-        claims.Add(new Claim(ClaimTypes.NameIdentifier, owner));
-        Claims = claims;
-    }
-
-    public string Key { get; set; }
-    public string OwnerName { get; set; }
-    public IReadOnlyCollection<Claim> Claims { get; set; }
 }

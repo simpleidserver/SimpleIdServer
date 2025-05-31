@@ -1,7 +1,5 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using MassTransit;
-using MassTransit.MessageData;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -183,23 +181,12 @@ void ConfigureServices(IServiceCollection services)
         o.ValueProviderFactories.Insert(0, new SeparatedQueryStringValueProviderFactory(","));
     });
     services.AddAuthentication(SCIMConstants.AuthenticationScheme).AddCustomAuthentication(c => { });
-    services.AddAuthorization(opts =>
-    {
-        opts.AddPolicy("QueryScimResource", p => p.RequireAssertion(_ => true));
-        opts.AddPolicy("AddScimResource", p => p.RequireAssertion(_ => true));
-        opts.AddPolicy("DeleteScimResource", p => p.RequireAssertion(_ => true));
-        opts.AddPolicy("UpdateScimResource", p => p.RequireAssertion(_ => true));
-        opts.AddPolicy("BulkScimResource", p => p.RequireAssertion(_ => true));
-        opts.AddPolicy("UserAuthenticated", p => p.RequireAssertion(_ => true));
-        opts.AddPolicy("Provison", p => p.RequireAssertion(_ => true));
-    });
-    services.AddSingleton<IMessageDataRepository>(new InMemoryMessageDataRepository());
     services.AddScim(o =>
     {
         o.MaxOperations = 3;
         o.IgnoreUnsupportedCanonicalValues = false;
         o.MergeExtensionAttributes = true;
-    }, skipAuth: true)
+    })
         .AddInMemorySchemas(schemas)
         .AddInMemoryAttributeMappings(attributesMapping);
 }

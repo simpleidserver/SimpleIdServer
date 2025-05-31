@@ -7,13 +7,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.Scim.Infrastructure;
+using SimpleIdServer.Scim.ApiKeyAuth;
 using SimpleIdServer.Scim.Persistence.MongoDB;
 using SimpleIdServer.Scim.Startup.Configurations;
 using SimpleIdServer.Scim.Startup.Consumers;
 using System;
 using System.IO;
-using SimpleIdServer.Scim;
 
 namespace SimpleIdServer.Scim.Startup.Infrastructures;
 
@@ -25,8 +24,8 @@ public class ScimServerSetup
         var builder = webApplicationBuilder.Services.AddScim(o =>
             {
                 o.IgnoreUnsupportedCanonicalValues = false;
-            },true)
-            .UpdateApiKeys(apiKeysConfiguration)
+            }, true)
+            .EnableApiKeyAuth(apiKeysConfiguration)
             .EnableSwagger()
             .ConfigureMassTransit(cb => ConfigureMessageBroker(webApplicationBuilder, cb, massTransitConf));
         if(storageConfiguration.Type == StorageTypes.MONGODB)
