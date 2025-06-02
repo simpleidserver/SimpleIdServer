@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using SimpleIdServer.Authzen.Rego.Discover;
 
 namespace SimpleIdServer.Authzen.Rego.Compiler;
 
@@ -29,38 +30,42 @@ public class OpaCompiler : IOpaCompiler
 {
     private readonly IOpaPathResolver _opaPathResolver;
     private readonly IRegoPathResolver _regoPathResolver;
+    private readonly IRegoPoliciesResolver _regoPoliciesResolver;
 
     public OpaCompiler(
         IOpaPathResolver opaPathResolver,
-        IRegoPathResolver regoPathResolver)
+        IRegoPathResolver regoPathResolver,
+        IRegoPoliciesResolver regoPoliciesResolver)
     {
         _opaPathResolver = opaPathResolver;
         _regoPathResolver = regoPathResolver;
+        _regoPoliciesResolver = regoPoliciesResolver;
     }
 
     public async Task<List<OpaFileCompilationResult>> Compile(CancellationToken cancellationToken = default(CancellationToken))
     {
         var opaPath = _opaPathResolver.ResolveOpaFilePath();
         var regoPath = _regoPathResolver.ResolvePoliciesPath();
+        var policies = await _regoPoliciesResolver.Discover(cancellationToken);
         var wasmPath = Path.Combine(regoPath, "wasm");
-        var compilationResults = new List<(string sourceFile, string targetFile, byte[] compiledContent)>();
         var tmpPath = Path.GetTempPath();
-        var regoFiles = Directory.GetFiles(regoPath, "*.rego", SearchOption.AllDirectories);
         var result = new List<OpaFileCompilationResult>();
-        foreach (var regoFile in regoFiles)
+        var compilationResults = new List<(string sourceFile, string targetFile, byte[] compiledContent)>();
+        foreach (var policy in policies)
         {
             if (cancellationToken.IsCancellationRequested)
             {
                 break;
             }
 
-            var fileName = Path.GetFileNameWithoutExtension(regoFile);
+            var fileName = Path.GetFileNameWithoutExtension(policy.Path);
             var tempWasmFile = Path.Combine(tmpPath, $"{Guid.NewGuid()}.wasm");
-            var finalWasmFile = Path.Combine(wasmPath, $"{fileName}.wasm");
+            var finalWasmFile = Path.Combine(wasmPath, $"{policy.PolicyName}.wasm");
+            var args = $"build -t wasm -e {policy.AllowPolicyName} {string.Join(" ", policy.Libs.Select(l => $"\"{l.filePath}\""))} \"{policy.Path}\" -o \"{tempWasmFile}\"";
             var startInfo = new ProcessStartInfo
             {
                 FileName = opaPath,
-                Arguments = $"build -t wasm -e authz/allow \"{regoFile}\" -o \"{tempWasmFile}\"",
+                Arguments = $"build -t wasm -e {policy.AllowPolicyName} {string.Join(" ", policy.Libs.Select(l => $"\"{l.filePath}\""))} \"{policy.Path}\" -o \"{tempWasmFile}\"",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -85,7 +90,7 @@ public class OpaCompiler : IOpaCompiler
             }
 
             var compiledContent = await File.ReadAllBytesAsync(tempWasmFile, cancellationToken);
-            compilationResults.Add((regoFile, finalWasmFile, compiledContent));
+            compilationResults.Add((policy.Path, finalWasmFile, compiledContent));
             try { File.Delete(tempWasmFile); } catch { }
             result.Add(new OpaFileCompilationResult
             {
@@ -96,7 +101,7 @@ public class OpaCompiler : IOpaCompiler
 
         if (Directory.Exists(wasmPath))
         {
-            Directory.Delete(wasmPath);
+            Directory.Delete(wasmPath, true);
         }
 
         Directory.CreateDirectory(wasmPath);

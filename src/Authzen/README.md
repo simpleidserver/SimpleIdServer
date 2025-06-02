@@ -1,6 +1,8 @@
 https://play.openpolicyagent.org/µ
 
-C:\Projects\SimpleIdServer\src\Authzen\SimpleIdServer.Authzen.Startup\bin\Debug\net8.0\download\opa_windows_amd64.exe build -t wasm -e api/GET/users/__id/allow get.rego -o rules.wasm : pour comiler en WASM
+C:\Projects\SimpleIdServer\src\Authzen\SimpleIdServer.Authzen.Startup\bin\Debug\net8.0\download\opa_windows_amd64.exe build -t wasm -e users/read/allow policies/users/read.rego -o read.wasm
+
+ : pour comiler en WASM
 
 Il existe plusieurs technologies pour évaluer les accès.
 

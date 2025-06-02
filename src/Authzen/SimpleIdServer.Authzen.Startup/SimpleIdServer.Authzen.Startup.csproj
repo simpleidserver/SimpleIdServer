@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
@@ -9,5 +8,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SimpleIdServer.Authzen.Rego\SimpleIdServer.Authzen.Rego.csproj" />
+  </ItemGroup>
+  
+   <ItemGroup>
+    <None Include="policies\**\*.rego">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="policies\**\*.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

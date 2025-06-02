@@ -1,5 +1,6 @@
 using SimpleIdServer.Authzen.Rego;
 using SimpleIdServer.Authzen.Rego.Compiler;
+using SimpleIdServer.Authzen.Rego.Discover;
 using SimpleIdServer.Authzen.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -19,6 +20,7 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IAuthzenPolicyEvaluator, RegoEvaluator>();
         services.AddTransient<IRegoPathResolver, RegoPathResolver>();
+        services.AddTransient<IRegoPoliciesResolver, RegoPoliciesResolver>();
         return services;
     }
 
