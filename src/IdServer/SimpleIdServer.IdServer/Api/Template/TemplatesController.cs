@@ -88,15 +88,17 @@ public class TemplatesController : BaseController
                 return new NotFoundResult();
             }
 
+            var existingStyles = existingTemplate.Styles;
             foreach (var s in template.Styles)
             {
-                var existingStyle = existingTemplate.Styles.Single(st => st.Id == s.Id);
+                var existingStyle = existingStyles.Single(st => st.Id == s.Id);
                 if (existingStyle != null)
                 {
                     existingStyle.Value = s.Value;
                 }
             }
 
+            existingTemplate.Styles = existingStyles.ToList();
             existingTemplate.Windows = template.Windows;
             existingTemplate.Elements = template.Elements;
             await _templateStore.SaveChanges(cancellationToken);
