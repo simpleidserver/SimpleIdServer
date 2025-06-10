@@ -1,10 +1,11 @@
 ﻿using MassTransit;
-using Newtonsoft.Json;
 using SimpleIdServer.Scim.ExternalEvents;
+using SimpleIdServer.Scim.MassTransit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Startup.Consumers
@@ -26,7 +27,7 @@ namespace SimpleIdServer.Scim.Startup.Consumers
         {
             var bigPayload = await context.Message.Payload.Value;
             var type = _types.Single(t => t.Name == context.Message.Name);
-            var message = JsonConvert.DeserializeObject(Encoding.UTF8.GetString(bigPayload), type);
+            var message = JsonSerializer.Deserialize(Encoding.UTF8.GetString(bigPayload), type);
             // CONTINUE...
         }
     }

@@ -20,7 +20,7 @@ builder.AddSidIdentityServer()
     {
         e.UseSqlServer(connectionString, o =>
         {
-            o.MigrationsAssembly("SimpleIdServer.IdServer.SqlServerMigrations");
+            o.MigrationsAssembly("SidFormBuilder.SqlServerMigrations");
             o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         });
     });

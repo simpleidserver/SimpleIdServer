@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using SimpleIdServer.Scim.Infrastructure;
+using SimpleIdServer.Scim.ApiKeyAuth;
 using SimpleIdServer.Scim.Startup.Configurations;
 using SimpleIdServer.Scim.Startup.Infrastructures;
 

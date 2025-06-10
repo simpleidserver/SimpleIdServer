@@ -3,7 +3,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using SimpleIdServer.IdServer;
 var builder = WebApplication.CreateBuilder(args);
 
 const string connectionString = "Host=localhost;Port=5432;Database=mydatabase;Username=admin;Password=tJWBx3ccNJ6dyp1wxoA99qqQ";
@@ -20,7 +19,7 @@ builder.AddSidIdentityServer()
     {
         e.UseSqlite(connectionString, o =>
         {
-            o.MigrationsAssembly("SimpleIdServer.IdServer.SqliteMigrations");
+            o.MigrationsAssembly("SidFormBuilder.SqliteMigrations");
             o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
         });
     });

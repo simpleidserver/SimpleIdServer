@@ -29,7 +29,7 @@ const string connectionString = "";
 {
     e.UseSqlServer(connectionString, o =>
     {
-        o.MigrationsAssembly("SimpleIdServer.IdServer.SqlServerMigrations");
+        o.MigrationsAssembly("SidFormBuilder.SqlServerMigrations");
         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 })
@@ -62,7 +62,7 @@ const string connectionString = "";
 {
     e.UseNpgsql(connectionString, o =>
     {
-        o.MigrationsAssembly("SimpleIdServer.IdServer.PostgreMigrations");
+        o.MigrationsAssembly("SidFormBuilder.PostgreMigrations");
         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 })
@@ -95,7 +95,7 @@ const string connectionString = "";
 {
     e.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), o =>
     {
-        o.MigrationsAssembly("SimpleIdServer.IdServer.MySQLMigrations");
+        o.MigrationsAssembly("SidFormBuilder.MySQLMigrations");
         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 })
@@ -146,7 +146,7 @@ const string connectionString = "";
 {
     e.UseSqlite(connectionString, o =>
     {
-        o.MigrationsAssembly("SimpleIdServer.IdServer.SqliteMigrations");
+        o.MigrationsAssembly("SidFormBuilder.SqliteMigrations");
         o.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery);
     });
 })
