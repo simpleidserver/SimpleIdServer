@@ -13,5 +13,13 @@ namespace Microsoft.AspNetCore.Http
             var relativePath = requestMessage.PathBase.Value;
             return http + host + relativePath;
         }
+
+        public static string GetAbsoluteUri(this HttpRequest requestMessage)
+        {
+            var host = requestMessage.Host.Value;
+            var http = "http://";
+            if (requestMessage.IsHttps) http = "https://";
+            return http + host;
+        }
     }
 }

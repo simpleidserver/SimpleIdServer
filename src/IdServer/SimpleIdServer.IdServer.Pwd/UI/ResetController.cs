@@ -3,6 +3,7 @@
 
 using FormBuilder;
 using FormBuilder.Builders;
+using FormBuilder.Helpers;
 using FormBuilder.Models;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
@@ -45,6 +46,7 @@ public class ResetController : BaseController
     private readonly IRealmStore _realmStore;
     private readonly ITemplateStore _templateStore;
     private readonly IWorkflowHelper _workflowHelper;
+    private readonly IWorkflowLinkHelper _workflowLinkHelper;
     private readonly ILogger<ResetController> _logger;
     private readonly FormBuilderOptions _formBuilderOptions;
 
@@ -65,6 +67,7 @@ public class ResetController : BaseController
         IRealmStore realmStore,
         ITemplateStore templateStore,
         IWorkflowHelper workflowHelper,
+        IWorkflowLinkHelper workflowLinkHelper,
         ILogger<ResetController> logger,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(tokenRepository, jwtBuilder)
     {
@@ -82,6 +85,7 @@ public class ResetController : BaseController
         _realmStore = realmStore;
         _templateStore = templateStore;
         _workflowHelper = workflowHelper;
+        _workflowLinkHelper = workflowLinkHelper;
         _logger = logger;
         _formBuilderOptions = formBuilderOptions.Value;
     }
@@ -113,7 +117,7 @@ public class ResetController : BaseController
         };
         var result = await BuildWorkflowViewModel(prefix, vm, cancellationToken);
         result.SetInput(viewModel);
-        result.CurrentStepId = _workflowHelper.GetNextAmr(null, result, vm);
+        result.CurrentStepId = _workflowLinkHelper.ResolveNextStep(null, result.Workflow, vm.CurrentLink);
         return View(result);
     }
 
@@ -164,7 +168,7 @@ public class ResetController : BaseController
         {
             area = Constants.AreaPwd
         });
-        var issuer = Request.GetAbsoluteUriWithVirtualPath();
+        var issuer = Request.GetAbsoluteUri();
         var parameter = new ResetPasswordParameter(
             $"{issuer}{url}", 
             user, 

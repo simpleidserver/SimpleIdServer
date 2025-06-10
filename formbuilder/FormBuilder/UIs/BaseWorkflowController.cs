@@ -34,7 +34,7 @@ public class BaseWorkflowController : Controller
         var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
         return new WorkflowViewModel
         {
-            CurrentStepId= step.Id,
+            CurrentStepId = step.Id,
             Workflow = workflow,
             Template = template,
             AntiforgeryToken = new AntiforgeryTokenRecord
