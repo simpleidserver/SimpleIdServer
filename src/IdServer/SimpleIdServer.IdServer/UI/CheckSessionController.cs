@@ -5,7 +5,6 @@ using Hangfire;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
@@ -138,7 +137,7 @@ namespace SimpleIdServer.IdServer.UI
                 var validationResult = await Validate(prefix, postLogoutRedirectUri, idTokenHint, cancellationToken);
                 if (Request.QueryString.HasValue)
                 {
-                    url = Request.GetEncodedPathAndQuery().Replace($"/{Config.DefaultEndpoints.EndSession}", $"/{Config.DefaultEndpoints.EndSessionCallback}");
+                    url = $"/{Config.DefaultEndpoints.EndSessionCallback}?{string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"))}";
                 }
 
                 var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(_realmStore.Realm, subject));
