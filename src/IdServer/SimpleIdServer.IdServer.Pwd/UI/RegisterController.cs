@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Resources;
@@ -56,7 +57,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         if (userRegistrationProgress == null && !isAuthenticated)
         {
             var res = new SidWorkflowViewModel();
-            res.SetErrorMessage(Global.NotAllowedToRegister);
+            res.SetErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister);
             return View(res);
         }
 
@@ -82,7 +83,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         if (userRegistrationProgress == null && !isAuthenticated)
         {
             var res = new SidWorkflowViewModel();
-            res.SetErrorMessage(Resources.Global.NotAllowedToRegister);
+            res.SetErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister);
             return View(res);
         }
 
@@ -100,7 +101,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         if (errors.Any())
         {
             result.SetInput(viewModel);
-            result.ErrorMessages = errors;
+            result.SetErrorMessages(errors);
             return View(result);
         }
 
@@ -114,7 +115,7 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
             if(isUserExists)
             {
                 result.SetInput(viewModel);
-                result.SetErrorMessage(Global.UserWithSameLoginAlreadyExists);
+                result.SetErrorMessage(RegisterFormErrorMessages.UserWithSameLoginAlreadyExists);
                 return View(result);
             }
 

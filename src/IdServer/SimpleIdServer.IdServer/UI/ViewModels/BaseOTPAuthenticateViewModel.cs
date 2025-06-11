@@ -1,6 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
-using SimpleIdServer.IdServer.Resources;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels
@@ -15,10 +15,10 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         {
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(ReturnUrl))
-                errors.Add(Global.MissingReturnUrl);
+                errors.Add(AuthFormErrorMessages.MissingReturnUrl);
 
             if (string.IsNullOrWhiteSpace(Login))
-                errors.Add(Global.MissingLogin);
+                errors.Add(AuthFormErrorMessages.MissingLogin);
 
             errors.AddRange(SpecificValidate());
             return errors;
@@ -30,7 +30,7 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         {
             var errors = new List<string>();
             if (OTPCode == null)
-                errors.Add(Global.MissingConfirmationCode);
+                errors.Add(AuthFormErrorMessages.MissingConfirmationCode);
             return errors;
         }
     }

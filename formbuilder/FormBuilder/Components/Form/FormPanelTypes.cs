@@ -3,5 +3,6 @@
 public enum FormPanelTypes
 {
     CSS = 0,
-    JSON = 1
+    JSON = 1,
+    TRANSLATION = 2
 }

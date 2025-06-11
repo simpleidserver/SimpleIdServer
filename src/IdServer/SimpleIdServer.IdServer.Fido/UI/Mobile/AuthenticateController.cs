@@ -1,9 +1,9 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
+using FormBuilder;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
-using FormBuilder;
 using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
@@ -33,7 +33,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateMobileViewModel>
     {
         private readonly IConfiguration _configuration;
-        private readonly IAuthenticationHelper _authenticationHelper;
         private readonly IDistributedCache _distributedCache;
 
         public AuthenticateController(
@@ -65,7 +64,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, formBuilderOptions)
         {
             _configuration = configuration;
-            _authenticationHelper = authenticationHelper;
             _distributedCache= distributedCache;
         }
 

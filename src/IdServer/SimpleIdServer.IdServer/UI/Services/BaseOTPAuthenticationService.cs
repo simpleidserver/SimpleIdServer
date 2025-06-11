@@ -2,6 +2,7 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.Generic;
@@ -32,8 +33,8 @@ public abstract class BaseOTPAuthenticationService : GenericAuthenticationServic
 
     protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, BaseOTPAuthenticateViewModel viewModel, CancellationToken cancellationToken)
     {
-        if (authenticatedUser.IsBlocked()) return Task.FromResult(CredentialsValidationResult.Error("user_blocked", "user_blocked"));
-        if (authenticatedUser.ActiveOTP == null) return Task.FromResult(CredentialsValidationResult.Error("no_active_otp", "no_active_otp"));
+        if (authenticatedUser.IsBlocked()) return Task.FromResult(CredentialsValidationResult.Error(AuthFormErrorMessages.UserBlocked, AuthFormErrorMessages.UserBlocked));
+        if (authenticatedUser.ActiveOTP == null) return Task.FromResult(CredentialsValidationResult.Error(AuthFormErrorMessages.NoActiveOtp, AuthFormErrorMessages.NoActiveOtp));
         var activeOtp = authenticatedUser.ActiveOTP;
         var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
         if (!otpAuthenticator.Verify(viewModel.OTPCode, activeOtp)) return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));

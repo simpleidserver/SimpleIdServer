@@ -1,0 +1,119 @@
+﻿@using FormBuilder.Models
+
+<RadzenTabs @bind-SelectedIndex="@selectedIndex">
+    <Tabs>
+        <RadzenTabsItem Text="Success messages">
+            <RadzenText TextStyle="TextStyle.Subtitle1">Success messages</RadzenText>
+            <hr />
+            <RadzenDataGrid Data="@GetGroupedTranslations(SuccessMessageTranslations)">
+                <Columns>
+                    <RadzenDataGridColumn Property="Key" Title="Code"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Translations">
+                        <Template Context="data">
+                            <RadzenStack>
+                                @foreach (var language in AllSupportedLanguages)
+                                {
+                                    <RadzenRow>
+                                        <RadzenColumn Size="6">
+                                            <RadzenTextBox Disabled=true Value="@language"></RadzenTextBox>
+                                        </RadzenColumn>
+                                        <RadzenColumn Size="6">
+                                            <RadzenTextBox Value="@GetTranslation(language, data.Key, SuccessMessageTranslations)" ValueChanged="@((newValue) => UpdateTranslation(language, data.Key, SuccessMessageTranslations, newValue, SuccessMessageTranslationsChanged))"></RadzenTextBox>
+                                        </RadzenColumn>
+                                    </RadzenRow>
+                                }
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="Error messages">
+            <RadzenText TextStyle="TextStyle.Subtitle1">Error messages</RadzenText>
+            <hr />
+            <RadzenDataGrid Data="@GetGroupedTranslations(ErrorMessageTranslations)">
+                <Columns>
+                    <RadzenDataGridColumn Property="Key" Title="Code"></RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Translations">
+                        <Template Context="data">
+                            <RadzenStack>
+                                @foreach (var language in AllSupportedLanguages)
+                                {
+                                    <RadzenRow>
+                                        <RadzenColumn Size="2">
+                                            <RadzenLabel>@language</RadzenLabel>
+                                        </RadzenColumn>
+                                        <RadzenColumn Size="10">
+                                            <RadzenTextBox class="fullWidth" Value="@GetTranslation(language, data.Key, ErrorMessageTranslations)" ValueChanged="@((newValue) => UpdateTranslation(language, data.Key, ErrorMessageTranslations, newValue, ErrorMessageTranslationsChanged))"></RadzenTextBox>
+                                        </RadzenColumn>
+                                    </RadzenRow>
+                                }
+                            </RadzenStack>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    int selectedIndex { get; set; } = 0;
+
+    [Parameter]
+    public List<FormMessageTranslation> SuccessMessageTranslations
+    {
+        get; set;
+    } = new List<FormMessageTranslation>();
+
+    [Parameter]
+    public EventCallback<List<FormMessageTranslation>> SuccessMessageTranslationsChanged { get; set; }
+
+    [Parameter]
+    public List<FormMessageTranslation> ErrorMessageTranslations
+    {
+        get; set;
+    } = new List<FormMessageTranslation>();
+
+    [Parameter]
+    public EventCallback<List<FormMessageTranslation>> ErrorMessageTranslationsChanged { get; set; }
+
+    [Parameter]
+    public List<string> AllSupportedLanguages
+    {
+        get; set;
+    } = new List<string>();
+
+    private Dictionary<string, List<FormMessageTranslation>> GetGroupedTranslations(List<FormMessageTranslation> messageTranslations)
+    {
+        return messageTranslations
+            .GroupBy(mt => mt.Code)
+            .ToDictionary(g => g.Key, g => g.ToList());
+    }
+
+    private async Task UpdateTranslation(string language, string code, List<FormMessageTranslation> translations, string newValue, EventCallback<List<FormMessageTranslation>> changed)
+    {
+        var selectedTranslation = translations.SingleOrDefault(t => t.Language == language && t.Code == code);
+        if(selectedTranslation != null)
+        {
+            selectedTranslation.Value = newValue;
+        }
+        else
+        {
+            translations.Add(new FormMessageTranslation
+            {
+                Code = code,
+                Language = language,
+                Value = newValue
+            });
+        }
+
+        await changed.InvokeAsync(translations);
+    }
+
+    private string GetTranslation(string language, string code, List<FormMessageTranslation> translations)
+    {
+        var selectedTranslation = translations.SingleOrDefault(t => t.Language == language && t.Code == code);
+        return selectedTranslation?.Value;
+    }
+}

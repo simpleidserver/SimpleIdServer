@@ -3,6 +3,7 @@
 
 using FormBuilder.UIs;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Resources;
 
 namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels
@@ -23,11 +24,11 @@ namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels
         public List<string> Validate(ModelStateDictionary modelState)
         {
             var result = new List<string>();
-            if (string.IsNullOrWhiteSpace(Code)) result.Add(Global.MissingConfirmationCode);
-            if (string.IsNullOrWhiteSpace(Destination)) result.Add(Global.MissingLogin);
-            if (string.IsNullOrWhiteSpace(Password)) result.Add(Global.MissingPassword);
-            if (string.IsNullOrWhiteSpace(ConfirmationPassword)) result.Add(Global.MissingConfirmedPassword);
-            if (Password != ConfirmationPassword) result.Add(Global.PasswordMismatch);
+            if (string.IsNullOrWhiteSpace(Code)) result.Add(AuthFormErrorMessages.MissingConfirmationCode);
+            if (string.IsNullOrWhiteSpace(Destination)) result.Add(AuthFormErrorMessages.MissingLogin);
+            if (string.IsNullOrWhiteSpace(Password)) result.Add(AuthFormErrorMessages.MissingPassword);
+            if (string.IsNullOrWhiteSpace(ConfirmationPassword)) result.Add(AuthFormErrorMessages.MissingConfirmedPassword);
+            if (Password != ConfirmationPassword) result.Add(AuthFormErrorMessages.PasswordMismatch);
             return result;
         }
     }

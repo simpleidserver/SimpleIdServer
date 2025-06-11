@@ -14,6 +14,7 @@ using SimpleIdServer.IdServer.Fido.DTOs;
 using SimpleIdServer.IdServer.Fido.Extensions;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using System.Text.Json;
@@ -53,11 +54,11 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         [HttpGet]
         public async Task<IActionResult> GetStatus([FromRoute] string prefix, string sessionId, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, nameof(sessionId)));
+            if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.MissingSessionIdParameter, string.Format(IdServer.Resources.Global.MissingParameter, nameof(sessionId)));
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
-            if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Resources.Global.SessionCannotBeExtracted);
+            if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.SessionCannotBeExtracted, Resources.Global.SessionCannotBeExtracted);
             var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
-            if (!sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Resources.Global.AuthenticationNotConfirmed);
+            if (!sessionRecord.IsValidated) return BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.AuthenticationNotConfirmed, Resources.Global.AuthenticationNotConfirmed);
             return NoContent();
         }
 
@@ -88,9 +89,9 @@ namespace SimpleIdServer.IdServer.Fido.Apis
         {
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, nameof(sessionId)));
+            if (string.IsNullOrWhiteSpace(sessionId)) return BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.MissingSessionIdParameter, string.Format(IdServer.Resources.Global.MissingParameter, nameof(sessionId)));
             var session = await _distributedCache.GetStringAsync(sessionId, cancellationToken);
-            if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Resources.Global.SessionCannotBeExtracted);
+            if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.SessionCannotBeExtracted, Resources.Global.SessionCannotBeExtracted);
             var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
             return new OkObjectResult(new BeginU2FLoginResult
             {
@@ -115,16 +116,16 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             using (var transaction = _transactionBuilder.Build())
             {
                 prefix = prefix ?? IdServer.Constants.DefaultRealm;
-                if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
+                if (request == null) return BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.InvalidIncomingRequest, Global.InvalidIncomingRequest);
                 var session = await _distributedCache.GetStringAsync(request.SessionId, cancellationToken);
-                if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Resources.Global.SessionCannotBeExtracted);
+                if (string.IsNullOrWhiteSpace(session)) return BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.SessionCannotBeExtracted, Resources.Global.SessionCannotBeExtracted);
                 JsonWebToken jsonWebToken = null;
                 if (!TryGetIdentityToken(prefix, out jsonWebToken))
-                    if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, EndU2FRegisterRequestNames.Login));
+                    if (string.IsNullOrWhiteSpace(request.Login)) return BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.MissingLoginParameter, string.Format(IdServer.Resources.Global.MissingParameter, EndU2FRegisterRequestNames.Login));
                 var login = jsonWebToken?.Subject ?? request.Login;
                 var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
                 if (authenticatedUser == null)
-                    return BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(SimpleIdServer.IdServer.Resources.Global.UnknownUser, login));
+                    return BuildError(System.Net.HttpStatusCode.Unauthorized, AuthFormErrorMessages.UserDoesntExist, string.Format(SimpleIdServer.IdServer.Resources.Global.UnknownUser, login));
 
                 var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
                 var fidoOptions = GetOptions(sessionRecord.CredentialType);
@@ -160,19 +161,19 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             var fidoOptions = GetOptions(request.CredentialType);
             var issuer = Request.GetAbsoluteUriWithVirtualPath();
             prefix = prefix ?? IdServer.Constants.DefaultRealm;
-            if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest));
+            if (request == null) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.InvalidIncomingRequest, Global.InvalidIncomingRequest));
             JsonWebToken jsonWebToken = null;
             if (!TryGetIdentityToken(prefix, out jsonWebToken))
-                if (string.IsNullOrWhiteSpace(request.Login)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(IdServer.Resources.Global.MissingParameter, BeginU2FLoginRequestNames.Login)));
+                if (string.IsNullOrWhiteSpace(request.Login)) return (null, BuildError(System.Net.HttpStatusCode.BadRequest, AuthFormErrorMessages.MissingLoginParameter, string.Format(IdServer.Resources.Global.MissingParameter, BeginU2FLoginRequestNames.Login)));
 
             var login = jsonWebToken?.Subject ?? request.Login;
             var authenticatedUser = await _authenticationHelper.GetUserByLogin(login, prefix, cancellationToken);
             if (authenticatedUser == null)
-                return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(IdServer.Resources.Global.UnknownUser, login)));
+                return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, AuthFormErrorMessages.UserDoesntExist, string.Format(IdServer.Resources.Global.UnknownUser, login)));
 
             var fidoCredentials = authenticatedUser.GetStoredFidoCredentials(request.CredentialType);
             if (!fidoCredentials.Any())
-                return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, ErrorCodes.ACCESS_DENIED, string.Format(Fido.Resources.Global.NoCredential, login)));
+                return (null, BuildError(System.Net.HttpStatusCode.Unauthorized, AuthFormErrorMessages.NoCredential, string.Format(Fido.Resources.Global.NoCredential, login)));
 
             var exts = new AuthenticationExtensionsClientInputs()
             {

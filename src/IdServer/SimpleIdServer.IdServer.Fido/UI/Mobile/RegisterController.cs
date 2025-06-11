@@ -13,6 +13,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -58,7 +59,7 @@ namespace SimpleIdServer.IdServer.Fido.UI.Mobile
             if (userRegistrationProgress == null && !isAuthenticated)
             {
                 var res = new SidWorkflowViewModel();
-                res.SetErrorMessage(Global.NotAllowedToRegister);
+                res.SetErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister);
                 return View(res);
             }
 

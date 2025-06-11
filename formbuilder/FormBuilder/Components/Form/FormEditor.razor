@@ -54,6 +54,7 @@
         <RadzenButton Icon="play_arrow" Text="Debug" Click="@(async () => await LaunchDebug())" ButtonStyle="ButtonStyle.Secondary" />
         <RadzenButton Icon="draft" Text="Json" Click="@(() => SwitchPanel(FormPanelTypes.JSON))" ButtonStyle="ButtonStyle.Secondary" />
         <RadzenButton Icon="css" Text="Css" Click="@(() => SwitchPanel(FormPanelTypes.CSS))" ButtonStyle="ButtonStyle.Secondary" />
+        <RadzenButton Icon="data_object" Text="Translations" Click="@(() => SwitchPanel(FormPanelTypes.TRANSLATION))" ButtonStyle="ButtonStyle.Secondary"></RadzenButton>
         @if (CanSave)
         {
             <RadzenButton Icon="save" Text="Save" Style="margin-left: 5px" Click="@(async() => await Save())" Disabled="@isSaveDisabled" />
@@ -135,6 +136,11 @@
                 @if (panelType == FormPanelTypes.JSON)
                 {
                     <JsonPanelComponent @ref=jsonPanelComponent Json="@SerializedForm" JsonChanged="HandleJsonChanged"></JsonPanelComponent>   
+                }
+
+                @if(panelType == FormPanelTypes.TRANSLATION)
+                {
+                    <TranslationPanelComponent AllSupportedLanguages=@SupportedLanguageCodes @bind-SuccessMessageTranslations="@Form.SuccessMessageTranslations" @bind-ErrorMessageTranslations="@Form.ErrorMessageTranslations"></TranslationPanelComponent>
                 }
             </div>
         </RadzenSplitterPane>

@@ -19,9 +19,9 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Layout;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
-using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -45,7 +45,6 @@ public class ResetController : BaseController
     private readonly ILanguageRepository _languageRepository;
     private readonly IRealmStore _realmStore;
     private readonly ITemplateStore _templateStore;
-    private readonly IWorkflowHelper _workflowHelper;
     private readonly IWorkflowLinkHelper _workflowLinkHelper;
     private readonly ILogger<ResetController> _logger;
     private readonly FormBuilderOptions _formBuilderOptions;
@@ -66,7 +65,6 @@ public class ResetController : BaseController
         ILanguageRepository languageRepository,
         IRealmStore realmStore,
         ITemplateStore templateStore,
-        IWorkflowHelper workflowHelper,
         IWorkflowLinkHelper workflowLinkHelper,
         ILogger<ResetController> logger,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(tokenRepository, jwtBuilder)
@@ -84,7 +82,6 @@ public class ResetController : BaseController
         _languageRepository = languageRepository;
         _realmStore = realmStore;
         _templateStore = templateStore;
-        _workflowHelper = workflowHelper;
         _workflowLinkHelper = workflowLinkHelper;
         _logger = logger;
         _formBuilderOptions = formBuilderOptions.Value;
@@ -134,7 +131,7 @@ public class ResetController : BaseController
         var validationResult = viewModel.Validate(ModelState);
         if(validationResult.Any())
         {
-            result.ErrorMessages = validationResult;
+            result.SetErrorMessages(validationResult);
             return View(result);
         }
 
@@ -142,7 +139,7 @@ public class ResetController : BaseController
         var user = await GetUser();
         if(user == null)
         {
-            result.SetErrorMessage(Global.UserIsUnknown);
+            result.SetErrorMessage(AuthFormErrorMessages.UserIsUnknown);
             return View(result);
         }
 
@@ -153,13 +150,13 @@ public class ResetController : BaseController
         var destination = service.GetDestination(user);
         if(string.IsNullOrWhiteSpace(destination))
         {
-            result.SetErrorMessage(Global.MissingDestination);
+            result.SetErrorMessage(AuthFormErrorMessages.MissingDestination);
             return View(result);
         }
 
         if(viewModel.Value != destination)
         {
-            result.SetErrorMessage(Global.InvalidDestination);
+            result.SetErrorMessage(AuthFormErrorMessages.InvalidDestination);
             return View(result);
         }
 
@@ -184,11 +181,11 @@ public class ResetController : BaseController
         catch(Exception ex)
         {
             _logger.LogError(ex.ToString());
-            result.SetErrorMessage(Global.CannotSendOtpCode);
+            result.SetErrorMessage(AuthFormErrorMessages.CannotSendOtpCode);
             return View(result);
         }
 
-        result.SetSuccessMessage(Global.OtpCodeIsSent);
+        result.SetSuccessMessage(AuthFormSuccessMessages.OtpCodeIsSent);
         return View(result);
 
         async Task<User> GetUser()
@@ -212,7 +209,7 @@ public class ResetController : BaseController
         if(resetPasswordLink == null)
         {
             var vm = new SidWorkflowViewModel();
-            vm.SetErrorMessage(Global.InvalidResetLink);
+            vm.SetErrorMessage(AuthFormErrorMessages.InvalidResetLink);
             return View(vm);
         }
 
@@ -245,7 +242,7 @@ public class ResetController : BaseController
             var errors = viewModel.Validate(ModelState);
             if (errors.Any())
             {
-                result.ErrorMessages = errors;;
+                result.SetErrorMessages(errors);
                 result.SetInput(viewModel);
                 return View(result);
             }
@@ -255,7 +252,7 @@ public class ResetController : BaseController
             var resetPasswordLink = await service.Verify(viewModel.Code, cancellationToken);
             if (resetPasswordLink == null)
             {
-                result.SetErrorMessage(Global.OtpCodeIsInvalid);
+                result.SetErrorMessage(AuthFormErrorMessages.OtpCodeIsInvalid);
                 result.SetInput(viewModel);
                 return View(result);
             }
@@ -279,7 +276,7 @@ public class ResetController : BaseController
             await transaction.Commit(cancellationToken);
             viewModel.IsPasswordUpdated = true;
             result.SetInput(viewModel);
-            result.SetSuccessMessage(Global.PasswordIsUpdated);
+            result.SetSuccessMessage(AuthFormSuccessMessages.PasswordIsUpdated);
             return View(result);
         }
     }

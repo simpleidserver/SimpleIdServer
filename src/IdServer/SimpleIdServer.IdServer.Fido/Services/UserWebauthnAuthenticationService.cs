@@ -5,7 +5,7 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Fido.Apis;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
-using SimpleIdServer.IdServer.Resources;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using System.Text.Json;
@@ -48,18 +48,18 @@ namespace SimpleIdServer.IdServer.Fido.Services
 
         protected override async Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, AuthenticateWebauthnViewModel viewModel, CancellationToken cancellationToken)
         {
-            if (authenticatedUser.IsBlocked()) return CredentialsValidationResult.Error("user_blocked", Global.UserAccountIsBlocked);
-            if (!authenticatedUser.GetStoredFidoCredentials(Constants.AMR).Any()) return CredentialsValidationResult.Error("missing_credential", "missing_credential");
+            if (authenticatedUser.IsBlocked()) return CredentialsValidationResult.Error(AuthFormErrorMessages.UserBlocked, AuthFormErrorMessages.UserBlocked);
+            if (!authenticatedUser.GetStoredFidoCredentials(Constants.AMR).Any()) return CredentialsValidationResult.Error(AuthFormErrorMessages.MissingCredential, AuthFormErrorMessages.MissingCredential);
             var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
             if (string.IsNullOrWhiteSpace(session))
             {
-                return CredentialsValidationResult.Error("unknown_session", "unknown_session");
+                return CredentialsValidationResult.Error(AuthFormErrorMessages.UnknownSession, AuthFormErrorMessages.UnknownSession);
             }
 
             var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
             if (!sessionRecord.IsValidated)
             {
-                return CredentialsValidationResult.Error("session_not_validated", "session_not_validated");
+                return CredentialsValidationResult.Error(AuthFormErrorMessages.SessionNotValidated, AuthFormErrorMessages.SessionNotValidated);
             }
 
             return CredentialsValidationResult.Ok(authenticatedUser, false);

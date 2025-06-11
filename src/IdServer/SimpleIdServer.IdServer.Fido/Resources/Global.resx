@@ -141,4 +141,13 @@
   <data name="MissingSessionId" xml:space="preserve">
     <value>The session identifier is missing</value>
   </data>
+  <data name="MissingCredential" xml:space="preserve">
+    <value>Credential is missing</value>
+  </data>
+  <data name="UnknownSession" xml:space="preserve">
+    <value>Session doesn't exist</value>
+  </data>
+  <data name="SessionNotValidated" xml:space="preserve">
+    <value>Session has not been validated</value>
+  </data>
 </root>

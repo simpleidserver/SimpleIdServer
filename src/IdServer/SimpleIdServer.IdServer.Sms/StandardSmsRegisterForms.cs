@@ -4,6 +4,7 @@
 using FormBuilder.Models;
 using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
+using SimpleIdServer.IdServer.Resources;
 
 namespace SimpleIdServer.IdServer.Sms;
 
@@ -17,5 +18,15 @@ public static class StandardSmsRegisterForms
         .ConfigureSendConfirmationCode(smsSendConfirmationCodeFormId)
         .ConfigureRegistration(smsRegisterFormId)
         .ConfigureBackButton(backButtonId)
+        .AddErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister, Global.NotAllowedToRegister)
+        .AddErrorMessage(RegisterFormErrorMessages.MissingValue, Global.MissingValue)
+        .AddErrorMessage(RegisterFormErrorMessages.MissingAction, Global.MissingAction)
+        .AddErrorMessage(RegisterFormErrorMessages.ActionIsInvalid, Global.ActionIsInvalid)
+        .AddErrorMessage(RegisterFormErrorMessages.MissingOtpCode, Global.MissingOtpCode)
+        .AddErrorMessage(RegisterFormErrorMessages.OtpCodeMustBeNumber, Global.OtpCodeMustBeNumber)
+        .AddErrorMessage(RegisterFormErrorMessages.UserWithSameClaimAlreadyExists, Global.UserWithSameClaimAlreadyExists)
+        .AddErrorMessage(RegisterFormErrorMessages.OtpCodeIsInvalid, Global.OtpCodeIsInvalid)
+        .AddErrorMessage(RegisterFormErrorMessages.ImpossibleToSendOtpCode, Global.ImpossibleToSendOtpCode)
+        .AddSuccessMessage(RegisterFormSuccessMessages.OtpCodeIsSent, Global.OtpCodeIsSent)
         .Build(DateTime.UtcNow);
 }

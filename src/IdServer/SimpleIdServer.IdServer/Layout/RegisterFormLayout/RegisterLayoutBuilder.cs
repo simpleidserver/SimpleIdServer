@@ -6,6 +6,7 @@ using FormBuilder.Conditions;
 using FormBuilder.Models;
 using FormBuilder.Models.Rules;
 using FormBuilder.Rules;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,28 @@ public class RegisterLayoutBuilder
     public RegisterLayoutBuilder AddElement(IFormElementRecord record)
     {
         FormRecord.Elements.Add(record);
+        return this;
+    }
+
+    public RegisterLayoutBuilder AddSuccessMessage(string code, string value)
+    {
+        FormRecord.SuccessMessageTranslations.Add(new FormMessageTranslation
+        {
+            Language = Constants.DefaultLanguage,
+            Value = value,
+            Code = code
+        });
+        return this;
+    }
+
+    public RegisterLayoutBuilder AddErrorMessage(string code, string value)
+    {
+        FormRecord.ErrorMessageTranslations.Add(new FormMessageTranslation
+        {
+            Language = Constants.DefaultLanguage,
+            Value = value,
+            Code = code
+        });
         return this;
     }
 

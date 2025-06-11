@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
@@ -22,10 +23,10 @@ public class PwdRegisterViewModel : IRegisterViewModel
     public List<string> Validate()
     {
         var errors = new List<string>();
-        if (string.IsNullOrWhiteSpace(Login)) errors.Add(Global.MissingLogin);
-        if (string.IsNullOrWhiteSpace(Password)) errors.Add(Global.MissingPassword);
-        if (string.IsNullOrWhiteSpace(ConfirmedPassword)) errors.Add(Global.MissingConfirmedPassword);
-        if (!string.IsNullOrWhiteSpace(Password) && !string.IsNullOrWhiteSpace(ConfirmedPassword) && Password != ConfirmedPassword) errors.Add(Global.PasswordMismatch);
+        if (string.IsNullOrWhiteSpace(Login)) errors.Add(RegisterFormErrorMessages.MissingLogin);
+        if (string.IsNullOrWhiteSpace(Password)) errors.Add(RegisterFormErrorMessages.MissingPassword);
+        if (string.IsNullOrWhiteSpace(ConfirmedPassword)) errors.Add(RegisterFormErrorMessages.MissingConfirmedPassword);
+        if (!string.IsNullOrWhiteSpace(Password) && !string.IsNullOrWhiteSpace(ConfirmedPassword) && Password != ConfirmedPassword) errors.Add(RegisterFormErrorMessages.PasswordMismatch);
         return errors;
     }
 }

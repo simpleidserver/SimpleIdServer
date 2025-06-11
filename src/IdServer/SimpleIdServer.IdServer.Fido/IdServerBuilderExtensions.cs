@@ -23,6 +23,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, MobileRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitMobileAuthDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitMobileConfigurationDefDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, UpdateFidoTranslationsDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<MobileOptions>();
         if (isDefaultAuthMethod)
         {

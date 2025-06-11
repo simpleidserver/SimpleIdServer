@@ -57,7 +57,7 @@
             var isInitialized = false;
 
             var displayError = function (errorJson) {
-                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error_description"]);
+                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error"]);
             }
 
             var displaySuccessMessage = function () {

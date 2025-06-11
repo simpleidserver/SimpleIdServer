@@ -2,8 +2,8 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using FormBuilder.Models;
+using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace SimpleIdServer.IdServer.Layout.AuthFormLayout;
@@ -37,6 +37,28 @@ public class AuthLayoutBuilder
     public AuthLayoutBuilder AddElement(IFormElementRecord record)
     {
         FormRecord.Elements.Add(record);
+        return this;
+    }
+
+    public AuthLayoutBuilder AddSuccessMessage(string code, string value)
+    {
+        FormRecord.ErrorMessageTranslations.Add(new FormMessageTranslation
+        {
+            Language = Constants.DefaultLanguage,
+            Value = value,
+            Code = code
+        });
+        return this;
+    }
+
+    public AuthLayoutBuilder AddErrorMessage(string code, string value)
+    {
+        FormRecord.ErrorMessageTranslations.Add(new FormMessageTranslation
+        {
+            Language = Constants.DefaultLanguage,
+            Value = value,
+            Code = code
+        });
         return this;
     }
 

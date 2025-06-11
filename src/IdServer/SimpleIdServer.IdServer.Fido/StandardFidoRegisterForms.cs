@@ -5,6 +5,7 @@ using FormBuilder.Models;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
+using SimpleIdServer.IdServer.Resources;
 using System.Collections.ObjectModel;
 
 namespace SimpleIdServer.IdServer.Fido;
@@ -40,6 +41,15 @@ public class StandardFidoRegisterForms
             }
         })
         .ConfigureBackButton(webauthnBackButtonId)
+        .AddErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister, Global.NotAllowedToRegister)
+        .AddErrorMessage(RegisterFormErrorMessages.MissingSessionIdParameter, string.Format(Global.MissingParameter, "sessionId"))
+        .AddErrorMessage(RegisterFormErrorMessages.MissingLoginParameter, string.Format(Global.MissingParameter, "login"))
+        .AddErrorMessage(RegisterFormErrorMessages.MissingDisplayNameParameter, string.Format(Global.MissingParameter, "display_name"))
+        .AddErrorMessage(RegisterFormErrorMessages.MissingAuthenticatorAttestationRawResponseParameter, string.Format(Global.MissingParameter, "attestation"))
+        .AddErrorMessage(RegisterFormErrorMessages.SessionCannotBeExtracted, Resources.Global.SessionCannotBeExtracted)
+        .AddErrorMessage(RegisterFormErrorMessages.InvalidIncomingRequest, Global.InvalidIncomingRequest)
+        .AddErrorMessage(RegisterFormErrorMessages.RegistrationNotConfirmed, Resources.Global.RegistrationNotConfirmed)
+        .AddErrorMessage(RegisterFormErrorMessages.UserWithSameLoginAlreadyExists, Global.UserWithSameLoginAlreadyExists)
         .Build(DateTime.UtcNow);
 
     public static FormRecord MobileForm = RegisterLayoutBuilder.New("94c14531-9258-40da-8884-2b52fcf9f0f4", "mobileRegister", Constants.MobileAMR)
@@ -67,5 +77,14 @@ public class StandardFidoRegisterForms
         })
         .AddElement(StandardFormComponents.NewScanQrCode())
         .ConfigureBackButton(mobileBackButtonId)
+        .AddErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister, Global.NotAllowedToRegister)
+        .AddErrorMessage(RegisterFormErrorMessages.MissingSessionIdParameter, string.Format(Global.MissingParameter, "sessionId"))
+        .AddErrorMessage(RegisterFormErrorMessages.MissingLoginParameter, string.Format(Global.MissingParameter, "login"))
+        .AddErrorMessage(RegisterFormErrorMessages.MissingDisplayNameParameter, string.Format(Global.MissingParameter, "display_name"))
+        .AddErrorMessage(RegisterFormErrorMessages.MissingAuthenticatorAttestationRawResponseParameter, string.Format(Global.MissingParameter, "attestation"))
+        .AddErrorMessage(RegisterFormErrorMessages.SessionCannotBeExtracted, Resources.Global.SessionCannotBeExtracted)
+        .AddErrorMessage(RegisterFormErrorMessages.InvalidIncomingRequest, Global.InvalidIncomingRequest)
+        .AddErrorMessage(RegisterFormErrorMessages.RegistrationNotConfirmed, Resources.Global.RegistrationNotConfirmed)
+        .AddErrorMessage(RegisterFormErrorMessages.UserWithSameLoginAlreadyExists, Global.UserWithSameLoginAlreadyExists)
         .Build(DateTime.UtcNow);
 }

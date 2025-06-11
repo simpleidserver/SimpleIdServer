@@ -3,6 +3,7 @@
 
 using FormBuilder.UIs;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Resources;
 
 namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;
@@ -23,9 +24,9 @@ public class ResetPasswordViewModel : IStepViewModel
     {
         var result = new List<string>();
         if (string.IsNullOrWhiteSpace(Login))
-            result.Add(Global.MissingLogin);
+            result.Add(AuthFormErrorMessages.MissingLogin);
         if (string.IsNullOrWhiteSpace(Value))
-            result.Add(Global.MissingValue);
+            result.Add(AuthFormErrorMessages.MissingValue);
         return result;
     }
 }

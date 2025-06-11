@@ -1,8 +1,8 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using FormBuilder;
 using FormBuilder.Repositories;
 using FormBuilder.Stores;
-using FormBuilder;
 using MassTransit;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
@@ -12,8 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using SimpleIdServer.IdServer.Domains;
-using SimpleIdServer.IdServer.Fido.Apis;
 using SimpleIdServer.IdServer.Fido.Services;
 using SimpleIdServer.IdServer.Fido.UI.ViewModels;
 using SimpleIdServer.IdServer.Helpers;
@@ -24,15 +22,12 @@ using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
-using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
 {
     [Area(Constants.AMR)]
     public class AuthenticateController : BaseAuthenticationMethodController<AuthenticateWebauthnViewModel>
     {
-        private readonly IDistributedCache _distributedCache;
-
         public AuthenticateController(
             ITemplateStore templateStore, 
             IConfiguration configuration,
@@ -61,7 +56,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
             IWorkflowHelper workflowHelper,
             IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, formBuilderOptions)
         {
-            _distributedCache = distributedCache;
         }
 
         protected override string Amr => Constants.AMR;
@@ -89,25 +83,6 @@ namespace SimpleIdServer.IdServer.Fido.UI.Webauthn
                 realm = $"/{viewModel.Realm}/";
             viewModel.BeginLoginUrl = $"{issuer}{realm}{Constants.EndPoints.BeginLogin}";
             viewModel.EndLoginUrl = $"{issuer}{realm}{Constants.EndPoints.EndLogin}";
-        }
-
-        protected async Task<ValidationStatus> ValidateCredentials(AuthenticateWebauthnViewModel viewModel, User user, CancellationToken cancellationToken)
-        {
-            var session = await _distributedCache.GetStringAsync(viewModel.SessionId, cancellationToken);
-            if (string.IsNullOrWhiteSpace(session))
-            {
-                ModelState.AddModelError("unknown_session", "unknown_session");
-                return ValidationStatus.NOCONTENT;
-            }
-
-            var sessionRecord = JsonSerializer.Deserialize<AuthenticationSessionRecord>(session);
-            if(!sessionRecord.IsValidated)
-            {
-                ModelState.AddModelError("session_not_validated", "session_not_validated");
-                return ValidationStatus.NOCONTENT;
-            }
-
-            return ValidationStatus.AUTHENTICATE;
         }
     }
 }

@@ -15,8 +15,8 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Layout;
+using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System;
@@ -105,7 +105,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
                 UserRepository.Add(user);
                 Counters.UserRegistered();
                 await transaction.Commit(CancellationToken.None);
-                result.SetSuccessMessage(Global.UserIsCreated);
+                result.SetSuccessMessage(RegisterFormSuccessMessages.UserIsCreated);
                 viewModel.IsCreated = true;
                 viewModel.ReturnUrl = registrationProgress.RedirectUrl ?? redirectUrl;
                 result.SetInput(viewModel);
@@ -124,7 +124,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
         var nextAmr = GetNextAmr(result, viewModel);
         if (IsLastStep(nextAmr) || registrationProgress == null)
         {
-            result.SetSuccessMessage(Global.UserIsUpdated);
+            result.SetSuccessMessage(RegisterFormSuccessMessages.UserIsUpdated);
             viewModel.IsUpdated = true;
             viewModel.ReturnUrl = registrationProgress?.RedirectUrl ?? redirectUrl;
             result.SetInput(viewModel);

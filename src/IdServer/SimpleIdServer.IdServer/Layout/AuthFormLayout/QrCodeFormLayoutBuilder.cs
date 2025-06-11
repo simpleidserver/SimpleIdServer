@@ -68,6 +68,28 @@ public class QrCodeFormLayoutBuilder
         return this;
     }
 
+    public QrCodeFormLayoutBuilder AddSuccessMessage(string code, string value)
+    {
+        _record.ErrorMessageTranslations.Add(new FormMessageTranslation
+        {
+            Language = Constants.DefaultLanguage,
+            Value = value,
+            Code = code
+        });
+        return this;
+    }
+
+    public QrCodeFormLayoutBuilder AddErrorMessage(string code, string value)
+    {
+        _record.ErrorMessageTranslations.Add(new FormMessageTranslation
+        {
+            Language = Constants.DefaultLanguage,
+            Value = value,
+            Code = code
+        });
+        return this;
+    }
+
     public QrCodeFormLayoutBuilder ConfigureDisplayQrCode()
     {
         var record = StandardFormComponents.NewScanQrCode();

@@ -104,7 +104,7 @@ namespace SimpleIdServer.IdServer.UI
         public async Task<IActionResult> EndSession([FromRoute] string prefix, CancellationToken cancellationToken)
         {
             prefix = prefix ?? Constants.DefaultRealm;
-            var url = Config.DefaultEndpoints.EndSessionCallback;
+            var url = $"/{Config.DefaultEndpoints.EndSessionCallback}";
             var jObjBody = Request.Query.ToJObject();
             var idTokenHint = jObjBody.GetIdTokenHintFromRpInitiatedLogoutRequest();
             var postLogoutRedirectUri = jObjBody.GetPostLogoutRedirectUriFromRpInitiatedLogoutRequest();
@@ -138,6 +138,11 @@ namespace SimpleIdServer.IdServer.UI
                 if (Request.QueryString.HasValue)
                 {
                     url = $"/{Config.DefaultEndpoints.EndSessionCallback}?{string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"))}";
+                }
+
+                if (!string.IsNullOrWhiteSpace(prefix))
+                {
+                    url = $"/{prefix}{url}";
                 }
 
                 var kvp = Request.Cookies.SingleOrDefault(c => c.Key == _options.GetSessionCookieName(_realmStore.Realm, subject));

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Resources;
 using System.Collections.Generic;
 
@@ -23,13 +24,13 @@ public abstract class OTPRegisterViewModel : IRegisterViewModel, IOTPViewModel
     public List<string> Validate()
     {
         var result = new List<string>();
-        if (string.IsNullOrWhiteSpace(Value)) result.Add(Global.MissingValue);
-        if (string.IsNullOrWhiteSpace(Action)) result.Add(Global.MissingAction);
-        else if (Action != "SENDCONFIRMATIONCODE" && Action != "REGISTER") result.Add(Global.ActionIsInvalid);
+        if (string.IsNullOrWhiteSpace(Value)) result.Add(RegisterFormErrorMessages.MissingValue);
+        if (string.IsNullOrWhiteSpace(Action)) result.Add(RegisterFormErrorMessages.MissingAction);
+        else if (Action != "SENDCONFIRMATIONCODE" && Action != "REGISTER") result.Add(RegisterFormErrorMessages.ActionIsInvalid);
         if (Action == "REGISTER")
         {
-            if (string.IsNullOrWhiteSpace(OTPCode)) result.Add(Global.MissingOtpCode);
-            else if (!long.TryParse(OTPCode, out long l)) result.Add(Global.OtpCodeMustBeNumber);
+            if (string.IsNullOrWhiteSpace(OTPCode)) result.Add(RegisterFormErrorMessages.MissingOtpCode);
+            else if (!long.TryParse(OTPCode, out long l)) result.Add(RegisterFormErrorMessages.OtpCodeMustBeNumber);
             else result.AddRange(SpecificValidate());
         }
         else result.AddRange(SpecificValidate());

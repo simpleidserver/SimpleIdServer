@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 
-using FormBuilder;
 using FormBuilder.Helpers;
 using FormBuilder.Models;
 using FormBuilder.Services;
@@ -13,7 +12,6 @@ using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -69,7 +67,11 @@ public class FormsController : BaseController
             await CheckAccessToken(prefix, Config.DefaultScopes.Forms.Name);
             var existingForm = await _formStore.GetLatestVersionByCorrelationId(prefix, id, cancellationToken);
             if (existingForm == null) throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownForm, id));
-            existingForm.Update(form.Elements.ToList(), _dateTimeHelper.GetCurrent());
+            existingForm.Update(
+                form.Elements.ToList(), 
+                form.SuccessMessageTranslations.ToList(), 
+                form.ErrorMessageTranslations.ToList(), 
+                _dateTimeHelper.GetCurrent());
             await _formStore.SaveChanges(cancellationToken);
             return new NoContentResult();
         }

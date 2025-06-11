@@ -5,6 +5,7 @@ using FormBuilder.Models;
 using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
+using SimpleIdServer.IdServer.Resources;
 using System.Collections.ObjectModel;
 
 namespace SimpleIdServer.IdServer.Pwd;
@@ -38,5 +39,13 @@ public static class StandardPwdRegisterForms
             }
         })
         .ConfigureBackButton(backBtnId)
+        .AddErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister, Global.NotAllowedToRegister)
+        .AddErrorMessage(RegisterFormErrorMessages.MissingLogin, Global.MissingLogin)
+        .AddErrorMessage(RegisterFormErrorMessages.MissingPassword, Global.MissingPassword)
+        .AddErrorMessage(RegisterFormErrorMessages.MissingConfirmedPassword, Global.MissingConfirmedPassword)
+        .AddErrorMessage(RegisterFormErrorMessages.PasswordMismatch, Global.PasswordMismatch)
+        .AddErrorMessage(RegisterFormErrorMessages.UserWithSameLoginAlreadyExists, Global.UserWithSameLoginAlreadyExists)
+        .AddSuccessMessage(RegisterFormSuccessMessages.UserIsUpdated, Global.UserIsUpdated)
+        .AddSuccessMessage(RegisterFormSuccessMessages.UserIsCreated, Global.UserIsCreated)
         .Build(DateTime.UtcNow);
 }

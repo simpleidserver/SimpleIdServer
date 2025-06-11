@@ -14,6 +14,14 @@ public class FormRecord : BaseVersionRecord, ICloneable, IFormRecordCollection
     public string? Category { get; set; }
     public string? Realm { get; set; }
     public bool ActAsStep { get; set; }
+    public List<FormMessageTranslation> SuccessMessageTranslations
+    {
+        get; set;
+    } = new List<FormMessageTranslation>();
+    public List<FormMessageTranslation> ErrorMessageTranslations
+    {
+        get; set;
+    } = new List<FormMessageTranslation>();
     public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();
 
     public object Clone()
@@ -32,13 +40,31 @@ public class FormRecord : BaseVersionRecord, ICloneable, IFormRecordCollection
             Status = Status,
             UpdateDateTime = UpdateDateTime,
             VersionNumber = VersionNumber,
-            Elements = elements
+            Elements = elements,
+            SuccessMessageTranslations = SuccessMessageTranslations.Select(s => new FormMessageTranslation
+            {
+                Code = s.Code,
+                Language = s.Language,
+                Value = s.Value
+            }).ToList(),
+            ErrorMessageTranslations = ErrorMessageTranslations.Select(s => new FormMessageTranslation
+            {
+                Code = s.Code,
+                Language = s.Language,
+                Value = s.Value
+            }).ToList()
         };
     }
 
-    public void Update(List<IFormElementRecord> elements, DateTime dateTime)
+    public void Update(
+        List<IFormElementRecord> elements, 
+        List<FormMessageTranslation> successMessageTranslations, 
+        List<FormMessageTranslation> errorMessageTranslations,
+        DateTime dateTime)
     {
         UpdateDateTime = dateTime;
+        SuccessMessageTranslations = successMessageTranslations;
+        ErrorMessageTranslations = errorMessageTranslations;
         Elements = new ObservableCollection<IFormElementRecord>(elements);
     }
 

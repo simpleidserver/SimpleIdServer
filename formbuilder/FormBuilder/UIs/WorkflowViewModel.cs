@@ -17,10 +17,30 @@ public class WorkflowViewModel
     public List<string> SuccessMessages { get; set; }
 
     public void SetErrorMessage(string errorMessage)
-        => ErrorMessages = new List<string> { errorMessage };
+    {
+        ErrorMessages = new List<string>
+        {
+            errorMessage
+        };
+    }
+
+    public void SetErrorMessages(List<string> errorMessages)
+    {
+        ErrorMessages = errorMessages;
+    }
 
     public void SetSuccessMessage(string successMessage)
-        => SuccessMessages = new List<string> { successMessage };
+    {
+        SuccessMessages = new List<string>
+        {
+            successMessage
+        };
+    }
+
+    public void SetSuccessMessages(List<string> successMessages)
+    {
+        SuccessMessages = successMessages;
+    }
 
     public void SetInput<T>(T record) where T : class
     {

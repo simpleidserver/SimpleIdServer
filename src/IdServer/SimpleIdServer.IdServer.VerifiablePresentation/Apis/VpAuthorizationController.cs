@@ -11,6 +11,7 @@ using SimpleIdServer.Did;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Exceptions;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.VerifiablePresentation.DTOs;
@@ -83,7 +84,7 @@ public class VpAuthorizationController : BaseController
         {
             var presentationDefinition = await _presentationDefinitionStore.GetByPublicId(id, prefix, cancellationToken);
             if(presentationDefinition == null)
-                throw new OAuthException(HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownPresentationDefinition, id));
+                throw new OAuthException(HttpStatusCode.NotFound, RegisterFormErrorMessages.UnknownPresentationDefinition, string.Format(Global.UnknownPresentationDefinition, id));
             var state = Guid.NewGuid().ToString();
             var nonce = Guid.NewGuid().ToString();
             var qrCodeUrl = GetQRCodeUrl(id, prefix, nonce, state);
@@ -132,19 +133,19 @@ public class VpAuthorizationController : BaseController
 
     private async Task<VpAuthorizationValidationResult> Validate(VpAuthorizationResponse request, string prefix, CancellationToken cancellationToken)
     {
-        if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidIncomingRequest);
-        if (string.IsNullOrWhiteSpace(request.VpToken)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "vp_token"));
-        if (string.IsNullOrWhiteSpace(request.PresentationSubmission)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "presentation_submission"));
-        if (string.IsNullOrWhiteSpace(request.State)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "state"));
+        if (request == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.InvalidIncomingRequest, Global.InvalidIncomingRequest);
+        if (string.IsNullOrWhiteSpace(request.VpToken)) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.MissingVpTokenParameter, string.Format(Global.MissingParameter, "vp_token"));
+        if (string.IsNullOrWhiteSpace(request.PresentationSubmission)) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.MissingPresentationSubmissionParameter, string.Format(Global.MissingParameter, "presentation_submission"));
+        if (string.IsNullOrWhiteSpace(request.State)) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.MissingStateParameter, string.Format(Global.MissingParameter, "state"));
 
         var verifiablePresentation = JsonSerializer.Deserialize<Vp.Models.VerifiablePresentation>(request.VpToken);
-        if (verifiablePresentation == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidVerifiablePresentation);
+        if (verifiablePresentation == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.InvalidVerifiablePresentation, Global.InvalidVerifiablePresentation);
         var presentationSubmission = JsonSerializer.Deserialize<PresentationSubmission>(request.PresentationSubmission);
-        if (presentationSubmission == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidPresentationSubmission);
+        if (presentationSubmission == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.InvalidPresentationSubmission, Global.InvalidPresentationSubmission);
         var verifiablePresentationJsonObject = JsonDocument.Parse(request.VpToken);
 
         var cachedValue = await _distributedCache.GetStringAsync(request.State, cancellationToken);
-        if (cachedValue == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.StateIsNotValid);
+        if (cachedValue == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.StateIsNotValid, Global.StateIsNotValid);
         var vpPendingAuthorization = JsonSerializer.Deserialize<VpPendingAuthorization>(cachedValue);
         var presentationDefinition = await _presentationDefinitionStore.GetByPublicId(vpPendingAuthorization.PresentationDefinitionId, prefix, cancellationToken);
         var vpVerifier = new VpVerifier(_didFactoryResolver);
@@ -155,7 +156,7 @@ public class VpAuthorizationController : BaseController
         catch(Exception ex)
         {
             _logger.LogError(ex.ToString());
-            throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.VerifiablePresentationProofInvalid);
+            throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.VerifiablePresentationProofInvalid, Global.VerifiablePresentationProofInvalid);
         }
 
         var result = new Dictionary<string, JsonNode>();
@@ -164,17 +165,17 @@ public class VpAuthorizationController : BaseController
         foreach(var inputDescriptor in inputDescriptors)
         {
             var descriptorMap = presentationSubmission.DescriptorMaps.SingleOrDefault(m => m.Id == inputDescriptor.PublicId);
-            if (descriptorMap == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.PresentationSubmissionMissingVerifiableCredential, inputDescriptor.PublicId));
-            if (descriptorMap.PathNested == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.PresentationSubmissinMissingPathNested);
-            if (!inputDescriptor.Format.Any(f => f.Format == descriptorMap.PathNested.Format)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.PresentationSubmissionBadFormat, descriptorMap.PathNested.Format));
+            if (descriptorMap == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.PresentationSubmissionMissingVerifiableCredential, string.Format(Global.PresentationSubmissionMissingVerifiableCredential, inputDescriptor.PublicId));
+            if (descriptorMap.PathNested == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.PresentationSubmissinMissingPathNested, Global.PresentationSubmissinMissingPathNested);
+            if (!inputDescriptor.Format.Any(f => f.Format == descriptorMap.PathNested.Format)) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.PresentationSubmissionBadFormat, string.Format(Global.PresentationSubmissionBadFormat, descriptorMap.PathNested.Format));
             var token = verifiablePresentationJsonObject.SelectToken(descriptorMap.PathNested.Path);
-            if (token == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.CannotExtractVcFromPath, descriptorMap.PathNested.Path));
+            if (token == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.CannotExtractVcFromPath, string.Format(Global.CannotExtractVcFromPath, descriptorMap.PathNested.Path));
             var vcJson = token.ToString();
             var vc = JsonSerializer.Deserialize<W3CVerifiableCredential>(vcJson);
-            if (vc == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidVerifiableCredential);
+            if (vc == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.InvalidVerifiableCredential, Global.InvalidVerifiableCredential);
             var did = await _didFactoryResolver.Resolve(vc.Issuer, cancellationToken);
-            if (did == null) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.VcIssuerNotDid);
-            if (!securedDocument.Check(vc, did)) throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Format(Global.VerifiableCredentialProofInvalid, vc.Id));
+            if (did == null) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.VcIssuerNotDid, Global.VcIssuerNotDid);
+            if (!securedDocument.Check(vc, did)) throw new OAuthException(HttpStatusCode.BadRequest, RegisterFormErrorMessages.VerifiableCredentialProofInvalid, string.Format(Global.VerifiableCredentialProofInvalid, vc.Id));
             result.Add(vc.Id, vc.CredentialSubject);
         }
 

@@ -3,6 +3,7 @@
 using FormBuilder.Models;
 using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Layout.AuthFormLayout;
+using SimpleIdServer.IdServer.Resources;
 
 namespace SimpleIdServer.IdServer.Sms;
 
@@ -15,5 +16,15 @@ public static class StandardSmsAuthForms
     public static FormRecord SmsForm = OtpAuthFormLayoutBuilder.New("3781726f-07a0-48ad-8619-91323102d489", "smsAuth", Constants.AMR, LayoutTranslations.PhoneNumber)
         .ConfigureSendConfirmationCode(smsSendConfirmationCode)
         .ConfigureAuthentication(smsAuthForm)
+        .AddErrorMessage(AuthFormErrorMessages.MaximumNumberActiveSessions, Global.MaximumNumberActiveSessions)
+        .AddErrorMessage(AuthFormErrorMessages.MissingLogin, Global.MissingLogin)
+        .AddErrorMessage(AuthFormErrorMessages.MissingReturnUrl, Global.MissingReturnUrl)
+        .AddErrorMessage(AuthFormErrorMessages.UserDoesntExist, Global.UserDoesntExist)
+        .AddErrorMessage(AuthFormErrorMessages.InvalidCredential, Global.InvalidCredential)
+        .AddErrorMessage(AuthFormErrorMessages.UserBlocked, Global.UserAccountIsBlocked)
+        .AddErrorMessage(AuthFormErrorMessages.NoActiveOtp, Global.NoActiveOtp)
+        .AddErrorMessage(AuthFormErrorMessages.AuthenticationMethodIsNotWellConfigured, Global.AuthenticationMethodIsNotWellConfigured)
+        .AddErrorMessage(AuthFormErrorMessages.MissingConfirmationCode, Global.MissingConfirmationCode)
+        .AddSuccessMessage(AuthFormSuccessMessages.ConfirmationcodeSent, Global.ConfirmationcodeSent)
         .Build();
 }

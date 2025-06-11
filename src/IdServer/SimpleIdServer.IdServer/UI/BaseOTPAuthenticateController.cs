@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -71,13 +72,13 @@ namespace SimpleIdServer.IdServer.UI
             var authenticatedUser = await UserAuthenticationService.GetUser(authenticatedUserId, viewModel, prefix, cancellationToken);
             if (authenticatedUser == null)
             {
-                return UserAuthenticationResult.Error(Global.UserDoesntExist);
+                return UserAuthenticationResult.Error(AuthFormErrorMessages.UserDoesntExist);
             }
 
             var activeOtp = authenticatedUser.ActiveOTP;
             if(activeOtp == null)
             {
-                return UserAuthenticationResult.Error(Global.NoActiveOtp);
+                return UserAuthenticationResult.Error(AuthFormErrorMessages.NoActiveOtp);
             }
 
             var otpAuthenticator = _otpAuthenticators.Single(a => a.Alg == activeOtp.OTPAlg);
@@ -90,11 +91,11 @@ namespace SimpleIdServer.IdServer.UI
                     {
                         await notificationService.Send("One Time Password", string.Format(FormattedMessage, otpCode), new Dictionary<string, string>(), authenticatedUser);
                         if (activeOtp.OTPAlg == Domains.OTPAlgs.TOTP) viewModel.TOTPStep = activeOtp.TOTPStep;
-                        return UserAuthenticationResult.Success(Global.ConfirmationcodeSent);
+                        return UserAuthenticationResult.Success(AuthFormSuccessMessages.ConfirmationcodeSent);
                     }
                     catch(Exception)
                     {
-                        return UserAuthenticationResult.Error(Global.AuthenticationMethodIsNotWellConfigured);
+                        return UserAuthenticationResult.Error(AuthFormErrorMessages.AuthenticationMethodIsNotWellConfigured);
                     }
                 default:
                     var errors = viewModel.CheckConfirmationCode();

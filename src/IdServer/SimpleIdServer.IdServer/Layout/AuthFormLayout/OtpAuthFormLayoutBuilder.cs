@@ -38,6 +38,28 @@ public class OtpAuthFormLayoutBuilder
         return new OtpAuthFormLayoutBuilder(record, loginTranslations);
     }
 
+    public OtpAuthFormLayoutBuilder AddSuccessMessage(string code, string value)
+    {
+        _record.SuccessMessageTranslations.Add(new FormMessageTranslation
+        {
+            Language = Constants.DefaultLanguage,
+            Value = value,
+            Code = code
+        });
+        return this;
+    }
+
+    public OtpAuthFormLayoutBuilder AddErrorMessage(string code, string value)
+    {
+        _record.ErrorMessageTranslations.Add(new FormMessageTranslation
+        {
+            Language = Constants.DefaultLanguage,
+            Value = value,
+            Code = code
+        });
+        return this;
+    }
+
     public OtpAuthFormLayoutBuilder ConfigureAuthentication(string id)
     {
         var authForm = new FormStackLayoutRecord

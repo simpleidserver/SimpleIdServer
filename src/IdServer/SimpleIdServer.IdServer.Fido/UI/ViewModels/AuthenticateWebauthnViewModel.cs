@@ -1,6 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Fido.Resources;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
@@ -20,13 +21,13 @@ namespace SimpleIdServer.IdServer.Fido.UI.ViewModels
         {
             var result = new List<string>();
             if (string.IsNullOrWhiteSpace(ReturnUrl))
-                result.Add(Global.MissingReturnUrl);
+                result.Add(AuthFormErrorMessages.MissingReturnUrl);
 
             if (string.IsNullOrWhiteSpace(Login))
-                result.Add(Global.MissingLogin);
+                result.Add(AuthFormErrorMessages.MissingLogin);
 
             if (string.IsNullOrWhiteSpace(SessionId))
-                result.Add(Global.MissingSessionId);
+                result.Add(AuthFormErrorMessages.MissingSessionId);
 
             return result;
         }

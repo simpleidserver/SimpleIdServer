@@ -3,6 +3,7 @@
 using FormBuilder.Models;
 using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Layout.AuthFormLayout;
+using SimpleIdServer.IdServer.Resources;
 
 namespace SimpleIdServer.IdServer.Otp;
 
@@ -12,5 +13,15 @@ public static class StandardOtpAuthForms
 
     public static FormRecord OtpForm = OtpAuthFormLayoutBuilder.New("934cc5f3-f079-49e7-8a50-0392633df7f7", "otpAuth", Constants.Amr, LayoutTranslations.Login)
         .ConfigureAuthentication(otpCodeFormId)
+        .AddErrorMessage(AuthFormErrorMessages.MaximumNumberActiveSessions, Global.MaximumNumberActiveSessions)
+        .AddErrorMessage(AuthFormErrorMessages.MissingLogin, Global.MissingLogin)
+        .AddErrorMessage(AuthFormErrorMessages.MissingReturnUrl, Global.MissingReturnUrl)
+        .AddErrorMessage(AuthFormErrorMessages.UserDoesntExist, Global.UserDoesntExist)
+        .AddErrorMessage(AuthFormErrorMessages.InvalidCredential, Global.InvalidCredential)
+        .AddErrorMessage(AuthFormErrorMessages.UserBlocked, Global.UserAccountIsBlocked)
+        .AddErrorMessage(AuthFormErrorMessages.NoActiveOtp, Global.NoActiveOtp)
+        .AddErrorMessage(AuthFormErrorMessages.AuthenticationMethodIsNotWellConfigured, Global.AuthenticationMethodIsNotWellConfigured)
+        .AddErrorMessage(AuthFormErrorMessages.MissingConfirmationCode, Global.MissingConfirmationCode)
+        .AddSuccessMessage(AuthFormSuccessMessages.ConfirmationcodeSent, Global.ConfirmationcodeSent)
         .Build();
 }

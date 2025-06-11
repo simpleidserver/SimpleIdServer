@@ -70,6 +70,15 @@ namespace SimpleIdServer.IdServer.Fido.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Credential is missing.
+        /// </summary>
+        internal static string MissingCredential {
+            get {
+                return ResourceManager.GetString("MissingCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à The login is missing.
         /// </summary>
         internal static string MissingLogin {
@@ -129,6 +138,24 @@ namespace SimpleIdServer.IdServer.Fido.Resources {
         internal static string SessionCannotBeExtracted {
             get {
                 return ResourceManager.GetString("SessionCannotBeExtracted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Session has not been validated.
+        /// </summary>
+        internal static string SessionNotValidated {
+            get {
+                return ResourceManager.GetString("SessionNotValidated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Session doesn&apos;t exist.
+        /// </summary>
+        internal static string UnknownSession {
+            get {
+                return ResourceManager.GetString("UnknownSession", resourceCulture);
             }
         }
     }

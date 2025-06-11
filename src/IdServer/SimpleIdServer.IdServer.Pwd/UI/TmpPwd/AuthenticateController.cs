@@ -14,10 +14,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd.Services;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
-using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Infrastructures;
@@ -78,18 +78,18 @@ public class AuthenticateController : BaseAuthenticationMethodController<ResetTe
             var user = await UserRepository.GetById(authenticatedUserId, cancellationToken);
             if (user == null)
             {
-                return UserAuthenticationResult.Error(Global.CannotResolveUser);
+                return UserAuthenticationResult.Error(AuthFormErrorMessages.CannotResolveUser);
             }
 
             var credential = user.Credentials.SingleOrDefault(c => c.CredentialType == Constants.AreaPwd && c.IsActive);
             if (credential == null)
             {
-                return UserAuthenticationResult.Error(Global.NoActivePassword);
+                return UserAuthenticationResult.Error(AuthFormErrorMessages.NoActivePassword);
             }
 
             if (!credential.IsTemporary)
             {
-                return UserAuthenticationResult.Error(Global.PasswordIsNotTemporary);
+                return UserAuthenticationResult.Error(AuthFormErrorMessages.PasswordIsNotTemporary);
             }
 
             credential.Value = PasswordHelper.ComputerHash(credential, viewModel.Password);

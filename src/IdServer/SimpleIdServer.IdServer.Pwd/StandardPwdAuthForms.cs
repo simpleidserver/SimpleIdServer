@@ -11,6 +11,7 @@ using FormBuilder.Rules;
 using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
+using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.UI.ViewModels;
 using System.Collections.ObjectModel;
 
@@ -126,7 +127,15 @@ public class StandardPwdAuthForms
                     }
                 }
             }
-        }).Build();
+        })
+        .AddErrorMessage(AuthFormErrorMessages.MaximumNumberActiveSessions, Global.MaximumNumberActiveSessions)
+        .AddErrorMessage(AuthFormErrorMessages.MissingLogin, Global.MissingLogin)
+        .AddErrorMessage(AuthFormErrorMessages.MissingPassword, Global.MissingPassword)
+        .AddErrorMessage(AuthFormErrorMessages.MissingReturnUrl, Global.MissingReturnUrl)
+        .AddErrorMessage(AuthFormErrorMessages.UserDoesntExist, Global.UserDoesntExist)
+        .AddErrorMessage(AuthFormErrorMessages.InvalidCredential, Global.InvalidCredential)
+        .AddErrorMessage(AuthFormErrorMessages.UserBlocked, Global.UserAccountIsBlocked)
+        .Build();
 
     public static FormRecord ResetForm = AuthLayoutBuilder.New("8d416c21-2278-4e11-9544-f5a36f979b6d", "resetPwd", "resetPwd", false)
         .AddElement(new FormStackLayoutRecord
@@ -158,7 +167,14 @@ public class StandardPwdAuthForms
                 // Back button.
                 StandardFormComponents.NewBack()
             }
-        }).Build();
+        })
+        .AddErrorMessage(AuthFormErrorMessages.MissingLogin, Global.MissingLogin)
+        .AddErrorMessage(AuthFormErrorMessages.MissingValue, Global.MissingValue)
+        .AddErrorMessage(AuthFormErrorMessages.UserIsUnknown, Global.UserIsUnknown)
+        .AddErrorMessage(AuthFormErrorMessages.MissingDestination, Global.MissingDestination)
+        .AddErrorMessage(AuthFormErrorMessages.InvalidDestination, Global.InvalidDestination)
+        .AddErrorMessage(AuthFormErrorMessages.CannotSendOtpCode, Global.CannotSendOtpCode)
+        .AddSuccessMessage(AuthFormSuccessMessages.OtpCodeIsSent, Global.OtpCodeIsSent).Build();
 
     public static FormRecord ConfirmResetForm = AuthLayoutBuilder.New("595f4393-ef11-4e59-bae9-3033f945239c", "confirmResetPwd", "confirmResetPwd", false)
         .AddElement(new FormStackLayoutRecord
@@ -253,7 +269,16 @@ public class StandardPwdAuthForms
                     Labels = LayoutTranslations.Back
                 }
             }
-        }).Build();
+        })
+        .AddErrorMessage(AuthFormErrorMessages.InvalidResetLink, Global.InvalidResetLink)
+        .AddErrorMessage(AuthFormErrorMessages.MissingConfirmationCode, Global.MissingConfirmationCode)
+        .AddErrorMessage(AuthFormErrorMessages.MissingLogin, Global.MissingLogin)
+        .AddErrorMessage(AuthFormErrorMessages.MissingPassword, Global.MissingPassword)
+        .AddErrorMessage(AuthFormErrorMessages.MissingConfirmedPassword, Global.MissingConfirmedPassword)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordMismatch, Global.PasswordMismatch)
+        .AddErrorMessage(AuthFormErrorMessages.OtpCodeIsInvalid, Global.OtpCodeIsInvalid)
+        .AddSuccessMessage(AuthFormSuccessMessages.PasswordIsUpdated, Global.PasswordIsUpdated)
+        .Build();
 
     public static FormRecord ResetTemporaryPasswordForm = AuthLayoutBuilder.New("d8e6cc6b-cdff-424d-9e09-0daab82a08c2", "resetTmpPwd", "resetTmpPwd", false)
         .AddElement(new FormStackLayoutRecord
@@ -290,5 +315,16 @@ public class StandardPwdAuthForms
                 // Update
                 StandardFormComponents.NewButton(LayoutTranslations.Update)
             }
-        }).Build();
+        })
+        .AddErrorMessage(AuthFormErrorMessages.MaximumNumberActiveSessions, Global.MaximumNumberActiveSessions)
+        .AddErrorMessage(AuthFormErrorMessages.MissingLogin, Global.MissingLogin)
+        .AddErrorMessage(AuthFormErrorMessages.MissingPassword, Global.MissingPassword)
+        .AddErrorMessage(AuthFormErrorMessages.MissingReturnUrl, Global.MissingReturnUrl)
+        .AddErrorMessage(AuthFormErrorMessages.UserDoesntExist, Global.UserDoesntExist)
+        .AddErrorMessage(AuthFormErrorMessages.InvalidCredential, Global.InvalidCredential)
+        .AddErrorMessage(AuthFormErrorMessages.UserBlocked, Global.UserAccountIsBlocked)
+        .AddErrorMessage(AuthFormErrorMessages.CannotResolveUser, Global.CannotResolveUser)
+        .AddErrorMessage(AuthFormErrorMessages.NoActivePassword, Global.NoActivePassword)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordIsNotTemporary, Global.PasswordIsNotTemporary)
+        .Build();
 }

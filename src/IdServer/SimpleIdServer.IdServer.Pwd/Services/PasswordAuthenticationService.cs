@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -53,7 +54,7 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
     {
         if (authenticatedUser.IsBlocked())
         {
-            return Task.FromResult(CredentialsValidationResult.Error("user_blocked", Global.UserAccountIsBlocked));
+            return Task.FromResult(CredentialsValidationResult.Error(AuthFormErrorMessages.UserBlocked, AuthFormErrorMessages.UserBlocked));
         }
 
         var authService = _authServices.SingleOrDefault(s => s.Name == authenticatedUser.Source);

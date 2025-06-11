@@ -15,6 +15,7 @@ using SimpleIdServer.IdServer.Api;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Jwt;
+using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -77,7 +78,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
             {
                 Template = template
             };
-            res.SetErrorMessage(Global.NotAllowedToRegister);
+            res.SetErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister);
             return View(res);
         }
 
@@ -103,7 +104,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
             {
                 Template = template,
             };
-            res.SetErrorMessage(Global.NotAllowedToRegister);
+            res.SetErrorMessage(RegisterFormErrorMessages.NotAllowedToRegister);
             return View(res);
         }
 
@@ -112,7 +113,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         var errorMessages = viewModel.Validate();
         if (errorMessages.Any())
         {
-            result.ErrorMessages = errorMessages;
+            result.SetErrorMessages(errorMessages);
             result.SetInput(viewModel);
             return View(result);
         }
@@ -121,7 +122,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         var emailIsTaken = await IsUserExists(viewModel.Value, prefix);
         if (emailIsTaken)
         {
-            result.SetErrorMessage(string.Format(Global.UserWithSameClaimAlreadyExists, Amr));
+            result.SetErrorMessage(RegisterFormErrorMessages.UserWithSameClaimAlreadyExists);
             result.SetInput(viewModel);
             return View(result);
         }
@@ -147,7 +148,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
         });
         if (!isOtpCodeCorrect)
         {
-            result.SetErrorMessage(Global.OtpCodeIsInvalid);
+            result.SetErrorMessage(RegisterFormErrorMessages.OtpCodeIsInvalid);
             result.SetInput(viewModel);
             return View(result);
         }
@@ -179,7 +180,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
             catch(Exception ex)
             {
                 _logger.LogError(ex.ToString());
-                result.SetErrorMessage(Global.ImpossibleToSendOtpCode);
+                result.SetErrorMessage(RegisterFormErrorMessages.ImpossibleToSendOtpCode);
                 result.SetInput(viewModel);
                 return View(result);
             }
@@ -188,7 +189,7 @@ public abstract class BaseOTPRegisterController<TOptions, TViewModel> : BaseRegi
             {
                 SlidingExpiration = TimeSpan.FromHours(2)
             });
-            result.SetSuccessMessage(Global.OtpCodeIsSent);
+            result.SetSuccessMessage(RegisterFormSuccessMessages.OtpCodeIsSent);
             result.SetInput(viewModel);
             return View(result);
         }

@@ -18,6 +18,7 @@ using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
 using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Layout;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
@@ -125,8 +126,8 @@ namespace SimpleIdServer.IdServer.UI
                 var tokenSet = _antiforgery.GetAndStoreTokens(HttpContext);
                 var result = await this.BuildViewModel(prefix, workflow, forms, cancellationToken);
                 result.SetInput(viewModel);
-                if(IsMaximumActiveSessionReached()) result.SetErrorMessage(Global.MaximumNumberActiveSessions);
-                if(acrInfo != null && acrInfo.UserId != null && string.IsNullOrWhiteSpace(viewModel.Login)) result.SetErrorMessage(Global.MissingLogin);
+                if(IsMaximumActiveSessionReached()) result.SetErrorMessage(AuthFormErrorMessages.MaximumNumberActiveSessions);
+                if(acrInfo != null && acrInfo.UserId != null && string.IsNullOrWhiteSpace(viewModel.Login)) result.SetErrorMessage(AuthFormErrorMessages.MissingLogin);
                 return View(result);
             }
             catch(CryptographicException)
@@ -196,20 +197,20 @@ namespace SimpleIdServer.IdServer.UI
             var errors = viewModel.Validate();
             if (errors.Any())
             {
-                workflowResult.ErrorMessages = errors;
+                workflowResult.SetErrorMessages(errors);
                 return View(workflowResult);
             }
 
             if (acrInfo != null && !string.IsNullOrWhiteSpace(acrInfo.UserId) && !TryGetLogin(acrInfo, out string login))
             {
                 viewModel.Login = null;
-                workflowResult.SetErrorMessage(Global.MissingLogin);
+                workflowResult.SetErrorMessage(AuthFormErrorMessages.MissingLogin);
                 return View(workflowResult);
             }
 
             if (IsMaximumActiveSessionReached())
             {
-                workflowResult.SetErrorMessage(Global.MaximumNumberActiveSessions);
+                workflowResult.SetErrorMessage(AuthFormErrorMessages.MaximumNumberActiveSessions);
                 return View(workflowResult);
             }
 
@@ -217,13 +218,13 @@ namespace SimpleIdServer.IdServer.UI
             var result = await CustomAuthenticate(prefix, acrInfo?.UserId, viewModel, token);
             if (result.Errors != null && result.Errors.Any())
             {
-                workflowResult.ErrorMessages = result.Errors;
+                workflowResult.SetErrorMessages(result.Errors);
                 return View(workflowResult);
             }
 
             if (result.SuccessMessages != null && result.SuccessMessages.Any())
             {
-                workflowResult.SuccessMessages = result.SuccessMessages;
+                workflowResult.SetSuccessMessages(result.SuccessMessages);
                 return View(workflowResult);
             }
 
@@ -236,7 +237,7 @@ namespace SimpleIdServer.IdServer.UI
                 switch (authenticationResult.Status)
                 {
                     case ValidationStatus.UNKNOWN_USER:
-                        workflowResult.SetErrorMessage(Global.UserDoesntExist);
+                        workflowResult.SetErrorMessage(AuthFormErrorMessages.UserDoesntExist);
                         await Bus.Publish(new UserLoginFailureEvent
                         {
                             Realm = prefix,
@@ -253,7 +254,7 @@ namespace SimpleIdServer.IdServer.UI
                         using (var transaction = TransactionBuilder.Build())
                         {
                             var options = GetOptions();
-                            workflowResult.SetErrorMessage(Global.InvalidCredential);
+                            workflowResult.SetErrorMessage(AuthFormErrorMessages.InvalidCredential);
                             await Bus.Publish(new UserLoginFailureEvent
                             {
                                 Realm = prefix,
@@ -370,8 +371,6 @@ namespace SimpleIdServer.IdServer.UI
             var allTickets = _sessionManager.FetchTicketsFromAllRealm(HttpContext);
             return (allTickets.Count() >= Options.MaxNbActiveSessions);
         }
-
-        protected void SetSuccessMessage(string msg) => ViewBag.SuccessMessage = msg;
 
         protected abstract bool TryGetLogin(AcrAuthInfo amrInfo, out string login);
 

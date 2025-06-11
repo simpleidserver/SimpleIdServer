@@ -23,6 +23,7 @@ namespace Microsoft.Extensions.DependencyInjection
             idServerBuilder.Services.AddDid();
             idServerBuilder.Services.AddTransient<IWorkflowLayoutService, VpRegisterWorkflowLayout>();
             idServerBuilder.Services.AddTransient<IDataSeeder, InitVpDataseeder>();
+            idServerBuilder.Services.AddTransient<IDataSeeder, UpdateVpTranslationsDataseeder>();
             idServerBuilder.AddRoute("getPresentationDefinition", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.PresentationDefinitions + "/{id}", new { controller = "PresentationDefinitions", action = "Get" });
             idServerBuilder.AddRoute("vpAuthorizeCallback", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizeCallback, new { controller = "VpAuthorization", action = "Callback" });
             idServerBuilder.AddRoute("vpQrCode", SimpleIdServer.IdServer.VerifiablePresentation.Constants.Endpoints.VpAuthorizeQrCode + "/{id}", new { controller = "VpAuthorization", action = "GetQRCode" });
