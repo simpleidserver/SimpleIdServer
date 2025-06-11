@@ -30,7 +30,7 @@ Thanks to its modularity and extensibility, SimpleIdServer can be customized to 
 Install SimpleIdServer templates.
 
 ```
-dotnet new --install SimpleIdServer.Templates
+dotnet new install SimpleIdServer.Templates
 ```
 
 This will add the following templates
