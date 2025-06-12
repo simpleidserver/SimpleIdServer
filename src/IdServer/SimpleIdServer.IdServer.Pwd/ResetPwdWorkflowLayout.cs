@@ -35,7 +35,7 @@ public class ResetPwdWorkflowLayout : IWorkflowLayoutService
                     {
                         new WorkflowLinkTargetLayout 
                         { 
-                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            TargetFormCorrelationId = StandardPwdAuthForms.ConfirmResetForm.CorrelationId,
                             Description = "Reset"
                         }
                     },

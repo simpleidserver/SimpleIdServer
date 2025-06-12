@@ -3,6 +3,7 @@ using System;
 using FormBuilder.EF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FormBuilder.PostgreMigrations.Migrations
 {
     [DbContext(typeof(FormBuilderDbContext))]
-    partial class FormBuilderDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250612210035_AddTranslations")]
+    partial class AddTranslations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

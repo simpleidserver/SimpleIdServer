@@ -24,6 +24,13 @@ public class WorkflowLink : ICloneable
     {
         ActionType = link.ActionType;
         ActionParameter = link.ActionParameter;
+        TargetStepId = link.TargetStepId;
+        Targets = link.Targets?.Select(t => new WorkflowLinkTarget
+        {
+            Condition = t.Condition,
+            TargetStepId = t.TargetStepId,
+            Description = t.Description
+        }).ToList() ?? new List<WorkflowLinkTarget>();
     }
 
     public object Clone()

@@ -138,7 +138,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                     {
                         new WorkflowLinkTargetLayout 
                         { 
-                            TargetFormCorrelationId = FormBuilder.Constants.EmptyStep.CorrelationId,
+                            TargetFormCorrelationId = StandardPwdAuthForms.ResetForm.CorrelationId,
                             Description = "Forget"
                         }
                     },

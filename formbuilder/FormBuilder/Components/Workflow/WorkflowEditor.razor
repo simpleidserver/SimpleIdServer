@@ -196,14 +196,11 @@
             var targetStepIds = stepLink.Targets.Select(t => t.TargetStepId);
             var nextSteps = Context.Definition.Workflow.Steps.Where(s => targetStepIds.Contains(s.Id));
             isBlocked = false;
+            WorkflowLinkLayout lnk = null;
             if(workflowLayout != null)
             {
                 var elt = form.GetChildByCorrelationId(stepLink.Source.EltId);
-                var lnk = workflowLayout.Links.SingleOrDefault(l => l.EltCorrelationId == elt.CorrelationId);
-                if(lnk != null) 
-                {
-                    isBlocked = lnk.Targets == null || lnk.Targets.Any();
-                }
+                lnk = workflowLayout.Links.SingleOrDefault(l => l.EltCorrelationId == elt.CorrelationId);
             }
 
             if(targetStepIds.Count() > 1)
@@ -222,8 +219,14 @@
                 int si = 0;
                 foreach (var targetStepId in targetStepIds)
                 {
-                    var target = stepLink.Targets.Single(t => t.TargetStepId == targetStepId);
                     var nextStep = nextSteps.SingleOrDefault(s => s.Id == targetStepId);
+                    var target = stepLink.Targets.Single(t => t.TargetStepId == targetStepId);
+                    if (lnk != null && nextStep != null)
+                    {
+                        var selectedTarget = lnk.Targets.SingleOrDefault(t => t.TargetFormCorrelationId == nextStep.FormRecordCorrelationId);
+                        isBlocked = selectedTarget != null;
+                    }
+
                     if (nextStep != null)
                     {
                         AddNode(newStartPosX, startPosY, nextStep, conditionNode, si, target.Description, isBlocked, stepLink);
@@ -242,6 +245,12 @@
             {
                 var target = stepLink.Targets.First();
                 var nextStep = nextSteps.FirstOrDefault();
+                if (lnk != null && nextStep != null)
+                {
+                    var selectedTarget = lnk.Targets.SingleOrDefault(t => t.TargetFormCorrelationId == nextStep.FormRecordCorrelationId);
+                    isBlocked = selectedTarget != null;
+                }
+
                 if (nextStep != null)
                 {
                     AddNode(startPosX, startPosY, nextStep, node, i, target.Description, isBlocked, stepLink);

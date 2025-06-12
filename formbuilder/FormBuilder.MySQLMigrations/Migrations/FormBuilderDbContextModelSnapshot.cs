@@ -42,6 +42,10 @@ namespace FormBuilder.MySQLMigrations.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("ErrorMessageTranslations")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -51,6 +55,10 @@ namespace FormBuilder.MySQLMigrations.Migrations
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
+
+                    b.Property<string>("SuccessMessageTranslations")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("UpdateDateTime")
                         .HasColumnType("datetime(6)");
