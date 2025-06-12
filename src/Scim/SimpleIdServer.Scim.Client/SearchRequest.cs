@@ -11,5 +11,7 @@ namespace SimpleIdServer.Scim.Client
         public int Count { get; set; } = 100;
         [JsonPropertyName("startIndex")]
         public int StartIndex { get; set; }
+        [JsonPropertyName("filter")]
+        public string Filter { get; set; }
     }
 }

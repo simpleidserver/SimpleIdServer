@@ -76,7 +76,26 @@ namespace SimpleIdServer.Scim.Client
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"{GetPath(userEdp)}?{queryString}")
             };
-            if(!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", accessToken);
+            var httpClient = GetHttpClient();
+            var httpResult = await httpClient.SendAsync(request, cancellationToken);
+            httpResult.EnsureSuccessStatusCode();
+            var json = await httpResult.Content.ReadAsStringAsync(cancellationToken);
+            var jsonObj = JsonObject.Parse(json).AsObject();
+            return (RepresentationSerializer.DeserializeSearchRepresentations(jsonObj), json);
+        }
+
+        public async Task<(SearchResult<RepresentationResult>, string)> SearchGroups(SearchRequest searchRequest, string accessToken, CancellationToken cancellationToken)
+        {
+            if (_resourceTypes == null) await GetResourceTypes(cancellationToken);
+            var groupEdp = _resourceTypes.Resources.Single(r => r.Name == "Group").Endpoint;
+            var queryString = SerializeQueryString(searchRequest);
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"{GetPath(groupEdp)}?{queryString}")
+            };
+            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", accessToken);
             var httpClient = GetHttpClient();
             var httpResult = await httpClient.SendAsync(request, cancellationToken);
             httpResult.EnsureSuccessStatusCode();
@@ -94,7 +113,7 @@ namespace SimpleIdServer.Scim.Client
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"{GetPath(groupEdp)}/{id}")
             };
-            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", accessToken);
             var httpClient = GetHttpClient();
             var httpResult = await httpClient.SendAsync(request, cancellationToken);
             httpResult.EnsureSuccessStatusCode();
