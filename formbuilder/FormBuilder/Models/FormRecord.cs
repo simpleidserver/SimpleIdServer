@@ -109,7 +109,19 @@ public class FormRecord : BaseVersionRecord, ICloneable, IFormRecordCollection
             Status = RecordVersionStatus.Draft,
             Realm = Realm,
             VersionNumber = VersionNumber + 1,
-            Elements = new ObservableCollection<IFormElementRecord>(clonedElements)
+            Elements = new ObservableCollection<IFormElementRecord>(clonedElements),
+            SuccessMessageTranslations = SuccessMessageTranslations?.Select(s => new FormMessageTranslation
+            {
+                Code = s.Code,
+                Language = s.Language,
+                Value = s.Value
+            }).ToList() ?? new List<FormMessageTranslation>(),
+            ErrorMessageTranslations = ErrorMessageTranslations?.Select(s => new FormMessageTranslation
+            {
+                Code = s.Code,
+                Language = s.Language,
+                Value = s.Value
+            }).ToList() ?? new List<FormMessageTranslation>()
         };
     }
 

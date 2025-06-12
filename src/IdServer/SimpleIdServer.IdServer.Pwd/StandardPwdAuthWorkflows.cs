@@ -51,14 +51,15 @@ public static class StandardPwdAuthWorkflows
             {
                 Method = HttpMethods.POST,
                 IsAntiforgeryEnabled = true,
-                Target = "/{realm}/pwd/Authenticate",
+                Target = "/{realm}/pwd/Authenticate?returnUrl={returnUrl}",
                 Transformers = new List<ITransformerParameters>
                 {
                     new RegexTransformerParameters()
                     {
                         Rules = new ObservableCollection<MappingRule>
                         {
-                            new MappingRule { Source = "$.Realm", Target = "realm" }
+                            new MappingRule { Source = "$.Realm", Target = "realm" },
+                            new MappingRule { Source = "$.ReturnUrl", Target = "returnUrl" }
                         }
                     },
                     new RelativeUrlTransformerParameters()

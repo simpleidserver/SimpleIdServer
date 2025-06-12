@@ -124,7 +124,7 @@ public class BaseAuthenticateController : BaseController
 
     protected string GetClientId(string returnUrl)
     {
-        if(string.IsNullOrWhiteSpace(returnUrl) || IsProtected(returnUrl))
+        if(string.IsNullOrWhiteSpace(returnUrl) || !IsProtected(returnUrl))
         {
             return null;
         }
