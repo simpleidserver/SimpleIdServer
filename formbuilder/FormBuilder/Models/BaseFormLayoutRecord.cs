@@ -12,6 +12,7 @@ public abstract class BaseFormLayoutRecord : IFormElementRecord, IFormRecordColl
     public string CorrelationId { get; set; }
     public string CssStyle { get; set; } = "";
     public abstract string Type { get; }
+    public abstract int NbElements { get; }
     public ObservableCollection<IFormElementRecord> Elements { get; set; } = new ObservableCollection<IFormElementRecord>();
     public Dictionary<string, object> HtmlAttributes { get; set; } = new Dictionary<string, object>();
     public List<LabelTranslation> Labels { get; set; } = new List<LabelTranslation>();

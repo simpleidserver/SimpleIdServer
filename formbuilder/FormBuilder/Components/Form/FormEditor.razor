@@ -84,7 +84,7 @@
                     <ul class="elements">
                         @foreach (var def in definitions.Where(d => d.Category == ElementDefinitionCategories.LAYOUT))
                         {
-                            <li>
+                            <li draggable="true" @ondragstart="@(() => HandleDragStart(def))">
                                 <div class="icon"><RadzenIcon Icon="@def.Icon" class="icon" /></div><span class="text">@def.Type</span>
                             </li>
                         }

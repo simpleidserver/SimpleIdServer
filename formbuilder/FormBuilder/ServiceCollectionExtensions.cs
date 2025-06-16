@@ -12,6 +12,7 @@ using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.Password;
+using FormBuilder.Components.FormElements.Row;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Components.FormElements.Title;
 using FormBuilder.Conditions;
@@ -55,6 +56,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFormElementDefinition, FormPasswordFieldDefinition>();
         services.AddTransient<IFormElementDefinition, FormButtonDefinition>();
         services.AddTransient<IFormElementDefinition, FormStackLayoutDefinition>();
+        services.AddTransient<IFormElementDefinition, RowLayoutDefinition>();
         services.AddTransient<IFormElementDefinition, FormCheckboxDefinition>();
         services.AddTransient<IFormElementDefinition, DividerLayoutDefinition>();
         services.AddTransient<IFormElementDefinition, FormAnchorDefinition>();

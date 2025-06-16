@@ -1,4 +1,5 @@
-﻿using FormBuilder.Models;
+﻿using FormBuilder.Components.Drag;
+using FormBuilder.Models;
 using FormBuilder.Models.Layout;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -306,6 +307,7 @@ public class FormEditorContext
     private Action _droppedCallback;
     public SelectionTypes SelectionType { get; private set; }
     public IFormElementRecord SelectedEltInstance { get; private set; }
+    public ParentEltContext SelectedEltInstanceParent { get; private set; }
     public IFormElementDefinition SelectedEltDefinition { get; private set; }
 
     public FormEditorContext(WorkflowLayout workflowLayout)
@@ -313,10 +315,16 @@ public class FormEditorContext
         _workflowLayout = workflowLayout;
     }
 
-    public void SelectInstance(IFormElementRecord selectedEltInstance, Action droppedCallback)
+    public void SelectInstance(IFormElementRecord selectedEltInstance, ParentEltContext parentContext, Action droppedCallback)
     {
+        if(SelectedEltInstance != null)
+        {
+            return;
+        }
+
         SelectionType = SelectionTypes.RECORD;
         SelectedEltInstance = selectedEltInstance;
+        SelectedEltInstanceParent = parentContext;
         SelectedEltDefinition = null;
     }
 
@@ -331,6 +339,7 @@ public class FormEditorContext
     {
         SelectedEltDefinition = null;
         SelectedEltInstance = null;
+        SelectedEltInstanceParent = null;
         if (_droppedCallback != null) _droppedCallback();
     }
 

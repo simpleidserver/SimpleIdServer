@@ -42,6 +42,10 @@
     pointer-events: none;
 }
 
+.rowColumn {
+    min-height: 150px;
+}
+
 .stepElement {
     background-color: white;
 }
@@ -96,22 +100,9 @@
 }
 
 .dropZone {
-    position: absolute;
-    height: 10px;
-    width: 100%;
-}
-
-.dropZone.top {
-    top: 0px;
-}
-
-.dropZone.bottom {
-    bottom: 0px;
-}
-
-.dropZone.active {
-    text-align: center;
-    height: 10px;
+    height: 20px;
+    background-color: #e1e1e1;
+    border: 1px dashed black;
 }
 
 .dropZone.active,
@@ -120,7 +111,6 @@
     border: 1px dashed green;
     background-color: rgba(226, 255, 226, 0.5);
 }
-
 
 /* Editable layout container */
 .editableLayoutContainer {

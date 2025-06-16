@@ -1,0 +1,169 @@
+﻿@using System.Collections.ObjectModel
+@using FormBuilder.Components.Drag
+@using FormBuilder.Helpers
+@using FormBuilder.Models
+@using System.Collections.Specialized
+@implements IDisposable
+
+@for(var i = 0; i < Record.NbElements; i++)
+{
+    var columnIndex = i;
+    if (IsStack)
+    {
+        if(!IsEditModeEnabled)
+        {
+            @CreateComponent(columnIndex)
+        }
+        else
+        {
+            <DropZoneComponent Dropped="@(() => HandleEltDropped(columnIndex))"></DropZoneComponent>
+            @CreateComponent(columnIndex)
+        }
+    }
+    else
+    {
+        <RadzenColumn Size="@Size" class="rowColumn">
+            @if (!IsEditModeEnabled)
+            {
+                @CreateComponent(columnIndex)
+            }
+            else
+            {
+                <DropZoneComponent ClassName="fullHeight" Dropped="@(() => HandleEltDropped(columnIndex))">
+                    <Children>
+                        <RadzenColumn Size="@Size">
+                            @CreateComponent(columnIndex)
+                        </RadzenColumn>
+                    </Children>
+                </DropZoneComponent>
+            }
+        </RadzenColumn>
+    }
+}
+
+@code {
+    [Inject]
+    private IRenderFormElementsHelper renderFormsElementsHelper
+    {
+        get; set;
+    }
+
+    [Parameter]
+
+    public BaseFormLayoutRecord Record
+    {
+        get; set;
+    }
+
+    [Parameter]
+    public int Size
+    {
+        get; set;
+    }
+
+    [Parameter]
+    public bool IsStack
+    {
+        get; set;
+    }
+
+    [Parameter]
+    public bool IsEditModeEnabled
+    {
+        get; set;
+    }
+
+    [Parameter]
+    public WorkflowContext Context
+    {
+        get; set;
+    }
+
+    [Parameter] 
+    public ParentEltContext ParentContext 
+    { 
+        get; set; 
+    }
+
+    private bool isBlocked { get; set; }
+    private int currentLevel { get; set; }
+
+    public void Dispose()
+    {
+        if (Record != null)
+        {
+            Record.Elements.CollectionChanged -= HandleCollectionChanged;
+        }
+    }
+
+    private RenderFragment CreateComponent(int i) => builder =>
+    {
+        renderFormsElementsHelper.Render(builder, isBlocked, currentLevel, Record.Elements, Context, IsEditModeEnabled, i);
+    };
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if(Record != null)
+        {
+            currentLevel = ParentContext?.ParentLevel == null ? 0 : ParentContext.ParentLevel + 1;
+            isBlocked = Context.FormEditorContext.IsEltInvolvedInWorkflow(Record);
+            Record.Elements.CollectionChanged += HandleCollectionChanged;
+        }
+    }
+
+    private void HandleEltDropped(int newIndex)
+    {
+        IFormElementRecord eltRecord = null;
+        switch (Context.FormEditorContext.SelectionType)
+        {
+            case SelectionTypes.DEFINITION:
+                var def = Context.FormEditorContext.SelectedEltDefinition;
+                if(def == null) return;
+                eltRecord = Activator.CreateInstance(def.RecordType) as IFormElementRecord;
+                eltRecord.Id = Guid.NewGuid().ToString();
+                eltRecord.CorrelationId = Guid.NewGuid().ToString();
+                break;
+            case SelectionTypes.RECORD:
+                eltRecord = Context.FormEditorContext.SelectedEltInstance;
+                if (eltRecord == null) return;
+                if (eltRecord == (IFormElementRecord)Record) 
+                {
+                    Context.FormEditorContext.DropElement();
+                    return;
+                }
+
+                if (Record.Elements.Contains(eltRecord))
+                {
+                    var currentIndex = Record.Elements.IndexOf(eltRecord);
+                    if(currentIndex < newIndex)
+                    {
+                        newIndex--;
+                    }
+                }
+                break;
+        }
+
+        if (eltRecord == null) return;
+        if (Context.FormEditorContext.SelectedEltInstanceParent != null)
+        {
+            Context.FormEditorContext.SelectedEltInstanceParent.Elements.Remove(eltRecord);
+        }
+
+        if (newIndex >= Record.Elements.Count())
+        {
+            Record.Elements.Add(eltRecord);
+        }
+        else
+        {
+            Record.Elements.Insert(newIndex, eltRecord);
+        }
+
+        Context.FormEditorContext.DropElement();
+    }
+
+    private void HandleCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
+    {
+        StateHasChanged();
+    }
+}

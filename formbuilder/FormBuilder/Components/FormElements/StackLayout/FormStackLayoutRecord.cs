@@ -12,6 +12,7 @@ public class FormStackLayoutRecord : BaseFormLayoutRecord
     public bool IsSubmitting { get; set; }
     public FormTypes FormType { get; set; } = FormTypes.BLAZOR;
     public bool IsNotVisible { get; set; }
+    public override int NbElements => Elements.Count == 0 ? 1 : Elements.Count;
 
     public void Submit()
     {

@@ -16,7 +16,11 @@
                         case FormTypes.BLAZOR:
                             <EditForm style="@Value.CssStyle" Attributes=@Value.HtmlAttributes Model="Value" OnSubmit="async(e) => await Submit()" FormName="main">
                                 <RadzenStack Orientation="Orientation.Vertical">
-                                    @CustomRender
+                                    <EditableLayoutComponent Record="@Value"
+                                                             IsEditModeEnabled="@IsEditModeEnabled"
+                                                             Context="@Context"
+                                                             ParentContext="@ParentContext"
+                                                             IsStack=true />
                                 </RadzenStack>
                             </EditForm>
                             break;
@@ -28,7 +32,11 @@
                                 }
 
                                 <RadzenStack Orientation="Orientation.Vertical">
-                                    @CustomRender
+                                    <EditableLayoutComponent Record="@Value"
+                                                             IsEditModeEnabled="@IsEditModeEnabled"
+                                                             Context="@Context"
+                                                             ParentContext="@ParentContext"
+                                                             IsStack=true/>
                                 </RadzenStack>
                             </form>
                             break;
@@ -37,11 +45,14 @@
                 else
                 {
                     <RadzenStack Attributes=@Value.HtmlAttributes Style="@Value.CssStyle" Orientation="Orientation.Vertical">
-                        @CustomRender
+                        <EditableLayoutComponent Record="@Value"
+                                                 IsEditModeEnabled="@IsEditModeEnabled"
+                                                 Context="@Context"
+                                                 ParentContext="@ParentContext"
+                                                 IsStack=true />
                     </RadzenStack>
                 }
             }
-
         }
     </Children>
 </DraggableFormElement>

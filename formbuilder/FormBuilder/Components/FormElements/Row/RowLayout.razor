@@ -1,0 +1,13 @@
+﻿@using FormBuilder.Components.Drag
+
+<DraggableFormElement TDialog="EmptyDialog" Context="@Context" Record="@Value" TRecord="RowLayoutRecord" ParentContext="@ParentContext" IsViewSettingsDisabled="true" IsEditModeEnabled="@IsEditModeEnabled">
+    <Children>
+        <RadzenRow>
+            <EditableLayoutComponent IsEditModeEnabled="@IsEditModeEnabled"
+                                     Record="@Value"
+                                     Context="@Context"
+                                     IsStack=false
+                                     Size="@ComputeSize()"></EditableLayoutComponent>
+        </RadzenRow>
+    </Children>
+</DraggableFormElement>

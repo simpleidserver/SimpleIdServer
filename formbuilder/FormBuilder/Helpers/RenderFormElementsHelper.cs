@@ -10,6 +10,7 @@ public interface IRenderFormElementsHelper
 {
     void RenderCurrentStep(RenderTreeBuilder builder, WorkflowContext context, bool isEditModeEnabled);
     void Render(RenderTreeBuilder builder, bool isParentBlocked, int parentLevel, ObservableCollection<IFormElementRecord> elements, WorkflowContext context, bool isEditModeEnabled);
+    void Render(RenderTreeBuilder builder, bool isParentBlocked, int parentLevel, ObservableCollection<IFormElementRecord> elements, WorkflowContext context, bool isEditModeEnabled, int i);
 }
 
 public class RenderFormElementsHelper : IRenderFormElementsHelper
@@ -36,6 +37,18 @@ public class RenderFormElementsHelper : IRenderFormElementsHelper
             AddElt(builder, record, context, parentEltCtx, isEditModeEnabled);
             i++;
         }
+    }
+
+    public void Render(RenderTreeBuilder builder, bool isParentBlocked, int parentLevel, ObservableCollection<IFormElementRecord> elements, WorkflowContext context, bool isEditModeEnabled, int i)
+    {
+        var record = elements.ElementAtOrDefault(i);
+        if(record == null)
+        {
+            return;
+        }
+
+        var parentEltCtx = new ParentEltContext(isParentBlocked, parentLevel, elements, i);
+        AddElt(builder, record, context, parentEltCtx, isEditModeEnabled);
     }
 
     private void AddElt(RenderTreeBuilder builder, IFormElementRecord record, WorkflowContext context, ParentEltContext parentEltContext, bool isEditModeEnabled)

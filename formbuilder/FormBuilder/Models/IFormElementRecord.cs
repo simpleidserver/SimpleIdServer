@@ -8,6 +8,7 @@ using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.Password;
+using FormBuilder.Components.FormElements.Row;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Components.FormElements.Title;
 using System.Text.Json.Nodes;
@@ -27,6 +28,7 @@ namespace FormBuilder.Models;
 [JsonDerivedType(typeof(TitleRecord), typeDiscriminator: "Title")]
 [JsonDerivedType(typeof(ImageRecord), typeDiscriminator: "Image")]
 [JsonDerivedType(typeof(BackButtonRecord), typeDiscriminator: "BackButton")]
+[JsonDerivedType(typeof(RowLayoutRecord), typeDiscriminator: "RowLayout")]
 public interface IFormElementRecord
 {
     string Id { get; set; }

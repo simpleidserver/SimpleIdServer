@@ -4,12 +4,18 @@
     ondragover="event.preventDefault()" 
     @ondrop="@(async(e) => await HandleDrop())"
     @ondragenter="HandleDragEnter"
-    @ondragleave="HandleDragLeave"></div>
+    @ondragleave="HandleDragLeave">
+    @if (Children != null)
+    {
+        @Children
+    }
+</div>
 
 @code {
     bool IsActive { get; set; }
     [Parameter] public string ClassName { get; set; }
     [Parameter] public EventCallback Dropped { get; set; }
+    [Parameter] public RenderFragment Children { get; set; }
 
     private async Task HandleDrop()
     {
