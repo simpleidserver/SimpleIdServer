@@ -1,0 +1,14 @@
+﻿@using FormBuilder.Components.Drag
+
+<DraggableFormElement IsEditModeEnabled=@IsEditModeEnabled ParentContext="@ParentContext" Context="@Context" TDialog="ReCaptchaDialog" TRecord="ReCaptchaRecord" Record="@Value">
+    <Children>
+        @if(IsEditModeEnabled)
+        {
+            <span>Configure the RECAPTCHA</span>
+        }
+        else
+        {
+            <div id="@UniqueId"></div>
+        }
+    </Children>
+</DraggableFormElement>

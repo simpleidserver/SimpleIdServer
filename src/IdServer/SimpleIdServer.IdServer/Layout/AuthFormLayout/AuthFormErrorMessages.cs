@@ -37,4 +37,5 @@ public static class AuthFormErrorMessages
     public static string InvalidIncomingRequest = "InvalidIncomingRequest";
     public static string NoCredential = "NoCredential";
     public static string MissingLoginParameter = "MissingLoginParameter";
+    public static string InvalidCaptcha = "InvalidCaptcha";
 }

@@ -8,4 +8,6 @@ public interface ISidStepViewModel : IStepViewModel
 {
     string ReturnUrl { get; set; }
     string Realm { get; set; }
+    string CaptchaValue { get; set; }
+    string CaptchaType { get; set; }
 }

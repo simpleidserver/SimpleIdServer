@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
-using SimpleIdServer.IdServer.Resources;
 using System.Collections.Generic;
 
 namespace SimpleIdServer.IdServer.UI.ViewModels;
@@ -20,6 +19,8 @@ public abstract class OTPRegisterViewModel : IRegisterViewModel, IOTPViewModel
     public string CurrentLink { get; set; }
     public string Realm { get; set; }
     public bool UpdateOneCredential { get; set; }
+    public string CaptchaValue { get; set; }
+    public string CaptchaType { get; set; }
 
     public List<string> Validate()
     {

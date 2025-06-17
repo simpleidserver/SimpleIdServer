@@ -20,6 +20,8 @@ public abstract class BaseAuthenticateViewModel : ISidStepViewModel
     public string StepId { get; set; }
     public string WorkflowId { get; set; }
     public string CurrentLink { get; set; }
+    public string CaptchaValue { get; set; }
+    public string CaptchaType { get; set; }
 
     public abstract List<string> Validate();
 }

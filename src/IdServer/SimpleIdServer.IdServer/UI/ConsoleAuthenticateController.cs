@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using SimpleIdServer.IdServer.Api;
+using SimpleIdServer.IdServer.Captcha;
 using SimpleIdServer.IdServer.Console;
 using SimpleIdServer.IdServer.Console.Services;
 using SimpleIdServer.IdServer.Helpers;
@@ -57,7 +58,8 @@ public class ConsoleAuthenticateController : BaseOTPAuthenticateController<Authe
         IAcrHelper acrHelper,
         ITemplateStore templateStore,
         IWorkflowHelper workflowHelper,
-        IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, formBuilderOptions)
+        ICaptchaValidatorFactory captchaValidatorFactory,
+        IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, captchaValidatorFactory, formBuilderOptions)
     {
         _configuration = configuration;
     }

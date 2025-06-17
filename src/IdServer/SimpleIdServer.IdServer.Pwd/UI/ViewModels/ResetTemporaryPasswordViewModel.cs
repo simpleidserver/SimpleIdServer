@@ -2,7 +2,6 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 using SimpleIdServer.IdServer.Layout.AuthFormLayout;
-using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;

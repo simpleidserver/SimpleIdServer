@@ -18,4 +18,6 @@ public class RegisterMobileViewModel : IRegisterViewModel
     public bool IsCreated { get; set; }
     public string Realm { get; set; }
     public bool UpdateOneCredential { get; set; }
+    public string CaptchaValue { get; set; }
+    public string CaptchaType { get; set; }
 }

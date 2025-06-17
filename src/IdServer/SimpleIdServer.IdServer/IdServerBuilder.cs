@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.AspNetCore.Server.Kestrel.Https;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.IdServer.Api.Realms;
+using SimpleIdServer.IdServer.Captcha;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Consumers;
 using SimpleIdServer.IdServer.DataSeeder;
@@ -170,6 +171,16 @@ public class IdServerBuilder
     public IdServerBuilder AddInMemoryRealms(List<Realm> realms)
     {
         Services.AddSingleton<IRealmRepository>(new DefaultRealmRepository(realms));
+        return this;
+    }
+
+    /// <summary>
+    /// Configures the V2 reCAPTCHA options and registers the V2ReCaptchaValidator as the ICaptchaValidator implementation.
+    /// </summary>
+    public IdServerBuilder EnableV2Recaptcha(Action<V2ReCaptchaOptions> callback)
+    {
+        Services.Configure(callback);
+        Services.AddTransient<ICaptchaValidator, V2ReCaptchaValidator>();
         return this;
     }
 

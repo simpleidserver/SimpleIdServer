@@ -19,6 +19,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using SimpleIdServer.Configuration;
 using SimpleIdServer.Configuration.Redis;
+using SimpleIdServer.IdServer.Captcha;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Startup.Conf.Migrations.AfterDeployment;
@@ -90,6 +91,10 @@ public class SidServerSetup
             .AddLdapProvisioning()
             .AddFcmNotification()
             .AddGotifyNotification()
+            .EnableV2Recaptcha(c =>
+            {
+                ConfigureV2ReCaptcha(webApplicationBuilder, c);
+            })
             .AddSwagger(opt =>
             {
                 opt.IncludeDocumentation<AccessTokenTypeService>();
@@ -442,6 +447,13 @@ public class SidServerSetup
                 });
                 break;
         }
+    }
+
+    private static void ConfigureV2ReCaptcha(WebApplicationBuilder builder, V2ReCaptchaOptions options)
+    {
+        var section = builder.Configuration.GetSection(nameof(V2ReCaptchaOptions));
+        var conf = section.Get<V2ReCaptchaOptions>();
+        options.Secret = conf.Secret;
     }
 
     private static void ConfigureMessageBrokerMigration(WebApplicationBuilder builder)

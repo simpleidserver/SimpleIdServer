@@ -1182,4 +1182,7 @@
   <data name="PasswordIsNotTemporary" xml:space="preserve">
     <value>The password is not temporary</value>
   </data>
+  <data name="CaptchaIsNotValid" xml:space="preserve">
+    <value>The captcha is not valid</value>
+  </data>
 </root>

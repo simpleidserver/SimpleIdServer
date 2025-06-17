@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.IdServer.Captcha;
 using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.IntegrationEvents;
@@ -45,6 +46,7 @@ namespace SimpleIdServer.IdServer.UI
         private readonly IAntiforgery _antiforgery;
         private readonly ISessionManager _sessionManager;
         private readonly ILanguageRepository _languageRepository;
+        private readonly ICaptchaValidatorFactory _captchaValidatorFactory;
         private readonly FormBuilderOptions _formBuilderOptions;
 
         public BaseAuthenticationMethodController(
@@ -72,6 +74,7 @@ namespace SimpleIdServer.IdServer.UI
             ILanguageRepository languageRepository,
             IAcrHelper acrHelper,
             IWorkflowHelper workflowHelper,
+            ICaptchaValidatorFactory captchaValidatorFactory,
             IOptions<FormBuilderOptions> formBuilderOptions) : base(clientRepository, userRepository, userSessionRepository, amrHelper, busControl, userTransformer, dataProtectionProvider, authenticationHelper, transactionBuilder, tokenRepository, jwtBuilder, workflowStore, formStore, acrHelper, authenticationContextClassReferenceRepository, workflowHelper, options)
         {
             _templateStore = templateStore;
@@ -81,6 +84,7 @@ namespace SimpleIdServer.IdServer.UI
             _antiforgery = antiforgery;
             _sessionManager = sessionManager;
             _languageRepository = languageRepository;
+            _captchaValidatorFactory = captchaValidatorFactory;
             _formBuilderOptions = formBuilderOptions.Value;
         }
 
@@ -214,7 +218,14 @@ namespace SimpleIdServer.IdServer.UI
                 return View(workflowResult);
             }
 
-            // 5. Try to authenticate the user.
+            // 5. Validate Captcha.
+            if(!await _captchaValidatorFactory.Validate(viewModel, token))
+            {
+                workflowResult.SetErrorMessage(AuthFormErrorMessages.InvalidCaptcha);
+                return View(workflowResult);
+            }
+
+            // 6. Try to authenticate the user.
             var result = await CustomAuthenticate(prefix, acrInfo?.UserId, viewModel, token);
             if (result.Errors != null && result.Errors.Any())
             {
@@ -228,7 +239,7 @@ namespace SimpleIdServer.IdServer.UI
                 return View(workflowResult);
             }
 
-            // 6. Validate the credentials.
+            // 7. Validate the credentials.
             CredentialsValidationResult authenticationResult = null;
             if (result.AuthenticatedUser != null) authenticationResult = await _authenticationService.Validate(prefix, result.AuthenticatedUser, viewModel, token);
             else authenticationResult = await _authenticationService.Validate(prefix, acrInfo?.UserId, viewModel, token);

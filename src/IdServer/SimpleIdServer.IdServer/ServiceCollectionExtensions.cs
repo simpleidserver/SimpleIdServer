@@ -44,6 +44,7 @@ using SimpleIdServer.IdServer.Authenticate.AssertionParsers;
 using SimpleIdServer.IdServer.Authenticate.Handlers;
 using SimpleIdServer.IdServer.Authenticate.Validations;
 using SimpleIdServer.IdServer.Builders;
+using SimpleIdServer.IdServer.Captcha;
 using SimpleIdServer.IdServer.ClaimsEnricher;
 using SimpleIdServer.IdServer.ClaimTokenFormats;
 using SimpleIdServer.IdServer.Config;
@@ -102,6 +103,7 @@ public static class ServiceCollectionExtensions
         });
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
+        services.AddTransient<ICaptchaValidatorFactory, CaptchaValidatorFactory>();
         ConfigureDataSeeders(services);
         var mvcBuilder = services.AddControllersWithViews();
         var dataProtectionBuilder = services.AddDataProtection();

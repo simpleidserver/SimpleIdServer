@@ -1,7 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
-using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.UI.ViewModels;
 
 namespace SimpleIdServer.IdServer.Pwd.UI.ViewModels;
@@ -19,6 +18,8 @@ public class PwdRegisterViewModel : IRegisterViewModel
     public bool IsCreated { get; set; }
     public string Realm { get; set; }
     public bool UpdateOneCredential { get; set; }
+    public string CaptchaValue { get; set; }
+    public string CaptchaType { get; set; }
 
     public List<string> Validate()
     {

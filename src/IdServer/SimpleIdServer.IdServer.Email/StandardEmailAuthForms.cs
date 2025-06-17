@@ -18,6 +18,7 @@ public static class StandardEmailAuthForms
         .ConfigureAuthentication(emailAuthForm)
         .AddErrorMessage(AuthFormErrorMessages.MaximumNumberActiveSessions, Global.MaximumNumberActiveSessions)
         .AddErrorMessage(AuthFormErrorMessages.MissingLogin, Global.MissingLogin)
+        .AddErrorMessage(AuthFormErrorMessages.InvalidCaptcha, Global.CaptchaIsNotValid)
         .AddErrorMessage(AuthFormErrorMessages.MissingReturnUrl, Global.MissingReturnUrl)
         .AddErrorMessage(AuthFormErrorMessages.UserDoesntExist, Global.UserDoesntExist)
         .AddErrorMessage(AuthFormErrorMessages.InvalidCredential, Global.InvalidCredential)

@@ -17,6 +17,8 @@ public class ResetPasswordIndexViewModel : ISidStepViewModel
     public string WorkflowId { get; set; }
     public string CurrentLink { get; set; }
     public string Realm { get; set; }
+    public string CaptchaValue { get; set; }
+    public string CaptchaType { get; set; }
 
     public List<string> Validate(ModelStateDictionary modelState)
     {

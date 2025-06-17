@@ -47,7 +47,6 @@ FormBuilder.refreshCss = function (id, cssContent) {
         return;
     }
 
-    console.log('update');
     styleElement.removeAttribute('href');
     styleElement.id = id;
     styleElement.innerHTML = cssContent;

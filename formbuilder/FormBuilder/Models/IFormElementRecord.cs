@@ -8,6 +8,7 @@ using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.Password;
+using FormBuilder.Components.FormElements.ReCaptcha;
 using FormBuilder.Components.FormElements.Row;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Components.FormElements.Title;
@@ -29,6 +30,7 @@ namespace FormBuilder.Models;
 [JsonDerivedType(typeof(ImageRecord), typeDiscriminator: "Image")]
 [JsonDerivedType(typeof(BackButtonRecord), typeDiscriminator: "BackButton")]
 [JsonDerivedType(typeof(RowLayoutRecord), typeDiscriminator: "RowLayout")]
+[JsonDerivedType(typeof(ReCaptchaRecord), typeDiscriminator: "ReCaptchaRecord")]
 public interface IFormElementRecord
 {
     string Id { get; set; }

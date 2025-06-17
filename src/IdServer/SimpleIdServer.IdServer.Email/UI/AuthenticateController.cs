@@ -21,6 +21,7 @@ using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
+using SimpleIdServer.IdServer.Captcha;
 
 namespace SimpleIdServer.IdServer.Email.UI
 {
@@ -56,7 +57,8 @@ namespace SimpleIdServer.IdServer.Email.UI
             ILanguageRepository languageRepository,
             IAcrHelper acrHelper,
             IWorkflowHelper workflowHelper,
-            IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration,notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, formBuilderOptions)
+            ICaptchaValidatorFactory captchaValidatorFactory,
+            IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration,notificationServices, otpAuthenticators, userAuthenticationService, authenticationSchemeProvider, options, dataProtectionProvider, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, tokenRepository, transactionBuilder, jwtBuilder, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, captchaValidatorFactory, formBuilderOptions)
         {
             _configuration = configuration;
         }

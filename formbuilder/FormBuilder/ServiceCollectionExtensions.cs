@@ -12,6 +12,7 @@ using FormBuilder.Components.FormElements.Input;
 using FormBuilder.Components.FormElements.ListData;
 using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.Password;
+using FormBuilder.Components.FormElements.ReCaptcha;
 using FormBuilder.Components.FormElements.Row;
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Components.FormElements.Title;
@@ -65,6 +66,7 @@ public static class ServiceCollectionExtensions
         services.AddTransient<IFormElementDefinition, TitleDefinition>();
         services.AddTransient<IFormElementDefinition, ImageDefinition>();
         services.AddTransient<IFormElementDefinition, BackButtonDefinition>();
+        services.AddTransient<IFormElementDefinition, ReCaptchaDefinition>();
 
         services.AddTransient<IDateTimeHelper, DateTimeHelper>();
         services.AddTransient<ITranslationHelper, TranslationHelper>();

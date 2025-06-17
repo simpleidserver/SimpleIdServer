@@ -1,0 +1,31 @@
+﻿@using System.Text.Json
+@using FormBuilder.Components.Shared
+@inject DialogService dialogService
+
+<RadzenStack>
+    <RadzenFormField Text="Site key">
+        <RadzenTextBox @bind-Value="@Record.SiteKey"></RadzenTextBox>
+    </RadzenFormField>
+    <RadzenButton Text="Save" Click="@HandleSave"></RadzenButton>
+</RadzenStack>
+
+@code {
+    public int selectedIndex { get; set; } = 0;
+    ReCaptchaRecord CopyRecord { get; set; } = new ReCaptchaRecord();
+    [Parameter] public ReCaptchaRecord Record { get; set; }
+    [Parameter] public WorkflowContext WorkflowContext { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Record != null)
+        {
+            CopyRecord = JsonSerializer.Deserialize<ReCaptchaRecord>(JsonSerializer.Serialize(Record));
+        }
+    }
+
+    private void HandleSave()
+    {
+        dialogService.Close();
+    }
+}

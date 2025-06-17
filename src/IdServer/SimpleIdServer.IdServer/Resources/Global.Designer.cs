@@ -772,6 +772,15 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à The captcha is not valid.
+        /// </summary>
+        public static string CaptchaIsNotValid {
+            get {
+                return ResourceManager.GetString("CaptchaIsNotValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à the certificate cannot be generated.
         /// </summary>
         public static string CertificateCannotBeGenerated {
