@@ -4,7 +4,6 @@
 using SimpleIdServer.IdServer.Domains.DTOs;
 using System.Data;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Text.Json;
 
 namespace SimpleIdServer.IdServer.Domains

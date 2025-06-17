@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store.EF.Extensions;
 
 namespace SimpleIdServer.IdServer.Store.EF.Configurations;
 
@@ -11,8 +12,6 @@ public class MigrationExecutionHistoryConfiguration : IEntityTypeConfiguration<M
     public void Configure(EntityTypeBuilder<MigrationExecutionHistory> builder)
     {
         builder.HasKey(b => b.Id);
-        builder.Property(a => a.Errors).HasConversion(
-            v => string.Join(',', v),
-            v => v.Split(',', StringSplitOptions.None).ToList());
+        builder.Property(a => a.Errors).ConfigureSerializer();
     }
 }

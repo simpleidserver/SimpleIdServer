@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store.EF.Extensions;
 
 namespace SimpleIdServer.IdServer.Store.Configurations;
 
@@ -11,8 +12,6 @@ public class PresentationDefinitionInputDescriptorConstraintConfiguration : IEnt
     public void Configure(EntityTypeBuilder<PresentationDefinitionInputDescriptorConstraint> builder)
     {
         builder.HasKey(p => p.Id);
-        builder.Property(a => a.Path).HasConversion(
-            v => string.Join(',', v),
-            v => v.Split(',', StringSplitOptions.None).ToList());
+        builder.Property(a => a.Path).ConfigureSerializer();
     }
 }

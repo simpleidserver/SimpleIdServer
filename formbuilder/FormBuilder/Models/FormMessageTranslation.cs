@@ -16,4 +16,12 @@ public class FormMessageTranslation
     {
         get; set;
     }
+
+    public string Key
+    {
+        get
+        {
+            return $"{Language}:{Code}";
+        }
+    }
 }

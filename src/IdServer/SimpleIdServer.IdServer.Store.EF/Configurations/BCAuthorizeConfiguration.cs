@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store.EF.Extensions;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
@@ -13,9 +14,7 @@ namespace SimpleIdServer.IdServer.Store.Configurations
             builder.HasKey(bc => bc.Id);
             builder.Ignore(bc => bc.IsActive);
             builder.Ignore(bc => bc.LastHistory);
-            builder.Property(a => a.Scopes).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
+            builder.Property(a => a.Scopes).ConfigureSerializer();
             builder.HasMany(a => a.Histories).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.Ignore(bc => bc.AuthorizationDetails);
         }

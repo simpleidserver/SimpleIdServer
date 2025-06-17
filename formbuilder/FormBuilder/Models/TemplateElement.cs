@@ -16,4 +16,12 @@ public class TemplateElement
     {
         get; set;
     }
+
+    public string Key
+    {
+        get
+        {
+            return $"{Element}:{Name}";
+        }
+    }
 }

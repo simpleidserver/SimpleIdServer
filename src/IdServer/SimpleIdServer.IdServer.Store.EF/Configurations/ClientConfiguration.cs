@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SimpleIdServer.IdServer.Domains;
+using SimpleIdServer.IdServer.Store.EF.Extensions;
 
 namespace SimpleIdServer.IdServer.Store.Configurations
 {
@@ -11,33 +12,15 @@ namespace SimpleIdServer.IdServer.Store.Configurations
         public void Configure(EntityTypeBuilder<Client> builder)
         {
             builder.HasKey(c => c.Id);
-            builder.Property(a => a.ClientRegistrationTypesSupported).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
-            builder.Property(a => a.GrantTypes).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
-            builder.Property(a => a.ResponseTypes).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
-            builder.Property(a => a.RedirectionUrls).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
-            builder.Property(a => a.PostLogoutRedirectUris).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
-            builder.Property(a => a.Contacts).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
-            builder.Property(a => a.DefaultAcrValues).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
-            builder.Property(a => a.AuthorizationDataTypes).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
-            builder.Property(a => a.SubjectSyntaxTypesSupported).HasConversion(
-                v => string.Join(',', v),
-                v => v.Split(',', StringSplitOptions.None).ToList());
+            builder.Property(a => a.ClientRegistrationTypesSupported).ConfigureSerializer();
+            builder.Property(a => a.GrantTypes).ConfigureSerializer();
+            builder.Property(a => a.ResponseTypes).ConfigureSerializer();
+            builder.Property(a => a.RedirectionUrls).ConfigureSerializer();
+            builder.Property(a => a.PostLogoutRedirectUris).ConfigureSerializer();
+            builder.Property(a => a.Contacts).ConfigureSerializer();
+            builder.Property(a => a.DefaultAcrValues).ConfigureSerializer();
+            builder.Property(a => a.AuthorizationDataTypes).ConfigureSerializer();
+            builder.Property(a => a.SubjectSyntaxTypesSupported).ConfigureSerializer();
             builder.HasMany(c => c.Translations).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.SerializedJsonWebKeys).WithOne().OnDelete(DeleteBehavior.Cascade);
             builder.HasMany(c => c.DeviceAuthCodes).WithOne(a => a.Client).OnDelete(DeleteBehavior.Cascade);

@@ -137,7 +137,7 @@ namespace SimpleIdServer.IdServer.Domains
         /// Array of strings representing ways to contact people responsible for this client, typically email addresses.
         /// </summary>
         [JsonPropertyName(OAuthClientParameters.Contacts)]
-        public ICollection<string> Contacts { get; set; } = new List<string>();
+        public IEnumerable<string> Contacts { get; set; } = new List<string>();
         /// <summary>
         /// A unique identifier string assigned by the client developer or software publisher used by registration endpoints to identify the client software to be dynamically registered.
         /// </summary>
