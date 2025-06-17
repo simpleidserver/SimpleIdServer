@@ -8,6 +8,7 @@ using FormBuilder.Components.FormElements.Checkbox;
 using FormBuilder.Components.FormElements.Divider;
 using FormBuilder.Components.FormElements.Image;
 using FormBuilder.Components.FormElements.Input;
+using FormBuilder.Components.FormElements.Paragraph;
 using FormBuilder.Components.FormElements.Password;
 using FormBuilder.Models;
 
@@ -129,11 +130,13 @@ public class TemplateBuilder
         return this;
     }
 
-    public TemplateBuilder SetPasswordFieldClasses(string containerClass, string labelClass, string textBoxClass)
+    public TemplateBuilder SetPasswordFieldClasses(string containerClass, string labelClass, string textBoxClass, string viewPasswordContainer, string viewPasswordBtn)
     {
         SetClass(nameof(FormPasswordFieldRecord), FormPasswordElementNames.Container, containerClass);
         SetClass(nameof(FormPasswordFieldRecord), FormPasswordElementNames.Label, labelClass);
         SetClass(nameof(FormPasswordFieldRecord), FormPasswordElementNames.Password, textBoxClass);
+        SetClass(nameof(FormPasswordFieldRecord), FormPasswordElementNames.ViewPasswordContainer, viewPasswordContainer);
+        SetClass(nameof(FormPasswordFieldRecord), FormPasswordElementNames.ViewPasswordBtn, viewPasswordBtn);
         return this;
     }
 
@@ -168,6 +171,12 @@ public class TemplateBuilder
         SetClass(nameof(FormCheckboxRecord), CheckboxElementNames.Container, containerClass);
         SetClass(nameof(FormCheckboxRecord), CheckboxElementNames.Checkbox, checkboxClass);
         SetClass(nameof(FormCheckboxRecord), CheckboxElementNames.Label, labelClass);
+        return this;
+    }
+
+    public TemplateBuilder SetParagraphClass(string containerClass)
+    {
+        SetClass(nameof(ParagraphRecord), ParagraphElementNames.Container, containerClass);
         return this;
     }
 

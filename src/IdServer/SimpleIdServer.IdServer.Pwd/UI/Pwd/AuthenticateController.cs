@@ -24,10 +24,7 @@ namespace SimpleIdServer.IdServer.Pwd.UI.Pwd;
 
 [Area(Constants.AreaPwd)]
 public class AuthenticateController : BaseAuthenticationMethodController<AuthenticatePasswordViewModel>
-{
-    private readonly IConfiguration _configuration;
-
-    public AuthenticateController(
+{    public AuthenticateController(
         ITemplateStore templateStore,
         IConfiguration configuration,
         IPasswordAuthenticationService userAuthenticationService,
@@ -54,7 +51,6 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
         IWorkflowHelper workflowHelper,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuidler, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, formBuilderOptions)
     {
-        _configuration = configuration;
     }
 
     protected override string Amr => Constants.AreaPwd;
@@ -73,14 +69,6 @@ public class AuthenticateController : BaseAuthenticationMethodController<Authent
     }
 
     protected override void EnrichViewModel(AuthenticatePasswordViewModel viewModel)
-    {
-        var options = GetOptions();
-        viewModel.CanResetPassword = options?.CanResetPassword ?? false;
-    }
-
-    private IdServerPasswordOptions GetOptions()
-    {
-        var section = _configuration.GetSection(typeof(IdServerPasswordOptions).Name);
-        return section.Get<IdServerPasswordOptions>();
+    {;
     }
 }

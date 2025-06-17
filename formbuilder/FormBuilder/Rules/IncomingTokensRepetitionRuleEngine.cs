@@ -98,7 +98,7 @@ public class IncomingTokensRepetitionRuleEngine : GenericRepetitionRuleEngine<In
         var pathResult = path.Evaluate(node);
         var nodes = pathResult.Matches.Select(m => m.Value);
         if (nodes.Count() != 1) return;
-        object value = nodes.Single();
+        object value = nodes.Single()?.ToString();
         if (mappingRule.Transformer != null) value = _transformerFactory.Transform(value?.ToString(), mappingRule.Transformer, node);
         var definitionProperty = properties.SingleOrDefault(p => p.Name == mappingRule.Target);
         if (definitionProperty == null) return;

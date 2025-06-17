@@ -7,6 +7,7 @@ namespace FormBuilder.Components.FormElements.Password;
 
 public partial class FormPasswordField : IGenericFormElement<FormPasswordFieldRecord>
 {
+    private bool isPasswordVisible = false;
     [Parameter] public FormPasswordFieldRecord Value { get; set; }
     [Parameter] public WorkflowContext Context { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
@@ -51,5 +52,26 @@ public partial class FormPasswordField : IGenericFormElement<FormPasswordFieldRe
         {
             return HtmlClassResolver.Resolve(Value, FormPasswordElementNames.Password, Context);
         }
+    }
+
+    public string ViewPasswordContainerClass
+    {
+        get
+        {
+            return HtmlClassResolver.Resolve(Value, FormPasswordElementNames.ViewPasswordContainer, Context);
+        }
+    }
+
+    public string ViewPasswordBtnClass
+    {
+        get
+        {
+            return HtmlClassResolver.Resolve(Value, FormPasswordElementNames.ViewPasswordBtn, Context);
+        }
+    }
+
+    private void TogglePasswordVisibility()
+    {
+        isPasswordVisible = !isPasswordVisible;
     }
 }

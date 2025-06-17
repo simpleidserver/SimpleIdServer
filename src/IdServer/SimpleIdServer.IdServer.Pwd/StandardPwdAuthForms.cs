@@ -59,41 +59,10 @@ public class StandardPwdAuthForms
                         StandardFormComponents.NewAuthenticate()
                     }
                 },
-                new FormStackLayoutRecord
-                {
-                    Transformations = new List<ITransformationRule>
-                    {
-                        new PropertyTransformationRule
-                        {
-                            PropertyName = "IsNotVisible",
-                            PropertyValue = "true",
-                            Condition = new ComparisonParameter
-                            {
-                                Source = "$.CanResetPassword",
-                                Operator = ComparisonOperators.EQ,
-                                Value = "false"
-                            }
-                        },
-                        new PropertyTransformationRule
-                        {
-                            PropertyName = "IsNotVisible",
-                            PropertyValue = "false",
-                            Condition = new ComparisonParameter
-                            {
-                                Source = "$.CanResetPassword",
-                                Operator = ComparisonOperators.EQ,
-                                Value = "true"
-                            }
-                        }
-                    },
-                    Elements = new ObservableCollection<IFormElementRecord>
-                    {                        
-                        // Separator
-                        StandardFormComponents.NewSeparator(),
-                        // Forget my password
-                        StandardFormComponents.NewAnchor(pwdForgetBtnId, LayoutTranslations.ForgetPassword),
-                    }
-                },
+                // Separator
+                StandardFormComponents.NewSeparator(),
+                // Reset the password
+                StandardFormComponents.NewAnchor(pwdForgetBtnId, LayoutTranslations.ForgetPassword),
                 // Separator
                 StandardFormComponents.NewSeparator(),
                 // Register                    
@@ -123,6 +92,10 @@ public class StandardPwdAuthForms
                         LabelMappingRules = new List<LabelMappingRule>
                         {
                             new LabelMappingRule { Source = $"$.{nameof(ExternalIdProvider.DisplayName)}" },
+                        },
+                        FormRecordProperties = new List<MappingRule>
+                        {
+                            new MappingRule { Source = $"$.{nameof(ExternalIdProvider.AuthenticationScheme)}", Target = "CssId" }
                         }
                     }
                 }

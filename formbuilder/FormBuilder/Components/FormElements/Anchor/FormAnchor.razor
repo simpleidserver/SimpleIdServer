@@ -7,7 +7,7 @@
     <Children>
         @if(Value.ActAsButton)
         {
-            <button class="@BtnClass" 
+            <button id="@CssId" class="@BtnClass" 
                     @onclick=@(async (e) => await Navigate())>
                 @translationHelper.Translate(Value, IsEditModeEnabled ? "Please provide a name" : string.Empty, !IsEditModeEnabled)
             </button>
@@ -15,6 +15,7 @@
         else
         {
             <a href="#"
+                id="@CssId"
                 class="@AnchorClass"
                 @onclick:stopPropagation="true" 
                 @onclick:preventDefault="true" 

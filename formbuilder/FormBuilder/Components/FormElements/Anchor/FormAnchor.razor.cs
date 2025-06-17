@@ -12,6 +12,13 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     [Parameter] public FormAnchorRecord Value { get; set; }
     [Parameter] public bool IsEditModeEnabled { get; set; }
     [Parameter] public WorkflowContext Context { get; set; }
+    public string CssId
+    {
+        get
+        {
+            return Value.CssId ?? string.Empty;
+        }
+    }
     [Inject] private IWorkflowLinkActionFactory WorkflowLinkActionFactory { get; set; }
     [Inject] private IHtmlClassResolver htmlClassResolver { get; set; }
     public JsonNode InputData

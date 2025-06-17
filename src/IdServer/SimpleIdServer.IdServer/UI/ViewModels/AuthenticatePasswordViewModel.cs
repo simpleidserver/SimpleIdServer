@@ -11,7 +11,6 @@ namespace SimpleIdServer.IdServer.UI.ViewModels
         public AuthenticatePasswordViewModel() { }
 
         public string Password { get; set; }
-        public bool CanResetPassword { get; set; }
 
         public override List<string> Validate()
         {

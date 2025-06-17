@@ -5,7 +5,15 @@ namespace FormBuilder.Components.FormElements.Password;
 
 public class FormPasswordFieldRecord : BaseFormFieldRecord
 {
-    public string Value { get; set; }
+    public string Value 
+    { 
+        get; set; 
+    }
+
+    public bool CanViewPassword
+    {
+        get; set;
+    }
 
     public override string Type => FormPasswordFieldDefinition.TYPE;
 

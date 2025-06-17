@@ -37,6 +37,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IDataSeeder, InitPwdAuthDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, UpdatePwdTranslationsDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitPwdConfigurationDefDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, UpdatePwdFormDataseeder>();
         idServerBuilder.Services.AddTransient<IFakerDataService, PwdAuthFakerService>();
         idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerPasswordOptions));
         if (isDefaultAuthMethod)
