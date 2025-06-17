@@ -42,7 +42,7 @@ public class AuthLayoutBuilder
 
     public AuthLayoutBuilder AddSuccessMessage(string code, string value)
     {
-        FormRecord.ErrorMessageTranslations.Add(new FormMessageTranslation
+        FormRecord.SuccessMessageTranslations.Add(new FormMessageTranslation
         {
             Language = Constants.DefaultLanguage,
             Value = value,
