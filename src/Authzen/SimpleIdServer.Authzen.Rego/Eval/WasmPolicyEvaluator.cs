@@ -31,6 +31,7 @@ public class WasmPolicyEvaluator : IWasmPolicyEvaluator
         var opa = new WasmOpaPolicy(engine, module, 2);
         var json = JsonSerializer.Serialize(input);
         var result = opa.EvaluateJson(json, entryPoint, true);
-        return true;
+        var evaluationResult = JsonSerializer.Deserialize<List<AllowEvaluationResult>>(result) ?? new List<AllowEvaluationResult>();
+        return evaluationResult.Single().Result;
     }
 }

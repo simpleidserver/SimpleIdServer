@@ -41,11 +41,12 @@ static void Eval()
             Type = "users"
         }
     };
-    var e = evaluator.Evaluate(request, CancellationToken.None).Result;
-    string ss = "";
+    var evaluationResult = evaluator.Evaluate(request, CancellationToken.None).Result;
+    Console.WriteLine($"Policy evaluation result {evaluationResult}");
     // avoir une convention explicite pour mes règles rego
     // policies/{resource_type}/{action}.rego
     // exemple de fichier JSON 
+    // Exemple de chemin : path = "/v1/data/policy/{input.resource.type}/{input.action}/allow"
     /*
     {
     "subject": {
@@ -64,7 +65,6 @@ static void Eval()
     }
     }
     */
-    // Exemple de chemin : path = "/v1/data/policy/{input.resource.type}/{input.action}/allow"
 }
 
 DownloadOpa();
