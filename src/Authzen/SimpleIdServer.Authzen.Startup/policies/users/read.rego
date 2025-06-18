@@ -1,9 +1,11 @@
 package users.read
 
-import data.shared.helpers
+# import data.shared.helpers
 
 default allow := false
 
 allow if {
-  helpers.has_role("admin")
+  some role
+  role = "admin"
+  role == input.subject.properties.roles
 }

@@ -1,7 +1,17 @@
 namespace SimpleIdServer.Authzen.Rego;
 
-public class RegoDownloaderOptions
+public class RegoOptions
 {
+    public required string PoliciesFolderBasePath
+    {
+        get; set;
+    } = "policies";
+
+    public required string PolicyPath
+    {
+        get; set;
+    } = "authzen.evaluate.allow";
+    
     public required string GitHubUrl
     {
         get; set;

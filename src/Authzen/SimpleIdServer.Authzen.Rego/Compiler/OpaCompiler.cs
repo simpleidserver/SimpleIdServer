@@ -1,5 +1,8 @@
 using System.Diagnostics;
+using System.Formats.Tar;
+using System.IO.Compression;
 using SimpleIdServer.Authzen.Rego.Discover;
+using YamlDotNet.Serialization.ValueDeserializers;
 
 namespace SimpleIdServer.Authzen.Rego.Compiler;
 
@@ -10,7 +13,7 @@ public interface IOpaCompiler
 
 public class OpaFileCompilationResult
 {
-    public string FilePath
+    public string? FilePath
     {
         get; set;
     }
@@ -20,7 +23,7 @@ public class OpaFileCompilationResult
         get; set;
     }
 
-    public string ErrorMessage
+    public string? ErrorMessage
     {
         get; set;
     }
@@ -29,28 +32,32 @@ public class OpaFileCompilationResult
 public class OpaCompiler : IOpaCompiler
 {
     private readonly IOpaPathResolver _opaPathResolver;
-    private readonly IRegoPathResolver _regoPathResolver;
     private readonly IRegoPoliciesResolver _regoPoliciesResolver;
+    private readonly ICompiledOpaFilesResolver _compiledOpaFilesResolver;
 
     public OpaCompiler(
         IOpaPathResolver opaPathResolver,
-        IRegoPathResolver regoPathResolver,
-        IRegoPoliciesResolver regoPoliciesResolver)
+        IRegoPoliciesResolver regoPoliciesResolver,
+        ICompiledOpaFilesResolver compiledOpaFilesResolver)
     {
         _opaPathResolver = opaPathResolver;
-        _regoPathResolver = regoPathResolver;
         _regoPoliciesResolver = regoPoliciesResolver;
+        _compiledOpaFilesResolver = compiledOpaFilesResolver;
     }
 
     public async Task<List<OpaFileCompilationResult>> Compile(CancellationToken cancellationToken = default(CancellationToken))
     {
         var opaPath = _opaPathResolver.ResolveOpaFilePath();
-        var regoPath = _regoPathResolver.ResolvePoliciesPath();
         var policies = await _regoPoliciesResolver.Discover(cancellationToken);
-        var wasmPath = Path.Combine(regoPath, "wasm");
+        var wasmPath = _compiledOpaFilesResolver.GetCompiledOpaFolderPath();
         var tmpPath = Path.GetTempPath();
         var result = new List<OpaFileCompilationResult>();
         var compilationResults = new List<(string sourceFile, string targetFile, byte[] compiledContent)>();
+        if (policies == null)
+        {
+            return result;
+        }
+        
         foreach (var policy in policies)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -59,8 +66,8 @@ public class OpaCompiler : IOpaCompiler
             }
 
             var fileName = Path.GetFileNameWithoutExtension(policy.Path);
-            var tempWasmFile = Path.Combine(tmpPath, $"{Guid.NewGuid()}.wasm");
-            var finalWasmFile = Path.Combine(wasmPath, $"{policy.PolicyName}.wasm");
+            var tempWasmFile = Path.Combine(tmpPath, $"{Guid.NewGuid()}.{Constants.GzExtension}");
+            var finalWasmFile = Path.Combine(wasmPath, $"{policy.PolicyName}.{Constants.WasmFileExtension}");
             var args = $"build -t wasm -e {policy.AllowPolicyName} {string.Join(" ", policy.Libs.Select(l => $"\"{l.filePath}\""))} \"{policy.Path}\" -o \"{tempWasmFile}\"";
             var startInfo = new ProcessStartInfo
             {
@@ -89,7 +96,7 @@ public class OpaCompiler : IOpaCompiler
                 break;
             }
 
-            var compiledContent = await File.ReadAllBytesAsync(tempWasmFile, cancellationToken);
+            var compiledContent = await ExtractWasmFile(tempWasmFile);
             compilationResults.Add((policy.Path, finalWasmFile, compiledContent));
             try { File.Delete(tempWasmFile); } catch { }
             result.Add(new OpaFileCompilationResult
@@ -110,7 +117,36 @@ public class OpaCompiler : IOpaCompiler
             await File.WriteAllBytesAsync(targetFile, content, cancellationToken);
         }
 
+        File.Copy(
+            Path.Combine(_regoPoliciesResolver.GetPolicyPath(), Constants.PolicyFileName),
+            Path.Combine(wasmPath, Constants.PolicyFileName));
         return result;
+    }
+
+    private async Task<byte[]> ExtractWasmFile(string gzFilePath)
+    {
+        var outputDirectory = Path.Combine(Path.GetDirectoryName(gzFilePath) ?? string.Empty, Path.GetFileNameWithoutExtension(gzFilePath));
+        Directory.CreateDirectory(outputDirectory);
+        var wasmOutputFile = Path.Combine(outputDirectory, "policy.wasm");
+        using (var gzStream = File.OpenRead(gzFilePath))
+        using (var gzip = new GZipStream(gzStream, CompressionMode.Decompress))
+        using (var reader = new TarReader(gzip))
+        {
+            TarEntry entry;
+            while ((entry = reader.GetNextEntry()) != null)
+            {
+                if (entry.Name.EndsWith("policy.wasm", StringComparison.OrdinalIgnoreCase))
+                {
+                    using (var outStream = File.Create(wasmOutputFile))
+                    {
+                        await entry.DataStream.CopyToAsync(outStream);
+                    }
+                    break;
+                }
+            }
+        }
+
+        return await File.ReadAllBytesAsync(wasmOutputFile);
     }
 
     private static void CleanTemporaryFiles(string tmpPath)

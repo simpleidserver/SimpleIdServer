@@ -1,9 +1,8 @@
-using SimpleIdServer.Authzen.Rego.Compiler;
-
 namespace SimpleIdServer.Authzen.Rego.Discover;
 
 public interface IRegoPoliciesResolver
 {
+    string GetPolicyPath();
     Task<List<RegoPolicyRecord>?> Discover(CancellationToken cancellationToken = default(CancellationToken));
 }
 
@@ -15,6 +14,8 @@ public class RegoPoliciesResolver : IRegoPoliciesResolver
     {
         _regoPathResolver = regoPathResolver;
     }
+
+    public string GetPolicyPath() => _regoPathResolver.ResolvePoliciesPath();
 
     public async Task<List<RegoPolicyRecord>?> Discover(CancellationToken cancellationToken = default(CancellationToken))
     {
@@ -83,7 +84,7 @@ public class RegoPoliciesResolver : IRegoPoliciesResolver
             }
         }
 
-        return result;        
+        return result;
     }
 
     private static List<string> FilterInstructions(IEnumerable<string> lines, string instr)

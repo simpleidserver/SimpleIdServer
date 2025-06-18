@@ -1,7 +1,6 @@
-using System;
 using Microsoft.Extensions.Options;
 
-namespace SimpleIdServer.Authzen.Rego.Compiler;
+namespace SimpleIdServer.Authzen.Rego.Discover;
 
 public interface IRegoPathResolver
 {
@@ -10,9 +9,9 @@ public interface IRegoPathResolver
 
 public class RegoPathResolver : IRegoPathResolver
 {
-    private readonly RegoEvaluatorOptions _options;
+    private readonly RegoOptions _options;
 
-    public RegoPathResolver(IOptions<RegoEvaluatorOptions> options)
+    public RegoPathResolver(IOptions<RegoOptions> options)
     {
         _options = options.Value;
     }
@@ -24,7 +23,7 @@ public class RegoPathResolver : IRegoPathResolver
             return _options.PoliciesFolderBasePath;
         }
 
-        var assemblyLocation = Path.GetDirectoryName(typeof(RegoEvaluatorOptions).Assembly.Location);
+        var assemblyLocation = Path.GetDirectoryName(typeof(RegoOptions).Assembly.Location);
         return Path.Combine(assemblyLocation!, _options.PoliciesFolderBasePath);
     }
 }

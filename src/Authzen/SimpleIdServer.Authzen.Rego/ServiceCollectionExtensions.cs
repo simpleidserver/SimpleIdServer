@@ -1,43 +1,39 @@
 using SimpleIdServer.Authzen.Rego;
 using SimpleIdServer.Authzen.Rego.Compiler;
 using SimpleIdServer.Authzen.Rego.Discover;
+using SimpleIdServer.Authzen.Rego.Eval;
 using SimpleIdServer.Authzen.Services;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
-{
-    public static IServiceCollection AddRegoEvaluator(this IServiceCollection services, Action<RegoEvaluatorOptions>? cb = null)
+{    
+    internal static IServiceCollection AddRegoEvaluator(this IServiceCollection services)
     {
-        if (cb != null)
-        {
-            services.Configure(cb);
-        }
-        else
-        {
-            services.Configure<RegoEvaluatorOptions>((o) => { });
-        }
-
         services.AddTransient<IAuthzenPolicyEvaluator, RegoEvaluator>();
-        services.AddTransient<IRegoPathResolver, RegoPathResolver>();
-        services.AddTransient<IRegoPoliciesResolver, RegoPoliciesResolver>();
+        services.AddTransient<IWasmPolicyEvaluator, WasmPolicyEvaluator>();
         return services;
     }
 
-    internal static IServiceCollection AddRegoClientDownloader(this IServiceCollection services, Action<RegoDownloaderOptions>? cb = null)
+    internal static IServiceCollection AddRegoCompiler(this IServiceCollection services)
     {
-        if (cb != null)
-        {
-            services.Configure(cb);
-        }
-        else
-        {
-            services.Configure<RegoDownloaderOptions>((o) => { });
-        }
+        services.AddTransient<IOpaCompiler, OpaCompiler>();
+        return services;
+    }
 
+    internal static IServiceCollection AddRegoClientDownloader(this IServiceCollection services)
+    {
         services.AddTransient<IOpaDownloader, OpaDownloader>();
-        services.AddTransient<IOpaPathResolver, OpaPathResolver>();
         services.AddHttpClient();
+        return services;
+    }
+
+    internal static IServiceCollection AddRegoDiscovery(this IServiceCollection services)
+    {
+        services.AddTransient<IOpaPathResolver, OpaPathResolver>();
+        services.AddTransient<ICompiledOpaFilesResolver, CompiledOpaFilesResolver>();
+        services.AddTransient<IRegoPathResolver, RegoPathResolver>();
+        services.AddTransient<IRegoPoliciesResolver, RegoPoliciesResolver>();
         return services;
     }
 }

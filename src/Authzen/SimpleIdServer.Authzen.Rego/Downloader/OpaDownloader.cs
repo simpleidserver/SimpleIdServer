@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Options;
+using SimpleIdServer.Authzen.Rego.Discover;
 namespace SimpleIdServer.Authzen.Rego;
 
 public interface IOpaDownloader
@@ -12,12 +13,12 @@ public class OpaDownloader : IOpaDownloader
 {
     private readonly IOpaPathResolver _opaPathResolver;
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly RegoDownloaderOptions _options;
+    private readonly RegoOptions _options;
 
     public OpaDownloader(
         IOpaPathResolver opaPathResolver,
         IHttpClientFactory httpClientFactory,
-        IOptions<RegoDownloaderOptions> options
+        IOptions<RegoOptions> options
     )
     {
         _opaPathResolver = opaPathResolver;

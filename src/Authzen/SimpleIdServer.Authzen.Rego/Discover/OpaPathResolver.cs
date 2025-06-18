@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Options;
 
-namespace SimpleIdServer.Authzen.Rego;
+namespace SimpleIdServer.Authzen.Rego.Discover;
 
 public interface IOpaPathResolver
 {
@@ -13,13 +13,13 @@ public interface IOpaPathResolver
 public class OpaPathResolver : IOpaPathResolver
 {
     private const string folderName = "download";
-    private readonly RegoDownloaderOptions _options;
+    private readonly RegoOptions _options;
 
-    public OpaPathResolver(IOptions<RegoDownloaderOptions> options)
+    public OpaPathResolver(IOptions<RegoOptions> options)
     {
         _options = options.Value;
     }
-    
+
     public string ResolveDownloadPath()
     {
         if (string.IsNullOrWhiteSpace(_options.DownloadPath))

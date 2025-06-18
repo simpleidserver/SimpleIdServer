@@ -1,7 +1,18 @@
+using System.Text.Json.Serialization;
+
 namespace SimpleIdServer.Authzen.Dtos;
 
 public class Resource 
 {
-    public string Type { get; set; }
-    public string Id { get; set; }
+    [JsonPropertyName("type")]
+    public required string Type
+    {
+        get; set;
+    }
+
+    [JsonPropertyName("id")]
+    public required string Id
+    {
+        get; set;
+    }
 }
