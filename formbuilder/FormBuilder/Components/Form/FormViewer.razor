@@ -51,24 +51,33 @@
 
                 @if (Context.Execution != null)
                 {
-                    if (Context.Execution.ErrorMessages != null)
+                    if (Context.Execution.ErrorMessages != null && Context.Execution.ErrorMessages.Any())
                     {
-                        @foreach (var errorMessage in Context.Execution.ErrorMessages)
-                        {
-                            <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
-                                @TranslateErrorMessage(errorMessage)
-                            </RadzenAlert>
-                        }
+                        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            <ul>
+                                @foreach (var errorMessage in Context.Execution.ErrorMessages)
+                                {
+                                    <li>
+                                        @TranslateErrorMessage(errorMessage)
+                                    </li>
+
+                                }
+                            </ul>
+                        </RadzenAlert>
                     }
 
-                    if (Context.Execution.SuccessMessages != null)
+                    if (Context.Execution.SuccessMessages != null && Context.Execution.SuccessMessages.Any())
                     {
-                        @foreach (var successMessage in Context.Execution.SuccessMessages)
-                        {
-                            <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
-                                @TranslateSuccessMessage(successMessage)
-                            </RadzenAlert>
-                        }
+                        <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter">
+                            <ul>
+                                @foreach (var successMessage in Context.Execution.SuccessMessages)
+                                {
+                                    <li>
+                                        @TranslateSuccessMessage(successMessage)
+                                    </li>
+                                }
+                            </ul>
+                        </RadzenAlert>
                     }
                 }
 
@@ -203,25 +212,27 @@
     private string TranslateSuccessMessage(string message)
     {
         var currentCulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
-        var translation = Form.SuccessMessageTranslations.SingleOrDefault(t => t.Code == message && t.Language == currentCulture);
+        var translationKey = TranslationKeyParser.Parse(message);
+        var translation = Form.SuccessMessageTranslations.SingleOrDefault(t => t.Code == translationKey.Code && t.Language == currentCulture);
         if(translation == null)
         {
             return message;
         }
 
-        return translation.Value;
+        return string.Format(translation.Value, translationKey.Args);
     }
 
     private string TranslateErrorMessage(string message)
     {
         var currentCulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
-        var translation = Form.ErrorMessageTranslations.SingleOrDefault(t => t.Code == message && t.Language == currentCulture);
+        var translationKey = TranslationKeyParser.Parse(message);
+        var translation = Form.ErrorMessageTranslations.SingleOrDefault(t => t.Code == translationKey.Code && t.Language == currentCulture);
         if (translation == null)
         {
             return message;
         }
 
-        return translation.Value;
+        return string.Format(translation.Value, translationKey.Args);
     }
 
     private void Init()

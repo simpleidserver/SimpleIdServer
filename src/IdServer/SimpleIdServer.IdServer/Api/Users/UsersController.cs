@@ -39,6 +39,7 @@ namespace SimpleIdServer.IdServer.Api.Users
         private readonly IRecurringJobManager _recurringJobManager;
         private readonly IUserHelper _userHelper;
         private readonly ITransactionBuilder _transactionBuilder;
+        private readonly IPasswordValidationService _passwordValidationService;
         private readonly ILogger<UsersController> _logger;
         private readonly IdServerHostOptions _options;
 
@@ -54,6 +55,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             IRecurringJobManager recurringJobManager,
             IUserHelper userHelper,
             ITransactionBuilder transactionBuilder,
+            IPasswordValidationService passwordValidationService,
             ILogger<UsersController> logger,
             IOptions<IdServerHostOptions> options) : base(tokenRepository, jwtBuilder)
         {
@@ -66,6 +68,7 @@ namespace SimpleIdServer.IdServer.Api.Users
             _recurringJobManager = recurringJobManager;
             _userHelper = userHelper;
             _transactionBuilder = transactionBuilder;
+            _passwordValidationService = passwordValidationService;
             _logger = logger;
             _options = options.Value;
         }
@@ -335,6 +338,12 @@ namespace SimpleIdServer.IdServer.Api.Users
 
                     if (request.Credential.CredentialType == Constants.AreaPwd)
                     {
+                        var passwordValidationResult = _passwordValidationService.Validate(request.Credential.Value);
+                        if (passwordValidationResult != null)
+                        {
+                            throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(",", passwordValidationResult.Select(r => r.errorMessage)));
+                        }
+
                         request.Credential.Value = PasswordHelper.ComputerHash(request.Credential, request.Credential.Value);
                     }
 
@@ -374,6 +383,12 @@ namespace SimpleIdServer.IdServer.Api.Users
                     if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.UnknownUserCredential, credentialId));
                     if (existingCredential.CredentialType == Constants.AreaPwd)
                     {
+                        var passwordValidationResult = _passwordValidationService.Validate(request.Value);
+                        if (passwordValidationResult != null)
+                        {
+                            throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(",", passwordValidationResult.Select(r => r.errorMessage)));
+                        }
+
                         existingCredential.Value = PasswordHelper.ComputerHash(existingCredential, request.Value);
                     }
                     else

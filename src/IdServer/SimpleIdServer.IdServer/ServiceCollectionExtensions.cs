@@ -103,6 +103,7 @@ public static class ServiceCollectionExtensions
         });
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
         services.AddSingleton<ISidEndpointStore, SidEndpointStore>();
+        services.AddTransient<IPasswordValidationService, DefaultPasswordValidationService>();
         services.AddTransient<ICaptchaValidatorFactory, CaptchaValidatorFactory>();
         ConfigureDataSeeders(services);
         var mvcBuilder = services.AddControllersWithViews();

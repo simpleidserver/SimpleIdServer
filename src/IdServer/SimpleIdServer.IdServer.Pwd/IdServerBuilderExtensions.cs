@@ -3,6 +3,7 @@
 
 using DataSeeder;
 using FormBuilder;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SimpleIdServer.IdServer;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd;
@@ -26,6 +27,7 @@ public static class IdServerBuilderExtensions
     public static IdServerBuilder AddPwdAuthentication(this IdServerBuilder idServerBuilder, bool isDefaultAuthMethod = false)
     {
         idServerBuilder.MvcBuilder.AddApplicationPart(typeof(AuthenticateController).Assembly);
+        idServerBuilder.Services.RemoveAll<IPasswordValidationService>();
         idServerBuilder.Services.AddTransient<IAuthenticationMethodService, PwdAuthenticationMethodService>();
         idServerBuilder.Services.AddTransient<IPasswordAuthenticationService, PasswordAuthenticationService>();
         idServerBuilder.Services.AddTransient<IUserAuthenticationService, PasswordAuthenticationService>();
@@ -39,6 +41,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IDataSeeder, InitPwdConfigurationDefDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, UpdatePwdFormDataseeder>();
         idServerBuilder.Services.AddTransient<IFakerDataService, PwdAuthFakerService>();
+        idServerBuilder.Services.AddTransient<IPasswordValidationService, PasswordValidationService>();
         idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerPasswordOptions));
         if (isDefaultAuthMethod)
         {

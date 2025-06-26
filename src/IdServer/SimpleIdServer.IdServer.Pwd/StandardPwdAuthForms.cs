@@ -253,6 +253,12 @@ public class StandardPwdAuthForms
         .AddErrorMessage(AuthFormErrorMessages.MissingConfirmedPassword, Global.MissingConfirmedPassword)
         .AddErrorMessage(AuthFormErrorMessages.PasswordMismatch, Global.PasswordMismatch)
         .AddErrorMessage(AuthFormErrorMessages.OtpCodeIsInvalid, Global.OtpCodeIsInvalid)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordTooShort, Global.PasswordTooShort)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresNonAlphanumeric, Global.PasswordRequiresNonAlphanumeric)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresDigit, Global.PasswordRequiresDigit)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresLower, Global.PasswordRequiresLower)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresUpper, Global.PasswordRequiresUpper)
+        .AddErrorMessage(AuthFormErrorMessages.RequiredUniqueChars, Global.RequiredUniqueChars)
         .AddSuccessMessage(AuthFormSuccessMessages.PasswordIsUpdated, Global.PasswordIsUpdated)
         .Build();
 
@@ -303,5 +309,11 @@ public class StandardPwdAuthForms
         .AddErrorMessage(AuthFormErrorMessages.CannotResolveUser, Global.CannotResolveUser)
         .AddErrorMessage(AuthFormErrorMessages.NoActivePassword, Global.NoActivePassword)
         .AddErrorMessage(AuthFormErrorMessages.PasswordIsNotTemporary, Global.PasswordIsNotTemporary)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordTooShort, Global.PasswordTooShort)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresNonAlphanumeric, Global.PasswordRequiresNonAlphanumeric)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresDigit, Global.PasswordRequiresDigit)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresLower, Global.PasswordRequiresLower)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresUpper, Global.PasswordRequiresUpper)
+        .AddErrorMessage(AuthFormErrorMessages.RequiredUniqueChars, Global.RequiredUniqueChars)
         .Build();
 }

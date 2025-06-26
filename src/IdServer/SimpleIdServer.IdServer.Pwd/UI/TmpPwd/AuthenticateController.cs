@@ -30,6 +30,8 @@ namespace SimpleIdServer.IdServer.Pwd.UI.TmpPwd;
 [Area(Constants.AreaTmpPwd)]
 public class AuthenticateController : BaseAuthenticationMethodController<ResetTemporaryPasswordViewModel>
 {
+    private readonly IPasswordValidationService _passwordValidationService;
+
     public AuthenticateController(
         ITemplateStore templateStore,
         IConfiguration configuration,
@@ -57,8 +59,10 @@ public class AuthenticateController : BaseAuthenticationMethodController<ResetTe
         IAcrHelper acrHelper,
         IWorkflowHelper workflowHelper,
         ICaptchaValidatorFactory captchaValidatorFactory,
+        IPasswordValidationService passwordValidationService,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(templateStore, configuration, options, authenticationSchemeProvider, userAuthenticationService, dataProtectionProvider, tokenRepository, transactionBuilder, jwtBuilder, authenticationHelper, clientRepository, amrHelper, userRepository, userSessionRepository, userTransformer, busControl, antiforgery, authenticationContextClassReferenceRepository, sessionManager, workflowStore, formStore, languageRepository, acrHelper, workflowHelper, captchaValidatorFactory, formBuilderOptions)
     {
+        _passwordValidationService = passwordValidationService;
     }
 
     protected override string Amr => Constants.AreaTmpPwd;
@@ -92,6 +96,12 @@ public class AuthenticateController : BaseAuthenticationMethodController<ResetTe
             if (!credential.IsTemporary)
             {
                 return UserAuthenticationResult.Error(AuthFormErrorMessages.PasswordIsNotTemporary);
+            }
+
+            var passwordValidationResult = _passwordValidationService.Validate(viewModel.Password);
+            if (passwordValidationResult != null)
+            {
+                return UserAuthenticationResult.Error(passwordValidationResult.Select(p => p.code).ToList());
             }
 
             credential.Value = PasswordHelper.ComputerHash(credential, viewModel.Password);

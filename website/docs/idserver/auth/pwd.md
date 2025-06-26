@@ -26,6 +26,13 @@ The behavior of the authentication module is configurable via the `appsettings.j
 | Message | Contains the content of the message sent to the user. The message should include the URL leading to the password update form. |
 | ResetPasswordLinkExpirationInSeconds | Sets the duration (in seconds) after which the password update URL will expire. |
 | CanResetPassword | Determines whether the option to reset the password (i.e., the link) should be displayed to the user. |
+| EnableValidation | Enable or disable the password validation |
+| RequiredLength          | Gets or sets the minimum length that a password must have. |
+| RequiredUniqueChars     | Gets or sets the minimum number of unique characters that a password must contain. |
+| RequireNonAlphanumeric  | Gets or sets a flag indicating whether the password must contain at least one non-alphanumeric character. |
+| RequireLowercase        | Gets or sets a flag indicating whether the password must contain at least one lowercase ASCII character. |
+| RequireUppercase        | Gets or sets a flag indicating whether the password must contain at least one uppercase ASCII character. |
+| RequireDigit            | Gets or sets a flag indicating whether the password must contain at least one digit. |
 
 ```json title="appsettings.json"
   "IdServerPasswordOptions": {
@@ -33,7 +40,14 @@ The behavior of the authentication module is configurable via the `appsettings.j
     "ResetPasswordTitle": "Reset your password",
     "ResetPasswordBody": "Link to reset your password {0}",
     "ResetPasswordLinkExpirationInSeconds": "30",
-    "CanResetPassword": "true"
+    "CanResetPassword": "true",
+    "EnableValidation": "true",
+    "RequiredLength": "6",
+    "RequiredUniqueChars": "1",
+    "RequireNonAlphanumeric": "true",
+    "RequireLowercase": "true",
+    "RequireUppercase": "true",
+    "RequireDigit": "true"
   }
 ```
 

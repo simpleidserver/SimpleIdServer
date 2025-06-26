@@ -1185,4 +1185,22 @@
   <data name="CaptchaIsNotValid" xml:space="preserve">
     <value>The captcha is not valid</value>
   </data>
+  <data name="PasswordTooShort" xml:space="preserve">
+    <value>The password must be at least {0} characters long.</value>
+  </data>
+  <data name="PasswordRequiresNonAlphanumeric" xml:space="preserve">
+    <value>Passwords must have at least one non alphanumeric character</value>
+  </data>
+  <data name="PasswordRequiresDigit" xml:space="preserve">
+    <value>Passwords must have at least one digit ('0'-'9')</value>
+  </data>
+  <data name="PasswordRequiresLower" xml:space="preserve">
+    <value>Passwords must have at least one lowercase letter</value>
+  </data>
+  <data name="PasswordRequiresUpper" xml:space="preserve">
+    <value>Passwords must have at least one uppercase letter</value>
+  </data>
+  <data name="RequiredUniqueChars" xml:space="preserve">
+    <value>Passwords must use at least {0} different characters</value>
+  </data>
 </root>

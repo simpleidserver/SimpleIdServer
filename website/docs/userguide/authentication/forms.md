@@ -48,6 +48,7 @@ Five buttons at the top of the editor give you powerful control:
 * **Debug** : Enter arbitrary JSON to simulate different authentication inputs; elements with conditional visibility will toggle on/off accordingly.
 * **JSON** : Switch the Properties panel to show the raw JSON model of your form, so you can tweak element properties, add conditions, or define data‑binding rules.
 * **CSS** : Edit the template’s CSS. Choose among installed libraries (Radzen by default, or install Tailwind CSS) and override classes, scripts, or external files.
+* **Translations** : Edit the translations of the success and error messages in all languages supported by the Identity Server.
 * **Save** : Persist your edits to the draft version of this form.
 * **Publish** : Push all saved changes live. Only published forms will be served to end users at runtime.
 
@@ -121,3 +122,8 @@ Click **CSS** in the Actions panel to reveal the form's CSS Template:
 3. **CSS files** : Link external stylesheets or write inline CSS rules.
 
 Any change you make will instantly refresh the Preview. Remember: saving CSS changes affects all forms in the current realm, so coordinate updates carefully!
+
+### Editing the translations
+
+Click **Translations** in the Actions panel to view the available translations. 
+Use the Success messages and Error messages tabs to edit the corresponding translations.

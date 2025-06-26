@@ -15,7 +15,6 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Options;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
-using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -26,6 +25,8 @@ namespace SimpleIdServer.IdServer.Pwd;
 [Area(Constants.AreaPwd)]
 public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
 {
+    private readonly IPasswordValidationService _passwordValidationService;
+
     public RegisterController(
         IOptions<IdServerHostOptions> options, 
         IOptions<FormBuilderOptions> formOptions,
@@ -40,8 +41,10 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
         ILanguageRepository languageRepository,
         IRealmStore realmStore,
         ITemplateStore templateStore,
-        IWorkflowHelper workflowHelper) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore, workflowHelper)
+        IWorkflowHelper workflowHelper,
+        IPasswordValidationService passwordValidationService) : base(options, formOptions, distributedCache, userRepository, tokenRepository, transactionBuilder, jwtBuilder, antiforgery, formStore, workflowStore, languageRepository, realmStore, templateStore, workflowHelper)
     {
+        _passwordValidationService = passwordValidationService;
     }
 
     protected override string Amr => Constants.AreaPwd;
@@ -105,12 +108,21 @@ public class RegisterController : BaseRegisterController<PwdRegisterViewModel>
             return View(result);
         }
 
+        // 4. Validate the password.
+        var validationResult = _passwordValidationService.Validate(viewModel.Password);
+        if(validationResult != null)
+        {
+            result.SetInput(viewModel);
+            result.SetErrorMessages(validationResult.Select(v => v.code).ToList());
+            return View(result);
+        }
+
         if (!isAuthenticated) return await CreateUser();
         return await UpdateUser();
 
         async Task<IActionResult> CreateUser()
         {
-            // 4. Check a user already exists.
+            // 5. Check a user already exists.
             var isUserExists = await UserRepository.IsSubjectExists(viewModel.Login, prefix, cancellationToken);
             if(isUserExists)
             {

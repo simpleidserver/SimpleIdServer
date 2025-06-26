@@ -2194,6 +2194,51 @@ namespace SimpleIdServer.IdServer.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Passwords must have at least one digit (&apos;0&apos;-&apos;9&apos;).
+        /// </summary>
+        public static string PasswordRequiresDigit {
+            get {
+                return ResourceManager.GetString("PasswordRequiresDigit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Passwords must have at least one lowercase letter.
+        /// </summary>
+        public static string PasswordRequiresLower {
+            get {
+                return ResourceManager.GetString("PasswordRequiresLower", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Passwords must have at least one non alphanumeric character.
+        /// </summary>
+        public static string PasswordRequiresNonAlphanumeric {
+            get {
+                return ResourceManager.GetString("PasswordRequiresNonAlphanumeric", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Passwords must have at least one uppercase letter.
+        /// </summary>
+        public static string PasswordRequiresUpper {
+            get {
+                return ResourceManager.GetString("PasswordRequiresUpper", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à The password must be at least {0} characters long..
+        /// </summary>
+        public static string PasswordTooShort {
+            get {
+                return ResourceManager.GetString("PasswordTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Plain client secret is required.
         /// </summary>
         public static string PlainClientSecretRequired {
@@ -2334,6 +2379,15 @@ namespace SimpleIdServer.IdServer.Resources {
         public static string RequiredClientMetadataOrClientMetadataUri {
             get {
                 return ResourceManager.GetString("RequiredClientMetadataOrClientMetadataUri", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Passwords must use at least {0} different characters.
+        /// </summary>
+        public static string RequiredUniqueChars {
+            get {
+                return ResourceManager.GetString("RequiredUniqueChars", resourceCulture);
             }
         }
         

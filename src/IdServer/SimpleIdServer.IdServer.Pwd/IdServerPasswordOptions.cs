@@ -26,4 +26,50 @@ public class IdServerPasswordOptions
     /// </summary>
     [ConfigurationRecord("Expiration time", "Expiration time in seconds of the reset link", order: 3)]
     public int ResetPasswordLinkExpirationInSeconds { get; set; } = 30;
+
+    /// <summary>
+    /// Enable password validation.
+    /// </summary>
+    [ConfigurationRecord("Password validation", "Enable or disable the password validation", order: 4)]
+    public bool EnableValidation { get; set; } = false;
+
+    /// <summary>
+    /// Gets or sets the minimum length a password must be. Defaults to 6.
+    /// </summary>
+    [ConfigurationRecord("Required length", "Gets or sets the minimum length a password must be", order: 5, displayCondition: "EnableValidation=true")]
+    public int RequiredLength { get; set; } = 6;
+
+    /// <summary>
+    /// Gets or sets the minimum number of unique characters which a password must contain. Defaults to 1.
+    /// </summary>
+    [ConfigurationRecord("Required unique chars", "Gets or sets the minimum number of unique characters which a password must contain", order: 6, displayCondition: "EnableValidation=true")]
+    public int RequiredUniqueChars { get; set; } = 1;
+
+    /// <summary>
+    /// Gets or sets a flag indicating if passwords must contain a non-alphanumeric character. Defaults to true.
+    /// </summary>
+    /// <value>True if passwords must contain a non-alphanumeric character, otherwise false.</value>
+    [ConfigurationRecord("Require non alpha numeric", "Gets or sets a flag indicating if passwords must contain a non-alphanumeric character", order: 7, displayCondition: "EnableValidation=true")]
+    public bool RequireNonAlphanumeric { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a flag indicating if passwords must contain a lower case ASCII character. Defaults to true.
+    /// </summary>
+    /// <value>True if passwords must contain a lower case ASCII character.</value>
+    [ConfigurationRecord("Require lower case", "Gets or sets a flag indicating if passwords must contain a lower case ASCII character.", order: 8, displayCondition: "EnableValidation=true")]
+    public bool RequireLowercase { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a flag indicating if passwords must contain a upper case ASCII character. Defaults to true.
+    /// </summary>
+    /// <value>True if passwords must contain a upper case ASCII character.</value>
+    [ConfigurationRecord("Require upper case", "Gets or sets a flag indicating if passwords must contain a upper case ASCII character.", order: 9, displayCondition: "EnableValidation=true")]
+    public bool RequireUppercase { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a flag indicating if passwords must contain a digit. Defaults to true.
+    /// </summary>
+    /// <value>True if passwords must contain a digit.</value>
+    [ConfigurationRecord("Require digit", "Gets or sets a flag indicating if passwords must contain a digit.", order: 10, displayCondition: "EnableValidation=true")]
+    public bool RequireDigit { get; set; } = true;
 }

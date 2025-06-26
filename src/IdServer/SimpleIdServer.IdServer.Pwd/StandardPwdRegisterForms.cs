@@ -3,6 +3,7 @@
 using FormBuilder.Components.FormElements.StackLayout;
 using FormBuilder.Models;
 using SimpleIdServer.IdServer.Layout;
+using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Layout.RegisterFormLayout;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Resources;
@@ -45,6 +46,12 @@ public static class StandardPwdRegisterForms
         .AddErrorMessage(RegisterFormErrorMessages.MissingConfirmedPassword, Global.MissingConfirmedPassword)
         .AddErrorMessage(RegisterFormErrorMessages.PasswordMismatch, Global.PasswordMismatch)
         .AddErrorMessage(RegisterFormErrorMessages.UserWithSameLoginAlreadyExists, Global.UserWithSameLoginAlreadyExists)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordTooShort, Global.PasswordTooShort)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresNonAlphanumeric, Global.PasswordRequiresNonAlphanumeric)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresDigit, Global.PasswordRequiresDigit)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresLower, Global.PasswordRequiresLower)
+        .AddErrorMessage(AuthFormErrorMessages.PasswordRequiresUpper, Global.PasswordRequiresUpper)
+        .AddErrorMessage(AuthFormErrorMessages.RequiredUniqueChars, Global.RequiredUniqueChars)
         .AddSuccessMessage(RegisterFormSuccessMessages.UserIsUpdated, Global.UserIsUpdated)
         .AddSuccessMessage(RegisterFormSuccessMessages.UserIsCreated, Global.UserIsCreated)
         .Build(DateTime.UtcNow);

@@ -21,6 +21,7 @@ using SimpleIdServer.IdServer.Jwt;
 using SimpleIdServer.IdServer.Layout;
 using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Options;
+using SimpleIdServer.IdServer.Pwd.Services;
 using SimpleIdServer.IdServer.Pwd.UI.ViewModels;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
@@ -46,6 +47,7 @@ public class ResetController : BaseController
     private readonly IRealmStore _realmStore;
     private readonly ITemplateStore _templateStore;
     private readonly IWorkflowLinkHelper _workflowLinkHelper;
+    private readonly IPasswordValidationService _passwordValidationService;
     private readonly ILogger<ResetController> _logger;
     private readonly FormBuilderOptions _formBuilderOptions;
 
@@ -66,6 +68,7 @@ public class ResetController : BaseController
         IRealmStore realmStore,
         ITemplateStore templateStore,
         IWorkflowLinkHelper workflowLinkHelper,
+        IPasswordValidationService passwordValidationService,
         ILogger<ResetController> logger,
         IOptions<FormBuilderOptions> formBuilderOptions) : base(tokenRepository, jwtBuilder)
     {
@@ -83,6 +86,7 @@ public class ResetController : BaseController
         _realmStore = realmStore;
         _templateStore = templateStore;
         _workflowLinkHelper = workflowLinkHelper;
+        _passwordValidationService = passwordValidationService;
         _logger = logger;
         _formBuilderOptions = formBuilderOptions.Value;
     }
@@ -269,6 +273,14 @@ public class ResetController : BaseController
                     IsActive = true
                 };
                 user.Credentials.Add(credential);
+            }
+
+            var passwordValidationResult = _passwordValidationService.Validate(viewModel.Password);
+            if (passwordValidationResult != null)
+            {
+                result.SetErrorMessages(passwordValidationResult.Select(p => p.code).ToList());
+                result.SetInput(viewModel);
+                return View(result);
             }
 
             credential.Value = PasswordHelper.ComputerHash(credential, viewModel.Password);

@@ -1,5 +1,7 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using Hangfire.Storage.Monitoring;
+
 namespace SimpleIdServer.IdServer.Layout.AuthFormLayout;
 
 public static class AuthFormErrorMessages
@@ -38,4 +40,10 @@ public static class AuthFormErrorMessages
     public static string NoCredential = "NoCredential";
     public static string MissingLoginParameter = "MissingLoginParameter";
     public static string InvalidCaptcha = "InvalidCaptcha";
+    public static string PasswordTooShort = "PasswordTooShort";
+    public static string PasswordRequiresNonAlphanumeric = "PasswordRequiresNonAlphanumeric";
+    public static string PasswordRequiresDigit = "PasswordRequiresDigit";
+    public static string PasswordRequiresLower = "PasswordRequiresLower";
+    public static string PasswordRequiresUpper = "PasswordRequiresUpper";
+    public static string RequiredUniqueChars = "RequiredUniqueChars";
 }
