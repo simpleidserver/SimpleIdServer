@@ -52,4 +52,9 @@ public class UpdateAdvancedClientSettingsRequest
     {
         get; set;
     }
+    [JsonPropertyName(OAuthClientParameters.RefreshTokenExpirationTimeInSeconds)]
+    public double RefreshTokenExpirationTimeInSeconds
+    {
+        get; set;
+    }
 }

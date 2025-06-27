@@ -2205,4 +2205,10 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="PasswordIsTemporary" xml:space="preserve">
     <value>The password is temporary</value>
   </data>
+  <data name="RefreshTokenExpirationTime" xml:space="preserve">
+    <value>Refresh token expiration time</value>
+  </data>
+  <data name="RefreshTokenExpirationTimeTooltip" xml:space="preserve">
+    <value>Set the refresh token duration in seconds; by default, the value is 30 minutes</value>
+  </data>
 </root>

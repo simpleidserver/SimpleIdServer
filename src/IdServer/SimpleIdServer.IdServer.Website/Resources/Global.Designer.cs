@@ -4095,6 +4095,24 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Refresh token expiration time.
+        /// </summary>
+        public static string RefreshTokenExpirationTime {
+            get {
+                return ResourceManager.GetString("RefreshTokenExpirationTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the refresh token duration in seconds; by default, the value is 30 minutes.
+        /// </summary>
+        public static string RefreshTokenExpirationTimeTooltip {
+            get {
+                return ResourceManager.GetString("RefreshTokenExpirationTimeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Registration.
         /// </summary>
         public static string Registration {

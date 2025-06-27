@@ -313,6 +313,7 @@ public class ClientsController : BaseController
             existingClient.DPOPNonceLifetimeInSeconds = request.DPOPNonceLifetimeInSeconds;
             existingClient.IsDPOPNonceRequired = request.IsDPOPNonceRequired;
             existingClient.TokenExpirationTimeInSeconds = request.TokenExpirationTimeInSeconds;
+            existingClient.RefreshTokenExpirationTimeInSeconds = request.RefreshTokenExpirationTimeInSeconds;
             existingClient.UserCookieExpirationTimeInSeconds = request.UserCookieExpirationTimeInSeconds;
             existingClient.AuthorizationCodeExpirationInSeconds = request.AuthorizationCodeExpirationInSeconds;
             existingClient.DeviceCodeExpirationInSeconds = request.DeviceCodeExpirationInSeconds;

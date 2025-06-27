@@ -128,6 +128,16 @@
                         <RadzenNumeric Name="TokenExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.TokenExpirationTimeInSeconds></RadzenNumeric>
                     </div>
                 </div>
+                <!-- Refresh token expiration time -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.RefreshTokenExpirationTimeTooltip))" />
+                        <RadzenLabel Text="@Global.RefreshTokenExpirationTime" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenNumeric Name="RefreshTokenExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.RefreshTokenExpirationTimeInSeconds></RadzenNumeric>
+                    </div>
+                </div>
                 <!-- Cookie expiration time -->
                 <div class="row mt-1">
                     <div class="col-md-2">
@@ -221,6 +231,7 @@
         public string? TokenSignedResponseAlg { get; set; } = null;
         public string? IdTokenSignedResponseAlg { get; set; } = null;
         public string? AuthorizationSignedResponseAlg { get; set; } = null;
+        public double RefreshTokenExpirationTimeInSeconds { get; set; } = 60 * 30;
         public string? AuthorizationDataTypes { get; set; } = null;
         public bool IsDPoPRequired { get; set; } = false;
         public bool IsDPoPNonceRequired { get; set; } = false;
@@ -281,6 +292,11 @@
             updateAdvancedClient.TokenExpirationTimeInSeconds = Client.TokenExpirationTimeInSeconds.Value;
         }
 
+        if(Client.RefreshTokenExpirationTimeInSeconds != null)
+        {
+            updateAdvancedClient.RefreshTokenExpirationTimeInSeconds = Client.RefreshTokenExpirationTimeInSeconds.Value;
+        }
+
         if (Client.UserCookieExpirationTimeInSeconds != null)
         {
             updateAdvancedClient.UserCookieExpirationTimeInSeconds = Client.UserCookieExpirationTimeInSeconds.Value;
@@ -311,6 +327,7 @@
             IsDPoPNonceRequired = client.IsDPoPNonceRequired,
             IsDPoPRequired = client.IsDPoPRequired,
             TokenExpirationTimeInSeconds = client.TokenExpirationTimeInSeconds,
+            RefreshTokenExpirationTimeInSeconds = client.RefreshTokenExpirationTimeInSeconds,
             UserCookieExpirationTimeInSeconds = client.UserCookieExpirationTimeInSeconds,
             AuthorizationCodeExpirationInSeconds = client.AuthorizationCodeExpirationInSeconds,
             DeviceCodeExpirationInSeconds = client.DeviceCodeExpirationInSeconds,

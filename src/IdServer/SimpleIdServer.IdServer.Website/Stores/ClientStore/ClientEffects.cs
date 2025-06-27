@@ -3,6 +3,7 @@
 using Fluxor;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 using SimpleIdServer.DPoP;
 using SimpleIdServer.IdServer.Api.Clients;
 using SimpleIdServer.IdServer.Api.Token.Handlers;
@@ -693,6 +694,7 @@ public class ClientEffects
             DPOPNonceLifetimeInSeconds = act.DPOPNonceLifetimeInSeconds,
             IsDPOPNonceRequired = act.IsDPoPNonceRequired,
             TokenExpirationTimeInSeconds = act.TokenExpirationTimeInSeconds,
+            RefreshTokenExpirationTimeInSeconds = act.RefreshTokenExpirationTimeInSeconds,
             UserCookieExpirationTimeInSeconds = act.UserCookieExpirationTimeInSeconds,
             AuthorizationCodeExpirationInSeconds = act.AuthorizationCodeExpirationInSeconds,
             DeviceCodeExpirationInSeconds = act.DeviceCodeExpirationInSeconds,
@@ -731,7 +733,8 @@ public class ClientEffects
                 PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds,
                 DpopLifetimeSeconds = act.DpopLifetimeSeconds,
                 MaxBindingMessageSize = act.MaxBindingMessageSize,
-                MaxRequestParameterLifetimeSeconds = act.MaxRequestParameterLifetimeSeconds
+                MaxRequestParameterLifetimeSeconds = act.MaxRequestParameterLifetimeSeconds,
+                RefreshTokenExpirationTimeInSeconds = act.RefreshTokenExpirationTimeInSeconds
             });
         }
         catch
@@ -1336,6 +1339,10 @@ public class UpdateAdvancedClientSettingsAction
     public bool IsDPoPNonceRequired { get; set; } = false;
     public double DPOPNonceLifetimeInSeconds { get; set; }
     public double TokenExpirationTimeInSeconds { get; set; }
+    public double RefreshTokenExpirationTimeInSeconds
+    {
+        get; set;
+    }
     public double UserCookieExpirationTimeInSeconds { get; set; }
     public int AuthorizationCodeExpirationInSeconds { get; set; }
     public int DeviceCodeExpirationInSeconds { get; set; }
@@ -1365,6 +1372,7 @@ public class UpdateAdvancedClientSettingsSuccessAction
     public int MaxRequestParameterLifetimeSeconds { get; set; }
     public int MaxBindingMessageSize { get; set; }
     public int DpopLifetimeSeconds { get; set; }
+    public double RefreshTokenExpirationTimeInSeconds { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsFailureAction

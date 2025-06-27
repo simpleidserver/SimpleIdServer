@@ -397,6 +397,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.ClientStore
             client.MaxRequestParameterLifetimeSeconds = act.MaxRequestParameterLifetimeSeconds;
             client.MaxBindingMessageSize = act.MaxBindingMessageSize;
             client.DpopLifetimeSeconds = act.DpopLifetimeSeconds;
+            client.RefreshTokenExpirationTimeInSeconds = act.RefreshTokenExpirationTimeInSeconds;
             return state with
             {
                 Client = client
