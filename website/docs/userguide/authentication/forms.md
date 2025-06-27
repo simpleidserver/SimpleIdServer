@@ -127,3 +127,36 @@ Any change you make will instantly refresh the Preview. Remember: saving CSS cha
 
 Click **Translations** in the Actions panel to view the available translations. 
 Use the Success messages and Error messages tabs to edit the corresponding translations.
+
+## Adding Captcha
+
+In authentication or registration forms, it is possible to add a "Captcha" to verify whether the user is a human and not a bot.
+To add one, navigate to the graphical editor of a form and drag the component into the form.
+
+Currently, only the reCAPTCHA2 type is supported. You can create one at the following URL: https://www.google.com/recaptcha/admin/create.
+
+Once the Captcha is created, you will need to retrieve the `site key` and the `secret key` to configure the Captcha component.
+
+![reCAPTCHA2](./imgs/reCAPTCHA2.png)
+
+In the properties of the Captcha component, enter the `site key`, then save and publish the form changes.
+
+Here is what the Login and Password authentication form will look like when the Captcha is properly configured:
+
+![pwd witch captcha](./imgs/pwdWithCaptcha.png)
+
+When a form containing the Captcha is submitted by the user, the `CaptchaValue` element is sent to the backend along with the Captcha value.
+
+This value must be validated by your identity server in the backend.
+
+To enable this validation, edit the `Program.cs` file and call the `EnableV2Recaptcha` method. You must pass the `secret key` as a parameter.
+
+Here is an example configuration:
+
+```csharp title="Program.cs"
+webApplicationBuilder.AddSidIdentityServer()
+    .EnableV2Recaptcha(c => {
+        s.Secret = "<secret>";
+    })
+```
+"
