@@ -16,10 +16,14 @@ namespace SimpleIdServer.Scim.Client
 {
     public class SCIMClient : IDisposable
     {
+        private const string DefaultAuthenticationScheme = "Bearer";
+        
         private readonly HttpClientHandler _handler = null;
         private readonly string _baseUrl;
         private HttpClient _httpClient;
         private SearchResult<ResourceTypeResult> _resourceTypes;
+
+        public string AuthenticationScheme { get; set; } = DefaultAuthenticationScheme;
 
         public SCIMClient(string baseUrl)
         {
@@ -76,7 +80,7 @@ namespace SimpleIdServer.Scim.Client
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"{GetPath(userEdp)}?{queryString}")
             };
-            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", accessToken);
+            if (!string.IsNullOrWhiteSpace(accessToken)) AddAccessTokenToAuthorizationHeader(request, accessToken);
             var httpClient = GetHttpClient();
             var httpResult = await httpClient.SendAsync(request, cancellationToken);
             httpResult.EnsureSuccessStatusCode();
@@ -95,7 +99,7 @@ namespace SimpleIdServer.Scim.Client
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"{GetPath(groupEdp)}?{queryString}")
             };
-            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", accessToken);
+            if (!string.IsNullOrWhiteSpace(accessToken)) AddAccessTokenToAuthorizationHeader(request, accessToken);
             var httpClient = GetHttpClient();
             var httpResult = await httpClient.SendAsync(request, cancellationToken);
             httpResult.EnsureSuccessStatusCode();
@@ -113,7 +117,7 @@ namespace SimpleIdServer.Scim.Client
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"{GetPath(groupEdp)}/{id}")
             };
-            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", accessToken);
+            if (!string.IsNullOrWhiteSpace(accessToken)) AddAccessTokenToAuthorizationHeader(request, accessToken);
             var httpClient = GetHttpClient();
             var httpResult = await httpClient.SendAsync(request, cancellationToken);
             httpResult.EnsureSuccessStatusCode();
@@ -131,7 +135,7 @@ namespace SimpleIdServer.Scim.Client
                 Method = HttpMethod.Get,
                 RequestUri = new Uri($"{GetPath(groupEdp)}/{id}")
             };
-            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            if (!string.IsNullOrWhiteSpace(accessToken)) AddAccessTokenToAuthorizationHeader(request, accessToken);
             var httpClient = GetHttpClient();
             var httpResult = await httpClient.SendAsync(request, cancellationToken);
             httpResult.EnsureSuccessStatusCode();
@@ -150,12 +154,21 @@ namespace SimpleIdServer.Scim.Client
                 RequestUri = new Uri(GetPath(userEdp)),
                 Content = new StringContent(jsonObject.ToJsonString(), Encoding.UTF8, "application/json")
             };
-            if (!string.IsNullOrWhiteSpace(accessToken)) request.Headers.Add("Authorization", $"Bearer {accessToken}");
+            if (!string.IsNullOrWhiteSpace(accessToken)) AddAccessTokenToAuthorizationHeader(request, accessToken);
             var httpClient = GetHttpClient();
             var httpResult = await httpClient.SendAsync(request, cancellationToken);
             if (httpResult.IsSuccessStatusCode) return null;
             var content = await httpResult.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<SCIMErrorRepresentation>(content);
+        }
+
+        private void AddAccessTokenToAuthorizationHeader(HttpRequestMessage request, string accessToken)
+        {
+            var headerValue = string.IsNullOrEmpty(AuthenticationScheme) 
+                ? accessToken 
+                : string.Join(" ", AuthenticationScheme, accessToken);
+
+            request.Headers.Add("Authorization", headerValue);
         }
 
         private HttpClient GetHttpClient()
