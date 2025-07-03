@@ -319,16 +319,4 @@ public class IdServerConfiguration
     {
         SimpleIdServer.IdServer.Config.DefaultRealms.Master
     };
-
-    private static X509SecurityKey GenerateRandomSelfSignedCertificate()
-    {
-        var ecdsa = ECDsa.Create();
-        var req = new CertificateRequest("cn=selfSigned", ecdsa, HashAlgorithmName.SHA256);
-        var cert = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(2));
-        var key = new X509SecurityKey(cert)
-        {
-            KeyId = "selfSignedId"
-        };
-        return key;
-    }
 }

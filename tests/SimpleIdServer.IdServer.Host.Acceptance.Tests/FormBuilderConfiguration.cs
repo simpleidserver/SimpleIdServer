@@ -12,6 +12,7 @@ public class FormBuilderConfiguration
         StandardPwdAuthForms.PwdForm,
         StandardPwdAuthForms.ResetForm,
         StandardPwdAuthForms.ConfirmResetForm,
+        StandardPwdAuthForms.ResetTemporaryPasswordForm,
         StandardPwdRegisterForms.PwdForm
     };
 
