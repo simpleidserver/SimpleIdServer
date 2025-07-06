@@ -2,17 +2,26 @@
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using SimpleIdServer.IdServer.Swagger.Filters;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace SimpleIdServer.IdServer.Swagger;
 
 public class IdServerSwaggerApiConfiguration
 {
-    private readonly SwaggerGenOptions _options;
+    private readonly IServiceCollection _services;
+    private readonly List<string> _xmlPaths;
+    private bool _addDocumentFilter;
 
-    internal IdServerSwaggerApiConfiguration(SwaggerGenOptions options)
+    internal IdServerSwaggerApiConfiguration(IServiceCollection services)
     {
-        _options = options;
+        _services = services;
+        _xmlPaths = new List<string>();
+    }
+
+    internal SwaggerGenOptions Options
+    {
+        get; set;
     }
 
     public IdServerSwaggerApiConfiguration IncludeDocumentation<T>()
@@ -20,13 +29,36 @@ public class IdServerSwaggerApiConfiguration
         var assm = typeof(T).Assembly.ManifestModule.Name.Replace(".dll", string.Empty);
         var xmlFile = $"{assm}.xml";
         var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-        _options.IncludeXmlComments(xmlPath);
+        _xmlPaths.Add(xmlPath);
         return this;
+    }
+
+    public IdServerSwaggerApiConfiguration ExcludeDocumentations(params string[] filters)
+    {
+        _services.AddSingleton(new ExcludeEndpointsConfig
+        {
+            SegmentsToExclude = filters.ToArray()
+        });
+        _addDocumentFilter = true;
+        return this;
+    }
+
+    internal void Configure()
+    {
+        foreach(var xmlPath in _xmlPaths)
+        {
+            Options.IncludeXmlComments(xmlPath);
+        }
+
+        if(_addDocumentFilter)
+        {
+            Options.DocumentFilter<ExcludeEndpointsDocumentFilter>();
+        }
     }
 
     internal IdServerSwaggerApiConfiguration AddOAuthSecurity()
     {
-        _options.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
+        Options.AddSecurityDefinition("OAuth2", new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.OAuth2,
             Flows = new OpenApiOAuthFlows
@@ -58,7 +90,7 @@ public class IdServerSwaggerApiConfiguration
                 }
             }
         });
-        _options.AddSecurityRequirement(new OpenApiSecurityRequirement 
+        Options.AddSecurityRequirement(new OpenApiSecurityRequirement 
         {
             {
                 new OpenApiSecurityScheme

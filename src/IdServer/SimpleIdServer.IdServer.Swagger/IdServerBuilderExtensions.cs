@@ -11,17 +11,22 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class IdServerBuilderExtensions
 {
-    public static IdServerBuilder AddSwagger(this IdServerBuilder builder, Action<IdServerSwaggerApiConfiguration> action = null)
+    public static IdServerBuilder AddSwagger(
+        this IdServerBuilder builder, 
+        Action<IdServerSwaggerApiConfiguration> action = null)
     {
+        var conf = new IdServerSwaggerApiConfiguration(builder.Services);
+        if (action != null)
+        {
+            action(conf);
+        }
+
         builder.Services.AddSwaggerGen(o =>
         {
-            o.SchemaFilter<DescribeEnumMemberValues>();
-            var conf = new IdServerSwaggerApiConfiguration(o);
+            conf.Options = o;
+            conf.Configure();
             conf.AddOAuthSecurity();
-            if(action != null)
-            {
-                action(conf);
-            }
+            o.SchemaFilter<DescribeEnumMemberValues>();
         });
         builder.Services.RemoveAll<IApiDescriptionGroupCollectionProvider>();
         builder.Services.AddSingleton<IApiDescriptionGroupCollectionProvider, SidApiDescriptionGroupCollectionProvider>();
