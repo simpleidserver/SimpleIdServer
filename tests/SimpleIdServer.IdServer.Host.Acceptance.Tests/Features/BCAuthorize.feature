@@ -29,7 +29,7 @@ Scenario: Authentication response is returned with interval because PING is used
 
 Scenario: Authentication response is returned without interval because PUSH is used
 	Given authenticate a user
-	And build expiration time and add '10' seconds
+	And build expiration time and add '60' seconds
 	And build JWS request object for client 'fortyThreeClient' and sign with the key 'keyId'
 	| Key                       | Value                                |
 	| aud                       | https://localhost:8080               |
