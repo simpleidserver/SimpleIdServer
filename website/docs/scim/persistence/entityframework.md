@@ -131,3 +131,53 @@ app.Run();
 ```
 
 This setup shows how to accommodate SQLite’s limitations while still benefitting from Entity Framework’s powerful migration and connection capabilities.
+
+## Running the EF Migration
+
+Once your SCIM server is configured and ready to use a database, you can trigger the EF Core migration by calling the `EnsureEfStoreMigrated` function in your `Program.cs` file.
+
+```csharp title="Program.cs"
+var app = builder.Build();
+app.Services.EnsureEfStoreMigrated(new List<SCIMSchema>(), new List<SCIMAttributeMapping>(), new List<Realm>());;
+```
+
+This function takes three input parameters:
+
+1. **List of SCIM Schemas** : You can use the `SCIMSchemaExtractor` class to extract SCIM schemas from a JSON file. For example:
+
+```
+var userSchema = SimpleIdServer.Scim.SCIMSchemaExtractor.Extract(Path.Combine(basePath, "UserSchema.json"), SCIMResourceTypes.User, true);
+```
+
+2. **List of attribute mappings** : These mappings define parent-child relationships between two types of representations—for example, between a `Group` and a `User`.
+
+The code snippet below sets up the relationship from a `Group` to a `User`, where the `members` property of a `group` contains a list of `users`:
+
+```csharp
+new SCIMAttributeMapping
+{
+    Id = Guid.NewGuid().ToString(),
+    SourceAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id,
+    SourceResourceType = StandardSchemas.GroupSchema.ResourceType,
+    SourceAttributeSelector = "members",
+    TargetResourceType = StandardSchemas.UserSchema.ResourceType,
+    TargetAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+    Mode = Mode.PROPAGATE_INHERITANCE
+}
+```
+
+The following code snippet sets up the inverse relationship from a `User` to a `Group`, where the `groups` property of a `user` contains a list of `groups` :
+
+```
+new SCIMAttributeMapping
+{
+    Id = Guid.NewGuid().ToString(),
+    SourceAttributeId = userSchema.Attributes.First(a => a.Name == "groups").Id,
+    SourceResourceType = StandardSchemas.UserSchema.ResourceType,
+    SourceAttributeSelector = "groups",
+    TargetResourceType = StandardSchemas.GroupSchema.ResourceType,
+    TargetAttributeId = groupSchema.Attributes.First(a => a.Name == "members").Id
+}
+```
+
+3. **List of realms** : The third parameter defines the list of realms to be created. For more information, refer to the dedicated section on realms.
