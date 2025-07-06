@@ -1,0 +1,177 @@
+{
+  "docs": [
+    "overview",
+    {
+      "type": "category",
+      "label": "Installation",
+      "items": [
+        "installation/copyandpaste",
+        "installation/docker",
+        "installation/kubernetes",
+        "installation/template"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Identity server",
+      "items": [
+        {
+          "type": "category",
+          "label": "Quick Start",
+          "items": [
+            "idserver/quickstart/createminopenidserver",
+            "idserver/quickstart/createidserverwithui"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Authentication",
+          "items": [
+            "idserver/auth/pwd",
+            "idserver/auth/email",
+            "idserver/auth/sms",
+            "idserver/auth/otp",
+            "idserver/auth/mobile",
+            "idserver/auth/webauth"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "External Authentication",
+          "items": [
+            "idserver/externalauth/idproviders",
+            "idserver/externalauth/windows"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Protocols",
+          "items": [
+            "idserver/protocols/saml",
+            "idserver/protocols/wsfederation"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Persistence",
+          "items": [
+            "idserver/persistence/index",
+            "idserver/persistence/entityframework"
+          ]
+        },
+        "idserver/swagger",
+        {
+          "type": "category",
+          "label": "CSS templates",
+          "items": [
+            "idserver/templates/radzen",
+            "idserver/templates/tailwindcss"
+          ]
+        },
+        "idserver/realm",
+        "idserver/fapi2",
+        {
+          "type": "category",
+          "label": "Logging",
+          "items": [
+            "idserver/logging/logs",
+            "idserver/logging/telemetry"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Hosting",
+          "items": [
+            "idserver/hosting/iis",
+            "idserver/hosting/nginx",
+            "idserver/hosting/loadbalancing"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Migrations",
+          "items": [
+            "idserver/migrations/duende",
+            "idserver/migrations/openiddict"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Administration website",
+      "items": [
+        "idserveradmin/quickstart",
+        "idserveradmin/realm",
+        "idserveradmin/hosting",
+        "idserveradmin/loadbalancing",
+        {
+          "type": "category",
+          "label": "Logs",
+          "items": [
+            "idserveradmin/logging/logs",
+            "idserveradmin/logging/telemetry"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "User guide",
+      "items": [
+        {
+          "type": "category",
+          "label": "Authentication",
+          "items": [
+            "userguide/authentication/acrs",
+            "userguide/authentication/forms"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "SCIM2.0",
+      "items": [
+        "scim/quickstart",
+        {
+          "type": "category",
+          "label": "Persistence",
+          "items": [
+            "scim/persistence/entityframework",
+            "scim/persistence/mongodb"
+          ]
+        },
+        "scim/swagger",
+        "scim/realm",
+        "scim/integrationevents",
+        "scim/hosting",
+        "scim/loadbalancing",
+        "scim/security"
+      ]
+    },
+    "mobileapplication"
+  ],
+  "tutorials": [
+    "tutorial/overview",
+    {
+      "type": "category",
+      "label": "Tutorial",
+      "items": [
+        "tutorial/spa",
+        "tutorial/regularweb",
+        "tutorial/protectapi",
+        "tutorial/m2m",
+        "tutorial/highlysecuredregularweb",
+        "tutorial/ciba",
+        "tutorial/grantmgt",
+        "tutorial/wsfederation",
+        "tutorial/saml",
+        "tutorial/ldap",
+        "tutorial/scim",
+        "tutorial/fastfed",
+        "tutorial/delegation"
+      ]
+    }
+  ]
+}
