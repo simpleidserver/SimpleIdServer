@@ -11,21 +11,14 @@ public static class ScimBuilderExtensions
 {
     public static ScimBuilder EnableApiKeyAuth(this ScimBuilder builder, ApiKeysConfiguration? apiKeysConfiguration= null)
     {
-        if(apiKeysConfiguration != null)
-        {
-            builder.Services.AddSingleton(ApiKeysConfiguration.Default);
-        }
-        else
-        {
-            builder.Services.AddSingleton(apiKeysConfiguration);
-        }
+        builder.Services.AddSingleton(apiKeysConfiguration ?? ApiKeysConfiguration.Default);
         
         builder.Services.AddAuthentication(ApiKeyDefaults.AuthenticationScheme)
-                .AddApiKeyInHeaderOrQueryParams<ApiKeyProvider>(options =>
-                {
-                    options.Realm = "Sample Web API";
-                    options.KeyName = "Authorization";
-                });
+            .AddApiKeyInHeaderOrQueryParams<ApiKeyProvider>(options =>
+            {
+                options.Realm = "Sample Web API";
+                options.KeyName = "Authorization";
+            });
         builder.Services.AddAuthorization(opts => opts.AddDefaultSCIMAuthorizationPolicy());
         return builder;
     }
