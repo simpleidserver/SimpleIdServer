@@ -16,7 +16,10 @@ public class SCIMSchemaExtractor
     public static SCIMSchema Extract(string filePath, string resourceType, bool isRootSchema = false)
     {
         var content = File.ReadAllText(filePath);
-        var jObj = JsonSerializer.Deserialize<JsonObject>(content);
+        var jObj = JsonSerializer.Deserialize<JsonObject>(content, new JsonSerializerOptions
+        {
+            ReadCommentHandling = JsonCommentHandling.Skip,
+        });
         var builder = SCIMSchemaBuilder.Create(jObj[StandardSCIMRepresentationAttributes.Id].ToString(), 
             jObj[StandardSCIMRepresentationAttributes.Name].ToString(), 
             resourceType, 
