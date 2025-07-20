@@ -469,6 +469,17 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
+        /// Set the refresh token usage.
+        /// </summary>
+        /// <param name="usage"></param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetRefreshTokenUsage(RefreshTokenUsages usage)
+        {
+            _client.RefreshTokenUsage = usage;
+            return this;
+        }
+
+        /// <summary>
         /// Set the access token type.
         /// </summary>
         /// <param name="type"></param>

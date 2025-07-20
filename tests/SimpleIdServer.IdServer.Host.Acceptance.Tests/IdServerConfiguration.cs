@@ -121,6 +121,7 @@ public class IdServerConfiguration
             .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "sixtyFiveClient", "secondScope")
             .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "seventyClient", "openid", "profile", "role", "email")
             .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "seventyFourClient", "openid", "profile")
+            .AddConsent(SimpleIdServer.IdServer.Constants.DefaultRealm, "seventyFiveClient", "admin", "calendar", "offline_access")
             .AddClaim("degreeType", "BachelorDegree")
             .AddClaim("degreeName", "Bachelor of Science and Arts")
             .Build();
@@ -238,6 +239,7 @@ public class IdServerConfiguration
             ClientBuilder.BuildCredentialIssuer("seventyTwoClient", "password").IsTransactionCodeRequired().AddScope(UniversityCredential).Build(),
             ClientBuilder.BuildWalletClient("seventyThreeClient", "password").Build(),
             ClientBuilder.BuildTraditionalWebsiteClient("seventyFourClient", "password", null, "http://localhost:8080").DisableConsent().AddScope(SimpleIdServer.IdServer.Config.DefaultScopes.OpenIdScope, SimpleIdServer.IdServer.Config.DefaultScopes.Profile).Build(),
+            ClientBuilder.BuildTraditionalWebsiteClient("seventyFiveClient", "password", null, "http://localhost:8080").UseClientSecretPostAuthentication().EnableTokenInResponseType().EnableRefreshTokenGrantType().SetRefreshTokenUsage(RefreshTokenUsages.ReUse).ResourceParameterIsRequired().AddScope(AdminScope, CalendarScope, SimpleIdServer.IdServer.Config.DefaultScopes.OfflineAccessScope).Build()
         };
 
     public static List<DeviceAuthCode> DeviceAuthCodes = new List<DeviceAuthCode>

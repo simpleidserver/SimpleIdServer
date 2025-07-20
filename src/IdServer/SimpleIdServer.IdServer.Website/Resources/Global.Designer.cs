@@ -4113,6 +4113,42 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à One-time use.
+        /// </summary>
+        public static string RefreshTokenUsageOneTime {
+            get {
+                return ResourceManager.GetString("RefreshTokenUsageOneTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Reusable.
+        /// </summary>
+        public static string RefreshTokenUsageReusable {
+            get {
+                return ResourceManager.GetString("RefreshTokenUsageReusable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Refresh token usage.
+        /// </summary>
+        public static string RefreshTokenUsageType {
+            get {
+                return ResourceManager.GetString("RefreshTokenUsageType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à Set the usage type for the refresh token. For confidential clients, such as backend services or console applications, you can use a reusable refresh token.
+        /// </summary>
+        public static string RefreshTokenUsageTypeTooltip {
+            get {
+                return ResourceManager.GetString("RefreshTokenUsageTypeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Registration.
         /// </summary>
         public static string Registration {

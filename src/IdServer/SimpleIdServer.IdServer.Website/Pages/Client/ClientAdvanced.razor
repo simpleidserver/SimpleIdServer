@@ -138,6 +138,20 @@
                         <RadzenNumeric Name="RefreshTokenExpirationTimeInSeconds" Class="w-100" @bind-Value=@updateAdvancedClient.RefreshTokenExpirationTimeInSeconds></RadzenNumeric>
                     </div>
                 </div>
+                <!-- Refresh token usage type -->
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <RadzenIcon Icon="info" MouseEnter="@(args => ShowTooltip(args, Global.RefreshTokenUsageTypeTooltip))" />
+                        <RadzenLabel Text="@Global.RefreshTokenUsageType" Style="padding: 0px;" />
+                    </div>
+                    <div class="col">
+                        <RadzenDropDown class="fullWidth" @bind-Value="@updateAdvancedClient.RefreshTokenUsage"
+                        Name="RefreshTokenUsageType"
+                        Data="@refreshTokenUsageRecords"
+                        TextProperty="DisplayName"
+                        ValueProperty="Type" />
+                    </div>
+                </div>
                 <!-- Cookie expiration time -->
                 <div class="row mt-1">
                     <div class="col-md-2">
@@ -225,6 +239,11 @@
 
     IEnumerable<string> selectedResponseTypes { get; set; } = new List<string>();
     IEnumerable<string> responseTypes { get; set; } = new List<string>();
+    IEnumerable<RefreshTokenUsageRecord> refreshTokenUsageRecords = new List<RefreshTokenUsageRecord>
+    {
+        new RefreshTokenUsageRecord { Type = RefreshTokenUsages.OneTimeOnly, DisplayName = Global.RefreshTokenUsageOneTime },
+        new RefreshTokenUsageRecord { Type = RefreshTokenUsages.ReUse, DisplayName = Global.RefreshTokenUsageReusable }
+    };
 
     record UpdateAdvancedClient
     {
@@ -245,6 +264,13 @@
         public int DpopLifetimeSeconds { get; set; } = 300;
         public int MaxBindingMessageSize { get; set; } = 150;
         public int MaxRequestParameterLifetimeSeconds { get; set; } = 300;
+        public RefreshTokenUsages RefreshTokenUsage { get; set; } = RefreshTokenUsages.OneTimeOnly;
+    }
+
+    record RefreshTokenUsageRecord
+    {
+        public RefreshTokenUsages Type { get; set; }
+        public string DisplayName { get; set; }
     }
 
     UpdateAdvancedClient updateAdvancedClient = new UpdateAdvancedClient();
@@ -309,6 +335,7 @@
         updateAdvancedClient.MaxRequestParameterLifetimeSeconds = Client.MaxRequestParameterLifetimeSeconds;
         updateAdvancedClient.MaxBindingMessageSize = Client.MaxBindingMessageSize;
         updateAdvancedClient.DpopLifetimeSeconds = Client.DpopLifetimeSeconds;
+        updateAdvancedClient.RefreshTokenUsage = Client.RefreshTokenUsage;
         selectedResponseTypes = Client.ResponseTypes.Where(r => !string.IsNullOrWhiteSpace(r));
     }
 
@@ -335,7 +362,8 @@
             PARExpirationTimeInSeconds = client.PARExpirationTimeInSeconds,
             MaxRequestParameterLifetimeSeconds = client.MaxRequestParameterLifetimeSeconds,
             MaxBindingMessageSize = client.MaxBindingMessageSize,
-            DpopLifetimeSeconds = client.DpopLifetimeSeconds
+            DpopLifetimeSeconds = client.DpopLifetimeSeconds,
+            RefreshTokenUsage = client.RefreshTokenUsage
         });
     }
 

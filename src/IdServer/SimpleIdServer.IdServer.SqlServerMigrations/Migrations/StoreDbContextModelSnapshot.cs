@@ -1033,6 +1033,10 @@ namespace SimpleIdServer.IdServer.SqlServerMigrations.Migrations
                         .HasColumnType("float")
                         .HasAnnotation("Relational:JsonPropertyName", "refresh_token_expiration_time_seconds");
 
+                    b.Property<int>("RefreshTokenUsage")
+                        .HasColumnType("int")
+                        .HasAnnotation("Relational:JsonPropertyName", "refresh_token_usage");
+
                     b.Property<string>("RegistrationAccessToken")
                         .HasColumnType("nvarchar(max)")
                         .HasAnnotation("Relational:JsonPropertyName", "registration_access_token");

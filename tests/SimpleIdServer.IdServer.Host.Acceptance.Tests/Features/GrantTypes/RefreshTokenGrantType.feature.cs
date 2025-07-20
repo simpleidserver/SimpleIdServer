@@ -198,6 +198,142 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
+        [Xunit.SkippableFactAttribute(DisplayName="the same refresh token can be used twice")]
+        [Xunit.TraitAttribute("FeatureTitle", "RefreshTokenGrantType")]
+        [Xunit.TraitAttribute("Description", "the same refresh token can be used twice")]
+        public void TheSameRefreshTokenCanBeUsedTwice()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("the same refresh token can be used twice", null, tagsOfScenario, argumentsOfScenario, featureTags);
+#line 44
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            if ((TagHelper.ContainsIgnoreTag(tagsOfScenario) || TagHelper.ContainsIgnoreTag(featureTags)))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 45
+ testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table341 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table341.AddRow(new string[] {
+                            "response_type",
+                            "code"});
+                table341.AddRow(new string[] {
+                            "client_id",
+                            "seventyFiveClient"});
+                table341.AddRow(new string[] {
+                            "state",
+                            "state"});
+                table341.AddRow(new string[] {
+                            "response_mode",
+                            "query"});
+                table341.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+                table341.AddRow(new string[] {
+                            "nonce",
+                            "nonce"});
+                table341.AddRow(new string[] {
+                            "resource",
+                            "https://cal.example.com"});
+                table341.AddRow(new string[] {
+                            "scope",
+                            "offline_access"});
+#line 46
+ testRunner.When("execute HTTP GET request \'https://localhost:8080/authorization\'", ((string)(null)), table341, "When ");
+#line hidden
+#line 57
+ testRunner.And("extract parameter \'code\' from redirect url", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table342 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table342.AddRow(new string[] {
+                            "client_id",
+                            "seventyFiveClient"});
+                table342.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table342.AddRow(new string[] {
+                            "grant_type",
+                            "authorization_code"});
+                table342.AddRow(new string[] {
+                            "code",
+                            "$code$"});
+                table342.AddRow(new string[] {
+                            "redirect_uri",
+                            "http://localhost:8080"});
+#line 59
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table342, "And ");
+#line hidden
+#line 67
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 68
+ testRunner.And("extract parameter \'$.refresh_token\' from JSON body into \'refreshToken\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table343 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table343.AddRow(new string[] {
+                            "client_id",
+                            "seventyFiveClient"});
+                table343.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table343.AddRow(new string[] {
+                            "grant_type",
+                            "refresh_token"});
+                table343.AddRow(new string[] {
+                            "refresh_token",
+                            "$refreshToken$"});
+#line 70
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table343, "And ");
+#line hidden
+                TechTalk.SpecFlow.Table table344 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Key",
+                            "Value"});
+                table344.AddRow(new string[] {
+                            "client_id",
+                            "seventyFiveClient"});
+                table344.AddRow(new string[] {
+                            "client_secret",
+                            "password"});
+                table344.AddRow(new string[] {
+                            "grant_type",
+                            "refresh_token"});
+                table344.AddRow(new string[] {
+                            "refresh_token",
+                            "$refreshToken$"});
+#line 77
+ testRunner.And("execute HTTP POST request \'https://localhost:8080/token\'", ((string)(null)), table344, "And ");
+#line hidden
+#line 84
+ testRunner.And("extract JSON from body", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 86
+ testRunner.Then("JSON \'scope\'=\'admin calendar offline_access\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 87
+ testRunner.And("access_token audience contains \'https://cal.example.com\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 88
+ testRunner.And("access_token contains the claim \'scope\'=\'admin\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+#line 89
+ testRunner.And("access_token contains the claim \'scope\'=\'calendar\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
         [System.CodeDom.Compiler.GeneratedCodeAttribute("TechTalk.SpecFlow", "3.9.0.0")]
         [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
         public class FixtureData : System.IDisposable

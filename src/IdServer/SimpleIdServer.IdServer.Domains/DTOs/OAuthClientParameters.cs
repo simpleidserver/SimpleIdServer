@@ -104,5 +104,6 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string MaxRequestParameterLifetimeSeconds = "max_request_parameter_lifetime_seconds";
         public const string MaxBindingMessageSize = "max_binding_message_size";
         public const string DpopLifetimeSeconds = "dpop_lifetime_seconds";
+        public const string RefreshTokenUsage = "refresh_token_usage";
     }
 }

@@ -322,6 +322,7 @@ public class ClientsController : BaseController
             existingClient.MaxRequestParameterLifetimeSeconds = request.MaxRequestParameterLifetimeSeconds;
             existingClient.MaxBindingMessageSize = request.MaxBindingMessageSize;
             existingClient.DpopLifetimeSeconds = request.DpopLifetimeSeconds;
+            existingClient.RefreshTokenUsage = request.RefreshTokenUsage;
         }
     }
 

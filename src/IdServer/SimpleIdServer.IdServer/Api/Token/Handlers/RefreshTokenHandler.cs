@@ -108,9 +108,13 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                     var jwsPayload = JsonObject.Parse(tokenResult.Data).AsObject();
                     var originalJwsPayload = tokenResult.OriginalData == null ? null : JsonObject.Parse(tokenResult.OriginalData).AsObject();
                     if(originalJwsPayload != null)
+                    {
                         context.SetOriginalRequest(originalJwsPayload);
+                    }
                     else
+                    {
                         context.SetOriginalRequest(jwsPayload);
+                    }
 
                     var clientId = jwsPayload.GetClientIdFromAuthorizationRequest();
                     if (string.IsNullOrWhiteSpace(clientId))
@@ -146,7 +150,11 @@ namespace SimpleIdServer.IdServer.Api.Token.Handlers
                         return BuildError(HttpStatusCode.BadRequest, ErrorCodes.INVALID_GRANT, Global.RefreshTokenNotIssuedByClient);
                     }
 
-                    await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
+                    if (oauthClient.RefreshTokenUsage == RefreshTokenUsages.OneTimeOnly)
+                    {
+                        await _grantedTokenHelper.RemoveRefreshToken(refreshToken, cancellationToken);
+                    }
+
                     var scopes = GetScopes(originalJwsPayload, jwsPayload);
                     var resources = GetResources(originalJwsPayload, jwsPayload);
                     var claims = GetClaims(originalJwsPayload, jwsPayload);

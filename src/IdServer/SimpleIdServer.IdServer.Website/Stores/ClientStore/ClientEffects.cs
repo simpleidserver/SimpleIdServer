@@ -702,7 +702,8 @@ public class ClientEffects
             PARExpirationTimeInSeconds = act.PARExpirationTimeInSeconds,
             DpopLifetimeSeconds = act.DpopLifetimeSeconds,
             MaxBindingMessageSize = act.MaxBindingMessageSize,
-            MaxRequestParameterLifetimeSeconds = act.MaxRequestParameterLifetimeSeconds
+            MaxRequestParameterLifetimeSeconds = act.MaxRequestParameterLifetimeSeconds,
+            RefreshTokenUsage = act.RefreshTokenUsage
         };
         var requestMessage = new HttpRequestMessage
         {
@@ -734,7 +735,8 @@ public class ClientEffects
                 DpopLifetimeSeconds = act.DpopLifetimeSeconds,
                 MaxBindingMessageSize = act.MaxBindingMessageSize,
                 MaxRequestParameterLifetimeSeconds = act.MaxRequestParameterLifetimeSeconds,
-                RefreshTokenExpirationTimeInSeconds = act.RefreshTokenExpirationTimeInSeconds
+                RefreshTokenExpirationTimeInSeconds = act.RefreshTokenExpirationTimeInSeconds,
+                RefreshTokenUsage = act.RefreshTokenUsage
             });
         }
         catch
@@ -1351,6 +1353,7 @@ public class UpdateAdvancedClientSettingsAction
     public int MaxRequestParameterLifetimeSeconds { get; set; }
     public int MaxBindingMessageSize { get; set; }
     public int DpopLifetimeSeconds { get; set; }
+    public RefreshTokenUsages RefreshTokenUsage { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsSuccessAction
@@ -1373,6 +1376,7 @@ public class UpdateAdvancedClientSettingsSuccessAction
     public int MaxBindingMessageSize { get; set; }
     public int DpopLifetimeSeconds { get; set; }
     public double RefreshTokenExpirationTimeInSeconds { get; set; }
+    public RefreshTokenUsages RefreshTokenUsage { get; set; }
 }
 
 public class UpdateAdvancedClientSettingsFailureAction

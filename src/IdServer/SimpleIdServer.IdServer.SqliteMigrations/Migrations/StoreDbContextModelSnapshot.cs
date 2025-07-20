@@ -1020,6 +1020,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("REAL")
                         .HasAnnotation("Relational:JsonPropertyName", "refresh_token_expiration_time_seconds");
 
+                    b.Property<int>("RefreshTokenUsage")
+                        .HasColumnType("INTEGER")
+                        .HasAnnotation("Relational:JsonPropertyName", "refresh_token_usage");
+
                     b.Property<string>("RegistrationAccessToken")
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "registration_access_token");

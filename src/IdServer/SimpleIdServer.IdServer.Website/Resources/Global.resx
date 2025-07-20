@@ -2211,4 +2211,16 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="RefreshTokenExpirationTimeTooltip" xml:space="preserve">
     <value>Set the refresh token duration in seconds; by default, the value is 30 minutes</value>
   </data>
+  <data name="RefreshTokenUsageOneTime" xml:space="preserve">
+    <value>One-time use</value>
+  </data>
+  <data name="RefreshTokenUsageReusable" xml:space="preserve">
+    <value>Reusable</value>
+  </data>
+  <data name="RefreshTokenUsageType" xml:space="preserve">
+    <value>Refresh token usage</value>
+  </data>
+  <data name="RefreshTokenUsageTypeTooltip" xml:space="preserve">
+    <value>Set the usage type for the refresh token. For confidential clients, such as backend services or console applications, you can use a reusable refresh token</value>
+  </data>
 </root>

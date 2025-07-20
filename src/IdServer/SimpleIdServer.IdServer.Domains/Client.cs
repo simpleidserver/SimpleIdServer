@@ -591,6 +591,11 @@ namespace SimpleIdServer.IdServer.Domains
                 SerializedParameters = JsonSerializer.Serialize(value);
             }
         }
+        [JsonPropertyName(OAuthClientParameters.RefreshTokenUsage)]
+        public RefreshTokenUsages RefreshTokenUsage
+        {
+            get; set;
+        }
         [JsonIgnore]
         public string? SerializedParameters { get; set; } = null;
         /// <summary>

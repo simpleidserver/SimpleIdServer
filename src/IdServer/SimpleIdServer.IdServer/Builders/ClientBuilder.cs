@@ -32,6 +32,7 @@ namespace SimpleIdServer.IdServer.Builders
                 RedirectionUrls = redirectUrls,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
+                RefreshTokenUsage = RefreshTokenUsages.ReUse,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE },
                 Secrets = new List<ClientSecret>
                 {
@@ -61,6 +62,7 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientType = ClientTypes.WALLET,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
+                RefreshTokenUsage = RefreshTokenUsages.OneTimeOnly,
                 Secrets = new List<ClientSecret>
                 {
                     ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
@@ -90,6 +92,7 @@ namespace SimpleIdServer.IdServer.Builders
                 ClientType = ClientTypes.MACHINE,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
+                RefreshTokenUsage = RefreshTokenUsages.ReUse,
                 Secrets = new List<ClientSecret>
                 {
                     ClientSecret.Create(clientSecret, HashAlgs.PLAINTEXT)
@@ -120,6 +123,7 @@ namespace SimpleIdServer.IdServer.Builders
                 RedirectionUrls = redirectUrls,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
+                RefreshTokenUsage = RefreshTokenUsages.OneTimeOnly,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE },
                 Secrets = new List<ClientSecret>
                 {
@@ -190,6 +194,7 @@ namespace SimpleIdServer.IdServer.Builders
                 BCUserCodeParameter = false,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
+                RefreshTokenUsage = RefreshTokenUsages.OneTimeOnly,
                 Secrets = new List<ClientSecret>
                 {
                     ClientSecret.Create(Guid.NewGuid().ToString(), HashAlgs.PLAINTEXT)
@@ -215,6 +220,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 ClientId = clientId,
                 ClientType = ClientTypes.DEVICE,
+                RefreshTokenUsage = RefreshTokenUsages.OneTimeOnly,
                 TokenEndPointAuthMethod = OAuthClientSecretPostAuthenticationHandler.AUTH_METHOD,
                 IdTokenSignedResponseAlg = SecurityAlgorithms.EcdsaSha256,
                 CreateDateTime = DateTime.UtcNow,
@@ -247,6 +253,7 @@ namespace SimpleIdServer.IdServer.Builders
                 IsPublic = true,
                 ClientType = ClientTypes.MOBILE,
                 RedirectionUrls = redirectUrls,
+                RefreshTokenUsage = RefreshTokenUsages.OneTimeOnly,
                 CreateDateTime = DateTime.UtcNow,
                 UpdateDateTime = DateTime.UtcNow,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE },
@@ -278,6 +285,7 @@ namespace SimpleIdServer.IdServer.Builders
                 RedirectionUrls = redirectUrls,
                 ClientType = ClientTypes.SPA,
                 CreateDateTime = DateTime.UtcNow,
+                RefreshTokenUsage = RefreshTokenUsages.OneTimeOnly,
                 UpdateDateTime = DateTime.UtcNow,
                 IsPublic = true,
                 ResponseTypes = new List<string> { AuthorizationCodeResponseTypeHandler.RESPONSE_TYPE },
