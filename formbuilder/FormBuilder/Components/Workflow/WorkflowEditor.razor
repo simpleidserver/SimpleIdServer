@@ -442,14 +442,23 @@
     private void UpdateLink(WorkflowStep newStep, NodeModel sourceNodeModel, WorkflowLink sourceLink = null)
     {
         var sourceWorkflowStepNode = sourceNodeModel as WorkflowStepNode;
-        if (sourceWorkflowStepNode != null && sourceLink != null)
+        var conditionNode = sourceNodeModel as WorkflowConditionNode;
+        if (sourceLink != null)
         {
             var link = Context.Definition.Workflow.Links.SingleOrDefault(l => l.Id == sourceLink.Id);
             if(link != null) 
             {
-                link.Targets.First().TargetStepId = newStep.Id;
+                if(sourceWorkflowStepNode != null)
+                {
+                    link.Targets.First().TargetStepId = newStep.Id;
+                }
+                else if(conditionNode != null)
+                {
+                    link.Targets.Last().TargetStepId = newStep.Id;
+                }
             }
         }
+
     }
 
     private void RefreshAvailableLayouts()
