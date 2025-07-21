@@ -61,7 +61,9 @@ public class RegistrationController : BaseController
 		var cookieName = _options.GetRegistrationCookieName(_realmStore.Realm);
 		var allForms = await _formStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Registration, CancellationToken.None);
 		var registrationProgressId = Guid.NewGuid().ToString();
-		var workflowSteps = workflow.Steps.Select(s => allForms.Single(f => f.CorrelationId == s.FormRecordCorrelationId)).Where(s => s.ActAsStep);
+		var workflowSteps = workflow.Steps
+			.Where(s => s.FormRecordCorrelationId != FormBuilder.Constants.EmptyStep.CorrelationId)
+			.Select(s => allForms.Single(f => f.CorrelationId == s.FormRecordCorrelationId));
 		var amr = workflowSteps.First().Name;
         var registrationProgress = new UserRegistrationProgress 
 		{ 
