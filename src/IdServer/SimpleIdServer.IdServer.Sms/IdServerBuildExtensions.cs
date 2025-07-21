@@ -28,6 +28,7 @@ public static class IdServerBuildExtensions
         idServerBuilder.Services.AddTransient<IDataSeeder, InitSmsAuthDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, UpdateSmsTranslationsDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitSmsConfigurationDefDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, UpdateTargetsSmsWorkflowsDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add<IdServerSmsOptions>();
         if (isDefaultAuthMethod)
         {

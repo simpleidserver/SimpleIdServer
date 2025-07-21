@@ -27,6 +27,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, OtpAuthWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitOtpAuthDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, UpdateOtpTranslationsDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, UpdateTargetsOtpWorkflowsDataseeder>();
         if (isDefaultAuthMethod)
         {
             idServerBuilder.Services.Configure<IdServerHostOptions>(o =>

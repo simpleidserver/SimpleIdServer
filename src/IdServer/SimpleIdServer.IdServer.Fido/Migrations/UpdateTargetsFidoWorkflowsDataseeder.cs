@@ -7,14 +7,14 @@ using FormBuilder.Models;
 using FormBuilder.Repositories;
 using SimpleIdServer.IdServer.Stores;
 
-namespace SimpleIdServer.IdServer.Pwd.Migrations
+namespace SimpleIdServer.IdServer.Fido.Migrations
 {
-    public class UpdatePwdWorkflowsDataseeder : BaseAfterDeploymentDataSeeder
+    public class UpdateTargetsFidoWorkflowsDataseeder : BaseAfterDeploymentDataSeeder
     {
         private readonly ITransactionBuilder _transactionBuilder;
         private readonly IWorkflowStore _workflowStore;
 
-        public UpdatePwdWorkflowsDataseeder(
+        public UpdateTargetsFidoWorkflowsDataseeder(
             ITransactionBuilder transactionBuilder,
             IWorkflowStore workflowStore,
             IDataSeederExecutionHistoryRepository dataSeederExecutionHistoryRepository) : base(dataSeederExecutionHistoryRepository)
@@ -24,15 +24,16 @@ namespace SimpleIdServer.IdServer.Pwd.Migrations
         }
 
 
-        public override string Name => nameof(UpdatePwdWorkflowsDataseeder);
+        public override string Name => nameof(UpdateTargetsFidoWorkflowsDataseeder);
 
         protected override async Task Execute(CancellationToken cancellationToken)
         {
             using (var transaction = _transactionBuilder.Build())
             {
-                await TryUpdate(Constants.DefaultRealm, StandardPwdAuthWorkflows.DefaultPwdWorkflow, cancellationToken);
-                await TryUpdate(Constants.DefaultRealm, StandardPwdAuthWorkflows.DefaultConfirmResetPwdWorkflow, cancellationToken);
-                await TryUpdate(Constants.DefaultRealm, StandardPwdAuthWorkflows.DefaultCompletePwdAuthWorkflow, cancellationToken);
+                await TryUpdate(IdServer.Constants.DefaultRealm, StandardFidoAuthWorkflows.DefaultWebauthnWorkflow, cancellationToken);
+                await TryUpdate(IdServer.Constants.DefaultRealm, StandardFidoAuthWorkflows.DefaultMobileWorkflow, cancellationToken);
+                await TryUpdate(IdServer.Constants.DefaultRealm, StandardFidoRegistrationWorkflows.WebauthnWorkflow, cancellationToken);
+                await TryUpdate(IdServer.Constants.DefaultRealm, StandardFidoRegistrationWorkflows.MobileWorkflow, cancellationToken);
                 await transaction.Commit(cancellationToken);
             }
         }

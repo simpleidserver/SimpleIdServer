@@ -32,6 +32,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IDataSeeder, InitEmailAuthDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, UpdateEmailTranslationsDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitEmailConfigurationDefDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, UpdateTargetsEmailWorkflowsDataseeder>();
         idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerEmailOptions));
         if (isDefaultAuthMethod)
         {
