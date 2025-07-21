@@ -95,7 +95,7 @@ public static class StandardPwdAuthWorkflows
             .AddLinkHttpRequestAction(StandardPwdAuthForms.PwdForm, resetStep ?? FormBuilder.Constants.EmptyStep, StandardPwdAuthForms.pwdForgetBtnId, "Forget", new WorkflowLinkHttpRequestParameter
             {
                 Method = HttpMethods.GET,
-                Target = "/{realm}/pwd/Reset",
+                Target = "/{realm}/pwd/Reset?returnUrl={returnUrl}",
                 Transformers = new List<ITransformerParameters>
                 {
                     new RegexTransformerParameters()

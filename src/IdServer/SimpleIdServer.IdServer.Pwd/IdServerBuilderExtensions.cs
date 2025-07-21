@@ -40,6 +40,9 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IDataSeeder, UpdatePwdTranslationsDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitPwdConfigurationDefDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, UpdatePwdFormDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, UpdatePwdWorkflows4Dataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, AddMissingResetTmpPwdAuthDataseeder>();
+        idServerBuilder.Services.AddTransient<IDataSeeder, TransformNulltranslationToEmptyArrayDataseeder>();
         idServerBuilder.Services.AddTransient<IFakerDataService, PwdAuthFakerService>();
         idServerBuilder.Services.AddTransient<IPasswordValidationService, PasswordValidationService>();
         idServerBuilder.AutomaticConfigurationOptions.Add(typeof(IdServerPasswordOptions));

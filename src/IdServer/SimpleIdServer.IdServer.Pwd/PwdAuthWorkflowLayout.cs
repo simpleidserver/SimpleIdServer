@@ -147,7 +147,7 @@ public class PwdAuthWorkflowLayout : IWorkflowLayoutService
                     ActionParameter = JsonSerializer.Serialize(new WorkflowLinkHttpRequestParameter
                     {
                         Method = HttpMethods.GET,
-                        Target = "/{realm}/pwd/Reset",
+                        Target = "/{realm}/pwd/Reset?returnUrl={returnUrl}",
                         Transformers = new List<ITransformerParameters>
                         {
                             new RegexTransformerParameters()
