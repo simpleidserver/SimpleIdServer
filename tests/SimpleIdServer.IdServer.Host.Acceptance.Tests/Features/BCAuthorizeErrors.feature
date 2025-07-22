@@ -101,7 +101,7 @@ Scenario: request parameter must not be expired (request)
 
 	Then JSON 'error'='invalid_request'
 
-Scenario: lifetime of the request must not exceed 300 seconds (request)
+Scenario: lifetime of the request must not exceed 6000 seconds (request)
 	Given authenticate a user
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key | Value                  |
@@ -119,11 +119,11 @@ Scenario: lifetime of the request must not exceed 300 seconds (request)
 	And extract JSON from body
 
 	Then JSON 'error'='invalid_request'
-	And JSON 'error_description'='the maximum lifetime of the request is '300' seconds'
+	And JSON 'error_description'='the maximum lifetime of the request is '6000' seconds'
 
 Scenario: request parameter must contains jti (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key | Value                  |
 	| aud | https://localhost:8080 |
@@ -143,7 +143,7 @@ Scenario: request parameter must contains jti (request)
 
 Scenario: at least one token hint must be passed (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key | Value                  |
 	| aud | https://localhost:8080 |
@@ -164,7 +164,7 @@ Scenario: at least one token hint must be passed (request)
 
 Scenario: user_code is required when backchannel_user_code_parameter is true (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key           | Value                  |
 	| aud           | https://localhost:8080 |
@@ -186,7 +186,7 @@ Scenario: user_code is required when backchannel_user_code_parameter is true (re
 
 Scenario: scope or authorization_details parameter is required (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key           | Value                  |
 	| aud           | https://localhost:8080 |
@@ -209,7 +209,7 @@ Scenario: scope or authorization_details parameter is required (request)
 
 Scenario: authorization_details type is required (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key                   | Value                      |
 	| aud                   | https://localhost:8080     |
@@ -233,7 +233,7 @@ Scenario: authorization_details type is required (request)
 
 Scenario: authorization_details type must be valid (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key                   | Value                      |
 	| aud                   | https://localhost:8080     |
@@ -257,7 +257,7 @@ Scenario: authorization_details type must be valid (request)
 
 Scenario: scope must be valid (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key           | Value                  |
 	| aud           | https://localhost:8080 |
@@ -281,7 +281,7 @@ Scenario: scope must be valid (request)
 
 Scenario: client_notification_token parameter is required (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key           | Value                  |
 	| aud           | https://localhost:8080 |
@@ -305,7 +305,7 @@ Scenario: client_notification_token parameter is required (request)
 
 Scenario: client_notification_token size must be greater than 128 bits (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key                       | Value                  |
 	| aud                       | https://localhost:8080 |
@@ -330,7 +330,7 @@ Scenario: client_notification_token size must be greater than 128 bits (request)
 
 Scenario: id_token_hint must be valid (request)
 	Given authenticate a user
-	And build expiration time and add '120' seconds
+	And build expiration time and add '5000' seconds
 	And build JWS request object for client 'fortyTwoClient' and sign with the key 'keyId'
 	| Key                       | Value                                |
 	| aud                       | https://localhost:8080               |

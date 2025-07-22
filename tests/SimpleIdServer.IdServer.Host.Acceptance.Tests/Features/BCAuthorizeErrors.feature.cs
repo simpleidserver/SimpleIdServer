@@ -427,14 +427,14 @@ this.ScenarioInitialize(scenarioInfo);
             this.ScenarioCleanup();
         }
         
-        [Xunit.SkippableFactAttribute(DisplayName="lifetime of the request must not exceed 300 seconds (request)")]
+        [Xunit.SkippableFactAttribute(DisplayName="lifetime of the request must not exceed 6000 seconds (request)")]
         [Xunit.TraitAttribute("FeatureTitle", "BCAuthorizeErrors")]
-        [Xunit.TraitAttribute("Description", "lifetime of the request must not exceed 300 seconds (request)")]
-        public void LifetimeOfTheRequestMustNotExceed300SecondsRequest()
+        [Xunit.TraitAttribute("Description", "lifetime of the request must not exceed 6000 seconds (request)")]
+        public void LifetimeOfTheRequestMustNotExceed6000SecondsRequest()
         {
             string[] tagsOfScenario = ((string[])(null));
             System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
-            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("lifetime of the request must not exceed 300 seconds (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("lifetime of the request must not exceed 6000 seconds (request)", null, tagsOfScenario, argumentsOfScenario, featureTags);
 #line 104
 this.ScenarioInitialize(scenarioInfo);
 #line hidden
@@ -489,7 +489,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Then("JSON \'error\'=\'invalid_request\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
 #line hidden
 #line 122
- testRunner.And("JSON \'error_description\'=\'the maximum lifetime of the request is \'300\' seconds\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("JSON \'error_description\'=\'the maximum lifetime of the request is \'6000\' seconds\'", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
             }
             this.ScenarioCleanup();
@@ -517,7 +517,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 126
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table63 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -585,7 +585,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 146
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table65 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -656,7 +656,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 167
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table67 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -730,7 +730,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 189
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table69 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -807,7 +807,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 212
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table71 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -887,7 +887,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 236
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table73 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -967,7 +967,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 260
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table75 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1047,7 +1047,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 284
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table77 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1127,7 +1127,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 308
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table79 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",
@@ -1211,7 +1211,7 @@ this.ScenarioInitialize(scenarioInfo);
  testRunner.Given("authenticate a user", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
 #line hidden
 #line 333
- testRunner.And("build expiration time and add \'120\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
+ testRunner.And("build expiration time and add \'5000\' seconds", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
                 TechTalk.SpecFlow.Table table81 = new TechTalk.SpecFlow.Table(new string[] {
                             "Key",

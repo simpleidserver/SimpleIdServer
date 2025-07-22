@@ -469,6 +469,17 @@ namespace SimpleIdServer.IdServer.Builders
         }
 
         /// <summary>
+        /// Set the maximum lifetime in seconds for request parameters.
+        /// </summary>
+        /// <param name="i">Maximum lifetime in seconds</param>
+        /// <returns></returns>
+        public TraditionalWebsiteClientBuilder SetMaxRequestParameterLifetimeSeconds(int i)
+        {
+            _client.MaxRequestParameterLifetimeSeconds = i;
+            return this;
+        }
+
+        /// <summary>
         /// Set the refresh token usage.
         /// </summary>
         /// <param name="usage"></param>

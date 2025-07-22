@@ -52,14 +52,22 @@ task clean -depends fetchSubComponent {
 }
 
 task dockerBuild -depends clean {
-	$Env:TAG = GetDockerVersion
+	$Env:TAG = GetDockerVersion	
+	if (Get-Command "docker-compose" -ErrorAction SilentlyContinue) {
+		$composeCmd = "docker-compose"
+	} elseif (Get-Command "docker" -ErrorAction SilentlyContinue) {
+		$composeCmd = "docker compose"
+	} else {
+		throw "Neither 'docker-compose' nor 'docker compose' is available on this system."
+	}
+	
 	echo "Docker version: $Env:TAG"
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Startup\SimpleIdServer.IdServer.Startup.csproj -c $config -o $result_dir\docker\IdServer }
 	exec { dotnet publish $source_dir\IdServer\SimpleIdServer.IdServer.Website.Startup\SimpleIdServer.IdServer.Website.Startup.csproj -c $config -o $result_dir\docker\IdServerWebsite }
 	exec { dotnet publish $source_dir\Scim\SimpleIdServer.Scim.Startup\SimpleIdServer.Scim.Startup.csproj -c $config -o $result_dir\docker\Scim }
 	exec { dotnet publish $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Startup\SimpleIdServer.CredentialIssuer.Startup.csproj -c $config -o $result_dir\docker\CredentialIssuer }
-	exec { dotnet publish $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website.Startup\SimpleIdServer.CredentialIssuer.Website.Startup.csproj -c $config -o $result_dir\docker\CredentialIssuerWebsite }
-	exec { docker-compose -f local-docker-compose.yml build --no-cache }
+	exec { dotnet publish $source_dir\CredentialIssuer\SimpleIdServer.CredentialIssuer.Website.Startup\SimpleIdServer.CredentialIssuer.Website.Startup.csproj -c $config -o $result_dir\docker\CredentialIssuerWebsite }	
+	exec { iex "$composeCmd -f local-docker-compose.yml build --no-cache" }
 }
 
 task dockerPublish -depends dockerBuild {
