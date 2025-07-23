@@ -166,7 +166,7 @@ task compile -depends clean {
 	exec { dotnet --version }
 	exec { dotnet --info }
 
-	exec { msbuild -version }
+	exec { dotnet msbuild -version }
 	
 	exec { dotnet build $base_dir\json-ld.net\JsonLD.sln -c $config --version-suffix=$buildSuffix }
     exec { dotnet build .\SimpleIdServer.IdServer.Host.sln -c $config --version-suffix=$buildSuffix }
