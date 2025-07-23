@@ -21,5 +21,7 @@
 	<PackageReference Include="SimpleIdServer.Scim" Version="6.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="6.0.*-*" />
 	<PackageReference Include="SimpleIdServer.Scim.SqliteMigrations" Version="6.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.ApiKeyAuth" Version="6.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.MassTransit" Version="6.0.*-*" />
   </ItemGroup>
 </Project>
