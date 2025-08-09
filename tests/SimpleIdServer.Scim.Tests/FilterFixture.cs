@@ -37,6 +37,11 @@ namespace SimpleIdServer.Scim.Tests
             {
                 Id = Guid.NewGuid().ToString()
             };
+            var fourthRepresentation = new SCIMRepresentation
+            {
+                Id = Guid.NewGuid().ToString(),
+                LastModified = DateTime.Parse("2010-05-13T04:42:34Z")
+            };
             representation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("title"), schema.Id)
             {
                 Id = Guid.NewGuid().ToString(),
@@ -112,11 +117,22 @@ namespace SimpleIdServer.Scim.Tests
             {
                 ValueString = "foo.com"
             });
+            fourthRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userName"), schema.Id)
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "suraj"
+            });
+            fourthRepresentation.AddAttribute(new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), schema.GetAttribute("userType"), schema.Id)
+            {
+                Id = Guid.NewGuid().ToString(),
+                ValueString = "OtherValue"
+            });
             var representations = new List<SCIMRepresentation>
             {
                 representation,
                 secondRepresentation,
-                thirdRepresentation
+                thirdRepresentation,
+                fourthRepresentation
             };
 
             var firstResult = ParseAndExecuteFilter(representations.AsQueryable(), "userName eq \"bjensen\"", customSchema);
@@ -144,19 +160,20 @@ namespace SimpleIdServer.Scim.Tests
             var twentyTwoResult = ParseAndExecuteFilter(representations.AsQueryable(), "(userName eq \"bjensen\")", customSchema);
             var twentyThreeResult = ParseAndExecuteFilter(representations.AsQueryable(), "(userName eq \"bjensen\" or userName eq \"Jule\")", customSchema);
             var twentyFourResult = ParseAndExecuteFilter(representations.AsQueryable(), "(userName eq \"bjensen\") and emails[type eq \"work\" and value co \"example.org\"] and phoneNumbers[primary eq \"true\"]", customSchema);
-            
+            var twentyFiveResult = ParseAndExecuteFilter(representations.AsQueryable(), "(username eq suraj) and ((userType eq OtherValue) or (userType eq Public))", customSchema);
+
             Assert.Equal(1, firstResult.Count());
             Assert.Equal(1, secondResult.Count());
             Assert.Equal(2, thirdResult.Count());
             Assert.Equal(1, fourthResult.Count());
             Assert.Equal(1, fifthResult.Count());
             Assert.Equal(1, sixResult.Count());
-            Assert.Equal(2, sevenResult.Count());
-            Assert.Equal(2, eightResult.Count());
+            Assert.Equal(3, sevenResult.Count());
+            Assert.Equal(3, eightResult.Count());
             Assert.Equal(1, nineResult.Count());
             Assert.Equal(2, tenResult.Count());
             Assert.Equal(1, elevenResult.Count());
-            Assert.Equal(1, twelveResult.Count());
+            Assert.Equal(2, twelveResult.Count());
             Assert.Equal(1, thirteenResult.Count());
             Assert.Equal(1, fourteenResult.Count());
             Assert.Equal(2, fifteenResult.Count());
@@ -170,6 +187,8 @@ namespace SimpleIdServer.Scim.Tests
             Assert.Equal(1, twentyTwoResult.Count());
             Assert.Equal(2, twentyThreeResult.Count());
             Assert.Equal(1, twentyFourResult.Count());
+            Assert.Equal(1, twentyFiveResult.Count());
+            string ss = "";
         }
 
         private IQueryable<SCIMRepresentation> ParseAndExecuteFilter(IQueryable<SCIMRepresentation> representations, string filter, SCIMSchema customSchema)

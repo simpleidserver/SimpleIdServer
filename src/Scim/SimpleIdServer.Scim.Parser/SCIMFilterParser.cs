@@ -351,6 +351,11 @@ namespace SimpleIdServer.Scim.Parser
                     level++;
                 }
 
+                if('(' == character && groupingIsOpened)
+                {
+                    level++;
+                }
+
                 if ('(' == character && (string.IsNullOrWhiteSpace(filterBuilder.ToString()) || filterBuilder.ToString() == "not"))
                 {
                     if ('(' == character && level == 0 && filterBuilder.Length == 0) nbGroupingRoot++;
