@@ -12,7 +12,7 @@ namespace SimpleIdServer.Scim.ExternalEvents
 
         }
 
-        public RepresentationRemovedEvent(string id, string version, string resourceType, string realm, JsonObject representation, string token) : base(id, version, realm, resourceType, representation) 
+        public RepresentationRemovedEvent(string id, string version, string resourceType, string realm, JsonObject representation, string token) : base(id, version, resourceType, realm, representation) 
         {
             Token = token;
         }
