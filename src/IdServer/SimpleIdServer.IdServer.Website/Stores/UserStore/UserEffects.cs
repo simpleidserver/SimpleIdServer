@@ -106,7 +106,8 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 Email = action.Email,
                 Lastname = action.Lastname,
                 Name = action.Firstname,
-                NotificationMode = action.NotificationMode
+                NotificationMode = action.NotificationMode,
+                Middlename = action.Middlename
             };
             var requestMessage = new HttpRequestMessage
             {
@@ -118,7 +119,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             try
             {
                 httpResult.EnsureSuccessStatusCode();
-                dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
+                dispatcher.Dispatch(new UpdateUserDetailsSuccessAction { Middlename = action.Middlename, Email = action.Email, Firstname = action.Firstname, Lastname = action.Lastname, UserId = action.UserId, NotificationMode = action.NotificationMode });
             }
             catch
             {
@@ -548,6 +549,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string UserId { get; set; } = null!;
         public string? Email { get; set; } = null;
         public string? Firstname { get; set; } = null;
+        public string? Middlename { get; set; } = null;
         public string? Lastname { get; set; } = null;
         public string? NotificationMode { get; set; } = null;
     }
@@ -557,6 +559,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string UserId { get; set; } = null!;
         public string? Email { get; set; } = null;
         public string? Firstname { get; set; } = null;
+        public string? Middlename { get; set; } = null;
         public string? Lastname { get; set; } = null;
         public string? NotificationMode { get; set; } = null;
     }

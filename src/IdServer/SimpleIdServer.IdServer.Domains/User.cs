@@ -40,6 +40,10 @@ namespace SimpleIdServer.IdServer.Domains
         [UserProperty(true)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public string? Lastname { get; set; } = null;
+        [JsonPropertyName(UserNames.Middlename)]
+        [UserProperty(true)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Middlename { get; set; } = null;
         [JsonPropertyName(UserNames.Email)]
         [UserProperty(true)]
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
@@ -200,11 +204,29 @@ namespace SimpleIdServer.IdServer.Domains
             Consents.Remove(consent);
         }
 
-        public void UpdateEmail(string value) => UpdateClaim(JwtRegisteredClaimNames.Email, value);
+        public void UpdateEmail(string value)
+        {
+            Email = value;
+            UpdateClaim(JwtRegisteredClaimNames.Email, value);
+        }
 
-        public void UpdateName(string value) => UpdateClaim(JwtRegisteredClaimNames.Name, value);
+        public void UpdateName(string value)
+        {
+            Name = value;
+            UpdateClaim(JwtRegisteredClaimNames.Name, value);
+        }
 
-        public void UpdateLastname(string value) => UpdateClaim(JwtRegisteredClaimNames.FamilyName, value);
+        public void UpdateLastname(string value)
+        {
+            Lastname = value;
+            UpdateClaim(JwtRegisteredClaimNames.FamilyName, value);
+        }
+
+        public void UpdateMiddlename(string value)
+        {
+            Middlename = value;
+            UpdateClaim(JwtRegisteredClaimNames.MiddleName, value);
+        }
 
         public void UpdateClaim(string key, string value)
         {
@@ -329,6 +351,7 @@ namespace SimpleIdServer.IdServer.Domains
                 EmailVerified = EmailVerified,
                 Firstname = Firstname,
                 Lastname = Lastname,
+                Middlename = Middlename,
                 CreateDateTime = CreateDateTime,
                 UpdateDateTime= UpdateDateTime,
                 Source = Source,

@@ -54,6 +54,11 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Firstname</RadzenText>
         <RadzenTextBox Name="Firstname" @bind-Value="@updateUserSettings.Firstname" Class="w-100"></RadzenTextBox>
     </div>
+    <!-- Middle name -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Middlename</RadzenText>
+        <RadzenTextBox Name="Middlename" @bind-Value="@updateUserSettings.Middlename" Class="w-100"></RadzenTextBox>
+    </div>
     <!-- Last name -->
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Lastname</RadzenText>
@@ -66,12 +71,12 @@
             <RadzenLabel Text="@Global.NotificationMode" Style="padding: 0px;"></RadzenLabel>
         </div>
         <RadzenDropDown Class="w-100"
-            Data=@authMethodsState.Value.AuthenticationMethods.Where(m => m.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
-            TextProperty="Name"
-            ValueProperty="Id"
-            TValue="string"
-            @bind-Value=@updateUserSettings.NotificationMode></RadzenDropDown>
-        
+        Data=@authMethodsState.Value.AuthenticationMethods.Where(m => m.Capabilities.HasFlag(AuthenticationMethodCapabilities.PUSHNOTIFICATION))
+        TextProperty="Name"
+        ValueProperty="Id"
+        TValue="string"
+        @bind-Value=@updateUserSettings.NotificationMode></RadzenDropDown>
+
     </div>
     <SidAuthorizeView Roles=@($"/users/manage")>
         <Authorized>
@@ -94,6 +99,7 @@
         public DateTime UpdateDateTime { get; set; }
         public string? Email { get; set; } = null;
         public string? Firstname { get; set; } = null;
+        public string? Middlename { get; set; } = null;
         public string? Lastname { get; set; } = null;
         public string? NotificationMode { get; set; } = null;
         public DateTime? UnblockDateTime { get; set; } = null;
@@ -131,6 +137,7 @@
             Email = this.User.Email,
             Firstname = this.User.Firstname,
             Lastname = this.User.Lastname,
+            Middlename = this.User.Middlename,
             NotificationMode = this.User.NotificationMode,
             UnblockDateTime = this.User.UnblockDateTime,
             NbLoginAttempt = this.User.NbLoginAttempt
@@ -139,7 +146,7 @@
 
     void UpdateUserSettings(UpdateUserSettingsParameter parameter)
     {
-        var act = new UpdateUserDetailsAction { Email = parameter.Email, Firstname = parameter.Firstname, Lastname = parameter.Lastname, UserId = this.User.Id, NotificationMode = parameter.NotificationMode };
+        var act = new UpdateUserDetailsAction { Middlename = parameter.Middlename, Email = parameter.Email, Firstname = parameter.Firstname, Lastname = parameter.Lastname, UserId = this.User.Id, NotificationMode = parameter.NotificationMode };
         dispatcher.Dispatch(act);
     }
 

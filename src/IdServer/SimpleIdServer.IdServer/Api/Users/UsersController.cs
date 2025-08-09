@@ -236,6 +236,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                     user.UpdateEmail(request.Email);
                     user.UpdateName(request.Name);
                     user.UpdateLastname(request.Lastname);
+                    user.UpdateMiddlename(request.Middlename);
                     user.EmailVerified = request.EmailVerified;
                     user.NotificationMode = request.NotificationMode ?? string.Empty;
                     user.UpdateDateTime = DateTime.UtcNow;

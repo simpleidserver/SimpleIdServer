@@ -16,6 +16,8 @@ public class UpdateUserRequest
     public string Name { get; set; }
     [JsonPropertyName(UserNames.Lastname)]
     public string Lastname { get; set; }
+    [JsonPropertyName(UserNames.Middlename)]
+    public string Middlename { get; set; }
     [JsonPropertyName(UserNames.NotificationMode)]
     public string NotificationMode { get; set; }
 }

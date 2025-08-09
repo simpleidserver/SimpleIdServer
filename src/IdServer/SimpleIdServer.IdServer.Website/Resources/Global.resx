@@ -2223,4 +2223,7 @@ The &lt;b&gt;authorization_signed_response_alg&lt;/b&gt; will be set to &lt;b&gt
   <data name="RefreshTokenUsageTypeTooltip" xml:space="preserve">
     <value>Set the usage type for the refresh token. For confidential clients, such as backend services or console applications, you can use a reusable refresh token</value>
   </data>
+  <data name="Middlename" xml:space="preserve">
+    <value>Middlename</value>
+  </data>
 </root>

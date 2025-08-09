@@ -114,6 +114,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
             selectedUser.Value.UpdateName(act.Firstname);
             selectedUser.Value.UpdateLastname(act.Lastname);
             selectedUser.Value.UpdateEmail(act.Email);
+            selectedUser.Value.UpdateMiddlename(act.Middlename);
             selectedUser.Value.NotificationMode = act.NotificationMode;
             selectedUser.Value.UpdateDateTime = DateTime.Now;
             return state with

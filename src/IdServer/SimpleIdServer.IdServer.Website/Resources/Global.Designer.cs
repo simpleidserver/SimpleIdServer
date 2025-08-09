@@ -3364,6 +3364,15 @@ namespace SimpleIdServer.IdServer.Website.Resources {
         }
         
         /// <summary>
+        ///   Recherche une chaîne localisée semblable à Middlename.
+        /// </summary>
+        public static string Middlename {
+            get {
+                return ResourceManager.GetString("Middlename", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Recherche une chaîne localisée semblable à Scopes : {0}, Users : {1}, Groups : {2}, Clients: {3}, Api resources : {4}.
         /// </summary>
         public static string MigratedRecordsSummary {

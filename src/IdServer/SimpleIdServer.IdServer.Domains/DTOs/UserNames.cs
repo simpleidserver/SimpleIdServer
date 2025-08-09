@@ -8,6 +8,7 @@ namespace SimpleIdServer.IdServer.Domains.DTOs
         public const string Name = "name";
         public const string Firstname = "firstname";
         public const string Lastname = "lastname";
+        public const string Middlename = "middlename";
         public const string Email = "email";
         public const string EmailVerified = "emailVerified";
         public const string Claims = "claims";

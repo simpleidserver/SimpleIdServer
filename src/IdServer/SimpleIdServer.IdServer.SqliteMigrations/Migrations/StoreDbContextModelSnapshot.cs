@@ -2392,6 +2392,10 @@ namespace SimpleIdServer.IdServer.SqliteMigrations.Migrations
                         .HasColumnType("TEXT")
                         .HasAnnotation("Relational:JsonPropertyName", "lastname");
 
+                    b.Property<string>("Middlename")
+                        .HasColumnType("TEXT")
+                        .HasAnnotation("Relational:JsonPropertyName", "middlename");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT")

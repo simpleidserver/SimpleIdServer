@@ -2417,6 +2417,10 @@ namespace SimpleIdServer.IdServer.PostgreMigrations.Migrations
                         .HasColumnType("text")
                         .HasAnnotation("Relational:JsonPropertyName", "lastname");
 
+                    b.Property<string>("Middlename")
+                        .HasColumnType("text")
+                        .HasAnnotation("Relational:JsonPropertyName", "middlename");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
