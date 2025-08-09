@@ -70,7 +70,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             scimRepresentation.RealmName = addRepresentationCommand.Realm;
             scimRepresentation.SetResourceType(addRepresentationCommand.ResourceType);
             foreach (var attr in scimRepresentation.FlatAttributes) attr.RepresentationId = scimRepresentation.Id;
-            await _representationHelper.CheckUniqueness(scimRepresentation.FlatAttributes);
+            await _representationHelper.CheckUniqueness(addRepresentationCommand.Realm, scimRepresentation.FlatAttributes);
             var patchOperations = scimRepresentation.FlatAttributes.Select(a => new SCIMPatchResult
             {
                 Attr = a,

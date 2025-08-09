@@ -23,7 +23,7 @@ namespace SimpleIdServer.Scim.Helpers
     public interface IRepresentationHelper
     {
         Task<SCIMRepresentationPatchResult> Apply(SCIMRepresentation representation, IEnumerable<PatchOperationParameter> patchLst, IEnumerable<SCIMAttributeMapping> attributeMappings, bool ignoreUnsupportedCanonicalValues, CancellationToken cancellationToken);
-        Task CheckUniqueness(IEnumerable<SCIMRepresentationAttribute> attributes);
+        Task CheckUniqueness(string realm, IEnumerable<SCIMRepresentationAttribute> attributes);
         void CheckMutability(List<SCIMPatchResult> patchOperations);
         SCIMRepresentation ExtractSCIMRepresentationFromJSON(JsonObject json, string externalId, SCIMSchema mainSchema, ICollection<SCIMSchema> extensionSchemas, IEnumerable<SCIMAttributeMapping> attributeMappings);
     }
@@ -547,15 +547,15 @@ namespace SimpleIdServer.Scim.Helpers
 
         #region Check uniqueness
 
-        public async Task CheckUniqueness(IEnumerable<SCIMRepresentationAttribute> attributes)
+        public async Task CheckUniqueness(string realm, IEnumerable<SCIMRepresentationAttribute> attributes)
         {
             var uniqueServerAttributeIds = attributes.Where(a => a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.SERVER);
             var uniqueGlobalAttributes = attributes.Where(a => a.SchemaAttribute.Uniqueness == SCIMSchemaAttributeUniqueness.GLOBAL);
-            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueServerAttributeIds);
-            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(uniqueGlobalAttributes);
+            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(realm, uniqueServerAttributeIds);
+            await CheckSCIMRepresentationExistsForGivenUniqueAttributes(realm, uniqueGlobalAttributes);
         }
 
-        private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(IEnumerable<SCIMRepresentationAttribute> attributes)
+        private async Task CheckSCIMRepresentationExistsForGivenUniqueAttributes(string realm, IEnumerable<SCIMRepresentationAttribute> attributes)
         {
             foreach (var attribute in attributes)
             {
@@ -567,11 +567,21 @@ namespace SimpleIdServer.Scim.Helpers
                         break;
                     case SCIMSchemaAttributeTypes.INTEGER:
                         if (attribute.ValueInteger != null)
+                        {
                             records = await _scimRepresentationCommandRepository.FindAttributesByValue(attribute.SchemaAttribute.Id, attribute.ValueInteger.Value);
+                        }
                         break;
                 }
 
-                if (records != null && records.Any())
+                var isUnique = records != null && records.Any();
+                if(!string.IsNullOrWhiteSpace(realm))
+                {
+                    var representations = await _scimRepresentationCommandRepository.FindRepresentations(records.Select(r => r.RepresentationId).Distinct().ToList());
+                    var filteredRepresentations = representations.Where(r => r.RealmName == realm);
+                    isUnique = filteredRepresentations != null && filteredRepresentations.Any();
+                }
+
+                if (isUnique)
                 {
                     throw new SCIMUniquenessAttributeException(string.Format(Global.AttributeMustBeUnique, attribute.SchemaAttribute.Name));
                 }
