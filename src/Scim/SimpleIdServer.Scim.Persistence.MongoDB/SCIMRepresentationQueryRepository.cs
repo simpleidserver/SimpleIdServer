@@ -47,18 +47,18 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                         .ToMongoListAsync())
                         .Distinct()
                         .ToList();
-                    total = filteredRepresentationIds.Count();
+                    total = filteredRepresentationIds.Count;
                 }
             }
             else
             {
                 total = await _scimDbContext.SCIMRepresentationLst.AsQueryable()
                     .Where(s => s.ResourceType == parameter.ResourceType)
-                    .CountAsync();
+                    .CountAsync(cancellationToken);
             }
 
             if (parameter.Count == 0)
-                return new SearchSCIMRepresentationsResponse(total, new List<SCIMRepresentation>());
+                return new SearchSCIMRepresentationsResponse(total, []);
 
             var filteredRepresentations = _scimDbContext.SCIMRepresentationLst.AsQueryable()
                 .Where(r => r.ResourceType == parameter.ResourceType);
@@ -69,21 +69,20 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 var tmp = parameter.Filter.EvaluateMongoDbRepresentations(filteredRepresentations);
                 if (tmp != null)
                 {
-                    var tmpIds = await tmp.Select(r => r.Id).ToListAsync();
-                    if (filteredRepresentationIds == null) filteredRepresentationIds = tmpIds.ToList();
+                    var tmpIds = await tmp.Select(r => r.Id).ToListAsync(cancellationToken);
+                    if (filteredRepresentationIds == null) filteredRepresentationIds = [.. tmpIds];
                     else
                     {
-                        var logical = parameter.Filter as SCIMLogicalExpression;
-                        if (logical != null)
+                        if (parameter.Filter is SCIMLogicalExpression logical)
                         {
                             if (logical.LogicalOperator == Parser.Operators.SCIMLogicalOperators.AND)
-                                filteredRepresentationIds = filteredRepresentationIds.Intersect(tmpIds).ToList();
+                                filteredRepresentationIds = [.. filteredRepresentationIds.Intersect(tmpIds)];
                             else
-                                filteredRepresentationIds = filteredRepresentationIds.Union(tmpIds).ToList();
+                                filteredRepresentationIds = [.. filteredRepresentationIds.Union(tmpIds)];
                         }
                     }
 
-                    total = filteredRepresentationIds.Count();
+                    total = filteredRepresentationIds.Count;
                 }
             }
 
@@ -94,15 +93,23 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
             var paginationResult = await OrderByAndPaginate(filteredRepresentations, parameter, filteredRepresentationIds);
             filteredRepresentations = paginationResult.Query;
-            var filteredRepresentationsWithAttributes = from a in filteredRepresentations
-                                                        join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.Id equals b.RepresentationId into Attributes
-                                                        select new
-                                                        {
-                                                            Representation = a,
-                                                            Attributes = Attributes
-                                                        };
-            var representationWithAttributes = await filteredRepresentationsWithAttributes
-                .ToListAsync();
+            
+            var representationsList = await filteredRepresentations.ToListAsync(cancellationToken);
+            var representationIds = representationsList.Select(r => r.Id).ToList();
+            
+            var attributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
+                .Where(a => representationIds.Contains(a.RepresentationId))
+                .ToListAsync(cancellationToken);
+            
+            var attributesByRepId = attributes.GroupBy(a => a.RepresentationId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+            
+            var representationWithAttributes = representationsList.Select(rep => new
+            {
+                Representation = rep,
+                Attributes = attributesByRepId.ContainsKey(rep.Id) ? attributesByRepId[rep.Id] : new List<SCIMRepresentationAttribute>()
+            }).ToList();
+            
             if (paginationResult.OrderedRepresentationIds != null)
             {
                 representationWithAttributes = representationWithAttributes.Select(r => new
@@ -119,7 +126,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             foreach (var record in representationWithAttributes)
             {
                 var representation = record.Representation;
-                representation.FlatAttributes = record.Attributes.ToList();
+                representation.FlatAttributes = [.. record.Attributes];
                 representations.Add(representation);
             }
 
