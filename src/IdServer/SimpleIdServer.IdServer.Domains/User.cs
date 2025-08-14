@@ -14,6 +14,7 @@ namespace SimpleIdServer.IdServer.Domains
             {  JwtRegisteredClaimNames.Sub, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Name = str, (u) => u.Name) },
             {  JwtRegisteredClaimNames.Name, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Firstname = str, (u) => u.Firstname) },
             {  JwtRegisteredClaimNames.FamilyName, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Lastname = str, (u) => u.Lastname) },
+            {  JwtRegisteredClaimNames.MiddleName, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Middlename = str, (u) => u.Middlename) },
             {  JwtRegisteredClaimNames.Email, new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.Email = str, (u) => u.Email) },
             { "email_verified", new KeyValuePair<Action<User, string>, Func<User, object>>((u, str) => u.EmailVerified = bool.Parse(str), (u) => u.EmailVerified) }
         };
@@ -206,25 +207,21 @@ namespace SimpleIdServer.IdServer.Domains
 
         public void UpdateEmail(string value)
         {
-            Email = value;
             UpdateClaim(JwtRegisteredClaimNames.Email, value);
         }
 
         public void UpdateName(string value)
         {
-            Name = value;
             UpdateClaim(JwtRegisteredClaimNames.Name, value);
         }
 
         public void UpdateLastname(string value)
         {
-            Lastname = value;
             UpdateClaim(JwtRegisteredClaimNames.FamilyName, value);
         }
 
         public void UpdateMiddlename(string value)
         {
-            Middlename = value;
             UpdateClaim(JwtRegisteredClaimNames.MiddleName, value);
         }
 
@@ -238,7 +235,9 @@ namespace SimpleIdServer.IdServer.Domains
 
             var claim = OAuthUserClaims.FirstOrDefault(c => c.Name == key);
             if (claim != null)
+            {
                 claim.Value = value;
+            }
             else
             {
                 OAuthUserClaims.Add(new UserClaim
