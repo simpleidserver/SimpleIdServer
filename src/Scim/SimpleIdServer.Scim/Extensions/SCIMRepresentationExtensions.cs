@@ -180,7 +180,9 @@ namespace SimpleIdServer.Scim.Domain
                 representation.ApplyEmptyArray();
             }
 
-            var attributes = representation.HierarchicalAttributes.Select(a =>
+            var attributes = representation.HierarchicalAttributes
+                .Where(p => string.IsNullOrWhiteSpace(p.ParentAttributeId))
+                .Select(a =>
             {
                 var schema = representation.GetSchema(a);
                 var order = 1;
