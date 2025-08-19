@@ -109,6 +109,7 @@ public class StandardPwdAuthForms
         .AddErrorMessage(AuthFormErrorMessages.UserDoesntExist, Global.UserDoesntExist)
         .AddErrorMessage(AuthFormErrorMessages.InvalidCredential, Global.InvalidCredential)
         .AddErrorMessage(AuthFormErrorMessages.UserBlocked, Global.UserAccountIsBlocked)
+        .AddErrorMessage(AuthFormErrorMessages.NoCredential, Global.NoActivePassword)
         .Build();
 
     public static FormRecord ResetForm = AuthLayoutBuilder.New("8d416c21-2278-4e11-9544-f5a36f979b6d", "resetPwd", "resetPwd", false)

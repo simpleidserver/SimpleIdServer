@@ -5,7 +5,6 @@ using SimpleIdServer.IdServer.Domains;
 using SimpleIdServer.IdServer.Helpers;
 using SimpleIdServer.IdServer.Layout.AuthFormLayout;
 using SimpleIdServer.IdServer.Options;
-using SimpleIdServer.IdServer.Resources;
 using SimpleIdServer.IdServer.Stores;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
@@ -69,6 +68,11 @@ public class PasswordAuthenticationService : GenericAuthenticationService<Authen
         else
         {
             var credential = authenticatedUser.Credentials.FirstOrDefault(c => c.CredentialType == Constants.AreaPwd && c.IsActive);
+            if (credential == null)
+            {
+                return Task.FromResult(CredentialsValidationResult.Error(AuthFormErrorMessages.NoCredential, AuthFormErrorMessages.NoCredential));
+            }
+
             if (!PasswordHelper.VerifyHash(credential, viewModel.Password))
             {
                 return Task.FromResult(CredentialsValidationResult.InvalidCredentials(authenticatedUser));

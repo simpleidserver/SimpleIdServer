@@ -12,6 +12,11 @@ public static class PasswordHelper
 {
     public static bool VerifyHash(UserCredential credential, string pwd)
     {
+        if(credential == null)
+        {
+            return false;
+        }
+
         if(credential.HashAlg == PasswordHashAlgs.Default)
         {
             return VerifyDefaultHash(credential.Value, pwd);
