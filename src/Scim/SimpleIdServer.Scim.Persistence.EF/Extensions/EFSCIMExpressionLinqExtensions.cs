@@ -13,7 +13,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.XPath;
 
 namespace SimpleIdServer.Scim.Persistence.EF.Extensions
 {
@@ -46,6 +45,11 @@ namespace SimpleIdServer.Scim.Persistence.EF.Extensions
             {
                 filteredAttrs = filteredAttrs.Where(a => a.RepresentationId == id);
                 var result = await GetRepresentation(representations, id, resourceType, realm, cancellationToken);
+                if(result == null)
+                {
+                    return null;
+                }
+
                 result.FlatAttributes = filteredAttrs.ToList();
                 return result;
             }
