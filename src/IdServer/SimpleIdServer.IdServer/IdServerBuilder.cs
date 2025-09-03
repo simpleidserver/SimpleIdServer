@@ -139,6 +139,15 @@ public class IdServerBuilder
         Services.AddTransient<IDataSeeder, InitStaticUsersDataSeeder>();
         return this;
     }
+    /// <summary>
+    /// Adds an in-memory API resources repository using the provided list of API resources.
+    /// </summary>
+    public IdServerBuilder AddInMemoryApiResources(List<ApiResource> apiResources)
+    {
+        Services.AddSingleton(new StaticApiResourcesDataSeeder(apiResources));
+        Services.AddTransient<IDataSeeder, InitStaticApiResourceDataSeeder>();
+        return this;
+    }
 
     /// <summary>
     /// Adds an in-memory language repository using the provided list of languages.

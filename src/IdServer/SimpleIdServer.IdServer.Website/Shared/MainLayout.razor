@@ -1,4 +1,5 @@
-﻿@using SimpleIdServer.IdServer.Helpers
+﻿@using Microsoft.Extensions.Options
+@using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
 @using SimpleIdServer.IdServer.Website.Stores.AuthMethodsStore;
@@ -11,6 +12,7 @@
 @inherits Fluxor.Blazor.Web.Components.FluxorLayout
 @inject IState<RealmsState> state
 @inject IState<LanguagesState> languagesState
+@inject IOptions<IdServerWebsiteOptions> options
 @inject ContextMenuService contextMenuService
 @inject IDispatcher dispatcher
 @inject IUrlHelper urlHelper
@@ -75,10 +77,17 @@
                 </RadzenPanelMenuItem>
                 <RadzenPanelMenuItem Text="@Global.Configure" />
                 <RadzenPanelMenuItem Text="@Global.CertificateAuthoritiesTitle" Icon="shield" Path="@(urlHelper.GetUrl("/certificateauthorities"))" />
-                <RadzenPanelMenuItem Text="@Global.FederationEntitiesTitle" Icon="anchor" Path="@(urlHelper.GetUrl("/federationentities"))" />
+                @if(options.Value.Features.IsFederationEntitiesEnabled)
+                {
+                    <RadzenPanelMenuItem Text="@Global.FederationEntitiesTitle" Icon="anchor" Path="@(urlHelper.GetUrl("/federationentities"))" />
+                }
+
                 <RadzenPanelMenuItem Text="@Global.Auditing" Icon="source" Path="@(urlHelper.GetUrl("/auditing"))" />
                 <RadzenPanelMenuItem Text="@Global.RecurringJobs" Icon="schedule" Path="@(urlHelper.GetUrl("/recurringjobs/list"))" />
-                <RadzenPanelMenuItem Text="@Global.Migrations" Icon="upgrade" Path="@(urlHelper.GetUrl("/migrations"))" />
+                @if(options.Value.Features.IsMigrationsEnabled)
+                {
+                    <RadzenPanelMenuItem Text="@Global.Migrations" Icon="upgrade" Path="@(urlHelper.GetUrl("/migrations"))" />
+                }
             </RadzenPanelMenu>
         </RadzenSidebar>
         <RadzenBody>

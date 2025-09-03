@@ -140,7 +140,7 @@ namespace SimpleIdServer.IdServer.UI
                     url = $"/{Config.DefaultEndpoints.EndSessionCallback}?{string.Join("&", Request.Query.Select(q => $"{q.Key}={q.Value}"))}";
                 }
 
-                if (!string.IsNullOrWhiteSpace(prefix))
+                if (!string.IsNullOrWhiteSpace(prefix) && _options.RealmEnabled)
                 {
                     url = $"/{prefix}{url}";
                 }

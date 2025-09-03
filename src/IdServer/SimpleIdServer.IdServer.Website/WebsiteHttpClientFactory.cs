@@ -81,11 +81,17 @@ namespace SimpleIdServer.IdServer.Website
                 accessToken = _accessTokenStore.AccessTokens[realm];
             if (accessToken != null && accessToken.IsValid) return accessToken;
             if (accessToken != null && !accessToken.IsValid) _accessTokenStore.AccessTokens.TryRemove(realm, out GetAccessTokenResult r);
+            var scope = "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes workflows forms recurringjobs templates migrations";
+            if (_idServerWebsiteOptions.Features.IsFederationEntitiesEnabled)
+            {
+                scope += " federation_entities";
+            }
+
             var content = new List<KeyValuePair<string, string>>
                 {
                     new KeyValuePair<string, string>("client_id", _idServerWebsiteOptions.ClientId),
                     new KeyValuePair<string, string>("client_secret", _idServerWebsiteOptions.ClientSecret),
-                    new KeyValuePair<string, string>("scope", "provisioning users acrs configurations authenticationschemeproviders authenticationmethods registrationworkflows apiresources auditing certificateauthorities clients realms groups scopes federation_entities workflows forms recurringjobs templates migrations"),
+                    new KeyValuePair<string, string>("scope", scope),
                     new KeyValuePair<string, string>("grant_type", "client_credentials")
                 };
             var url = _idServerWebsiteOptions.Issuer;

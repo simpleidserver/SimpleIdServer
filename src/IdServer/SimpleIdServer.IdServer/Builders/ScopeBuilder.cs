@@ -22,6 +22,7 @@ namespace SimpleIdServer.IdServer.Builders
                 Id = Guid.NewGuid().ToString(),
                 Name = name, 
                 IsExposedInConfigurationEdp = isExposed,
+                Type = ScopeTypes.APIRESOURCE,
                 Realms = new List<Domains.Realm>
                 {
                     Config.DefaultRealms.Master

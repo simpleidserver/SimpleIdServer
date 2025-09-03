@@ -4,6 +4,7 @@
 using DataSeeder;
 using SimpleIdServer.IdServer.Config;
 using SimpleIdServer.IdServer.Stores;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,10 +36,21 @@ public class InitUserDataSeeder : BaseAfterDeploymentDataSeeder
         using (var transaction = _transactionBuilder.Build())
         {
             var subjects = DefaultUsers.All.Select(u => u.Name).ToList();
-            var existingUsers = await _userRepository.GetUsersBySubjects(subjects, Constants.DefaultRealm, cancellationToken);
+            var existingUsers = await _userRepository.GetUsersBySubjects(
+                subjects,
+                Constants.DefaultRealm,
+                cancellationToken);
             var unknownUsers = DefaultUsers.All.Where(u => !existingUsers.Any(eu => eu.Name == u.Name));
+            var allGroups = await _groupRepository.GetByIds(
+                unknownUsers.SelectMany(u => u.Groups?.Where(g => !string.IsNullOrWhiteSpace(g.GroupsId)).Select(g => g.GroupsId)?.Distinct()?.ToList() ?? new List<string>()).ToList(),
+                cancellationToken);
             foreach (var unknownUser in unknownUsers)
             {
+                foreach (var group in unknownUser.Groups)
+                {
+                    group.Group = allGroups.SingleOrDefault(g => g.Id == group.GroupsId);
+                }
+
                 _userRepository.Add(unknownUser);
             }
 
