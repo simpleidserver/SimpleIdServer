@@ -24,6 +24,11 @@ namespace SimpleIdServer.IdServer.Api.Users
         [JsonPropertyName(UserNames.Lastname)]
         public string Lastname { get; set; }
         /// <summary>
+        /// Middlename.
+        /// </summary>
+        [JsonPropertyName(UserNames.Middlename)]
+        public string Middlename { get; set; }
+        /// <summary>
         /// Email.
         /// </summary>
         [JsonPropertyName(UserNames.Email)]

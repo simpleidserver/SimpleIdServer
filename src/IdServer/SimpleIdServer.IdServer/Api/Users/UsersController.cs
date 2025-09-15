@@ -167,6 +167,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                         Name = request.Name,
                         Firstname = request.Firstname,
                         Lastname = request.Lastname,
+                        Middlename = request.Middlename,
                         Email = request.Email,
                         EmailVerified = request.EmailVerified,
                         OAuthUserClaims = request.Claims?.Select(c => new UserClaim
@@ -193,6 +194,7 @@ namespace SimpleIdServer.IdServer.Api.Users
                         Email = newUser.Email,
                         Firstname = newUser.Firstname,
                         Lastname = newUser.Lastname,
+                        Middlename = newUser.Middlename,
                         Claims = request.Claims
                     });
                     return new ContentResult

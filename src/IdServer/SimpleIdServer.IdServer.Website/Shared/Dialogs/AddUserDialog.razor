@@ -5,7 +5,7 @@
 @inject IState<UpdateUserState> updateUserState
 
 <RadzenTemplateForm Submit=@AddUser TItem="AddUserForm" Data=@addUser>
-    @if(!updateUserState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateUserState.Value.ErrorMessage))
+    @if (!updateUserState.Value.IsUpdating && !string.IsNullOrWhiteSpace(updateUserState.Value.ErrorMessage))
     {
         <RadzenAlert AllowClose="false" AlertStyle="AlertStyle.Danger" ShowIcon="true" Variant="Variant.Flat" Shade="Shade.Lighter">@updateUserState.Value.ErrorMessage</RadzenAlert>
     }
@@ -26,13 +26,18 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Lastname</RadzenText>
         <RadzenTextBox Name="LastName" @bind-Value="@addUser.LastName" class="w-100"></RadzenTextBox>
     </div>
+    <!-- Middlename -->
+    <div>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Middlename</RadzenText>
+        <RadzenTextBox Name="Middlename" @bind-Value="@addUser.Middlename" class="w-100"></RadzenTextBox>
+    </div>
     <!-- Email -->
     <div>
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">@Global.Email</RadzenText>
         <RadzenTextBox Name="Email" @bind-Value="@addUser.Email" class="w-100"></RadzenTextBox>
         <RadzenEmailValidator Component="Email" Text="@Global.EmailIsInvalid" />
     </div>
-    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating ? Global.Adding : Global.Add)" Disabled=updateUserState.Value.IsUpdating />
+    <RadzenButton class="mt-1" Variant="Variant.Flat" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Success" Text="@(updateUserState.Value.IsUpdating? Global.Adding: Global.Add)" Disabled=updateUserState.Value.IsUpdating />
 </RadzenTemplateForm>
 
 @code {
@@ -41,6 +46,7 @@
         public string Name { get; set; }
         public string? FirstName { get; set; } = null;
         public string? LastName { get; set; } = null;
+        public string? Middlename { get; set; } = null;
         public string? Email { get; set; } = null;
     }
 
@@ -59,6 +65,7 @@
             Email = user.Email,
             Firstname = user.FirstName,
             Lastname = user.LastName,
+            Middlename = user.Middlename,
             Name = user.Name
         });
     }
