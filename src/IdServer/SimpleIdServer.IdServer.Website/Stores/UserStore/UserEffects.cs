@@ -368,6 +368,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                 Email = action.Email,
                 Firstname = action.Firstname,
                 Lastname = action.Lastname,
+                Middlename = action.Middlename,
                 Name = action.Name
             };
             var requestMessage = new HttpRequestMessage
@@ -388,6 +389,7 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
                     Email = action.Email,
                     Firstname = action.Firstname,
                     Lastname = action.Lastname,
+                    Middlename = action.Middlename,
                     Name = action.Name
                 });
             }
@@ -745,6 +747,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         public string? Lastname { get; set; } = null;
 
         /// <summary>
+        /// (Optional) The user's middle name.
+        /// </summary>
+        public string? Middlename { get; set; } = null;
+
+        /// <summary>
         /// (Optional) The user's email.
         /// </summary>
         public string? Email { get; set; } = null;
@@ -774,6 +781,11 @@ namespace SimpleIdServer.IdServer.Website.Stores.UserStore
         /// (Optional) The user's last name.
         /// </summary>
         public string? Lastname { get; set; } = null;
+
+        /// <summary>
+        /// (Optional) The user's middle name.
+        /// </summary>
+        public string? Middlename { get; set; } = null;
 
         /// <summary>
         /// (Optional) The user's email.
