@@ -21,7 +21,7 @@ public class ScimServerSetup
 {
     public static void ConfigureScim(WebApplicationBuilder webApplicationBuilder, StorageConfiguration storageConfiguration, ApiKeysConfiguration apiKeysConfiguration)
     {
-        var massTransitConf = webApplicationBuilder.Configuration.Get<MassTransitStorageConfiguration>();
+        var massTransitConf = webApplicationBuilder.Configuration.GetSection(nameof(MassTransitStorageConfiguration)).Get<MassTransitStorageConfiguration>();
         var builder = webApplicationBuilder.Services.AddScim(o =>
             {
                 o.IgnoreUnsupportedCanonicalValues = false;
