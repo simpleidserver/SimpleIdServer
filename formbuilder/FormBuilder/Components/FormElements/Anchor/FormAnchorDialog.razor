@@ -13,6 +13,25 @@
                         <RadzenCheckBox @bind-Value="CopyRecord.ActAsButton" />
                         <RadzenLabel>Act as a button ?</RadzenLabel>
                     </div>
+                    <!-- Is static link -->
+                    <div>
+                        <RadzenCheckBox @bind-Value="CopyRecord.IsStaticLink" />
+                        <RadzenLabel>Is static link ?</RadzenLabel>
+                    </div>
+                    @if(CopyRecord.IsStaticLink)
+                    {
+
+                        <!-- Url -->
+                        <div>
+                            <RadzenLabel Text="URL"></RadzenLabel>
+                            <RadzenTextBox @bind-Value="@CopyRecord.Url"></RadzenTextBox>
+                        </div>
+                        <!-- Open in new tab  -->
+                        <div>
+                            <RadzenCheckBox @bind-Value="CopyRecord.OpenInNewTab" />
+                            <RadzenLabel>Open in new tab ?</RadzenLabel>
+                        </div>
+                    }
                 </RadzenStack>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Label">
@@ -43,6 +62,9 @@
         Record.ActAsButton = CopyRecord.ActAsButton;
         Record.Transformations = CopyRecord.Transformations;
         Record.Labels = CopyRecord.Labels;
+        Record.IsStaticLink = CopyRecord.IsStaticLink;
+        Record.Url = CopyRecord.Url;
+        Record.OpenInNewTab = CopyRecord.OpenInNewTab;
         dialogService.Close();
     }
 }

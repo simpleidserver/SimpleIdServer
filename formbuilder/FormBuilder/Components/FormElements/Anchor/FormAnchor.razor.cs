@@ -1,6 +1,7 @@
 ﻿using FormBuilder.Components.Drag;
 using FormBuilder.Factories;
 using FormBuilder.Helpers;
+using FormBuilder.Services;
 using Microsoft.AspNetCore.Components;
 using System.Text.Json.Nodes;
 
@@ -21,6 +22,7 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
     }
     [Inject] private IWorkflowLinkActionFactory WorkflowLinkActionFactory { get; set; }
     [Inject] private IHtmlClassResolver htmlClassResolver { get; set; }
+    [Inject] private IFormBuilderJsService formBuilderJsService { get; set; }
     public JsonNode InputData
     {
         get
@@ -48,10 +50,24 @@ public partial class FormAnchor : IGenericFormElement<FormAnchorRecord>
 
     private async Task Navigate()
     {
-        var linkExecution = Context.GetLinkExecutionFromElementAndCurrentStep(Value.Id);
-        var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);
-        if (linkExecution == null || link == null) return;
-        var act = WorkflowLinkActionFactory.Build(link.ActionType);
-        await act.Execute(link, linkExecution, Context);
+        if(Value.IsStaticLink)
+        {
+            if(Value.OpenInNewTab)
+            {
+                await formBuilderJsService.Navigate(Value.Url);
+            }
+            else
+            {
+                await formBuilderJsService.NavigateForce(Value.Url);
+            }
+        }
+        else
+        {
+            var linkExecution = Context.GetLinkExecutionFromElementAndCurrentStep(Value.Id);
+            var link = Context.GetLinkDefinitionFromCurrentStep(Value.Id);
+            if (linkExecution == null || link == null) return;
+            var act = WorkflowLinkActionFactory.Build(link.ActionType);
+            await act.Execute(link, linkExecution, Context);
+        }
     }
 }
