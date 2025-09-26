@@ -100,7 +100,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
                 propertyValueString,
                 propertyValueInteger,
                 propertyValueDatetime,
-                representationParameter: Expression.Parameter(typeof(SCIMRepresentationAttribute), "tn"));
+                representationParameter: Expression.Parameter(typeof(SCIMRepresentationAttribute), "tn"),
+                useRegex: true);
         }
 
 
@@ -184,7 +185,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
                 propertyValueBoolean,
                 propertyValueDecimal,
                 propertyValueBinary,
-                parameterExpression);
+                parameterExpression,
+                true);
             return Expression.And(Expression.Equal(schemaAttributeId, Expression.Constant(lastChild.SchemaAttribute.Id)), comparison);
         }
 

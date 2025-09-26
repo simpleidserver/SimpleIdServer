@@ -4,6 +4,7 @@ using SimpleIdServer.Scim.Domains;
 using SimpleIdServer.Scim.Parser.Operators;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -81,7 +82,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             }
         }
 
-        public static Expression EvaluateAttributes(this SCIMComparisonExpression expression, ParameterExpression parameterExpression, string propertyName = "CachedChildren")
+        public static Expression EvaluateAttributes(this SCIMComparisonExpression expression, ParameterExpression parameterExpression, string propertyName = "CachedChildren", bool useRegex = false)
         {
             var schemaAttributeId = Expression.Property(parameterExpression, "SchemaAttributeId");
             var propertyValueString = Expression.Property(parameterExpression, "ValueString");
@@ -97,7 +98,8 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                 propertyValueBoolean,
                 propertyValueDecimal,
                 propertyValueBinary,
-                parameterExpression);
+                parameterExpression,
+                useRegex);
             return Expression.And(Expression.Equal(schemaAttributeId, Expression.Constant(expression.LeftExpression.SchemaAttribute.Id)), comparison);
         }
 
@@ -252,7 +254,8 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             MemberExpression propertyValueBoolean = null,
             MemberExpression propertyValueDecimal = null,
             MemberExpression propertyValueBinary = null,
-            ParameterExpression representationParameter = null)
+            ParameterExpression representationParameter = null,
+            bool useRegex = false)
         {
             representationParameter = representationParameter ?? Expression.Parameter(typeof(SCIMRepresentationAttribute), "ra");
             propertyValueString = propertyValueString ?? Expression.Property(representationParameter, "ValueString");
@@ -268,22 +271,22 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                     switch (schemaAttr.Type)
                     {
                         case SCIMSchemaAttributeTypes.STRING:
-                            comparison = NotEqual(propertyValueString, Expression.Constant(comparisonExpression.Value), schemaAttr.CaseExact);
+                            comparison = NotEqual(propertyValueString, Expression.Constant(comparisonExpression.Value), schemaAttr.CaseExact, useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.INTEGER:
-                            comparison = NotEqual(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                            comparison = NotEqual(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value)), useRegex: useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.DATETIME:
-                            comparison = NotEqual(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
+                            comparison = NotEqual(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value)), useRegex: useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.BOOLEAN:
-                            comparison = NotEqual(propertyValueBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value)));
+                            comparison = NotEqual(propertyValueBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value)), useRegex: useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.DECIMAL:
-                            comparison = NotEqual(propertyValueDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value)));
+                            comparison = NotEqual(propertyValueDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value)), useRegex: useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.BINARY:
-                            comparison = NotEqual(propertyValueBinary, Expression.Constant(comparisonExpression.Value));
+                            comparison = NotEqual(propertyValueBinary, Expression.Constant(comparisonExpression.Value), useRegex: useRegex);
                             break;
                     }
                     break;
@@ -347,22 +350,22 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                     switch (schemaAttr.Type)
                     {
                         case SCIMSchemaAttributeTypes.STRING:
-                            comparison = Equal(propertyValueString, Expression.Constant(comparisonExpression.Value), schemaAttr.CaseExact);
+                            comparison = Equal(propertyValueString, Expression.Constant(comparisonExpression.Value), schemaAttr.CaseExact, useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.INTEGER:
-                            comparison = Equal(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value)));
+                            comparison = Equal(propertyValueInteger, Expression.Constant(ParseInt(comparisonExpression.Value)), useRegex: useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.DATETIME:
-                            comparison = Equal(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value)));
+                            comparison = Equal(propertyValueDatetime, Expression.Constant(ParseDateTime(comparisonExpression.Value)), useRegex: useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.BOOLEAN:
-                            comparison = Equal(propertyValueBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value)));
+                            comparison = Equal(propertyValueBoolean, Expression.Constant(ParseBoolean(comparisonExpression.Value)), useRegex: useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.DECIMAL:
-                            comparison = Equal(propertyValueDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value)));
+                            comparison = Equal(propertyValueDecimal, Expression.Constant(ParseDecimal(comparisonExpression.Value)), useRegex: useRegex);
                             break;
                         case SCIMSchemaAttributeTypes.BINARY:
-                            comparison = Equal(propertyValueBinary, Expression.Constant(comparisonExpression.Value));
+                            comparison = Equal(propertyValueBinary, Expression.Constant(comparisonExpression.Value), useRegex: useRegex);
                             break;
                     }
                     break;
@@ -373,10 +376,29 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                             var startWith = typeof(string).GetMethod("StartsWith", new Type[] { typeof(string) });
                             if (!schemaAttr.CaseExact)
                             {
-                                comparison = Expression.Call(
-                                    Expression.Call(Expression.Coalesce(propertyValueString, Expression.Constant(string.Empty)), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
-                                    startWith,
-                                    Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
+                                if(useRegex)
+                                {
+                                    var regexMethod = typeof(System.Text.RegularExpressions.Regex).GetMethod(
+                                        "IsMatch",
+                                        new Type[] { typeof(string), typeof(string), typeof(System.Text.RegularExpressions.RegexOptions) }
+                                    );
+                                    var escapedValue = System.Text.RegularExpressions.Regex.Escape(comparisonExpression.Value);
+                                    var pattern = $"^{escapedValue}";
+                                    comparison = Expression.Call(
+                                        null,
+                                        regexMethod,
+                                        propertyValueString,
+                                        Expression.Constant(pattern),
+                                        Expression.Constant(System.Text.RegularExpressions.RegexOptions.IgnoreCase)
+                                    );
+                                }
+                                else
+                                {
+                                    comparison = Expression.Call(
+                                        Expression.Call(Expression.Coalesce(propertyValueString, Expression.Constant(string.Empty)), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
+                                        startWith,
+                                        Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
+                                }
                             }
                             else
                             {
@@ -390,12 +412,32 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                     {
                         case SCIMSchemaAttributeTypes.STRING:
                             var endWith = typeof(string).GetMethod("EndsWith", new Type[] { typeof(string) });
-                            if(!schemaAttr.CaseExact)
+                            if (!schemaAttr.CaseExact)
                             {
-                                comparison = Expression.Call(
-                                    Expression.Call(Expression.Coalesce(propertyValueString, Expression.Constant(string.Empty)), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
-                                    endWith,
-                                    Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
+                                if(useRegex)
+                                {
+                                    var regexMethod = typeof(System.Text.RegularExpressions.Regex).GetMethod(
+                                        "IsMatch",
+                                        new Type[] { typeof(string), typeof(string), typeof(System.Text.RegularExpressions.RegexOptions) }
+                                    );
+                                    var escapedValue = System.Text.RegularExpressions.Regex.Escape(comparisonExpression.Value);
+                                    var pattern = $"{escapedValue}$";
+
+                                    comparison = Expression.Call(
+                                        null,
+                                        regexMethod,
+                                        propertyValueString,
+                                        Expression.Constant(pattern),
+                                        Expression.Constant(System.Text.RegularExpressions.RegexOptions.IgnoreCase)
+                                    );
+                                }
+                                else
+                                {
+                                    comparison = Expression.Call(
+                                        Expression.Call(Expression.Coalesce(propertyValueString, Expression.Constant(string.Empty)), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
+                                        endWith,
+                                        Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
+                                }
                             }
                             else
                             {
@@ -405,20 +447,36 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                     }
                     break;
                 case SCIMComparisonOperators.CO:
-                    if (schemaAttr.Type == SCIMSchemaAttributeTypes.STRING)
+                    var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                    if (!schemaAttr.CaseExact)
                     {
-                        var contains = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-                        if(!schemaAttr.CaseExact)
+                        if(useRegex)
+                        {
+                            var regexMethod = typeof(System.Text.RegularExpressions.Regex).GetMethod(
+                                "IsMatch",
+                                new Type[] { typeof(string), typeof(string), typeof(System.Text.RegularExpressions.RegexOptions) }
+                            );
+                            var escapedValue = System.Text.RegularExpressions.Regex.Escape(comparisonExpression.Value);
+
+                            comparison = Expression.Call(
+                                null,
+                                regexMethod,
+                                propertyValueString,
+                                Expression.Constant(escapedValue),
+                                Expression.Constant(System.Text.RegularExpressions.RegexOptions.IgnoreCase)
+                            );
+                        }
+                        else
                         {
                             comparison = Expression.Call(
                                 Expression.Call(Expression.Coalesce(propertyValueString, Expression.Constant(string.Empty)), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)),
                                 contains,
                                 Expression.Call(Expression.Constant(comparisonExpression.Value), typeof(string).GetMethod("ToLower", System.Type.EmptyTypes)));
                         }
-                        else
-                        {
-                            comparison = Expression.Call(propertyValueString, contains, Expression.Constant(comparisonExpression.Value));
-                        }
+                    }
+                    else
+                    {
+                        comparison = Expression.Call(propertyValueString, contains, Expression.Constant(comparisonExpression.Value));
                     }
                     break;
             }
@@ -454,7 +512,7 @@ namespace SimpleIdServer.Scim.Parser.Expressions
             return Expression.LessThanOrEqual(e1, e2);
         }
 
-        private static Expression Equal(Expression e1, Expression e2, bool caseSensitive = true)
+        private static Expression Equal(Expression e1, Expression e2, bool caseSensitive = true, bool useRegex = false)
         {
             if (IsNullableType(e1.Type) && !IsNullableType(e2.Type))
             {
@@ -465,35 +523,63 @@ namespace SimpleIdServer.Scim.Parser.Expressions
                 e1 = Expression.Convert(e1, e2.Type);
             }
 
-            if(!caseSensitive)
+            var checkCaseNotsensitive = !caseSensitive && e1.Type == typeof(string);
+            if (!checkCaseNotsensitive)
+            {
+                return Expression.Equal(e1, e2);
+            }
+
+            if (!useRegex)
             {
                 e1 = Expression.Coalesce(e1, Expression.Constant(string.Empty));
                 e1 = Expression.Call(e1, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
                 e2 = Expression.Call(e2, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
+                return Expression.Equal(e1, e2);
             }
 
-            return Expression.Equal(e1, e2);
+            var regexMethod = typeof(System.Text.RegularExpressions.Regex).GetMethod(
+                "IsMatch",
+                new Type[] { typeof(string), typeof(string), typeof(System.Text.RegularExpressions.RegexOptions) }
+            );
+            var escapeMethod = typeof(System.Text.RegularExpressions.Regex).GetMethod("Escape", new Type[] { typeof(string) });
+            if (e2 is ConstantExpression constantExpr && constantExpr.Value is string strValue)
+            {
+                var escapedValue = System.Text.RegularExpressions.Regex.Escape(strValue);
+                var pattern = $"^{escapedValue}$";
+                return Expression.Call(
+                    null,
+                    regexMethod,
+                    e1,
+                    Expression.Constant(pattern),
+                    Expression.Constant(System.Text.RegularExpressions.RegexOptions.IgnoreCase)
+                );
+            }
+            else
+            {
+                var escapedE2 = Expression.Call(null, escapeMethod, e2);
+                var concatMethod = typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string), typeof(string) });
+                var pattern = Expression.Call(
+                    null,
+                    concatMethod,
+                    Expression.Constant("^"),
+                    escapedE2,
+                    Expression.Constant("$")
+                );
+
+                return Expression.Call(
+                    null,
+                    regexMethod,
+                    e1,
+                    pattern,
+                    Expression.Constant(System.Text.RegularExpressions.RegexOptions.IgnoreCase)
+                );
+            }
         }
 
-        private static Expression NotEqual(Expression e1, Expression e2, bool caseSensitive = true)
+        private static Expression NotEqual(Expression e1, Expression e2, bool caseSensitive = true, bool useRegex = false)
         {
-            if (IsNullableType(e1.Type) && !IsNullableType(e2.Type))
-            {
-                e2 = Expression.Convert(e2, e1.Type);
-            }
-            else if (!IsNullableType(e1.Type) && IsNullableType(e2.Type))
-            {
-                e1 = Expression.Convert(e1, e2.Type);
-            }
-
-            if (!caseSensitive)
-            {
-                e1 = Expression.Coalesce(e1, Expression.Constant(string.Empty));
-                e1 = Expression.Call(e1, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
-                e2 = Expression.Call(e2, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
-            }
-
-            return Expression.NotEqual(e1, e2);
+            var equalExpr = Equal(e1, e2, caseSensitive, useRegex);
+            return Expression.Not(equalExpr);
         }
 
         private static Expression GreaterThanOrEqual(Expression e1, Expression e2)
