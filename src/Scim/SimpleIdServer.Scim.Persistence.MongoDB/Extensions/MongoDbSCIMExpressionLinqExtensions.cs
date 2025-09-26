@@ -177,15 +177,61 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
             var propertyValueBoolean = Expression.Property(attr, "ValueBoolean");
             var propertyValueDecimal = Expression.Property(attr, "ValueDecimal");
             var propertyValueBinary = Expression.Property(attr, "ValueBinary");
-            var comparison = SCIMExpressionLinqExtensions.BuildComparisonExpression(expression, lastChild.SchemaAttribute,
-                propertyValueString,
-                propertyValueInteger,
-                propertyValueDatetime,
-                propertyValueBoolean,
-                propertyValueDecimal,
-                propertyValueBinary,
-                parameterExpression);
+            
+            // Use MongoDB-optimized comparison expressions for string types to avoid $expr performance issues
+            Expression comparison;
+            if (lastChild.SchemaAttribute.Type == SCIMSchemaAttributeTypes.STRING && !lastChild.SchemaAttribute.CaseExact)
+            {
+                comparison = BuildMongoDbOptimizedStringComparison(expression, propertyValueString);
+            }
+            else
+            {
+                comparison = SCIMExpressionLinqExtensions.BuildComparisonExpression(expression, lastChild.SchemaAttribute,
+                    propertyValueString,
+                    propertyValueInteger,
+                    propertyValueDatetime,
+                    propertyValueBoolean,
+                    propertyValueDecimal,
+                    propertyValueBinary,
+                    parameterExpression);
+            }
+            
             return Expression.And(Expression.Equal(schemaAttributeId, Expression.Constant(lastChild.SchemaAttribute.Id)), comparison);
+        }
+
+        /// <summary>
+        /// Builds MongoDB-optimized string comparison expressions that avoid $expr and can use indexes effectively
+        /// </summary>
+        private static Expression BuildMongoDbOptimizedStringComparison(SCIMComparisonExpression expression, MemberExpression propertyValueString)
+        {
+            var value = expression.Value;
+            
+            switch (expression.ComparisonOperator)
+            {
+                case SCIMComparisonOperators.EQ:
+                    return MongoDbOptimizedExpressionExtensions.CreateOptimizedCaseInsensitiveEqual(propertyValueString, value);
+                
+                case SCIMComparisonOperators.NE:
+                    var equalExpr = MongoDbOptimizedExpressionExtensions.CreateOptimizedCaseInsensitiveEqual(propertyValueString, value);
+                    return Expression.Not(equalExpr);
+                
+                case SCIMComparisonOperators.SW:
+                    return MongoDbOptimizedExpressionExtensions.CreateOptimizedCaseInsensitiveStartsWith(propertyValueString, value);
+                
+                case SCIMComparisonOperators.EW:
+                    return MongoDbOptimizedExpressionExtensions.CreateOptimizedCaseInsensitiveEndsWith(propertyValueString, value);
+                
+                case SCIMComparisonOperators.CO:
+                    return MongoDbOptimizedExpressionExtensions.CreateOptimizedCaseInsensitiveContains(propertyValueString, value);
+                
+                default:
+                    // For other operators (GT, LT, GE, LE, PR), fall back to default behavior
+                    // as they don't typically benefit from case-insensitive optimization
+                    return SCIMExpressionLinqExtensions.BuildComparisonExpression(
+                        expression, 
+                        new SCIMSchemaAttribute("temp") { Type = SCIMSchemaAttributeTypes.STRING, CaseExact = false },
+                        propertyValueString);
+            }
         }
 
         #endregion

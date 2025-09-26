@@ -69,16 +69,36 @@ public static class MongoDbClientExtensions
         {
 		var compoundIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId).Ascending(a => a.SchemaAttributeId).Ascending(a => a.ValueString);
 		var representationIdIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.RepresentationId);
+		
+		// Add optimized index for filtering by SchemaAttributeId and ValueString (commonly used in SCIM queries)
+		var schemaAttributeValueIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.SchemaAttributeId).Ascending(a => a.ValueString);
+		
+		// Add index for ValueString with case-insensitive collation (useful for regex queries)
+		var caseInsensitiveCollation = new Collation("en", strength: CollationStrength.Secondary);
+		var valueStringCaseInsensitiveOptions = new CreateIndexOptions { Collation = caseInsensitiveCollation };
+		var valueStringIndex = Builders<SCIMRepresentationAttribute>.IndexKeys.Ascending(a => a.ValueString);
+		
             EnsureIndexCreated(db, "RepresentationId_1_SchemaAttributeId_1_ValueString_1", name, compoundIndex);
             EnsureIndexCreated(db, "RepresentationId_1", name, representationIdIndex);
+            EnsureIndexCreated(db, "SchemaAttributeId_1_ValueString_1", name, schemaAttributeValueIndex);
+            EnsureIndexCreated(db, "ValueString_1_case_insensitive", name, valueStringIndex, valueStringCaseInsensitiveOptions);
         }
 
-	private static async void EnsureIndexCreated(IMongoDatabase db, string indexName, string name, IndexKeysDefinition<SCIMRepresentationAttribute> indexDefinition)
+	private static async void EnsureIndexCreated(IMongoDatabase db, string indexName, string name, IndexKeysDefinition<SCIMRepresentationAttribute> indexDefinition, CreateIndexOptions options = null)
         {
             var collection = db.GetCollection<SCIMRepresentationAttribute>(name);
             var indexes = await collection.Indexes.List().ToListAsync();
             if (indexes.Any(i => i.Elements.Any(e => e.Name == "name" && e.Value.AsString == indexName))) return;
-            collection.Indexes.CreateOne(indexDefinition);
+            
+            if (options != null)
+            {
+                var indexModel = new CreateIndexModel<SCIMRepresentationAttribute>(indexDefinition, options);
+                collection.Indexes.CreateOne(indexModel);
+            }
+            else
+            {
+                collection.Indexes.CreateOne(indexDefinition);
+            }
         }
 
 	private static IMongoCollection<T> EnsureCollectionIsCreated<T>(IMongoDatabase db, string name)
