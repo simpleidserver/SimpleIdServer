@@ -9,13 +9,14 @@ namespace SimpleIdServer.Scim.Commands
 {
     public class ReplaceRepresentationCommand : ISCIMCommand<ReplaceRepresentationResult>
     {
-        public ReplaceRepresentationCommand(string id, string resourceType, RepresentationParameter representation, string location, string realm)
+        public ReplaceRepresentationCommand(string id, string resourceType, RepresentationParameter representation, string location, string realm, bool isPublishEvtsEnabled)
         {
             Id = id;
             ResourceType = resourceType;
             Representation = representation;
             Location = location;
             Realm = realm;
+            IsPublishEvtsEnabled = isPublishEvtsEnabled;
         }
 
         public string Id { get; private set; }
@@ -23,6 +24,7 @@ namespace SimpleIdServer.Scim.Commands
         public RepresentationParameter Representation { get; private set; }
         public string Location { get; }
         public string Realm { get; set; }
+        public bool IsPublishEvtsEnabled { get; set; }
     }
 
     public class ReplaceRepresentationResult

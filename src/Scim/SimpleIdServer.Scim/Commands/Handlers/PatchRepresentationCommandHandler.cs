@@ -83,7 +83,10 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
                 await _scimRepresentationCommandRepository.Update(existingRepresentation).ConfigureAwait(false);
                 await transaction.Commit().ConfigureAwait(false);
-                await NotifyAllReferences(references).ConfigureAwait(false);
+                if(patchRepresentationCommand.IsPublishEvtsEnabled)
+                {
+                    await NotifyAllReferences(references).ConfigureAwait(false);
+                }
             }
 
             existingRepresentation.Apply(references, patchResultLst);

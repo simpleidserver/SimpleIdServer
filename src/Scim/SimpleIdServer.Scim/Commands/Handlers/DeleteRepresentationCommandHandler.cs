@@ -55,7 +55,10 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 
                 await _scimRepresentationCommandRepository.Delete(representation).ConfigureAwait(false);
                 await transaction.Commit().ConfigureAwait(false);
-                await NotifyAllReferences(references).ConfigureAwait(false);
+                if(request.IsPublishEvtsEnabled)
+                {
+                    await NotifyAllReferences(references).ConfigureAwait(false);
+                }
             }
 
             return GenericResult<SCIMRepresentation>.Ok(result);

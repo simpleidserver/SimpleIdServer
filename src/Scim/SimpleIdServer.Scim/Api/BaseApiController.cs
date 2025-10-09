@@ -349,7 +349,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.AddResource);
             try
             {
-                var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm);
+                var command = new AddRepresentationCommand(_resourceType, jobj, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm, IsPublishEvtsEnabled);
                 var addRepresentationResult = await _addRepresentationCommandHandler.Handle(command);
                 if (addRepresentationResult.HasError) return this.BuildError(addRepresentationResult);
                 var representation = addRepresentationResult.Result;
@@ -398,13 +398,17 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.DeleteResource, id));
             try
             {
-                var getRepresentationResult = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm));
+                var getRepresentationResult = await _deleteRepresentationCommandHandler.Handle(new DeleteRepresentationCommand(id, _resourceType, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm, IsPublishEvtsEnabled));
                 if (getRepresentationResult.HasError) return this.BuildError(getRepresentationResult);
                 var representation = getRepresentationResult.Result;
                 representation.ApplyEmptyArray();
                 var location = GetLocation(realm, representation);
                 var content = representation.ToResponse(location, false, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                if (IsPublishEvtsEnabled)
+                {
+                    await _busControl.Publish(new RepresentationRemovedEvent(id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty));
+                }
+
                 return new StatusCodeResult((int)HttpStatusCode.NoContent);
             }
             catch (SCIMSchemaViolatedException ex)
@@ -442,7 +446,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(Global.UpdateResource, id);
             try
             {
-                var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm));
+                var updateResult = await _replaceRepresentationCommandHandler.Handle(new ReplaceRepresentationCommand(id, _resourceType, representationParameter, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm, IsPublishEvtsEnabled));
                 if (updateResult.HasError) return this.BuildError(updateResult);
                 if (!updateResult.Result.IsReplaced) return NoContent();
                 var representation = updateResult.Result.Representation;
@@ -515,7 +519,7 @@ namespace SimpleIdServer.Scim.Api
             _logger.LogInformation(string.Format(Global.PatchResource, id, patchRepresentation == null ? string.Empty : JsonSerializer.Serialize(patchRepresentation)));
             try
             {
-                var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm));
+                var patchRes = await _patchRepresentationCommandHandler.Handle(new PatchRepresentationCommand(id, ResourceType, patchRepresentation, _uriProvider.GetAbsoluteUriWithVirtualPath(), realm, IsPublishEvtsEnabled));
                 if (patchRes.HasError) return this.BuildError(patchRes);
                 var patchResult = patchRes.Result;
                 if (!patchResult.IsPatched) return NoContent();
@@ -525,9 +529,7 @@ namespace SimpleIdServer.Scim.Api
                 if(!_options.IsFullRepresentationReturned)
                 {
                     var content = representation.ToResponse(location, true, mergeExtensionAttributes: _options.MergeExtensionAttributes);
-                    if (IsPublishEvtsEnabled)
-                        await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty, patchRes.Result.PatchOperations));
-                    
+                    if (IsPublishEvtsEnabled) await _busControl.Publish(new RepresentationUpdatedEvent(representation.Id, representation.Version, GetResourceType(_resourceType), realm, content, _options.IncludeToken ? Request.GetToken() : string.Empty, patchRes.Result.PatchOperations));
                     return BuildHTTPResult(HttpStatusCode.OK, location, representation.Version, content);
                 }
                 else
