@@ -57,7 +57,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             if (!patchResult.Patches.Any()) return GenericResult<ReplaceRepresentationResult>.Ok(ReplaceRepresentationResult.NoReplacement());
             var patchOperations = patchResult.Patches.Where(p => p.Attr != null).ToList();
             var displayNameDifferent = existingRepresentation.DisplayName != oldDisplayName;
-            var modifiedAttributes = patchOperations.Where(p => p.Operation != SCIMPatchOperations.REMOVE && p.Attr != null && !p.Attr.IsLeaf() && p.Attr.SchemaAttribute.MultiValued == false).Select(p => p.Attr);
+            var modifiedAttributes = patchOperations.Where(p => p.Operation != SCIMPatchOperations.REMOVE && p.Attr != null && p.Attr.SchemaAttribute.MultiValued == false).Select(p => p.Attr);
             await _representationHelper.CheckUniqueness(replaceRepresentationCommand.Realm, modifiedAttributes);
             _representationHelper.CheckMutability(patchOperations);
             var references = await _representationReferenceSync.Sync(existingRepresentation.ResourceType, existingRepresentation, patchOperations, replaceRepresentationCommand.Location, schema, displayNameDifferent);

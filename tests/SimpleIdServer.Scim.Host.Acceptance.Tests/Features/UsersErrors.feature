@@ -249,6 +249,69 @@ Scenario: Error is returned when schema is not valid (HTTP POST)
 	Then JSON 'scimType'='invalidSyntax'
 	Then JSON 'detail'='the required schemas urn:ietf:params:scim:schemas:core:2.0:User,urn:ietf:params:scim:schemas:extension:enterprise:2.0:User are missing'
 
+Scenario: Error is returned when trying to update the username with HTTP PATCH but this username already exists
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body
+	And execute HTTP PATCH JSON request 'http://localhost/Users/$id$'
+	| Key        | Value                                                            |
+	| schemas    | [ "urn:ietf:params:scim:api:messages:2.0:PatchOp" ]				|
+	| Operations | [ { "op": "replace", "path": "userName", "value" : "bjen" } ]    |
+	And extract JSON from body
+
+
+	Then HTTP status code equals to '409'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='409'
+	Then JSON 'scimType'='uniqueness'
+	Then JSON 'detail'='attribute userName must be unique'
+
+Scenario: Error is returned when trying to update the username with HTTP PUT but this username already exists
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	
+	When execute HTTP POST JSON request 'http://localhost/Users'
+	| Key            | Value                                                                                                          |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen2                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+
+	And extract JSON from body
+	And extract 'id' from JSON body
+	And execute HTTP PUT JSON request 'http://localhost/Users/$id$'
+	| Key | Value |
+	| schemas        | [ "urn:ietf:params:scim:schemas:core:2.0:User", "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" ] |
+	| userName       | bjen                                                                                                           |
+	| name           | { "formatted" : "formatted", "familyName": "familyName", "givenName": "givenName" }                            |
+	| employeeNumber | number                                                                                                         |
+	And extract JSON from body
+
+	Then HTTP status code equals to '409'
+	Then JSON 'schemas[0]'='urn:ietf:params:scim:api:messages:2.0:Error'
+	Then JSON 'status'='409'
+	Then JSON 'scimType'='uniqueness'
+	Then JSON 'detail'='attribute userName must be unique'
+
 Scenario: Error is returned when trying to add two resources with the same unique attribute
 	When execute HTTP POST JSON request 'http://localhost/Users'
 	| Key            | Value                                                                                                          |
