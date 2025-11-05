@@ -6,6 +6,7 @@ using SimpleIdServer.Scim.Persistence.MongoDB.Extensions;
 using SimpleIdServer.Scim.Persistence.MongoDB.Infrastructures;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
@@ -33,10 +34,10 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
         public ICollection<CustomMongoDBRef> SchemaRefs { get; set; }
         public ICollection<CustomMongoDBRef> AttributeRefs { get; set; }
 
-        public async Task IncludeAll(SCIMDbContext dbContext)
+        public async Task IncludeAll(SCIMDbContext dbContext, CancellationToken cancellationToken = default)
         {
             IncludeSchemas(dbContext.Database);
-            await IncludeAttributes(dbContext);
+            await IncludeAttributes(dbContext, cancellationToken);
         }
 
         public void IncludeSchemas(IMongoDatabase database)
@@ -44,7 +45,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             Schemas = MongoDBEntity.GetReferences<SCIMSchema>(SchemaRefs, database);
         }
 
-        public async Task IncludeAttributes(SCIMDbContext dbContext)
+        public async Task IncludeAttributes(SCIMDbContext dbContext, CancellationToken cancellationToken = default)
         {
             // Optimize MongoDB query for large result sets by using Find with explicit options
             // This provides better performance than LINQ for large collections (e.g., groups with 20k+ members)
@@ -56,9 +57,9 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             };
 
             var cursor = await dbContext.SCIMRepresentationAttributeLst
-                .FindAsync(filter, findOptions);
+                .FindAsync(filter, findOptions, cancellationToken);
             
-            FlatAttributes = await cursor.ToListAsync();
+            FlatAttributes = await cursor.ToListAsync(cancellationToken);
         }
     }
 }

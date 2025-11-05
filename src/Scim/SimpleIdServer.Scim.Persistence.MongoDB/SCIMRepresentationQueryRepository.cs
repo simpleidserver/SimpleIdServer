@@ -153,7 +153,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
                 return null;
             }
 
-            await result.IncludeAll(_scimDbContext);
+            await result.IncludeAll(_scimDbContext, cancellationToken);
             return result;
         }
 
