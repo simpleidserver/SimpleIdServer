@@ -48,7 +48,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
         public async Task IncludeAttributes(SCIMDbContext dbContext, CancellationToken cancellationToken = default)
         {
             // Optimize MongoDB query for large result sets by using Find with explicit options
-            // This provides better performance than LINQ for large collections (e.g., groups with 20k+ members)
+            // This provides better performance than LINQ for representations with many attributes (e.g., a group with 20k+ member attributes)
             var filter = Builders<SCIMRepresentationAttribute>.Filter.Eq(a => a.RepresentationId, Id);
             var findOptions = new FindOptions<SCIMRepresentationAttribute>
             {
