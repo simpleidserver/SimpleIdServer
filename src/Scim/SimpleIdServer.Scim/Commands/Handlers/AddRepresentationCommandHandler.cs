@@ -78,7 +78,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 Path = a.FullPath
             }).ToList();
             scimRepresentation.RefreshHierarchicalAttributesCache();
-            var references = await _representationReferenceSync.Sync(addRepresentationCommand.ResourceType, scimRepresentation, patchOperations, addRepresentationCommand.Location, schema, false);
+            var references = await _representationReferenceSync.Sync(attributeMappings, addRepresentationCommand.ResourceType, scimRepresentation, patchOperations, addRepresentationCommand.Location, schema, false);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 await _scimRepresentationCommandRepository.Add(scimRepresentation).ConfigureAwait(false);
@@ -90,7 +90,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit().ConfigureAwait(false);
                 if(addRepresentationCommand.IsPublishEvtsEnabled)
                 {
-                    await NotifyAllReferences(references).ConfigureAwait(false);
+                    await NotifyAllReferences(
+                        scimRepresentation.Id,
+                        scimRepresentation.ResourceType,
+                        scimRepresentation.RealmName,
+                        references,
+                        attributeMappings).ConfigureAwait(false);
                 }
             }
 

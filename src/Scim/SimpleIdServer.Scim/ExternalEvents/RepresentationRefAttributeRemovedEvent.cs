@@ -1,8 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
-using SimpleIdServer.Scim.Domains;
-
 namespace SimpleIdServer.Scim.ExternalEvents
 {
     public class RepresentationRefAttributeRemovedEvent : BaseReferenceAttributeEvent
@@ -12,7 +10,12 @@ namespace SimpleIdServer.Scim.ExternalEvents
 
         }
 
-        public RepresentationRefAttributeRemovedEvent(SCIMRepresentationAttribute attribute) : base(attribute)
+        public RepresentationRefAttributeRemovedEvent(
+            string representationId,
+            string resourceType,
+            string fromRepresentationId,
+            string fromRepresentationType,
+            string? realm) : base(representationId, resourceType, fromRepresentationId, fromRepresentationType, representationId)
         {
         }
     }

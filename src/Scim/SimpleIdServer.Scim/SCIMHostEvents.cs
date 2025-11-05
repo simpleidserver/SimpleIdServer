@@ -15,7 +15,6 @@ public class SCIMHostEvents
     public Action<RepresentationAddedEvent> RepresentationAdded = (r) => { };
     public Action<RepresentationRefAttributeAddedEvent> RepresentationRefAttributeAdded = (r) => { };
     public Action<RepresentationRefAttributeRemovedEvent> RepresentationRefAttributeRemoved = (r) => { };
-    public Action<RepresentationRefAttributeUpdatedEvent> RepresentationRefAttributeUpdated = (r) => { };
     public Action<RepresentationRemovedEvent> RepresentationRemoved = (r) => { };
     public Action<RepresentationUpdatedEvent> RepresentationUpdated = (r) => { };
 }

@@ -15,8 +15,8 @@ namespace SimpleIdServer.Scim.Helpers
 {
     public class RepresentationReferenceSync : IRepresentationReferenceSync
 	{
-		private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
-		private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
+        private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
+        private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
 		private readonly ISCIMSchemaCommandRepository _scimSchemaCommandRepository;
 
 		public RepresentationReferenceSync(
@@ -29,21 +29,20 @@ namespace SimpleIdServer.Scim.Helpers
 			_scimSchemaCommandRepository = scimSchemaCommandRepository;
 		}
 
-        public async Task<List<RepresentationSyncResult>> Sync(string resourceType, SCIMRepresentation newSourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, string location, SCIMSchema schema, bool updateAllReference = false, bool isRepresentationRemoved = false)
+        public async Task<List<RepresentationSyncResult>> Sync(List<SCIMAttributeMapping> attributeMappings, string resourceType, SCIMRepresentation newSourceScimRepresentation, ICollection<SCIMPatchResult> patchOperations, string location, SCIMSchema schema, bool updateAllReference = false, bool isRepresentationRemoved = false)
         {
             var result = new RepresentationSyncResult();
-            var attributeMappingLst = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(resourceType);
             var sync = new List<RepresentationSyncResult>();
-            if (!attributeMappingLst.Any()) sync.Add(result);
+            if (!attributeMappings.Any()) sync.Add(result);
 
-            var mappedSchemas = (await _scimSchemaCommandRepository.FindSCIMSchemaByResourceTypes(attributeMappingLst.Select(a => a.TargetResourceType).Union(attributeMappingLst.Select(a => a.SourceResourceType)).Distinct())).ToList();
-            var selfReferenceAttribute = attributeMappingLst.FirstOrDefault(a => a.IsSelf);
-            var propagatedAttribute = attributeMappingLst.FirstOrDefault(a => a.Mode == Mode.PROPAGATE_INHERITANCE);
+            var mappedSchemas = (await _scimSchemaCommandRepository.FindSCIMSchemaByResourceTypes(attributeMappings.Select(a => a.TargetResourceType).Union(attributeMappings.Select(a => a.SourceResourceType)).Distinct())).ToList();
+            var selfReferenceAttribute = attributeMappings.FirstOrDefault(a => a.IsSelf);
+            var propagatedAttribute = attributeMappings.FirstOrDefault(a => a.Mode == Mode.PROPAGATE_INHERITANCE);
             var mode = propagatedAttribute == null ? Mode.STANDARD : Mode.PROPAGATE_INHERITANCE;
             var allAdded = new List<RepresentationModified>();
             var allRemoved = new List<RepresentationModified>();
 
-            foreach (var kvp in attributeMappingLst.GroupBy(m => m.SourceAttributeId))
+            foreach (var kvp in attributeMappings.GroupBy(m => m.SourceAttributeId))
             {
                 var sourceSchema = mappedSchemas.First(s => s.ResourceType == kvp.First().SourceResourceType && s.Attributes.Any(a => a.Id == kvp.Key)); 
                 var allCurrentIds = patchOperations.Where(o => o.Attr.SchemaAttributeId == kvp.Key).SelectMany(pa => patchOperations.Where(p => p.Attr.ParentAttributeId == pa.Attr.Id && p.Attr.SchemaAttribute.Name == "value").Select(p => p.Attr.ValueString));

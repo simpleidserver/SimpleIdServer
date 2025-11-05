@@ -36,10 +36,6 @@ public class BusHelper : IBusHelper
         {
             _options.SCIMEvents.RepresentationRefAttributeRemoved?.Invoke(refAttributeRemovedEvent);
         }
-        else if (evt is RepresentationRefAttributeUpdatedEvent refAttributeUpdatedEvent)
-        {
-            _options.SCIMEvents.RepresentationRefAttributeUpdated?.Invoke(refAttributeUpdatedEvent);
-        }
         else if (evt is RepresentationRemovedEvent removedEvent)
         {
             _options.SCIMEvents.RepresentationRemoved?.Invoke(removedEvent);

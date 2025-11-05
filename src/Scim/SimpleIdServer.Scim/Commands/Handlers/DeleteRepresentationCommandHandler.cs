@@ -15,15 +15,19 @@ namespace SimpleIdServer.Scim.Commands.Handlers
 {
     public class DeleteRepresentationCommandHandler : BaseCommandHandler, IDeleteRepresentationCommandHandler
     {
+        private readonly ISCIMAttributeMappingQueryRepository _scimAttributeMappingQueryRepository;
         private readonly ISCIMSchemaCommandRepository _scimSchemaCommandRepository;
         private readonly ISCIMRepresentationCommandRepository _scimRepresentationCommandRepository;
         private readonly IRepresentationReferenceSync _representationReferenceSync;
 
-        public DeleteRepresentationCommandHandler(ISCIMSchemaCommandRepository scimSchemaCommandRepository,
+        public DeleteRepresentationCommandHandler(
+            ISCIMAttributeMappingQueryRepository scimAttributeMappingQueryRepository,
+            ISCIMSchemaCommandRepository scimSchemaCommandRepository,
             ISCIMRepresentationCommandRepository scimRepresentationCommandRepository,
             IRepresentationReferenceSync representationReferenceSync,
             IBusHelper busControl) : base(busControl)
         {
+            _scimAttributeMappingQueryRepository = scimAttributeMappingQueryRepository;
             _scimSchemaCommandRepository = scimSchemaCommandRepository;
             _scimRepresentationCommandRepository = scimRepresentationCommandRepository;
             _representationReferenceSync = representationReferenceSync;
@@ -44,7 +48,8 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 Operation = SCIMPatchOperations.REMOVE,
                 Path = a.FullPath
             }).ToList();
-            var references = await _representationReferenceSync.Sync(request.ResourceType, representation, pathOperations, request.Location, schema, true, true);
+            var attributeMappings = await _scimAttributeMappingQueryRepository.GetBySourceResourceType(request.ResourceType);
+            var references = await _representationReferenceSync.Sync(attributeMappings, request.ResourceType, representation, pathOperations, request.Location, schema, true, true);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 foreach (var reference in references)
@@ -57,7 +62,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit().ConfigureAwait(false);
                 if(request.IsPublishEvtsEnabled)
                 {
-                    await NotifyAllReferences(references).ConfigureAwait(false);
+                    await NotifyAllReferences(
+                        representation.Id,
+                        representation.ResourceType,
+                        representation.RealmName, 
+                        references,
+                        attributeMappings).ConfigureAwait(false);
                 }
             }
 

@@ -60,7 +60,7 @@ namespace SimpleIdServer.Scim.Commands.Handlers
             var modifiedAttributes = patchOperations.Where(p => p.Operation != SCIMPatchOperations.REMOVE && p.Attr != null && p.Attr.SchemaAttribute.MultiValued == false).Select(p => p.Attr);
             await _representationHelper.CheckUniqueness(replaceRepresentationCommand.Realm, modifiedAttributes);
             _representationHelper.CheckMutability(patchOperations);
-            var references = await _representationReferenceSync.Sync(existingRepresentation.ResourceType, existingRepresentation, patchOperations, replaceRepresentationCommand.Location, schema, displayNameDifferent);
+            var references = await _representationReferenceSync.Sync(attributeMappings, existingRepresentation.ResourceType, existingRepresentation, patchOperations, replaceRepresentationCommand.Location, schema, displayNameDifferent);
             await using (var transaction = await _scimRepresentationCommandRepository.StartTransaction().ConfigureAwait(false))
             {
                 await _scimRepresentationCommandRepository.BulkDelete(patchOperations.Where(p => p.Operation == SCIMPatchOperations.REMOVE).Select(p => p.Attr), existingRepresentation.Id).ConfigureAwait(false);
@@ -78,7 +78,12 @@ namespace SimpleIdServer.Scim.Commands.Handlers
                 await transaction.Commit().ConfigureAwait(false);
                 if(replaceRepresentationCommand.IsPublishEvtsEnabled)
                 {
-                    await NotifyAllReferences(references).ConfigureAwait(false);
+                    await NotifyAllReferences(
+                        existingRepresentation.Id,
+                        existingRepresentation.ResourceType,
+                        existingRepresentation.RealmName,
+                        references,
+                        attributeMappings).ConfigureAwait(false);
                 }
             }
 

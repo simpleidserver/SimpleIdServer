@@ -1,4 +1,5 @@
-﻿using SimpleIdServer.Scim.Domains;
+﻿// Copyright (c) SimpleIdServer. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
 
 namespace SimpleIdServer.Scim.ExternalEvents
 {
@@ -9,11 +10,28 @@ namespace SimpleIdServer.Scim.ExternalEvents
 
         }
 
-        public BaseReferenceAttributeEvent(SCIMRepresentationAttribute attribute)
+        public BaseReferenceAttributeEvent(
+            string representationId,
+            string resourceType,
+            string fromRepresentationId,
+            string fromRepresentationType,
+            string? realm)
         {
-            Attribute = attribute;
+            RepresentationId = representationId;
+            ResourceType = resourceType;
+            FromRepresentationId = fromRepresentationId;
+            FromRepresentationType = fromRepresentationType;
+            Realm = realm;
         }
 
-        public SCIMRepresentationAttribute Attribute { get; set; }
+        public string RepresentationId { get; set; }
+
+        public string ResourceType {  get; set; }
+
+        public string FromRepresentationId { get; set; }
+
+        public string FromRepresentationType { get; set; }
+
+        public string? Realm { get; set; }
     }
 }
