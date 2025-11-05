@@ -9,6 +9,9 @@ namespace SimpleIdServer.Scim.Domains
 {
     public class SCIMRepresentation : BaseDomain, IEquatable<SCIMRepresentation>
     {
+        private Dictionary<string, SCIMSchema> _schemaByAttributeIdCache;
+        private Dictionary<string, SCIMSchema> _schemaByIdCache;
+
         public SCIMRepresentation()
         {
             Schemas = new List<SCIMSchema>();
@@ -81,12 +84,65 @@ namespace SimpleIdServer.Scim.Domains
 
         public SCIMSchema GetSchema(SCIMSchemaAttribute attribute)
         {
-            return Schemas.FirstOrDefault(s => s.HasAttribute(attribute));
+            EnsureSchemaCacheInitialized();
+            
+            if (_schemaByAttributeIdCache.TryGetValue(attribute.Id, out var schema))
+            {
+                return schema;
+            }
+            
+            return null;
         }
 
         public SCIMSchema GetSchema(string id)
         {
-            return Schemas.FirstOrDefault(s => s.Id == id);
+            EnsureSchemaCacheInitialized();
+            
+            if (_schemaByIdCache.TryGetValue(id, out var schema))
+            {
+                return schema;
+            }
+            
+            return null;
+        }
+
+        public SCIMSchema GetSchemaByAttributeId(string attributeId)
+        {
+            EnsureSchemaCacheInitialized();
+            
+            if (_schemaByAttributeIdCache.TryGetValue(attributeId, out var schema))
+            {
+                return schema;
+            }
+            
+            return null;
+        }
+
+        private void EnsureSchemaCacheInitialized()
+        {
+            if (_schemaByAttributeIdCache != null && _schemaByIdCache != null)
+            {
+                return;
+            }
+
+            _schemaByAttributeIdCache = new Dictionary<string, SCIMSchema>();
+            _schemaByIdCache = new Dictionary<string, SCIMSchema>();
+
+            foreach (var schema in Schemas)
+            {
+                _schemaByIdCache[schema.Id] = schema;
+                
+                foreach (var attribute in schema.Attributes)
+                {
+                    _schemaByAttributeIdCache[attribute.Id] = schema;
+                }
+            }
+        }
+
+        public void InvalidateSchemaCache()
+        {
+            _schemaByAttributeIdCache = null;
+            _schemaByIdCache = null;
         }
 
         public void AddAttribute(SCIMRepresentationAttribute attribute)
@@ -384,37 +440,71 @@ namespace SimpleIdServer.Scim.Domains
         public static List<SCIMRepresentationAttribute> BuildHierarchicalAttributes(IEnumerable<SCIMRepresentationAttribute> attributes)
         {
             var rootId = string.Empty;
-            if (attributes.Count() == 0) return new List<SCIMRepresentationAttribute>();
-            var parentsDictionary = new Dictionary<string, List<SCIMRepresentationAttribute>>();
-            var treeNodes = new List<SCIMRepresentationAttribute>();
-            foreach (var scimRepresentationAttribute in attributes)
-            {
-                var parentIdKey = scimRepresentationAttribute.ParentAttributeId ?? rootId;
-                treeNodes.Add(scimRepresentationAttribute);
-                if (!parentsDictionary.ContainsKey(parentIdKey))
-                {
-                    parentsDictionary[parentIdKey] = new List<SCIMRepresentationAttribute>() { scimRepresentationAttribute };
-                    continue;
-                }
+            var attributesList = attributes as List<SCIMRepresentationAttribute> ?? attributes.ToList();
+            if (attributesList.Count == 0) return new List<SCIMRepresentationAttribute>();
 
-                parentsDictionary[parentIdKey].Add(scimRepresentationAttribute);
+            var parentsDictionary = new Dictionary<string, List<SCIMRepresentationAttribute>>();
+            var existingIds = new HashSet<string>(attributesList.Count);
+            var emptyList = new List<SCIMRepresentationAttribute>();
+
+            foreach (var attr in attributesList)
+            {
+                existingIds.Add(attr.Id);
+                var parentIdKey = attr.ParentAttributeId ?? rootId;
+                if (!parentsDictionary.TryGetValue(parentIdKey, out var children))
+                {
+                    children = new List<SCIMRepresentationAttribute>();
+                    parentsDictionary[parentIdKey] = children;
+                }
+                children.Add(attr);
             }
 
-            foreach(var node in treeNodes)
+            foreach (var node in attributesList)
             {
-                if(parentsDictionary.ContainsKey(node.Id))
+                if (parentsDictionary.TryGetValue(node.Id, out var children))
                 {
-                    node.CachedChildren = parentsDictionary[node.Id];
-                    node.Children = parentsDictionary[node.Id];
+                    node.CachedChildren = children;
+                    node.Children = children;
                 }
                 else
                 {
-                    var lst = new List<SCIMRepresentationAttribute>();
-                    node.CachedChildren = lst;
-                    node.Children = lst;
+                    node.CachedChildren = emptyList;
+                    node.Children = emptyList;
                 }
             }
-            var attrWithNoParentLst = attributes.Where(a => a.ParentAttributeId == rootId || !attributes.Any(c => c.Id == a.ParentAttributeId)).ToList();
+
+            List<SCIMRepresentationAttribute> attrWithNoParentLst;
+            if (parentsDictionary.TryGetValue(rootId, out var rootChildren))
+            {
+                attrWithNoParentLst = new List<SCIMRepresentationAttribute>(rootChildren.Count);
+                foreach (var attr in rootChildren)
+                {
+                    attrWithNoParentLst.Add(attr);
+                }
+                
+                foreach (var attr in attributesList)
+                {
+                    if (!string.IsNullOrEmpty(attr.ParentAttributeId) && 
+                        attr.ParentAttributeId != rootId && 
+                        !existingIds.Contains(attr.ParentAttributeId))
+                    {
+                        attrWithNoParentLst.Add(attr);
+                    }
+                }
+            }
+            else
+            {
+                attrWithNoParentLst = new List<SCIMRepresentationAttribute>();
+                foreach (var attr in attributesList)
+                {
+                    if (string.IsNullOrEmpty(attr.ParentAttributeId) || 
+                        !existingIds.Contains(attr.ParentAttributeId))
+                    {
+                        attrWithNoParentLst.Add(attr);
+                    }
+                }
+            }
+
             foreach (var attrWithNoParent in attrWithNoParentLst)
             {
                 attrWithNoParent.ComputeValueIndex();

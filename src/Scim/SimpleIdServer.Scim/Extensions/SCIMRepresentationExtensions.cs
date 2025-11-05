@@ -180,7 +180,8 @@ namespace SimpleIdServer.Scim.Domain
                 representation.ApplyEmptyArray();
             }
 
-            var attributes = representation.HierarchicalAttributes
+            var attrs = representation.HierarchicalAttributes.ToList();
+            var attributes = attrs
                 .Where(p => string.IsNullOrWhiteSpace(p.ParentAttributeId))
                 .Select(a =>
             {

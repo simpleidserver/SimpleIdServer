@@ -30,31 +30,86 @@ namespace SimpleIdServer.Scim.Helpers
 				return;
 			}
 
-			foreach (var attributeMapping in attributeMappingLst)
+			var controllerNameCache = attributeMappingLst
+				.GroupBy(m => m.TargetResourceType)
+				.ToDictionary(
+					g => g.Key,
+					g => _resourceTypeResolver.ResolveByResourceType(g.Key).ControllerName
+				);
+
+			foreach (var representation in representationLst)
 			{
-				foreach(var representation in representationLst)
-                {
-	                var controllerName = _resourceTypeResolver.ResolveByResourceType(attributeMapping.TargetResourceType).ControllerName;
+				var referenceAttributeCache = new Dictionary<string, SCIMSchemaAttribute>();
+				foreach (var schema in representation.Schemas)
+				{
+					foreach (var attr in schema.Attributes.Where(a => !string.IsNullOrEmpty(a.ParentId)))
+					{
+						if (attr.Name == "$ref" && !referenceAttributeCache.ContainsKey(attr.ParentId))
+						{
+							referenceAttributeCache[attr.ParentId] = attr;
+						}
+					}
+				}
+
+				var childrenByParentId = new Dictionary<string, List<SCIMRepresentationAttribute>>();
+				foreach (var attr in representation.FlatAttributes)
+				{
+					if (!string.IsNullOrEmpty(attr.ParentAttributeId))
+					{
+						if (!childrenByParentId.ContainsKey(attr.ParentAttributeId))
+						{
+							childrenByParentId[attr.ParentAttributeId] = new List<SCIMRepresentationAttribute>();
+						}
+						childrenByParentId[attr.ParentAttributeId].Add(attr);
+					}
+				}
+
+				foreach (var attributeMapping in attributeMappingLst)
+				{
+					var controllerName = controllerNameCache[attributeMapping.TargetResourceType];
 					var attrs = representation.GetAttributesByAttrSchemaId(attributeMapping.SourceAttributeId).ToList();
-					foreach(var attr in attrs)
-                    {
-						var values = representation.GetChildren(attr);
-						var value = values.FirstOrDefault(v => v.SchemaAttribute.Name == "value");
-						var type = values.FirstOrDefault(v => v.SchemaAttribute.Name == "type");
-						var reference = values.FirstOrDefault(v => v.SchemaAttribute.Name == "$ref");
-						var schema = representation.GetSchema(attr);
-						var referenceAttribute = schema?.GetChildren(attr.SchemaAttribute).FirstOrDefault(v => v.Name == "$ref");
-						if (value == null || string.IsNullOrWhiteSpace(value.ValueString) || reference != null || referenceAttribute == null || type == null || type.ValueString != attributeMapping.TargetResourceType)
-                        {
+
+					foreach (var attr in attrs)
+					{
+						if (!childrenByParentId.TryGetValue(attr.Id, out var children))
+						{
 							continue;
-                        }
-						
-						representation.AddAttribute(attr, new SCIMRepresentationAttribute(Guid.NewGuid().ToString(), Guid.NewGuid().ToString(), referenceAttribute, referenceAttribute.SchemaId)
+						}
+
+						var childrenLookup = children.ToLookup(v => v.SchemaAttribute.Name);
+						var value = childrenLookup["value"].FirstOrDefault();
+						var type = childrenLookup["type"].FirstOrDefault();
+						var reference = childrenLookup["$ref"].FirstOrDefault();
+						if (value == null || 
+							string.IsNullOrWhiteSpace(value.ValueString) || 
+							reference != null || 
+							type == null || 
+							type.ValueString != attributeMapping.TargetResourceType)
+						{
+							continue;
+						}
+
+						var schema = representation.GetSchemaByAttributeId(attr.SchemaAttributeId);
+						if (schema == null)
+						{
+							continue;
+						}
+
+						if (!referenceAttributeCache.TryGetValue(attr.SchemaAttributeId, out var referenceAttribute))
+						{
+							continue;
+						}
+
+						representation.AddAttribute(attr, new SCIMRepresentationAttribute(
+							Guid.NewGuid().ToString(), 
+							Guid.NewGuid().ToString(), 
+							referenceAttribute, 
+							referenceAttribute.SchemaId)
 						{
 							ValueReference = $"{baseUrl}/{controllerName}/{value.ValueString}"
 						});
-                    }
-                }
+					}
+				}
 			}
 		}
 	}
