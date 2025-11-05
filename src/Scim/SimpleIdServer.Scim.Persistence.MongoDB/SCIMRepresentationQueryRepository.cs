@@ -97,9 +97,15 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             var representationsList = await filteredRepresentations.ToListAsync(cancellationToken);
             var representationIds = representationsList.Select(r => r.Id).ToList();
             
-            var attributes = await _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => representationIds.Contains(a.RepresentationId))
-                .ToListAsync(cancellationToken);
+            // Optimize MongoDB query for potentially large result sets (e.g., when querying groups with many members)
+            // Use Find API with explicit batch size instead of LINQ for better performance
+            var filter = Builders<SCIMRepresentationAttribute>.Filter.In(a => a.RepresentationId, representationIds);
+            var findOptions = new FindOptions<SCIMRepresentationAttribute>
+            {
+                BatchSize = 10000 // Fetch up to 10k documents per batch to reduce round trips
+            };
+            var cursor = await _scimDbContext.SCIMRepresentationAttributeLst.FindAsync(filter, findOptions, cancellationToken);
+            var attributes = await cursor.ToListAsync(cancellationToken);
             
             var attributesByRepId = attributes.GroupBy(a => a.RepresentationId)
                 .ToDictionary(g => g.Key, g => g.ToList());
