@@ -46,9 +46,22 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
 
         public async Task IncludeAttributes(SCIMDbContext dbContext)
         {
-            FlatAttributes = await dbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                .Where(a => a.RepresentationId == Id)
-                .ToMongoListAsync();
+            // Optimize MongoDB query for large result sets by using Find with explicit options
+            // This provides better performance than LINQ for large collections (e.g., groups with 20k+ members)
+            var filter = Builders<SCIMRepresentationAttribute>.Filter.Eq(a => a.RepresentationId, Id);
+            var findOptions = new FindOptions<SCIMRepresentationAttribute>
+            {
+                // Use larger batch size to reduce round trips to MongoDB
+                // Default first batch is 101, then 16MB chunks - we optimize for large groups
+                BatchSize = 10000, // Fetch up to 10k documents per batch
+                // Skip building intermediate LINQ expression trees
+                NoCursorTimeout = false
+            };
+
+            var cursor = await dbContext.SCIMRepresentationAttributeLst
+                .FindAsync(filter, findOptions);
+            
+            FlatAttributes = await cursor.ToListAsync();
         }
     }
 }
