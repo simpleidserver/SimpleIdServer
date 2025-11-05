@@ -16,6 +16,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 			CollectionProvisioningLst = "provisioningLst";
 			CollectionRealms = "realms";
             SupportTransaction = true;
+			BatchSize = 10000;
 		}
 
 		public string ConnectionString { get; set; }
@@ -28,5 +29,11 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 		public string CollectionRealms { get; set; }
 
         public bool SupportTransaction { get; set; }
+		
+		/// <summary>
+		/// MongoDB cursor batch size for large result sets. 
+		/// Default is 10000 to optimize performance when loading groups with many members.
+		/// </summary>
+		public int BatchSize { get; set; }
 	}
 }

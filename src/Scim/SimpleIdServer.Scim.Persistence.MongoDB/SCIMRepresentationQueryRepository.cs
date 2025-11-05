@@ -102,7 +102,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             var filter = Builders<SCIMRepresentationAttribute>.Filter.In(a => a.RepresentationId, representationIds);
             var findOptions = new FindOptions<SCIMRepresentationAttribute>
             {
-                BatchSize = 10000 // Fetch up to 10k documents per batch to reduce round trips
+                BatchSize = _scimDbContext.Options.BatchSize
             };
             var cursor = await _scimDbContext.SCIMRepresentationAttributeLst.FindAsync(filter, findOptions, cancellationToken);
             var attributes = await cursor.ToListAsync(cancellationToken);

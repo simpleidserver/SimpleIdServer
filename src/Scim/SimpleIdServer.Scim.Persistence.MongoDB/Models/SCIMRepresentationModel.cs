@@ -51,9 +51,8 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             var filter = Builders<SCIMRepresentationAttribute>.Filter.Eq(a => a.RepresentationId, Id);
             var findOptions = new FindOptions<SCIMRepresentationAttribute>
             {
-                // Use larger batch size to reduce round trips to MongoDB
-                // Default first batch is 101, then 16MB chunks - we optimize for large groups
-                BatchSize = 10000 // Fetch up to 10k documents per batch
+                // Use configured batch size to reduce round trips to MongoDB
+                BatchSize = dbContext.Options.BatchSize
             };
 
             var cursor = await dbContext.SCIMRepresentationAttributeLst
