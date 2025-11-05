@@ -104,7 +104,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             {
                 BatchSize = _scimDbContext.Options.BatchSize
             };
-            var cursor = await _scimDbContext.SCIMRepresentationAttributeLst.FindAsync(filter, findOptions, cancellationToken);
+            using var cursor = await _scimDbContext.SCIMRepresentationAttributeLst.FindAsync(filter, findOptions, cancellationToken);
             var attributes = await cursor.ToListAsync(cancellationToken);
             
             var attributesByRepId = attributes.GroupBy(a => a.RepresentationId)

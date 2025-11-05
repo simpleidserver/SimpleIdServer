@@ -30,10 +30,16 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 
         public bool SupportTransaction { get; set; }
 		
+		private int _batchSize = 10000;
 		/// <summary>
 		/// MongoDB cursor batch size for large result sets. 
 		/// Default is 10000 to optimize performance when loading groups with many members.
+		/// Minimum value is 1, maximum recommended is 16MB worth of documents.
 		/// </summary>
-		public int BatchSize { get; set; }
+		public int BatchSize 
+		{ 
+			get => _batchSize;
+			set => _batchSize = value > 0 ? value : throw new System.ArgumentException("BatchSize must be greater than 0", nameof(BatchSize));
+		}
 	}
 }

@@ -56,7 +56,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
                 BatchSize = dbContext.Options.BatchSize
             };
 
-            var cursor = await dbContext.SCIMRepresentationAttributeLst
+            using var cursor = await dbContext.SCIMRepresentationAttributeLst
                 .FindAsync(filter, findOptions, cancellationToken);
             
             FlatAttributes = await cursor.ToListAsync(cancellationToken);
