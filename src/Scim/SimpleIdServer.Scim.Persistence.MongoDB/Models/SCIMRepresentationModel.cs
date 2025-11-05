@@ -53,9 +53,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Models
             {
                 // Use larger batch size to reduce round trips to MongoDB
                 // Default first batch is 101, then 16MB chunks - we optimize for large groups
-                BatchSize = 10000, // Fetch up to 10k documents per batch
-                // Skip building intermediate LINQ expression trees
-                NoCursorTimeout = false
+                BatchSize = 10000 // Fetch up to 10k documents per batch
             };
 
             var cursor = await dbContext.SCIMRepresentationAttributeLst
