@@ -28,6 +28,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             var result = await _dbContext.Client.Queryable<SugarIdentityProvisioning>()
                     .Includes(p => p.Realms)
                     .Includes(p => p.Histories)
+                    .Includes(p => p.Processes)
                     .Includes(p => p.Definition, d => d.MappingRules)
                     .FirstAsync(p => p.Realms.Any(r => r.RealmsName == realm) && p.Id == id, cancellationToken);
             return result?.ToDomain();
@@ -44,6 +45,7 @@ namespace SimpleIdServer.IdServer.Store.SqlSugar
             _dbContext.Client.Updateable(transformedIdentityProvisioning).ExecuteCommand();
             _dbContext.Client.UpdateNav(SugarIdentityProvisioning.Transform(identityProvisioning))
                 .Include(c => c.Histories)
+                .Include(c => c.Processes)
                 .Include(c => c.Realms)
                 .ExecuteCommand();
         }

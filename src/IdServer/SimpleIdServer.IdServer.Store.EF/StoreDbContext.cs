@@ -37,6 +37,7 @@ namespace SimpleIdServer.IdServer.Store.EF
         public DbSet<Consent> Grants { get; set; }
         public DbSet<IdentityProvisioning> IdentityProvisioningLst { get; set; }
         public DbSet<IdentityProvisioningDefinition> IdentityProvisioningDefinitions { get; set; }
+        public DbSet<IdentityProvisioningProcess> IdentityProvisioningProcesses { get; set; }
         public DbSet<UserClaim> UserClaims { get; set; }
         public DbSet<UserCredential> UserCredential { get; set; }
         public DbSet<ExtractedRepresentation> ExtractedRepresentations { get; set; }
@@ -100,6 +101,7 @@ namespace SimpleIdServer.IdServer.Store.EF
             modelBuilder.ApplyConfiguration(new IdentityProvisioningDefinitionConfiguration());
             modelBuilder.ApplyConfiguration(new IdentityProvisioningMappingRuleConfiguration());
             modelBuilder.ApplyConfiguration(new IdentityProvisioningHistoryConfiguration());
+            modelBuilder.ApplyConfiguration(new IdentityProvisioningProcessConfiguration());
             modelBuilder.ApplyConfiguration(new ExtractedRepresentationConfiguration());
             modelBuilder.ApplyConfiguration(new RealmUserConfiguration());
             modelBuilder.ApplyConfiguration(new GroupConfiguration());

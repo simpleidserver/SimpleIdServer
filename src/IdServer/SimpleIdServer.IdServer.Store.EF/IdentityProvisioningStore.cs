@@ -43,6 +43,7 @@ public class IdentityProvisioningStore : IIdentityProvisioningStore
         return _dbContext.IdentityProvisioningLst
                     .Include(p => p.Realms)
                     .Include(p => p.Histories)
+                    .Include(p => p.Processes)
                     .Include(p => p.Definition).ThenInclude(d => d.MappingRules)
                     .SingleOrDefaultAsync(p => p.Realms.Any(r => r.Name == realm) && p.Id == id, cancellationToken);
     }

@@ -23,6 +23,8 @@ public class SugarIdentityProvisioning
     public SugarIdentityProvisioningDefinition Definition { get; set; } = null!;
     [Navigate(NavigateType.OneToMany, nameof(SugarIdentityProvisioningHistory.IdentityProvisioningId))]
     public List<SugarIdentityProvisioningHistory> Histories { get; set; }
+    [Navigate(NavigateType.OneToMany, nameof(SugarIdentityProvisioningProcess.IdentityProvisioningId))]
+    public List<SugarIdentityProvisioningProcess> Processes { get; set; }
     [Navigate(typeof(SugarIdentityProvisioningRealm), nameof(SugarIdentityProvisioningRealm.IdentityProvisioningLstId), nameof(SugarIdentityProvisioningRealm.RealmsName))]
     public List<SugarRealm> Realms { get; set; }
     [Navigate(NavigateType.OneToMany, nameof(SugarUser.IdentityProvisioningId))]
@@ -40,6 +42,7 @@ public class SugarIdentityProvisioning
             UpdateDateTime = identityProvisioning.UpdateDateTime,
             DefinitionName = identityProvisioning.Definition.Name,
             Histories = identityProvisioning.Histories.Select(h => SugarIdentityProvisioningHistory.Transform(h)).ToList(),
+            Processes = identityProvisioning.Processes.Select(p => SugarIdentityProvisioningProcess.Transform(p)).ToList(),
             Definition = SugarIdentityProvisioningDefinition.Transform(identityProvisioning.Definition),
             Realms = identityProvisioning.Realms.Select(r => new SugarRealm
             {
@@ -60,6 +63,7 @@ public class SugarIdentityProvisioning
             UpdateDateTime = UpdateDateTime,
             Definition = Definition?.ToDomain(),
             Histories = Histories == null ? new List<IdentityProvisioningHistory>() : Histories.Select(h => h.ToDomain()).ToList(),
+            Processes = Processes == null ? new List<IdentityProvisioningProcess>() : Processes.Select(p => p.ToDomain()).ToList(),
             Realms = Realms == null ? new List<Realm>() : Realms.Select(h => h.ToDomain()).ToList()
         };
     }

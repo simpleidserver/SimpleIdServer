@@ -433,6 +433,32 @@ namespace SimpleIdServer.IdServer.Api.Provisioning
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> RefreshProjections([FromRoute] string prefix, string id, CancellationToken cancellationToken)
+        {
+            prefix = prefix ?? Constants.DefaultRealm;
+            try
+            {
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Provisioning.Name);
+                    var result = await _identityProvisioningStore.Get(prefix, id, cancellationToken);
+                    if (result == null)
+                        return BuildError(System.Net.HttpStatusCode.NotFound, ErrorCodes.NOT_FOUND, string.Format(Global.UnknownIdProvisioning, id));
+                    
+                    result.RefreshProjections();
+                    _identityProvisioningStore.Update(result);
+                    await transaction.Commit(cancellationToken);
+                    
+                    return NoContent();
+                }
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+        }
+
         private void SyncConfiguration(IdentityProvisioning identityProvisioning, Dictionary<string, string> values)
         {
             var optionKey = $"{identityProvisioning.Name}:{identityProvisioning.Definition.OptionsName}";

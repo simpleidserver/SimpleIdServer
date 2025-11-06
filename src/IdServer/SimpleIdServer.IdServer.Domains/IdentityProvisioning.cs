@@ -13,53 +13,50 @@ public class IdentityProvisioning
     public DateTime UpdateDateTime { get; set; }
     public IdentityProvisioningDefinition Definition { get; set; } = null!;
     public ICollection<IdentityProvisioningHistory> Histories { get; set; } = new List<IdentityProvisioningHistory>();
-    public ICollection<IdentityProvisioningProcess> Processes
-    {
-        get
-        {
-            var grpLst = Histories.GroupBy(h => h.ProcessId);
-            var result = new List<IdentityProvisioningProcess>();
-            foreach(var grp in grpLst)
-            {
-                var record = new IdentityProvisioningProcess();
-                record.Id = grp.Key;
-                foreach (var row in grp)
-                    record.Consume(row);
-                result.Add(record);
-            }
-
-            return result;
-        }
-    }
+    public ICollection<IdentityProvisioningProcess> Processes { get; set; } = new List<IdentityProvisioningProcess>();
     public ICollection<Realm> Realms { get; set; } = new List<Realm>();
     public ICollection<User> Users { get; set; } = new List<User>();
 
     public string Launch()
     {
         var processId = Guid.NewGuid().ToString();
-        Histories.Add(new IdentityProvisioningHistory
+        var history = new IdentityProvisioningHistory
         {
             ProcessId = processId,
             Status = IdentityProvisioningHistoryStatus.CREATE,
             ExecutionDateTime = DateTime.UtcNow
-        });
+        };
+        Histories.Add(history);
+        
+        var process = new IdentityProvisioningProcess
+        {
+            Id = processId
+        };
+        process.Consume(history);
+        Processes.Add(process);
+        
         return processId;
     }
 
     public void Start(string processId, int totalPages)
     {
-        Histories.Add(new IdentityProvisioningHistory
+        var history = new IdentityProvisioningHistory
         {
             ProcessId = processId,
             Status = IdentityProvisioningHistoryStatus.START,
             ExecutionDateTime = DateTime.UtcNow,
             TotalPages = totalPages
-        });
+        };
+        Histories.Add(history);
+        
+        var process = Processes.FirstOrDefault(p => p.Id == processId);
+        if (process != null)
+            process.Consume(history);
     }
 
     public void Extract(string processId, int currentPage, int nbUsers, int nbGroups, int nbFilteredRepresentations)
     {
-        Histories.Add(new IdentityProvisioningHistory
+        var history = new IdentityProvisioningHistory
         {
             ProcessId = processId,
             Status = IdentityProvisioningHistoryStatus.EXPORT,
@@ -68,33 +65,48 @@ public class IdentityProvisioning
             NbUsers = nbUsers,
             NbGroups = nbGroups,
             NbFilteredRepresentations = nbFilteredRepresentations
-        });
+        };
+        Histories.Add(history);
+        
+        var process = Processes.FirstOrDefault(p => p.Id == processId);
+        if (process != null)
+            process.Consume(history);
     }
 
     public void FinishExtract(string processId)
     {
-        Histories.Add(new IdentityProvisioningHistory
+        var history = new IdentityProvisioningHistory
         {
             ProcessId = processId,
             Status = IdentityProvisioningHistoryStatus.FINISHEXPORT,
             ExecutionDateTime = DateTime.UtcNow
-        });
+        };
+        Histories.Add(history);
+        
+        var process = Processes.FirstOrDefault(p => p.Id == processId);
+        if (process != null)
+            process.Consume(history);
     }
 
     public void Import(string processId, int totalPage)
     {
-        Histories.Add(new IdentityProvisioningHistory
+        var history = new IdentityProvisioningHistory
         {
             ProcessId = processId,
             Status = IdentityProvisioningHistoryStatus.STARTIMPORT,
             ExecutionDateTime = DateTime.UtcNow,
             TotalPages = totalPage
-        });
+        };
+        Histories.Add(history);
+        
+        var process = Processes.FirstOrDefault(p => p.Id == processId);
+        if (process != null)
+            process.Consume(history);
     }
 
     public void Import(string processId, int nbUsers, int nbGroups, int currentPage)
     {
-        Histories.Add(new IdentityProvisioningHistory
+        var history = new IdentityProvisioningHistory
         {
             ProcessId = processId,
             Status = IdentityProvisioningHistoryStatus.IMPORT,
@@ -102,33 +114,67 @@ public class IdentityProvisioning
             CurrentPage = currentPage,
             NbUsers = nbUsers,
             NbGroups = nbGroups
-        });
+        };
+        Histories.Add(history);
+        
+        var process = Processes.FirstOrDefault(p => p.Id == processId);
+        if (process != null)
+            process.Consume(history);
     }
 
     public void FinishImport(string processId)
     {
-        Histories.Add(new IdentityProvisioningHistory
+        var history = new IdentityProvisioningHistory
         {
             ProcessId = processId,
             Status = IdentityProvisioningHistoryStatus.FINISHIMPORT,
             ExecutionDateTime = DateTime.UtcNow
-        });
+        };
+        Histories.Add(history);
+        
+        var process = Processes.FirstOrDefault(p => p.Id == processId);
+        if (process != null)
+            process.Consume(history);
     }
 
     public IdentityProvisioningProcess GetProcess(string processId)
     {
-        var filteredHistories = Histories.Where(h => h.ProcessId == processId);
-        if (!filteredHistories.Any()) return null;
-        var result = new IdentityProvisioningProcess
+        return Processes.FirstOrDefault(p => p.Id == processId);
+    }
+    
+    public void RefreshProjections()
+    {
+        var grpLst = Histories.GroupBy(h => h.ProcessId);
+        foreach(var grp in grpLst)
         {
-            Id = processId
-        };
-        foreach (var history in filteredHistories)
-        {
-            result.Consume(history);
+            var process = Processes.FirstOrDefault(p => p.Id == grp.Key);
+            if (process == null)
+            {
+                process = new IdentityProvisioningProcess { Id = grp.Key };
+                Processes.Add(process);
+            }
+            else
+            {
+                // Reset the process state before recalculating
+                process.CreateDateTime = default;
+                process.StartExportDateTime = null;
+                process.EndExportDateTime = null;
+                process.StartImportDateTime = null;
+                process.EndImportDateTime = null;
+                process.NbExtractedPages = 0;
+                process.NbExtractedUsers = 0;
+                process.NbExtractedGroups = 0;
+                process.NbFilteredRepresentations = 0;
+                process.NbImportedPages = 0;
+                process.NbImportedGroups = 0;
+                process.NbImportedUsers = 0;
+                process.TotalPageToExtract = 0;
+                process.TotalPageToImport = 0;
+            }
+            
+            foreach (var history in grp)
+                process.Consume(history);
         }
-
-        return result;
     }
 }
 
@@ -149,6 +195,7 @@ public class IdentityProvisioningProcess
     public int NbImportedUsers { get; set; }
     public int TotalPageToExtract { get; set; }
     public int TotalPageToImport { get; set; }
+    public IdentityProvisioning IdentityProvisioning { get; set; } = null!;
 
     public bool IsExported
     {
