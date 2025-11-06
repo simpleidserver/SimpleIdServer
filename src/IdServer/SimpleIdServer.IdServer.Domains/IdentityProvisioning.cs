@@ -155,8 +155,8 @@ public class IdentityProvisioning
             }
             else
             {
-                // Reset the process state before recalculating
-                process.CreateDateTime = default;
+                // Reset the process state before recalculating from histories
+                process.CreateDateTime = DateTime.MinValue;
                 process.StartExportDateTime = null;
                 process.EndExportDateTime = null;
                 process.StartImportDateTime = null;
