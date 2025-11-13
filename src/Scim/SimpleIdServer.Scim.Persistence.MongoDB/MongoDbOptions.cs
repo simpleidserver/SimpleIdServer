@@ -1,5 +1,6 @@
 ﻿// Copyright (c) SimpleIdServer. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See LICENSE in the project root for license information.
+using System;
 
 namespace SimpleIdServer.Scim.Persistence.MongoDB
 {
@@ -16,6 +17,7 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 			CollectionProvisioningLst = "provisioningLst";
 			CollectionRealms = "realms";
             SupportTransaction = true;
+			BatchSize = 10000;
 		}
 
 		public string ConnectionString { get; set; }
@@ -28,5 +30,23 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
 		public string CollectionRealms { get; set; }
 
         public bool SupportTransaction { get; set; }
+		
+		private int _batchSize;
+		/// <summary>
+		/// MongoDB cursor batch size for large result sets. 
+		/// Default is 10000 to optimize performance when loading groups with many members.
+		/// Higher values reduce network round trips but increase memory usage.
+		/// Minimum value is 1.
+		/// </summary>
+		public int BatchSize 
+		{ 
+			get => _batchSize;
+			set
+			{
+				if (value <= 0)
+					throw new ArgumentOutOfRangeException(nameof(BatchSize), "BatchSize must be greater than 0");
+				_batchSize = value;
+			}
+		}
 	}
 }
