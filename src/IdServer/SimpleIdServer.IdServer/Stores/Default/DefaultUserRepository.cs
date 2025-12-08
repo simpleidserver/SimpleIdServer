@@ -98,7 +98,7 @@ public class DefaultUserRepository : IUserRepository
 
     public virtual Task<bool> IsSubjectExists(string sub, string realm, CancellationToken cancellationToken)
     {
-        var result = UsersQueryable.Any(u => u.Realms.Any(r => r.RealmsName == realm) && u.Name == sub);
+        var result = UsersQueryable.Any(u => u.Realms.Any(r => r.RealmsName == realm) && u.Name.ToLowerInvariant() == sub.ToLowerInvariant());
         return Task.FromResult(result);
     }
 
