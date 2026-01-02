@@ -149,12 +149,15 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 isNewUser = true;
             }
 
-            var success = await _fido2.MakeNewCredentialAsync(request.AuthenticatorAttestationRawResponse, sessionRecord.Options, async (arg, c) =>
+            var attestation = await _fido2.MakeNewCredentialAsync(new MakeNewCredentialParams
             {
-                return true;
-            }, cancellationToken: cancellationToken);
+                AttestationResponse = request.AuthenticatorAttestationRawResponse,
+                OriginalOptions = sessionRecord.Options,
+                IsCredentialIdUniqueToUserCallback = (args, c) => Task.FromResult(true),
+                RequestTokenBindingId = null
+            }, cancellationToken);
 
-            user.AddFidoCredential(sessionRecord.CredentialType, success.Result);
+            user.AddFidoCredential(sessionRecord.CredentialType, attestation);
             if (request.DeviceData != null)
             {
                 user.Devices.Add(new UserDevice
@@ -224,7 +227,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                     await transaction.Commit(cancellationToken);
                     return new OkObjectResult(new EndU2FRegisterResult
                     {
-                        Sig = success.Result.SignCount
+                        Sig = attestation.SignCount
                     });
                 }
 
@@ -232,7 +235,7 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 await _distributedCache.SetStringAsync(registrationProgress.RegistrationProgressId, Newtonsoft.Json.JsonConvert.SerializeObject(registrationProgress));
                 return new OkObjectResult(new EndU2FRegisterResult
                 {
-                    Sig = success.Result.SignCount
+                    Sig = attestation.SignCount
                 });
             }
         }
@@ -270,9 +273,16 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             {
                 Extensions = true,
                 UserVerificationMethod = true,
-                DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs() { Attestation = "none" }
+                // DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs() { Attestation = "none" }
             };
-            var options = _fido2.RequestNewCredential(fidoUser, existingKeys, authenticatorSelection, AttestationConveyancePreference.None, exts);
+            var options = _fido2.RequestNewCredential(new RequestNewCredentialParams
+            {
+                User = fidoUser,
+                ExcludeCredentials = existingKeys,
+                AuthenticatorSelection = authenticatorSelection,
+                AttestationPreference = AttestationConveyancePreference.None,
+                Extensions = exts
+            });
             var sessionId = Guid.NewGuid().ToString();
             var sessionRecord = new RegistrationSessionRecord(options, request.Login, request.CredentialType, cookieValue);
             await _distributedCache.SetStringAsync(sessionId, System.Text.Json.JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions

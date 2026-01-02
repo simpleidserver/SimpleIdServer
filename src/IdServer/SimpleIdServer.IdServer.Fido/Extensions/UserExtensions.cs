@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.Domains
 {
     public static class UserExtensions
     {
-        public static User AddFidoCredential(this User user, string credentialType, AttestationVerificationSuccess attestation)
+        public static User AddFidoCredential(this User user, string credentialType, RegisteredPublicKeyCredential attestation)
         {
             var existingCredential = user.Credentials.SingleOrDefault(c => c.CredentialType == credentialType);
             if(existingCredential != null) user.Credentials.Remove(existingCredential);
@@ -19,21 +19,22 @@ namespace SimpleIdServer.IdServer.Domains
                 CredentialType = credentialType,
                 Value = JsonSerializer.Serialize(new StoredFidoCredential
                 {
-                    Type = attestation.Type,
+                    Type = PublicKeyCredentialType.PublicKey,
                     Id = attestation.Id,
                     Descriptor = new PublicKeyCredentialDescriptor(attestation.Id),
                     PublicKey = attestation.PublicKey,
-                    UserHandle = attestation.User.Id,
-                    SignCount = attestation.Counter,
-                    CredType = attestation.CredType,
+                    UserHandle = attestation.User?.Id,
+                    UserId = attestation.User?.Id,
+                    SignCount = attestation.SignCount,
+                    CredType = attestation.Type.ToString(),
                     RegDate = DateTime.Now,
                     AaGuid = attestation.AaGuid,
-                    Transports = attestation.Transports,
-                    BE = attestation.BE,
-                    BS = attestation.BS,
+                    Transports = attestation.Transports?.ToArray() ?? Array.Empty<AuthenticatorTransport>(),
+                    BE = attestation.IsBackupEligible,
+                    BS = attestation.IsBackedUp,
                     AttestationObject = attestation.AttestationObject,
-                    AttestationClientDataJSON = attestation.AttestationClientDataJSON,
-                    DevicePublicKeys = new List<byte[]>() { attestation.DevicePublicKey }
+                    AttestationClientDataJSON = attestation.AttestationClientDataJson,
+                    DevicePublicKeys = new List<byte[]>()
                 }),
                 IsActive = true
             });

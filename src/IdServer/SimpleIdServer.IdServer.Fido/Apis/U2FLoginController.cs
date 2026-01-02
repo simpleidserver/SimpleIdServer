@@ -137,13 +137,23 @@ namespace SimpleIdServer.IdServer.Fido.Apis
                 };
 
                 var fidoCredentials = authenticatedUser.GetFidoCredentials(sessionRecord.CredentialType);
-                var credential = fidoCredentials.First(c => c.GetFidoCredential(sessionRecord.CredentialType).Descriptor.Id.SequenceEqual(request.Assertion.Id));
+                var credentialId = request.Assertion.RawId;
+                var credential = fidoCredentials.First(c => c.GetFidoCredential(sessionRecord.CredentialType).Descriptor.Id.SequenceEqual(credentialId));
                 var creds = credential.GetFidoCredential(sessionRecord.CredentialType);
                 var storedCounter = creds.SignatureCounter;
-                var res = await _fido2.MakeAssertionAsync(request.Assertion, options, creds.PublicKey, creds.DevicePublicKeys, storedCounter, callback, cancellationToken: cancellationToken);
-                creds.SignCount = res.Counter;
-                if (res.DevicePublicKey is not null)
-                    creds.DevicePublicKeys.Add(res.DevicePublicKey);
+
+                var res = await _fido2.MakeAssertionAsync(new MakeAssertionParams
+                {
+                    AssertionResponse = request.Assertion,
+                    OriginalOptions = options,
+                    StoredPublicKey = creds.PublicKey,
+                    StoredSignatureCounter = storedCounter,
+                    IsUserHandleOwnerOfCredentialIdCallback = callback,
+                    RequestTokenBindingId = null
+                }, cancellationToken);
+                creds.SignCount = res.SignCount;
+                // if (res.DevicePublicKey is not null)
+                //    creds.DevicePublicKeys.Add(res.DevicePublicKey);
                 credential.Value = JsonSerializer.Serialize(creds);
                 _userRepository.Update(authenticatedUser);
                 await transaction.Commit(cancellationToken);
@@ -179,14 +189,15 @@ namespace SimpleIdServer.IdServer.Fido.Apis
             {
                 Extensions = true,
                 UserVerificationMethod = true,
-                DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs()
+                // DevicePubKey = new AuthenticationExtensionsDevicePublicKeyInputs()
             };
-            var existingCredentials = fidoCredentials.Select(c => c.Descriptor);
-            var options = _fido2.GetAssertionOptions(
-                existingCredentials,
-                UserVerificationRequirement.Discouraged,
-                exts
-            );
+            var existingCredentials = fidoCredentials.Select(c => c.Descriptor).ToList();
+            var options = _fido2.GetAssertionOptions(new GetAssertionOptionsParams
+            {
+                AllowedCredentials = existingCredentials,
+                UserVerification = UserVerificationRequirement.Discouraged,
+                Extensions = exts
+            });
             var sessionId = Guid.NewGuid().ToString();
             var sessionRecord = new AuthenticationSessionRecord(options, request.Login, request.CredentialType);
             await _distributedCache.SetStringAsync(sessionId, JsonSerializer.Serialize(sessionRecord), new DistributedCacheEntryOptions

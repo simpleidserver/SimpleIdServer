@@ -1,19 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Description>Add FIDO2 support.</Description>
 	</PropertyGroup>
 	<ItemGroup>
-	  <None Remove="Apis\U2FRegisterController.cs~RF23df1b.TMP" />
-	</ItemGroup>
-	<ItemGroup>
 	  <ProjectReference Include="..\SimpleIdServer.IdServer\SimpleIdServer.IdServer.csproj" />
 	  <ProjectReference Include="..\SimpleIdServer.Configuration\SimpleIdServer.Configuration.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="Fido2.AspNet" Version="4.0.0-beta3" />
+		<PackageReference Include="Fido2.AspNet" Version="4.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Resources\Global.Designer.cs">
