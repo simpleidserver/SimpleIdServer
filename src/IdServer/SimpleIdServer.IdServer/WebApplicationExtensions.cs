@@ -689,13 +689,14 @@ public static class WebApplicationExtensions
 
         webApplication.MapControllerRoute(
             name: "defaultWithArea",
-            pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{area:exists}/{controller=Home}/{action=Index}/{id?}",
+            constraints: new { controller = new NotEqualConstraint("Registration", "ExternalAuthenticate") });
         webApplication.MapControllerRoute(
             name: "default",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + "{controller=Home}/{action=Index}/{id?}",
             constraints: new { controller = new NotEqualConstraint("Sessions") });
 
-        if(usePrefix)
+        if (usePrefix)
         {
             webApplication.MapControllerRoute(
                name: "getSessions",
