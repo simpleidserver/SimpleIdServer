@@ -57,7 +57,7 @@ public class RegisterController : BaseRegisterController<RegisterWebauthnViewMod
         var userRegistrationProgress = await GetRegistrationProgress();
         if (userRegistrationProgress == null && !isAuthenticated)
         {
-            var res = new SidWorkflowViewModel();
+            var res = await BuildViewModel(new RegisterWebauthnViewModel(), prefix, cancellationToken);
             res.SetErrorMessage(Global.NotAllowedToRegister);
             return View(res);
         }

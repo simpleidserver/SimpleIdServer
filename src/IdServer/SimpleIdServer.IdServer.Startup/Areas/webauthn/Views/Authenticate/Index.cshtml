@@ -16,8 +16,8 @@
     var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
-    var beginLoginUrl = Model.Input["BeginLoginUrl"].ToString();
-    var endLoginUrl = Model.Input["EndLoginUrl"].ToString();
+    var beginLoginUrl = Model.Input["BeginLoginUrl"]?.ToString() ?? string.Empty;
+    var endLoginUrl = Model.Input["EndLoginUrl"]?.ToString() ?? string.Empty;
 }
 
 <component type="typeof(WorkflowViewer)"

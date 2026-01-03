@@ -9,7 +9,7 @@ public class WorkflowViewModel
     public WorkflowRecord Workflow { get; set; }
     public Template Template { get; set; }
     public List<FormRecord> FormRecords { get; set; }
-    public JsonObject Input { get; set; }
+    public JsonObject Input { get; set; } = new JsonObject();
     public AntiforgeryTokenRecord AntiforgeryToken { get; set; } = new AntiforgeryTokenRecord();
     public string CurrentStepId { get; set; }
     public string Realm { get; set; }

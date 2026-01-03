@@ -74,7 +74,7 @@ public class WorkflowContext
 
     public static WorkflowContext CreateWorkflow(WorkflowRecord workflow, List<FormRecord> records, string currentStepId, List<string> errorMessages, List<string> successMessages, AntiforgeryTokenRecord antiforgeryTokenRecord, JsonObject inputData, List<string> supportedLanguageCodes, Template template)
     {
-        var clonedWorkflow = workflow.Clone() as WorkflowRecord;
+        var clonedWorkflow = workflow?.Clone() as WorkflowRecord;
         var clonedRecords = records.Select(x => x.Clone() as FormRecord).ToList();
         var result = new WorkflowContext
         {

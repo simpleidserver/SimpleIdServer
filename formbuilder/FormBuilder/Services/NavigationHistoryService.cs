@@ -27,7 +27,10 @@ public class NavigationHistoryService : INavigationHistoryService
     public async Task SaveCurrentStep(WorkflowContext context)
     {
         var uri = _navigationManager.Uri;
-        await _sessionStorage.SetAsync($"Step.{context.Definition.Workflow.Id}.{context.Execution.CurrentStepId}", uri);
+        if(context.Definition.Workflow != null)
+        {
+            await _sessionStorage.SetAsync($"Step.{context.Definition.Workflow.Id}.{context.Execution.CurrentStepId}", uri);
+        }
     }
 
     public async Task SaveExecutedLink(WorkflowContext context, string linkId)

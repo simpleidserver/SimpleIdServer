@@ -226,7 +226,7 @@
     {
         var currentCulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
         var translationKey = TranslationKeyParser.Parse(message);
-        var translation = Form.ErrorMessageTranslations.SingleOrDefault(t => t.Code == translationKey.Code && t.Language == currentCulture);
+        var translation = Form?.ErrorMessageTranslations?.SingleOrDefault(t => t.Code == translationKey.Code && t.Language == currentCulture);
         if (translation == null)
         {
             return message;

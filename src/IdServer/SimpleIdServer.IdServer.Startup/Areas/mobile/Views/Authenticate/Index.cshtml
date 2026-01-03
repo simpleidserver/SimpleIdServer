@@ -18,8 +18,8 @@
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "mobile" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "mobile" });
     var jsonObj = JsonSerializer.Deserialize<JsonObject>(Model.Input.ToString());
-    var beginLoginUrl = Model.Input["BeginLoginUrl"].ToString();
-    var loginStatusUrl = Model.Input["LoginStatusUrl"].ToString();
+    var beginLoginUrl = Model.Input["BeginLoginUrl"]?.ToString() ?? string.Empty;
+    var loginStatusUrl = Model.Input["LoginStatusUrl"]?.ToString() ?? string.Empty;
 }
 
 <component type="typeof(WorkflowViewer)"

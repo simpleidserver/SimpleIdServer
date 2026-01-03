@@ -15,10 +15,10 @@
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
-    var beginRegisterUrl = Model.Input["BeginRegisterUrl"].ToString();
-    var endRegisterUrl = Model.Input["EndRegisterUrl"].ToString();
-    var returnUrl = Model.Input["ReturnUrl"].ToString();
-    var isCreated = Model.Input["IsCreated"].ToString();
+    var beginRegisterUrl = Model.Input["BeginRegisterUrl"]?.ToString() ?? string.Empty;
+    var endRegisterUrl = Model.Input["EndRegisterUrl"]?.ToString() ?? string.Empty;
+    var returnUrl = Model.Input["ReturnUrl"]?.ToString() ?? string.Empty;
+    var isCreated = Model.Input["IsCreated"]?.ToString() ?? "false";
 }
 
 <component type="typeof(WorkflowViewer)"

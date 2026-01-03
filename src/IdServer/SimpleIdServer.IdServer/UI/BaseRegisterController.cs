@@ -138,8 +138,7 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
 
     protected async Task<WorkflowViewModel> BuildViewModel(UserRegistrationProgress registrationProgress, TViewModel viewModel, string prefix, CancellationToken cancellationToken)
     {
-        prefix = prefix ?? Constants.DefaultRealm;
-        var tokenSet = Antiforgery.GetAndStoreTokens(HttpContext);
+        var result = await BuildViewModel(viewModel, prefix, cancellationToken);
         var records = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Registration, cancellationToken);
         WorkflowRecord workflow = null;
         if(registrationProgress.UpdateOneCredential)
@@ -151,16 +150,26 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             workflow = await WorkflowStore.Get(prefix, registrationProgress.WorkflowId, cancellationToken);
         }
 
-        var template = await TemplateStore.GetActive(prefix, cancellationToken);
         var workflowFormIds = workflow.Steps.Select(s => s.FormRecordCorrelationId);
         var filteredRecords = records.Where(r => workflowFormIds.Contains(r.CorrelationId));
         var record = filteredRecords.Single(r => r.Name == Amr);
         var step = workflow.GetStep(record.CorrelationId);
         var languages = await LanguageRepository.GetAll(cancellationToken);
+        result.CurrentStepId = step.Id;
+        result.Workflow = workflow;
+        viewModel.UpdateOneCredential = registrationProgress.UpdateOneCredential;
+        return result;
+    }
+
+    protected async Task<WorkflowViewModel> BuildViewModel(TViewModel viewModel, string prefix, CancellationToken cancellationToken)
+    {
+        prefix = prefix ?? Constants.DefaultRealm;
+        var tokenSet = Antiforgery.GetAndStoreTokens(HttpContext);
+        var records = await FormStore.GetLatestPublishedVersionByCategory(prefix, FormCategories.Registration, cancellationToken);
+        var template = await TemplateStore.GetActive(prefix, cancellationToken);
+        var languages = await LanguageRepository.GetAll(cancellationToken);
         var result = new SidWorkflowViewModel
         {
-            CurrentStepId = step.Id,
-            Workflow = workflow,
             FormRecords = records,
             Languages = languages,
             Template = template,
@@ -173,7 +182,6 @@ public abstract class BaseRegisterController<TViewModel> : BaseController where 
             }
         };
         viewModel.Realm = Options.RealmEnabled ? prefix : null;
-        viewModel.UpdateOneCredential = registrationProgress.UpdateOneCredential;
         return result;
     }
 
