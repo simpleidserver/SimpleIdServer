@@ -1,40 +1,71 @@
-﻿@using FormBuilder
-@using FormBuilder.Components.Workflow
-@using FormBuilder.Helpers
-@using Microsoft.AspNetCore.Http
-@using Microsoft.Extensions.Options
-@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
-@inject IOptions<FormBuilderOptions> options
-@inject IUriProvider uriProvider
-@inject IHttpContextAccessor HttpContextAccessor;
+﻿@using SimpleIdServer.IdServer.Pwd
+@using SimpleIdServer.IdServer.Pwd.UI.ViewModels
+@using SimpleIdServer.IdServer.Template.Startup.Resources
+@using SimpleIdServer.IdServer.UI.ViewModels
+@using System.Text.Json
+
+@model SidWorkflowViewModel
 
 @{
-    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
-    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
-    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
-    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    PwdRegisterViewModel inputModel = new PwdRegisterViewModel();
+    if (Model?.Input != null && Model.Input.Count > 0)
+    {
+        inputModel = JsonSerializer.Deserialize<PwdRegisterViewModel>(Model.Input) ?? new PwdRegisterViewModel();
+    }
 }
 
-<component type="typeof(WorkflowViewer)"
-           render-mode="ServerPrerendered"
-           param-Input="@Model.Input"
-           param-Workflow="@Model.Workflow"
-           param-FormRecords="@Model.FormRecords"
-           param-CurrentStepId="@Model.CurrentStepId"
-           param-ErrorMessages="@Model.ErrorMessages"
-           param-SuccessMessages="@Model.SuccessMessages"
-           param-AntiforgeryToken="@Model.AntiforgeryToken"
-           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
-           param-Template="@Model.Template"/>
+@section CardTop {
+    <h4 class="card-title text-center mb-4">@RegisterPwdResource.register_title</h4>
+}
 
-@section Header {
-    @foreach (var cssStyle in Model.Template.CssStyles)
-    {
-        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
-    }
+@if (Model?.Workflow == null)
+{
+    <div class="text-center text-muted">
+        <small>@RegisterPwdResource.register_pwd</small>
+    </div>
+}
+else
+{
+    <form method="post" asp-area="pwd" asp-controller="Register" asp-action="Index">
+        @Html.AntiForgeryToken()
 
-    @foreach (var jsStyle in Model.Template.JsStyles)
+        <!-- Hidden fields (workflow binding) -->
+        <input type="hidden" name="@nameof(PwdRegisterViewModel.ReturnUrl)" value="@inputModel.ReturnUrl" />
+        <input type="hidden" name="@nameof(PwdRegisterViewModel.Realm)" value="@Model.Realm" />
+        <input type="hidden" name="@nameof(PwdRegisterViewModel.WorkflowId)" value="@Model.Workflow.Id" />
+        <input type="hidden" name="@nameof(PwdRegisterViewModel.StepId)" value="@Model.CurrentStepId" />
+        <input type="hidden" name="@nameof(PwdRegisterViewModel.CurrentLink)" value="@Model.Workflow.Links.Single(l => l.Source.EltId == StandardPwdRegisterForms.pwdRegisterFormId).Id" />
+
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <div class="mb-3">
+                <label class="form-label">@RegisterPwdResource.login</label>
+                <input name="@nameof(PwdRegisterViewModel.Login)" type="text" class="form-control" placeholder="@RegisterPwdResource.login" required autofocus value="@inputModel.Login" />
+            </div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">@RegisterPwdResource.password</label>
+            <input name="@nameof(PwdRegisterViewModel.Password)" type="password" class="form-control" placeholder="@RegisterPwdResource.password" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">@RegisterPwdResource.confirmed_password</label>
+            <input name="@nameof(PwdRegisterViewModel.ConfirmedPassword)" type="password" class="form-control" placeholder="@RegisterPwdResource.confirmed_password" required />
+        </div>
+
+        <div class="d-grid mb-3">
+            <button type="submit" class="btn btn-primary btn-lg">
+                @(User.Identity.IsAuthenticated ? RegisterPwdResource.update : RegisterPwdResource.create)
+            </button>
+        </div>
+    </form>
+
+    @if (!string.IsNullOrWhiteSpace(inputModel.ReturnUrl))
     {
-        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
+        <hr class="my-4" />
+        <div class="text-center">
+            <a href="@inputModel.ReturnUrl" class="text-decoration-none">Back</a>
+        </div>
     }
 }

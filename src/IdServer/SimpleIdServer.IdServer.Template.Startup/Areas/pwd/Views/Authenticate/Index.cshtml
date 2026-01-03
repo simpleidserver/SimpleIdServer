@@ -1,167 +1,121 @@
 ﻿@using FormBuilder.Helpers
-@using Microsoft.AspNetCore.Http
-@using Microsoft.Extensions.Options
 @using SimpleIdServer.IdServer.Pwd
 @using SimpleIdServer.IdServer.Template.Startup.Resources
 @using SimpleIdServer.IdServer.UI.ViewModels
 @using System.Text.Json
-@using System.Threading
 @model SidWorkflowViewModel
 
 @{
-    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
-    ViewData["Title"] = "Authenticate";
     var inputModel = JsonSerializer.Deserialize<AuthenticatePasswordViewModel>(Model.Input);
-    var currentStep = Model.Workflow.Steps.Single(s => s.Id == Model.CurrentStepId);
-    var form = Model.FormRecords.Single(r => r.CorrelationId == currentStep.FormRecordCorrelationId);
-
-    string TranslateErrorMessage(string message)
-    {
-        var currentCulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
-        var translationKey = TranslationKeyParser.Parse(message);
-        var translation = form?.ErrorMessageTranslations?.SingleOrDefault(t => t.Code == translationKey.Code && t.Language == currentCulture);
-        if (translation == null)
-        {
-            return message;
-        }
-
-        return string.Format(translation.Value, translationKey.Args);
-    }
 }
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5">
-            <div class="card shadow">
-                <div class="card-body p-4">
-                    @if (inputModel.LogoUri != null)
-                    {
-                        <div class="text-center mb-4">
-                            <img src="@inputModel.LogoUri" alt="@inputModel.ClientName" class="img-fluid" style="max-height: 80px;" />
-                        </div>
-                    }
-
-                    <h4 class="card-title text-center mb-4">Authenticate"</h4>
-
-                    @if (Model.ErrorMessages != null)
-                    {
-                        <div class="alert alert-danger" role="alert">
-                            <ul class="mb-0">
-                                @foreach (var error in Model.ErrorMessages)
-                                {
-                                    <li>@TranslateErrorMessage(error)</li>
-                                }
-                            </ul>
-                        </div>
-                    }
-
-                    
-                    <form method="post" asp-area="pwd" asp-controller="Authenticate" asp-action="Index">
-                        @Html.AntiForgeryToken()
-
-                        <!-- Hidden fields -->
-                        <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.ReturnUrl)" value="@inputModel.ReturnUrl" />
-                        <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.Realm)" value="@Model.Realm" />
-                        <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.WorkflowId)" value="@Model.Workflow.Id" />
-                        <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.StepId)" value="@Model.CurrentStepId" />
-                        <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.CurrentLink)" value="@Model.Workflow.Links.Single(l => l.Source.EltId == StandardPwdAuthForms.pwdAuthFormId).Id" />
-
-                        <!-- Login field -->
-                        <div class="mb-3">
-                            <label class="form-label">@AuthenticatePasswordResource.login</label>
-                            <input name="@nameof(AuthenticatePasswordViewModel.Login)" type="text" class="form-control" placeholder="@AuthenticatePasswordResource.login" required autofocus />
-                        </div>
-
-                        <!-- Password field -->
-                        <div class="mb-3">
-                            <label class="form-label">@AuthenticatePasswordResource.password</label>
-                            <input name="@nameof(AuthenticatePasswordViewModel.Password)" type="password" class="form-control" placeholder="@AuthenticatePasswordResource.password" required />
-                        </div>
-
-                        <!-- Remember me checkbox -->
-                        <div class="mb-3 form-check">
-                            <input name="@nameof(AuthenticatePasswordViewModel.RememberLogin)" type="checkbox" class="form-check-input" id="rememberMe" />
-                            <label class="form-check-label" for="rememberMe">
-                                Remember me
-                            </label>
-                        </div>
-
-                        <!-- Submit button -->
-                        <div class="d-grid mb-3">
-                            <button type="submit" class="btn btn-primary btn-lg">
-                                Authenticate
-                            </button>
-                        </div>
-                    </form>
-
-                    <!-- Separator -->
-                    <hr class="my-4" />
-
-                    <!-- Forget password link -->
-                    <div class="text-center mb-3">
-                        <a href="@Url.Action("Index", "Reset", new { area = "pwd", returnUrl = inputModel.AuthUrl, prefix = Model.Workflow.Realm, WorkflowId = Model.Workflow.Id, StepId = Model.CurrentStepId, CurrentLink = Model.Workflow.Links.Single(l => l.Source.EltId == StandardPwdAuthForms.pwdForgetBtnId).Id })" class="text-decoration-none">
-                            Reset password
-                        </a>
-                    </div>
-
-                    <!-- Separator -->
-                    <hr class="my-4" />
-
-                    <!-- Register link -->
-                    <div class="text-center mb-3">
-                        <a href="@Url.Action("Index", "Registration", new { prefix = Model.Workflow.Realm, workflowName = "pwd", redirectUrl = inputModel.AuthUrl })" class="text-decoration-none">
-                            Register
-                        </a>
-                    </div>
-
-                    @if (inputModel.ExternalIdsProviders != null && inputModel.ExternalIdsProviders.Any())
-                    {
-                        <!-- Separator -->
-                        <hr class="my-4" />
-
-                        <!-- External Identity Providers -->
-                        <div class="mb-3">
-                            <p class="text-center text-muted mb-3">@AuthenticatePasswordResource.external_authenticate</p>
-                            @foreach (var provider in inputModel.ExternalIdsProviders)
-                            {
-                                <div class="d-grid mb-2">
-                                    <a href="@Url.Action("Login", "ExternalAuthenticate", new { scheme = provider.AuthenticationScheme, returnUrl = inputModel.ReturnUrl, prefix = Model.Workflow.Realm, currentLink = Model.Workflow.Links.Single(l => l.Source.EltId == StandardPwdAuthForms.pwdAuthExternalIdProviderId).Id })
-                                       class="btn btn-outline-secondary"
-                                       id="@provider.AuthenticationScheme">
-                                        @provider.DisplayName
-                                    </a>
-                                </div>
-                            }
-                        </div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(inputModel.TosUri) || !string.IsNullOrEmpty(inputModel.PolicyUri))
-                    {
-                        <div class="text-center mt-4">
-                            <small class="text-muted">
-                                @if (!string.IsNullOrEmpty(inputModel.TosUri))
-                                {
-                                    <a href="@inputModel.TosUri" target="_blank" class="text-decoration-none">Terms of service</a>
-                                }
-                                @if (!string.IsNullOrEmpty(inputModel.TosUri) && !string.IsNullOrEmpty(inputModel.PolicyUri))
-                                {
-                                    <span> | </span>
-                                }
-                                @if (!string.IsNullOrEmpty(inputModel.PolicyUri))
-                                {
-                                    <a href="@inputModel.PolicyUri" target="_blank" class="text-decoration-none">Privacy policy</a>
-                                }
-                            </small>
-                        </div>
-                    }
-                
-                </div>
-            </div>
+@section CardTop {
+    @if (inputModel.LogoUri != null)
+    {
+        <div class="text-center mb-4">
+            <img src="@inputModel.LogoUri" alt="@inputModel.ClientName" class="img-fluid" style="max-height: 80px;" />
         </div>
+    }
+
+    <h4 class="card-title text-center mb-4">Authenticate</h4>
+}
+
+<form method="post" asp-area="pwd" asp-controller="Authenticate" asp-action="Index">
+    @Html.AntiForgeryToken()
+
+    <!-- Hidden fields -->
+    <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.ReturnUrl)" value="@inputModel.ReturnUrl" />
+    <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.Realm)" value="@Model.Realm" />
+    <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.WorkflowId)" value="@Model.Workflow.Id" />
+    <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.StepId)" value="@Model.CurrentStepId" />
+    <input type="hidden" name="@nameof(AuthenticatePasswordViewModel.CurrentLink)" value="@Model.Workflow.Links.Single(l => l.Source.EltId == StandardPwdAuthForms.pwdAuthFormId).Id" />
+
+    <!-- Login field -->
+    <div class="mb-3">
+        <label class="form-label">@AuthenticatePasswordResource.login</label>
+        <input name="@nameof(AuthenticatePasswordViewModel.Login)" type="text" class="form-control" placeholder="@AuthenticatePasswordResource.login" required autofocus />
     </div>
+
+    <!-- Password field -->
+    <div class="mb-3">
+        <label class="form-label">@AuthenticatePasswordResource.password</label>
+        <input name="@nameof(AuthenticatePasswordViewModel.Password)" type="password" class="form-control" placeholder="@AuthenticatePasswordResource.password" required />
+    </div>
+
+    <!-- Remember me checkbox -->
+    <div class="mb-3 form-check">
+        <input name="@nameof(AuthenticatePasswordViewModel.RememberLogin)" type="checkbox" class="form-check-input" id="rememberMe" />
+        <label class="form-check-label" for="rememberMe">
+            Remember me
+        </label>
+    </div>
+
+    <!-- Submit button -->
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary btn-lg">
+            Authenticate
+        </button>
+    </div>
+</form>
+
+<!-- Separator -->
+<hr class="my-4" />
+
+<!-- Forget password link -->
+<div class="text-center mb-3">
+    <a href="@Url.Action("Index", "Reset", new { area = "pwd", returnUrl = inputModel.AuthUrl, prefix = Model.Workflow.Realm, WorkflowId = Model.Workflow.Id, StepId = Model.CurrentStepId, CurrentLink = Model.Workflow.Links.Single(l => l.Source.EltId == StandardPwdAuthForms.pwdForgetBtnId).Id })" class="text-decoration-none">
+        Reset password
+    </a>
 </div>
 
-@section Scripts {
+<!-- Separator -->
+<hr class="my-4" />
 
+<!-- Register link -->
+<div class="text-center mb-3">
+    <a href="@Url.Action("Index", "Registration", new { prefix = Model.Workflow.Realm, workflowName = "pwd", redirectUrl = inputModel.AuthUrl })" class="text-decoration-none">
+        Register
+    </a>
+</div>
+
+@if (inputModel.ExternalIdsProviders != null && inputModel.ExternalIdsProviders.Any())
+{
+    <!-- Separator -->
+    <hr class="my-4" />
+
+    <!-- External Identity Providers -->
+    <div class="mb-3">
+        <p class="text-center text-muted mb-3">@AuthenticatePasswordResource.external_authenticate</p>
+        @foreach (var provider in inputModel.ExternalIdsProviders)
+        {
+            <div class="d-grid mb-2">
+                <a href="@Url.Action("Login", "ExternalAuthenticate", new { scheme = provider.AuthenticationScheme, returnUrl = inputModel.ReturnUrl, prefix = Model.Workflow.Realm, currentLink = Model.Workflow.Links.Single(l => l.Source.EltId == StandardPwdAuthForms.pwdAuthExternalIdProviderId).Id })"
+                   class="btn btn-outline-secondary"
+                   id="@provider.AuthenticationScheme">
+                    @provider.DisplayName
+                </a>
+            </div>
+        }
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(inputModel.TosUri) || !string.IsNullOrEmpty(inputModel.PolicyUri))
+{
+    <div class="text-center mt-4">
+        <small class="text-muted">
+            @if (!string.IsNullOrEmpty(inputModel.TosUri))
+            {
+                <a href="@inputModel.TosUri" target="_blank" class="text-decoration-none">Terms of service</a>
+            }
+            @if (!string.IsNullOrEmpty(inputModel.TosUri) && !string.IsNullOrEmpty(inputModel.PolicyUri))
+            {
+                <span> | </span>
+            }
+            @if (!string.IsNullOrEmpty(inputModel.PolicyUri))
+            {
+                <a href="@inputModel.PolicyUri" target="_blank" class="text-decoration-none">Privacy policy</a>
+            }
+        </small>
+    </div>
 }
 
