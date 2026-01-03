@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.4.33122.133
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11312.210 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Startup Layer", "01. Startup Layer", "{68306EFF-55D9-497B-9482-FEB81C485914}"
 EndProject
@@ -174,6 +174,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Migrations", "src\IdServer\SimpleIdServer.IdServer.Migrations\SimpleIdServer.IdServer.Migrations.csproj", "{1C89FFB2-6054-73EC-8DFE-B97CC1C7B55B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Migrations.Openiddict", "src\IdServer\SimpleIdServer.IdServer.Migrations.Openiddict\SimpleIdServer.IdServer.Migrations.Openiddict.csproj", "{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Template.Startup", "src\IdServer\SimpleIdServer.IdServer.Template.Startup\SimpleIdServer.IdServer.Template.Startup.csproj", "{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -453,6 +455,10 @@ Global
 		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -540,6 +546,7 @@ Global
 		{A6C36FE3-F338-477B-E160-360D44D30D43} = {E3ED0DEE-B9BE-4A44-918E-78AF07F8CC13}
 		{1C89FFB2-6054-73EC-8DFE-B97CC1C7B55B} = {E3ED0DEE-B9BE-4A44-918E-78AF07F8CC13}
 		{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D} = {E3ED0DEE-B9BE-4A44-918E-78AF07F8CC13}
+		{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04} = {78D7AC79-BA12-4EB0-9175-DBF140E28F7C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1FE1E2C8-475E-4592-8609-D331B1D01730}

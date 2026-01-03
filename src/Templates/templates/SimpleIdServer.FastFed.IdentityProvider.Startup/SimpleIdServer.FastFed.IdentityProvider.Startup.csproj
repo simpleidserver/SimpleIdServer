@@ -7,14 +7,14 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
 		<PackageReference Include="MassTransit.SqlTransport.SqlServer" Version="8.4.0" />
-		<PackageReference Include="SimpleIdServer.Webfinger.Client" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.Webfinger.Store.EF" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.FastFed.Store.EF" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.Webfinger.Client" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.Webfinger.Store.EF" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml.Sid" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Authentication.Saml" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim.Sid" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider.Provisioning.Scim" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.IdentityProvider" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.FastFed.Store.EF" Version="7.0.*-*" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Update="Resources\ApplicationProviderResource.Designer.cs">

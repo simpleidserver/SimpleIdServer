@@ -13,15 +13,15 @@
 	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0 " />
 	<PackageReference Include="AspNetCore.Authentication.ApiKey" Version="8.0.1" />
 	<PackageReference Include="MassTransit.Azure.Storage" Version="8.4.0" />
-	<PackageReference Include="SimpleIdServer.Scim.Persistence.MongoDB" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim.PostgreMigrations" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim.SqlServerMigrations" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim.MySQLMigrations" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim.SwashbuckleV6" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim.SqliteMigrations" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim.ApiKeyAuth" Version="6.0.*-*" />
-	<PackageReference Include="SimpleIdServer.Scim.MassTransit" Version="6.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.Persistence.MongoDB" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.PostgreMigrations" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.SqlServerMigrations" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.MySQLMigrations" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.SwashbuckleV6" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.Persistence.EF" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.SqliteMigrations" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.ApiKeyAuth" Version="7.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim.MassTransit" Version="7.0.*-*" />
   </ItemGroup>
 </Project>

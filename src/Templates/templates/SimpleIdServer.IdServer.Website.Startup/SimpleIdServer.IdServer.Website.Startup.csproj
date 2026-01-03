@@ -7,8 +7,8 @@
 	</PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="SimpleIdServer.IdServer.Website" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.IdServer.Website.OpenTelemetry" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Website" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Website.OpenTelemetry" Version="7.0.*-*" />
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
 		<PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.12.0" />

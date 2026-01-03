@@ -6,7 +6,7 @@
   </PropertyGroup>
 	
   <ItemGroup>
-	<PackageReference Include="SimpleIdServer.Scim" Version="6.0.*-*" />
+	<PackageReference Include="SimpleIdServer.Scim" Version="7.0.*-*" />
   </ItemGroup>
 
 </Project>

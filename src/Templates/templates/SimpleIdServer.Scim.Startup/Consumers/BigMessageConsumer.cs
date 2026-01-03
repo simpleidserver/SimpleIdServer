@@ -18,8 +18,7 @@ namespace SimpleIdServer.Scim.Startup.Consumers
             typeof(RepresentationRemovedEvent),
             typeof(RepresentationUpdatedEvent),
             typeof(RepresentationRefAttributeAddedEvent),
-            typeof(RepresentationRefAttributeRemovedEvent),
-            typeof(RepresentationRefAttributeUpdatedEvent)
+            typeof(RepresentationRefAttributeRemovedEvent)
         };
 
 

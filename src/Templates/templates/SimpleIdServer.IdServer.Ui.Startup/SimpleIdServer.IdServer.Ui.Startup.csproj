@@ -5,8 +5,8 @@
 		<ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="6.0.*-*" />
-		<PackageReference Include="SimpleIdServer.IdServer" Version="6.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="7.0.*-*" />
+		<PackageReference Include="SimpleIdServer.IdServer" Version="7.0.*-*" />
 		<PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
 	</ItemGroup>
 	<ItemGroup>
