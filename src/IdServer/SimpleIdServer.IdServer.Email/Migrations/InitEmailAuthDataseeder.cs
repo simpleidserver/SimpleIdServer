@@ -35,6 +35,7 @@ public class InitEmailAuthDataseeder : BaseAuthDataSeeder
             var acr = BuildAcr();
             await TryAddAcr(IdServer.Constants.DefaultRealm, acr, cancellationToken);
             await TryAddForm(IdServer.Constants.DefaultRealm, StandardEmailAuthForms.EmailForm, cancellationToken);
+            await TryAddForm(IdServer.Constants.DefaultRealm, StandardEmailAuthForms.EmptyEmailForm, cancellationToken);
             await TryAddForm(IdServer.Constants.DefaultRealm, StandardEmailRegistrationForms.EmailForm, cancellationToken);
             await TryAddWorkflow(IdServer.Constants.DefaultRealm, StandardEmailAuthWorkflows.DefaultWorkflow, cancellationToken);
             await Commit(cancellationToken);

@@ -102,7 +102,7 @@
     private void HandleSave(ActionState<FormRecord, bool> state)
     {
         _updateForm = state;
-        dispatcher.Dispatch(new UpdateFormAction { Id = formState.Value.Form.CorrelationId, Form = formState.Value.Form });
+        dispatcher.Dispatch(new UpdateFormAction { Id = formState.Value.Form.CorrelationId, Form = state.Content });
     }
 
     private void HandlePublish(ActionState<FormRecord, FormRecord> state)

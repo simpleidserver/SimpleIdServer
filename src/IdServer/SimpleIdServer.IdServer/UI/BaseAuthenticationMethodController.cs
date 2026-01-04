@@ -27,6 +27,7 @@ using SimpleIdServer.IdServer.UI.AuthProviders;
 using SimpleIdServer.IdServer.UI.Infrastructures;
 using SimpleIdServer.IdServer.UI.Services;
 using SimpleIdServer.IdServer.UI.ViewModels;
+using SimpleIdServer.Scim.Domains;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -235,8 +236,33 @@ namespace SimpleIdServer.IdServer.UI
 
             if (result.SuccessMessages != null && result.SuccessMessages.Any())
             {
-                workflowResult.SetSuccessMessages(result.SuccessMessages);
-                return View(workflowResult);
+                var returnUrl = viewModel.ReturnUrl;
+                string nextAmr;
+                if (!IsProtected(returnUrl))
+                {
+                    var r = await GetNextAmrFromNormalAuthentication(prefix, viewModel, false, token);
+                    nextAmr = r.nextAmr;
+                }
+                else
+                {
+                    var unprotectedUrl = Unprotect(returnUrl);
+                    var r = await GetNextAmrFormAuthorizationRequestAuthentication(prefix, Amr, unprotectedUrl, viewModel, false, token);
+                    nextAmr = r.nextAmr;
+                }
+
+                if (WorkflowHelper.IsLastStep(nextAmr))
+                {
+                    workflowResult.SetSuccessMessages(result.SuccessMessages);
+                    return View(workflowResult);
+                }
+
+                return await Authenticate(prefix,
+                   viewModel,
+                   Amr,
+                   result.AuthenticatedUser,
+                   token,
+                   acrInfo?.RememberLogin ?? viewModel.RememberLogin,
+                   false);
             }
 
             // 7. Validate the credentials.
@@ -423,8 +449,8 @@ namespace SimpleIdServer.IdServer.UI
         public User AuthenticatedUser { get; private set; }
 
         public static UserAuthenticationResult Ok(User authenticatedUser = null) => new UserAuthenticationResult(authenticatedUser);
-        public static UserAuthenticationResult Success(List<string> successMessages) => new UserAuthenticationResult { SuccessMessages = successMessages };
-        public static UserAuthenticationResult Success(string successMessage) => Success(new List<string> { successMessage });
+        public static UserAuthenticationResult Success(List<string> successMessages, User user) => new UserAuthenticationResult { SuccessMessages = successMessages, AuthenticatedUser = user };
+        public static UserAuthenticationResult Success(string successMessage, User user) => Success(new List<string> { successMessage }, user);
         public static UserAuthenticationResult Error(List<string> errors) => new UserAuthenticationResult(errors);
         public static UserAuthenticationResult Error(string error) => Error(new List<string> { error });
     }

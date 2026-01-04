@@ -28,7 +28,7 @@ public abstract class BaseOTPAuthenticationService : GenericAuthenticationServic
     {
         var authenticatedUser = await GetUser(authenticatedUserId, viewModel, realm, cancellationToken);
         if (authenticatedUser == null) return CredentialsValidationResult.Error(ValidationStatus.UNKNOWN_USER);
-        return await Validate(realm, authenticatedUserId, viewModel, cancellationToken);
+        return await Validate(realm, authenticatedUser, viewModel, cancellationToken);
     }
 
     protected override Task<CredentialsValidationResult> Validate(string realm, User authenticatedUser, BaseOTPAuthenticateViewModel viewModel, CancellationToken cancellationToken)

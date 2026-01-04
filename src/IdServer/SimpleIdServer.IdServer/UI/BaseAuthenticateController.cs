@@ -257,7 +257,7 @@ public class BaseAuthenticateController : BaseController
         }
     }
 
-    private async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication<T>(string realm, T viewModel, bool isTemporaryCredential, CancellationToken cancellationToken) where T : ISidStepViewModel
+    protected async Task<(string nextAmr, List<string> amrs)> GetNextAmrFromNormalAuthentication<T>(string realm, T viewModel, bool isTemporaryCredential, CancellationToken cancellationToken) where T : ISidStepViewModel
     {
         var acr = await AcrRepository.GetByName(realm, Options.DefaultAcrValue, cancellationToken);
         var workflow = await WorkflowStore.Get(realm, acr.AuthenticationWorkflow, cancellationToken);
@@ -268,7 +268,7 @@ public class BaseAuthenticateController : BaseController
         return (nextAmr, amrs);
     }
 
-    private async Task<(string nextAmr, Client client, AcrResult acr)> GetNextAmrFormAuthorizationRequestAuthentication<T>(string realm, string currentAmr, string unprotectedUrl, T viewModel, bool isTemporaryCredential, CancellationToken cancellationToken) where T : ISidStepViewModel
+    protected async Task<(string nextAmr, Client client, AcrResult acr)> GetNextAmrFormAuthorizationRequestAuthentication<T>(string realm, string currentAmr, string unprotectedUrl, T viewModel, bool isTemporaryCredential, CancellationToken cancellationToken) where T : ISidStepViewModel
     {
         var query = ExtractQueryFromUnprotectedUrl(unprotectedUrl);
         var acrValues = query.GetAcrValuesFromAuthorizationRequest();

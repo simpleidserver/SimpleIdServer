@@ -28,6 +28,7 @@ public static class IdServerBuilderExtensions
         idServerBuilder.Services.AddTransient<IUserEmailAuthenticationService, UserEmailAuthenticationService>();
         idServerBuilder.Services.AddTransient<IResetPasswordService, UserEmailResetPasswordService>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailAuthWorkflowLayout>();
+        idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmptyEmailAuthWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IWorkflowLayoutService, EmailRegisterWorkflowLayout>();
         idServerBuilder.Services.AddTransient<IDataSeeder, InitEmailAuthDataseeder>();
         idServerBuilder.Services.AddTransient<IDataSeeder, UpdateEmailTranslationsDataseeder>();

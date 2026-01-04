@@ -29,6 +29,7 @@ namespace SimpleIdServer.IdServer.Email.Migrations
             using (var transaction = _transactionBuilder.Build())
             {
                 await TryUpdate(IdServer.Constants.DefaultRealm, StandardEmailAuthForms.EmailForm, cancellationToken);
+                await TryUpdate(IdServer.Constants.DefaultRealm, StandardEmailAuthForms.EmptyEmailForm, cancellationToken);
                 await TryUpdate(IdServer.Constants.DefaultRealm, StandardEmailRegistrationForms.EmailForm, cancellationToken);
                 await transaction.Commit(cancellationToken);
             }

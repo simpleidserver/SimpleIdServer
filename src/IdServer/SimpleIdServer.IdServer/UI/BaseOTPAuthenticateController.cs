@@ -92,7 +92,7 @@ namespace SimpleIdServer.IdServer.UI
                     {
                         await notificationService.Send("One Time Password", string.Format(FormattedMessage, otpCode), new Dictionary<string, string>(), authenticatedUser);
                         if (activeOtp.OTPAlg == Domains.OTPAlgs.TOTP) viewModel.TOTPStep = activeOtp.TOTPStep;
-                        return UserAuthenticationResult.Success(AuthFormSuccessMessages.ConfirmationcodeSent);
+                        return UserAuthenticationResult.Success(AuthFormSuccessMessages.ConfirmationcodeSent, authenticatedUser);
                     }
                     catch(Exception)
                     {
