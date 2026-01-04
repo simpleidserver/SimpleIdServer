@@ -1,56 +1,52 @@
-﻿@using FormBuilder
-@using FormBuilder.Components.Workflow
-@using FormBuilder.Helpers
-@using Microsoft.AspNetCore.Http
-@using Microsoft.Extensions.Options
+﻿@using FormBuilder.Helpers
+@using SimpleIdServer.IdServer.Fido
+@using SimpleIdServer.IdServer.Fido.UI.ViewModels
+@using SimpleIdServer.IdServer.Template.Startup.Resources
+@using SimpleIdServer.IdServer.UI.ViewModels
 @using System.Text.Json
-@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
-@inject IOptions<FormBuilderOptions> options
-@inject IUriProvider uriProvider
-@inject IHttpContextAccessor HttpContextAccessor;
+@model SidWorkflowViewModel
 
 @{
-    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
-    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
-    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
-    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "webauthn" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "webauthn" });
-    var beginLoginUrl = Model.Input["BeginLoginUrl"]?.ToString() ?? string.Empty;
-    var endLoginUrl = Model.Input["EndLoginUrl"]?.ToString() ?? string.Empty;
+    var returnUrl = Model.Input[nameof(ISidStepViewModel.ReturnUrl)]?.ToString() ?? string.Empty;
+    var vm = JsonSerializer.Deserialize<AuthenticateWebauthnViewModel>(Model.Input.ToString());
 }
 
-<component type="typeof(WorkflowViewer)"
-           render-mode="ServerPrerendered"
-           param-Input="@Model.Input"
-           param-Workflow="@Model.Workflow"
-           param-FormRecords="@Model.FormRecords"
-           param-CurrentStepId="@Model.CurrentStepId"
-           param-ErrorMessages="@Model.ErrorMessages"
-           param-SuccessMessages="@Model.SuccessMessages"
-           param-AntiforgeryToken="@Model.AntiforgeryToken"
-           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
-           param-Template="@Model.Template" />
-
-@section Header {
-    @foreach (var cssStyle in Model.Template.CssStyles)
-    {
-        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
-    }
-
-    @foreach (var jsStyle in Model.Template.JsStyles)
-    {
-        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
-    }
+@section CardTop {
+    <partial name="_WorkflowAuthTitle" model="@AuthenticateWebauthnResource.authenticate" />
 }
+
+<partial name="_WorkflowAuthAsyncError" />
+
+<div id="fido2Auth">
+    <form id="webauthForm" asp-area="webauthn" asp-controller="Authenticate" asp-action="Index" method="post">
+        @Html.AntiForgeryToken()
+
+        <input type="hidden" name="@nameof(ISidStepViewModel.ReturnUrl)" value="@returnUrl" />
+        <input type="hidden" name="@nameof(ISidStepViewModel.Realm)" value="@Model.Realm" />
+        <input type="hidden" name="@nameof(BaseAuthenticateViewModel.StepId)" value="@Model.CurrentStepId" />
+        <input type="hidden" name="@nameof(BaseAuthenticateViewModel.WorkflowId)" value="@Model.Workflow.Id" />
+        <input type="hidden" name="@nameof(BaseAuthenticateViewModel.CurrentLink)" value="@Model.Workflow.Links.Single(l => l.Source.EltId == StandardFidoAuthForms.webauthnFormId).Id" />
+        <input type="hidden" name="@nameof(IQRCodeAuthViewModel.SessionId)" />
+
+        <div class="mb-3">
+            <label class="form-label" for="Login">@AuthenticateWebauthnResource.login</label>
+            <input id="Login" name="@nameof(BaseAuthenticateViewModel.Login)" class="form-control" autocomplete="on" required />
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">@AuthenticateWebauthnResource.authenticate</button>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
+    <partial name="_WorkflowAuthAsyncErrorScripts" />
     <script type="text/javascript">
-        let csharpReference;
-
         var init = function () {
-            var beginLoginUrl = "@beginLoginUrl";
-            var endLoginUrl = "@endLoginUrl";
+            var beginLoginUrl = "@vm.BeginLoginUrl";
+            var endLoginUrl = "@vm.EndLoginUrl";
             var makeAssertionsUrl = "@makeAssertionsOptionsUrl";
             var authenticateUrl = "@authenticateUrl";
             var isInitialized = false;
@@ -60,7 +56,7 @@
             }
 
             var displayError = function (errorJson) {
-                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error"]);
+                window.sidWorkflowAuth.displayError(errorJson);
             }
 
             var tryListenForm = function () {
@@ -118,6 +114,7 @@
             }
 
             async function makeAssertionOptions(form) {
+                window.sidWorkflowAuth.clearError();
                 toggleBtn(true);
                 let response = await fetch(beginLoginUrl, {
                     method: 'POST',
@@ -157,10 +154,8 @@
             tryListenForm();
         };
 
-        setCsharpReference  = function(ref) {
-            console.log(ref);
-            csharpReference = ref;
+        $(document).ready(function () {
             init();
-        };
+        });
     </script>
 }

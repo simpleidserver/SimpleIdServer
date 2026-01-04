@@ -1,61 +1,73 @@
 ﻿@using FormBuilder
-@using FormBuilder.Components.Workflow
 @using FormBuilder.Helpers
 @using Microsoft.AspNetCore.Http
 @using Microsoft.Extensions.Options
+@using SimpleIdServer.IdServer.Fido
+@using SimpleIdServer.IdServer.Fido.UI.ViewModels
+@using SimpleIdServer.IdServer.Template.Startup.Resources
+@using SimpleIdServer.IdServer.UI.ViewModels
 @using System.Text.Json
 @using System.Text.Json.Nodes
-@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
+@model SidWorkflowViewModel
 @inject IOptions<FormBuilderOptions> options
 @inject IUriProvider uriProvider
 @inject IHttpContextAccessor HttpContextAccessor;
 
 @{
-    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
     var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
     Model.AntiforgeryToken.CookieValue = antiforgeryToken;
     var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
     var makeAssertionsOptionsUrl = Url.Action("MakeAssertionOptions", "Authenticate", new { area = "mobile" });
     var authenticateUrl = Url.Action("Index", "Authenticate", new { area = "mobile" });
-    var jsonObj = JsonSerializer.Deserialize<JsonObject>(Model.Input.ToString());
-    var beginLoginUrl = Model.Input["BeginLoginUrl"]?.ToString() ?? string.Empty;
-    var loginStatusUrl = Model.Input["LoginStatusUrl"]?.ToString() ?? string.Empty;
+    var returnUrl = Model.Input[nameof(ISidStepViewModel.ReturnUrl)]?.ToString() ?? string.Empty;
+    var inputViewModel = JsonSerializer.Deserialize<AuthenticateMobileViewModel>(Model.Input.ToString());
+    var beginLoginUrl = inputViewModel.BeginLoginUrl;
+    var loginStatusUrl = inputViewModel.LoginStatusUrl;
 }
 
-<component type="typeof(WorkflowViewer)"
-           render-mode="ServerPrerendered"
-           param-Input="@Model.Input"
-           param-Workflow="@Model.Workflow"
-           param-FormRecords="@Model.FormRecords"
-           param-CurrentStepId="@Model.CurrentStepId"
-           param-ErrorMessages="@Model.ErrorMessages"
-           param-SuccessMessages="@Model.SuccessMessages"
-           param-AntiforgeryToken="@Model.AntiforgeryToken"
-           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
-           param-Template="@Model.Template" />
-
-@section Header {
-    @foreach (var cssStyle in Model.Template.CssStyles)
-    {
-        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
-    }
-
-    @foreach (var jsStyle in Model.Template.JsStyles)
-    {
-        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
-    }
+@section CardTop {
+    <partial name="_WorkflowAuthTitle" model="@AuthenticateMobileResource.auth_title" />
 }
+
+<partial name="_WorkflowAuthAsyncError" />
+
+<form id="generateQrCodeForm" asp-area="mobile" asp-controller="Authenticate" asp-action="Index" method="post">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="@nameof(ISidStepViewModel.ReturnUrl)" value="@returnUrl" />
+    <input type="hidden" name="@nameof(ISidStepViewModel.Realm)" value="@Model.Realm" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.StepId)" value="@Model.CurrentStepId" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.WorkflowId)" value="@Model.Workflow.Id" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.CurrentLink)" value="@Model.Workflow.Links.Single(l => l.Source.EltId == StandardFidoAuthForms.mobileFormId).Id" />
+    <input type="hidden" name="@nameof(IQRCodeAuthViewModel.SessionId)" />
+
+    <div class="mb-3">
+        <label class="form-label" for="Login">@AuthenticateMobileResource.login</label>
+        <input id="Login" name="@nameof(BaseAuthenticateViewModel.Login)" class="form-control" autocomplete="on" required />
+    </div>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-primary">@AuthenticateMobileResource.generate_qrcode</button>
+    </div>
+</form>
+
+<div id="qrCodeContainer" class="mt-4" style="display: none !important; text-align: center;">
+    <h5 class="mb-3">@AuthenticateMobileResource.scan_mobileapp</h5>
+    <div class="picture-container">
+        <img src="" class="img-fluid" alt="image" />
+    </div>
+</div>
 
 @section Scripts {
+    <partial name="_WorkflowAuthAsyncErrorScripts" />
     <script type="text/javascript">
-        let csharpReference;
         var isInitialized = false;
         var init = function() {
             var beginLoginUrl = "@beginLoginUrl";
             var loginStatusUrl = "@loginStatusUrl";
 
             var displayError = function (errorJson) {
-                csharpReference.invokeMethodAsync("SetErrorMessage", errorJson["error"]);
+                window.sidWorkflowAuth.displayError(errorJson);
             }
 
             var displayQRCode = function (img) {
@@ -83,6 +95,7 @@
             }
 
             async function makeAssertionOptions(form) {
+                window.sidWorkflowAuth.clearError();
                 let response = await fetch(beginLoginUrl, {
                     method: 'POST',
                     body: JSON.stringify({ login: form.Login, credential_type: 'mobile' }),
@@ -124,9 +137,8 @@
             tryListenForm();
         }
 
-        setCsharpReference = function (ref) {
-            csharpReference = ref;
+        $(document).ready(function() {
             init();
-        };
+        });
     </script>
 }

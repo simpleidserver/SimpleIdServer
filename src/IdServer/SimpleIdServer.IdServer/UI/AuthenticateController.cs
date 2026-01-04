@@ -27,11 +27,11 @@ using System.Collections.Generic;
 namespace SimpleIdServer.IdServer.UI;
 
 [Area(Constants.ConsoleAmr)]
-public class ConsoleAuthenticateController : BaseOTPAuthenticateController<AuthenticateConsoleViewModel>
+public class AuthenticateController : BaseOTPAuthenticateController<AuthenticateConsoleViewModel>
 {
     private readonly IConfiguration _configuration;
 
-    public ConsoleAuthenticateController(
+    public AuthenticateController(
         IConfiguration configuration,
         IEnumerable<IUserNotificationService> notificationServices, 
         IEnumerable<IOTPAuthenticator> otpAuthenticators,

@@ -1,40 +1,42 @@
-﻿@using FormBuilder
-@using FormBuilder.Components.Workflow
-@using FormBuilder.Helpers
-@using Microsoft.AspNetCore.Http
-@using Microsoft.Extensions.Options
-@model SimpleIdServer.IdServer.UI.ViewModels.SidWorkflowViewModel
-@inject IOptions<FormBuilderOptions> options
-@inject IUriProvider uriProvider
-@inject IHttpContextAccessor HttpContextAccessor;
+﻿@using SimpleIdServer.IdServer.Console
+@using SimpleIdServer.IdServer.Template.Startup.Resources
+@using SimpleIdServer.IdServer.Template.Startup.ViewModels
+@using SimpleIdServer.IdServer.UI.ViewModels
+@using System.Text.Json
+@model SidWorkflowViewModel
 
 @{
-    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
-    var antiforgeryToken = HttpContextAccessor.HttpContext.Request.Cookies[options.Value.AntiforgeryCookieName];
-    Model.AntiforgeryToken.CookieValue = antiforgeryToken;
-    var step = Model.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var inputModel = JsonSerializer.Deserialize<AuthenticateConsoleViewModel>(Model.Input);
 }
 
-<component type="typeof(WorkflowViewer)"
-           render-mode="ServerPrerendered"
-           param-Input="@Model.Input"
-           param-Workflow="@Model.Workflow"
-           param-FormRecords="@Model.FormRecords"
-           param-CurrentStepId="@Model.CurrentStepId"
-           param-ErrorMessages="@Model.ErrorMessages"
-           param-SuccessMessages="@Model.SuccessMessages"
-           param-AntiforgeryToken="@Model.AntiforgeryToken"
-           param-SupportedLanguageCodes="@Model.SupportedLanguageCodes"
-           param-Template="@Model.Template"/>
-
-@section Header {
-    @foreach (var cssStyle in Model.Template.CssStyles)
+@section CardTop {
+    @if (inputModel.LogoUri != null)
     {
-        <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
+        <div class="text-center mb-4">
+            <img src="@inputModel.LogoUri" alt="@inputModel.ClientName" class="img-fluid" style="max-height: 80px;" />
+        </div>
     }
 
-    @foreach (var jsStyle in Model.Template.JsStyles)
-    {
-        <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
-    }
+    <h4 class="card-title text-center mb-4">@AuthenticateConsoleResource.title</h4>
 }
+
+<partial name="_OtpAuthenticate" model="@(new OtpAuthenticatePartialViewModel
+{
+    Workflow = Model,
+    Input = inputModel,
+    Area = SimpleIdServer.IdServer.Constants.ConsoleAmr,
+    AuthFormEltId = StandardConsoleAuthForms.consoleAuthForm,
+    SendCodeEltId = StandardConsoleAuthForms.consoleSendConfirmationCode,
+    Title = AuthenticateConsoleResource.title,
+    LoginLabel = AuthenticateConsoleResource.login,
+    LoginPlaceholder = AuthenticateConsoleResource.login,
+    LoginInputType = "text",
+    ConfirmationCodeLabel = AuthenticateConsoleResource.confirmationcode,
+    ConfirmationCodePlaceholder = AuthenticateConsoleResource.confirmationcode,
+    RememberLoginLabel = AuthenticateConsoleResource.remember_login,
+    AuthenticateButtonLabel = AuthenticateConsoleResource.authenticate,
+    SendCodeButtonLabel = AuthenticateConsoleResource.sendconfirmationcode,
+    CodeValidityFormat = AuthenticateConsoleResource.code_validity,
+    TosLabel = "",
+    PolicyLabel = ""
+})" />

@@ -21,7 +21,7 @@
     <h4 class="card-title text-center mb-4">@AuthenticateEmailResource.title</h4>
 }
 
-<partial name="_OtpAuthenticate" model="new OtpAuthenticatePartialViewModel
+<partial name="_OtpAuthenticate" model="@(new OtpAuthenticatePartialViewModel
 {
     Workflow = Model,
     Input = inputModel,
@@ -40,4 +40,4 @@
     CodeValidityFormat = AuthenticateEmailResource.code_validity,
     TosLabel = AuthenticateEmailResource.tos,
     PolicyLabel = AuthenticateEmailResource.policy
-}" />
+})" />
