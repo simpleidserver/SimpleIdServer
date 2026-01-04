@@ -1,0 +1,110 @@
+@using SimpleIdServer.IdServer.Template.Startup.ViewModels
+@using SimpleIdServer.IdServer.UI.ViewModels
+@model OtpAuthenticatePartialViewModel
+
+@{
+    var inputModel = Model.Input;
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.CodeValidityFormat) && inputModel.TOTPStep.HasValue)
+{
+    <div class="alert alert-info" role="alert">
+        @string.Format(Model.CodeValidityFormat, inputModel.TOTPStep.Value)
+    </div>
+}
+
+<!-- Authenticate (OTP) -->
+<form method="post" asp-area="@Model.Area" asp-controller="Authenticate" asp-action="Index">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.ReturnUrl)" value="@inputModel.ReturnUrl" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.Realm)" value="@Model.Workflow.Realm" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.WorkflowId)" value="@Model.Workflow.Workflow.Id" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.StepId)" value="@Model.Workflow.CurrentStepId" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.CurrentLink)" value="@Model.Workflow.Workflow.Links.Single(l => l.Source.EltId == Model.AuthFormEltId).Id" />
+
+    <input type="hidden" name="@nameof(BaseOTPAuthenticateViewModel.Action)" value="AUTHENTICATE" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.CaptchaType)" value="@inputModel.CaptchaType" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.CaptchaValue)" value="@inputModel.CaptchaValue" />
+
+    <div class="mb-3">
+        <label class="form-label">@Model.LoginLabel</label>
+        @if (inputModel.IsAuthInProgress)
+        {
+            <input name="@nameof(BaseAuthenticateViewModel.Login)" type="@Model.LoginInputType" class="form-control" value="@inputModel.Login" disabled="disabled" />
+            <input name="@nameof(BaseAuthenticateViewModel.Login)" type="hidden" value="@inputModel.Login" />
+        }
+        else
+        {
+            <input name="@nameof(BaseAuthenticateViewModel.Login)" type="@Model.LoginInputType" class="form-control" placeholder="@Model.LoginPlaceholder" value="@inputModel.Login" required autofocus />
+        }
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">@Model.ConfirmationCodeLabel</label>
+        <input name="@nameof(BaseOTPAuthenticateViewModel.OTPCode)" type="password" class="form-control" placeholder="@Model.ConfirmationCodePlaceholder" required />
+    </div>
+
+    <div class="mb-3 form-check">
+        <input name="@nameof(BaseAuthenticateViewModel.RememberLogin)" type="checkbox" class="form-check-input" id="rememberMe" value="true" @(inputModel.RememberLogin ? "checked" : string.Empty) />
+        <label class="form-check-label" for="rememberMe">@Model.RememberLoginLabel</label>
+    </div>
+
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary btn-lg">@Model.AuthenticateButtonLabel</button>
+    </div>
+</form>
+
+<hr class="my-4" />
+
+<!-- Send confirmation code -->
+<form method="post" asp-area="@Model.Area" asp-controller="Authenticate" asp-action="Index">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.ReturnUrl)" value="@inputModel.ReturnUrl" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.Realm)" value="@Model.Workflow.Realm" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.WorkflowId)" value="@Model.Workflow.Workflow.Id" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.StepId)" value="@Model.Workflow.CurrentStepId" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.CurrentLink)" value="@Model.Workflow.Workflow.Links.Single(l => l.Source.EltId == Model.SendCodeEltId).Id" />
+
+    <input type="hidden" name="@nameof(BaseOTPAuthenticateViewModel.Action)" value="SENDCONFIRMATIONCODE" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.CaptchaType)" value="@inputModel.CaptchaType" />
+    <input type="hidden" name="@nameof(BaseAuthenticateViewModel.CaptchaValue)" value="@inputModel.CaptchaValue" />
+
+    <div class="mb-3">
+        <label class="form-label">@Model.LoginLabel</label>
+        @if (inputModel.IsAuthInProgress)
+        {
+            <input name="@nameof(BaseAuthenticateViewModel.Login)" type="@Model.LoginInputType" class="form-control" value="@inputModel.Login" disabled="disabled" />
+            <input name="@nameof(BaseAuthenticateViewModel.Login)" type="hidden" value="@inputModel.Login" />
+        }
+        else
+        {
+            <input name="@nameof(BaseAuthenticateViewModel.Login)" type="@Model.LoginInputType" class="form-control" placeholder="@Model.LoginPlaceholder" value="@inputModel.Login" required />
+        }
+    </div>
+
+    <div class="d-grid">
+        <button type="submit" class="btn btn-outline-secondary">@Model.SendCodeButtonLabel</button>
+    </div>
+</form>
+
+@if (!string.IsNullOrEmpty(inputModel.TosUri) || !string.IsNullOrEmpty(inputModel.PolicyUri))
+{
+    <div class="text-center mt-4">
+        <small class="text-muted">
+            @if (!string.IsNullOrEmpty(inputModel.TosUri) && !string.IsNullOrWhiteSpace(Model.TosLabel))
+            {
+                <a href="@inputModel.TosUri" target="_blank" class="text-decoration-none">@Model.TosLabel</a>
+            }
+            @if (!string.IsNullOrEmpty(inputModel.TosUri) && !string.IsNullOrEmpty(inputModel.PolicyUri) && !string.IsNullOrWhiteSpace(Model.TosLabel) && !string.IsNullOrWhiteSpace(Model.PolicyLabel))
+            {
+                <span> | </span>
+            }
+            @if (!string.IsNullOrEmpty(inputModel.PolicyUri) && !string.IsNullOrWhiteSpace(Model.PolicyLabel))
+            {
+                <a href="@inputModel.PolicyUri" target="_blank" class="text-decoration-none">@Model.PolicyLabel</a>
+            }
+        </small>
+    </div>
+}
