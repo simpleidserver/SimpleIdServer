@@ -109,6 +109,86 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB.Extensions
 
         #region Filter attributes
 
+        public static IMongoQueryable<SCIMRepresentationAttribute> EvaluateMongoDbAttributesDirect(this SCIMExpression expression, IMongoQueryable<SCIMRepresentationAttribute> attributes)
+        {
+            var treeNodeParameter = Expression.Parameter(typeof(SCIMRepresentationAttribute), "attr");
+            var anyWhereExpression = expression.EvaluateAttributesDirect(treeNodeParameter);
+            if (anyWhereExpression == null) return null;
+            var enumarableType = typeof(Queryable);
+            var whereMethod = enumarableType.GetMethods()
+                 .Where(m => m.Name == "Where" && m.IsGenericMethodDefinition)
+                 .Where(m => m.GetParameters().Count() == 2).First().MakeGenericMethod(typeof(SCIMRepresentationAttribute));
+            var equalLambda = Expression.Lambda<Func<SCIMRepresentationAttribute, bool>>(anyWhereExpression, treeNodeParameter);
+            var whereExpr = Expression.Call(whereMethod, Expression.Constant(attributes), equalLambda);
+            var finalSelectArg = Expression.Parameter(typeof(IQueryable<SCIMRepresentationAttribute>), "f");
+            var finalSelectRequestBody = Expression.Lambda(whereExpr, new ParameterExpression[] { finalSelectArg });
+            var result = (IMongoQueryable<SCIMRepresentationAttribute>)finalSelectRequestBody.Compile().DynamicInvoke(attributes);
+            return result;
+        }
+
+        public static Expression EvaluateAttributesDirect(this SCIMExpression expression, ParameterExpression parameterExpression)
+        {
+            var attrExpression = expression as SCIMAttributeExpression;
+            var logicalExpression = expression as SCIMLogicalExpression;
+            var comparisonExpression = expression as SCIMComparisonExpression;
+            if (attrExpression != null) return attrExpression.EvaluateAttributesDirect(parameterExpression);
+            if (logicalExpression != null) return logicalExpression.EvaluateAttributesDirect(parameterExpression);
+            if (comparisonExpression != null) return comparisonExpression.EvaluateAttributesDirect(parameterExpression);
+            return null;
+        }
+
+        public static Expression EvaluateAttributesDirect(this SCIMAttributeExpression expression, ParameterExpression parameterExpression)
+        {
+            var schemaAttributeIdProperty = Expression.Property(parameterExpression, "SchemaAttributeId");
+            var equal = Expression.Equal(schemaAttributeIdProperty, Expression.Constant(expression.SchemaAttribute.Id));
+            var complex = expression as SCIMComplexAttributeExpression;
+            if (complex != null)
+            {
+                return complex.GroupingFilter.EvaluateAttributesDirect(parameterExpression);
+            }
+
+            return equal;
+        }
+
+        public static Expression EvaluateAttributesDirect(this SCIMLogicalExpression expression, ParameterExpression parameterExpression)
+        {
+            var leftExpression = expression.LeftExpression.EvaluateAttributesDirect(parameterExpression);
+            var rightExpression = expression.RightExpression.EvaluateAttributesDirect(parameterExpression);
+            if (leftExpression == null && rightExpression == null) return null;
+            if (leftExpression != null && rightExpression == null) return leftExpression;
+            if (leftExpression == null && rightExpression != null) return rightExpression;
+            switch (expression.LogicalOperator)
+            {
+                case SCIMLogicalOperators.AND:
+                    return Expression.AndAlso(leftExpression, rightExpression);
+                default:
+                    return Expression.OrElse(leftExpression, rightExpression);
+            }
+        }
+
+        public static Expression EvaluateAttributesDirect(this SCIMComparisonExpression expression, ParameterExpression parameterExpression)
+        {
+            var lastChild = expression.LeftExpression.GetLastChild();
+            if (ParserConstants.MappingStandardAttributePathToProperty.ContainsKey(lastChild.GetFullPath())) return null;
+            var schemaAttributeId = Expression.Property(parameterExpression, "SchemaAttributeId");
+            var propertyValueString = Expression.Property(parameterExpression, "ValueString");
+            var propertyValueInteger = Expression.Property(parameterExpression, "ValueInteger");
+            var propertyValueDatetime = Expression.Property(parameterExpression, "ValueDateTime");
+            var propertyValueBoolean = Expression.Property(parameterExpression, "ValueBoolean");
+            var propertyValueDecimal = Expression.Property(parameterExpression, "ValueDecimal");
+            var propertyValueBinary = Expression.Property(parameterExpression, "ValueBinary");
+            var comparison = SCIMExpressionLinqExtensions.BuildComparisonExpression(expression, lastChild.SchemaAttribute,
+                propertyValueString,
+                propertyValueInteger,
+                propertyValueDatetime,
+                propertyValueBoolean,
+                propertyValueDecimal,
+                propertyValueBinary,
+                parameterExpression,
+                true);
+            return Expression.And(Expression.Equal(schemaAttributeId, Expression.Constant(lastChild.SchemaAttribute.Id)), comparison);
+        }
+
         public static IMongoQueryable<EnrichedAttribute> EvaluateMongoDbAttributes(this SCIMExpression expression, IMongoQueryable<EnrichedAttribute> attributes)
         {
             var treeNodeParameter = Expression.Parameter(typeof(EnrichedAttribute), "tn");

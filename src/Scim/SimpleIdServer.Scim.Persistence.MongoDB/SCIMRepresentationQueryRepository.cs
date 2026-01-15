@@ -30,20 +30,13 @@ namespace SimpleIdServer.Scim.Persistence.MongoDB
             int total = 0;
             if (parameter.Filter != null)
             {
-                var filteredRepresentationAttributes = from a in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable()
-                                                       join b in _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable() on a.ParentAttributeId equals b.Id into Parents
-                                                       select new EnrichedAttribute
-                                                       {
-                                                           Attribute = a,
-                                                           Parent = Parents.First(),
-                                                           Children = new List<SCIMRepresentationAttribute>()
-                                                       };
-                filteredRepresentationAttributes = parameter.Filter.EvaluateMongoDbAttributes(filteredRepresentationAttributes);
+                var filteredRepresentationAttributes = _scimDbContext.SCIMRepresentationAttributeLst.AsQueryable();
+                filteredRepresentationAttributes = parameter.Filter.EvaluateMongoDbAttributesDirect(filteredRepresentationAttributes);
                 if (filteredRepresentationAttributes != null)
                 {
                     filteredRepresentationIds = (await
                         filteredRepresentationAttributes
-                        .Select(a => a.Attribute.RepresentationId)
+                        .Select(a => a.RepresentationId)
                         .ToMongoListAsync())
                         .Distinct()
                         .ToList();
