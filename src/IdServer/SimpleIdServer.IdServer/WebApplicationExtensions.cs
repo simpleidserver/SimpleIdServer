@@ -255,6 +255,9 @@ public static class WebApplicationExtensions
         webApplication.SidMapControllerRoute("updateUserCredential",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Users + "/{id}/credentials/{credentialId}",
             defaults: new { controller = "Users", action = "UpdateCredential" });
+        webApplication.SidMapControllerRoute("updatePasswordCredential",
+            pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Users + "/{id}/pwd",
+            defaults: new { controller = "Users", action = "UpdatePasswordCredential" });
         webApplication.SidMapControllerRoute("deleteUserCredential",
             pattern: (usePrefix ? "{prefix}/" : string.Empty) + DefaultEndpoints.Users + "/{id}/credentials/{credentialId}",
             defaults: new { controller = "Users", action = "DeleteCredential" });

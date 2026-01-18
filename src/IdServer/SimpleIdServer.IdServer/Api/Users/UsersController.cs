@@ -421,6 +421,50 @@ namespace SimpleIdServer.IdServer.Api.Users
                 return BuildError(ex);
             }
         }
+        
+        [HttpPut]
+        public async Task<IActionResult> UpdatePasswordCredential([FromRoute] string prefix, string id, [FromBody] UpdateUserPasswordRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                using (var transaction = _transactionBuilder.Build())
+                {
+                    prefix = prefix ?? Constants.DefaultRealm;
+                    await CheckAccessToken(prefix, Config.DefaultScopes.Users.Name);
+                    if (string.IsNullOrWhiteSpace(request.Value)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, UserCredentialNames.Value));
+                    if (string.IsNullOrWhiteSpace(request.OldValue)) throw new OAuthException(ErrorCodes.INVALID_REQUEST, string.Format(Global.MissingParameter, "old_value"));
+                    var user = await _userRepository.GetById(id, prefix, cancellationToken);
+                    if (user == null) return new NotFoundResult();
+                    var existingCredential = user.Credentials.SingleOrDefault(c => c.CredentialType == Constants.AreaPwd && c.IsActive);
+                    if (existingCredential == null) throw new OAuthException(ErrorCodes.INVALID_REQUEST, Global.NoActivePasswordCredential);
+                    if (!PasswordHelper.VerifyHash(existingCredential, request.OldValue))
+                    {
+                        throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, Global.InvalidOldPassword);
+                    }
+
+                    var passwordValidationResult = _passwordValidationService.Validate(request.Value);
+                    if (passwordValidationResult != null)
+                    {
+                        throw new OAuthException(HttpStatusCode.BadRequest, ErrorCodes.INVALID_REQUEST, string.Join(",", passwordValidationResult.Select(r => r.errorMessage)));
+                    }
+
+                    existingCredential.Value = PasswordHelper.ComputerHash(existingCredential, request.Value);
+                    user.UpdateDateTime = DateTime.UtcNow;
+                    _userRepository.Update(user);
+                    await transaction.Commit(cancellationToken);
+                    await _busControl.Publish(new UpdateUserCredentialSuccessEvent
+                    {
+                        Realm = prefix,
+                        Name = user.Name
+                    });
+                    return new NoContentResult();
+                }
+            }
+            catch (OAuthException ex)
+            {
+                return BuildError(ex);
+            }
+        }
 
         [HttpDelete]
         public async Task<IActionResult> DeleteCredential([FromRoute] string prefix, string id, string credentialId, CancellationToken cancellationToken)

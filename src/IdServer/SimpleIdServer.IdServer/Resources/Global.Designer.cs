@@ -3317,5 +3317,23 @@ namespace SimpleIdServer.IdServer.Resources {
                 return ResourceManager.GetString("Version", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à no active password credential found for this user.
+        /// </summary>
+        public static string NoActivePasswordCredential {
+            get {
+                return ResourceManager.GetString("NoActivePasswordCredential", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Recherche une chaîne localisée semblable à the old password is invalid.
+        /// </summary>
+        public static string InvalidOldPassword {
+            get {
+                return ResourceManager.GetString("InvalidOldPassword", resourceCulture);
+            }
+        }
     }
 }

@@ -1203,4 +1203,10 @@
   <data name="RequiredUniqueChars" xml:space="preserve">
     <value>Passwords must use at least {0} different characters</value>
   </data>
+  <data name="NoActivePasswordCredential" xml:space="preserve">
+    <value>no active password credential found for this user</value>
+  </data>
+  <data name="InvalidOldPassword" xml:space="preserve">
+    <value>the old password is invalid</value>
+  </data>
 </root>
