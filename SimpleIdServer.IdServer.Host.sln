@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.3.11312.210 d18.3
+VisualStudioVersion = 18.3.11312.210
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01. Startup Layer", "01. Startup Layer", "{68306EFF-55D9-497B-9482-FEB81C485914}"
 EndProject
@@ -176,6 +176,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Migrations.Openiddict", "src\IdServer\SimpleIdServer.IdServer.Migrations.Openiddict\SimpleIdServer.IdServer.Migrations.Openiddict.csproj", "{7BABE6E4-5F4B-7A0D-9FF2-FA97AA9BE01D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.IdServer.Template.Startup", "src\IdServer\SimpleIdServer.IdServer.Template.Startup\SimpleIdServer.IdServer.Template.Startup.csproj", "{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.Aspire.Startup.AppHost", "SimpleIdServer.Aspire.Startup\SimpleIdServer.Aspire.Startup.AppHost\SimpleIdServer.Aspire.Startup.AppHost.csproj", "{D047D448-15C5-4D4A-AFE2-11EB665AFCEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleIdServer.Aspire.Startup.ServiceDefaults", "SimpleIdServer.Aspire.Startup\SimpleIdServer.Aspire.Startup.ServiceDefaults\SimpleIdServer.Aspire.Startup.ServiceDefaults.csproj", "{9985E428-EA34-813E-0139-BF603B1D0549}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -459,6 +463,14 @@ Global
 		{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{229D32F6-33CD-40FE-C5CF-9E52A2ACCB04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D047D448-15C5-4D4A-AFE2-11EB665AFCEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D047D448-15C5-4D4A-AFE2-11EB665AFCEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D047D448-15C5-4D4A-AFE2-11EB665AFCEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D047D448-15C5-4D4A-AFE2-11EB665AFCEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9985E428-EA34-813E-0139-BF603B1D0549}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9985E428-EA34-813E-0139-BF603B1D0549}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9985E428-EA34-813E-0139-BF603B1D0549}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9985E428-EA34-813E-0139-BF603B1D0549}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
