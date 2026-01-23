@@ -1,0 +1,43 @@
+﻿@using SimpleIdServer.IdServer.Email
+@using SimpleIdServer.IdServer.Email.UI.ViewModels
+@using SimpleIdServer.IdServer.Template.Startup.Resources
+@using SimpleIdServer.IdServer.Template.Startup.ViewModels
+@using SimpleIdServer.IdServer.UI.ViewModels
+@using System.Text.Json
+@model SidWorkflowViewModel
+
+@{
+    var inputModel = JsonSerializer.Deserialize<AuthenticateEmailViewModel>(Model.Input);
+}
+
+@section CardTop {
+    @if (inputModel.LogoUri != null)
+    {
+        <div class="text-center mb-4">
+            <img src="@inputModel.LogoUri" alt="@inputModel.ClientName" class="img-fluid" style="max-height: 80px;" />
+        </div>
+    }
+
+    <h4 class="card-title text-center mb-4">@AuthenticateEmailResource.title</h4>
+}
+
+<partial name="_OtpAuthenticate" model="@(new OtpAuthenticatePartialViewModel
+{
+    Workflow = Model,
+    Input = inputModel,
+    Area = "email",
+    AuthFormEltId = StandardEmailAuthForms.emailAuthForm,
+    SendCodeEltId = StandardEmailAuthForms.emailSendConfirmationCode,
+    Title = AuthenticateEmailResource.title,
+    LoginLabel = AuthenticateEmailResource.email,
+    LoginPlaceholder = AuthenticateEmailResource.email,
+    LoginInputType = "email",
+    ConfirmationCodeLabel = AuthenticateEmailResource.confirmationcode,
+    ConfirmationCodePlaceholder = AuthenticateEmailResource.confirmationcode,
+    RememberLoginLabel = AuthenticateEmailResource.remember_login,
+    AuthenticateButtonLabel = AuthenticateEmailResource.authenticate,
+    SendCodeButtonLabel = AuthenticateEmailResource.sendconfirmationcode,
+    CodeValidityFormat = AuthenticateEmailResource.code_validity,
+    TosLabel = AuthenticateEmailResource.tos,
+    PolicyLabel = AuthenticateEmailResource.policy
+})" />

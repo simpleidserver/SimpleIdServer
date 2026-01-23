@@ -181,6 +181,8 @@ task compile -depends clean {
 task buildTemplate {
 	$IdServerPathFullSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Startup"
 	$IdServerPathFullTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Startup"
+	$IdServerPathTemplateSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Template.Startup"
+	$IdServerPathTemplateTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Template.Startup"
 	$IdServerPathEmptySource = "$source_dir/IdServer/SimpleIdServer.IdServer.Empty.Startup"
 	$IdServerPathEmptyTarget = "$source_dir/Templates/templates/SimpleIdServer.IdServer.Empty.Startup"
 	$IdServerPathUiSource = "$source_dir/IdServer/SimpleIdServer.IdServer.Ui.Startup"
@@ -203,6 +205,7 @@ task buildTemplate {
 	$FastFedIdentityProviderPathTarget = "$source_dir/Templates/templates/SimpleIdServer.FastFed.IdentityProvider.Startup"
 		
 	CopyFolder $IdServerPathFullSource $IdServerPathFullTarget
+	CopyFolder $IdServerPathTemplateSource $IdServerPathTemplateTarget
 	CopyFolder $IdServerPathEmptySource $IdServerPathEmptyTarget
 	CopyFolder $IdServerPathUiSource $IdServerPathUiTarget
 	CopyFolder $IdserverAdminSource $IdserverAdminTarget

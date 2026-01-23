@@ -1,0 +1,43 @@
+﻿@using SimpleIdServer.IdServer.Otp
+@using SimpleIdServer.IdServer.Otp.UI.ViewModels
+@using SimpleIdServer.IdServer.Template.Startup.Resources
+@using SimpleIdServer.IdServer.Template.Startup.ViewModels
+@using SimpleIdServer.IdServer.UI.ViewModels
+@using System.Text.Json
+@model SidWorkflowViewModel
+
+@{
+    var inputModel = JsonSerializer.Deserialize<AuthenticateOtpViewModel>(Model.Input);
+}
+
+@section CardTop {
+    @if (inputModel.LogoUri != null)
+    {
+        <div class="text-center mb-4">
+            <img src="@inputModel.LogoUri" alt="@inputModel.ClientName" class="img-fluid" style="max-height: 80px;" />
+        </div>
+    }
+
+    <h4 class="card-title text-center mb-4">@AuthenticateOtpResource.title</h4>
+}
+
+<partial name="_OtpAuthenticate" model="@(new OtpAuthenticatePartialViewModel
+{
+    Workflow = Model,
+    Input = inputModel,
+    Area = Constants.Amr,
+    AuthFormEltId = StandardOtpAuthForms.otpCodeFormId,
+    SendCodeEltId = "",
+    Title = AuthenticateOtpResource.title,
+    LoginLabel = AuthenticateOtpResource.login,
+    LoginPlaceholder = AuthenticateOtpResource.login,
+    LoginInputType = "text",
+    ConfirmationCodeLabel = AuthenticateOtpResource.confirmationcode,
+    ConfirmationCodePlaceholder = AuthenticateOtpResource.confirmationcode,
+    RememberLoginLabel = "",
+    AuthenticateButtonLabel = AuthenticateOtpResource.authenticate,
+    SendCodeButtonLabel = "",
+    CodeValidityFormat = AuthenticateOtpResource.code_validity,
+    TosLabel = AuthenticateOtpResource.tos,
+    PolicyLabel = AuthenticateOtpResource.policy
+})" />

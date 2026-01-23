@@ -1,0 +1,95 @@
+@using FormBuilder.Helpers
+@using FormBuilder.UIs
+@using System.Linq
+@using System.Threading
+
+@model WorkflowViewModel
+
+@inject IUriProvider uriProvider
+
+@{
+    Layout = "~/Views/Shared/_FormBuilderLayout.cshtml";
+
+    var currentStep = Model?.Workflow?.Steps?.SingleOrDefault(s => s.Id == Model.CurrentStepId);
+    var form = (currentStep != null && Model?.FormRecords != null)
+        ? Model.FormRecords.SingleOrDefault(r => r.CorrelationId == currentStep.FormRecordCorrelationId)
+        : null;
+
+    string TranslateMessage(string message, IEnumerable<FormBuilder.Models.FormMessageTranslation> translations)
+    {
+        if (translations == null)
+        {
+            return message;
+        }
+
+        var currentCulture = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName;
+        var translationKey = TranslationKeyParser.Parse(message);
+        var translation = translations.SingleOrDefault(t => t.Code == translationKey.Code && t.Language == currentCulture);
+        if (translation == null)
+        {
+            return message;
+        }
+
+        return string.Format(translation.Value, translationKey.Args);
+    }
+}
+
+@section Header {
+    @if (Model?.Template?.CssStyles != null)
+    {
+        @foreach (var cssStyle in Model.Template.CssStyles)
+        {
+            <link rel="stylesheet" href="@uriProvider.GetCssUrl(Model.Template.Id, cssStyle)" />
+        }
+    }
+
+    @if (Model?.Template?.JsStyles != null)
+    {
+        @foreach (var jsStyle in Model.Template.JsStyles)
+        {
+            <script src="@uriProvider.GetJsUrl(Model.Template.Id, jsStyle)" type="text/javascript"></script>
+        }
+    }
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    @RenderSection("CardTop", required: false)
+
+                    @if (Model?.SuccessMessages != null && Model.SuccessMessages.Any())
+                    {
+                        <div class="alert alert-success" role="alert">
+                            <ul class="mb-0">
+                                @foreach (var success in Model.SuccessMessages)
+                                {
+                                    <li>@TranslateMessage(success, form?.SuccessMessageTranslations)</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    @if (Model?.ErrorMessages != null && Model.ErrorMessages.Any())
+                    {
+                        <div class="alert alert-danger" role="alert">
+                            <ul class="mb-0">
+                                @foreach (var error in Model.ErrorMessages)
+                                {
+                                    <li>@TranslateMessage(error, form?.ErrorMessageTranslations)</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}

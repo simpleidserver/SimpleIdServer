@@ -1,0 +1,29 @@
+<script type="text/javascript">
+    window.sidWorkflowAuth = window.sidWorkflowAuth || {};
+
+    window.sidWorkflowAuth.clearError = function (selector) {
+        var elt = selector ? $(selector) : $("#errors");
+        if (elt.length === 0) return;
+        elt.text("");
+        elt.css("display", "none");
+    };
+
+    window.sidWorkflowAuth.displayError = function (errorJson, selector) {
+        var message = null;
+        if (errorJson) {
+            message = errorJson["error_description"] || errorJson["error"] || errorJson["message"] || null;
+        }
+
+        if (!message) {
+            message = "Unknown error";
+        }
+
+        var elt = selector ? $(selector) : $("#errors");
+        if (elt.length === 0) {
+            return;
+        }
+
+        elt.text(message);
+        elt.css("display", "");
+    };
+</script>

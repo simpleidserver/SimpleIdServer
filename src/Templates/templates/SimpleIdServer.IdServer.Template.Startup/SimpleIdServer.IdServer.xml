@@ -1,0 +1,1550 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>SimpleIdServer.IdServer</name>
+    </assembly>
+    <members>
+        <member name="F:SimpleIdServer.IdServer.AdditionalJsonWebKeyParameterNames.Jkt">
+            <summary>
+            https://www.ietf.org/archive/id/draft-ietf-oauth-dpop-16.txt
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.AdditionalJsonWebKeyParameterNames.Act">
+            <summary>
+            The act (actor) claim provides a means within a JWT to express that delegation has occurred and identify the acting party to whom authority has been delegated.
+            Actor claim.
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.Api.Authorization.ResponseModes.FormPostResponseModeHandler">
+            <summary>
+            Implementation https://openid.net/specs/oauth-v2-form-post-response-mode-1_0.html
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.Api.BCAuthorize.BCAuthorizeController">
+            <summary>
+            Backchannel Authentication Endpoit MUST utilize TLS.
+            Recommendation : FAPI suggests to use "tls_client_auth" or "self_signed_tls_client_auth".
+            https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#auth_backchannel_endpoint
+            </summary>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.BCAuthorize.BCAuthorizeRequestValidator.CheckLoginHintToken(SimpleIdServer.IdServer.Api.HandlerContext,System.Threading.CancellationToken)">
+            <summary>
+            Authorization server verifies the expiration.
+            </summary>
+            <param name="context"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.BCAuthorize.BCAuthorizeRequestValidator.CheckLoginHint(SimpleIdServer.IdServer.Api.HandlerContext,System.Threading.CancellationToken)">
+            <summary>
+            Value contains the subject of the user.
+            </summary>
+            <param name="context"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+            <exception cref="T:SimpleIdServer.IdServer.Exceptions.OAuthException"></exception>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.BCAuthorize.BCAuthorizeRequestValidator.CheckIdTokenHint(SimpleIdServer.IdServer.Api.HandlerContext,System.Threading.CancellationToken)">
+            <summary>
+            ID Token previously issued to the client by the OpenID Provider being passed back as a hint.
+            </summary>
+            <param name="context"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+            <exception cref="T:SimpleIdServer.IdServer.Exceptions.OAuthException"></exception>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.HandlerContextResponse.Add(System.String,System.String)">
+            <summary>
+            Add parameter.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.Api.Configuration.OAuthConfigurationController">
+            <summary>
+            Implementation : https://tools.ietf.org/html/draft-ietf-oauth-discovery-10
+            </summary>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.Configuration.OAuthConfigurationController.Get(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Get authorization server metadata.
+            </summary>
+            <param name="prefix"></param>
+            <param name="token"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.OpenIdConfiguration.OpenIdConfigurationController.Get(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Get OpenID Provider Metadata.
+            </summary>
+            <param name="prefix"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.Api.Register.RegistrationController">
+            <summary>
+            https://www.rfc-editor.org/rfc/rfc7591
+            </summary>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.Register.RegistrationController.Add(System.String,SimpleIdServer.IdServer.Api.Register.RegisterClientRequest,System.Threading.CancellationToken)">
+            <summary>
+            Register a client.
+            </summary>
+            <param name="prefix">Realm</param>
+            <param name="request">Registration request</param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.Register.RegistrationController.Get(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Get a client
+            </summary>
+            <param name="prefix">Realm</param>
+            <param name="id">Client's identifier.</param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.Register.RegistrationController.Delete(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Delete a client.
+            </summary>
+            <param name="prefix">Realm</param>
+            <param name="id">Client's identifier</param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.Register.RegistrationController.Update(System.String,System.String,SimpleIdServer.IdServer.Api.Register.RegisterClientRequest,System.Threading.CancellationToken)">
+            <summary>
+            Update a client.
+            </summary>
+            <param name="prefix">Realm</param>
+            <param name="id">Client's identifier</param>
+            <param name="request">Update request</param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.Api.Token.Handlers.PreAuthorizedCodeHandler">
+            <summary>
+            The code representing the Credential Issuer's authorization for the Wallet to obtain Credentials of a certain type.
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.Api.Token.Handlers.TokenExchangeHandler">
+            <summary>
+            https://datatracker.ietf.org/doc/html/rfc8693#TokenTypeIdentifiers
+            </summary>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Api.Token.TokenBuilders.ITokenBuilder.Build(SimpleIdServer.IdServer.Api.Token.TokenBuilders.BuildTokenParameter,SimpleIdServer.IdServer.Api.HandlerContext,System.Threading.CancellationToken,System.Boolean)">
+            <summary>
+            Build new token.
+            </summary>
+            <param name="scopes"></param>
+            <param name="audiences"></param>
+            <param name="handlerContext"></param>
+            <returns></returns>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Api.Users.RegisterUserRequest.Name">
+            <summary>
+            Name.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Api.Users.RegisterUserRequest.Firstname">
+            <summary>
+            Firstname.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Api.Users.RegisterUserRequest.Lastname">
+            <summary>
+            Lastname.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Api.Users.RegisterUserRequest.Email">
+            <summary>
+            Email.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Api.Users.RegisterUserRequest.EmailVerified">
+            <summary>
+            Is email verified.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Api.Users.RegisterUserRequest.Claims">
+            <summary>
+            Claims.
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.Authenticate.Handlers.OAuthClientPrivateKeyJwtAuthenticationHandler">
+            <summary>
+            https://oauth.net/private-key-jwt/
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.Authenticate.Handlers.OAuthClientSecretJwtAuthenticationHandler">
+            <summary>
+            https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.Authenticate.Handlers.OAuthClientSelfSignedTlsClientAuthenticationHandler.AUTH_METHOD">
+            <summary>
+            Indicates that the client authentication to the authorization server will occur using mutual TLS with the client
+            utilizing a self signed certificate.
+            </summary>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.#ctor(SimpleIdServer.IdServer.Store.IUserSessionResitory,Microsoft.Extensions.Options.IOptions{SimpleIdServer.IdServer.Options.IdServerHostOptions},Microsoft.Extensions.Options.IOptionsMonitor{Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions},Microsoft.Extensions.Logging.ILoggerFactory,System.Text.Encodings.Web.UrlEncoder,Microsoft.AspNetCore.Authentication.ISystemClock)">
+            <summary>
+            Initializes a new instance of <see cref="T:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationHandler"/>.
+            </summary>
+            <param name="options">Accessor to <see cref="T:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions"/>.</param>
+            <param name="logger">The <see cref="T:Microsoft.Extensions.Logging.ILoggerFactory"/>.</param>
+            <param name="encoder">The <see cref="T:System.Text.Encodings.Web.UrlEncoder"/>.</param>
+            <param name="clock">The <see cref="T:Microsoft.AspNetCore.Authentication.ISystemClock"/>.</param>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.Events">
+            <summary>
+            The handler calls methods on the events which give the application control at certain points where processing is occurring.
+            If it is not provided a default instance is supplied which does nothing when the methods are called.
+            </summary>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.InitializeHandlerAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.CreateEventsAsync">
+            <summary>
+            Creates a new instance of the events instance.
+            </summary>
+            <returns>A new instance of the events instance.</returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.HandleAuthenticateAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.FinishResponseAsync">
+            <inheritdoc />
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.HandleSignInAsync(System.Security.Claims.ClaimsPrincipal,Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc />
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.HandleSignOutAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc />
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.HandleForbiddenAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc />
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Auth.IdServerCookieAuthenticationHandler.HandleChallengeAsync(Microsoft.AspNetCore.Authentication.AuthenticationProperties)">
+            <inheritdoc />
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.AddSigningKey(Microsoft.IdentityModel.Tokens.SigningCredentials,System.String,SimpleIdServer.IdServer.Domains.SecurityKeyTypes)">
+            <summary>
+            Add signing key used to check the 'request' parameter.
+            </summary>
+            <param name="signingCredentials"></param>
+            <param name="alg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.EnableUMAGrantType">
+            <summary>
+            Allows the client to use UMA grant-type.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.EnablePasswordGrantType">
+            <summary>
+            Add password grant-type.
+            Exchange user's credentials for an access token.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.UseOnlyPasswordGrantType">
+            <summary>
+            Use only the password grant-type.
+            Exchange user's credentials for an access token.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.EnableRefreshTokenGrantType(System.Nullable{System.Double})">
+            <summary>
+            Allows client to continue to have a valid access token without further interaction with the user.
+            </summary>
+            <param name="refreshTokenExpirationTimeInSeconds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.SetClientName(System.String,System.String)">
+            <summary>
+            Set client name.
+            </summary>
+            <param name="clientName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.UsePrivateKeyJwtAuthentication">
+            <summary>
+            Use 'private_key_jwt' as authentication method.
+            For more information : https://oauth.net/private-key-jwt/
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.UseClientSecretJwtAuthentication">
+            <summary>
+            Use 'client_secret_jwt' as authentication method.
+            For more information : https://openid.net/specs/openid-connect-core-1_0.html#ClientAuthentication
+            </summary>
+            <param name="jsonWebKeys"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.UseClientSelfSignedAuthentication">
+            <summary>
+            Use 'self_signed_tls_client_auth' as authentication method.
+            For more information : https://www.rfc-editor.org/rfc/rfc8705.html#name-self-signed-method-metadata
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.UseClientTlsAuthentication(System.String,System.String,System.String,System.String)">
+            <summary>
+            Use 'tls_client_auth' as authentication method.
+            For more information : https://oauth.net/2/mtls/
+            </summary>
+            <param name="subjectDn">Expected subject distinguished name of the certificate.</param>
+            <param name="sanDns">Expected dNSName SAN entry in the certificate.</param>
+            <param name="sanEmail">Expected rfc822Name SAN entry in the certificate.</param>
+            <param name="sanIp">A string representation of an IP address in either dotted decimal notation (IPV4) or colon-delimited hexadecimal (IPV6) that is expected to be present as an iPAddress SAN entry in the certificate</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.SetAccessTokenType(SimpleIdServer.IdServer.Domains.AccessTokenTypes)">
+            <summary>
+            Set the access token type (jwt or reference).
+            Default value is jwt.
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.SetTokenExpirationTimeInSeconds(System.Double)">
+            <summary>
+            Set the token expiration time in seconds.
+            </summary>
+            <param name="tokenExpirationTimeInSeconds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.AddSelfSignedCertificate(System.String,System.String)">
+            <summary>
+            Add a self signed certificate into the Json Web Key (JWK).
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.ActAsUMAResourceServer">
+            <summary>
+            Client will act as a UMA resource server.
+            Grant access to the scope uma_protection.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ApiClientBuilder.UseDPOPProof(System.Boolean)">
+            <summary>
+            DPOP Proof is required
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildCredentialIssuer(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm,System.String[])">
+            <summary>
+            Build credential issuer client.
+            </summary>
+            <param name="clientId"></param>
+            <param name="clientSecret"></param>
+            <param name="realm"></param>
+            <param name="redirectUrls"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildWalletClient(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm)">
+            <summary>
+            Build wallet client - use credential offer - cross device (with information pre-submitted by the End-User).
+            </summary>
+            <param name="clientId"></param>
+            <param name="realm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildCredentialIssuerClient(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm)">
+            <summary>
+            Build credential issuer client.
+            </summary>
+            <param name="clientId"></param>
+            <param name="clientSecret"></param>
+            <param name="realm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildApiClient(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm)">
+            <summary>
+            Build client for REST.API.
+            By default client_credentials grant-type is used to obtain an access token outside of the context of a user.
+            </summary>
+            <param name="clientId"></param>
+            <param name="clientSecret"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildTraditionalWebsiteClient(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm,System.String[])">
+            <summary>
+            Build client for traditional website like ASP.NET CORE.
+            By default authorization_code grant-type PKCE is used by confidential and public clients to exchange an authorization code for an access token.
+            </summary>
+            <param name="clientId"></param>
+            <param name="clientSecret"></param>
+            <param name="redirectUrls"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildExternalAuthDeviceClient(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm)">
+            <summary>
+            Build external authentication device client.
+            CIBA is enabled.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildDeviceClient(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm)">
+            <summary>
+            Build a device client.
+            </summary>
+            <param name="clientId"></param>
+            <param name="clientSecret"></param>
+            <param name="realm"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildMobileApplication(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm,System.String[])">
+            <summary>
+            Build mobile application.
+            Authorization code + PKCE.
+            </summary>
+            <param name="clientId"></param>
+            <param name="clientSecret"></param>
+            <param name="redirectUrls"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.ClientBuilder.BuildUserAgentClient(System.String,System.String,SimpleIdServer.IdServer.Domains.Realm,System.String[])">
+            <summary>
+            Build client for user-agent based application for example : SPA, angular etc...
+            Authorization code + PKCE.
+            </summary>
+            <param name="clientId"></param>
+            <param name="clientSecret"></param>
+            <param name="redirectUrls"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.CredentialIssuerClientBuilder.EnableClientGrantType">
+            <summary>
+            Allows the client to use client_credentials grant-type.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.CredentialIssuerClientBuilder.SetClientName(System.String,System.String)">
+            <summary>
+            Set client name.
+            </summary>
+            <param name="clientName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.EnableRefreshTokenGrantType(System.Nullable{System.Double})">
+            <summary>
+            Allows client to continue to have a valid access token without further interaction with the user.
+            </summary>
+            <param name="refreshTokenExpirationTimeInSeconds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.EnableIdTokenInResponseType">
+            <summary>
+            Response type can return 'id_token'.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.EnableTokenInResponseType">
+            <summary>
+            Response type can return 'token'.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.AddScope(SimpleIdServer.IdServer.Domains.Scope[])">
+            <summary>
+            Add scope.
+            </summary>
+            <param name="scopes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.EnableAccessToGrantsApi">
+            <summary>
+            Enable the access to the grants token.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.EnableOfflineAccess">
+            <summary>
+            Enable offline_access.
+            This scope value requests that an OAUTH2.0 refresh token be issued that can be used to obtain an access token that grants access to the End-User's UserInfo Endpoint even when the End-User is not present (not logged-in).
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.AddSigningKey(Microsoft.IdentityModel.Tokens.SigningCredentials,System.String,SimpleIdServer.IdServer.Domains.SecurityKeyTypes)">
+            <summary>
+            Add signing key used to check the 'request' parameter.
+            </summary>
+            <param name="signingCredentials"></param>
+            <param name="alg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetRequestObjectSigning(System.String)">
+            <summary>
+            Set the algorithm used to sign the request object.
+            </summary>
+            <param name="alg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetRequestObjectEncryption(System.String,System.String)">
+            <summary>
+            Configure the algorithm to encrypt the request object.
+            </summary>
+            <param name="alg"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetSubjectType(System.String)">
+            <summary>
+            Set the subject_type.
+            </summary>
+            <param name="subjectType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetPairwiseSubjectType(System.String)">
+            <summary>
+            Use pairwise subject_type.
+            </summary>
+            <param name="salt">Salt used to generate the pairwise subject.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetUserInfoSignedResponseAlg(System.String)">
+            <summary>
+            Set the algorithm to sign the userinfo response.
+            </summary>
+            <param name="signingAlg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetUserInfoEncryption(System.String,System.String)">
+            <summary>
+            Set the algorithm to encrypt the userinfo response.
+            </summary>
+            <param name="alg"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.UseClientTlsAuthentication(System.String,System.String,System.String,System.String)">
+            <summary>
+            Use 'tls_client_auth' as authentication method.
+            For more information : https://oauth.net/2/mtls/
+            </summary>
+            <param name="subjectDn">Expected subject distinguished name of the certificate.</param>
+            <param name="sanDns">Expected dNSName SAN entry in the certificate.</param>
+            <param name="sanEmail">Expected rfc822Name SAN entry in the certificate.</param>
+            <param name="sanIp">A string representation of an IP address in either dotted decimal notation (IPV4) or colon-delimited hexadecimal (IPV6) that is expected to be present as an iPAddress SAN entry in the certificate</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.UseClientPkceAuthentication">
+            <summary>
+            PKCE is an extension to the Authorization Code flow to prevent CSRF and 
+            For more information: https://oauth.net/2/pkce/
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetSectorIdentifierUri(System.String)">
+            <summary>
+            Set the sector_identifier_uri.
+            </summary>
+            <param name="uri"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetDefaultMaxAge(System.Int32)">
+            <summary>
+            Set the default Maximum Authentication Age.
+            Specifies that the End-User MUST be actively authenticated if the End-User was authenticated longer ago than the specified number of seconds.
+            </summary>
+            <param name="defaultMaxAge"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.ResourceParameterIsRequired">
+            <summary>
+            resource parameter must be required
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetClientName(System.String,System.String)">
+            <summary>
+            Set client name.
+            </summary>
+            <param name="clientName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.MobileClientBuilder.SetClientLogoUri(System.String,System.String)">
+            <summary>
+            Set the logo uri.
+            </summary>
+            <param name="logoUri"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableRefreshTokenGrantType(System.Nullable{System.Double})">
+            <summary>
+            Allows client to continue to have a valid access token without further interaction with the user.
+            </summary>
+            <param name="refreshTokenExpirationTimeInSeconds"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableCIBAGrantType(System.String,System.String,System.Nullable{System.Int32})">
+            <summary>
+            Allows client to use CIBA grant-type.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableDeviceCodeGrantType">
+            <summary>
+            Enable device code grant-type
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableUMAGrantType">
+            <summary>
+            Allows the client to use UMA grant-type.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableClientGrantType">
+            <summary>
+            Allows the client to use client_credentials grant-type.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableIdTokenInResponseType">
+            <summary>
+            Response type can return 'id_token'.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableTokenInResponseType">
+            <summary>
+            Response type can return 'token'.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.AddScope(SimpleIdServer.IdServer.Domains.Scope[])">
+            <summary>
+            Add scope.
+            </summary>
+            <param name="scopes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableAccessToGrantsApi">
+            <summary>
+            Enable the access to the grants token.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.EnableOfflineAccess">
+            <summary>
+            Enable offline_access.
+            This scope value requests that an OAUTH2.0 refresh token be issued that can be used to obtain an access token that grants access to the End-User's UserInfo Endpoint even when the End-User is not present (not logged-in).
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.AddAuthDataTypes(System.String[])">
+            <summary>
+            Add scope.
+            </summary>
+            <param name="scopes"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.AddSigningKey(Microsoft.IdentityModel.Tokens.SigningCredentials,System.String,SimpleIdServer.IdServer.Domains.SecurityKeyTypes)">
+            <summary>
+            Add signing key used to check the 'request' parameter.
+            </summary>
+            <param name="signingCredentials"></param>
+            <param name="alg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetRequestObjectSigning(System.String)">
+            <summary>
+            Set the algorithm used to sign the request object.
+            </summary>
+            <param name="alg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetRequestObjectEncryption(System.String,System.String)">
+            <summary>
+            Configure the algorithm to encrypt the request object.
+            </summary>
+            <param name="alg"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetSubjectType(System.String)">
+            <summary>
+            Set the subject_type.
+            </summary>
+            <param name="subjectType"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetPairwiseSubjectType(System.String)">
+            <summary>
+            Use pairwise subject_type.
+            </summary>
+            <param name="salt">Salt used to generate the pairwise subject.</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetUserInfoSignedResponseAlg(System.String)">
+            <summary>
+            Set the algorithm to sign the userinfo response.
+            </summary>
+            <param name="signingAlg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetUserInfoEncryption(System.String,System.String)">
+            <summary>
+            Set the algorithm to encrypt the userinfo response.
+            </summary>
+            <param name="alg"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.UsePingDeliveryMode(System.Int32)">
+            <summary>
+            Use ping delivery mode.
+            https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#rfc.section.10.2
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.UsePollDeliveryMode(System.Int32)">
+            <summary>
+            Use poll delivery mode
+            https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#rfc.section.5
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.UsePushDeliveryMode">
+            <summary>
+            Use push delivery mode.
+            https://openid.net/specs/openid-client-initiated-backchannel-authentication-core-1_0.html#rfc.section.10.3
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetBCAuthenticationRequestSigningAlg(System.String)">
+            <summary>
+            Set the algorithm used to sign the request object in /bc-authorize.
+            </summary>
+            <param name="alg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.DisableBCUserCode">
+            <summary>
+            A secret code is not required to authenticate the end-user.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetSigAuthorizationResponse(System.String)">
+            <summary>
+            Set authorization_signed_response_alg.
+            </summary>
+            <param name="sigAlg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetEncAuthorizationResponse(System.String,System.String)">
+            <summary>
+            Set authorization_encrypted_response_alg and authorization_encrypted_response_enc.
+            </summary>
+            <param name="alg"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.UseClientTlsAuthentication(System.String,System.String,System.String,System.String)">
+            <summary>
+            Use 'tls_client_auth' as authentication method.
+            For more information : https://oauth.net/2/mtls/
+            </summary>
+            <param name="subjectDn">Expected subject distinguished name of the certificate.</param>
+            <param name="sanDns">Expected dNSName SAN entry in the certificate.</param>
+            <param name="sanEmail">Expected rfc822Name SAN entry in the certificate.</param>
+            <param name="sanIp">A string representation of an IP address in either dotted decimal notation (IPV4) or colon-delimited hexadecimal (IPV6) that is expected to be present as an iPAddress SAN entry in the certificate</param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.UseClientPrivateKeyJwtAuthentication">
+            <summary>
+            Use 'private_key_jwt' as authentication method.
+            For more information : https://oauth.net/private-key-jwt/
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.UseClientPkceAuthentication">
+            <summary>
+            PKCE is an extension to the Authorization Code flow to prevent CSRF and 
+            For more information: https://oauth.net/2/pkce/
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.UseClientSecretPostAuthentication">
+            <summary>
+            Use client_secret_post authentication
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.UseDPOPProof(System.Boolean)">
+            <summary>
+            DPOP Proof is required
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetAccessTokenType(SimpleIdServer.IdServer.Domains.AccessTokenTypes)">
+            <summary>
+            Set the access token type.
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetSectorIdentifierUri(System.String)">
+            <summary>
+            Set the sector_identifier_uri.
+            </summary>
+            <param name="uri"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetDefaultMaxAge(System.Int32)">
+            <summary>
+            Set the default Maximum Authentication Age.
+            Specifies that the End-User MUST be actively authenticated if the End-User was authenticated longer ago than the specified number of seconds.
+            </summary>
+            <param name="defaultMaxAge"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.ResourceParameterIsRequired">
+            <summary>
+            resource parameter must be required
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetClientName(System.String,System.String)">
+            <summary>
+            Set client name.
+            </summary>
+            <param name="clientName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.SetClientLogoUri(System.String,System.String)">
+            <summary>
+            Set the logo uri.
+            </summary>
+            <param name="logoUri"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.TraditionalWebsiteClientBuilder.DisableConsent">
+            <summary>
+            Disable OPENID consent.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.UserAgentClientBuilder.UseImplicitFlow">
+            <summary>
+            Use implicit flow.
+            Return id_token and token.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.UserAgentClientBuilder.SetClientName(System.String,System.String)">
+            <summary>
+            Set client name.
+            </summary>
+            <param name="clientName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.UserAgentClientBuilder.SetSigAuthorizationResponse(System.String)">
+            <summary>
+            Set authorization_signed_response_alg.
+            </summary>
+            <param name="sigAlg"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.UserAgentClientBuilder.SetEncAuthorizationResponse(System.String,System.String)">
+            <summary>
+            Set authorization_encrypted_response_alg and authorization_encrypted_response_enc.
+            </summary>
+            <param name="alg"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.Builders.WalletClientBuilder.RequireTransactionCode">
+            <summary>
+            Boolean value specifying whether the Credential Issuer expects presentation of a transaction code along with the Token Request in a Pre-Authorized Code Flow. 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.ClaimsEnricher.HttpClaimsExtractor">
+            <summary>
+            https://openid.net/specs/openid-connect-core-1_0.html#AggregatedDistributedClaims
+            </summary>
+        </member>
+        <member name="M:SimpleIdServer.IdServer.ClientKeyGenerator.GenerateRSAEncryptionKey(System.String,System.String,System.String)">
+            <summary>
+            Generate encryption key used to generate encrypted 'id_token'.
+            </summary>
+            <param name="keyId"></param>
+            <param name="alg"></param>
+            <param name="enc"></param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:SimpleIdServer.IdServer.ClientKeyGenerator.GenerateRSASignatureKey(System.String,System.String)" -->
+        <member name="T:SimpleIdServer.IdServer.ConfirmationClaimTypes">
+            <summary>
+            Confirmation Claim ("cnf") related constants
+            https://datatracker.ietf.org/doc/html/rfc7800
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.ConfirmationClaimTypes.Cnf">
+            <summary>
+            https://datatracker.ietf.org/doc/html/rfc7800#section-6.1.1
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.ConfirmationClaimTypes.Jwk">
+            <summary>
+            https://datatracker.ietf.org/doc/html/rfc7800#section-6.2.2
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.ConfirmationClaimTypes.Jwe">
+            <summary>
+            https://datatracker.ietf.org/doc/html/rfc7800#section-6.2.2
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.ConfirmationClaimTypes.Jku">
+            <summary>
+            https://datatracker.ietf.org/doc/html/rfc7800#section-6.2.2
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.ConfirmationClaimTypes.Kid">
+            <summary>
+            https://datatracker.ietf.org/doc/html/rfc7800#section-6.2.2        
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.Constants.AlgDir">
+            <summary>
+            Direct use of a shared symmetric key as the CEK.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationRequestParameters.ClientNotificationToken">
+            <summary>
+            REQUIRED if the Client is registered to use Ping or Push modes. 
+            It is a bearer token provided by the Client that will be used by the OpenID Provider to authenticate the callback request to the Client.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationRequestParameters.BindingMessage">
+            <summary>
+            OPTIONAL. A human readable identifier or message intended to be displayed on both the consumption device and the authentication device to interlock them together for the transaction by way of a visual cue for the end-user.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationRequestParameters.UserCode">
+            <summary>
+            A secret code, such as password or pin, known only to the user but verifiable by the OP.
+            This parameter should only be present if client registration parameter backchannel_user_code_parameter indicates support for user code.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationRequestParameters.RequestedExpiry">
+            <summary>
+            A positive integer allowing the client to request the expires_in value for the auth_req_id the server will return.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationRequestParameters.LoginHintToken">
+            <summary>
+            A token containing information identifying the end-user for whom authentication is being requested. 
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationRequestParameters.Request">
+            <summary>
+            Signed authentication request.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationRequestParameters.PermissionIds">
+            <summary>
+            Permission identifiers.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationResponseParameters.AuthReqId">
+            <summary>
+            This is a unique identifier to identify the authentication request made by the Client.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationResponseParameters.ExpiresIn">
+            <summary>
+            A JSON number with a positive integer value indicating the expiration time of the "auth_req_id" in seconds since the authentication request was received. 
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.BCAuthenticationResponseParameters.Interval">
+            <summary>
+            A JSON number with a positive integer value indicating the minimum amount of time in seconds that the Client MUST wait between polling requests to the token endpoint.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.DeviceAuthorizationNames.DeviceCode">
+            <summary>
+            Device verification code.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.DeviceAuthorizationNames.UserCode">
+            <summary>
+            End-user verification code.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.DeviceAuthorizationNames.VerificationUri">
+            <summary>
+            The end-user verification URI on the authorization server.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.DeviceAuthorizationNames.VerificationUriComplete">
+            <summary>
+            A verification URI that includes the "user_code".
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.DeviceAuthorizationNames.ExpiresIn">
+            <summary>
+            The lifetime in seconds of the "device_code" and "user_code".
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.DeviceAuthorizationNames.Interval">
+            <summary>
+            The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.
+            </summary>
+        </member>
+        <member name="F:SimpleIdServer.IdServer.DTOs.OAuthConfigurationNames.TlsClientCertificateBoundAccessTokens">
+            <summary>
+            Boolean value indicating server support for mutual-TLS client certificate-bound access tokens.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.PresentationDefinition.Id">
+            <summary>
+            MUST contain an ID property.
+            The value of this property MUST be a string.
+            The string SHOIOULD provide a unique ID for the desired context.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.PresentationDefinition.InputDescriptors">
+            <summary>
+            MUST contain an input_descriptors property.
+            Its value must be an array of Input Descriptor Objects.
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.DTOs.InputDescriptor">
+            <summary>
+            Object used to describe the information a Verifier requires of a Holder.
+            All Input Descriptors MUST be satisfied.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.InputDescriptor.Name">
+            <summary>
+            MAY contain a name property.
+            SHOULD be a human-friendly string intended to constitute a distinctive designation of the Presentation Definition.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.InputDescriptor.Purpose">
+            <summary>
+            MAY contain a purpose property.
+            If present, its value MUST be a string that describes the purpose for which the Presentation Definition's inputs are being used for.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.InputDescriptor.Format">
+            <summary>
+            MAY inbclude a format property.
+            Value MUST be an object with one or more properties matching the registered Claim Format Desigations.
+            The properties inform the Holder of the Claim format configurations that Verifier can process.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.InputDescriptor.Constraints">
+            <summary>
+            MUST be an object composed of at least one of the following properties : fields or limit_disclosure.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.Constraints.Fields">
+            <summary>
+            SHALL be processed forward from 0-index.
+            MUST be an array of objects.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.Constraints.LimitDisclosure">
+            <summary>
+            MAY contain a limit_disclosure property.
+            MUST be required or preferred.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.ConstraintsFields.Path">
+            <summary>
+            MUST contain a path property.
+            Array of one or more JSONPath string expressions that select a target value from the input.
+            Array must be evaluated from 0-index forward.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.ConstraintsFields.Id">
+            <summary>
+            MAY contain an id property.
+            MUST be a string that is unique from every other field object's id property.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.ConstraintsFields.Purpose">
+            <summary>
+            MAY contain a purpose property.
+            MUST be a string that describes the purpose for which the field is being requested.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.ConstraintsFields.Name">
+            <summary>
+            MAY contain a name property.
+            MUST be a string, and SHOULD be a human-friendly name that describes what the target field represents.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.ConstraintsFields.Filter">
+            <summary>
+            MAY contain a filter property.
+            UST be a JSON Schema descriptor used to filter against the values returned from evaluation of the JSONPath string expressions in the path array.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.DTOs.ConstraintsFields.Optional">
+            <summary>
+            MAY contain an optional property.
+            MUST be a boolean, wherein true indicates the field is optional, and false or non-presence of the property indicates the field is required.
+             Even when the optional property is present, the value located at the indicated path of the field MUST validate against the JSON Schema filter, if a filter is present.
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.DTOs.U2FConfigurationResultNames">
+            <summary>
+            FIDO U2F metadata configuration.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.Authority">
+            <summary>
+            Base URL of the identity server.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultScopes">
+            <summary>
+            OAUTH2.0 client's default scopes.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.ClientSecretExpirationInSeconds">
+            <summary>
+            Client secret expiration time in seconds.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.AuthorizationCodeExpirationInSeconds">
+            <summary>
+            Authorization code expiration time in seconds.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.CredOfferExpirationInSeconds">
+            <summary>
+            Pre Authorization code expiration time in seconds.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DeviceCodeExpirationInSeconds">
+            <summary>
+            Device code expiration time in seconds.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DeviceCodeInterval">
+            <summary>
+            The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.AuthorizationCodeIssuerStateExpirationInSeconds">
+            <summary>
+            Expiration time of the issuer state.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.SoftwareStatementTrustedParties">
+            <summary>
+            Trusted parties used to validate the software statement.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.MtlsEnabled">
+            <summary>
+            Mututal TLS is enabled.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultTokenExpirationTimeInSeconds">
+            <summary>
+            Default Token Expiration Time in seconds.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultRefreshTokenExpirationTimeInSeconds">
+            <summary>
+            Default Refresh Token Expiration Time in seconds.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.OTPIssuer">
+            <summary>
+            Default OTP issuer.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.IsScopeClaimConcatenationEnabled">
+            <summary>
+            If true then "scope" claim is expressed as a list of space-delimited case sensistive strings"
+            If false then "scope" claim is expressed as an array of string.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultTokenEndPointAuthMethod">
+            <summary>
+            Default authentication method used by the client.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultTokenSignedResponseAlg">
+            <summary>
+            Default token signed response algorithm.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultTokenProfile">
+            <summary>
+            OAUTH2.0 client's default token profile.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultTokenEncrypteAlg">
+            <summary>
+            Default encryption alg (JWE).
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultTokenEncryptedEnc">
+            <summary>
+            Default encryption enc (JWE).
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultSubjectType">
+            <summary>
+            Default subject type.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultCodeChallengeMethod">
+            <summary>
+            Default code challenge method.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultMaxAge">
+            <summary>
+            Default max_age.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.Parameters">
+            <summary>
+            Customizable parameters.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.SupportedUICultures">
+            <summary>
+            UI cultures.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultCulture">
+            <summary>
+            Default culture.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultAcrValue">
+            <summary>
+            Default acr value.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.UseRealm">
+            <summary>
+            Enable or disable realm.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.MaxRequestLifetime">
+            <summary>
+            Set the maximum lifetime of an authorization request.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.IsBCEnabled">
+            <summary>
+            Enable or disable Back Channel Authentication.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.MaxBindingMessageSize">
+            <summary>
+            Maximum number of characters for the "binding_message".
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.SessionCookieName">
+            <summary>
+            NAME of the cookie used to store the session id.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.RegistrationCookieName">
+            <summary>
+            NAME of the cookie used to store the state of the registration.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.CacheExternalAuthProvidersInSeconds">
+            <summary>
+            Number of seconds the external authentication providers will be stored.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.GrantManagementActionRequired">
+            <summary>
+             If true, all authorization requests must specify a grant_management_action.
+             Default value is false.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DefaultClaimTokenFormat">
+            <summary>
+            Get the default token claim format.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.ValidityPeriodPermissionTicketInSeconds">
+            <summary>
+            Validity of permission ticket in seconds.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.RequestSubmittedInterval">
+            <summary>
+            The minimum amount of time in seconds that the client SHOULD wait between polling requests to the token endpoint. 
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.IsUMAEnabled">
+            <summary>
+            Enable or disable UMA.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.IsEmailUsedDuringAuthentication">
+            <summary>
+            Use the email during the authentication.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.RequiredPushedAuthorizationRequest">
+            <summary>
+            Indicating whether the authorization server accepts authorization request data only via PAR.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.PARExpirationTimeInSeconds">
+            <summary>
+            Expiration time of a PAR.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.ExtractRepresentationsFolder">
+            <summary>
+            Destination folder where representations will be extracted.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.WalletAuthorizationServer">
+            <summary>
+            If the Credential Issuer is not the same than Authorization Server, then the authorization server must be specified.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.SendCredentialOfferByReference">
+            <summary>
+            Send credential offer by reference using credential_offer_uri parameter.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.DPoPLifetimeSeconds">
+            <summary>
+            Lifetime of a DPoP in seconds.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.IdServerHostOptions.EndSessionRedirectionTimeInMS">
+            <summary>
+            Defint the time in MS to end the user's session.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.SoftwareStatementTrustedParty.Iss">
+            <summary>
+            Get the issuer.
+            </summary>
+        </member>
+        <member name="P:SimpleIdServer.IdServer.Options.SoftwareStatementTrustedParty.JwksUrl">
+            <summary>
+            Get the JWKS url.
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.SubjectTypeBuilders.PairWiseSubjectTypeBuidler">
+            <summary>
+            RFC : https://openid.net/specs/openid-connect-core-1_0.html#PairwiseAlg
+            </summary>
+        </member>
+        <member name="T:SimpleIdServer.IdServer.UI.IOTPRegisterOptions">
+            <summary>
+            OTP Values are used for password reset or during registration.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.IdServerBuilder.AddBackChannelAuthentication(System.Action{Hangfire.IGlobalConfiguration})">
+            <summary>
+            Add back channel authentication (CIBA).
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.IdServerBuilder.UseRealm">
+            <summary>
+            IdentityServer can be hosted in several Realm.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.IdServerBuilder.PARIsRequired">
+            <summary>
+            Authorization server accepts authorization request data only via PAR.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.IdServerBuilder.UseInMemoryMassTransit">
+            <summary>
+            Use in memory implementation of mass transit.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.Extensions.DependencyInjection.IdServerBuilder.UseMassTransit(System.Action{MassTransit.IBusRegistrationConfigurator})">
+            <summary>
+            Configure and use mass transit.
+            </summary>
+            <param name="massTransitOptions"></param>
+            <returns></returns>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Microsoft.Extensions.DependencyInjection.ServiceCollectionExtensions.AddSIDIdentityServer(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{SimpleIdServer.IdServer.Options.IdServerHostOptions},System.Action{Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions},System.Action{Microsoft.AspNetCore.DataProtection.IDataProtectionBuilder})" -->
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetWalletIssuer(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            OPTIONAL : STRING containing the wallet's OPENID CONNER ISSUER URL.
+            The Credential Issuer will use the discovery process as defined in [SIOPv2] to determine the Wallet's capabilities and endpoints. 
+            RECOMMENDED in Dynamic Credential Request.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetUserHint(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+             OPTIONAL. JSON String containing an opaque user hint the Wallet MAY use in subsequent callbacks to optimize the user's experience. 
+             RECOMMENDED in Dynamic Credential Request.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetIssuerState(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            OPTIONAL. String value identifying a certain processing context at the Credential Issuer.
+            A value for this parameter is typically passed in a Credential Offer from the Credential Issuer to the Wallet.
+            This request parameter is used to pass the issuer_state value back to the Credential Issuer.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetPresentationDefinition(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            CONDITIONAL : String containing a presentation definition JSON object.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetResourcesFromAuthorizationRequest(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            Indicates the target service or resource to which access is being requested. 
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetLoginHintFromAuthorizationRequest(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            Hint to the OpenId Provider regarding the end-user for whom authentication is beging requested.
+            The value may contain an email address, phone number, account number, subject identifier etc...
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetDPOPJktFromAuthorizationRequest(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            This parameter can be used to bind the issued authorization code to a specific key.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetIdTokenHintFromAuthorizationRequest(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            An ID token previously issued to the client by the OpenId provider being passed back as a hint to identify the end-user for whom authentication is being requested.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetGrantIdFromAuthorizationRequest(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            String value identifying an individual grant managed by a particular authorization server for a certain client and a certain resource owner. 
+            he grant_id value must have been issued by the respective authorization server and the respective client must be authorized to use the particular grant id.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetGrantManagementActionFromAuthorizationRequest(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            String value controlling the way the authorization server shall handle the grant when processing an authorization request.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetSubjectToken(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            A security token that represents the identify of the party on behalf of whom the request is being made.
+            Typically, the subject of this token will be the subject of the security token issued in the response to this request.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetSubjectTokenType(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            An identifier, that indicates the type of the security token in the subject_token parameter.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetRequestedTokenType(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            An identifier, for the type of the requested security token.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetActorToken(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            A security token that represents the identity of the acting party.
+            It will be the party that is authorized to use the requested security token and act on behalf of the subject.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetActorTokenType(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            An identifier, that indicates the type of the security token in the actor_token parameter.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetResources(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            URI that indicates that target service or resource where the client intends to use the requested security token.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetAudiences(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            Logical name of the target service where the client intends to use the requested security token.
+            Client identifier is example of thing that might be used as audience parameter.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetLoginHintToken(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            A token containing information identifying the end-user for whom authentication is begin requested.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetClientNotificationToken(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            If the client is registered to use Ping or Push modes.
+            If is a bearer token provided by the client that will be used by the OpenID Provider to authenticate the callback request to the client.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetBindingMessage(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            A human readable-identifier or message intended to be displayed on both the consumption device and the authentication device to interlock them together for the transaction by way of a visual cue for the end-user.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+        <member name="M:System.Text.Json.Nodes.JsonObjectExtensions.GetRequestedExpiry(System.Text.Json.Nodes.JsonObject)">
+            <summary>
+            A positive integer allowing the client to request the expires_in value for the auth_req_id the server will return.
+            </summary>
+            <param name="jObj"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
