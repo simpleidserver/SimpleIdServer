@@ -9,34 +9,35 @@
 	  <PackageReference Include="SidFormBuilder.PostgreMigrations" Version="7.0.*-*" />
 	  <PackageReference Include="SidFormBuilder.SqliteMigrations" Version="7.0.*-*" />
 	  <PackageReference Include="SidFormBuilder.SqlServerMigrations" Version="7.0.*-*" />
-	  <ProjectReference Include="SidFormBuilder.Tailwindcss" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.Did.Key" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.Configuration.Redis" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.Configuration" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Email" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Federation" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Fido" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Migrations.Duende"  Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Migrations.Openiddict" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.MySQLMigrations" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Notification.Fcm" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Notification.Gotify" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.OpenTelemetry" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Otp" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.PostgreMigrations" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Provisioning.LDAP" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Provisioning.SCIM" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Pwd" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Saml.Idp" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Sms" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.SqliteMigrations" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.SqlServerMigrations" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Store.EF" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.Swagger" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.VerifiablePresentation" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer.WsFederation" Version="7.0.*-*" />
-	  <ProjectReference Include="SimpleIdServer.IdServer" Version="7.0.*-*" />
+      <PackageReference Include="SidFormBuilder.Tailwindcss" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.Did.Key" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.Configuration.Redis" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.Configuration" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Email" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Federation" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Fido" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Migrations.Duende"  Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Migrations.Openiddict" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.MySQLMigrations" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Notification.Fcm" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Notification.Gotify" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.OpenTelemetry" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Otp" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.PostgreMigrations" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Provisioning.LDAP" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Provisioning.SCIM" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Pwd" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Saml.Idp" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Sms" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.SqliteMigrations" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.SqlServerMigrations" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Store.EF" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.Swagger" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.VerifiablePresentation" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer.WsFederation" Version="7.0.*-*" />
+      <PackageReference Include="SimpleIdServer.IdServer" Version="7.0.*-*" />
 	</ItemGroup>
+	<ItemGroup>
 	<ItemGroup>
 	  <PackageReference Include="Hangfire.SqlServer" Version="1.8.18" />
 	  <PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />
