@@ -1,0 +1,121 @@
+{
+  "author": "SimpleIdServer",
+  "classifications": [
+    "OpenId",
+    "Oauth",
+	"Uma",
+	"Ciba"
+  ],
+  "name": "Identity Server",
+  "identity": "SimpleIdServer.IdServer.Template.Startup",
+  "groupIdentity": "SimpleIdServer.IdServer.Template.Startup",
+  "shortName": "idservertemplate",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "symbols": {
+	  "messageBrokerConnectionString": {
+		"type": "parameter",
+		"defaultValue": "Data Source=.;Initial Catalog=MessageBroker;Integrated Security=True;TrustServerCertificate=True",
+		"replaces": "MESSAGEBROKER-CONNECTIONSTRING",
+		"isRequired": false,
+		"description": "Connection string for the message broker."
+	  },
+	  "messageBrokerTransport": {
+		"type": "parameter",
+		"defaultValue": "INMEMORY",
+		"replaces": "MESSAGEBROKER-TRANSPORT",
+		"isRequired": false,
+		"description": "Message broker transport",
+		"choices": [
+			{
+			  "choice": "INMEMORY",
+			  "description": "INMEMORY"
+			},
+			{
+			  "choice": "SQLSERVER",
+			  "description": "SQLSERVER"
+			}
+		]
+	  },
+	  "storageConnectionString": {
+		  "type": "parameter",
+		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "STORAGE-CONNECTIONSTRING",
+		  "isRequired": false,
+		  "description": "Connection string for the storage."
+	  },
+	  "distributedCacheConnectionString": {
+		  "type": "parameter",
+		  "defaultValue": "Data Source=.;Initial Catalog=IdServer;Integrated Security=True;TrustServerCertificate=True",
+		  "replaces": "DISTRIBUTEDCACHE-CONNECTIONSTRING",
+		  "isRequired": false,
+		  "description": "Connection string for the distributed cache."
+	  },
+	  "storageType": {
+		  "type": "parameter",
+		  "defaultValue": "INMEMORY",
+		  "replaces": "STORAGE-TYPE",
+		  "isRequired": false,
+		  "description": "Type of storage",
+		  "choices": [
+			  {
+				"choice": "INMEMORY",
+				"description": "INMEMORY"
+			  },
+			  {
+				"choice": "SQLSERVER",
+				"description": "SQLSERVER"
+			  },
+			  {
+				"choice": "POSTGRE",
+				"description": "POSTGRE"
+			  },
+			  {
+				"choice": "MYSQL",
+				"description": "MYSQL"
+			  }
+		  ]
+	  },
+	  "distributedCacheType": {
+		  "type": "parameter",
+		  "defaultValue": "INMEMORY",
+		  "replaces": "DISTRIBUTEDCACHE-TYPE",
+		  "isRequired": false,
+		  "description": "Type of distributed cache",
+		  "choices": [
+			  {
+				"choice": "INMEMORY",
+				"description": "INMEMORY"
+			  },
+			  {
+				"choice": "SQLSERVER",
+				"description": "SQLSERVER"
+			  },
+			  {
+				"choice": "REDIS",
+				"description": "REDIS"
+			  },
+			  {
+				"choice": "POSTGRE",
+				"description": "POSTGRE"
+			  },
+			  {
+				"choice": "MYSQL",
+				"description": "MYSQL"
+			  }
+		  ]
+	  },
+	  "redisInstanceName": {
+		  "type": "parameter",
+		  "defaultValue": "SampleInstance",
+		  "replaces": "REDIS-INSTANCENAME",
+		  "isRequired": false,
+		  "description": "Instance name of REDIS."
+	  }
+  },
+  "sourceName": "SimpleIdServer.IdServer.Template.Startup",
+  "preferNameDirectory": "true",
+  "primaryOutputs": [ { "path": "SimpleIdServer.IdServer.Template.Startup.csproj" } ]
+}

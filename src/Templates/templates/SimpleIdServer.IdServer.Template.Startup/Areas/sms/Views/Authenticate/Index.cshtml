@@ -1,0 +1,43 @@
+﻿@using SimpleIdServer.IdServer.Sms
+@using SimpleIdServer.IdServer.Sms.UI.ViewModels
+@using SimpleIdServer.IdServer.Template.Startup.Resources
+@using SimpleIdServer.IdServer.Template.Startup.ViewModels
+@using SimpleIdServer.IdServer.UI.ViewModels
+@using System.Text.Json
+@model SidWorkflowViewModel
+
+@{
+    var inputModel = JsonSerializer.Deserialize<AuthenticateSmsViewModel>(Model.Input);
+}
+
+@section CardTop {
+    @if (inputModel.LogoUri != null)
+    {
+        <div class="text-center mb-4">
+            <img src="@inputModel.LogoUri" alt="@inputModel.ClientName" class="img-fluid" style="max-height: 80px;" />
+        </div>
+    }
+
+    <h4 class="card-title text-center mb-4">@AuthenticateSmsResource.title</h4>
+}
+
+<partial name="_OtpAuthenticate" model="@(new OtpAuthenticatePartialViewModel
+{
+    Workflow = Model,
+    Input = inputModel,
+    Area = "sms",
+    AuthFormEltId = StandardSmsAuthForms.smsAuthForm,
+    SendCodeEltId = StandardSmsAuthForms.smsSendConfirmationCode,
+    Title = AuthenticateSmsResource.title,
+    LoginLabel = AuthenticateSmsResource.phonenumber,
+    LoginPlaceholder = AuthenticateSmsResource.phonenumber,
+    LoginInputType = "tel",
+    ConfirmationCodeLabel = AuthenticateSmsResource.confirmationcode,
+    ConfirmationCodePlaceholder = AuthenticateSmsResource.confirmationcode,
+    RememberLoginLabel = AuthenticateSmsResource.remember_login,
+    AuthenticateButtonLabel = AuthenticateSmsResource.authenticate,
+    SendCodeButtonLabel = AuthenticateSmsResource.sendconfirmationcode,
+    CodeValidityFormat = AuthenticateSmsResource.code_validity,
+    TosLabel = AuthenticateSmsResource.tos,
+    PolicyLabel = AuthenticateSmsResource.policy
+})" />

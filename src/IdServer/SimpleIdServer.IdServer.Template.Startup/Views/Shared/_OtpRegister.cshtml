@@ -1,0 +1,80 @@
+@using SimpleIdServer.IdServer.Template.Startup.ViewModels
+@using SimpleIdServer.IdServer.UI.ViewModels
+@model OtpRegisterPartialViewModel
+
+@{
+    var inputModel = Model.Input;
+}
+
+<partial name="_WorkflowAuthAsyncError" />
+
+<!-- Send confirmation code -->
+<form method="post" asp-area="@Model.Area" asp-controller="Register" asp-action="Index">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.ReturnUrl)" value="@inputModel.ReturnUrl" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.Realm)" value="@Model.Workflow.Realm" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.WorkflowId)" value="@Model.Workflow.Workflow.Id" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.StepId)" value="@Model.Workflow.CurrentStepId" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.CurrentLink)" value="@Model.Workflow.Workflow.Links.Single(l => l.Source.EltId == Model.SendConfirmationCodeFormId).Id" />
+
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.Action)" value="SENDCONFIRMATIONCODE" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.CaptchaType)" value="@inputModel.CaptchaType" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.CaptchaValue)" value="@inputModel.CaptchaValue" />
+
+    <div class="mb-3">
+        <label class="form-label">@Model.ValueLabel</label>
+        @if (!string.IsNullOrWhiteSpace(inputModel.Value) && (User.Identity.IsAuthenticated || inputModel.IsVerified))
+        {
+            <input name="@nameof(OTPRegisterViewModel.Value)" type="@Model.ValueInputType" class="form-control" value="@inputModel.Value" disabled="disabled" />
+            <input name="@nameof(OTPRegisterViewModel.Value)" type="hidden" value="@inputModel.Value" />
+        }
+        else
+        {
+            <input name="@nameof(OTPRegisterViewModel.Value)" type="@Model.ValueInputType" class="form-control" placeholder="@Model.ValuePlaceholder" value="@inputModel.Value" required autofocus />
+        }
+    </div>
+
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-outline-secondary">@Model.SendCodeButtonLabel</button>
+    </div>
+</form>
+
+<hr class="my-4" />
+
+<!-- Register -->
+<form method="post" asp-area="@Model.Area" asp-controller="Register" asp-action="Index">
+    @Html.AntiForgeryToken()
+
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.ReturnUrl)" value="@inputModel.ReturnUrl" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.Realm)" value="@Model.Workflow.Realm" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.WorkflowId)" value="@Model.Workflow.Workflow.Id" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.StepId)" value="@Model.Workflow.CurrentStepId" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.CurrentLink)" value="@Model.Workflow.Workflow.Links.Single(l => l.Source.EltId == Model.RegisterFormId).Id" />
+
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.Action)" value="REGISTER" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.CaptchaType)" value="@inputModel.CaptchaType" />
+    <input type="hidden" name="@nameof(OTPRegisterViewModel.CaptchaValue)" value="@inputModel.CaptchaValue" />
+
+    <div class="mb-3">
+        <label class="form-label">@Model.ValueLabel</label>
+        @if (!string.IsNullOrWhiteSpace(inputModel.Value) && (User.Identity.IsAuthenticated || inputModel.IsVerified))
+        {
+            <input name="@nameof(OTPRegisterViewModel.Value)" type="@Model.ValueInputType" class="form-control" value="@inputModel.Value" disabled="disabled" />
+            <input name="@nameof(OTPRegisterViewModel.Value)" type="hidden" value="@inputModel.Value" />
+        }
+        else
+        {
+            <input name="@nameof(OTPRegisterViewModel.Value)" type="@Model.ValueInputType" class="form-control" placeholder="@Model.ValuePlaceholder" value="@inputModel.Value" required />
+        }
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">@Model.ConfirmationCodeLabel</label>
+        <input name="@nameof(OTPRegisterViewModel.OTPCode)" type="password" class="form-control" placeholder="@Model.ConfirmationCodePlaceholder" required />
+    </div>
+
+    <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary btn-lg">@Model.RegisterButtonLabel</button>
+    </div>
+</form>

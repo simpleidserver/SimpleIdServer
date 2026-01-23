@@ -1,0 +1,42 @@
+﻿@using SimpleIdServer.IdServer.Console
+@using SimpleIdServer.IdServer.Template.Startup.Resources
+@using SimpleIdServer.IdServer.Template.Startup.ViewModels
+@using SimpleIdServer.IdServer.UI.ViewModels
+@using System.Text.Json
+@model SidWorkflowViewModel
+
+@{
+    var inputModel = JsonSerializer.Deserialize<AuthenticateConsoleViewModel>(Model.Input);
+}
+
+@section CardTop {
+    @if (inputModel.LogoUri != null)
+    {
+        <div class="text-center mb-4">
+            <img src="@inputModel.LogoUri" alt="@inputModel.ClientName" class="img-fluid" style="max-height: 80px;" />
+        </div>
+    }
+
+    <h4 class="card-title text-center mb-4">@AuthenticateConsoleResource.title</h4>
+}
+
+<partial name="_OtpAuthenticate" model="@(new OtpAuthenticatePartialViewModel
+{
+    Workflow = Model,
+    Input = inputModel,
+    Area = SimpleIdServer.IdServer.Constants.ConsoleAmr,
+    AuthFormEltId = StandardConsoleAuthForms.consoleAuthForm,
+    SendCodeEltId = StandardConsoleAuthForms.consoleSendConfirmationCode,
+    Title = AuthenticateConsoleResource.title,
+    LoginLabel = AuthenticateConsoleResource.login,
+    LoginPlaceholder = AuthenticateConsoleResource.login,
+    LoginInputType = "text",
+    ConfirmationCodeLabel = AuthenticateConsoleResource.confirmationcode,
+    ConfirmationCodePlaceholder = AuthenticateConsoleResource.confirmationcode,
+    RememberLoginLabel = AuthenticateConsoleResource.remember_login,
+    AuthenticateButtonLabel = AuthenticateConsoleResource.authenticate,
+    SendCodeButtonLabel = AuthenticateConsoleResource.sendconfirmationcode,
+    CodeValidityFormat = AuthenticateConsoleResource.code_validity,
+    TosLabel = "",
+    PolicyLabel = ""
+})" />
