@@ -119,7 +119,7 @@ public class UserRepository : IUserRepository
         var result = await _dbContext.Users
             .Include(u => u.Realms)
             .AsNoTracking()
-            .AnyAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Name.ToLowerInvariant() == sub.ToLowerInvariant(), cancellationToken);
+            .AnyAsync(u => u.Realms.Any(r => r.RealmsName == realm) && u.Name.ToLower() == sub.ToLower(), cancellationToken);
         return result;
     }
 
