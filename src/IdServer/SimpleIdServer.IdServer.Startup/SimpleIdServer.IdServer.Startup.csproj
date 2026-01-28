@@ -54,7 +54,7 @@
 	  <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
 	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
 	  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
-	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
+	  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.2" />
 	  <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="8.0.10" />
 	  <PackageReference Include="Community.Microsoft.Extensions.Caching.PostgreSql" Version="4.0.6" />
 	  <PackageReference Include="NeoSmart.Caching.Sqlite.AspNetCore" Version="8.0.0" />

@@ -1,6 +1,6 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var idserver = builder.AddProject<Projects.SimpleIdServer_IdServer_Template_Startup>("idserver")
+var idserver = builder.AddProject<Projects.SimpleIdServer_IdServer_Startup>("idserver")
 	.WithHttpsEndpoint(5001, name: "idserver-https")
 	.WithHttpEndpoint(5000, name: "idserver-http");
 

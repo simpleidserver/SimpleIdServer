@@ -216,3 +216,4 @@ wwwroot/
 
 docs/_site/
 /src/IdServer/SimpleIdServer.IdServer.MySQLMigrations/Migrations/StoreDbContextModelSnapshot.cs
+*.Development.json
