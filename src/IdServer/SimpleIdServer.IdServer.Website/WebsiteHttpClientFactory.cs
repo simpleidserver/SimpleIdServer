@@ -71,7 +71,7 @@ namespace SimpleIdServer.IdServer.Website
             {
                 if (_idServerWebsiteOptions.IsReamEnabled)
                 {
-                    realm = _realmStore.Realm ?? Constants.DefaultRealm;
+                    realm = !string.IsNullOrWhiteSpace(_realmStore.Realm) ? _realmStore.Realm : Constants.DefaultRealm;
                 }
                 else realm = string.Empty;
             }

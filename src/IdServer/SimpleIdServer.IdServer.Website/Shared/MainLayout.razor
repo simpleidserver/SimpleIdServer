@@ -1,4 +1,5 @@
-﻿@using Microsoft.Extensions.Options
+﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.Extensions.Options
 @using SimpleIdServer.IdServer.Helpers
 @using SimpleIdServer.IdServer.Website.Infrastructures
 @using SimpleIdServer.IdServer.Website.Stores.AcrsStore;
@@ -110,7 +111,10 @@
     string activeRealm;
     string userName { get; set; }
     @inject AuthenticationStateProvider GetAuthenticationStateAsync
+    @inject IOptions<IdServerWebsiteOptions> IdServerWebsiteOptions
+    @inject IHttpContextAccessor HttpContextAccessor
     @inject IRealmStore realmStore
+    @inject IJSRuntime JS
 
     public string CurrentLanguage
     {
@@ -151,6 +155,16 @@
             dispatcher.Dispatch(new GetAllRegistrationWorkflowsAction());
             dispatcher.Dispatch(new GetAllAcrsAction());
             dispatcher.Dispatch(new GetAllConfigurationDefinitionsAction());
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (string.IsNullOrEmpty(realmStore.Realm))
+        {
+            var realm = await JS.InvokeAsync<string>("blazorGetCookie", CookieRealmStore.DefaultRealmCookieName);
+            realmStore.Realm = realm;
         }
     }
 }
