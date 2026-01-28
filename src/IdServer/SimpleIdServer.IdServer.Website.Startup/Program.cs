@@ -57,6 +57,9 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error");
 }
 
+app.UsePathBase("/sso/idserverui/");
+app.UseStaticFiles();
+app.UseRouting();
 app.UseIdserverAdmin();
 app.UseHttpsRedirection();
 app.UseAntiforgery();
