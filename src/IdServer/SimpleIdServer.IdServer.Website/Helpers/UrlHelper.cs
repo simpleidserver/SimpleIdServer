@@ -9,7 +9,7 @@ namespace SimpleIdServer.IdServer.Website.Helpers;
 
 public interface IUrlHelper
 {
-    string GetUrl(string url);
+    string GetUrl(string url, bool includeRealm = true);
 }
 
 public class UrlHelper : IUrlHelper
@@ -28,14 +28,14 @@ public class UrlHelper : IUrlHelper
         _httpContextAccessor = httpContextAccessor;
     }
 
-    public string GetUrl(string url)
+    public string GetUrl(string url, bool includeRealm = true)
     {
         var pathBase = _httpContextAccessor.HttpContext?.Request.PathBase.Value?.TrimEnd('/') ?? string.Empty;        
-        if (!_options.IsReamEnabled)
+        if (!_options.IsReamEnabled || !includeRealm)
         {
             return string.IsNullOrEmpty(pathBase) ? url : $"{pathBase}{url}";
         }
-        
+
         var realmPath = string.IsNullOrWhiteSpace(_realmStore.Realm) ? string.Empty : $"/{_realmStore.Realm}";
         return $"{pathBase}{realmPath}{url}";
     }

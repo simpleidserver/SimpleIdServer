@@ -900,7 +900,8 @@ namespace SimpleIdServer.OpenIdConnect
                 WriteNonceCookie(message.Nonce);
             }
 
-            Options.CorrelationCookie.Path = Options.IsRealmEnabled ? $"/{_realmStore.Realm}{Options.CallbackPath}" : Options.CallbackPath;
+            var pathBase = Context.Request.PathBase.Value?.TrimEnd('/') ?? string.Empty;
+            Options.CorrelationCookie.Path = Options.IsRealmEnabled ? $"{pathBase}/{_realmStore.Realm}{Options.CallbackPath}" : $"{pathBase}{Options.CallbackPath}";
             GenerateCorrelationId(properties);
 
             var redirectContext = new RedirectContext(Context, Scheme, Options, properties)
@@ -972,7 +973,8 @@ namespace SimpleIdServer.OpenIdConnect
                 throw new ArgumentNullException(nameof(nonce));
             }
 
-            Options.NonceCookie.Path = Options.IsRealmEnabled ? $"/{_realmStore.Realm}{Options.CallbackPath}" : Options.CallbackPath;
+            var pathBase = Context.Request.PathBase.Value?.TrimEnd('/') ?? string.Empty;
+            Options.NonceCookie.Path = Options.IsRealmEnabled ? $"{pathBase}/{_realmStore.Realm}{Options.CallbackPath}" : $"{pathBase}{Options.CallbackPath}";
             var cookieOptions = Options.NonceCookie.Build(Context, Clock.UtcNow);
 
             Response.Cookies.Append(

@@ -1,11 +1,14 @@
 ﻿@using System.Web
+@using SimpleIdServer.IdServer.Website.Helpers
 @attribute [AllowAnonymous]
 @inject NavigationManager _navigationManager
 @inject IJSRuntime JSRuntime
+@inject IUrlHelper _urlHelper
 
 @code {
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await JSRuntime.InvokeVoidAsync("navigateToUrl", "/auth?returnUrl=" + HttpUtility.UrlEncode(_navigationManager.Uri));
+        var authUrl = _urlHelper.GetUrl("/auth", includeRealm: false);
+        await JSRuntime.InvokeVoidAsync("navigateToUrl", $"{authUrl}?returnUrl={HttpUtility.UrlEncode(_navigationManager.Uri)}");
     }
 }
