@@ -2,7 +2,7 @@
   "profiles": {
     "SimpleIdServer.IdServer.Startup": {
       "commandName": "Project",
-      "applicationUrl": "http://0.0.0.0:81",
+      "applicationUrl": "https://0.0.0.0:5001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

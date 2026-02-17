@@ -88,7 +88,7 @@ public class ResourceTypesController : Controller
         var resolutionResult = resolutionResults.FirstOrDefault(r => r.ResourceType == schema.ResourceType);
         if (resolutionResult != null)
         {
-            endpoint = $"{_uriProvider.GetRelativePath()}/{resolutionResult.ControllerName}";
+            endpoint = $"/{resolutionResult.ControllerName}";
         }
 
         return new JsonObject
