@@ -30,6 +30,7 @@ if (!app.Environment.IsDevelopment())
 FormBuilder.Startup.Config.DataSeeder.SeedData(app);
 app.Services.SeedData();
 app.UseHttpsRedirection();
+app.UseFormBuilder();
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseStaticFiles();

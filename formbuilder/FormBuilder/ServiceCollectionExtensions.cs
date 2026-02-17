@@ -94,6 +94,8 @@ public static class ServiceCollectionExtensions
 
         services.AddTransient<IUriProvider, UriProvider>();
 
+        services.AddScoped<IHttpRequestState, HttpRequestState>();
+
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkPopupAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkUrlAction>();
         services.AddTransient<IWorkflowLinkAction, WorkflowLinkHttpRequestAction>();

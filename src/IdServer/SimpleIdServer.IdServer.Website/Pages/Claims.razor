@@ -4,9 +4,12 @@
 
 <h3>Claims</h3>
 
-@foreach(var cl in claims)
+@if(claims != null)
 {
-    <h1>@cl.Type @cl.Value</h1>
+    foreach(var cl in claims)
+    {
+        <h1>@cl.Type @cl.Value</h1>
+    }
 }
 
 @code {
@@ -20,6 +23,7 @@
         {
             var authState = GetAuthenticationStateAsync.GetAuthenticationStateAsync().Result;
             claims = authState.User.Claims;
+            this.StateHasChanged();
         }
     }
 }

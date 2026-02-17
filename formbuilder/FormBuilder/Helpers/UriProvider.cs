@@ -18,10 +18,12 @@ public interface IUriProvider
 public class UriProvider : IUriProvider
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpRequestState _httpRequestState;
 
-    public UriProvider(IHttpContextAccessor httpContextAccessor)
+    public UriProvider(IHttpContextAccessor httpContextAccessor, IHttpRequestState httpRequestState)
     {
         _httpContextAccessor = httpContextAccessor;
+        _httpRequestState = httpRequestState;
     }
 
     public string GetCssUrl(string templateId, TemplateStyle style)
@@ -58,20 +60,25 @@ public class UriProvider : IUriProvider
 
     public virtual string GetAbsoluteUriWithVirtualPath()
     {
-        var requestMessage = _httpContextAccessor.HttpContext.Request;
-        var host = requestMessage.Host.Value;
-        var http = "http://";
-        if (requestMessage.IsHttps)
+        if (_httpContextAccessor?.HttpContext != null)
         {
-            http = "https://";
+            var requestMessage = _httpContextAccessor.HttpContext.Request;
+            var host = requestMessage.Host.Value;
+            var http = requestMessage.IsHttps ? "https://" : "http://";
+            var relativePath = requestMessage.PathBase.Value;
+            return http + host + relativePath;
         }
 
-        var relativePath = requestMessage.PathBase.Value;
-        return http + host + relativePath;
+        return _httpRequestState.GetAbsoluteUriWithVirtualPath();
     }
     public string GetRelativePath()
     {
-        var requestMessage = _httpContextAccessor.HttpContext.Request;
-        return requestMessage.PathBase.Value;
+        if (_httpContextAccessor?.HttpContext != null)
+        {
+            var requestMessage = _httpContextAccessor.HttpContext.Request;
+            return requestMessage.PathBase.Value;
+        }
+
+        return _httpRequestState.PathBase ?? string.Empty;
     }
 }

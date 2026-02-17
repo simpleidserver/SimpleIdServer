@@ -1,4 +1,5 @@
-﻿using FormBuilder.Models.Transformer;
+﻿using FormBuilder.Helpers;
+using FormBuilder.Models.Transformer;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json.Nodes;
@@ -14,10 +15,12 @@ public class RelativeUrlTransformerParameters : ITransformerParameters
 public class RelativeUrlTransformer : GenericTransformer<RelativeUrlTransformerParameters>
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IHttpRequestState _httpRequestState;
 
-    public RelativeUrlTransformer(IHttpContextAccessor httpContextAccessor)
+    public RelativeUrlTransformer(IHttpContextAccessor httpContextAccessor, IHttpRequestState httpRequestState)
     {
         _httpContextAccessor = httpContextAccessor;
+        _httpRequestState = httpRequestState;
     }
 
     public override string Type => RelativeUrlTransformerParameters.TYPE;
@@ -31,7 +34,16 @@ public class RelativeUrlTransformer : GenericTransformer<RelativeUrlTransformerP
 
     internal override object InternalTransform(string value, RelativeUrlTransformerParameters parameters, JsonNode data)
     {
-        var request = _httpContextAccessor.HttpContext.Request.GetAbsoluteUriWithVirtualPath();
+        string request;
+        if (_httpContextAccessor?.HttpContext != null)
+        {
+            request = _httpContextAccessor.HttpContext.Request.GetAbsoluteUriWithVirtualPath();
+        }
+        else
+        {
+            request = _httpRequestState.GetAbsoluteUriWithVirtualPath();
+        }
+
         return $"{request}{value}";
     }
 }

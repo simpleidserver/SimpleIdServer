@@ -39,7 +39,23 @@ public class WorkflowLinkHttpRequestService : IWorkflowLinkHttpRequestService
 
         if (Uri.TryCreate(target, UriKind.RelativeOrAbsolute, out var uri))
         {
-            var query = uri.Query;
+            string? query = null;
+            string basePath = target;
+            if (uri.IsAbsoluteUri)
+            {
+                query = uri.Query;
+                basePath = $"{uri.Scheme}://{uri.Authority}{uri.AbsolutePath}";
+            }
+            else
+            {
+                var qIndex = target.IndexOf('?');
+                if (qIndex >= 0)
+                {
+                    query = target.Substring(qIndex);
+                    basePath = target.Substring(0, qIndex);
+                }
+            }
+
             if (!string.IsNullOrEmpty(query))
             {
                 var queryParams = System.Web.HttpUtility.ParseQueryString(query);
@@ -51,9 +67,7 @@ public class WorkflowLinkHttpRequestService : IWorkflowLinkHttpRequestService
                     }
                 }
 
-                target = uri.IsAbsoluteUri
-                    ? $"{uri.Scheme}://{uri.Authority}{uri.AbsolutePath}"
-                    : uri.GetLeftPart(UriPartial.Path);
+                target = basePath;
             }
         }
 

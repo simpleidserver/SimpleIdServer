@@ -38,6 +38,7 @@ public static class WebApplicationExtensions
         }
 
         webApplication.MapBlazorHub();
+        webApplication.UseFormBuilder();
         webApplication.UseSidRequestLocalization();
         webApplication.UseMiddleware<LanguageMiddleware>();
         webApplication.UseCookiePolicy(new CookiePolicyOptions

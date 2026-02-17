@@ -12,6 +12,7 @@ public static class ApplicationBuilderExtensions
     public static IApplicationBuilder UseIdserverAdmin(this WebApplication builder)
     {
         var options = builder.Services.GetRequiredService<IOptions<IdServerWebsiteOptions>>().Value;
+        builder.UseFormBuilder();
         builder.UseStaticFiles();
         builder.UseMiddleware<RealmMiddleware>();
         if (options.ForceHttps)

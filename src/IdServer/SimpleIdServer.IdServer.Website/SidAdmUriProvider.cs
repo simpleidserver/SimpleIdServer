@@ -10,7 +10,7 @@ public class SidAdmUriProvider : UriProvider
 {
     private readonly IdServerWebsiteOptions _options;
 
-    public SidAdmUriProvider(IHttpContextAccessor httpContextAccessor, IOptions<IdServerWebsiteOptions> options) : base(httpContextAccessor)
+    public SidAdmUriProvider(IHttpContextAccessor httpContextAccessor, IHttpRequestState httpRequestState, IOptions<IdServerWebsiteOptions> options) : base(httpContextAccessor, httpRequestState)
     {
         _options = options.Value;
     }
