@@ -16,7 +16,7 @@ public static class LayoutTranslations
     public static List<LabelTranslation> RememberMe = LabelTranslationBuilder.New().AddTranslation("en", "Remember me").AddTranslation("fr", "Se souvenir de moi").Build();
     public static List<LabelTranslation> Authenticate = LabelTranslationBuilder.New().AddTranslation("en", "Authenticate").AddTranslation("fr", "Authentifier").Build();
     public static List<LabelTranslation> Separator = LabelTranslationBuilder.New().AddTranslation("en", "OR").AddTranslation("fr", "OU").Build();
-    public static List<LabelTranslation> ForgetPassword = LabelTranslationBuilder.New().AddTranslation("en", "Forget my password").AddTranslation("fr", "Avez-vous oublié votre mot de passe ?").Build();
+    public static List<LabelTranslation> ForgotPassword = LabelTranslationBuilder.New().AddTranslation("en", "Forgot my password").AddTranslation("fr", "Avez-vous oublié votre mot de passe ?").Build();
     public static List<LabelTranslation> Register = LabelTranslationBuilder.New().AddTranslation("en", "Register").AddTranslation("en", "Update", new UserAuthenticatedParameter()).AddTranslation("fr", "Enregister").AddTranslation("en", "Mettre à jour", new UserAuthenticatedParameter()).Build();
     public static List<LabelTranslation> ResetPassword = LabelTranslationBuilder.New().AddTranslation("en", "Reset your password").AddTranslation("fr", "Réinitialiser le mot de passe").Build();
     public static List<LabelTranslation> SendLink = LabelTranslationBuilder.New().AddTranslation("en", "Send link").AddTranslation("fr", "Envoyer le lien").Build();
