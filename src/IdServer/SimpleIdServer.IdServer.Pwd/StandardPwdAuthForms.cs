@@ -62,7 +62,7 @@ public class StandardPwdAuthForms
                 // Separator
                 StandardFormComponents.NewSeparator(),
                 // Reset the password
-                StandardFormComponents.NewAnchor(pwdForgetBtnId, LayoutTranslations.ForgetPassword),
+                StandardFormComponents.NewAnchor(pwdForgetBtnId, LayoutTranslations.ForgotPassword),
                 // Separator
                 StandardFormComponents.NewSeparator(),
                 // Register                    

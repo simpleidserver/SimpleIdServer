@@ -178,7 +178,7 @@ namespace SimpleIdServer.IdServer.Light.Startup.Resources {
         }
         
         /// <summary>
-        ///   Recherche une chaîne localisée semblable à Forget my password.
+        ///   Recherche une chaîne localisée semblable à Forgot my password.
         /// </summary>
         public static string reset_pwd {
             get {
